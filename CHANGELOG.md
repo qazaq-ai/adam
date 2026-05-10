@@ -21,6 +21,54 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.7.0] — 2026-05-09 — G1.0 — typed slot inventory + email/topics hygiene
+
+**Minor-version release.** Opens the **proof-carrying generation arc** with the foundational milestone. Codex's external review proposed a generation layer where the model "собирает допустимое высказывание из доказанных typed propositions". After agreeing on the framing and noting that Kazakh agglutinative morphology is itself a proof system at the word level, we sequenced this work as **G1 → G2 → G3**:
+
+- **G1.0 (this release)** — typed slot inventory schema + 38 documented slots + coverage invariant. Descriptive at this milestone — the inventory documents the surface; the realiser doesn't yet consult it for variation. **No behavioural change.**
+- **G1.5** — realiser optionally enumerates `VariantStrategy`s per slot and rng-picks one per turn. Adds variation without touching templates.
+- **G2.0** — `ProofObject = { conclusion, support, derivation, hedges }`; chain-query + safety-refusal layers retrofit to produce proof objects; verifier gates the emit.
+- **G3.0** — typed composer over proof objects → answer IR → realiser. Generation as proof-carrying composition.
+
+Per the project's identity, the morphological algebra is itself a proof system at the word level (FST roundtrip 100 %). G1→G3 extends that discipline upward to discourse.
+
+### What changed
+
+**1. Typed slot inventory.** New module [`adam_dialog::slot_inventory`](crates/adam-dialog/src/slot_inventory.rs) defines `SlotKind`, `VariantStrategy`, `Slot`, `SlotInventory`. New on-disk schema [`data/dialog/slot_inventory.toml`](data/dialog/slot_inventory.toml) registers **38 slots** across 14 kinds (PersonName / PlaceName / Profession / Numeric / NounTerm / PredicateTerm / Chain / CuratedFact / SystemSelf / CurriculumTopic / ErrorCode / RustConcept / ConflictValue / Sentinel). Each entry documents:
+- `name` — placeholder key as it appears in templates
+- `kind` — categorical type
+- `description` + `example` — human-readable doc
+- `variants` — list of surface-realisation strategies (Literal / RespectfulAddress / FstLocative / FstGenitive / FstDative / FstAblative)
+- `fst_features` — documented FST feature specs templates may apply
+
+**2. Coverage invariant.** New test [`slot_inventory_coverage`](crates/adam-dialog/tests/slot_inventory_coverage.rs) enforces that every `{slot_name}` placeholder referenced in `data/dialog/templates/v1.toml` is registered in `slot_inventory.toml` (with a small justified-exemption list for FST feature components and known TODOs). Future template additions can no longer introduce anonymous slots — the typed schema must be updated alongside.
+
+**3. Email + GitHub topics hygiene** (Codex follow-up):
+- README commercial-licensing email replaced (`hello@qazaq.ai` was a placeholder) with `baimurza.daulet@gmail.com`
+- GitHub topics extended from 14 → 20 (the platform max) with 6 graph + symbolic-AI tags: `knowledge-graph`, `graph-reasoning`, `forward-chaining`, `typed-fact-graph`, `symbolic-ai`, `explainable-ai`. Surfaces the project to embedding-search and topic-discovery indexers under tags that match the actual architecture.
+
+### Why this is `x.y.0`
+
+Per cadence policy, minor-version is reserved for significant capability changes. v5.7.0 introduces:
+1. New module surface (`adam_dialog::slot_inventory`) — public API
+2. New on-disk schema (`data/dialog/slot_inventory.toml`) — versioned format
+3. New invariant test (coverage gate for future template changes)
+4. **First milestone of a multi-release research arc** (G1 → G2 → G3 proof-carrying generation)
+
+The first three together justify minor-version. Pure-data follow-ups (more slot entries, more variant strategies) ship as `x.y.{1, 5, …}` patches.
+
+### Tests
+
+- 6 new unit tests in [`slot_inventory::tests`](crates/adam-dialog/src/slot_inventory.rs) covering schema validation / duplicate detection / variant enumeration / kind grouping
+- 1 new invariant test (`templates_only_reference_registered_slots_v570`) asserting coverage between templates + inventory
+- All 1 226 prior tests + 7 new = **1 233 passing**
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --workspace --release --tests -- -D warnings` clean; `cargo test --workspace --release` 0 failures.
+
+**Stripe — Deterministic AI research (G1.0 of the proof-carrying generation arc; typed slot inventory shipped; email + GitHub-topics hygiene from Codex follow-up).**
+
 ## [5.6.6] — 2026-05-09 — Codex follow-up review — paraphrase gaps + lesson-context + AskPreviousError
 
 **Patch milestone.** Closes 4 dialog defects Codex surfaced after running the v5.6.5 fixes through additional dialog testing. All four are wider-coverage extensions of v5.6.5 paths plus one new intent surface.

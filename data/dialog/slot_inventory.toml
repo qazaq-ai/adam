@@ -1,0 +1,395 @@
+# Typed slot inventory — v5.7.0 (G1.0 milestone of the proof-carrying
+# generation arc).
+#
+# This file documents every slot the dialog templates consume, with a
+# typed `kind` annotation and a list of `variants` describing which
+# surface realisations the slot value can produce.
+#
+# **Why this exists.** Pre-v5.7.0 slots were a typeless
+# `HashMap<String, String>`: any template could pull any key, any
+# unfamiliar key would silently render as `{slot_name}` literal in the
+# output. Variation in responses came entirely from picking among
+# template strings, never from the slot side.
+#
+# **What G1 ships (this file + the `slot_inventory` module).** The
+# typed inventory is the foundation for proof-carrying generation
+# (G2 + G3). At G1.0 the inventory is descriptive — it documents the
+# slot surface and lets future code query "is this slot registered?"
+# / "what kinds of variation does this slot support?". The realiser
+# does not yet consult the inventory to pick variants; that's G1.5.
+#
+# **Schema.**
+#
+#   schema_version   integer; bumped when the on-disk format changes.
+#
+#   [[slots]]
+#     name           string; the placeholder key as it appears in
+#                    templates ({name} / {city|locative} / etc.).
+#     kind           one of: person_name | place_name | profession
+#                    | numeric | noun_term | predicate_term | chain
+#                    | curated_fact | system_self | curriculum_topic
+#                    | error_code | rust_concept | conflict_value
+#                    | sentinel.
+#     description    one-line natural-language description (Kazakh
+#                    or English) of what the slot carries.
+#     example        a representative literal value.
+#     variants       list of surface-realisation strategies the slot
+#                    supports. The runtime picks one per turn (rng-
+#                    seeded). Strategies:
+#                      "literal"            — use the value verbatim
+#                      "respectful_address" — Kazakh tradition: turn
+#                                             "Дәулет" into "Дәке"
+#                      "fst_locative"       — synthesise X-да/-де
+#                      "fst_genitive"       — synthesise X-ның/-нің
+#                      (extensible — future strategies are pure
+#                      data, no recompilation)
+#     fst_features   list of FST features ({slot|case=loc} forms)
+#                    legitimately used in templates. Documentation;
+#                    the realiser parses these in slot_syntax.
+
+schema_version = 1
+
+# ── Profile slots (1sg-acquired during the conversation) ──────────
+[[slots]]
+name = "name"
+kind = "person_name"
+description = "User's first name absorbed via StatementOfName."
+example = "Дәулет"
+variants = ["literal", "respectful_address"]
+fst_features = ["genitive", "dative"]
+
+[[slots]]
+name = "name_respect"
+kind = "person_name"
+description = "Pre-rendered respectful-address form (Дәулет → Дәке). Set by language_core::kazakh_respectful_address when the name supports the transformation."
+example = "Дәке"
+variants = ["literal"]
+
+[[slots]]
+name = "city"
+kind = "place_name"
+description = "User's residence city absorbed via StatementOfLocation."
+example = "Алматы"
+variants = ["literal"]
+fst_features = ["locative", "ablative", "genitive", "dative"]
+
+[[slots]]
+name = "city_id"
+kind = "sentinel"
+description = "Canonical geo-entity id (e.g. geo_kz_001) for cities resolved by language_core::canonical_geo_entity. Used by tooling, not user-visible text."
+example = "geo_kz_001"
+variants = ["literal"]
+
+[[slots]]
+name = "geo_kind"
+kind = "sentinel"
+description = "Geographic-entity classifier (city / region / mountain / lake / …) for geo-feature templates."
+example = "city"
+variants = ["literal"]
+
+[[slots]]
+name = "age"
+kind = "numeric"
+description = "User's age (in years) absorbed via StatementOfAge."
+example = "30"
+variants = ["literal"]
+
+[[slots]]
+name = "occupation"
+kind = "profession"
+description = "User's profession absorbed via StatementOfOccupation or extract_secondary_profile_facts."
+example = "бағдарламашы"
+variants = ["literal"]
+fst_features = ["genitive", "dative"]
+
+[[slots]]
+name = "activity"
+kind = "noun_term"
+description = "User's current activity (StatementOfActivity)."
+example = "жасанды интеллект моделімді жасап жатырмын"
+variants = ["literal"]
+
+# ── Topic / IsA query slots ────────────────────────────────────────
+[[slots]]
+name = "topic"
+kind = "noun_term"
+description = "Topic the current turn answers about. Set by topic-extraction (best_noun_hint_with_confidence / pedagogical_topic_hint) or by SubmitSolution lesson-context inheritance."
+example = "ownership"
+variants = ["literal"]
+
+[[slots]]
+name = "noun"
+kind = "noun_term"
+description = "Synonym of `topic` used by some legacy template families. Both are populated by the same extractor."
+example = "жер"
+variants = ["literal"]
+
+[[slots]]
+name = "subject_term"
+kind = "noun_term"
+description = "Subject of a yes/no IsA query (extracted from «<X> — <Y> Q?» pattern). Capitalised for sentence-initial use in confirm/deny templates."
+example = "Қасқыр"
+variants = ["literal"]
+
+[[slots]]
+name = "predicate_term"
+kind = "predicate_term"
+description = "Predicate of a yes/no IsA query. Lowercase as it appears in the user's input."
+example = "тірі"
+variants = ["literal"]
+
+[[slots]]
+name = "chain"
+kind = "chain"
+description = "Rendered IsA chain from find_isa_chain — pretty-printed as 'subject → hop1 → ... → predicate' for proof-of-claim citations."
+example = "қасқыр → жыртқыш → жануар → тіршілік иесі → тірі"
+variants = ["literal"]
+
+# ── Reasoning + retrieval slots ────────────────────────────────────
+[[slots]]
+name = "fact"
+kind = "curated_fact"
+description = "Verbatim curated fact text from world_core (Fact.raw_text). Used by unknown.with_grounded_fact and the comparison family."
+example = "Жер — Күн жүйесіндегі ғаламшар."
+variants = ["literal"]
+
+# ── System-identity slots ──────────────────────────────────────────
+[[slots]]
+name = "system_name"
+kind = "system_self"
+description = "adam's first name."
+example = "адам"
+variants = ["literal"]
+
+[[slots]]
+name = "system_full_name"
+kind = "system_self"
+description = "adam's full architectural name."
+example = "Agglutinative Reasoning Kernel"
+variants = ["literal"]
+
+[[slots]]
+name = "system_abbreviation"
+kind = "system_self"
+description = "Architecture acronym."
+example = "ARK"
+variants = ["literal"]
+
+[[slots]]
+name = "system_kind"
+kind = "system_self"
+description = "Self-classification noun: «тілдік модель» / «деректі диалог жүйесі» / etc."
+example = "тілдік модель"
+variants = ["literal"]
+
+# ── Curriculum + cargo-verify slots ────────────────────────────────
+[[slots]]
+name = "exercise_body"
+kind = "curriculum_topic"
+description = "Pre-rendered exercise prompt body for AskExercise / CodeRequest, supplied by adam_dialog::pedagogical."
+example = "Мына кодта қате бар: ..."
+variants = ["literal"]
+
+[[slots]]
+name = "purpose_body"
+kind = "curriculum_topic"
+description = "Why-question response body for AskPurpose, supplied by pedagogical::purpose_for."
+example = "Иелік — Rust-тың ең негізгі ережесі..."
+variants = ["literal"]
+
+[[slots]]
+name = "cargo_status"
+kind = "sentinel"
+description = "SubmitSolution verifier outcome (passed / failed / env_error). Drives template sub-routing."
+example = "passed"
+variants = ["literal"]
+
+[[slots]]
+name = "error_code"
+kind = "error_code"
+description = "Compiler error code from cargo_verify (E0382 / E0507 / …)."
+example = "E0382"
+variants = ["literal"]
+
+[[slots]]
+name = "error_explanation"
+kind = "curriculum_topic"
+description = "Pre-rendered Kazakh explanation for the error code, from pedagogical::explain_error_code."
+example = "Сіз бір мәнді басқа функцияға ..."
+variants = ["literal"]
+
+# ── Comparison / contrast slots ────────────────────────────────────
+[[slots]]
+name = "other_language"
+kind = "noun_term"
+description = "Other programming language in CrossLanguageContrast queries."
+example = "Python"
+variants = ["literal"]
+
+[[slots]]
+name = "rust_concept"
+kind = "rust_concept"
+description = "Rust concept being contrasted against another language."
+example = "ownership"
+variants = ["literal"]
+
+[[slots]]
+name = "contrast_body"
+kind = "curriculum_topic"
+description = "Pre-rendered contrast body from pedagogical::contrast_for."
+example = "Rust-та иелік compile-time-да тексеріледі ..."
+variants = ["literal"]
+
+# ── Belief-conflict slots ──────────────────────────────────────────
+[[slots]]
+name = "predicate"
+kind = "sentinel"
+description = "Conflict predicate (атыңыз / жасыңыз / қалаңыз / мамандығыңыз) for check_contradiction templates."
+example = "қалаңыз"
+variants = ["literal"]
+
+[[slots]]
+name = "old_value"
+kind = "conflict_value"
+description = "Older asserted value in a belief contradiction."
+example = "Алматы"
+variants = ["literal"]
+
+[[slots]]
+name = "new_value"
+kind = "conflict_value"
+description = "Newer asserted value in a belief contradiction."
+example = "Астана"
+variants = ["literal"]
+
+# ── System self-introduction aspect bodies ────────────────────────
+# Pre-rendered Kazakh text bodies for each ask_about_system aspect,
+# supplied by adam_dialog::system_identity::SystemAspect → text
+# mapping. Each is a single curated paragraph; templates reference
+# them via {system_<aspect>}.
+[[slots]]
+name = "system_creator"
+kind = "system_self"
+description = "Creator-aspect body for ask_about_system.creator."
+example = "Мені Дәулет Баймұрза құрды..."
+variants = ["literal"]
+
+[[slots]]
+name = "system_birthdate"
+kind = "system_self"
+description = "Birthdate-aspect body for ask_about_system.birthdate."
+example = "Алғашқы commit 2026-04-07-де..."
+variants = ["literal"]
+
+[[slots]]
+name = "system_architecture"
+kind = "system_self"
+description = "Architecture-aspect body — describes ARK / FST / typed-fact-graph."
+example = "ARK — Agglutinative Reasoning Kernel..."
+variants = ["literal"]
+
+[[slots]]
+name = "system_capabilities"
+kind = "system_self"
+description = "Capabilities-aspect body."
+example = "Істей алатыным: ..."
+variants = ["literal"]
+
+[[slots]]
+name = "system_knowledge"
+kind = "system_self"
+description = "Knowledge-aspect body — what domains adam knows about."
+example = "Қазіргі білімімнің ауқымы: ..."
+variants = ["literal"]
+
+[[slots]]
+name = "system_limitations"
+kind = "system_self"
+description = "Limitations-aspect body."
+example = "Істей алмайтыным: ..."
+variants = ["literal"]
+
+[[slots]]
+name = "system_principles"
+kind = "system_self"
+description = "Principles-aspect body — what adam stands for."
+example = "Менің ұстанатын принциптерім: ..."
+variants = ["literal"]
+
+[[slots]]
+name = "system_self_comparison"
+kind = "system_self"
+description = "Self-comparison body — adam vs other models."
+example = "Мен — детерминисттік тіл моделі..."
+variants = ["literal"]
+
+[[slots]]
+name = "system_implementation"
+kind = "system_self"
+description = "Implementation-aspect body — programming language / stack."
+example = "Менің кодым Rust тілінде жазылған..."
+variants = ["literal"]
+
+[[slots]]
+name = "system_generic_capability"
+kind = "system_self"
+description = "Generic-capability body — for catch-all 'can you do X?' questions."
+example = "Жоқ, ондай әрекетті өзім орындай алмаймын..."
+variants = ["literal"]
+
+[[slots]]
+name = "system_multi_topic_capability"
+kind = "system_self"
+description = "Multi-topic capability body — when the user asks about several capabilities at once."
+example = "Бірнеше тақырып бойынша көмектесе аламын..."
+variants = ["literal"]
+
+# ── Misc dialog slots referenced by templates ─────────────────────
+[[slots]]
+name = "example"
+kind = "curated_fact"
+description = "Verbatim corpus quote retrieved by adam-retrieval for unknown.with_evidence templates."
+example = "«Не болса о болсын, айды аспанға бір шығардым»"
+variants = ["literal"]
+
+[[slots]]
+name = "noun_hint"
+kind = "noun_term"
+description = "Topic-extraction noun hint, before disambiguation. Used by unknown.with_noun fallback templates."
+example = "жер"
+variants = ["literal"]
+
+[[slots]]
+name = "name_respect_distinct"
+kind = "person_name"
+description = "Sentinel marker — non-empty when {name_respect} is structurally different from {name} (i.e. the respectful transformation actually fired). Used by templates that conditionally include the address form."
+example = "1"
+variants = ["literal"]
+
+[[slots]]
+name = "raw_excerpt"
+kind = "curated_fact"
+description = "Raw cargo-check stderr fragment shown alongside SubmitSolution.failed_* explanations."
+example = "error[E0382]: borrow of moved value: `s`"
+variants = ["literal"]
+
+[[slots]]
+name = "check_correct_value"
+kind = "numeric"
+description = "Expected numerical value for math-answer-check templates."
+example = "12"
+variants = ["literal"]
+
+[[slots]]
+name = "check_user_value"
+kind = "numeric"
+description = "User-supplied numerical value for math-answer-check templates."
+example = "11"
+variants = ["literal"]
+
+[[slots]]
+name = "check_unknown"
+kind = "noun_term"
+description = "Variable name being solved for in math-answer-check templates."
+example = "x"
+variants = ["literal"]

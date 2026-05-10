@@ -65,6 +65,7 @@ pub mod realiser;
 pub mod selection;
 pub mod semantics;
 pub mod sentence_decomp;
+pub mod slot_inventory;
 pub mod slot_syntax;
 pub mod system_identity;
 pub mod task;
