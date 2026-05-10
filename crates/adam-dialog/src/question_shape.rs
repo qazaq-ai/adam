@@ -208,7 +208,7 @@ fn is_yes_no_check(lower: &str) -> bool {
     // (e.g. қасқыр → жыртқыш → жануар → тіршілік иесі → тірі); the
     // detector now routes these to YesNoCheck so the planner can
     // confirm or hedge per the chain query.
-    extract_yes_no_isa_pair(lower).is_some()
+    extract_yes_no_isa_pair(lower).is_some() || extract_yes_no_property_pair(lower).is_some()
 }
 
 /// **v5.4.0** — extract `(subject, predicate)` from a bare yes/no IsA
@@ -266,6 +266,86 @@ pub fn extract_yes_no_isa_pair(input: &str) -> Option<(String, String)> {
         return None;
     }
     Some((subject.to_string(), predicate))
+}
+
+/// **v5.5.0** — extract `(subject, predicate)` from the no-em-dash
+/// property-form yes/no question.
+///
+/// Recognised surface form (after lowercasing):
+///
+///   - `<X (-genitive)?> <Y> (ме|ма|ба|бе|па|пе) ?`
+///     where `<Y>` is a single-word predicate (typically an adjective
+///     or short noun) and the input contains exactly TWO content
+///     tokens before the question particle.
+///
+/// Examples that match:
+///
+///   - «Айдың дөңгелек пе?»          → ("ай", "дөңгелек")
+///   - «Ай дөңгелек пе?»              → ("ай", "дөңгелек")
+///   - «Темір қатты ма?»              → ("темір", "қатты")
+///   - «Қазақстанның үлкен бе?»       → ("қазақстан", "үлкен")
+///
+/// Examples that don't match (delegated to em-dash form or rejected):
+///
+///   - «Ит — жануар ма?»              (em-dash present)
+///   - «Сіз қалайсыз?»                 (no yes/no particle)
+///   - «Біз қазір кешке кездесеміз бе?» (>2 content tokens — too long)
+///
+/// Conservative by design: only fires on the canonical 2-content-word
+/// surface so the existing em-dash IsA detector and unrelated
+/// patterns aren't shadowed.
+pub fn extract_yes_no_property_pair(input: &str) -> Option<(String, String)> {
+    let lower = input.trim().to_lowercase();
+    if lower.contains(" — ") || lower.contains(" - ") {
+        return None;
+    }
+    let trimmed = lower.trim_end_matches('?').trim();
+    let last_particle = [" ме", " ма", " ба", " бе", " па", " пе"]
+        .iter()
+        .find(|tag| trimmed.ends_with(*tag))?;
+    let body = trimmed[..trimmed.len() - last_particle.len()].trim_end();
+    let tokens: Vec<&str> = body.split_whitespace().collect();
+    if tokens.len() != 2 {
+        return None;
+    }
+    // Strip optional genitive on the subject (1st token).
+    let subject = strip_genitive(tokens[0]);
+    let predicate = tokens[1].to_string();
+    if subject.chars().count() < 2 || predicate.chars().count() < 2 {
+        return None;
+    }
+    // Same NP-rejection list as the em-dash form so self-knowledge
+    // questions don't get misrouted.
+    const NON_NP_PREDICATES: &[&str] = &[
+        "білесіз",
+        "білесің",
+        "білемін",
+        "білдім",
+        "бар",
+        "жоқ",
+        "болады",
+        "болады?",
+    ];
+    if NON_NP_PREDICATES.iter().any(|w| predicate == *w) {
+        return None;
+    }
+    Some((subject, predicate))
+}
+
+/// **v5.5.0** — strip the Kazakh genitive marker (`-ның / -нің /
+/// -дың / -дің / -тың / -тің`) from a single token so the bare root
+/// can be looked up in the typed-fact graph. Conservative — only
+/// strips when the residue is at least 2 chars.
+fn strip_genitive(token: &str) -> String {
+    const GENITIVE_SUFFIXES: &[&str] = &["ның", "нің", "дың", "дің", "тың", "тің"];
+    for suf in GENITIVE_SUFFIXES {
+        if let Some(stem) = token.strip_suffix(suf) {
+            if stem.chars().count() >= 2 {
+                return stem.to_string();
+            }
+        }
+    }
+    token.to_string()
 }
 
 #[cfg(test)]
@@ -368,6 +448,69 @@ mod tests {
         // «X — білемін бе?» is a self-knowledge question, not an IsA
         // query; should not extract a (subject, predicate) pair.
         assert_eq!(extract_yes_no_isa_pair("Мен — білемін бе?"), None);
+    }
+
+    #[test]
+    fn extracts_property_pair_genitive_subject_v550() {
+        // **v5.5.0** — adjective-as-predicate, genitive subject form.
+        // Pre-v5.5.0 «Айдың дөңгелек пе?» had no em-dash and so the
+        // v5.4.0 detector returned None; the question fell to the
+        // retrieval path and surfaced a tangential proverb.
+        assert_eq!(
+            extract_yes_no_property_pair("Айдың дөңгелек пе?"),
+            Some(("ай".into(), "дөңгелек".into()))
+        );
+        assert_eq!(
+            extract_yes_no_property_pair("Қазақстанның үлкен бе?"),
+            Some(("қазақстан".into(), "үлкен".into()))
+        );
+    }
+
+    #[test]
+    fn extracts_property_pair_bare_subject_v550() {
+        // **v5.5.0** — adjective-as-predicate, bare-subject form.
+        // «Ай дөңгелек пе?» / «Темір қатты ма?» — no genitive marker,
+        // still extracts the pair.
+        assert_eq!(
+            extract_yes_no_property_pair("Ай дөңгелек пе?"),
+            Some(("ай".into(), "дөңгелек".into()))
+        );
+        assert_eq!(
+            extract_yes_no_property_pair("Темір қатты ма?"),
+            Some(("темір".into(), "қатты".into()))
+        );
+        assert_eq!(
+            extract_yes_no_property_pair("Су сұйық па?"),
+            Some(("су".into(), "сұйық".into()))
+        );
+    }
+
+    #[test]
+    fn property_pair_rejects_em_dash_form_v550() {
+        // **v5.5.0** — em-dash form is delegated to extract_yes_no_isa_pair;
+        // the property-form detector must not shadow it.
+        assert_eq!(extract_yes_no_property_pair("Ит — жануар ма?"), None);
+    }
+
+    #[test]
+    fn property_pair_rejects_long_inputs_v550() {
+        // **v5.5.0** — only fires on exactly 2 content tokens before
+        // the question particle; longer inputs would over-match.
+        assert_eq!(
+            extract_yes_no_property_pair("Біз қазір кешке кездесеміз бе?"),
+            None
+        );
+    }
+
+    #[test]
+    fn detects_property_yes_no_questions_v550() {
+        // **v5.5.0** — detect() routes the property form to YesNoCheck
+        // alongside the v5.4.0 em-dash IsA form.
+        assert_eq!(
+            detect("Айдың дөңгелек пе?"),
+            Some(QuestionShape::YesNoCheck)
+        );
+        assert_eq!(detect("Темір қатты ма?"), Some(QuestionShape::YesNoCheck));
     }
 
     #[test]

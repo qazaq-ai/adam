@@ -1,0 +1,18 @@
+{
+  "_comment": "v5.5.0 — kernel-level fixes for the two architectural deferrals from v5.4.8: (1) adjective-as-predicate yes/no questions and (2) comparison detector proper-noun preservation. Both required code-level changes, not just curated data. (1) is implemented as a new `extract_yes_no_property_pair` function in question_shape.rs that recognises «<X (-Genitive)?> <Y> (ме|ма|ба|бе|па|пе)?» without an em-dash separator; conversation.rs tries it as fallback after the em-dash form. New `properties.jsonl` ships 17 curated property facts (ай / жер / күн → дөңгелек, темір / тас → қатты, су → сұйық, etc.) using the existing IsA predicate. (2) is implemented by inverting the v4.77.5 case-stripping order: `try_extract_comparison_topics` now returns LITERAL tokens (no stripping); `lookup` in conversation.rs tries literal first, then case-stripped via the new `strip_trailing_case_for_lookup` public wrapper. Result: «Алматы» and «Астана» reach world_core intact (proper-noun preservation), while «Үкіметтің» genitive normalisation still works for common nouns.",
+  "cases": [
+    {"id": "prop_001", "category": "property_predicate_genitive_subject", "query": "Айдың дөңгелек пе?", "any_substring": ["дөңгелек"], "none_substring": ["табылмады", "жетпейді"]},
+    {"id": "prop_002", "category": "property_predicate_bare_subject", "query": "Ай дөңгелек пе?", "any_substring": ["дөңгелек"], "none_substring": ["табылмады"]},
+    {"id": "prop_003", "category": "property_predicate_bare_subject", "query": "Жер дөңгелек пе?", "any_substring": ["дөңгелек"], "none_substring": []},
+    {"id": "prop_004", "category": "property_predicate_bare_subject", "query": "Темір қатты ма?", "any_substring": ["қатты"], "none_substring": []},
+    {"id": "prop_005", "category": "property_predicate_bare_subject", "query": "Су сұйық па?", "any_substring": ["сұйық"], "none_substring": []},
+    {"id": "prop_006", "category": "property_predicate_bare_subject", "query": "Қар ақ па?", "any_substring": ["ақ"], "none_substring": []},
+    {"id": "prop_007", "category": "property_predicate_bare_subject", "query": "От ыстық па?", "any_substring": ["ыстық"], "none_substring": []},
+    {"id": "prop_008", "category": "property_predicate_bare_subject", "query": "Мұз суық па?", "any_substring": ["суық"], "none_substring": []},
+    {"id": "prop_009", "category": "property_predicate_bare_subject", "query": "Бал тәтті ме?", "any_substring": ["тәтті"], "none_substring": []},
+    {"id": "comparison_001", "category": "proper_noun_comparison", "query": "Алматы мен Астана айырмашылығы қандай?", "any_substring": ["алматы", "астана"], "none_substring": ["алма мен аста"]},
+    {"id": "regression_001", "category": "yes_no_isa_regression", "query": "Ит — жануар ма?", "any_substring": ["жануар"], "none_substring": []},
+    {"id": "regression_002", "category": "yes_no_isa_regression", "query": "Қасқыр — тірі ме?", "any_substring": ["тірі"], "none_substring": []},
+    {"id": "regression_003", "category": "antonym_denial_regression", "query": "Тас — тірі ме?", "any_substring": ["емес", "жансыз"], "none_substring": []}
+  ]
+}

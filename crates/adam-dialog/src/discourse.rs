@@ -1200,18 +1200,33 @@ pub fn try_extract_comparison_topics(input: &str) -> Option<(String, String)> {
                 x = stripped;
             }
         }
-        // **v4.77.5** — Codex round-3 Bug 2: strip Kazakh case
-        // suffixes from Y (the head of the second NP). Pattern
-        // «X пен Y-нің айырмашылығы қандай?» / «Парламент пен
-        // Үкіметтің айырмашылығы» — Y has genitive «-тің» / «-нің»
-        // glued on. Stripping yields the bare lemma so the dual
-        // lookup in conversation.rs can find the world_core entry
-        // (which is keyed on bare «үкімет» / «парламент»).
-        let rhs_clean = strip_trailing_kazakh_case(rhs.trim());
-        let x_clean = strip_trailing_kazakh_case(x.trim());
-        return Some((x_clean.to_string(), rhs_clean.to_string()));
+        // **v5.5.0** — return LITERAL tokens (no case stripping at
+        // extraction time). The v4.77.5 case-stripping was correct
+        // for «Үкіметтің» (genitive on common noun) but broke proper
+        // nouns: «Алматы» → «алма» (because «-ты» was treated as Acc
+        // suffix), «Астана» → «аста» («-на» as Dat suffix). The 2026-
+        // 05-09 30-turn audit surfaced this on «Алматы мен Астана
+        // айырмашылығы». Pushing the stripping into a fallback at
+        // lookup time gives both correctness branches:
+        //   1. literal token matches a proper noun in world_core
+        //      → use it (correct for Алматы / Астана)
+        //   2. literal misses, case-stripped form matches
+        //      → use the stripped form (preserves Үкіметтің fix)
+        // Conversation::comparison_lookup_chain implements the
+        // two-phase fallback explicitly.
+        return Some((x.trim().to_string(), rhs.trim().to_string()));
     }
     None
+}
+
+/// **v5.5.0** — public wrapper exposing the case-stripping helper to
+/// `conversation.rs` for the comparison-lookup fallback. Pre-v5.5.0
+/// the function was crate-private and stripping happened at
+/// extraction time; v5.5.0 inverts the order so `try_extract_
+/// comparison_topics` returns literal tokens and the caller tries
+/// case-stripping only after a literal lookup miss.
+pub fn strip_trailing_case_for_lookup(s: &str) -> &str {
+    strip_trailing_kazakh_case(s)
 }
 
 /// **v4.77.5** — Strip a trailing Kazakh case suffix from a noun

@@ -566,6 +566,8 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "бағдарламалау ұғымы",
     // **v5.4.8** — closed-class antonym hub for тірі.
     "өлі сипат",
+    // **v5.5.0** — properties.jsonl multiword IsA target.
+    "газ тәрізді",
     "орталық азия",
     "жүк машинасы",
     "аспан денесі",

@@ -21,6 +21,62 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.5.0] — 2026-05-09 — Kernel-level fixes — adjective-as-predicate + comparison proper-noun preservation
+
+**Minor-version release.** Two architectural deferrals from the v5.4.8 audit fixed at the kernel level (not just curated data). Per the cadence policy, kernel-signature changes warrant `x.y.0`. Performance + lazy-load work originally targeted at v5.5.0 moves to v5.6.0.
+
+### What changed
+
+**1. Adjective-as-predicate yes/no detector — new `extract_yes_no_property_pair`.** Pre-v5.5.0 the v5.4.0 yes/no detector required an em-dash separator (`<X> — <Y> particle?`); «Айдың дөңгелек пе?» (genitive subject + adjective predicate, no em-dash) had no path through the chain query and fell to the retrieval fallback (tangential proverb). Kernel-level fix:
+- New [`extract_yes_no_property_pair`](crates/adam-dialog/src/question_shape.rs) recognises `<X (-genitive)?> <Y> (ме|ма|ба|бе|па|пе)?` with no em-dash. Conservative: only fires on EXACTLY 2 content tokens before the particle, so longer constructions don't get mistakenly matched.
+- New [`strip_genitive`](crates/adam-dialog/src/question_shape.rs) helper — strips Kazakh genitive markers (`-ның / -нің / -дың / -дің / -тың / -тің`) on the subject so «айдың» normalises to «ай».
+- [`is_yes_no_check`](crates/adam-dialog/src/question_shape.rs) now ORs the property-form recogniser into the YesNoCheck shape.
+- [`Conversation::turn_with_trace`](crates/adam-dialog/src/conversation.rs) tries the em-dash form first (canonical predicative IsA), falls back to property form. Both feed the same [`find_isa_chain`](crates/adam-dialog/src/conversation.rs) flow — downstream code unchanged.
+- New [`data/world_core/properties.jsonl`](data/world_core/properties.jsonl) — 17 curated property facts (ай / жер / күн → дөңгелек, темір / тас → қатты, су → сұйық, ауа → газ, қар → ақ, көмір → қара, от → ыстық, мұз → суық, бал → тәтті, лимон → қышқыл, ит → адал, қазақстан → үлкен / тәуелсіз).
+
+**2. Comparison detector proper-noun preservation — invert the case-stripping order.** Pre-v5.5.0 the v4.77.5 case-stripping fix in [`try_extract_comparison_topics`](crates/adam-dialog/src/discourse.rs) over-stripped proper nouns: «Алматы» → «алма» (because «-ты» was treated as Acc suffix), «Астана» → «аста» («-на» as Dat). The 30-turn audit at v5.4.8 surfaced this on «Алматы мен Астана айырмашылығы». Kernel-level fix:
+- [`try_extract_comparison_topics`](crates/adam-dialog/src/discourse.rs) now returns LITERAL tokens (no stripping at extraction time).
+- New public wrapper [`strip_trailing_case_for_lookup`](crates/adam-dialog/src/discourse.rs) exposes the case-stripping helper to callers.
+- [`Conversation::turn_with_trace`](crates/adam-dialog/src/conversation.rs) splits the comparison lookup into two phases: literal first (matches «Алматы» / «Астана» as proper nouns), then case-stripped fallback (preserves the v4.77.5 «Үкіметтің» genitive normalisation for common nouns).
+
+### Live REPL — before / after
+
+| Query | Pre-v5.5.0 | Post-v5.5.0 |
+|---|---|---|
+| Айдың дөңгелек пе? | tangential proverb | «Ай — дөңгелек. Бұл ай → дөңгелек тізбегі арқылы расталады.» |
+| Темір қатты ма? | retrieval-fallback corpus quote | «Иә, Темір — қатты. Дәлел тізбегі: темір → қатты.» |
+| Су сұйық па? | (no match) | «Иә, Су — сұйық. Дәлел тізбегі: су → сұйық.» |
+| Алматы мен Астана айырмашылығы қандай? | «Алма мен аста екеуі де танылады, бірақ біреуінің не екеуінің анықтамасы әлі менің базамда жоқ.» | «Анықтамаларды қатар қойдым: Алматы — Қазақстанның ірі қаласы. Астана — Қазақстанның астанасы.» |
+
+### Tests
+
+- New live holdout [`live_holdout_v5500_kernel.json`](data/eval/live_holdout_v5500_kernel.json) + [Rust runner](crates/adam-dialog/tests/live_holdout_v5500_kernel.rs) — **13 cases** across 4 categories (property_predicate_genitive_subject / property_predicate_bare_subject / proper_noun_comparison / regression). Pass-rate floor 100 %.
+- 5 new unit tests in `question_shape.rs`: `extracts_property_pair_genitive_subject_v550`, `extracts_property_pair_bare_subject_v550`, `property_pair_rejects_em_dash_form_v550`, `property_pair_rejects_long_inputs_v550`, `detects_property_yes_no_questions_v550`.
+
+### Measurable impact
+
+| Metric | v5.4.8 | v5.5.0 | Delta |
+|---|---|---|---|
+| Initial facts | 3 367 | 3 384 | +17 |
+| Derived facts | 36 918 | **37 014** | +96 |
+| Workspace tests | 1 187 | **1 205** | +18 (5 unit + 13 live-holdout) |
+| New question-shape forms | 1 (em-dash) | **2** (em-dash + property) | +100 % surface coverage |
+
+### Why this is `x.y.0` and not `x.y.5`
+
+The cadence policy reserves minor-version increments for **significant capability changes**. v5.5.0 introduces:
+1. A new structural pattern in the question-shape detector (property predicate with genitive subject)
+2. A new value-extraction primitive (`strip_trailing_case_for_lookup`) exposed at the public API surface
+3. A new world_core domain class (properties — distinct from existing entity / bridge / curriculum domains)
+
+These together justify minor-version. Pure-data follow-ups (more property facts, more curriculum concepts) would be `x.y.{1, 5, …}` patches.
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --workspace --release --tests -- -D warnings` clean; `cargo test --workspace --release` 0 failures.
+
+**Stripe — Deterministic AI research (kernel-level detector arc; property predicates + proper-noun preservation; v5.4.8 architectural deferrals closed at the right layer).**
+
 ## [5.4.8] — 2026-05-09 — Bundled detector patches — antonym denial + «X түрі» + 6 IsA-gap closures
 
 **Bundled-patches release.** Per the user's directive to ship all remaining detector patches together rather than one-per-release, this lands 8 fixes in a single tag. Closes the 3 deferrals from v5.4.7 + 5 new bugs surfaced by a 30-turn extended audit on novel phrasings.

@@ -1358,13 +1358,21 @@ impl Conversation {
         {
             extra_slots.insert("__compare_x__".into(), x_topic.clone());
             extra_slots.insert("__compare_y__".into(), y_topic.clone());
-            // **v4.77.0** — dual lookup. Search extracted_facts for the
-            // first IsA fact about each topic; take raw_text as the
+            // **v4.77.0 + v5.5.0** — dual lookup with two-phase
+            // case fallback. Search extracted_facts for the first
+            // IsA fact about each topic; take raw_text as the
             // definition. IsA preferred (most definitional); any
             // predicate accepted as fallback. Lowercased root match.
-            let lookup = |needle: &str| -> Option<String> {
+            //
+            // **v5.5.0** — comparison topics are now returned LITERAL
+            // (no case-stripping at extraction time) so proper nouns
+            // like «Алматы» / «Астана» reach world_core intact.
+            // When the literal lookup misses, retry with the case-
+            // stripped form via `strip_trailing_case_for_lookup` —
+            // preserves the v4.77.5 «Үкіметтің» genitive normalisation
+            // for common nouns while keeping proper nouns whole.
+            let lookup_literal = |needle: &str| -> Option<String> {
                 let needle_lower = needle.to_lowercase();
-                // Pass 1: prefer IsA facts (most definitional)
                 let by_isa = self.extracted_facts.iter().find(|f| {
                     f.subject.root.to_lowercase() == needle_lower
                         && matches!(f.predicate, adam_reasoning::Predicate::IsA)
@@ -1372,11 +1380,20 @@ impl Conversation {
                 if let Some(f) = by_isa {
                     return Some(f.raw_text.clone());
                 }
-                // Pass 2: any predicate
                 self.extracted_facts
                     .iter()
                     .find(|f| f.subject.root.to_lowercase() == needle_lower)
                     .map(|f| f.raw_text.clone())
+            };
+            let lookup = |needle: &str| -> Option<String> {
+                if let Some(found) = lookup_literal(needle) {
+                    return Some(found);
+                }
+                let stripped = crate::discourse::strip_trailing_case_for_lookup(needle);
+                if stripped != needle {
+                    return lookup_literal(stripped);
+                }
+                None
             };
             if let Some(x_def) = lookup(x_topic) {
                 extra_slots.insert("__compare_x_def__".into(), x_def);
@@ -1515,6 +1532,7 @@ impl Conversation {
         {
             if let Some((subject, predicate)) =
                 crate::question_shape::extract_yes_no_isa_pair(input)
+                    .or_else(|| crate::question_shape::extract_yes_no_property_pair(input))
             {
                 let chain = find_isa_chain(
                     &self.extracted_facts,

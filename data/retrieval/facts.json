@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3367,
+    "facts_total": 3384,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2801,
+      "is_a": 2818,
       "lives_in": 8,
       "part_of": 244,
       "related_to": 123
@@ -88,6 +88,7 @@
       "world_core/programming_languages.jsonl": 56,
       "world_core/programming_rust.jsonl": 686,
       "world_core/programming_rust_advanced.jsonl": 25,
+      "world_core/properties.jsonl": 17,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
       "world_core/role_bridges.jsonl": 63,
@@ -59342,6 +59343,346 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Unsafe — Rust қауіпсіздік кепілдіктерін айналып өтуге арналған блок."
+    },
+    {
+      "subject": {
+        "surface": "ай",
+        "root": "ай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дөңгелек",
+        "root": "дөңгелек",
+        "pos": "noun"
+      },
+      "pattern": "world_core/properties",
+      "source": {
+        "pack": "world_core/properties.jsonl",
+        "sample_id": "prop_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ай — дөңгелек."
+    },
+    {
+      "subject": {
+        "surface": "жер",
+        "root": "жер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дөңгелек",
+        "root": "дөңгелек",
+        "pos": "noun"
+      },
+      "pattern": "world_core/properties",
+      "source": {
+        "pack": "world_core/properties.jsonl",
+        "sample_id": "prop_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жер — дөңгелек."
+    },
+    {
+      "subject": {
+        "surface": "күн",
+        "root": "күн",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дөңгелек",
+        "root": "дөңгелек",
+        "pos": "noun"
+      },
+      "pattern": "world_core/properties",
+      "source": {
+        "pack": "world_core/properties.jsonl",
+        "sample_id": "prop_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Күн — дөңгелек."
+    },
+    {
+      "subject": {
+        "surface": "темір",
+        "root": "темір",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қатты",
+        "root": "қатты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/properties",
+      "source": {
+        "pack": "world_core/properties.jsonl",
+        "sample_id": "prop_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Темір — қатты."
+    },
+    {
+      "subject": {
+        "surface": "тас",
+        "root": "тас",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қатты",
+        "root": "қатты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/properties",
+      "source": {
+        "pack": "world_core/properties.jsonl",
+        "sample_id": "prop_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тас — қатты."
+    },
+    {
+      "subject": {
+        "surface": "су",
+        "root": "су",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сұйық",
+        "root": "сұйық",
+        "pos": "noun"
+      },
+      "pattern": "world_core/properties",
+      "source": {
+        "pack": "world_core/properties.jsonl",
+        "sample_id": "prop_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Су — сұйық."
+    },
+    {
+      "subject": {
+        "surface": "ауа",
+        "root": "ауа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "газ тәрізді",
+        "root": "газ тәрізді",
+        "pos": "noun"
+      },
+      "pattern": "world_core/properties",
+      "source": {
+        "pack": "world_core/properties.jsonl",
+        "sample_id": "prop_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ауа — газ тәрізді."
+    },
+    {
+      "subject": {
+        "surface": "ауа",
+        "root": "ауа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "газ",
+        "root": "газ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/properties",
+      "source": {
+        "pack": "world_core/properties.jsonl",
+        "sample_id": "prop_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ауа — газ."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "үлкен",
+        "root": "үлкен",
+        "pos": "noun"
+      },
+      "pattern": "world_core/properties",
+      "source": {
+        "pack": "world_core/properties.jsonl",
+        "sample_id": "prop_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан — үлкен."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәуелсіз",
+        "root": "тәуелсіз",
+        "pos": "noun"
+      },
+      "pattern": "world_core/properties",
+      "source": {
+        "pack": "world_core/properties.jsonl",
+        "sample_id": "prop_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан — тәуелсіз."
+    },
+    {
+      "subject": {
+        "surface": "қар",
+        "root": "қар",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ақ",
+        "root": "ақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/properties",
+      "source": {
+        "pack": "world_core/properties.jsonl",
+        "sample_id": "prop_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қар — ақ."
+    },
+    {
+      "subject": {
+        "surface": "көмір",
+        "root": "көмір",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қара",
+        "root": "қара",
+        "pos": "noun"
+      },
+      "pattern": "world_core/properties",
+      "source": {
+        "pack": "world_core/properties.jsonl",
+        "sample_id": "prop_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Көмір — қара."
+    },
+    {
+      "subject": {
+        "surface": "от",
+        "root": "от",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ыстық",
+        "root": "ыстық",
+        "pos": "noun"
+      },
+      "pattern": "world_core/properties",
+      "source": {
+        "pack": "world_core/properties.jsonl",
+        "sample_id": "prop_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "От — ыстық."
+    },
+    {
+      "subject": {
+        "surface": "мұз",
+        "root": "мұз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "суық",
+        "root": "суық",
+        "pos": "noun"
+      },
+      "pattern": "world_core/properties",
+      "source": {
+        "pack": "world_core/properties.jsonl",
+        "sample_id": "prop_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мұз — суық."
+    },
+    {
+      "subject": {
+        "surface": "бал",
+        "root": "бал",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәтті",
+        "root": "тәтті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/properties",
+      "source": {
+        "pack": "world_core/properties.jsonl",
+        "sample_id": "prop_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бал — тәтті."
+    },
+    {
+      "subject": {
+        "surface": "лимон",
+        "root": "лимон",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қышқыл",
+        "root": "қышқыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/properties",
+      "source": {
+        "pack": "world_core/properties.jsonl",
+        "sample_id": "prop_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Лимон — қышқыл."
+    },
+    {
+      "subject": {
+        "surface": "ит",
+        "root": "ит",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адал",
+        "root": "адал",
+        "pos": "noun"
+      },
+      "pattern": "world_core/properties",
+      "source": {
+        "pack": "world_core/properties.jsonl",
+        "sample_id": "prop_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ит — адал."
     },
     {
       "subject": {
