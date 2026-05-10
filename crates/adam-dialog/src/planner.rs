@@ -587,6 +587,39 @@ pub fn plan_response_with_epistemic(
             };
         }
     }
+    // **v5.6.5 — Codex 2026-05-09 review.** High-stakes-topic safety
+    // refusal (medical / legal / financial / current-data). Routes to
+    // dedicated `safety_refusal.<category>` family BEFORE all factual
+    // paths. Pre-v5.6.5 a medical query like «Басым ауырып тұр, қандай
+    // дәрі ішейін?» surfaced the curated noun fact «Бас — дене бөлігі»
+    // — source-backed but product-dangerous misroute. Honest refusal
+    // points the user at a qualified specialist.
+    if let Some(category) = extra_slots.get("__safety_refusal__") {
+        let key = format!("safety_refusal.{category}");
+        if !repo.get(&key).is_empty() {
+            trace.push(format!("planner: safety_refusal override → {key}"));
+            let applicable_all = repo.get(&key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
+            trace.push(format!(
+                "planner: applicable_total={} chosen_index={} text='{}'",
+                applicable_all.len(),
+                idx,
+                chosen,
+            ));
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
     // **v4.78.0** — political-safety refusal (Codex round-3 Bug 3).
     // Routes to dedicated `political_safety` family BEFORE all
     // factual paths. adam doesn't give partisan recommendations.

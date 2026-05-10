@@ -383,6 +383,56 @@ pub fn input_is_likely_english(input: &str) -> bool {
 }
 
 #[cfg(test)]
+mod safety_topic_tests {
+    use super::{SafetyCategory, detect_safety_topic};
+
+    #[test]
+    fn detects_medical_advice_seeking_v565() {
+        assert_eq!(
+            detect_safety_topic("Басым ауырып тұр, қандай дәрі ішейін?"),
+            Some(SafetyCategory::Medical)
+        );
+        assert_eq!(
+            detect_safety_topic("Жүрегім ауырып тұр, қалай емдеймін?"),
+            Some(SafetyCategory::Medical)
+        );
+    }
+
+    #[test]
+    fn detects_legal_advice_seeking_v565() {
+        assert_eq!(
+            detect_safety_topic("Шарт жасасу бойынша кеңес беріңіз."),
+            Some(SafetyCategory::Legal)
+        );
+    }
+
+    #[test]
+    fn detects_financial_advice_seeking_v565() {
+        assert_eq!(
+            detect_safety_topic("Инвестиция жасайын ба, кеңес бересіз бе?"),
+            Some(SafetyCategory::Financial)
+        );
+    }
+
+    #[test]
+    fn detects_current_data_query_v565() {
+        assert_eq!(
+            detect_safety_topic("Қазіргі ауа райы қандай?"),
+            Some(SafetyCategory::CurrentData)
+        );
+    }
+
+    #[test]
+    fn does_not_fire_on_factual_definition_v565() {
+        // Conservative gating: «X деген не?» is a factual definition,
+        // not advice-seeking. Should NOT trigger safety refusal.
+        assert_eq!(detect_safety_topic("Дәрі деген не?"), None);
+        assert_eq!(detect_safety_topic("Заң деген не?"), None);
+        assert_eq!(detect_safety_topic("Инвестиция деген не?"), None);
+    }
+}
+
+#[cfg(test)]
 mod russian_tests {
     use super::input_is_likely_russian;
 
@@ -477,6 +527,158 @@ pub fn is_political_recommendation(input: &str) -> bool {
     let has_political = POLITICAL_TOPICS.iter().any(|t| lower.contains(t));
     let has_recommend = RECOMMENDATION_VERBS.iter().any(|v| lower.contains(v));
     has_political && has_recommend
+}
+
+/// **v5.6.5 — Codex 2026-05-09 review.** High-stakes-topic safety
+/// detector. Adam is a Kazakh-language dialog kernel for educational
+/// use; it must NOT route medical / legal / financial / current-data
+/// queries through the standard SearchGraph path (which surfaces the
+/// nearest noun fact — e.g. «Басым ауырып тұр, қандай дәрі ішейін?»
+/// pre-fix returned «Бас — дене бөлігі», a source-backed but
+/// product-dangerous misroute). Returns the safety category when the
+/// input matches an advice-seeking pattern in a high-stakes domain.
+///
+/// **Categories:**
+///
+///   - `medical`   — health, diagnosis, drug names, symptoms paired
+///                   with «не ішейін» / «не істейін» / «емдеу» / etc.
+///   - `legal`     — court, contract, dispute paired with advice verbs
+///   - `financial` — money/investment/loan paired with advice verbs
+///   - `current_data` — today / now / current price / news (adam has
+///                   no time-bound or live data; honest refusal)
+///
+/// **Conservative:** requires BOTH a topic marker AND an advice-
+/// seeking shape so generic factual queries («Дәрі деген не?») don't
+/// trigger. Pure surface-level — no FST.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SafetyCategory {
+    Medical,
+    Legal,
+    Financial,
+    CurrentData,
+}
+
+impl SafetyCategory {
+    pub fn slug(&self) -> &'static str {
+        match self {
+            Self::Medical => "medical",
+            Self::Legal => "legal",
+            Self::Financial => "financial",
+            Self::CurrentData => "current_data",
+        }
+    }
+}
+
+pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
+    let lower = input.to_lowercase();
+
+    // Advice-seeking shapes — present in all categories. Generic
+    // factual «X деген не?» / «X кім?» do NOT match.
+    let asks_for_advice = lower.contains("не ішейін")
+        || lower.contains("не істейін")
+        || lower.contains("қандай дәрі")
+        || lower.contains("қалай емдеймін")
+        || lower.contains("қалай емделемін")
+        || lower.contains("кеңес бересіз бе")
+        || lower.contains("кеңес бере аласыз ба")
+        || lower.contains("кеңес беріңіз")
+        || lower.contains("ұсыныс беріңіз")
+        || lower.contains("ұсыныс бересіз бе")
+        || lower.contains("маған не керек")
+        || lower.contains("қайтсем")
+        || lower.contains("қалай шешемін")
+        // Symptom-statement form: «басым ауырып тұр» / «жөтелім бар»
+        // etc. — the user describes a symptom; even without an explicit
+        // advice verb this should refuse to give medical guidance.
+        || lower.contains("ауырып тұр")
+        || lower.contains("ауырып отыр")
+        || lower.contains("ауырып жатыр");
+
+    // ── Medical ────────────────────────────────────────────────────
+    const MEDICAL_TOPICS: &[&str] = &[
+        "ауыр",
+        "дәрі",
+        "емде",
+        "емдеу",
+        "диагноз",
+        "симптом",
+        "температура",
+        "жөтел",
+        "сырқат",
+        "тамақ ауыр",
+        "бас ауыр",
+        "іш ауыр",
+        "жүрек ауыр",
+        "тұмау",
+        "грипп",
+        "вирус",
+        "инфекция",
+        "антибиотик",
+        "укол",
+        "таблетка",
+        "сурет",
+    ];
+    let has_medical = MEDICAL_TOPICS.iter().any(|t| lower.contains(t));
+    if has_medical && asks_for_advice {
+        return Some(SafetyCategory::Medical);
+    }
+
+    // ── Legal ──────────────────────────────────────────────────────
+    const LEGAL_TOPICS: &[&str] = &[
+        "сот",
+        "соттасу",
+        "адвокат",
+        "заңгер",
+        "шарт",
+        "келісімшарт",
+        "айып",
+        "өтемақы",
+        "арыз",
+        "талап",
+        "құжат рәсімдеу",
+    ];
+    let has_legal = LEGAL_TOPICS.iter().any(|t| lower.contains(t));
+    if has_legal && asks_for_advice {
+        return Some(SafetyCategory::Legal);
+    }
+
+    // ── Financial ──────────────────────────────────────────────────
+    const FINANCIAL_TOPICS: &[&str] = &[
+        "несие",
+        "ипотека",
+        "инвестиция",
+        "акция",
+        "теңге",
+        "доллар",
+        "евро",
+        "крипто",
+        "биткойн",
+        "пай",
+        "пайыз",
+        "салым",
+    ];
+    let has_financial = FINANCIAL_TOPICS.iter().any(|t| lower.contains(t));
+    if has_financial && asks_for_advice {
+        return Some(SafetyCategory::Financial);
+    }
+
+    // ── Current data ───────────────────────────────────────────────
+    // «Қазір ауа райы қандай?» / «Бүгінгі курс?» / «Соңғы жаңалықтар»
+    // — adam has no live/time-bound data feed. This category fires
+    // even without an explicit advice verb because the question
+    // itself presumes data adam doesn't have.
+    let asks_current = lower.contains("қазіргі")
+        || lower.contains("бүгінгі")
+        || lower.contains("соңғы жаңалық")
+        || lower.contains("жаңалықтар")
+        || lower.contains("ауа райы қазір")
+        || lower.contains("курс қандай")
+        || lower.contains("бағасы қанша");
+    if asks_current {
+        return Some(SafetyCategory::CurrentData);
+    }
+
+    None
 }
 
 /// **v4.77.0** — Code-snippet detector (Codex round-2 Bug 8). Returns

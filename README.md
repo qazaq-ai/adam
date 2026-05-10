@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-5.6.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-5.6.5-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey?style=for-the-badge" alt="platform">
@@ -25,7 +25,7 @@
   <img src="https://img.shields.io/badge/RSS-~160%20MB-2EA44F?style=flat-square" alt="rss">
   <img src="https://img.shields.io/badge/GPU-0%25-2EA44F?style=flat-square" alt="gpu">
   <img src="https://img.shields.io/badge/derived%20facts-35%20469-9CCC65?style=flat-square" alt="derived facts">
-  <img src="https://img.shields.io/badge/world%20core-3265%20facts%20%2F%2054%20domains-9CCC65?style=flat-square" alt="world core">
+  <img src="https://img.shields.io/badge/world%20core-3124%20curated%20/%203384%20facts%20%2F%2060%20domains-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/lexicon-25.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/intents-41-2EA44F?style=flat-square" alt="intents">
 </p>
@@ -34,7 +34,7 @@
 
 ## 30-second pitch
 
-> **adam is a deterministic AI research kernel** — the first applied demonstrator of an alternative to probabilistic large language models, built on the agglutinative morphology of the Kazakh language. Three guarantees by architecture: every output traces to a curated source (**predictability**), runs as a single binary on M2 8GB with 0% GPU and ~21 ms p50 latency (**cheapness**), and is **architecturally incapable of hallucination** because the runtime cannot emit a claim without a backing fact (**safety**). Generalises across ~30 catalogued agglutinative languages (Turkish, Korean, Japanese, Finnish, Hungarian, Tamil, Quechua, Swahili, …). Pure Rust. BUSL-1.1.
+> **adam is a deterministic AI research kernel** — the first applied demonstrator of an alternative to probabilistic large language models, built on the agglutinative morphology of the Kazakh language. Three guarantees by architecture: every output traces to a curated source (**predictability**), runs as a single binary on M2 8GB with 0% GPU and ~21 ms p50 latency (**cheapness**), and **emits no unsupported claims** — every fact-bearing reply cites a curated source or grounded reasoning chain, with safety-refusal templates for high-stakes topics (medical / legal / financial / current-data) (**safety**). Designed to extend across ~30 catalogued agglutinative languages — currently demonstrated on Kazakh; cross-language ports are a research goal, not a shipped capability. Pure Rust. BUSL-1.1.
 
 > **Reading order:** [MISSION.md](MISSION.md) (thesis) → [RESEARCH.md](RESEARCH.md) (open questions) → [COLLABORATION.md](COLLABORATION.md) (partner terms) → [AGENTS.md](AGENTS.md) (orientation for automated scouts) → [CHANGELOG.md](CHANGELOG.md) (full release history).
 
@@ -46,7 +46,7 @@ Modern LLMs carry three structural problems we treat as **not inevitable**:
 |---|---|
 | **Black box** — opaque internals, no source attribution, no auditable explanation for any specific output | **Predictability** — every claim traceable to a curated source; every reasoning step inspectable |
 | **Resource cost** — billions of parameters, GPU clusters, datacentre inference, kilowatt-scale energy per query | **Cheapness** — single binary on M2 8GB, **0% GPU**, ~21 ms p50 latency, ~300 MB RSS |
-| **Hallucination risk** — confident generation of plausible-sounding but factually wrong content, no internal mechanism to flag it | **Safety** — architectural impossibility: the runtime cannot emit a claim without a backing fact in `world_core` or a grounded reasoning chain |
+| **Hallucination risk** — confident generation of plausible-sounding but factually wrong content, no internal mechanism to flag it | **Safety** — every fact-bearing reply cites a curated source, a grounded reasoning chain, or refuses honestly; high-stakes topics (medical / legal / financial / current-data) route to dedicated safety-refusal templates instead of nearest-noun retrieval |
 
 **Hypothesis:** agglutinative languages — Kazakh in particular — exhibit unusually mathematical morphology. Every word decomposes into a root plus a predictable sequence of typed suffixes (case, number, tense, person, possessive, polarity, modality). Composition is **rule-bound, not learned**. That structure is the substrate for a deterministic runtime: FST morphology + typed suffix priors as deterministic prior layers, a curated knowledge graph as the only fact source, templates as the only path from fact to text. **No probabilistic free generation. No retrained-from-scratch behaviour per release.**
 
@@ -113,7 +113,7 @@ Every layer outputs deterministic, regression-tested JSON artifacts. `bash ./scr
 ```
 $ cargo run --release -p adam-dialog --bin adam_chat
 adam-chat: loaded 114 template families
-adam-chat: reasoning on — 35 469 derived facts (3 265 supporting extracted facts)
+adam-chat: reasoning on — 37 014 derived facts (3 384 supporting extracted facts)
 
 > Қасқыр — тірі ме?                          # bare yes/no IsA, v5.4.0
 Қасқыр — тірі. Бұл қасқыр → тірі тізбегі арқылы расталады.
@@ -150,8 +150,8 @@ For a full evidence dump on any Kazakh root, run [`adam_inspect`](crates/adam-di
 | GPU usage | **0%** | vs LLM dedicated GPU |
 | Hallucination rate | **0%** (architectural) | verified by graph admissibility tests |
 | Lexicon roots | **25.5 k** | 13.6 k pure Kazakh + 11.9 k Apertium imports |
-| Curated facts | **3 265** | across 54 world_core domains |
-| Derived facts | **35 469** | from 10 forward-chaining rules over the curated graph |
+| Curated facts | **3 325** (3 124 entries) | across 60 world_core domains |
+| Derived facts | **37 014** | from 10 forward-chaining rules over the curated graph |
 | Dialog intents | **41** | template planner with `{slot\|features}` FST-aware syntax |
 
 See [`docs/performance.md`](docs/performance.md) for the full performance report and [`docs/scaling_report.md`](docs/scaling_report.md) for the per-tier scaling bench.
@@ -164,7 +164,7 @@ See [`docs/performance.md`](docs/performance.md) for the full performance report
 
 **Why Kazakh?** Kazakh's agglutinative morphology is exceptionally regular: every word decomposes into root + typed suffixes (case, number, tense, person, possessive, polarity, modality), each contributing a known operator. Composition is rule-bound, not learned. This is the cleanest substrate we know of for a deterministic AI runtime.
 
-**Will it generalise to other languages?** The architecture is designed for it. ~30 candidate agglutinative languages catalogued in [MISSION.md](MISSION.md#agglutinative-languages--global-research-frontier). Closest port: Karakalpak (~1–2 weeks of Lexicon adaptation estimated). Furthest: Quechua, Swahili (different phonology assumptions; full architectural validation needed).
+**Will it generalise to other languages?** The architecture is *designed* for it but not yet *demonstrated* on a second language. ~30 candidate agglutinative languages are catalogued in [MISSION.md](MISSION.md#agglutinative-languages--global-research-frontier); first port (Karakalpak or Kyrgyz) is on the v6 research roadmap with measured porting cost as a deliverable. Treat the multi-language story as a research goal, not a current product capability.
 
 **What is the funding model?** Two parallel tracks: angel pre-seed private capital ($200K–300K target) and state research grants from agglutinative-language country research agencies (Japan JST/JSPS, South Korea NRF, Finland Academy of Finland, Turkey TÜBİTAK, Hungary NKFIH, Estonia ETAg, Uzbekistan, Kyrgyzstan, Mongolia, Tatarstan). See [COLLABORATION.md](COLLABORATION.md).
 

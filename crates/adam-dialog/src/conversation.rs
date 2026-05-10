@@ -797,15 +797,23 @@ impl Conversation {
         // whatever leaks through (e.g. `Это`) and surfaces a
         // half-Russian half-Kazakh refusal. Per
         // `project_kazakh_only_directive`, adam is Kazakh-only —
-        // Russian inputs should refuse cleanly. Mark the intent so
-        // the planner picks the dedicated `unknown.non_kazakh`
-        // template family.
-        // **v5.2.5** — Codex round-3 audit Bug 6. English-input
-        // refusal joins the Russian-input refusal so adam stays
-        // Kazakh-only as advertised. Both flow into the same
-        // `unknown.non_kazakh` template family via `__non_kazakh__`.
-        let russian_input = crate::discourse::input_is_likely_russian(input)
-            || crate::discourse::input_is_likely_english(input);
+        // **v5.6.5 — order fix.** Code-snippet detection now runs
+        // BEFORE non-Kazakh detection so a Rust code block carrying
+        // English-only function words (`from` / `let` / `do` / etc.)
+        // doesn't fall through to the `unknown.non_kazakh` refusal.
+        // Codex 2026-05-09 review caught this on E0382 holdout snippets
+        // («```rust\nlet s = String::from("hi"); let _t = s; …```»):
+        // pre-fix the detector saw `from` (Rust idiom) as an English
+        // function word and refused; post-fix the code-input flag
+        // suppresses the russian/english check entirely.
+        let code_input = crate::discourse::input_is_code_snippet(input);
+
+        // Russian / English inputs should refuse cleanly via
+        // `unknown.non_kazakh`. Skip the check on code blocks (see
+        // v5.6.5 ordering fix above).
+        let russian_input = !code_input
+            && (crate::discourse::input_is_likely_russian(input)
+                || crate::discourse::input_is_likely_english(input));
 
         // **v4.6.12** — Math-expression detection. Real-REPL
         // 2026-04-29: «5+5» / «7 + 3 =» / «6:2=» / «5-ті 7-ге
@@ -815,12 +823,6 @@ impl Conversation {
         // requires a clear math shape (operator near digits OR
         // math verb + numeric tokens) — pure mentions of numbers
         // («Қазақстанда 17 облыс бар») don't trigger.
-        // **v4.77.0** — code-snippet detection (Codex round-2 Bug 8).
-        // Detect Python-style code BEFORE math classification so
-        // «for i in range(3): print(i)» doesn't fall to math_refusal.
-        // Routes to dedicated `code_refusal` template via
-        // `__code_input__` slot.
-        let code_input = crate::discourse::input_is_code_snippet(input);
         let math_input = !code_input && crate::discourse::input_is_math_expression(input);
 
         // **v4.2.0** — tool-loop orchestration replaces the v4.0.37
@@ -1159,6 +1161,18 @@ impl Conversation {
         // (give a recommendation).
         if crate::discourse::is_political_recommendation(input) {
             extra_slots.insert("__political_safety__".into(), "1".into());
+        }
+        // **v5.6.5** — Codex 2026-05-09 review. Medical / legal /
+        // financial / current-data safety layer. Pre-v5.6.5 «Басым
+        // ауырып тұр, қандай дәрі ішейін?» surfaced the curated noun
+        // fact «Бас — дене бөлігі» — source-backed but product-
+        // dangerous (medical advice misroute). Detect high-stakes
+        // advice-seeking patterns and route to a dedicated
+        // `safety_refusal.<category>` template family that names the
+        // limitation honestly and points the user at a qualified
+        // specialist.
+        if let Some(category) = crate::discourse::detect_safety_topic(input) {
+            extra_slots.insert("__safety_refusal__".into(), category.slug().into());
         }
         // v4.6.12 — Math-input marker (set above based on
         // `input_is_math_expression`). Carried into the planner

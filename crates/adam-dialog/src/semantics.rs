@@ -2269,6 +2269,13 @@ fn detect_ask_location(joined: &str) -> bool {
         || joined.contains("қай аудан")
         // self-recall variants: «Қай қалада тұрамын?»
         || (has_self_recall_marker && joined.contains("қай"))
+        // **v5.6.5** — bare locative «қайда» self-recall: «Мен қайда
+        // тұрамын?». Codex 2026-05-09 review caught this falling
+        // through to StatementOfLocation. Conservative — requires
+        // both the locative interrogative AND a self-recall verb
+        // («тұрамын / тұрамыз»).
+        || (has_self_recall_marker
+            && tokens.iter().any(|t| *t == "қайда" || *t == "қайдан"))
 }
 
 /// User states location: "мен Алматыданмын", "астанада тұрамын",
@@ -2301,12 +2308,36 @@ fn detect_statement_of_location(
     // user had asserted living there. Post-fix question markers
     // («қай», «қашан», «неге», «қандай», «?») bail out so the turn
     // falls through to AskLocation or other detectors.
+    //
+    // **v5.6.5** — Codex 2026-05-09 review caught «Мен қайда
+    // тұрамын?» still falling through (`Қай екен, түсіндім`).
+    // Root cause: `joined.contains("қай ")` requires a trailing
+    // space, so the locative form «қайда» (single token, no space
+    // before its case suffix) didn't match. Adding token-level
+    // membership in the question-pronoun closed list catches
+    // «қайда / қашан / қалай / неге / қандай / қанша» when they
+    // appear standalone, regardless of surrounding whitespace.
+    let question_pronouns: &[&str] = &[
+        "қайда",
+        "қайдан",
+        "қашан",
+        "қалай",
+        "неге",
+        "қандай",
+        "қанша",
+        "неше",
+        "неліктен",
+    ];
+    let has_question_pronoun = tokens
+        .iter()
+        .any(|t| question_pronouns.contains(&t.as_str()));
     let is_question = joined.contains('?')
         || joined.contains("қай ")
         || joined.contains(" қай ")
         || joined.starts_with("қай ")
         || joined.contains("қандай")
-        || joined.contains("қашан");
+        || joined.contains("қашан")
+        || has_question_pronoun;
     if is_question {
         return None;
     }
