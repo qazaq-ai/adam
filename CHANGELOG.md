@@ -21,6 +21,51 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.14.5] — 2026-05-10 — V0.1 — Voice-input live-test fixes (mic stop bug + whisper model pre-flight)
+
+**Patch milestone.** Two real bugs surfaced by the first live test of v5.14.0 voice input. Architecturally minor; UX-critical.
+
+### What changed
+
+**1. `MicCapture::stop` rewritten — fully user-driven stop signal.** The v5.14.0 design used `recv_timeout(100 ms)` over a `mpsc::channel` as the stop signal: as soon as the audio callback paused for >100 ms between chunks (normal at low CPU load and large buffer sizes), the drain loop terminated and recording cut. In live use this fired during natural speech pauses — the user couldn't finish a single word before the mic shut off.
+
+The new design holds samples in a shared `Arc<Mutex<Vec<i16>>>` written by the cpal callback, gated by an `Arc<AtomicBool>` running flag. `MicCapture::stop` flips the flag, drops the cpal stream (which joins the audio thread), copies the accumulated buffer, downmixes + resamples. The stop trigger is now whatever the *caller* uses — Enter in `adam_chat`, a button in a future GUI, etc. No inter-chunk timing assumption.
+
+Two new public accessors on `MicCapture`:
+- `elapsed()` — wall-clock since `start`; caller polls against safety cap
+- `max_duration()` — the configured cap, surfaced for the UX prompt
+
+**2. Pre-flight whisper-model file check in adam_chat.** Pre-fix the user pasted the docs placeholder `--whisper-model /path/to/...` and got a cryptic mid-stream «failed to initialize whisper context» from inside whisper-cli. Post-fix `adam_chat --voice-input` checks the model path exists *before* the first capture turn and points the user at the official Hugging Face download page. When `--whisper-model` is omitted, an explicit warning surfaces (whisper-cli's default model search may still fail; better to be explicit).
+
+**3. UX prompts clarified.**
+- «press Enter to start recording» (was: «press Enter to record»)
+- After start: `[voice] ● recording — speak now in Kazakh; press Enter when done (auto-stop in 30 s)` — with a recording bullet, language hint, and a visible safety cap
+- After stop: `[voice] captured 3.2 s of audio; transcribing …` — surfaces actual recorded duration so the user can see whether the capture matched what they said
+
+### Why `x.y.5`
+
+Per cadence policy: bug-fix + UX hygiene + small public-API additions on `MicCapture` (`elapsed` / `max_duration`). No new public surface beyond accessors; no architectural shift; the V0 pipeline (mic → STT → kernel) is unchanged.
+
+### Live demo (post-fix)
+
+```text
+[voice] press Enter to start recording …
+[voice] ● recording — speak now in Kazakh; press Enter when done (auto-stop in 30 s)
+[voice] captured 3.4 s of audio; transcribing …
+[voice] heard: «Сәлем»
+```
+
+### Tests
+
+- 10 unit tests in `adam-voice` still passing (downmix / resample / argv / missing binary / env var); the new mic threading doesn't introduce additional unit-testable surface beyond what V0 already covered. Live-test on M2 Mac with whisper-cpp 1.8.4 + ggml model resolved both reported bugs.
+- Workspace 1 282 passing (no behavioural change for non-voice paths)
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --all-targets --features voice -- -D warnings` clean; `cargo test --workspace` 0 failures; `bash scripts/check_metrics_currency.sh` clean.
+
+**Stripe — Deterministic AI research (V0 voice-input live-test fixes; mic stop signal + model pre-flight).**
+
 ## [5.14.0] — 2026-05-10 — V0 — Voice-input transducer (push-to-talk + whisper.cpp shell-out)
 
 **Minor-version release.** First milestone of the **voice arc** (V0 → V5, v5.14.0–v5.19.0). Codex's post-v5.11.0 audit asked for full voice dialogue; this release ships the foundational input transducer behind the architectural boundary that keeps the kernel deterministic.

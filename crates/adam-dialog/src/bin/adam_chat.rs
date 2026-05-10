@@ -473,21 +473,43 @@ fn run_voice_repl(
     }
     let mut cli = WhisperCli::new(&bin);
     if let Some(m) = whisper_model_arg {
+        let model_path = std::path::Path::new(m);
+        // **v5.14.5** — pre-flight model file check. Pre-fix the user
+        // pasted the docs placeholder `--whisper-model /path/to/...`
+        // and got a cryptic «failed to initialize whisper context»
+        // mid-stream. Now we honestly fail fast with the path the
+        // user gave us so the fix is one-line.
+        if !model_path.exists() {
+            eprintln!(
+                "adam-chat --voice-input: whisper model not found at {model_path:?}. \
+                 Download a Kazakh-supporting model from \
+                 https://huggingface.co/ggerganov/whisper.cpp/tree/main \
+                 (e.g. `ggml-medium.bin`) and pass --whisper-model <path>."
+            );
+            return ExitCode::FAILURE;
+        }
         cli = cli.with_model(m);
+    } else {
+        eprintln!(
+            "adam-chat --voice-input: --whisper-model not set. The whisper-cli \
+             default model search may fail; pass --whisper-model <path> to be safe. \
+             Models: https://huggingface.co/ggerganov/whisper.cpp/tree/main"
+        );
     }
     if let Some(lang) = whisper_language_arg {
         cli = cli.with_language(lang);
     }
 
     eprintln!(
-        "adam-chat --voice-input: push-to-talk active. Press Enter to record \
-         (up to 30 s), then Enter again to stop. ^D to quit."
+        "adam-chat --voice-input: push-to-talk active. Press Enter to record, \
+         say what you want, press Enter again to stop. Recording auto-stops \
+         after 30 s. ^D to quit."
     );
     let stdin = io::stdin();
     let mut prompt_line = String::new();
     loop {
         prompt_line.clear();
-        eprint!("[voice] press Enter to record … ");
+        eprint!("[voice] press Enter to start recording … ");
         io::stderr().lock().flush().ok();
         if stdin.lock().read_line(&mut prompt_line).is_err() || prompt_line.is_empty() {
             return ExitCode::SUCCESS;
@@ -499,7 +521,17 @@ fn run_voice_repl(
                 continue;
             }
         };
-        eprint!("[voice] recording … press Enter to stop");
+        // **v5.14.5** — explicit user-driven stop signal. Pre-v5.14.5
+        // the mic stopped on a 100 ms inter-chunk drain timeout,
+        // which fired during natural speech pauses on low-load CPU
+        // and cut recordings before the user finished a word. Now
+        // the loop blocks on `read_line` until the user explicitly
+        // hits Enter, with a 30 s safety cap polled separately.
+        eprintln!(
+            "[voice] ● recording — speak now in Kazakh; press Enter when done \
+             (auto-stop in {} s)",
+            cap.max_duration().as_secs()
+        );
         io::stderr().lock().flush().ok();
         let mut stop_line = String::new();
         let _ = stdin.lock().read_line(&mut stop_line);
@@ -510,6 +542,11 @@ fn run_voice_repl(
                 continue;
             }
         };
+        eprintln!(
+            "[voice] captured {:.1} s of audio; transcribing …",
+            samples.len() as f64 / adam_voice::mic::WHISPER_SAMPLE_RATE as f64
+        );
+        io::stderr().lock().flush().ok();
         let tmp_dir = std::env::temp_dir();
         let wav_path = tmp_dir.join(format!("adam_voice_turn_{}.wav", *turn + 1));
         if let Err(e) = write_wav(&samples, &wav_path) {

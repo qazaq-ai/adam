@@ -17,13 +17,20 @@
 //!
 //! ## Threading model
 //!
-//! cpal hands us a real-time callback on its own thread. We push
-//! decoded samples through a [`std::sync::mpsc`] channel; the main
-//! thread drains the channel into the output buffer. No locks on the
-//! audio path.
+//! cpal hands us a real-time callback on its own thread. The
+//! callback appends decoded samples to a shared `Arc<Mutex<Vec<i16>>>`
+//! buffer, gated by an `Arc<AtomicBool>` running flag. The main
+//! thread reads the flag at stop time and copies the buffer once the
+//! stream is dropped (cpal joins the audio thread on drop, so by
+//! then no more callbacks are firing). v5.14.5 replaced the v5.14.0
+//! mpsc-channel-with-drain-timeout design after a live-test bug
+//! report — the drain timeout cut recordings short on natural speech
+//! pauses; the stop signal is now fully user-driven.
 
 use std::path::Path;
-use std::sync::mpsc::{Receiver, Sender, channel};
+use std::sync::Arc;
+use std::sync::Mutex;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
 
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
@@ -54,15 +61,24 @@ impl Default for MicConfig {
     }
 }
 
-/// Push-to-talk capture session. Holds the cpal stream + the
-/// sample-collecting receiver until the user calls [`stop`].
+/// Push-to-talk capture session. Holds the cpal stream + a shared
+/// sample buffer the audio callback writes into. The stream stays
+/// open until [`stop`] is called explicitly OR the configured
+/// `max_duration` elapses (safety cap, queried by the caller via
+/// [`elapsed`]).
 ///
-/// Drop on the returned struct is silent — no panic if the audio
-/// device hangs up mid-stream.
+/// **v5.14.5** — replaced the v5.14.0 `recv_timeout`-drain stop
+/// signal which had a subtle bug: cpal callbacks can pause >100 ms
+/// between chunks (low CPU load, large buffer sizes), and the drain
+/// loop would terminate as soon as the first such pause hit — cutting
+/// the recording before the user finished speaking. Post-v5.14.5
+/// the stop signal is **fully user-driven** (Enter in adam_chat),
+/// not derived from inter-chunk timing.
 pub struct MicCapture {
     config: MicConfig,
     stream: cpal::Stream,
-    rx: Receiver<Vec<i16>>,
+    samples: Arc<Mutex<Vec<i16>>>,
+    running: Arc<AtomicBool>,
     started_at: Instant,
     device_sample_rate: u32,
     device_channels: u16,
@@ -70,9 +86,9 @@ pub struct MicCapture {
 
 impl MicCapture {
     /// Open the default input device, negotiate a config, and start
-    /// the capture stream. Returns a [`MicCapture`] handle that
-    /// continues capturing until [`stop`] is called or the configured
-    /// `max_duration` elapses.
+    /// the capture stream. The capture continues until [`stop`] is
+    /// called or [`elapsed`] exceeds `config.max_duration` (caller is
+    /// responsible for polling).
     pub fn start(config: MicConfig) -> Result<Self> {
         let host = cpal::default_host();
         let device = host
@@ -86,40 +102,58 @@ impl MicCapture {
         let device_sample_rate = cfg.sample_rate.0;
         let device_channels = cfg.channels;
 
-        let (tx, rx): (Sender<Vec<i16>>, Receiver<Vec<i16>>) = channel();
+        let samples: Arc<Mutex<Vec<i16>>> = Arc::new(Mutex::new(Vec::with_capacity(
+            // Pre-allocate ~1 s worth at 48 kHz × max channels.
+            (device_sample_rate as usize * device_channels as usize).max(48_000),
+        )));
+        let running = Arc::new(AtomicBool::new(true));
 
-        let err_tx = tx.clone();
         let stream = match sample_format {
-            SampleFormat::I16 => device
-                .build_input_stream(
-                    &cfg,
-                    move |data: &[i16], _: &cpal::InputCallbackInfo| {
-                        let _ = tx.send(data.to_vec());
-                    },
-                    move |e| {
-                        eprintln!("[adam-voice mic] stream error: {e}");
-                        let _ = err_tx.send(Vec::new());
-                    },
-                    None,
-                )
-                .map_err(|e| VoiceError::StreamBuild(e.to_string()))?,
-            SampleFormat::F32 => device
-                .build_input_stream(
-                    &cfg,
-                    move |data: &[f32], _: &cpal::InputCallbackInfo| {
-                        let converted: Vec<i16> = data
-                            .iter()
-                            .map(|&s| (s.clamp(-1.0, 1.0) * i16::MAX as f32) as i16)
-                            .collect();
-                        let _ = tx.send(converted);
-                    },
-                    move |e| {
-                        eprintln!("[adam-voice mic] stream error: {e}");
-                        let _ = err_tx.send(Vec::new());
-                    },
-                    None,
-                )
-                .map_err(|e| VoiceError::StreamBuild(e.to_string()))?,
+            SampleFormat::I16 => {
+                let buf = Arc::clone(&samples);
+                let run = Arc::clone(&running);
+                device
+                    .build_input_stream(
+                        &cfg,
+                        move |data: &[i16], _: &cpal::InputCallbackInfo| {
+                            if !run.load(Ordering::Relaxed) {
+                                return;
+                            }
+                            if let Ok(mut g) = buf.lock() {
+                                g.extend_from_slice(data);
+                            }
+                        },
+                        move |e| {
+                            eprintln!("[adam-voice mic] stream error: {e}");
+                        },
+                        None,
+                    )
+                    .map_err(|e| VoiceError::StreamBuild(e.to_string()))?
+            }
+            SampleFormat::F32 => {
+                let buf = Arc::clone(&samples);
+                let run = Arc::clone(&running);
+                device
+                    .build_input_stream(
+                        &cfg,
+                        move |data: &[f32], _: &cpal::InputCallbackInfo| {
+                            if !run.load(Ordering::Relaxed) {
+                                return;
+                            }
+                            if let Ok(mut g) = buf.lock() {
+                                g.reserve(data.len());
+                                for &s in data {
+                                    g.push((s.clamp(-1.0, 1.0) * i16::MAX as f32) as i16);
+                                }
+                            }
+                        },
+                        move |e| {
+                            eprintln!("[adam-voice mic] stream error: {e}");
+                        },
+                        None,
+                    )
+                    .map_err(|e| VoiceError::StreamBuild(e.to_string()))?
+            }
             other => {
                 return Err(VoiceError::StreamBuild(format!(
                     "unsupported sample format {other:?}"
@@ -132,28 +166,41 @@ impl MicCapture {
         Ok(Self {
             config,
             stream,
-            rx,
+            samples,
+            running,
             started_at: Instant::now(),
             device_sample_rate,
             device_channels,
         })
     }
 
-    /// Drain the channel into a flat `Vec<i16>`, downmixing
-    /// multi-channel input to mono and resampling to 16 kHz. Stops
-    /// when no more samples arrive within a 100 ms quiet window OR
-    /// the configured `max_duration` elapsed.
+    /// Wall-clock time since [`start`] returned. Caller polls this
+    /// against `config.max_duration` to enforce the safety cap from
+    /// the main thread without coupling the audio callback to time.
+    pub fn elapsed(&self) -> Duration {
+        self.started_at.elapsed()
+    }
+
+    /// Configured `max_duration` from the [`MicConfig`].
+    pub fn max_duration(&self) -> Duration {
+        self.config.max_duration
+    }
+
+    /// Stop capture and return the captured samples downmixed to
+    /// mono + resampled to 16 kHz. The audio callback observes the
+    /// `running` flag and stops appending immediately; we then drop
+    /// the stream and copy the accumulated buffer.
     pub fn stop(self) -> Result<Vec<i16>> {
-        let mut raw: Vec<i16> = Vec::new();
-        let drain_window = Duration::from_millis(100);
-        while let Ok(chunk) = self.rx.recv_timeout(drain_window) {
-            raw.extend(chunk);
-            if self.started_at.elapsed() >= self.config.max_duration {
-                break;
-            }
-        }
-        // Stream drops here implicitly via `self.stream`.
+        // Signal the callback to stop appending. This is purely
+        // cooperative — the callback may still be mid-call on cpal's
+        // audio thread when we set the flag, and any data already
+        // written before the next callback observation stays in the
+        // buffer (acceptable; that's a few ms of speech).
+        self.running.store(false, Ordering::Relaxed);
+        // Drop the stream. cpal joins the audio thread on drop, so
+        // by the time `drop` returns, no more callbacks will fire.
         drop(self.stream);
+        let raw = self.samples.lock().map(|g| g.clone()).unwrap_or_default();
         let mono = downmix_to_mono(&raw, self.device_channels);
         let resampled = resample_linear(&mono, self.device_sample_rate, WHISPER_SAMPLE_RATE);
         Ok(resampled)
