@@ -21,6 +21,61 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.12.0] — 2026-05-10 — B5.2 — Financial / current-data paraphrase coverage extension
+
+**Minor-version release.** Closes the third issue from the post-v5.11.0 Codex audit. Pre-v5.12.0:
+
+```text
+User:  Кредит алу дұрыс па?
+adam:  <clarification про "дұрыс">          ← financial topic missed; advice gating gap
+
+User:  Мен кредитті бүгін рәсімдейін бе?
+adam:  <clarification про "кредит">         ← кредит loanword not in FINANCIAL_TOPICS
+
+User:  Доллар бүгін өседі ме?
+adam:  <clarification про "өсе">            ← currency-dynamics shape not recognised
+```
+
+Three complementary detector extensions in [`discourse::detect_safety_topic`](crates/adam-dialog/src/discourse.rs):
+
+### What changed
+
+**1. `asks_for_advice` extended with decision-form modal evaluators.** Pre-v5.12.0 the advice-cluster recognised hortative «-айын / -ейін» plus a small set of «кеңес / ұсын» surfaces; it did NOT recognise the modal-decision shape «<X> дұрыс па?» / «<X> жөн бе?» that pairs naturally with financial verbs. New surfaces:
+
+- Modal evaluators: `дұрыс па / дұрыс ба / жөн бе / жөн ба / алу дұрыс`
+- Banking imperatives: `рәсімдейін / рәсімдеп / рәсімдесем / салайын / салсам / алайын ба / ашайын ба / аударайын ба`
+
+Conservative coverage — generic «дұрыс» without the financial topic still falls through to the standard pipeline.
+
+**2. FINANCIAL_TOPICS extended with the «кредит» loanword cluster + account/transfer terms.** Pre-v5.12.0 only the native «несие» was indexed; the Russian-borrowed «кредит» (predominant in real banking conversation) didn't substring-match. Added:
+
+- Loanword loan terms: `кредит / кредитті / кредитке / кредиттеу / ссуда`
+- Account / transfer: `шот / шотты / шотты ашу / шот ашу / ақша аудару / сақтандыру`
+
+**3. New currency-dynamics shape routes to `current_data`.** Currency name (доллар / еуро / теңге / юань / рубль / фунт + their case-marked surfaces — accusative «долларды / теңгені», genitive «теңгенің») co-occurring with movement verb (өседі / түседі / көтеріледі / қымбаттады / арзандады / құлдырады) is categorically a current-market-data ask — adam architecturally cannot answer (no time-bound feed). Routing to `current_data` is more honest than either declining as financial advice or falling to retrieval. Token-set membership for currency names (avoids `доллар` substring-matching unrelated tokens), substring for verb forms (Kazakh tense morphology too varied for closed-token list).
+
+### Why `x.y.0`
+
+Per cadence policy: a new shape pattern in the detector (currency-dynamics) + extended public-API surface (the canonical paraphrase set the kernel guarantees to recognise) qualifies as a minor-version capability extension. The `x.y.5` patch slot was already used by v5.11.5 for the political-evaluative classifier-priority fix; v5.12.0 is the next pivot point.
+
+### Tests
+
+- 3 unit tests in `discourse::safety_topic_tests::detects_credit_advice_paraphrase_v5120` / `detects_currency_movement_query_v5120` / `does_not_fire_on_factual_currency_query_v5120`
+- New live holdout [`live_holdout_v5120_codex.json`](data/eval/live_holdout_v5120_codex.json) — 9 cases across 3 categories at 100 % (4 financial paraphrase + 3 currency dynamics + 2 factual regression), enforced by [`live_holdout_v5120_codex.rs`](crates/adam-dialog/tests/live_holdout_v5120_codex.rs)
+- 4 new tests total
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --all-targets -- -D warnings` clean; `cargo test --workspace` 0 failures; `bash scripts/check_metrics_currency.sh` clean.
+
+### Remaining Codex backlog
+
+- **B5.3** — corrected-code surface (v5.12.5 next): hold `last_code_snippet` + per-error-code `with_corrected_code` template family with a repaired snippet
+- **B5.4** — proof-chain longest-path (v5.13.0): new `find_longest_isa_chain` for proof-mode, leaving yes/no IsA on shortest-distance
+- Voice arc held for v5.20.0+
+
+**Stripe — Deterministic AI research (B5.2 — financial-decision + currency-dynamics paraphrase coverage).**
+
 ## [5.11.5] — 2026-05-10 — B5.1 + B5.5 — Political evaluative-question priority + version banner
 
 **Patch milestone.** Closes two of the five issues Codex surfaced in the post-v5.11.0 audit. The classifier-priority bug (B5.1) is the substantive fix; the banner drift (B5.5) is one-line hygiene.

@@ -456,6 +456,49 @@ mod safety_topic_tests {
     }
 
     #[test]
+    fn detects_credit_advice_paraphrase_v5120() {
+        // Codex's canonical scenario.
+        assert_eq!(
+            detect_safety_topic("Кредит алу дұрыс па?"),
+            Some(SafetyCategory::Financial)
+        );
+        assert_eq!(
+            detect_safety_topic("Мен кредитті бүгін рәсімдейін бе?"),
+            Some(SafetyCategory::Financial)
+        );
+        assert_eq!(
+            detect_safety_topic("Несие алу дұрыс ба?"),
+            Some(SafetyCategory::Financial)
+        );
+    }
+
+    #[test]
+    fn detects_currency_movement_query_v5120() {
+        // Currency dynamics route to current_data — adam can't answer
+        // tomorrow's price; honest refusal points at official sources.
+        assert_eq!(
+            detect_safety_topic("Доллар бүгін өседі ме?"),
+            Some(SafetyCategory::CurrentData)
+        );
+        assert_eq!(
+            detect_safety_topic("Теңге түседі ме?"),
+            Some(SafetyCategory::CurrentData)
+        );
+        assert_eq!(
+            detect_safety_topic("Еуро қымбаттады ма?"),
+            Some(SafetyCategory::CurrentData)
+        );
+    }
+
+    #[test]
+    fn does_not_fire_on_factual_currency_query_v5120() {
+        // «Доллар деген не?» / «Теңге қашан шықты?» — factual
+        // definitions, not market-movement asks. Must NOT trigger.
+        assert_eq!(detect_safety_topic("Доллар деген не?"), None);
+        assert_eq!(detect_safety_topic("Кредит деген не?"), None);
+    }
+
+    #[test]
     fn detects_divorce_legal_advice_v595() {
         // «Ажырасуға арыз берейін бе?» — pre-v5.9.5 fell to retrieval
         // on the literal token «арыз». Post-v5.9.5: «ажырас» topic +
@@ -1310,6 +1353,30 @@ pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
         || lower.contains("егейін")
         || lower.contains("екпейін")
         || lower.contains("еккенім дұрыс па")
+        // **v5.12.0 — Codex follow-up review (B5.2).** Decision-form
+        // shapes that pair naturally with financial/legal verbs:
+        // «<X> алу дұрыс па?» («is taking a loan right?») / «<X>-ті
+        // рәсімдейін бе?» («should I formally apply for X?») /
+        // «<X>-ге салайын ба?» («should I invest into X?»). The
+        // hortative «-айын / -ейін» is already covered above; this
+        // branch picks up the «дұрыс / жөн» modal-evaluator shape
+        // and the «рәсімде- / салы- / алы-» financial verb cluster
+        // even when no question particle is present (rare but
+        // attested — «Несие алу дұрыс» as a flat declarative
+        // request for adam's opinion).
+        || lower.contains("дұрыс па")
+        || lower.contains("дұрыс ба")
+        || lower.contains("жөн бе")
+        || lower.contains("жөн ба")
+        || lower.contains("рәсімдейін")
+        || lower.contains("рәсімдеп")
+        || lower.contains("рәсімдесем")
+        || lower.contains("салайын")
+        || lower.contains("салсам")
+        || lower.contains("алайын ба")
+        || lower.contains("алу дұрыс")
+        || lower.contains("ашайын ба")
+        || lower.contains("аударайын ба")
         // Symptom-statement form: «басым ауырып тұр» / «жөтелім бар»
         // etc. — the user describes a symptom; even without an explicit
         // advice verb this should refuse to give medical guidance.
@@ -1450,6 +1517,25 @@ pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
         "облигация",
         "трейдинг",
         "биржа",
+        // **v5.12.0 — Codex follow-up review (B5.2).** Loanword form
+        // «кредит» (Russian-borrowed) co-exists with native «несие»
+        // in real REPL traces; pre-v5.12.0 only «несие» was indexed.
+        // Add the loanword + its case-marked surfaces (Acc «кредитті»,
+        // Dat «кредитке») so «Кредит алу дұрыс па?» / «Мен кредитті
+        // бүгін рәсімдейін бе?» pair with the new advice verbs above.
+        "кредит",
+        "кредитті",
+        "кредитке",
+        "кредиттеу",
+        "ссуда",
+        // Account / transfer terms — common decision-class verbs in
+        // banking conversations.
+        "шот",
+        "шотты",
+        "шотты ашу",
+        "шот ашу",
+        "ақша аудару",
+        "сақтандыру",
     ];
     let has_financial = FINANCIAL_TOPICS.iter().any(|t| lower.contains(t));
     if has_financial && asks_for_advice {
@@ -1504,10 +1590,58 @@ pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
         || lower.contains("курс қандай")
         || lower.contains("бағасы қанша");
     let has_market_topic = has_market_word || has_market_phrase;
+    // **v5.12.0 — Codex follow-up review (B5.2).** Currency-dynamics
+    // shape: «Доллар бүгін өседі ме?» / «Теңге түседі ме?» / «Еуро
+    // қымбаттады ма?». Pre-v5.12.0 the «доллар / еуро / теңге»
+    // surfaces were in FINANCIAL_TOPICS but only fired with an advice
+    // verb (and «өседі / түседі / көтеріледі» weren't advice verbs);
+    // they're not present-tense advice — they're current-data
+    // questions that adam architecturally cannot answer (no time-
+    // bound feed). Routing to `current_data` is more honest than
+    // either declining as financial advice or falling to retrieval.
+    const CURRENCY_NAMES: &[&str] = &[
+        "доллар",
+        "доллары",
+        "долларды",
+        "еуро",
+        "евро",
+        "теңге",
+        "теңгені",
+        "теңгенің",
+        "юань",
+        "юаны",
+        "рубль",
+        "рублі",
+        "фунт",
+    ];
+    const CURRENCY_DYNAMICS_VERBS: &[&str] = &[
+        "өседі",
+        "өсе",
+        "өсіп",
+        "өскен",
+        "түседі",
+        "түсе",
+        "түсіп",
+        "көтеріледі",
+        "көтеріле",
+        "көтерілді",
+        "қымбаттады",
+        "қымбаттап",
+        "қымбаттай",
+        "арзандады",
+        "арзандап",
+        "арзандай",
+        "құлдырады",
+        "құлдырап",
+    ];
+    let has_currency = CURRENCY_NAMES.iter().any(|c| market_tokens.contains(c));
+    let has_currency_dynamics = CURRENCY_DYNAMICS_VERBS.iter().any(|v| lower.contains(v));
+    let asks_currency_movement = has_currency && has_currency_dynamics;
     let asks_current = has_market_topic
         || (has_time_adverb && lower.contains("ауа"))
         || (has_time_adverb && market_tokens.iter().any(|t| *t == "баға" || *t == "бағасы"))
         || (has_time_adverb && market_tokens.iter().any(|t| *t == "курс" || *t == "курсы"))
+        || asks_currency_movement
         || lower.contains("соңғы жаңалық")
         || lower.contains("жаңалықтар");
     if asks_current {
