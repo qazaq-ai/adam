@@ -82,6 +82,25 @@ pub fn plan_response_with_session(
     }
     ensure_geo_kind_slot(&mut slots);
     ensure_name_respect_slot(&mut slots);
+    // **v5.6.6 — Codex follow-up review.** SubmitSolution lesson-
+    // context inheritance. The v4.95.5 fallback in `extract_slots`
+    // tried to read `last_exercise_topic` from its local slot map,
+    // but that map is built fresh from the Intent — the session
+    // wasn't visible. Do the resolution HERE instead, where `slots`
+    // is the session-merged map, so a passing snippet after an
+    // `AskExercise { topic: ownership }` turn inherits "ownership"
+    // as the lesson topic instead of "println" (filtered out at
+    // detection time per the v5.6.6 detect_submit_solution change)
+    // or empty (which falls to a topic-less template variant).
+    if matches!(intent, Intent::SubmitSolution { topic: None, .. }) && !slots.contains_key("topic")
+    {
+        if let Some(t) = slots.get("last_exercise_topic").cloned() {
+            if !t.is_empty() {
+                slots.insert("topic".into(), t);
+            }
+        }
+    }
+
     // **v4.95.0** — SubmitSolution sub-routing. After extract_slots
     // ran cargo_verify and populated cargo_status, switch the
     // template key to the matching sub-family. Done here (not in
@@ -587,6 +606,40 @@ pub fn plan_response_with_epistemic(
             };
         }
     }
+    // **v5.6.6 — Codex follow-up review.** AskPreviousError recall.
+    // Pre-v5.6.6 «Ал алдыңғы қате неде болды?» fell to retrieval on
+    // «болд». New override consults session state populated by a
+    // prior failed SubmitSolution turn and routes to a dedicated
+    // template family.
+    if let Some(mode) = extra_slots.get("__ask_previous_error__") {
+        let key = format!("ask_previous_error.{mode}");
+        if !repo.get(&key).is_empty() {
+            trace.push(format!("planner: ask_previous_error override → {key}"));
+            let applicable_all = repo.get(&key);
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            let fillable: Vec<&String> = applicable_all
+                .iter()
+                .filter(|t| template_is_fillable(t, &slots))
+                .collect();
+            let effective: Vec<&String> = if fillable.is_empty() {
+                applicable_all.iter().collect()
+            } else {
+                fillable
+            };
+            let idx = (rng_seed as usize) % effective.len().max(1);
+            let chosen = effective.get(idx).map(|s| (*s).clone()).unwrap_or_default();
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
     // **v5.6.5 — Codex 2026-05-09 review.** High-stakes-topic safety
     // refusal (medical / legal / financial / current-data). Routes to
     // dedicated `safety_refusal.<category>` family BEFORE all factual
@@ -905,6 +958,26 @@ pub fn plan_response_with_epistemic(
     for (k, v) in extra_slots {
         slots.insert(k.clone(), v.clone());
     }
+    // **v5.6.6 — Codex follow-up review.** SubmitSolution lesson-
+    // context inheritance. The v4.95.5 fallback in `extract_slots`
+    // tried to read `last_exercise_topic` from its local slot map,
+    // but that map is built fresh from the Intent — the session
+    // wasn't visible there. Do the resolution HERE, where `slots` is
+    // the session-merged map (session + extract_slots + extra_slots),
+    // so a passing snippet after an `AskExercise { topic: ownership }`
+    // turn inherits "ownership" as the lesson topic instead of
+    // "println" (filtered out at detection time per the v5.6.6
+    // detect_submit_solution change) or empty (which falls to a
+    // topic-less template variant).
+    if matches!(intent, Intent::SubmitSolution { topic: None, .. }) && !slots.contains_key("topic")
+    {
+        if let Some(t) = slots.get("last_exercise_topic").cloned() {
+            if !t.is_empty() {
+                slots.insert("topic".into(), t);
+            }
+        }
+    }
+
     // **v4.95.0** — SubmitSolution sub-routing. extract_slots ran
     // cargo_verify and populated cargo_status; switch the template
     // key to the matching sub-family. Done here (after slot

@@ -1340,7 +1340,21 @@ pub fn detect_submit_solution(input: &str) -> Option<(String, Option<String>)> {
     if !looks_like_rust {
         return None;
     }
-    let topic = pedagogical_topic_hint(input);
+    // **v5.6.6 — Codex follow-up review.** Filter pedagogical_topic_
+    // hint to canonical curriculum-stage IDs only when used as
+    // SubmitSolution.topic. Pre-v5.6.6 a clean snippet like
+    // ` ```rust\nprintln!("hello")\n``` ` made `pedagogical_topic_
+    // hint` return `Some("println")` (the snippet contained the Rust
+    // syntax token «println» which is in `LATIN_TECH_SUBJECTS`),
+    // which the planner then surfaced as «println тапсырмаңыз
+    // шешілді» — treating an implementation detail as a lesson topic.
+    // The fix passes through only canonical curriculum stages
+    // (ownership / borrow / lifetime / traits / async); other
+    // Latin-token hits are dropped so the planner falls back to
+    // `session.last_exercise_topic` (set by the prior AskExercise
+    // turn) per the v4.95.5 multi-turn lesson-state path.
+    const CURRICULUM_STAGES: &[&str] = &["ownership", "borrow", "lifetime", "traits", "async"];
+    let topic = pedagogical_topic_hint(input).filter(|t| CURRICULUM_STAGES.contains(&t.as_str()));
     Some((trimmed.to_string(), topic))
 }
 

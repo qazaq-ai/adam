@@ -610,6 +610,26 @@ templates = [
     "Процесі: {explain_steps}",
 ]
 
+# **v5.6.6 — Codex follow-up review.** AskPreviousError recall family.
+# Surfaces session-stored last error from a prior failed SubmitSolution
+# turn. Variant selection: `with_data` (last_cargo_error_code present)
+# vs `empty` (no prior failure recorded — honest "no previous error in
+# this session"). Slots: {error_code} / {error_explanation} / {topic}.
+[[families]]
+key = "ask_previous_error.with_data"
+templates = [
+    "Алдыңғы қате — **{error_code}**. {error_explanation}",
+    "Соңғы тапсырыста {topic} бойынша **{error_code}** қатесі шықты. {error_explanation}",
+    "Бұл — {error_code}. {error_explanation} Қайта көрсеңіз, түзетуге дайын.",
+]
+
+[[families]]
+key = "ask_previous_error.empty"
+templates = [
+    "Ағымдағы сұхбатта тіркелген қате жоқ — әлі ешқандай тапсырыс берілмеген немесе соңғысы сәтті өтті. Жаттығу бастаймыз ба?",
+    "Алдыңғы қате жайлы дерек жоқ: бұл сессияда сәтсіз тапсырыс жоқ.",
+]
+
 # **v5.6.5 — Codex 2026-05-09 review.** Safety-refusal families for
 # high-stakes topics (medical / legal / financial / current-data).
 # Pre-v5.6.5 a query like «Басым ауырып тұр, қандай дәрі ішейін?»

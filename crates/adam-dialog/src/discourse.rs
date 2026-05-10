@@ -529,6 +529,39 @@ pub fn is_political_recommendation(input: &str) -> bool {
     has_political && has_recommend
 }
 
+/// **v5.6.6 — Codex follow-up review.** AskPreviousError detector.
+/// After a failed SubmitSolution turn the session carries
+/// `last_cargo_error_code`, `last_error_explanation`,
+/// `last_submission_topic`. A natural follow-up like «Ал алдыңғы
+/// қате неде болды?» / «Соңғы қате не еді?» / «Бұл қате неден?»
+/// should surface those slots — pre-v5.6.6 the question fell to
+/// retrieval over the literal token «болд» and produced a tangential
+/// proverb. Returns true when the input is unambiguously a previous-
+/// error recall question; the caller (Conversation::turn) routes to
+/// `ask_previous_error.{with_data,empty}` accordingly.
+pub fn is_ask_previous_error(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    // Recall markers in Kazakh: «алдыңғы / соңғы / бұл / алғашқы»
+    // PLUS the noun «қате» (error). Tightly gated to avoid matching
+    // anything that mentions «қате» incidentally.
+    let has_recall_marker = lower.contains("алдыңғы")
+        || lower.contains("соңғы")
+        || lower.contains("алғашқы")
+        || lower.contains("бұл қате")
+        || lower.contains("осы қате")
+        || lower.contains("кешегі");
+    let mentions_error = lower.contains("қате") || lower.contains("error");
+    let asks_about_it = lower.contains("неде")
+        || lower.contains("неден")
+        || lower.contains("не еді")
+        || lower.contains("қандай")
+        || lower.contains("түсіндір")
+        || lower.contains("түсіндіріп")
+        || lower.contains("тағы айт")
+        || lower.contains("қайталап");
+    has_recall_marker && mentions_error && asks_about_it
+}
+
 /// **v5.6.5 — Codex 2026-05-09 review.** High-stakes-topic safety
 /// detector. Adam is a Kazakh-language dialog kernel for educational
 /// use; it must NOT route medical / legal / financial / current-data
@@ -574,6 +607,15 @@ pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
 
     // Advice-seeking shapes — present in all categories. Generic
     // factual «X деген не?» / «X кім?» do NOT match.
+    //
+    // **v5.6.6 — Codex follow-up review.** Extended with paraphrase
+    // patterns Codex caught: «қанша ішейін» (drug dose hortative),
+    // «қол қояйын ба» (contract-signing hortative), «алуға кеңес бер»
+    // (loan-taking advice imperative), bare imperative «кеңес бер»
+    // alongside the polite forms, generic dose questions «қанша / қанша
+    // мөлшерде». The key is to catch hortative «-айын / -ейін / -яйн»
+    // (1sg.HORT) + question particle, which is the canonical
+    // Kazakh advice-seeking shape.
     let asks_for_advice = lower.contains("не ішейін")
         || lower.contains("не істейін")
         || lower.contains("қандай дәрі")
@@ -582,11 +624,27 @@ pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
         || lower.contains("кеңес бересіз бе")
         || lower.contains("кеңес бере аласыз ба")
         || lower.contains("кеңес беріңіз")
+        || lower.contains("кеңес бер")
         || lower.contains("ұсыныс беріңіз")
         || lower.contains("ұсыныс бересіз бе")
+        || lower.contains("ұсынбыз")
+        || lower.contains("ұсын")
         || lower.contains("маған не керек")
         || lower.contains("қайтсем")
         || lower.contains("қалай шешемін")
+        // **v5.6.6** — hortative + question particle. «-айын ба /
+        // -ейін бе / -яйн ма» asks "should I do X?" — definitionally
+        // an advice request when paired with a high-stakes topic.
+        || lower.contains("ішейін")
+        || lower.contains("ішейін бе")
+        || lower.contains("ішсем")
+        || lower.contains("қояйын")
+        || lower.contains("қол қою")
+        || lower.contains("алайын")
+        || lower.contains("алуға")
+        || lower.contains("қанша мөлшерде")
+        || lower.contains("қанша ішейін")
+        || lower.contains("қанша ішсем")
         // Symptom-statement form: «басым ауырып тұр» / «жөтелім бар»
         // etc. — the user describes a symptom; even without an explicit
         // advice verb this should refuse to give medical guidance.
@@ -595,6 +653,10 @@ pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
         || lower.contains("ауырып жатыр");
 
     // ── Medical ────────────────────────────────────────────────────
+    // **v5.6.6** — extended with common drug names + symptom verbs
+    // that Codex caught as paraphrase gaps. List is intentionally
+    // bilingual (Kazakh + Latin / Russian transliterations) since
+    // brand names cross language boundaries.
     const MEDICAL_TOPICS: &[&str] = &[
         "ауыр",
         "дәрі",
@@ -617,6 +679,23 @@ pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
         "укол",
         "таблетка",
         "сурет",
+        // v5.6.6 — drug-name paraphrases
+        "аспирин",
+        "парацетамол",
+        "ибупрофен",
+        "анальгин",
+        "цитрамон",
+        "но-шпа",
+        "нурофен",
+        "анестезин",
+        "витамин",
+        "гормон",
+        "эмульсия",
+        "капля",
+        // Generic prescription-class
+        "рецепт",
+        "доза",
+        "мөлшер",
     ];
     let has_medical = MEDICAL_TOPICS.iter().any(|t| lower.contains(t));
     if has_medical && asks_for_advice {
@@ -624,6 +703,8 @@ pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
     }
 
     // ── Legal ──────────────────────────────────────────────────────
+    // **v5.6.6** — extended with contract / signing patterns Codex
+    // caught.
     const LEGAL_TOPICS: &[&str] = &[
         "сот",
         "соттасу",
@@ -631,11 +712,25 @@ pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
         "заңгер",
         "шарт",
         "келісімшарт",
+        "келісім-шарт",
         "айып",
         "өтемақы",
         "арыз",
         "талап",
         "құжат рәсімдеу",
+        // v5.6.6
+        "қол қою",
+        "қол қояйын",
+        "келісімшартқа",
+        "шартқа",
+        "иммигрант",
+        "виза",
+        "азамат",
+        "құқық",
+        "мұрагер",
+        "мұра",
+        "ажырас",
+        "талас",
     ];
     let has_legal = LEGAL_TOPICS.iter().any(|t| lower.contains(t));
     if has_legal && asks_for_advice {
@@ -643,8 +738,10 @@ pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
     }
 
     // ── Financial ──────────────────────────────────────────────────
+    // **v5.6.6** — extended with crypto + bank-loan paraphrases.
     const FINANCIAL_TOPICS: &[&str] = &[
         "несие",
+        "несиесін",
         "ипотека",
         "инвестиция",
         "акция",
@@ -656,6 +753,18 @@ pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
         "пай",
         "пайыз",
         "салым",
+        // v5.6.6
+        "bitcoin",
+        "btc",
+        "ethereum",
+        "криптовалюта",
+        "банк",
+        "займ",
+        "қарыз алу",
+        "депозит",
+        "облигация",
+        "трейдинг",
+        "биржа",
     ];
     let has_financial = FINANCIAL_TOPICS.iter().any(|t| lower.contains(t));
     if has_financial && asks_for_advice {
@@ -667,13 +776,55 @@ pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
     // — adam has no live/time-bound data feed. This category fires
     // even without an explicit advice verb because the question
     // itself presumes data adam doesn't have.
-    let asks_current = lower.contains("қазіргі")
+    //
+    // **v5.6.6 — Codex follow-up review.** Extended with broader
+    // surface forms: «Bitcoin бағасы қандай?», «Бүгін ауа райы
+    // қандай?», «курс / бағасы / баға» as topics on their own (not
+    // just paired with «қандай»), crypto / market terms, time
+    // adverbs «бүгін / қазір» when paired with a time-bound query
+    // shape.
+    let has_time_adverb = lower.contains("қазіргі")
+        || lower.contains("қазір ")
         || lower.contains("бүгінгі")
-        || lower.contains("соңғы жаңалық")
-        || lower.contains("жаңалықтар")
-        || lower.contains("ауа райы қазір")
+        || lower.contains("бүгін ")
+        || lower.contains("ертеңгі")
+        || lower.contains("ертең ");
+    // **v5.6.6 — bug fix.** Market-term check uses TOKEN BOUNDARIES,
+    // not raw substring contains. Pre-fix `lower.contains("курс")`
+    // matched «рекурсия» (recursion) — a false positive that misrouted
+    // the «async fn рекурсия деген не?» curriculum holdout to the
+    // current-data refusal. The fix splits on non-alphabetic chars
+    // and checks token-set membership for the short / ambiguous
+    // markers; multi-word terms still use substring (those are
+    // unambiguous by structure).
+    let market_tokens: std::collections::HashSet<&str> =
+        lower.split(|c: char| !c.is_alphabetic()).collect();
+    const MARKET_WORDS: &[&str] = &[
+        "курс",
+        "курсы",
+        "баға",
+        "бағасы",
+        "bitcoin",
+        "btc",
+        "биткойн",
+        "ethereum",
+        "крипто",
+        "крипту",
+        "криптовалюта",
+        "биржа",
+    ];
+    let has_market_word = MARKET_WORDS.iter().any(|w| market_tokens.contains(w));
+    let has_market_phrase = lower.contains("ауа райы")
+        || lower.contains("акция бағасы")
         || lower.contains("курс қандай")
         || lower.contains("бағасы қанша");
+    let has_market_topic = has_market_word || has_market_phrase;
+    let asks_current = has_market_topic
+        || (has_time_adverb && lower.contains("ауа"))
+        || (has_time_adverb && market_tokens.iter().any(|t| *t == "баға" || *t == "бағасы"))
+        || (has_time_adverb && market_tokens.iter().any(|t| *t == "курс" || *t == "курсы"))
+        || lower.contains("соңғы жаңалық")
+        || lower.contains("жаңалықтар");
     if asks_current {
         return Some(SafetyCategory::CurrentData);
     }

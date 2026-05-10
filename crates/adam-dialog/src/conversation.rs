@@ -1174,6 +1174,27 @@ impl Conversation {
         if let Some(category) = crate::discourse::detect_safety_topic(input) {
             extra_slots.insert("__safety_refusal__".into(), category.slug().into());
         }
+        // **v5.6.6 — Codex follow-up review.** AskPreviousError recall
+        // route. Pre-v5.6.6 «Ал алдыңғы қате неде болды?» fell to
+        // retrieval on the literal token «болд» — a tangential proverb.
+        // Now consult session state populated by a prior failed
+        // SubmitSolution turn (`last_cargo_error_code` /
+        // `last_error_explanation` / `last_submission_topic`) and route
+        // to `ask_previous_error.{with_data,empty}`.
+        if crate::discourse::is_ask_previous_error(input) {
+            if let Some(code) = self.session.get("last_cargo_error_code") {
+                extra_slots.insert("__ask_previous_error__".into(), "with_data".into());
+                extra_slots.insert("error_code".into(), code.clone());
+                if let Some(expl) = self.session.get("last_error_explanation") {
+                    extra_slots.insert("error_explanation".into(), expl.clone());
+                }
+                if let Some(topic) = self.session.get("last_submission_topic") {
+                    extra_slots.insert("topic".into(), topic.clone());
+                }
+            } else {
+                extra_slots.insert("__ask_previous_error__".into(), "empty".into());
+            }
+        }
         // v4.6.12 — Math-input marker (set above based on
         // `input_is_math_expression`). Carried into the planner
         // so the `math_refusal` template family fires.
@@ -1637,7 +1658,7 @@ impl Conversation {
                         .get("last_exercise_topic")
                         .and_then(|t| curriculum.stage(t).map(|s| s.id.clone()))
                 });
-            if let (Some(status), Some(stage_id)) = (cargo_status, lesson_stage_id) {
+            if let (Some(status), Some(stage_id)) = (cargo_status, lesson_stage_id.clone()) {
                 let entry = self.curriculum_progress.entry(stage_id).or_default();
                 match status {
                     "passed" => entry.record_pass(),
@@ -1647,6 +1668,39 @@ impl Conversation {
                     // the student's solution.
                     _ => {}
                 }
+            }
+            // **v5.6.6 — Codex follow-up review.** Capture the last
+            // SubmitSolution result into session so a follow-up turn
+            // like «Ал алдыңғы қате неде болды?» can recall the
+            // error code + explanation + topic. Pre-v5.6.6 the
+            // follow-up fell to retrieval and surfaced a tangential
+            // sentence on the literal token «болд». Cleared on a
+            // passing solution so a subsequent recall question
+            // honestly says "previous error not present".
+            match plan.slots.get("cargo_status").map(String::as_str) {
+                Some("failed") => {
+                    if let Some(code) = plan.slots.get("error_code") {
+                        self.session
+                            .insert("last_cargo_error_code".into(), code.clone());
+                    }
+                    if let Some(expl) = plan.slots.get("error_explanation") {
+                        self.session
+                            .insert("last_error_explanation".into(), expl.clone());
+                    }
+                    if let Some(topic) = plan.slots.get("topic") {
+                        self.session
+                            .insert("last_submission_topic".into(), topic.clone());
+                    }
+                }
+                Some("passed") => {
+                    self.session.remove("last_cargo_error_code");
+                    self.session.remove("last_error_explanation");
+                    if let Some(topic) = plan.slots.get("topic") {
+                        self.session
+                            .insert("last_submission_topic".into(), topic.clone());
+                    }
+                }
+                _ => {}
             }
         }
 
