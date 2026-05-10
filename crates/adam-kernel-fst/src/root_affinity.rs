@@ -97,9 +97,15 @@ impl RootAffinity {
     /// Load a JSON affinity file from disk. Mismatched versions
     /// return a dedicated error so callers can fail fast instead of
     /// silently using a stale prior.
+    ///
+    /// **v5.6.0** — switched from `fs::read` + `from_slice` (which
+    /// holds the entire 27 MB file as `Vec<u8>` alongside the parsed
+    /// struct at peak) to `BufReader::new(File::open)` +
+    /// `from_reader`. Cuts peak RSS during load by ~27 MB.
     pub fn load<P: AsRef<Path>>(path: P) -> Result<Self, RootAffinityLoadError> {
-        let bytes = std::fs::read(path.as_ref()).map_err(RootAffinityLoadError::Io)?;
-        let priors: Self = serde_json::from_slice(&bytes).map_err(RootAffinityLoadError::Json)?;
+        let file = std::fs::File::open(path.as_ref()).map_err(RootAffinityLoadError::Io)?;
+        let reader = std::io::BufReader::new(file);
+        let priors: Self = serde_json::from_reader(reader).map_err(RootAffinityLoadError::Json)?;
         if priors.version != SCHEMA_VERSION {
             return Err(RootAffinityLoadError::VersionMismatch {
                 expected: SCHEMA_VERSION,

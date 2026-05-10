@@ -129,9 +129,15 @@ impl SuffixPriors {
     /// current `SCHEMA_VERSION`; mismatched versions return a
     /// dedicated error so callers can fail fast instead of silently
     /// using a stale prior.
+    ///
+    /// **v5.6.0** — switched from `fs::read` + `from_slice` to
+    /// `BufReader::new(File::open)` + `from_reader` so the raw
+    /// 2.4 MB byte buffer isn't held alongside the parsed struct at
+    /// peak.
     pub fn load<P: AsRef<Path>>(path: P) -> Result<Self, SuffixPriorsLoadError> {
-        let bytes = std::fs::read(path.as_ref()).map_err(SuffixPriorsLoadError::Io)?;
-        let priors: Self = serde_json::from_slice(&bytes).map_err(SuffixPriorsLoadError::Json)?;
+        let file = std::fs::File::open(path.as_ref()).map_err(SuffixPriorsLoadError::Io)?;
+        let reader = std::io::BufReader::new(file);
+        let priors: Self = serde_json::from_reader(reader).map_err(SuffixPriorsLoadError::Json)?;
         if priors.version != SCHEMA_VERSION {
             return Err(SuffixPriorsLoadError::VersionMismatch {
                 expected: SCHEMA_VERSION,

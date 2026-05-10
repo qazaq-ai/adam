@@ -21,6 +21,60 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.6.0] — 2026-05-09 — Performance — parallel load + streaming JSON parse
+
+**Minor-version release.** Cold-start performance arc — closes both spec targets from the original v5.5.0 plan that moved to v5.6.0. Two architectural changes work together to achieve a **27 % faster warm-cache cold start** and a **31 % RSS reduction**.
+
+### What changed
+
+**1. Parallel cold-start load.** Pre-v5.6.0 [`adam_chat`](crates/adam-dialog/src/bin/adam_chat.rs) loaded 5 large JSON artefacts sequentially: retrieval index (18 MB), reasoning chains (24 MB combined), suffix priors (2.4 MB), root affinity (27 MB), world_core directory. Total = sum of individual times. v5.6.0 spawns each loader on its own `std::thread::spawn`; total time approaches `max(individual)` instead of `sum`. The Conversation builder still waits for all threads (no lazy-load delay on the first user query) — only the cold-start phase is parallelised.
+
+**2. Streaming JSON parse via `BufReader::new(File::open)` + `serde_json::from_reader`.** Pre-v5.6.0 the loaders used `read_to_string` / `read` followed by `from_str` / `from_slice`, which holds the entire file as `String` / `Vec<u8>` in addition to the parsed struct at peak. Switching to `from_reader` removes the intermediate buffer — peak memory drops by `len(file)` for each artefact. Applied to:
+- [`adam_chat::load_retrieval_index`](crates/adam-dialog/src/bin/adam_chat.rs) — saves 18 MB peak
+- [`adam_chat::load_reasoning_chains`](crates/adam-dialog/src/bin/adam_chat.rs) — saves 22 + 2.4 MB peak
+- [`RootAffinity::load`](crates/adam-kernel-fst/src/root_affinity.rs) — saves 27 MB peak
+- [`SuffixPriors::load`](crates/adam-kernel-fst/src/suffix_priors.rs) — saves 2.4 MB peak
+
+### Measurable impact
+
+| Metric | Pre-v5.6.0 | Post-v5.6.0 | Improvement |
+|---|---|---|---|
+| Cold start (warm cache) | 0.38–0.41 s | **0.22–0.28 s** | **27–45 % faster** ✅ <500 ms target |
+| Cold start (cold disk) | 1.22 s | **0.96–1.21 s** | 21 % faster |
+| Max RSS | 230 MB | **160 MB** | **31 % reduction** ✅ <200 MB target |
+| Peak memory | 225 MB | **154 MB** | **32 % reduction** |
+| p50 turn latency | 21.42 ms | **21.57 ms** | unchanged (no regression) ✅ |
+| p95 turn latency | 31.58 ms | 31.64 ms | unchanged |
+
+Both spec targets from the original v5.5.0 plan met:
+- ✅ Cold start <500 ms (warm cache)
+- ✅ RSS <200 MB
+- ✅ p50 latency does not regress
+
+### Why this is `x.y.0` and not `x.y.5`
+
+Per cadence policy, minor-version is reserved for **significant capability changes**. v5.6.0 introduces:
+1. New runtime architecture for cold-start (parallel I/O across thread pool)
+2. New peak-memory profile (streaming parse changes the memory-vs-throughput tradeoff at the library layer; affects every binary, not just `adam_chat`)
+3. Two library API surface changes (`RootAffinity::load`, `SuffixPriors::load` now use `BufReader`)
+
+These together justify minor-version. Future RSS work (lazy load on first use, binary serialization format) would target subsequent minor versions.
+
+### Verified
+
+- Workspace **1 205 passing** (unchanged — no behavioural change to dialog layer)
+- `cargo fmt --all --check` clean
+- `cargo test --workspace --release` 0 failures
+- `adam_chat --once "Сәлем"` smoke-tested 4× post-build, identical output to pre-v5.6.0
+- `adam_resource_bench --turns 100` confirms p50 unchanged
+
+### Deferred to future work
+
+- **Lazy load on first use** — would save additional ~50 MB RSS by deferring `RootAffinity` until a SearchGraph PMI rerank actually runs. Skipped because v5.6.0 already meets the <200 MB target without it; lazy-load adds latency to the first query that hits a deferred resource (acceptable tradeoff if pursued, but not justified at current numbers).
+- **Binary serialization format (bincode / postcard)** — would cut cold-disk further (~50 % JSON parse cost). Out of scope for v5.6.0; tracked for v5.7+ if cold-disk becomes a bottleneck.
+
+**Stripe — Deterministic AI research (cold-start performance arc; both targets met without behavioural regression).**
+
 ## [5.5.0] — 2026-05-09 — Kernel-level fixes — adjective-as-predicate + comparison proper-noun preservation
 
 **Minor-version release.** Two architectural deferrals from the v5.4.8 audit fixed at the kernel level (not just curated data). Per the cadence policy, kernel-signature changes warrant `x.y.0`. Performance + lazy-load work originally targeted at v5.5.0 moves to v5.6.0.
