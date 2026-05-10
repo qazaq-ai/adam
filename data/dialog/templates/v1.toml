@@ -681,6 +681,30 @@ templates = [
     "Қандай қатені түзетуді сұрап жатқаныңыз нақты белгісіз — менде осы сұхбатта тіркелген сәтсіз тапсырыс жоқ. Кодты бере салыңыз, қарап шығамын.",
 ]
 
+# **v5.10.5 — Codex follow-up review (B4.1).** Proof-chain mode. The
+# user asked «X-тің Y екенін дәлелде» / «Дәлелде X — Y». Detector:
+# `discourse::extract_proof_request`. Planner sentinel:
+# `__proof_chain__ = with_data | empty`. Slots: {subject_term} /
+# {predicate_term} / {chain}. The surface mirrors the IR shape from
+# `answer_ir::compose_isa_proof_chain` («Дәлелдейік: <subject> —
+# <predicate>. Тізбек: <chain>. Сондықтан <subject> — <predicate>.»);
+# the IR composer remains the formal spec while the dialog layer
+# uses the template path.
+[[families]]
+key = "proof_chain.with_data"
+templates = [
+    "Дәлелдейік: {subject_term} — {predicate_term}. Тізбек: {chain}. Сондықтан {subject_term} — {predicate_term}.",
+    "Қарап шығайық: {subject_term} — {predicate_term}. Тізбек: {chain}. Соның дәлелі осы.",
+    "Тізбек бойынша: {chain}. Сондықтан {subject_term} — {predicate_term}.",
+]
+
+[[families]]
+key = "proof_chain.empty"
+templates = [
+    "{subject_term} мен {predicate_term} арасында дәлелдеуге келетін тізбек менде сақталмаған.",
+    "Бұл тұжырымды дәлелдейтін тізбекті таба алмадым: {subject_term} мен {predicate_term} арасында белгілі дерек жоқ.",
+]
+
 # **v5.6.5 — Codex 2026-05-09 review.** Safety-refusal families for
 # high-stakes topics (medical / legal / financial / current-data).
 # Pre-v5.6.5 a query like «Басым ауырып тұр, қандай дәрі ішейін?»

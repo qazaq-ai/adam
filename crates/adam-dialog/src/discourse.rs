@@ -502,6 +502,33 @@ mod user_self_location_tests {
 }
 
 #[cfg(test)]
+mod proof_request_tests_v5105 {
+    use super::extract_proof_request;
+
+    #[test]
+    fn extracts_genitive_proof_shape_v5105() {
+        // «<X>-тің <Y> екенін дәлелде» — canonical proof-request shape.
+        let r = extract_proof_request("Қасқырдың тірі екенін дәлелде.");
+        assert_eq!(r, Some(("қасқыр".to_string(), "тірі".to_string())));
+    }
+
+    #[test]
+    fn extracts_em_dash_proof_shape_v5105() {
+        // «Дәлелде X — Y».
+        let r = extract_proof_request("Дәлелде Қасқыр — тірі.");
+        assert_eq!(r, Some(("қасқыр".to_string(), "тірі".to_string())));
+    }
+
+    #[test]
+    fn does_not_fire_on_unrelated_query_v5105() {
+        // Non-proof shape — must return None.
+        assert_eq!(extract_proof_request("Қасқыр — тірі ме?"), None);
+        assert_eq!(extract_proof_request("Қасқыр деген не?"), None);
+        assert_eq!(extract_proof_request("Бұл не?"), None);
+    }
+}
+
+#[cfg(test)]
 mod ask_fix_previous_error_tests_v5100 {
     use super::is_ask_fix_previous_error;
 
@@ -732,6 +759,73 @@ pub fn is_ask_previous_error(input: &str) -> bool {
         || lower.contains("тағы айт")
         || lower.contains("қайталап");
     has_recall_marker && mentions_error && asks_about_it
+}
+
+/// **v5.10.5 — Codex follow-up review (B4.1).** AskProofChain
+/// detector. Pre-v5.10.5 the user request «Қасқырдың тірі екенін
+/// дәлелде.» / «Дәлелде Қасқыр — тірі.» / «Қасқыр неге тірі?»
+/// fell to the standard YesNoConfirm path or to retrieval — the
+/// user got the answer but never the proof performance. Post-v5.10.5
+/// this detector flips the conversation into proof-mode (`AnswerShape
+/// ::IsAProofChain`), which surfaces the IsA chain step-by-step
+/// instead of wrapping a yes/no verdict around it.
+///
+/// Conservative: requires explicit proof-request shape («дәлел / дәлелде
+/// / неге / себебі»). Generic factual questions don't trigger.
+/// Returns `Option<(subject, object)>` parsed from the question — the
+/// caller uses these to query `find_isa_proof` and route through
+/// `compose(proof, AnswerShape::IsAProofChain, seed)`.
+pub fn extract_proof_request(input: &str) -> Option<(String, String)> {
+    let lower = input.to_lowercase();
+    let raw = input.trim().trim_end_matches(['.', '?', '!']);
+
+    // Shape A: «X-тің Y екенін дәлелде» / «X-нің Y екенін дәлелдеп бер».
+    // The «(?:тің|нің|дың|дің|тың|тің)» genitive is followed by «Y екенін
+    // дәлелде». Parse by splitting on «екенін дәлелде».
+    if let Some(idx) = lower.find("екенін дәлел") {
+        let prefix = &raw[..idx.min(raw.len())];
+        let prefix_lower = prefix.to_lowercase();
+        // Walk the prefix backwards to find «<X>-тің <Y>» — we need
+        // genitive-suffix split.
+        let parts: Vec<&str> = prefix_lower.split_whitespace().collect();
+        if parts.len() >= 2 {
+            let last = parts[parts.len() - 1];
+            let before = parts[..parts.len() - 1].join(" ");
+            // Strip genitive suffix from the subject.
+            let subject = strip_genitive_suffix(&before);
+            if !subject.is_empty() && !last.is_empty() {
+                return Some((subject, last.to_string()));
+            }
+        }
+    }
+
+    // Shape B: «дәлелде X — Y» / «X неге Y?» — flatter parse with
+    // explicit em-dash separator OR «неге» + bare-Y.
+    if lower.starts_with("дәлелде ") || lower.starts_with("дәлелдеп бер") {
+        let body = lower
+            .trim_start_matches("дәлелдеп бер")
+            .trim_start_matches("дәлелде")
+            .trim_start_matches(['.', ':', ' ']);
+        // Split on em-dash («—»).
+        if let Some((subj, pred)) = body.split_once('—') {
+            let subj = subj.trim().trim_end_matches([' ', ',']).to_string();
+            let pred = pred.trim().trim_end_matches(['.', ' ', ',']).to_string();
+            if !subj.is_empty() && !pred.is_empty() {
+                return Some((subj, pred));
+            }
+        }
+    }
+
+    None
+}
+
+fn strip_genitive_suffix(token: &str) -> String {
+    for suf in ["тің", "тың", "дің", "дың", "нің", "ның"] {
+        if let Some(stem) = token.strip_suffix(suf) {
+            return stem.to_string();
+        }
+    }
+    token.to_string()
 }
 
 /// **v5.10.0 — Codex follow-up review (B3).** AskFixPreviousError

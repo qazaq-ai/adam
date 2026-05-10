@@ -76,6 +76,18 @@ pub enum AnswerShape {
     /// High-stakes safety refusal: medical / legal / financial /
     /// current-data.
     SafetyRefusal,
+    /// **v5.10.5 — B4.1 of the Codex follow-up review arc.** Proof-
+    /// chain mode requested by the user via «дәлелде X (Y)» / «X-тің
+    /// Y екенін дәлелде» / «дәлелдеп бер». Distinct from
+    /// `YesNoConfirm` (which is a *yes/no answer* whose IsA chain is
+    /// supporting evidence) — `IsAProofChain` is a *proof
+    /// performance*: «Дәлелдейік: A → B → C → D. Сондықтан A — D.»
+    /// The conclusion is the same shape (IsA + Affirmative + non-
+    /// empty chain), but the surface emphasises the chain itself
+    /// rather than wrapping a yes/no verdict around it. Per the v5.9.0
+    /// G3.0 substrate, no new proof-object structure is required —
+    /// `from_isa_chain` already carries the derivation trace.
+    IsAProofChain,
 }
 
 /// One node in the answer-IR tree. Composition is recursive — every
@@ -107,6 +119,19 @@ pub enum AnswerNode {
     /// Refusal body for safety / no-data / system-self answers. The
     /// body is curated text bound to the proof's domain or kind.
     RefusalBody { surface: String },
+    /// **v5.10.5.** Proof-prologue used by `IsAProofChain`: opens the
+    /// performance with «Дәлелдейік:» / «Қарап шығайық:» (rng-picked).
+    ProofPrologue { surface: String },
+    /// **v5.10.5.** Stepwise rendering of the IsA chain — «A → B → C
+    /// → D» — distinct from [`AnswerNode::ChainCitation`] which
+    /// embeds chain text in a parenthetical. The proof composer for
+    /// `IsAProofChain` uses this node to make the chain the
+    /// structural focus of the answer.
+    ProofChainSteps { rendered_steps: String },
+    /// **v5.10.5.** Concluding statement bound to the chain — «Сондықтан
+    /// X — Y.» — distinct from a bare `Predicate` node so the realiser
+    /// can emit it on its own clause.
+    ProofConclusion { surface: String },
     /// Concatenation of child nodes. The renderer walks them
     /// left-to-right and joins their surface forms with single
     /// spaces, then lets the post-processor fix punctuation
@@ -145,6 +170,7 @@ pub fn compose(proof: &ProofObject, shape: AnswerShape, rng_seed: u64) -> Option
         AnswerShape::YesNoDeny => compose_yes_no_deny(proof, rng_seed),
         AnswerShape::YesNoUnknown => compose_yes_no_unknown(proof, rng_seed),
         AnswerShape::SafetyRefusal => compose_safety_refusal(proof, rng_seed),
+        AnswerShape::IsAProofChain => compose_isa_proof_chain(proof, rng_seed)?,
     };
     Some(AnswerIR {
         shape,
@@ -171,6 +197,19 @@ fn proof_matches_shape(proof: &ProofObject, shape: AnswerShape) -> bool {
                 proof.conclusion.predicate,
                 ClaimPredicate::SafetyRefusal { .. }
             )
+        }
+        // **v5.10.5.** Proof-chain mode requires affirmative IsA AND
+        // a non-empty derivation chain — without the chain there is
+        // nothing to perform. `compose_isa_proof_chain` itself returns
+        // `None` if the chain is empty (which `proof_matches_shape`
+        // can't see at this layer); the caller selects this shape only
+        // when the user explicitly asked for a proof, so the empty
+        // chain case is the user's signal that the kernel can't
+        // perform one — handled by routing back through standard
+        // template path.
+        AnswerShape::IsAProofChain => {
+            matches!(proof.conclusion.predicate, ClaimPredicate::IsA)
+                && proof.conclusion.polarity == Polarity::Affirmative
         }
     }
 }
@@ -298,8 +337,11 @@ fn walk(node: &AnswerNode, out: &mut String) {
         | AnswerNode::Subject { surface }
         | AnswerNode::Predicate { surface }
         | AnswerNode::Punctuation { surface }
-        | AnswerNode::RefusalBody { surface } => out.push_str(surface),
+        | AnswerNode::RefusalBody { surface }
+        | AnswerNode::ProofPrologue { surface }
+        | AnswerNode::ProofConclusion { surface } => out.push_str(surface),
         AnswerNode::ChainCitation { rendered_chain } => out.push_str(rendered_chain),
+        AnswerNode::ProofChainSteps { rendered_steps } => out.push_str(rendered_steps),
         AnswerNode::Hedge { surface, .. } => out.push_str(surface),
         AnswerNode::Sequence { nodes } => {
             for child in nodes {
@@ -352,6 +394,56 @@ fn render_chain(proof: &ProofObject) -> Option<String> {
 fn pick_confirm_verdict(rng_seed: u64) -> String {
     const VERDICTS: &[&str] = &["Иә,", "Дұрыс,"];
     VERDICTS[(rng_seed as usize) % VERDICTS.len()].to_string()
+}
+
+fn pick_proof_prologue(rng_seed: u64) -> String {
+    const PROLOGUES: &[&str] = &["Дәлелдейік:", "Қарап шығайық:", "Тізбек бойынша:"];
+    PROLOGUES[(rng_seed as usize) % PROLOGUES.len()].to_string()
+}
+
+/// **v5.10.5 — B4.1 composer.** Build a proof-performance IR over an
+/// IsA chain. Pre-conditions enforced by `proof_matches_shape` +
+/// non-empty chain check here. Surface shape:
+///
+/// > Дәлелдейік: <subject> — <terminal>. Тізбек: A → B → C → D.
+/// > Сондықтан <subject> — <terminal>.
+///
+/// Returns `None` when the proof has no derivation chain — the
+/// caller (Conversation::turn) falls back to the regular YesNoConfirm
+/// path or the template family in that case.
+fn compose_isa_proof_chain(proof: &ProofObject, rng_seed: u64) -> Option<AnswerNode> {
+    let chain_text = render_chain(proof)?;
+    let subject = capitalise_first(&proof.conclusion.subject);
+    let predicate = proof.conclusion.object.clone();
+    let prologue = pick_proof_prologue(rng_seed);
+    let nodes = vec![
+        AnswerNode::ProofPrologue { surface: prologue },
+        AnswerNode::Punctuation {
+            surface: " ".to_string(),
+        },
+        AnswerNode::Subject {
+            surface: subject.clone(),
+        },
+        AnswerNode::Punctuation {
+            surface: " — ".to_string(),
+        },
+        AnswerNode::Predicate {
+            surface: predicate.clone(),
+        },
+        AnswerNode::Punctuation {
+            surface: ". ".to_string(),
+        },
+        AnswerNode::ProofChainSteps {
+            rendered_steps: format!("Тізбек: {chain_text}."),
+        },
+        AnswerNode::Punctuation {
+            surface: " ".to_string(),
+        },
+        AnswerNode::ProofConclusion {
+            surface: format!("Сондықтан {subject} — {predicate}."),
+        },
+    ];
+    Some(AnswerNode::Sequence { nodes })
 }
 
 fn capitalise_first(s: &str) -> String {
@@ -439,6 +531,58 @@ mod tests {
         );
         assert!(text.contains("Кітап"), "subject in answer: {text}");
         assert!(text.contains("тағам"), "predicate in answer: {text}");
+    }
+
+    #[test]
+    fn compose_isa_proof_chain_renders_steps_v5105() {
+        let proof = ProofObject::from_isa_chain(
+            "қасқыр".into(),
+            "тірі".into(),
+            vec![
+                "қасқыр".into(),
+                "жыртқыш".into(),
+                "жануар".into(),
+                "тірі".into(),
+            ],
+            vec!["R1_is_a_transitivity".into()],
+        );
+        let ir = compose(&proof, AnswerShape::IsAProofChain, 0).expect("composer fires");
+        assert_eq!(ir.shape, AnswerShape::IsAProofChain);
+        let text = realise_answer_ir(&ir);
+        // Prologue + chain + conclusion all present.
+        assert!(
+            text.contains("Дәлелдейік")
+                || text.contains("Қарап шығайық")
+                || text.contains("Тізбек бойынша"),
+            "prologue surface: {text}"
+        );
+        assert!(
+            text.contains("қасқыр → жыртқыш → жануар → тірі"),
+            "chain stepwise: {text}"
+        );
+        assert!(text.contains("Сондықтан"), "conclusion surface: {text}");
+    }
+
+    #[test]
+    fn compose_isa_proof_chain_returns_none_on_empty_chain_v5105() {
+        // Direct fact — chain has only the subject (single-element
+        // chain). The proof matches IsA + Affirmative shape gate but
+        // the composer enforces non-empty derivation as a content
+        // check; an empty chain has no proof to perform.
+        let proof = ProofObject::from_curated_fact(
+            "ит".into(),
+            "is_a".into(),
+            "жануар".into(),
+            adam_reasoning::FactSource {
+                pack: "world_core".into(),
+                sample_id: "wc_anm_001".into(),
+            },
+            "Ит — жануар.".into(),
+        );
+        // `from_curated_fact` produces a proof with no derivation
+        // chain — composer must return None.
+        let ir = compose(&proof, AnswerShape::IsAProofChain, 0);
+        assert!(ir.is_none(), "expected None on no-derivation proof");
     }
 
     #[test]

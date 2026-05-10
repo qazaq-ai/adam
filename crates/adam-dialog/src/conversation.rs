@@ -1276,6 +1276,47 @@ impl Conversation {
                 extra_slots.insert("__ask_fix_previous_error__".into(), "empty".into());
             }
         }
+        // **v5.10.5 — Codex follow-up review (B4.1).** Proof-chain
+        // mode. When the user asks «Қасқырдың тірі екенін дәлелде.» /
+        // «Дәлелде Қасқыр — тірі.», route to the new proof-chain
+        // template family that performs the IsA chain step-by-step
+        // rather than wrapping a yes/no verdict around it. The IR
+        // composer in `answer_ir::compose_isa_proof_chain` is the
+        // formal spec for this surface; the dialog layer wires it
+        // through the slot/template path for now (composer-driven
+        // routing is held for the broader G3.0-integration arc).
+        if let Some((subject, predicate)) = crate::discourse::extract_proof_request(input) {
+            let chain = find_isa_chain(
+                &self.extracted_facts,
+                &self.derived_facts,
+                &subject,
+                &predicate,
+            );
+            let subject_cap = {
+                let mut c = subject.chars();
+                match c.next() {
+                    Some(ch) => ch.to_uppercase().collect::<String>() + c.as_str(),
+                    None => String::new(),
+                }
+            };
+            extra_slots.insert("subject_term".into(), subject_cap.clone());
+            extra_slots.insert("predicate_term".into(), predicate.clone());
+            match chain {
+                Some(path) if path.len() >= 2 => {
+                    extra_slots.insert("__proof_chain__".into(), "with_data".into());
+                    extra_slots.insert("chain".into(), path.join(" → "));
+                    proof_object = Some(crate::proof_object::ProofObject::from_isa_chain(
+                        subject.clone(),
+                        predicate.clone(),
+                        path,
+                        vec!["R1_is_a_transitivity".to_string()],
+                    ));
+                }
+                _ => {
+                    extra_slots.insert("__proof_chain__".into(), "empty".into());
+                }
+            }
+        }
         // v4.6.12 — Math-input marker (set above based on
         // `input_is_math_expression`). Carried into the planner
         // so the `math_refusal` template family fires.

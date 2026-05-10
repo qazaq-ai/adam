@@ -21,6 +21,47 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.10.5] — 2026-05-10 — B4.1 — Proof-chain mode (AnswerShape::IsAProofChain)
+
+**Patch milestone.** First half of B4 (the generation arc that builds atop the v5.9.0 G3.0 substrate). Pre-v5.10.5 the user request «Қасқырдың тірі екенін дәлелде.» / «Дәлелде Қасқыр — тірі.» fell to the standard yes/no IsA path or to retrieval — the user got the answer but never the proof performance.
+
+### What changed
+
+**1. New detector [`discourse::extract_proof_request`](crates/adam-dialog/src/discourse.rs).** Conservative: requires explicit proof-request shape («дәлел / дәлелде»). Returns `Option<(subject, predicate)>` — the caller uses these to query `find_isa_chain`. Two parse shapes:
+
+- **Genitive shape:** «X-тің Y екенін дәлелде» / «X-нің Y екенін дәлелде» / «X-дың Y екенін дәлелде» — split on «екенін дәлел», walk prefix backwards, strip genitive suffix from subject token.
+- **Em-dash shape:** «Дәлелде X — Y» / «Дәлелдеп бер X — Y» — split body on em-dash.
+
+**2. New `AnswerShape::IsAProofChain` + composer in [`answer_ir`](crates/adam-dialog/src/answer_ir.rs).** Distinct from `YesNoConfirm` (which is a *yes/no answer* whose IsA chain is supporting evidence) — `IsAProofChain` is a *proof performance*: «Дәлелдейік: A → B → C → D. Сондықтан A — D.» Three new `AnswerNode` variants:
+- `ProofPrologue` — opens the performance with «Дәлелдейік:» / «Қарап шығайық:» / «Тізбек бойынша:» (rng-picked)
+- `ProofChainSteps` — stepwise chain rendering, structurally separate from `ChainCitation` which embeds chain text in a parenthetical
+- `ProofConclusion` — concluding statement bound to the chain, on its own clause
+
+`compose_isa_proof_chain` returns `None` when the proof has no derivation chain (single-element chain via `from_curated_fact`); the caller falls back through the template path.
+
+**3. Conversation handler + planner override.** When `extract_proof_request` returns `Some((subject, predicate))`, the conversation layer queries `find_isa_chain` (same path as the v5.4.0 yes/no IsA wiring), sets sentinel `__proof_chain__ = with_data | empty`, and surfaces slots `subject_term` / `predicate_term` / `chain`. New planner override routes to `proof_chain.{with_data,empty}` template family. Uses the new `TemplateRepository::has_key` primitive (added v5.10.0) so a template-pack regression doesn't render `unknown` clarifications.
+
+**4. Two new template families.** `proof_chain.with_data` (3 variants — emphasising prologue / mid-chain / chain-first) and `proof_chain.empty` (2 honest "no chain available" refusals). Surface mirrors the IR shape produced by `compose_isa_proof_chain`; the IR composer remains the formal spec while the dialog layer wires templates for v5.10.5 (composer-driven routing held for the broader G3.0-integration arc).
+
+**5. Proof object construction.** The handler builds a typed `ProofObject::from_isa_chain` with the resolved chain path + `R1_is_a_transitivity` rule id, attached to `TurnTrace.proof_object` so the v5.8.5 verifier-gate audits the rendered proof-chain text.
+
+### Why `x.y.5`
+
+Per cadence policy: detector + handler + 2 template families + 1 new public AnswerShape variant + 3 new public AnswerNode variants + 2 new composer helpers. New surface but additive to the existing G3.0 substrate; no new module; no architectural shift. The next-step counterpart (v5.11.0 — countable propositions «N сөйлем» + explicit «дәлелсіз» refusal) is the broader B4 capability.
+
+### Tests
+
+- 3 unit tests in `discourse::proof_request_tests_v5105` (genitive shape / em-dash shape / regression-no-fire)
+- 2 unit tests in `answer_ir::tests::compose_isa_proof_chain_*_v5105` (renders steps / returns None on empty chain)
+- New live holdout [`live_holdout_v5105_codex.json`](data/eval/live_holdout_v5105_codex.json) — 5 cases across 3 categories at 100 % (3 proof-chain variants + regression yes/no IsA + regression bare definition), enforced by [`live_holdout_v5105_codex.rs`](crates/adam-dialog/tests/live_holdout_v5105_codex.rs)
+- 6 new tests total
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --all-targets -- -D warnings` clean; `cargo test --workspace` 0 failures; `bash scripts/check_metrics_currency.sh` clean.
+
+**Stripe — Deterministic AI research (B4.1 — proof-chain mode; first generation surface built atop G3.0 substrate).**
+
 ## [5.10.0] — 2026-05-10 — B3 — Persistent active_error + AskFixPreviousError follow-up route
 
 **Minor-version release.** Closes the third Codex follow-up issue (B3): the second follow-up after a compiler error fell to retrieval on the literal token «болд» / «оны» — adam lost the cached error context across multi-turn dialog. Pre-v5.10.0:

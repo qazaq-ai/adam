@@ -1,0 +1,10 @@
+{
+  "_comment": "v5.10.5 — Codex follow-up review (B4.1). Proof-chain mode. Pre-v5.10.5 the user request «Қасқырдың тірі екенін дәлелде» / «Дәлелде Қасқыр — тірі» fell to the standard yes/no IsA path or to retrieval — the user got the answer but never the proof performance. Post-v5.10.5: detector `discourse::extract_proof_request` parses (subject, predicate); planner sentinel `__proof_chain__ = with_data | empty` routes to new `proof_chain.{with_data,empty}` template family that performs the chain step-by-step («Дәлелдейік: X — Y. Тізбек: A → B → C → D. Сондықтан X — Y.»). New `AnswerShape::IsAProofChain` + `compose_isa_proof_chain` in `answer_ir` ship the formal IR spec; the dialog layer wires the surface through templates for v5.10.5. Composer-driven routing is held for the broader G3.0-integration arc.",
+  "cases": [
+    {"id": "proof_chain_genitive_qasqyr_tiri", "category": "proof_chain_v5105", "query": "Қасқырдың тірі екенін дәлелде.", "any_substring": ["дәлелдейік", "тізбек", "сондықтан"], "none_substring": ["түсінбедім", "сақтаулы қате жоқ"]},
+    {"id": "proof_chain_em_dash_qasqyr_tiri", "category": "proof_chain_v5105", "query": "Дәлелде Қасқыр — тірі.", "any_substring": ["дәлелдейік", "тізбек", "сондықтан"], "none_substring": ["түсінбедім", "сақтаулы қате жоқ"]},
+    {"id": "proof_chain_no_data_empty_branch", "category": "proof_chain_v5105", "query": "Кітаптың тағам екенін дәлелде.", "any_substring": ["сақталмаған", "белгілі дерек жоқ", "таба алмадым"], "none_substring": ["түсінбедім"]},
+    {"id": "regression_yesno_unaffected", "category": "regression_yesno_isa", "query": "Қасқыр — тірі ме?", "any_substring": ["иә", "дұрыс", "тірі"], "none_substring": ["сақталмаған"]},
+    {"id": "regression_definition_unaffected", "category": "regression_definition", "query": "Қасқыр деген не?", "any_substring": ["қасқыр"], "none_substring": ["дәлелдейік", "сондықтан"]}
+  ]
+}

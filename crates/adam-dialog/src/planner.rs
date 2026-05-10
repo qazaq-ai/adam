@@ -648,6 +648,44 @@ pub fn plan_response_with_epistemic(
     // explanation + Rust error-index pointer); on `empty` mode
     // routes to `ask_fix_previous_error.empty` for the no-context
     // honest refusal.
+    // **v5.10.5 — Codex follow-up review (B4.1).** Proof-chain
+    // override. Routes to `proof_chain.with_data` when the chain was
+    // resolved (slots `subject_term` / `predicate_term` / `chain` set
+    // by Conversation::turn_with_trace), or to `proof_chain.empty`
+    // for the honest "no derivation chain available" refusal. The
+    // surface mirrors the IR shape produced by
+    // `answer_ir::compose_isa_proof_chain`: «Дәлелдейік: <subject> —
+    // <predicate>. Тізбек: <chain>. Сондықтан <subject> —
+    // <predicate>.»
+    if let Some(mode) = extra_slots.get("__proof_chain__") {
+        let key = format!("proof_chain.{mode}");
+        if repo.has_key(&key) {
+            trace.push(format!("planner: proof_chain override → {key}"));
+            let applicable_all = repo.get(&key);
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            let fillable: Vec<&String> = applicable_all
+                .iter()
+                .filter(|t| template_is_fillable(t, &slots))
+                .collect();
+            let effective: Vec<&String> = if fillable.is_empty() {
+                applicable_all.iter().collect()
+            } else {
+                fillable
+            };
+            let idx = (rng_seed as usize) % effective.len().max(1);
+            let chosen = effective.get(idx).map(|s| (*s).clone()).unwrap_or_default();
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
     if let Some(mode) = extra_slots.get("__ask_fix_previous_error__") {
         let mut candidates: Vec<String> = Vec::new();
         if mode != "empty" {
