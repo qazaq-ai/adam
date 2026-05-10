@@ -46,6 +46,7 @@
 //! is the original v1.0 MVP reference kept as a historical snapshot.
 
 pub mod action;
+pub mod answer_ir;
 pub mod belief;
 pub mod cargo_verify;
 pub mod conversation;

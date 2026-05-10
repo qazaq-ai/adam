@@ -21,6 +21,64 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.9.0] — 2026-05-09 — G3.0 — Typed answer IR + proof-carrying composer (final milestone of the proof-carrying generation arc)
+
+**Minor-version release.** Closes the **proof-carrying generation arc** end-to-end. Codex's seven-step pipeline («facts + rules + constraints → derived proof object → structured answer IR → FST/morphology realiser → final answer → verifier») is now wired through the kernel for the four shapes the kernel can prove today.
+
+### What changed
+
+**1. New module [`adam_dialog::answer_ir`](crates/adam-dialog/src/answer_ir.rs).** Defines:
+- [`AnswerShape`] — what kind of answer is being composed: `YesNoConfirm` / `YesNoDeny` / `YesNoUnknown` / `SafetyRefusal`
+- [`AnswerNode`] — typed IR-tree node: `ConfirmVerdict` / `DenyVerdict` / `Subject` / `Predicate` / `Punctuation` / `ChainCitation` / `Hedge{marker}` / `RefusalBody` / `Sequence{nodes}`
+- [`AnswerIR`] — root `{ shape, root, source_proof }` with the source `ProofObject` baked in for verification
+
+**2. `compose(proof, shape, rng_seed) -> Option<AnswerIR>`.** Takes a typed proof + target shape, produces an IR tree. Returns `None` on shape/proof mismatch (e.g. `Polarity::Negated` proof asked for `YesNoConfirm` shape — composer refuses to silently coerce). Determinism: same `(proof, shape, rng_seed)` → byte-identical IR. The seed selects between equivalent surface forms (e.g. «Иә,» vs «Дұрыс,» for confirm verdicts).
+
+**3. `realise_answer_ir(ir) -> String`.** Walks the IR depth-first and concatenates surface forms with whitespace normalisation. The result is what the verifier audits.
+
+**4. `realise_and_verify(ir) -> Result<String, VerificationOutcome>`.** End-to-end gate: realise + audit against the source proof. Callers may emit only on `Ok`. Failures land back in the planner / template path.
+
+**5. The arc is closed.** The pipeline now flows:
+
+```text
+user input
+  → Conversation::turn_with_trace produces ProofObject (G2.0 + G2.5)
+  → compose(proof, shape, seed) produces AnswerIR    (G3.0)
+  → realise_and_verify produces verified text         (G3.0 + G2.5)
+  → emit only if Verified
+```
+
+### Why this fits the project's identity
+
+Per `MISSION.md`: «казахская агглютинативная морфология детерминистически компонует типизированные операторы». G3.0 lifts that compositional discipline from the morpheme level to the discourse level: an `AnswerNode` tree composes typed sub-claims with explicit support — every node traceable to its proof. The same algebra Kazakh applies at `root + suffix chain`, the kernel now applies at `subject + predicate + chain citation + hedge`.
+
+### Scope at G3.0
+
+**Four shapes wired:** YesNoConfirm / YesNoDeny / YesNoUnknown / SafetyRefusal. These are the shapes the kernel can already prove today (per the v5.8.5 G2.5 wiring). Definition / Comparison / StepByStep shapes will land as separate composer paths in the v5.9.x patch series — G3.0 ships the typed substrate; per-shape composers grow incrementally on top.
+
+**Coexists with template path.** v5.9.0 does NOT replace `Conversation::turn` or its template-driven render loop. Templates continue to work; the composer is an alternative path for the four shapes it covers. Callers (e.g. future v5.9.x integration in Conversation) opt in.
+
+### Why `x.y.0`
+
+Per cadence policy:
+1. New public module surface (`adam_dialog::answer_ir`) — 3 enums + 2 structs + 3 functions
+2. New typed IR substrate that future composer paths build on
+3. **Final milestone of the proof-carrying generation arc** (G1 → G1.5 → G2.0 → G2.5 → G3.0 — arc closed)
+
+The arc spanned 5 minor releases over the v5.7–v5.9 series; v5.9.0 closes it.
+
+### Tests
+
+- 10 unit tests in `answer_ir::tests` covering: each of the 4 shapes / shape-mismatch rejection / determinism per seed / verdict variation across seeds / verifier accepts well-formed IR / serde round-trip / polarity-shape disagreement rejection
+- 4 end-to-end tests in `answer_ir_e2e_v590` exercising the complete pipeline (Conversation → ProofObject → compose → realise_and_verify) for all 4 shapes
+- 14 new tests added (10 unit + 4 e2e); workspace test suite **1 224 passing**, 17 ignored, 0 failures (`cargo test --workspace --release`)
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --workspace --release --tests -- -D warnings` clean; `cargo test --workspace --release` 0 failures; `bash scripts/check_metrics_currency.sh` clean.
+
+**Stripe — Deterministic AI research (G3.0 typed answer IR + proof-carrying composer; proof-carrying generation arc closed end-to-end).**
+
 ## [5.8.5] — 2026-05-09 — G2.5 — verifier-gate в Conversation::turn (proof attached to every guarded path)
 
 **Patch milestone.** Wires the v5.8.0 `ProofObject` formalism into `Conversation::turn_with_trace` for the four paths the kernel can prove today. Every turn that fires one of those paths now produces a typed proof object alongside the rendered text, runs `verifier::audit` against it, and surfaces the verdict in [`TurnTrace`](crates/adam-dialog/src/conversation.rs).
