@@ -21,6 +21,47 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.7.5] — 2026-05-09 — G1.5 — realiser variation engine + keyword cluster extensions
+
+**Patch milestone** on the proof-carrying generation arc. Builds on v5.7.0's typed slot inventory by wiring the realiser to consult it for opt-in per-slot variation.
+
+### What changed
+
+**1. `realise_with_inventory(plan, inventory, rng_seed)` — new public API.** Backward-compatible: the original `realise(plan)` is preserved as a thin wrapper that passes `None` inventory, and every existing template renders bit-for-bit identically.
+
+**2. `{slot|vary}` directive** — opt-in variation. Templates can now mark a slot for variant-picking:
+- `{name|vary}` — realiser consults the inventory's `variants` list for `name`, rng-picks a `VariantStrategy`, applies the transform
+- `{name|vary+dative}` — pick variant strategy first (e.g. `Дәулет` → `Дәке` via `RespectfulAddress`), then apply FST dative on the result (`Дәкеге`)
+- Without `vary` in the feature spec, behaviour is unchanged
+
+**3. `apply_variant_strategy` — implementations for all 6 strategies:**
+- `Literal` — value verbatim
+- `RespectfulAddress` — Kazakh tradition (`Дәулет` → `Дәке`); falls back to literal when the name doesn't qualify (< 3 chars, etc.)
+- `FstLocative` / `FstGenitive` / `FstDative` / `FstAblative` — FST inflection variants (overlap with template-side `{slot|case=X}` syntax for explicit author intent; the variant strategy is for inventory-driven choice)
+
+**4. Per-placeholder rng salt.** Each `{...}` placeholder in a template gets a distinct rng seed (base seed + placeholder index) so multi-slot templates with the same slot referenced twice can produce coherent results without forcing identical strategies in every position.
+
+**5. Keyword cluster extensions** for indexer discovery (continuation of the Codex follow-up tag work):
+- [`AGENTS.md`](AGENTS.md) — Architecture / Properties / Application / Research clusters extended with `knowledge graph`, `graph reasoning`, `forward chaining`, `typed-fact graph`, `proof-carrying generation`, `typed slot inventory`, `symbolic AI`, `explainable AI`, `no unsupported claims`, `LLM alternative`
+- [`CITATION.cff`](CITATION.cff) keywords array extended with `knowledge-graph`, `graph-reasoning`, `forward-chaining`, `typed-fact-graph`, `symbolic-ai`, `proof-carrying-generation`
+- [`codemeta.json`](codemeta.json) keywords array extended with the same set + `no unsupported claims`, `typed slot inventory`
+
+### G1.5 → G2.0 trajectory
+
+G1.5 ships the **mechanism** (variation engine). User-visible variation surface is held back at this milestone — the inventory's `variants` lists are mostly `[Literal]` for now. G2.0 (`ProofObject` + verifier gate) is the precondition for templates to safely opt into richer variation: the verifier ensures every variant still satisfies the proof-carrying constraint.
+
+### Tests
+
+- 5 new unit tests in `realiser::variation_tests` covering: variant-picking with single strategy / fallback to literal for non-transformable values / no-op without inventory / determinism per seed / combinability with FST features
+- `slot_syntax`-level tests untouched (unchanged behaviour)
+- All 1 233 prior tests + 5 new = **1 238 passing**
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --workspace --release --tests -- -D warnings` clean; `cargo test --workspace --release` 0 failures; `bash scripts/check_metrics_currency.sh` clean.
+
+**Stripe — Deterministic AI research (G1.5 of the proof-carrying generation arc; realiser variation engine + indexer discovery extensions).**
+
 ## [5.7.0] — 2026-05-09 — G1.0 — typed slot inventory + email/topics hygiene
 
 **Minor-version release.** Opens the **proof-carrying generation arc** with the foundational milestone. Codex's external review proposed a generation layer where the model "собирает допустимое высказывание из доказанных typed propositions". After agreeing on the framing and noting that Kazakh agglutinative morphology is itself a proof system at the word level, we sequenced this work as **G1 → G2 → G3**:

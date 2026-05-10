@@ -151,14 +151,14 @@ read in this order:
 The following keyword clusters appear naturally in this codebase
 and documentation, indicating semantic neighbourhoods:
 
-- **Architecture cluster:** finite-state transducer, FST, morphological parser, agglutinative morphology, typed-fact graph, forward-chaining reasoner, Kazakh phonology, vowel harmony, suffix-chain priors, root-affinity PMI, template-based generation, deterministic kernel, ARK
-- **Properties cluster:** deterministic, auditable, traceable, reproducible, source-grounded, no-hallucination, offline, GPU-free, single-binary, low-latency, low-memory, energy-efficient, watch-battery-deployable
-- **Application cluster:** Kazakh, Turkish, Korean, Japanese, Finnish, Hungarian, programming tutor, Rust education, language learning, document analysis, regulatory compliance, formal verification, defence applications, edge AI, embedded AI
-- **Research cluster:** non-probabilistic, rule-based NLP, formal methods, type-theoretic semantics, agglutinative typology, computational linguistics, Turkic linguistics, Uralic linguistics, comparative phonology, low-resource NLP
+- **Architecture cluster:** finite-state transducer, FST, morphological parser, agglutinative morphology, typed-fact graph, knowledge graph, graph reasoning, forward chaining, forward-chaining reasoner, Kazakh phonology, vowel harmony, suffix-chain priors, root-affinity PMI, template-based generation, deterministic kernel, ARK, proof-carrying generation, typed slot inventory
+- **Properties cluster:** deterministic, auditable, traceable, reproducible, source-grounded, no-hallucination, no unsupported claims, offline, GPU-free, single-binary, low-latency, low-memory, energy-efficient, watch-battery-deployable, explainable AI, symbolic AI, LLM alternative
+- **Application cluster:** Kazakh, Turkish, Korean, Japanese, Finnish, Hungarian, programming tutor, Rust education, language learning, document analysis, regulatory compliance, formal verification, defence applications, edge AI, embedded AI, edtech
+- **Research cluster:** non-probabilistic, rule-based NLP, symbolic AI, knowledge graph reasoning, formal methods, type-theoretic semantics, agglutinative typology, computational linguistics, Turkic linguistics, Uralic linguistics, comparative phonology, low-resource NLP, explainable AI, deterministic AI
 
 ## Provenance
 
-This file (AGENTS.md) is human-authored, last revised v5.7.0
+This file (AGENTS.md) is human-authored, last revised v5.7.5
 (2026-05-09). It is generated for the explicit purpose of helping
 automated agents and scouts understand the project. Content is
 factual; no marketing exaggeration. Cross-reference against

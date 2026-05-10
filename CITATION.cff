@@ -44,6 +44,12 @@ keywords:
   - offline-ai
   - educational-ai
   - cognitive-kernel
+  - knowledge-graph
+  - graph-reasoning
+  - forward-chaining
+  - typed-fact-graph
+  - symbolic-ai
+  - proof-carrying-generation
 identifiers:
   - type: url
     value: "https://github.com/qazaq-ai/adam"
@@ -70,5 +76,5 @@ preferred-citation:
       email: baimurza.daulet@gmail.com
   year: 2026
   url: "https://github.com/qazaq-ai/adam"
-  version: 5.7.0
+  version: 5.7.5
   license: BUSL-1.1

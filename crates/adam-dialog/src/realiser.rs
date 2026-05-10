@@ -21,7 +21,9 @@
 
 use adam_kernel_fst::morphotactics::synthesise_noun;
 
+use crate::language_core::kazakh_respectful_address;
 use crate::planner::ResponsePlan;
+use crate::slot_inventory::{SlotInventory, VariantStrategy};
 use crate::slot_syntax::{parse_noun_features, parse_placeholder};
 
 /// Render a response plan into the final output string. Scans the
@@ -37,7 +39,35 @@ use crate::slot_syntax::{parse_noun_features, parse_placeholder};
 /// punctuation; preserves quote-led replies («...») by stepping
 /// into the first alphabetic codepoint past the opening quote.
 pub fn realise(plan: &ResponsePlan) -> String {
-    let raw = expand_template(&plan.literal, &plan.slots);
+    let raw = expand_template(&plan.literal, &plan.slots, None, 0);
+    let cased = capitalise_first_letter(&raw);
+    ensure_sentence_final(&cased)
+}
+
+/// **v5.7.5 — G1.5 of the proof-carrying generation arc.** Render a
+/// response plan with an attached typed slot inventory, enabling
+/// per-slot variant selection.
+///
+/// Templates can now opt into variation via the `vary` directive:
+/// `{name|vary}` tells the realiser to consult the inventory's
+/// `variants` list for the slot and rng-pick a strategy (e.g.
+/// `Literal` vs `RespectfulAddress` for `{name}`). Without `vary`
+/// in the feature spec the realiser falls back to the v0.8.0 path
+/// (literal substitution + optional FST features) bit-for-bit.
+///
+/// `rng_seed` is the same per-turn seed used by the planner — pinning
+/// the seed makes variant selection deterministic.
+///
+/// **Backward compatibility.** `realise(plan)` (no inventory) is
+/// preserved as a thin wrapper; every existing template renders
+/// identically. Variation is opt-in at the template authorship
+/// level — no existing template surface changes.
+pub fn realise_with_inventory(
+    plan: &ResponsePlan,
+    inventory: Option<&SlotInventory>,
+    rng_seed: u64,
+) -> String {
+    let raw = expand_template(&plan.literal, &plan.slots, inventory, rng_seed);
     let cased = capitalise_first_letter(&raw);
     ensure_sentence_final(&cased)
 }
@@ -172,9 +202,22 @@ mod realiser_tests {
     }
 }
 
-fn expand_template(template: &str, slots: &std::collections::HashMap<String, String>) -> String {
+fn expand_template(
+    template: &str,
+    slots: &std::collections::HashMap<String, String>,
+    inventory: Option<&SlotInventory>,
+    rng_seed: u64,
+) -> String {
     let mut out = String::with_capacity(template.len());
     let mut i = 0;
+    // **v5.7.5** — per-placeholder rng salt. Each placeholder gets a
+    // distinct salt derived from its position in the template, so
+    // multi-slot templates with `{name|vary}` ... `{name|vary}` (same
+    // slot referenced twice) can pick the same variant deterministically
+    // OR differ across positions if a future strategy tier wants that.
+    // For G1.5 the salt is the byte offset of the placeholder; same
+    // template + same seed = same expansion.
+    let mut placeholder_index: u64 = 0;
     let bytes = template.as_bytes();
     while i < bytes.len() {
         // `{` is a single byte; safe to compare at a byte offset since
@@ -182,7 +225,13 @@ fn expand_template(template: &str, slots: &std::collections::HashMap<String, Str
         if bytes[i] == b'{' {
             if let Some(end_rel) = template[i + 1..].find('}') {
                 let inner = &template[i + 1..i + 1 + end_rel];
-                out.push_str(&expand_placeholder(inner, slots));
+                out.push_str(&expand_placeholder(
+                    inner,
+                    slots,
+                    inventory,
+                    rng_seed.wrapping_add(placeholder_index),
+                ));
+                placeholder_index = placeholder_index.wrapping_add(1);
                 i += 1 + end_rel + 1;
                 continue;
             }
@@ -194,22 +243,220 @@ fn expand_template(template: &str, slots: &std::collections::HashMap<String, Str
     out
 }
 
-fn expand_placeholder(inner: &str, slots: &std::collections::HashMap<String, String>) -> String {
+fn expand_placeholder(
+    inner: &str,
+    slots: &std::collections::HashMap<String, String>,
+    inventory: Option<&SlotInventory>,
+    rng_seed: u64,
+) -> String {
     let (slot_name, feature_spec) = parse_placeholder(inner);
     let Some(root) = slots.get(slot_name) else {
         // Unfilled — leave the raw placeholder visible.
         return format!("{{{inner}}}");
     };
-    match feature_spec {
-        None => root.clone(),
+    let (vary_requested, fst_spec) = split_vary_directive(feature_spec);
+    // **v5.7.5** — when the template asks for `vary` AND an inventory
+    // is attached AND the slot is registered with non-trivial variants,
+    // pick a `VariantStrategy` per turn (rng-seeded) and apply it.
+    // Falls back to the literal path if any precondition fails so
+    // existing behaviour is preserved bit-for-bit when inventory is
+    // absent or the slot isn't documented yet.
+    let varied: Option<String> = if vary_requested {
+        inventory
+            .and_then(|inv| inv.get(slot_name))
+            .filter(|slot| slot.supports_variation())
+            .and_then(|slot| pick_and_apply_variant(slot, root, rng_seed))
+    } else {
+        None
+    };
+    let value: String = varied.unwrap_or_else(|| root.clone());
+    match fst_spec {
+        None => value,
         Some(spec) => {
             // Kazakh-only surface (v1.1.0): non-Cyrillic roots aren't
             // expected. FST phonology operates directly on whatever
             // glyphs are passed in; if a Latin-only root leaks through
             // from an upstream bug it's better surfaced as visibly
             // wrong output than silently transliterated.
-            let features = parse_noun_features(spec);
-            synthesise_noun(root, features)
+            let features = parse_noun_features(&spec);
+            synthesise_noun(&value, features)
         }
+    }
+}
+
+/// **v5.7.5** — strip the `vary` token from a feature spec. Returns
+/// `(vary_requested, remaining_feature_spec)`. The remaining spec is
+/// what `parse_noun_features` consumes for FST inflection. Conservative
+/// — only strips an exact `vary` token; longer tokens that include
+/// the string (`varying`, etc.) pass through untouched.
+fn split_vary_directive(spec: Option<&str>) -> (bool, Option<String>) {
+    let Some(spec) = spec else {
+        return (false, None);
+    };
+    let mut vary = false;
+    let mut kept: Vec<&str> = Vec::new();
+    for tok in spec.split('+') {
+        let trimmed = tok.trim();
+        if trimmed.eq_ignore_ascii_case("vary") {
+            vary = true;
+        } else if !trimmed.is_empty() {
+            kept.push(trimmed);
+        }
+    }
+    let kept = if kept.is_empty() {
+        None
+    } else {
+        Some(kept.join("+"))
+    };
+    (vary, kept)
+}
+
+/// **v5.7.5** — apply a `VariantStrategy` from the inventory. Returns
+/// `Some(transformed_value)` if a non-Literal strategy fired and
+/// produced a meaningful difference; `None` otherwise (caller falls
+/// back to the literal value).
+///
+/// Strategy selection: rng-pick uniformly from the slot's `variants`
+/// list. The first strategy in the list (typically `Literal`) is
+/// included in the pool so variation isn't always-on — sometimes the
+/// turn just uses the literal value. This is what makes the variation
+/// feel natural rather than mechanically alternating.
+fn pick_and_apply_variant(
+    slot: &crate::slot_inventory::Slot,
+    value: &str,
+    rng_seed: u64,
+) -> Option<String> {
+    if slot.variants.is_empty() {
+        return None;
+    }
+    let idx = (rng_seed as usize) % slot.variants.len();
+    let strategy = slot.variants[idx];
+    apply_variant_strategy(strategy, value)
+}
+
+/// **v5.7.5** — execute a single `VariantStrategy` against a literal
+/// value. Returns `Some(transformed)` on success, `None` when the
+/// strategy is `Literal` (no transformation) or doesn't apply (e.g.
+/// `RespectfulAddress` on a name without a recognised first
+/// consonant). The caller treats `None` as "use the literal value".
+///
+/// FST-case strategies (`FstLocative` / `FstGenitive` / etc.) return
+/// `Some` with the synthesised inflected form. They overlap with the
+/// existing `{slot|case=X}` template syntax — the variant strategy
+/// is for inventory-driven variation; the template-side syntax is
+/// for explicit author intent. Both paths feed the same FST.
+fn apply_variant_strategy(strategy: VariantStrategy, value: &str) -> Option<String> {
+    use adam_kernel_fst::morphotactics::{Case, NounFeatures};
+    match strategy {
+        VariantStrategy::Literal => None,
+        VariantStrategy::RespectfulAddress => kazakh_respectful_address(value),
+        VariantStrategy::FstLocative => Some(synthesise_noun(
+            value,
+            NounFeatures {
+                case: Some(Case::Locative),
+                ..Default::default()
+            },
+        )),
+        VariantStrategy::FstGenitive => Some(synthesise_noun(
+            value,
+            NounFeatures {
+                case: Some(Case::Genitive),
+                ..Default::default()
+            },
+        )),
+        VariantStrategy::FstDative => Some(synthesise_noun(
+            value,
+            NounFeatures {
+                case: Some(Case::Dative),
+                ..Default::default()
+            },
+        )),
+        VariantStrategy::FstAblative => Some(synthesise_noun(
+            value,
+            NounFeatures {
+                case: Some(Case::Ablative),
+                ..Default::default()
+            },
+        )),
+    }
+}
+
+#[cfg(test)]
+mod variation_tests {
+    use super::*;
+    use crate::slot_inventory::{Slot, SlotKind, VariantStrategy};
+    use std::collections::HashMap;
+
+    fn name_slot(variants: Vec<VariantStrategy>) -> SlotInventory {
+        SlotInventory {
+            schema_version: 1,
+            slots: vec![Slot {
+                name: "name".into(),
+                kind: SlotKind::PersonName,
+                description: "test".into(),
+                example: "Дәулет".into(),
+                variants,
+                fst_features: vec![],
+            }],
+        }
+    }
+
+    #[test]
+    fn vary_directive_picks_respectful_form_v575() {
+        let inv = name_slot(vec![VariantStrategy::RespectfulAddress]);
+        let mut slots = HashMap::new();
+        slots.insert("name".into(), "Дәулет".into());
+        // RespectfulAddress is the only variant — selection is forced.
+        let out = expand_template("Сәлем, {name|vary}!", &slots, Some(&inv), 0);
+        assert_eq!(out, "Сәлем, Дәке!");
+    }
+
+    #[test]
+    fn vary_directive_falls_back_to_literal_for_non_transformable_v575() {
+        let inv = name_slot(vec![VariantStrategy::RespectfulAddress]);
+        let mut slots = HashMap::new();
+        // Two-char name: kazakh_respectful_address rejects (requires
+        // ≥ 3 chars per the v4.18.0 / v4.51.5 rules). Variant strategy
+        // returns None, realiser falls back to the literal value.
+        slots.insert("name".into(), "Әл".into());
+        let out = expand_template("Сәлем, {name|vary}!", &slots, Some(&inv), 0);
+        assert_eq!(out, "Сәлем, Әл!");
+    }
+
+    #[test]
+    fn vary_directive_no_op_without_inventory_v575() {
+        let mut slots = HashMap::new();
+        slots.insert("name".into(), "Дәулет".into());
+        // No inventory attached — `vary` is silently ignored, value
+        // is rendered literally. This is the v0.8.0-compat path.
+        let out = expand_template("Сәлем, {name|vary}!", &slots, None, 0);
+        assert_eq!(out, "Сәлем, Дәулет!");
+    }
+
+    #[test]
+    fn vary_directive_deterministic_per_seed_v575() {
+        // Two strategies — Literal and RespectfulAddress. Same seed =
+        // same outcome.
+        let inv = name_slot(vec![
+            VariantStrategy::Literal,
+            VariantStrategy::RespectfulAddress,
+        ]);
+        let mut slots = HashMap::new();
+        slots.insert("name".into(), "Дәулет".into());
+        let out_seed_0_a = expand_template("{name|vary}", &slots, Some(&inv), 0);
+        let out_seed_0_b = expand_template("{name|vary}", &slots, Some(&inv), 0);
+        assert_eq!(out_seed_0_a, out_seed_0_b);
+    }
+
+    #[test]
+    fn vary_directive_combinable_with_fst_features_v575() {
+        // `{name|vary+dative}` — first pick variant strategy, then
+        // apply FST dative on the result. With RespectfulAddress
+        // alone, "Дәулет" → "Дәке" → dative "Дәкеге".
+        let inv = name_slot(vec![VariantStrategy::RespectfulAddress]);
+        let mut slots = HashMap::new();
+        slots.insert("name".into(), "Дәулет".into());
+        let out = expand_template("{name|vary+dative}", &slots, Some(&inv), 0);
+        assert_eq!(out, "Дәкеге");
     }
 }
