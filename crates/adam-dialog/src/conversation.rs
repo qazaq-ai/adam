@@ -2626,6 +2626,35 @@ fn check_antonym_denial(
     None
 }
 
+/// **v5.8.0 — G2.0 of the proof-carrying generation arc.** Companion
+/// to [`find_isa_chain`] that returns a typed [`ProofObject`] alongside
+/// the chain path. Pre-v5.8.0 callers received only the
+/// `Vec<String>` chain; the proof structure (which kind of support
+/// the chain provides, what hedges apply, what rule fired) had to be
+/// reconstructed at the call site. Now construction is centralised
+/// here so every consumer of the chain query receives the same typed
+/// object — and the [`crate::proof_object::verifier`] gate can audit
+/// the result before emission.
+///
+/// Returns `Some(ProofObject)` when a chain exists; `None` otherwise.
+/// Callers wanting the antonym-denial case should check
+/// [`check_antonym_denial`] separately and use
+/// [`ProofObject::from_antonym_denial`] to wrap that path.
+pub fn find_isa_proof(
+    extracted: &[ReasFact],
+    derived: &[DerivedFact],
+    subject: &str,
+    target: &str,
+) -> Option<crate::proof_object::ProofObject> {
+    let chain = find_isa_chain(extracted, derived, subject, target)?;
+    Some(crate::proof_object::ProofObject::from_isa_chain(
+        subject.to_lowercase(),
+        target.to_lowercase(),
+        chain,
+        vec!["R1_is_a_transitivity".to_string()],
+    ))
+}
+
 /// **v5.4.7** — strip the genitive marker from a two-word
 /// "X-Genitive Y-Possessive" izafet construction so the bare
 /// compound form can be looked up. Returns `None` for inputs that

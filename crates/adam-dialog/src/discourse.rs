@@ -602,6 +602,25 @@ impl SafetyCategory {
     }
 }
 
+/// **v5.8.0 — G2.0 of the proof-carrying generation arc.** Convert
+/// the discourse-layer `SafetyCategory` into the proof-layer
+/// `SafetyDomain`. The two enums are structurally independent
+/// (discourse depends only on heuristics + closed-class word lists;
+/// proof_object stays free of discourse-layer types) but the
+/// boundary needs one explicit bridge — this `From` impl. Used by
+/// callers building a typed `ProofObject::safety_refusal` from a
+/// detected category.
+impl From<SafetyCategory> for crate::proof_object::SafetyDomain {
+    fn from(cat: SafetyCategory) -> Self {
+        match cat {
+            SafetyCategory::Medical => Self::Medical,
+            SafetyCategory::Legal => Self::Legal,
+            SafetyCategory::Financial => Self::Financial,
+            SafetyCategory::CurrentData => Self::CurrentData,
+        }
+    }
+}
+
 pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
     let lower = input.to_lowercase();
 

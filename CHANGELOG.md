@@ -21,6 +21,66 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.8.0] — 2026-05-09 — G2.0 — ProofObject + verifier::audit (proof-carrying generation foundation)
+
+**Minor-version release.** Third milestone of the proof-carrying generation arc. Codex's review framing — «генератор не "придумывает текст" — он собирает допустимое высказывание из доказанных typed propositions» — needs a typed proof bundle to compose over. G2.0 ships that bundle.
+
+### What changed
+
+**1. New module [`adam_dialog::proof_object`](crates/adam-dialog/src/proof_object.rs).** Defines:
+- [`ProofObject`] — typed bundle: `{ conclusion, support, derivation, hedges, unsupported_claims }`
+- [`Claim`] + [`ClaimPredicate`] (IsA / HasProperty / NoData / SafetyRefusal{domain} / Definition / SystemSelf / Other) + [`Polarity`] (Affirmative / Negated)
+- [`SupportLink`] + [`SupportKind`] (CuratedFact / DerivedFact / TemplateRefusal / AntonymDenial / SystemSelf / PolicyRefusal)
+- [`DerivationTrace`] — chain path + rule ids
+- [`HedgeMarker`] (NoData / SafetyRefusal / PartialMatch / DerivedNotCurated / AntonymDenial / SystemSelf)
+- [`SafetyDomain`] (Medical / Legal / Financial / CurrentData / Political)
+
+Six builder constructors covering every kernel path that can produce a verifier-passing proof: `from_isa_chain`, `from_curated_fact`, `from_antonym_denial`, `safety_refusal`, `no_data_refusal`, `system_self`.
+
+**2. [`proof_object::verifier::audit(answer, proof)`](crates/adam-dialog/src/proof_object.rs).** Gates emission. Returns one of:
+- `Verified` — answer is safe to emit
+- `UnsupportedClaims(Vec<String>)` — proof flagged sub-claims it can't support; do not emit
+- `MissingSupport` — proof has zero support links; do not emit
+- `EmptyAnswer` — answer text is empty; do not emit
+
+At G2.0 the verifier checks structural validity (support non-empty, unsupported_claims empty, answer non-empty). It does NOT yet parse the answer text and cross-validate that every NL claim maps to a support entry — that's G2.5 once the claim-extraction surface lands. The producer (each `from_*` constructor) is trusted to fill the proof correctly; this gate catches structural bugs early.
+
+**3. Two retrofits.** Aдditive — original APIs preserved bit-for-bit, new companions added:
+- [`conversation::find_isa_proof`](crates/adam-dialog/src/conversation.rs) — wraps the v5.4.0 `find_isa_chain` and returns a typed `ProofObject` with the chain path + rule id baked into the [`DerivationTrace`].
+- [`discourse::SafetyCategory`](crates/adam-dialog/src/discourse.rs) gains a `From<SafetyCategory> for proof_object::SafetyDomain` bridge so safety detections feed directly into [`ProofObject::safety_refusal`].
+
+**4. Verification is opt-in at this milestone.** Conversation::turn_with_trace doesn't yet gate every response through the verifier. That's G2.5 (next release). G2.0 ships the **types + builders + verifier function** — enough infrastructure for callers to opt in without breaking existing behaviour.
+
+### Why this is `x.y.0`
+
+Per cadence policy:
+1. New public module surface (`adam_dialog::proof_object`) — 5 enums, 4 structs, verifier function
+2. New public API (`conversation::find_isa_proof`)
+3. New cross-module bridge (`From<SafetyCategory> for SafetyDomain`)
+4. **Third milestone of a multi-release research arc** (G1 → G2 → G3 — past the halfway mark)
+
+### Tests
+
+- 11 unit tests in `proof_object::tests` covering: `from_*` builders / verifier accept-cases / verifier reject-cases / serde round-trip / `add_unsupported_claim` blocks emission
+- 7 end-to-end tests in `proof_object_e2e` covering: `SafetyCategory` → `SafetyDomain` bridge / safety_refusal proof verification / live chain query producing valid proof / `from_curated_fact` provenance round-trip / no-data refusal / antonym-denial polarity / regression guard for factual definitions
+- All 1 238 prior tests + 18 new = **1 256 passing**
+
+### G2.0 → G2.5 trajectory
+
+| Milestone | Status |
+|---|---|
+| G1.0 — typed slot inventory (v5.7.0) | ✅ |
+| G1.5 — realiser variation engine (v5.7.5) | ✅ |
+| **G2.0 — `ProofObject` + verifier (v5.8.0)** | ✅ **shipped** |
+| **G2.5** — Conversation gates emission on verifier outcome (next) | next |
+| G3.0 — typed composer over proof objects → answer IR | future |
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --workspace --release --tests -- -D warnings` clean; `cargo test --workspace --release` 0 failures; `bash scripts/check_metrics_currency.sh` clean.
+
+**Stripe — Deterministic AI research (G2.0 of the proof-carrying generation arc; typed proof object + verifier shipped; six builder constructors + cross-module bridge).**
+
 ## [5.7.5] — 2026-05-09 — G1.5 — realiser variation engine + keyword cluster extensions
 
 **Patch milestone** on the proof-carrying generation arc. Builds on v5.7.0's typed slot inventory by wiring the realiser to consult it for opt-in per-slot variation.

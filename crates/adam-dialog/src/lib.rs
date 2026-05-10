@@ -59,6 +59,7 @@ pub mod nlg;
 pub mod pedagogical;
 pub mod phoneme;
 pub mod planner;
+pub mod proof_object;
 pub mod quality;
 pub mod question_shape;
 pub mod realiser;
