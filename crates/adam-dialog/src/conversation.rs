@@ -1366,7 +1366,18 @@ impl Conversation {
             extra_slots.insert("__epistemic_refusal__".into(), "1".into());
         }
         if let Some((subject, predicate)) = crate::discourse::extract_proof_request(input) {
-            let chain = find_isa_chain(
+            // **v5.13.0 — Codex follow-up review (B5.4).** Proof mode
+            // uses the longest IsA chain rather than the BFS-shortest
+            // one. Pre-v5.13.0 «Қасқырдың тірі екенін дәлелде» fell to
+            // `find_isa_chain` and surfaced a 2-element direct edge
+            // (қасқыр → тірі) when the world_core hierarchy supports
+            // a richer derivation (қасқыр → жыртқыш → жануар →
+            // тіршілік иесі → тірі). Codex's audit asked for the full
+            // path. yes/no IsA still uses the shortest variant — fast,
+            // sufficient for "is X a Y?" reachability check; the
+            // longest variant is reserved for explicit proof-request
+            // shapes where the chain is the user-visible payload.
+            let chain = find_longest_isa_chain(
                 &self.extracted_facts,
                 &self.derived_facts,
                 &subject,
@@ -2791,7 +2802,7 @@ fn graph_predicate_hint(intent: &Intent) -> Option<String> {
 /// Both `subject` and `target` are matched against `f.subject.root` /
 /// `f.object.root` after lower-casing on both sides; multi-word roots
 /// like `"тіршілік иесі"` are preserved as-is by the upstream loader.
-pub(crate) fn find_isa_chain(
+pub fn find_isa_chain(
     extracted: &[ReasFact],
     derived: &[DerivedFact],
     subject: &str,
@@ -2982,6 +2993,118 @@ pub fn collect_provable_isa_objects(
         frontier = next;
     }
     out
+}
+
+/// **v5.13.0 — Codex follow-up review (B5.4).** Longest-path companion
+/// to [`find_isa_chain`]. The yes/no IsA path keeps the BFS-shortest
+/// chain (cheaper, sufficient — confirms reachability with the
+/// minimum hops); proof-chain mode (the v5.10.5 `extract_proof_request`
+/// route) wants the *most informative* derivation — the chain Codex
+/// audited as «слишком сжатый» when it reduced to a 2-element direct
+/// edge despite a richer concept hierarchy being available.
+///
+/// Algorithm: depth-bounded DFS with backtracking and a per-branch
+/// visited-set. `MAX_DEPTH` is 6 (vs 8 for the BFS shortest variant)
+/// — kept tighter to bound the branching factor on deeply-connected
+/// concept hubs (тіршілік иесі / зат / нәрсе), which would otherwise
+/// produce too many paths to enumerate. Depth-6 is comfortably above
+/// the longest curated chain in world_core (max observed: 4 hops).
+///
+/// Returns `Some(path)` with `path.len() >= 2` when a chain is found
+/// (subject and target both present); `None` when no path exists at
+/// all. When subject == target, returns the singleton subject (same
+/// contract as `find_isa_chain`).
+pub fn find_longest_isa_chain(
+    extracted: &[ReasFact],
+    derived: &[DerivedFact],
+    subject: &str,
+    target: &str,
+) -> Option<Vec<String>> {
+    const MAX_DEPTH: usize = 6;
+    let subject_lc = subject.to_lowercase();
+    let target_lc = target.to_lowercase();
+    if subject_lc == target_lc {
+        return Some(vec![subject_lc]);
+    }
+    let mut path: Vec<String> = vec![subject_lc.clone()];
+    let mut visited: std::collections::HashSet<String> = std::collections::HashSet::new();
+    visited.insert(subject_lc.clone());
+    let mut best: Option<Vec<String>> = None;
+    longest_dfs(
+        &subject_lc,
+        &target_lc,
+        extracted,
+        derived,
+        &mut path,
+        &mut visited,
+        &mut best,
+        0,
+        MAX_DEPTH,
+    );
+    best
+}
+
+#[allow(clippy::too_many_arguments)]
+fn longest_dfs(
+    node: &str,
+    target: &str,
+    extracted: &[ReasFact],
+    derived: &[DerivedFact],
+    path: &mut Vec<String>,
+    visited: &mut std::collections::HashSet<String>,
+    best: &mut Option<Vec<String>>,
+    depth: usize,
+    max_depth: usize,
+) {
+    if depth >= max_depth {
+        return;
+    }
+    let mut neighbours: Vec<String> = Vec::new();
+    let mut seen_local: std::collections::HashSet<String> = std::collections::HashSet::new();
+    for f in extracted {
+        if matches!(f.predicate, ReasPredicate::IsA) && f.subject.root.to_lowercase() == node {
+            let obj = f.object.root.to_lowercase();
+            if seen_local.insert(obj.clone()) {
+                neighbours.push(obj);
+            }
+        }
+    }
+    for d in derived {
+        if matches!(d.predicate, adam_reasoning::Predicate::IsA)
+            && d.subject.root.to_lowercase() == node
+        {
+            let obj = d.object.root.to_lowercase();
+            if seen_local.insert(obj.clone()) {
+                neighbours.push(obj);
+            }
+        }
+    }
+    for next in neighbours {
+        if visited.contains(&next) {
+            continue;
+        }
+        path.push(next.clone());
+        visited.insert(next.clone());
+        if next == target {
+            if best.as_ref().is_none_or(|b| path.len() > b.len()) {
+                *best = Some(path.clone());
+            }
+        } else {
+            longest_dfs(
+                &next,
+                target,
+                extracted,
+                derived,
+                path,
+                visited,
+                best,
+                depth + 1,
+                max_depth,
+            );
+        }
+        path.pop();
+        visited.remove(&next);
+    }
 }
 
 /// **v5.4.7** — strip the genitive marker from a two-word

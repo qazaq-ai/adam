@@ -83,7 +83,10 @@ pub use belief::{
     BeliefConflict, BeliefDigest, BeliefFact, BeliefState, ConfidenceBand, EntityKind,
     EntityMemory, FactStatus, PendingQuestion, Provenance, QuestionNature, USER_SELF_KEY,
 };
-pub use conversation::{ComposeMode, Conversation, IntentKind, TurnTrace};
+pub use conversation::{
+    ComposeMode, Conversation, IntentKind, TurnTrace, collect_provable_isa_objects, find_isa_chain,
+    find_isa_proof, find_longest_isa_chain,
+};
 pub use dialog_context::{DialogContext, TopicMention};
 pub use domain_index::DomainIndex;
 pub use intent::{GreetingKind, Intent, SubjectPerson};

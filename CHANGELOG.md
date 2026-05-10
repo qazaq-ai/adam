@@ -21,6 +21,57 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.13.0] — 2026-05-10 — B5.4 — Proof-chain longest path (find_longest_isa_chain)
+
+**Minor-version release.** Closes the fifth and final issue from the post-v5.11.0 Codex audit. Pre-v5.13.0 «Қасқырдың тірі екенін дәлелде» surfaced a 2-element direct edge `қасқыр → тірі` instead of the richer derivation `қасқыр → жыртқыш → жануар → тіршілік иесі → тірі` that the world_core hierarchy actually supports. The proof was *correct* but visually degenerate — the user couldn't see the chain of reasoning, only its endpoints.
+
+### What changed
+
+**1. New public API [`find_longest_isa_chain`](crates/adam-dialog/src/conversation.rs).** Depth-bounded DFS with backtracking + per-branch visited-set. Returns the **longest simple path** between subject and target (or `None` when no path exists). Same return-type contract as `find_isa_chain` (BFS-shortest variant): `Option<Vec<String>>`, `Some([subject])` on `subject == target`.
+
+- `MAX_DEPTH = 6` (vs 8 for BFS-shortest) — kept tighter to bound the branching factor on deeply-connected concept hubs (тіршілік иесі / зат / нәрсе).
+- Cycle-safe: visited-set per branch ensures simple paths only. `a → b → a` won't infinite-loop; the DFS backtracks past `a` and tries the next child.
+- Deduplicated outgoing edges: a single fact source can declare both `extracted` and `derived` rules pointing to the same object; we fold them through a per-node `seen_local` HashSet so the BFS doesn't double-count.
+
+**2. Proof-mode handler in [`conversation::turn_with_trace`](crates/adam-dialog/src/conversation.rs)** (the v5.10.5 `extract_proof_request` route) now calls `find_longest_isa_chain` instead of `find_isa_chain`. Yes/no IsA path stays on the BFS-shortest variant — fast, sufficient for "is X a Y?" reachability.
+
+**3. Public re-exports.** `crate::conversation::{find_isa_chain, find_isa_proof, find_longest_isa_chain, collect_provable_isa_objects}` are now re-exported from the lib.rs root for downstream consumers (and integration tests). `find_isa_chain` was previously `pub(crate)` — promoted to `pub` since `find_longest_isa_chain` belongs alongside it as a public API surface.
+
+### Live demo
+
+```text
+User:  Қасқырдың тірі екенін дәлелде.
+
+Pre-v5.13.0:
+adam:  Дәлелдейік: Қасқыр — тірі. Тізбек: қасқыр → тірі. Сондықтан Қасқыр — тірі.
+       ← chain reduces to a 2-element direct edge
+
+Post-v5.13.0:
+adam:  Дәлелдейік: Қасқыр — тірі. Тізбек: қасқыр → жыртқыш → жануар → тіршілік иесі → тірі.
+       Сондықтан Қасқыр — тірі.
+       ← full derivation walked, every hop visible
+```
+
+### Why `x.y.0`
+
+Per cadence policy: new public API (`find_longest_isa_chain`) + visibility upgrade for the existing `find_isa_chain` + behavioural change to the user-visible proof-mode surface. Algorithm switch (BFS-shortest → DFS-longest) is a capability change, not a hygiene patch.
+
+### Tests
+
+- 4 unit tests in [`longest_isa_chain_v5130`](crates/adam-dialog/tests/longest_isa_chain_v5130.rs):
+  - Synthetic A → direct B AND A → C → D → E → B: longest picks the 4-hop chain while shortest picks the direct edge
+  - No-path case returns `None`
+  - Self-loop (subject == target) returns singleton (same contract as `find_isa_chain`)
+  - Cycle-safe: `a → b → a → c` traverses `a → b → c` without revisiting
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --all-targets -- -D warnings` clean; `cargo test --workspace` 0 failures; `bash scripts/check_metrics_currency.sh` clean.
+
+**This release closes the post-v5.11.0 Codex audit cycle.** All 5 issues (B5.1–B5.5) closed across v5.11.5 / v5.12.0 / v5.12.5 / v5.13.0. Voice arc held for v5.20.0+.
+
+**Stripe — Deterministic AI research (B5.4 — proof-chain longest-path; full derivation surfacing in proof mode).**
+
 ## [5.12.5] — 2026-05-10 — B5.3 — Corrected-code surface (per-error-code repaired snippets + rotation counter)
 
 **Patch milestone.** Closes the fourth issue from the post-v5.11.0 Codex audit. Pre-v5.12.5 a follow-up like «Түзетілген кодты көрсет» / «Тағы бір мысал бер» after a failed SubmitSolution repeated the v5.10.0 generic explanation — Codex's audit asked for a concrete *repaired* snippet the user can copy-paste-run.
