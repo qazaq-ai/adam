@@ -1,5 +1,5 @@
 {
-  "version": "5.3.10",
+  "version": "5.4.6",
   "status": "world_core_refresh",
   "elapsed_s": 0,
   "packs_completed": 9,
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3332,
+    "facts_total": 3345,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2767,
+      "is_a": 2780,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -91,6 +91,7 @@
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
       "world_core/role_bridges.jsonl": 63,
+      "world_core/rust_curriculum_concepts.jsonl": 13,
       "world_core/society.jsonl": 63,
       "world_core/sports.jsonl": 18,
       "world_core/time.jsonl": 44,
@@ -61701,6 +61702,266 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Ел — мемлекет."
+    },
+    {
+      "subject": {
+        "surface": "иелік",
+        "root": "иелік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ұғымы",
+        "root": "rust ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/rust_curriculum_concepts",
+      "source": {
+        "pack": "world_core/rust_curriculum_concepts.jsonl",
+        "sample_id": "rcc_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Иелік (ownership) — Rust бағдарламалаудың негізгі ұғымы; әр мәннің бір ғана иесі болады, иесі аумақтан шыққанда мән жойылады."
+    },
+    {
+      "subject": {
+        "surface": "қарызға алу",
+        "root": "қарызға алу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ұғымы",
+        "root": "rust ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/rust_curriculum_concepts",
+      "source": {
+        "pack": "world_core/rust_curriculum_concepts.jsonl",
+        "sample_id": "rcc_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарызға алу (borrowing) — Rust-тағы сілтеме арқылы мән алу тәсілі; иелік иесінде қалады, сілтеме уақытша ғана."
+    },
+    {
+      "subject": {
+        "surface": "қарыз",
+        "root": "қарыз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ұғымы",
+        "root": "rust ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/rust_curriculum_concepts",
+      "source": {
+        "pack": "world_core/rust_curriculum_concepts.jsonl",
+        "sample_id": "rcc_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарыз (borrow) — қарызға алу әрекеті; ағылшын тіліндегі borrow атауының қазақша баламасы."
+    },
+    {
+      "subject": {
+        "surface": "өмір кезеңі",
+        "root": "өмір кезеңі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ұғымы",
+        "root": "rust ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/rust_curriculum_concepts",
+      "source": {
+        "pack": "world_core/rust_curriculum_concepts.jsonl",
+        "sample_id": "rcc_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Өмір кезеңі (lifetime) — Rust-тағы сілтеменің жарамды болатын аумағын белгілейтін ұғым; компилятор сілтемелердің жарамдылығын статикалық тексереді."
+    },
+    {
+      "subject": {
+        "surface": "тіршілік мерзімі",
+        "root": "тіршілік мерзімі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ұғымы",
+        "root": "rust ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/rust_curriculum_concepts",
+      "source": {
+        "pack": "world_core/rust_curriculum_concepts.jsonl",
+        "sample_id": "rcc_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тіршілік мерзімі — өмір кезеңінің синонимі; lifetime ұғымының тағы бір қазақша атауы."
+    },
+    {
+      "subject": {
+        "surface": "тіршілік мерзімі",
+        "root": "тіршілік мерзімі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өмір кезеңі",
+        "root": "өмір кезеңі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/rust_curriculum_concepts",
+      "source": {
+        "pack": "world_core/rust_curriculum_concepts.jsonl",
+        "sample_id": "rcc_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тіршілік мерзімі — өмір кезеңінің синонимі; lifetime ұғымының тағы бір қазақша атауы."
+    },
+    {
+      "subject": {
+        "surface": "қасиет",
+        "root": "қасиет",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ұғымы",
+        "root": "rust ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/rust_curriculum_concepts",
+      "source": {
+        "pack": "world_core/rust_curriculum_concepts.jsonl",
+        "sample_id": "rcc_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қасиет (trait) — Rust-тағы trait ұғымы; типтерге ортақ мінез-құлықты сипаттайтын интерфейс."
+    },
+    {
+      "subject": {
+        "surface": "қасиеттер",
+        "root": "қасиеттер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ұғымы",
+        "root": "rust ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/rust_curriculum_concepts",
+      "source": {
+        "pack": "world_core/rust_curriculum_concepts.jsonl",
+        "sample_id": "rcc_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қасиеттер — қасиеттің көпше түрі; Rust traits жинағы."
+    },
+    {
+      "subject": {
+        "surface": "қасиеттер",
+        "root": "қасиеттер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қасиет",
+        "root": "қасиет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/rust_curriculum_concepts",
+      "source": {
+        "pack": "world_core/rust_curriculum_concepts.jsonl",
+        "sample_id": "rcc_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қасиеттер — қасиеттің көпше түрі; Rust traits жинағы."
+    },
+    {
+      "subject": {
+        "surface": "асинхрон",
+        "root": "асинхрон",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ұғымы",
+        "root": "rust ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/rust_curriculum_concepts",
+      "source": {
+        "pack": "world_core/rust_curriculum_concepts.jsonl",
+        "sample_id": "rcc_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Асинхрон (async) — Rust-тағы async/await ұғымы; жіберілген тапсырмалардың параллель орындалуын сипаттайды."
+    },
+    {
+      "subject": {
+        "surface": "асинхронды",
+        "root": "асинхронды",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ұғымы",
+        "root": "rust ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/rust_curriculum_concepts",
+      "source": {
+        "pack": "world_core/rust_curriculum_concepts.jsonl",
+        "sample_id": "rcc_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Асинхронды — асинхронның сын есім түрі; параллельді деген мағынаны білдіреді."
+    },
+    {
+      "subject": {
+        "surface": "rust ұғымы",
+        "root": "rust ұғымы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бағдарламалау ұғымы",
+        "root": "бағдарламалау ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/rust_curriculum_concepts",
+      "source": {
+        "pack": "world_core/rust_curriculum_concepts.jsonl",
+        "sample_id": "rcc_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Rust ұғымы — бағдарламалау ұғымы."
+    },
+    {
+      "subject": {
+        "surface": "бағдарламалау ұғымы",
+        "root": "бағдарламалау ұғымы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұғым",
+        "root": "ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/rust_curriculum_concepts",
+      "source": {
+        "pack": "world_core/rust_curriculum_concepts.jsonl",
+        "sample_id": "rcc_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бағдарламалау ұғымы — ұғым."
     },
     {
       "subject": {

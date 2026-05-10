@@ -2429,6 +2429,55 @@ pub(crate) fn find_isa_chain(
     subject: &str,
     target: &str,
 ) -> Option<Vec<String>> {
+    // **v5.4.7** — possessive-multiword fallback. Try the literal
+    // (subject, target) first; if no chain is found and `target` is
+    // an "izafet" construction like «дененің бөлігі» (genitive +
+    // possessive on a two-word noun phrase), retry with the bare
+    // form «дене бөлігі». World_core stores the bare form; user
+    // queries can use either surface, so the chain-lookup is the
+    // right place to bridge them.
+    if let Some(chain) = find_isa_chain_inner(extracted, derived, subject, target) {
+        return Some(chain);
+    }
+    if let Some(normalised) = strip_izafet_genitive(target) {
+        if normalised != target {
+            return find_isa_chain_inner(extracted, derived, subject, &normalised);
+        }
+    }
+    None
+}
+
+/// **v5.4.7** — strip the genitive marker from a two-word
+/// "X-Genitive Y-Possessive" izafet construction so the bare
+/// compound form can be looked up. Returns `None` for inputs that
+/// don't match the pattern.
+///
+/// Recognised genitive suffixes (Kazakh): `-ның / -нің / -дың /
+/// -дің / -тың / -тің`. Conservative: only fires on a two-word
+/// input where the first word ends in one of those suffixes and
+/// the residue is at least 3 chars.
+fn strip_izafet_genitive(phrase: &str) -> Option<String> {
+    let parts: Vec<&str> = phrase.split_whitespace().collect();
+    if parts.len() != 2 {
+        return None;
+    }
+    const GENITIVE_SUFFIXES: &[&str] = &["ның", "нің", "дың", "дің", "тың", "тің"];
+    for suf in GENITIVE_SUFFIXES {
+        if let Some(stem) = parts[0].strip_suffix(suf) {
+            if stem.chars().count() >= 3 {
+                return Some(format!("{stem} {}", parts[1]));
+            }
+        }
+    }
+    None
+}
+
+fn find_isa_chain_inner(
+    extracted: &[ReasFact],
+    derived: &[DerivedFact],
+    subject: &str,
+    target: &str,
+) -> Option<Vec<String>> {
     const MAX_DEPTH: usize = 8;
     let subject = subject.to_lowercase();
     let target = target.to_lowercase();

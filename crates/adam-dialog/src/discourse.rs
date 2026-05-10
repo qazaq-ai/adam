@@ -1992,6 +1992,20 @@ pub fn strip_addressee(input: &str) -> &str {
     if !has_addressee_signal(input) {
         return input;
     }
+    // **v5.4.7** — predicative-IsA preservation guard. Pre-v5.4.7
+    // «Адам — тірі ме?» got stripped to «тірі ме?» because the
+    // em-dash is in `ADDRESSEE_SEPARATORS` (carry-over from forms
+    // like «Адам — қаласың?» where the verb post-dash is 2sg). But
+    // when the post-dash residual is a bare yes/no IsA pair
+    // (`<noun-phrase> (ме|ма|ба|бе|па|пе)?` — the v5.4.0 predicative
+    // pattern), `адам` is the SUBJECT of the IsA question, not a
+    // vocative addressee, and the bridge chain `адам IsA тіршілік
+    // иесі IsA тірі` should resolve. Differentiator from the legacy
+    // test «Адам — қаласың?»: that residual ends in a 2sg verb
+    // (`қаласың`), not in a yes/no IsA particle.
+    if looks_like_predicative_isa_question(input) {
+        return input;
+    }
     let trimmed = input.trim_start();
     let lower = trimmed.to_lowercase();
     let mut best: Option<usize> = None;
@@ -2023,6 +2037,26 @@ pub fn strip_addressee(input: &str) -> &str {
     } else {
         input
     }
+}
+
+/// **v5.4.7** — does the input match the bare yes/no IsA pattern
+/// «<X> — <Y> (ме|ма|ба|бе|па|пе)?» introduced in v5.4.0? Used by
+/// `strip_addressee` to preserve «Адам — тірі ме?» (predicative IsA)
+/// from the vocative stripper. The pattern is intentionally narrow:
+/// em-dash separator, the trailing question particle is one of the
+/// six closed-class yes/no markers, the input ends with `?` or one
+/// of those particles. A 2sg verb form post-dash (e.g. «қаласың»,
+/// «білесің») does NOT match because the verb stem doesn't end in
+/// the particle.
+fn looks_like_predicative_isa_question(input: &str) -> bool {
+    let lower = input.trim().to_lowercase();
+    if !lower.contains(" — ") {
+        return false;
+    }
+    let body = lower.trim_end_matches('?').trim();
+    [" ме", " ма", " ба", " бе", " па", " пе"]
+        .iter()
+        .any(|tag| body.ends_with(tag))
 }
 
 /// **v4.11.5** — does the input carry any signal of being addressed
@@ -2520,5 +2554,22 @@ mod tests {
             "Қазақстандағы адам туралы не білесіз?"
         );
         assert_eq!(strip_addressee("Сәлем"), "Сәлем");
+    }
+
+    #[test]
+    fn preserves_predicative_isa_question_v547() {
+        // **v5.4.7** — bare yes/no IsA queries «<X> — <Y> (ме|ма|...)?»
+        // must not be parsed as vocatives even when X is `Адам`. The
+        // chain query in conversation::find_isa_chain should resolve
+        // адам → тіршілік иесі → тірі. Pre-v5.4.7 these were stripped
+        // and routed to a clarifier.
+        assert_eq!(strip_addressee("Адам — тірі ме?"), "Адам — тірі ме?");
+        assert_eq!(
+            strip_addressee("Адам — тіршілік иесі ме?"),
+            "Адам — тіршілік иесі ме?"
+        );
+        // Sanity: legacy 2sg-verb vocative still strips because the
+        // residual doesn't end in a yes/no IsA particle.
+        assert_eq!(strip_addressee("Адам — қаласың?"), "қаласың?");
     }
 }

@@ -1,0 +1,15 @@
+{
+  "_comment": "v5.4.7 — closes the 4 detector edge cases deferred from v5.4.6. (1) адам polysemy: vocative-stripper guard for predicative IsA — «Адам — тірі ме?» now resolves through the chain query. (2) Possessive multiword «X-нің Y-ы» izafet construction normalisation in find_isa_chain — «Бас — дененің бөлігі ме?» now finds the chain (бас IsA дене бөлігі) via genitive stripping. (3) Curriculum-stage routing for definitional queries: rust_curriculum_concepts.jsonl ships definitions for ownership / borrow / lifetime / traits / async + Kazakh aliases (иелік / қарызға алу / өмір кезеңі / тіршілік мерзімі / қасиет / қасиеттер / асинхрон). (4) Same world_core entries answer «Қасиеттер қалай жұмыс істейді?». Audit pass-rate 60/64 → 61/64 (94 % → 95 %). Three remaining conceptually-subtle cases (тас IS NOT тірі / зат түрі / бағдарламашы IsA кәсіп) defer to v5.4.8+ — they require negation reasoning or polysemy disambiguation outside the chain query model.",
+  "cases": [
+    {"id": "adam_poly_001", "category": "адам_polysemy_predicative_isa", "query": "Адам — тірі ме?", "any_substring": ["тірі"], "none_substring": ["клар", "нақтылай"]},
+    {"id": "adam_poly_002", "category": "адам_polysemy_predicative_isa", "query": "Адам — тіршілік иесі ме?", "any_substring": ["тіршілік"], "none_substring": []},
+    {"id": "adam_poly_vocative_regress", "category": "адам_vocative_regression", "query": "Адам, келесі сабақ қандай?", "any_substring": ["келесі", "иелік", "ownership"], "none_substring": []},
+    {"id": "izafet_genitive_001", "category": "possessive_multiword_normalisation", "query": "Бас — дененің бөлігі ме?", "any_substring": ["дене"], "none_substring": ["табылмады", "дерек жоқ", "жетпейді"]},
+    {"id": "rust_curriculum_001", "category": "rust_curriculum_definition", "query": "Өмір кезеңі деген не?", "any_substring": ["lifetime", "өмір кезеңі", "сілтеме"], "none_substring": ["проб", "кезеңі туралы нақты бір мысал"]},
+    {"id": "rust_curriculum_002", "category": "rust_curriculum_definition", "query": "Тіршілік мерзімі деген не?", "any_substring": ["lifetime", "өмір кезеңі"], "none_substring": []},
+    {"id": "rust_curriculum_003", "category": "rust_curriculum_definition", "query": "Қасиет деген не?", "any_substring": ["trait", "интерфейс", "қасиет"], "none_substring": []},
+    {"id": "rust_curriculum_004", "category": "rust_curriculum_definition", "query": "Қасиеттер қалай жұмыс істейді?", "any_substring": ["trait", "қасиет"], "none_substring": ["алматыда отырып"]},
+    {"id": "rust_curriculum_005", "category": "rust_curriculum_definition", "query": "Асинхрон деген не?", "any_substring": ["async", "параллель"], "none_substring": []},
+    {"id": "rust_curriculum_006", "category": "rust_curriculum_definition", "query": "Қарызға алу деген не?", "any_substring": ["borrow", "сілтеме", "қарызға"], "none_substring": []}
+  ]
+}

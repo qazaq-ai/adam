@@ -21,6 +21,57 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.4.7] — 2026-05-09 — Detector edge-case closure — адам polysemy + izafet genitive + Rust curriculum concepts
+
+**Closing release for the v5.4.5 audit.** Fixes the 4 deferred detector edge cases. **Audit pass-rate 60/64 → 61/64 (94 % → 95 %)**. Cumulative: 81 % → 89 % → 94 % → 95 % across v5.4.0 → v5.4.5 → v5.4.6 → v5.4.7.
+
+### What changed
+
+**1. адам polysemy (system identity vs human concept).** Pre-v5.4.7 «Адам — тірі ме?» fired the vocative-stripper (em-dash is in `ADDRESSEE_SEPARATORS`, `?` is an addressee signal), reducing the input to «тірі ме?» — a topic-less question that fell to the clarifier template. The fix adds a `looks_like_predicative_isa_question` guard in [`strip_addressee`](crates/adam-dialog/src/discourse.rs): when the residual after the em-dash matches the bare yes/no IsA pattern (`<noun-phrase> (ме|ма|ба|бе|па|пе) ?`), the input is preserved so adam → тіршілік иесі → тірі can resolve. Differentiator from the legacy «Адам — қаласың?» (vocative + 2sg verb): the verb stem doesn't end in a yes/no particle.
+
+**2. Possessive multiword normalisation (izafet construction).** Pre-v5.4.7 «Бас — дененің бөлігі ме?» extracted predicate «дененің бөлігі» (genitive + possessive) but world_core stores the bare compound «дене бөлігі»; chain query found nothing. New [`strip_izafet_genitive`](crates/adam-dialog/src/conversation.rs) helper handles the Kazakh "X-Genitive Y-Possessive" pattern (suffixes: `-ның / -нің / -дың / -дің / -тың / -тің`). [`find_isa_chain`](crates/adam-dialog/src/conversation.rs) now retries with the normalised form when the literal lookup misses.
+
+**3. Rust curriculum concept definitions.** Pre-v5.4.7 «Өмір кезеңі деген не?» picked single-word «кезеңі» as topic and surfaced a tangential proverb; «Қасиеттер қалай жұмыс істейді?» picked «қасиет» but world_core had no entry. The fix:
+- New world_core domain [`rust_curriculum_concepts.jsonl`](data/world_core/rust_curriculum_concepts.jsonl) — 11 facts covering ownership / borrow / lifetime / traits / async with their Kazakh aliases (иелік / қарызға алу / қарыз / өмір кезеңі / тіршілік мерзімі / қасиет / қасиеттер / асинхрон / асинхронды) bridged via `rust ұғымы → бағдарламалау ұғымы → ұғым`.
+- `MULTIWORD_ENTITIES` extended with the multi-word aliases so the topic extractor matches «өмір кезеңі», «тіршілік мерзімі», «қарызға алу», «rust ұғымы», «бағдарламалау ұғымы» before falling back to first_noun_root.
+
+### Live REPL — before / after
+
+| Query | Pre-v5.4.7 | Post-v5.4.7 |
+|---|---|---|
+| Адам — тірі ме? | (clarifier — vocative stripped субъект) | «Адам — тірі. Бұл адам → тірі тізбегі арқылы расталады.» |
+| Бас — дененің бөлігі ме? | «...дерек жоқ» (genitive form unmatched) | «Иә, Бас — дененің бөлігі. Дәлел тізбегі: бас → дене бөлігі.» |
+| Өмір кезеңі деген не? | proverb «Өмірдегі қызығың…» | «Өмір кезеңі (lifetime) — Rust-тағы сілтеменің жарамды болатын аумағын белгілейтін ұғым…» |
+| Қасиет деген не? | retrieval-fallback corpus quote | «Қасиет (trait) — Rust-тағы trait ұғымы; типтерге ортақ мінез-құлықты сипаттайтын интерфейс.» |
+
+### Tests
+
+- New live holdout [`live_holdout_v5470_deferred.json`](data/eval/live_holdout_v5470_deferred.json) + [Rust runner](crates/adam-dialog/tests/live_holdout_v5470_deferred.rs) — **10 cases** across 4 categories (адам_polysemy_predicative_isa / адам_vocative_regression / possessive_multiword_normalisation / rust_curriculum_definition). Pass-rate floor 100 %.
+- `preserves_predicative_isa_question_v547` unit test added to [`discourse.rs`](crates/adam-dialog/src/discourse.rs) covering both the new IsA-preservation path and the legacy 2sg-verb vocative-stripping regression.
+
+### Measurable impact
+
+| Metric | v5.4.6 | v5.4.7 | Delta |
+|---|---|---|---|
+| Initial facts | 3 332 | 3 345 | +13 |
+| Derived facts | 36 359 | **36 396** | +37 |
+| MULTIWORD_ENTITIES | 1 776 | 1 782 | +6 |
+| Workspace tests | 1 162 | **1 173** | +11 (10 live-holdout + 1 unit) |
+| 64-turn audit pass-rate | 94 % | **95 %** | +1 pp |
+
+### Remaining audit failures (deferred to v5.4.8+)
+
+3 conceptually-subtle cases remaining, none amenable to surgical fixes:
+- «Тас — тірі ме?» — needs negation reasoning ("the absence of evidence is evidence of absence" for closed-class properties)
+- «Кітап — заттың түрі ме?» — possessive-of meaning («X түрі» = "kind of X") needs an aliasing layer
+- «Бағдарламашы — кәсіп пе?» — semantic conflation (программист is a кәсіп иесі, not a кәсіп; the chain through кәсіп иесі doesn't help here)
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --workspace --release --tests -- -D warnings` clean; `cargo test --workspace --release` 0 failures.
+
+**Stripe — Deterministic AI research (v5.4.x audit-driven detector arc closed; 14 percentage-point cumulative improvement in real-Kazakh dialog adequacy across 7 days).**
+
 ## [5.4.6] — 2026-05-09 — Detector edge-case fixes — em-dash absorption + 2nd-person system polysemy
 
 **Surgical detector release.** Closes the three highest user-impact edge cases the v5.4.5 64-turn audit deferred. Pass-rate **57/64 → 60/64 (89 % → 94 %)** on the same audit.

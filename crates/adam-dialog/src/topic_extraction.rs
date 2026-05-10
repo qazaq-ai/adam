@@ -552,6 +552,18 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "дәстүрлі тағам",
     "ұлттық тағам",
     "дәстүрлі сусын",
+    // **v5.4.7** — Rust curriculum concept multiwords. Pre-v5.4.7
+    // «Өмір кезеңі деген не?» picked single-word «кезеңі» as topic
+    // and surfaced a tangential proverb; the curated definition in
+    // `rust_curriculum_concepts.jsonl` was unreachable. Registering
+    // these multiwords lets the topic extractor match the full
+    // phrase before falling back to first_noun_root.
+    "өмір кезеңі",
+    "өмір сүру кезеңі",
+    "тіршілік мерзімі",
+    "қарызға алу",
+    "rust ұғымы",
+    "бағдарламалау ұғымы",
     "орталық азия",
     "жүк машинасы",
     "аспан денесі",

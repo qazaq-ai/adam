@@ -5,7 +5,7 @@
   "description": "Deterministic AI research kernel for agglutinative languages. Applied demonstrator of Qazaq IR — a deterministic alternative to probabilistic large language models, built on Kazakh agglutinative morphology. Three guarantees: predictability (every claim traceable to a curated source), cheapness (single binary, 0% GPU, ~21 ms p50 latency, ~300 MB RSS), safety (architectural impossibility of hallucination). Generalises across ~30 catalogued agglutinative languages.",
   "license": "https://spdx.org/licenses/BUSL-1.1.html",
   "codeRepository": "https://github.com/qazaq-ai/adam",
-  "version": "5.4.6",
+  "version": "5.4.7",
   "dateCreated": "2026-04-07",
   "dateModified": "2026-05-09",
   "datePublished": "2026-05-08",
