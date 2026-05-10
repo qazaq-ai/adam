@@ -1262,7 +1262,7 @@ impl Conversation {
         if crate::discourse::is_ask_fix_previous_error(input)
             && !extra_slots.contains_key("__ask_previous_error__")
         {
-            if let Some(code) = self.session.get("last_cargo_error_code") {
+            if let Some(code) = self.session.get("last_cargo_error_code").cloned() {
                 let code_upper = code.to_uppercase();
                 extra_slots.insert("__ask_fix_previous_error__".into(), code_upper.clone());
                 extra_slots.insert("error_code".into(), code_upper);
@@ -1271,6 +1271,36 @@ impl Conversation {
                 }
                 if let Some(topic) = self.session.get("last_submission_topic") {
                     extra_slots.insert("topic".into(), topic.clone());
+                }
+                // **v5.12.5 — Codex follow-up review (B5.3).**
+                // Repeat-detection counter. «Тағы бір мысал бер» /
+                // «Басқа мысал бер» / second «Қалай түзетемін?» turn
+                // should rotate to a different repair variant rather
+                // than echoing the same template. We increment a
+                // session counter `fix_example_idx` on every fire;
+                // the planner override picks variant `idx %
+                // variants.len()` so the cycle is bounded.
+                let lower_input = input.to_lowercase();
+                let asks_for_another = lower_input.contains("тағы")
+                    || lower_input.contains("басқа мысал")
+                    || lower_input.contains("басқа нұсқа")
+                    || lower_input.contains("екінші мысал")
+                    || lower_input.contains("екіншісі");
+                let prev_idx: u32 = self
+                    .session
+                    .get("fix_example_idx")
+                    .and_then(|v| v.parse().ok())
+                    .unwrap_or(0);
+                let new_idx = if asks_for_another {
+                    prev_idx + 1
+                } else {
+                    prev_idx
+                };
+                self.session
+                    .insert("fix_example_idx".into(), new_idx.to_string());
+                extra_slots.insert("fix_example_idx".into(), new_idx.to_string());
+                if let Some(snippet) = self.session.get("last_code_snippet") {
+                    extra_slots.insert("user_snippet".into(), snippet.clone());
                 }
             } else {
                 extra_slots.insert("__ask_fix_previous_error__".into(), "empty".into());
@@ -1905,10 +1935,26 @@ impl Conversation {
                         self.session
                             .insert("last_submission_topic".into(), topic.clone());
                     }
+                    // **v5.12.5 — Codex follow-up review (B5.3).**
+                    // Capture the original failing snippet so a
+                    // follow-up like «Түзетілген кодты көрсет» can
+                    // ground the corrected example in the user's own
+                    // code. Stored as `last_code_snippet` (the input
+                    // string verbatim — markdown fences + body). Reset
+                    // the per-error variant counter so the first fix-
+                    // request after a fresh failure starts from the
+                    // primary repair (clone for E0382, `let mut` for
+                    // E0596, etc.); subsequent «Тағы бір мысал бер»
+                    // turns increment.
+                    self.session
+                        .insert("last_code_snippet".into(), input.to_string());
+                    self.session.insert("fix_example_idx".into(), "0".into());
                 }
                 Some("passed") => {
                     self.session.remove("last_cargo_error_code");
                     self.session.remove("last_error_explanation");
+                    self.session.remove("last_code_snippet");
+                    self.session.remove("fix_example_idx");
                     if let Some(topic) = plan.slots.get("topic") {
                         self.session
                             .insert("last_submission_topic".into(), topic.clone());

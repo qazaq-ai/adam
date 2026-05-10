@@ -21,6 +21,55 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.12.5] — 2026-05-10 — B5.3 — Corrected-code surface (per-error-code repaired snippets + rotation counter)
+
+**Patch milestone.** Closes the fourth issue from the post-v5.11.0 Codex audit. Pre-v5.12.5 a follow-up like «Түзетілген кодты көрсет» / «Тағы бір мысал бер» after a failed SubmitSolution repeated the v5.10.0 generic explanation — Codex's audit asked for a concrete *repaired* snippet the user can copy-paste-run.
+
+### What changed
+
+**1. Session captures `last_code_snippet` + `fix_example_idx` on failed SubmitSolution.** [Conversation::turn_with_trace](crates/adam-dialog/src/conversation.rs) now saves the user's failing input verbatim and resets the rotation counter to `0`. Cleared on a passing solution alongside the existing `last_cargo_error_code` / `last_error_explanation` cleanup.
+
+**2. Repeat-detection counter logic.** When `is_ask_fix_previous_error` fires AND session has a cached error, the handler checks the input for rotation markers («тағы / басқа мысал / басқа нұсқа / екінші мысал / екіншісі»). On rotation the counter increments; on a non-rotation request the counter holds. The counter rides through `extra_slots["fix_example_idx"]`. Idempotent for the user's first follow-up (no spurious rotation on «Қалай түзетемін?»).
+
+**3. Planner override picks variant by counter, not rng_seed.** The `__ask_fix_previous_error__` override now reads `fix_example_idx` first and falls back to `rng_seed` when not set. Modulo over `effective.len()` keeps the cycle bounded — no out-of-bounds panic on long sessions.
+
+**4. Four new per-error-code template families with runnable snippets** under `ask_fix_previous_error.with_corrected_code.{E0382,E0596,E0277,E0308}`:
+
+| Error | Variant 0 | Variant 1 |
+|---|---|---|
+| **E0382** (moved value) | `clone()` — `let t = s.clone();` | reference — `let t = &s;` |
+| **E0596** (immutable borrow) | `let mut x` — direct mutation | `&mut` reference — function-passed mutation |
+| **E0277** (trait bound) | `#[derive(Debug)]` + `{:?}` | `impl fmt::Display for T` (manual) |
+| **E0308** (mismatched types) | `as` cast (numeric) | `String::from(...)` / `.as_str()` (string types) |
+
+Each variant ships as a fenced ` ```rust … ``` ` block with a self-contained working example. The closing line invites the rotation marker («Тағы бір нұсқасын көргіңіз келсе, «Тағы бір мысал бер» деңіз»).
+
+**5. Planner candidate priority order.** For mode `<CODE>`:
+1. `ask_fix_previous_error.with_corrected_code.<CODE>` (preferred — has runnable snippet)
+2. `ask_fix_previous_error.<CODE>` (v5.10.0 explanation family)
+3. `ask_fix_previous_error.with_data` (generic fallback)
+
+Codes without a specialised family (E0107 / E0123 / …) skip step 1 and 2, falling cleanly to with_data via the v5.10.0 `has_key`-gated multi-candidate loop.
+
+### Why `x.y.5`
+
+Per cadence policy: detector-layer changes are zero (the v5.10.0 detector already covers «Тағы бір мысал бер»); the work is template-pack expansion + session-state extension + planner per-mode routing. No new public APIs; no architectural shift. The next slot v5.13.0 takes B5.4 (proof-chain longest-path).
+
+### Tests
+
+- 5 integration tests in [`ask_fix_corrected_code_v5125`](crates/adam-dialog/tests/ask_fix_corrected_code_v5125.rs):
+  - E0382 first request → clone variant + Rust fence present
+  - E0382 pre-seeded `idx=1` → reference variant
+  - E0596 → `let mut` first variant
+  - E0107 (unspecialised) → falls back to with_data with error-index link
+  - End-to-end rotation: counter at 0 on first turn → 1 after «Тағы бір мысал бер»
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --all-targets -- -D warnings` clean; `cargo test --workspace` 0 failures; `bash scripts/check_metrics_currency.sh` clean.
+
+**Stripe — Deterministic AI research (B5.3 — corrected-code surface; per-error-code runnable snippets + session-tracked rotation).**
+
 ## [5.12.0] — 2026-05-10 — B5.2 — Financial / current-data paraphrase coverage extension
 
 **Minor-version release.** Closes the third issue from the post-v5.11.0 Codex audit. Pre-v5.12.0:

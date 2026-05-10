@@ -761,6 +761,16 @@ pub fn plan_response_with_epistemic(
     if let Some(mode) = extra_slots.get("__ask_fix_previous_error__") {
         let mut candidates: Vec<String> = Vec::new();
         if mode != "empty" {
+            // **v5.12.5 — Codex follow-up review (B5.3).** Per-error-
+            // code corrected-code family is preferred when present —
+            // it carries a runnable repaired snippet (clone vs
+            // reference for E0382, `let mut` vs `&mut` for E0596,
+            // `as` cast vs `String::from` for E0308, `derive(Debug)`
+            // vs `impl Trait` for E0277). Pre-v5.12.5 the kernel
+            // had only the generic explanation family which Codex's
+            // audit flagged as repeating the same advice on
+            // follow-ups instead of producing concrete fix examples.
+            candidates.push(format!("ask_fix_previous_error.with_corrected_code.{mode}"));
             candidates.push(format!("ask_fix_previous_error.{mode}"));
             candidates.push("ask_fix_previous_error.with_data".to_string());
         } else {
@@ -785,7 +795,17 @@ pub fn plan_response_with_epistemic(
                 } else {
                     fillable
                 };
-                let idx = (rng_seed as usize) % effective.len().max(1);
+                // **v5.12.5 — Codex follow-up review (B5.3).** Pick
+                // variant by `fix_example_idx` (session-tracked
+                // counter) instead of rng_seed: «Тағы бір мысал бер»
+                // / «Басқа нұсқа» rotates through repair variants
+                // deterministically. Falls back to rng_seed when no
+                // counter is set (other ask_fix_previous_error modes).
+                let idx_source: usize = extra_slots
+                    .get("fix_example_idx")
+                    .and_then(|v| v.parse::<usize>().ok())
+                    .unwrap_or(rng_seed as usize);
+                let idx = idx_source % effective.len().max(1);
                 let chosen = effective.get(idx).map(|s| (*s).clone()).unwrap_or_default();
                 return ResponsePlan {
                     literal: chosen,

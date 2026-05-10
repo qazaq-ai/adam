@@ -681,6 +681,106 @@ templates = [
     "Қандай қатені түзетуді сұрап жатқаныңыз нақты белгісіз — менде осы сұхбатта тіркелген сәтсіз тапсырыс жоқ. Кодты бере салыңыз, қарап шығамын.",
 ]
 
+# **v5.12.5 — Codex follow-up review (B5.3).** Corrected-code surface.
+# Pre-v5.12.5 «Түзетілген кодты көрсет» / «Тағы бір мысал бер» after a
+# failed SubmitSolution repeated the generic explanation family;
+# Codex's audit asked for a concrete repaired snippet. Conversation
+# layer now stores `last_code_snippet` + `fix_example_idx` counter
+# on session; planner picks variant by counter (rotating «clone» vs
+# «reference» for E0382, «let mut» vs «&mut» for E0596, etc.) instead
+# of rng_seed. Per-error-code families ship two complementary repair
+# strategies as runnable Rust snippets.
+[[families]]
+key = "ask_fix_previous_error.with_corrected_code.E0382"
+templates = [
+    """**E0382** — moved value қайта пайдаланылды. Бірінші амал — `clone()` арқылы көшірме жасау. Түзетілген код:
+```rust
+let s = String::from(\"hi\");
+let t = s.clone();
+println!(\"{}\", s);
+```
+Енді `s` сақталып қалды; `t` — оның тәуелсіз көшірмесі. Тағы бір нұсқасын көргіңіз келсе, «Тағы бір мысал бер» деңіз.""",
+    """**E0382** — moved value қайта пайдаланылды. Екінші амал — иеліктен бас тартып, тек сілтеме (reference) алу. Түзетілген код:
+```rust
+let s = String::from(\"hi\");
+let t = &s;
+println!(\"{} {}\", s, t);
+```
+`&s` тек оқуға арналған сілтеме береді; `s` иелігі сол мәнде қалады. `clone()` нұсқасын көру үшін «Басқа нұсқа» деңіз.""",
+]
+
+[[families]]
+key = "ask_fix_previous_error.with_corrected_code.E0596"
+templates = [
+    """**E0596** — өзгертуге болмайтын айнымалыны өзгертіп тұрсыз. Бірінші амал — айнымалыны `let mut` ретінде жариялау. Түзетілген код:
+```rust
+let mut x = 5;
+x += 1;
+println!(\"{}\", x);
+```
+Тағы бір нұсқасын көргіңіз келсе, «Тағы бір мысал бер» деңіз.""",
+    """**E0596** — өзгертуге болмайтын айнымалыны өзгертіп тұрсыз. Екінші амал — функцияға `&mut` сілтеме арқылы беру. Түзетілген код:
+```rust
+fn change(s: &mut String) {
+    s.push_str(\" world\");
+}
+
+let mut s = String::from(\"hello\");
+change(&mut s);
+println!(\"{}\", s);
+```
+Қажет болса «Басқа нұсқа» деп тағы бір амал сұраңыз.""",
+]
+
+[[families]]
+key = "ask_fix_previous_error.with_corrected_code.E0277"
+templates = [
+    """**E0277** — қажетті trait типке іске асырылмаған. Бірінші амал — `#[derive(Debug)]` қосып, `{:?}` форматтаушысын қолдану. Түзетілген код:
+```rust
+#[derive(Debug)]
+struct Point { x: i32, y: i32 }
+
+let p = Point { x: 1, y: 2 };
+println!(\"{:?}\", p);
+```
+`Display` trait-ін қолмен жазғыңыз келсе, «Тағы бір мысал бер» деңіз.""",
+    """**E0277** — қажетті trait типке іске асырылмаған. Екінші амал — `Display` trait-ін қолмен `impl` ету. Түзетілген код:
+```rust
+use std::fmt;
+
+struct Point { x: i32, y: i32 }
+
+impl fmt::Display for Point {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, \"({}, {})\", self.x, self.y)
+    }
+}
+
+let p = Point { x: 1, y: 2 };
+println!(\"{}\", p);
+```""",
+]
+
+[[families]]
+key = "ask_fix_previous_error.with_corrected_code.E0308"
+templates = [
+    """**E0308** — типтер сәйкеспейді. Бірінші амал — `as` арқылы caster қосу (сандық типтер арасында). Түзетілген код:
+```rust
+let small: i32 = 5;
+let big: i64 = small as i64;
+println!(\"{}\", big);
+```
+`String` ↔ `&str` арасындағы сәйкестікті көру үшін «Тағы бір мысал бер» деңіз.""",
+    """**E0308** — типтер сәйкеспейді. Екінші амал — `&str` ↔ `String` арасында ауысу. Түзетілген код:
+```rust
+let literal: &str = \"hello\";
+let owned: String = String::from(literal);
+let back: &str = owned.as_str();
+println!(\"{} {}\", owned, back);
+```
+`String::from(...)` `&str`-тен иелігі бар `String` жасайды; `.as_str()` керісінше әрекет етеді.""",
+]
+
 # **v5.10.5 — Codex follow-up review (B4.1).** Proof-chain mode. The
 # user asked «X-тің Y екенін дәлелде» / «Дәлелде X — Y». Detector:
 # `discourse::extract_proof_request`. Planner sentinel:
