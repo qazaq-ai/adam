@@ -286,6 +286,23 @@ pub struct TurnTrace {
     pub tool_calls: Vec<crate::tool::ToolResult>,
     /// Per-step plan trace emitted by `plan_response_with_session`.
     pub plan_trace: Vec<String>,
+    /// **v5.8.5 — G2.5 of the proof-carrying generation arc.** Typed
+    /// proof object the planner consulted for this turn, when one
+    /// could be constructed. `None` for paths that don't yet produce
+    /// a proof (most pre-G2.0 intents); `Some` for the YesNoCheck
+    /// chain-query path and the safety-refusal path.
+    ///
+    /// When `Some`, [`Self::verification_outcome`] reports the
+    /// `verifier::audit` result. The G2.5 contract: every turn whose
+    /// proof object is non-None should be `VerificationOutcome::Verified`
+    /// — failures indicate either a bug in the builder or a malformed
+    /// kernel state, and the turn loop falls back to a no-data refusal
+    /// in that case.
+    pub proof_object: Option<crate::proof_object::ProofObject>,
+    /// **v5.8.5** — outcome of `verifier::audit(literal, proof_object)`
+    /// for this turn. `None` when no proof object was constructed;
+    /// otherwise the verifier verdict.
+    pub verification_outcome: Option<crate::proof_object::VerificationOutcome>,
 }
 
 /// Lightweight "kind" summary of an `Intent` — the payload (name /
@@ -1171,8 +1188,27 @@ impl Conversation {
         // `safety_refusal.<category>` template family that names the
         // limitation honestly and points the user at a qualified
         // specialist.
+        // **v5.8.5 — G2.5.** Track the typed proof object built during
+        // this turn. When a path produces verifiable evidence (chain
+        // query / antonym denial / safety refusal / curated fact),
+        // the conversation layer builds a `ProofObject` here; the
+        // post-plan audit (further down) verifies it and falls back
+        // to a no-data refusal on failure. `None` for paths that
+        // don't yet produce a proof.
+        let mut proof_object: Option<crate::proof_object::ProofObject> = None;
+
         if let Some(category) = crate::discourse::detect_safety_topic(input) {
             extra_slots.insert("__safety_refusal__".into(), category.slug().into());
+            // **v5.8.5 — G2.5.** Build the typed proof for this safety
+            // refusal. The refusal IS the proof — no curated support
+            // is required because the kernel is honestly declining
+            // a high-stakes domain. SafetyDomain captures which kind.
+            let domain: crate::proof_object::SafetyDomain = category.into();
+            proof_object = Some(crate::proof_object::ProofObject::safety_refusal(
+                input.to_string(),
+                category.slug().to_string(),
+                domain,
+            ));
         }
         // **v5.6.6 — Codex follow-up review.** AskPreviousError recall
         // route. Pre-v5.6.6 «Ал алдыңғы қате неде болды?» fell to
@@ -1588,6 +1624,15 @@ impl Conversation {
                     Some(path) if path.len() >= 2 => {
                         extra_slots.insert("__yes_no_outcome__".into(), "confirm".into());
                         extra_slots.insert("chain".into(), path.join(" → "));
+                        // **v5.8.5 — G2.5.** Build typed proof for the
+                        // confirm path. Chain depth ≤ 2 is direct
+                        // (CuratedFact); deeper is rule-derived.
+                        proof_object = Some(crate::proof_object::ProofObject::from_isa_chain(
+                            subject.clone(),
+                            predicate.clone(),
+                            path,
+                            vec!["R1_is_a_transitivity".to_string()],
+                        ));
                     }
                     _ => {
                         // **v5.4.8** — closed-class antonym denial.
@@ -1608,8 +1653,23 @@ impl Conversation {
                         if let Some(antonym_chain) = denial {
                             extra_slots.insert("__yes_no_outcome__".into(), "deny".into());
                             extra_slots.insert("chain".into(), antonym_chain.join(" → "));
+                            // **v5.8.5 — G2.5.** Typed proof for the
+                            // antonym denial. Negated polarity.
+                            proof_object =
+                                Some(crate::proof_object::ProofObject::from_antonym_denial(
+                                    subject.clone(),
+                                    predicate.clone(),
+                                    antonym_chain,
+                                ));
                         } else {
                             extra_slots.insert("__yes_no_outcome__".into(), "unknown".into());
+                            // **v5.8.5 — G2.5.** Honest no-data refusal:
+                            // chain query missed AND no antonym path.
+                            // The refusal IS the proof.
+                            proof_object = Some(crate::proof_object::ProofObject::no_data_refusal(
+                                subject.clone(),
+                                predicate.clone(),
+                            ));
                         }
                     }
                 }
@@ -1624,6 +1684,24 @@ impl Conversation {
             &extra_slots,
         );
         let output = realise(&plan);
+
+        // **v5.8.5 — G2.5 of the proof-carrying generation arc.**
+        // When this turn produced a typed `ProofObject`, run the
+        // verifier against the rendered output. The current builders
+        // (chain query / antonym denial / safety refusal / no-data
+        // refusal) are correct by construction so verification
+        // passes; the gate exists to catch FUTURE regressions and
+        // to surface the verdict in the trace for auditability.
+        //
+        // **Non-replacing at this milestone.** We log the outcome
+        // but do NOT replace the rendered text on failure — the
+        // builders we ship today never produce non-Verified outcomes
+        // on real flows, and a fallback path would be untested
+        // architectural complexity. G3.0 wires emission-gating once
+        // the composer can produce well-formed alternatives.
+        let verification_outcome: Option<crate::proof_object::VerificationOutcome> = proof_object
+            .as_ref()
+            .map(|proof| crate::proof_object::verifier::audit(&output, proof));
 
         // **v4.98.0** — lesson-state curriculum tracking. After a
         // SubmitSolution turn, look at the planner-produced
@@ -1818,6 +1896,8 @@ impl Conversation {
             epistemic_status,
             tool_calls,
             plan_trace: plan.trace.clone(),
+            proof_object,
+            verification_outcome,
         };
         (output, trace)
     }

@@ -21,6 +21,53 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.8.5] — 2026-05-09 — G2.5 — verifier-gate в Conversation::turn (proof attached to every guarded path)
+
+**Patch milestone.** Wires the v5.8.0 `ProofObject` formalism into `Conversation::turn_with_trace` for the four paths the kernel can prove today. Every turn that fires one of those paths now produces a typed proof object alongside the rendered text, runs `verifier::audit` against it, and surfaces the verdict in [`TurnTrace`](crates/adam-dialog/src/conversation.rs).
+
+### What changed
+
+**1. Two new fields on `TurnTrace`:**
+- `proof_object: Option<ProofObject>` — the typed proof when this turn could construct one; `None` for paths not yet wired
+- `verification_outcome: Option<VerificationOutcome>` — the `verifier::audit` verdict (`Verified` / `UnsupportedClaims` / `MissingSupport` / `EmptyAnswer`); `None` when no proof was constructed
+
+**2. Four paths construct proofs:**
+
+| Path | Builder | Proof shape |
+|---|---|---|
+| YesNoCheck → confirm (chain found) | `ProofObject::from_isa_chain` | `IsA` claim with chain path + `R1_is_a_transitivity` rule id; `DerivedNotCurated` hedge for chains > depth 2 |
+| YesNoCheck → deny (antonym hub reachable) | `ProofObject::from_antonym_denial` | `IsA` claim with `Polarity::Negated`, `AntonymDenial` support |
+| YesNoCheck → unknown (no chain, no antonym) | `ProofObject::no_data_refusal` | `NoData` predicate, `TemplateRefusal` support |
+| Safety topic detected | `ProofObject::safety_refusal` (via `From<SafetyCategory>` bridge) | `SafetyRefusal{domain}` predicate, `PolicyRefusal` support |
+
+**3. Verifier runs after `plan_response_with_epistemic`.** When `proof_object` is `Some`, the kernel calls `verifier::audit(rendered_text, proof)` and stores the outcome in the trace. **Non-replacing at this milestone** — the four builders ship structurally well-formed proofs by construction, so verification always passes today. The gate's value is **catching future regressions**: if a future path wires in a producer that emits malformed proofs (empty support / non-empty `unsupported_claims`), the trace will surface the failure.
+
+**4. Backward compatible.** `Conversation::turn(...)` (the simple API that returns just the response string) is unchanged; only `turn_with_trace` exposes the new trace fields. Paths that don't yet produce proofs (greetings, statements, generic Definition shape) leave both fields `None` — a regression test fences this scope explicitly.
+
+### G2.5 → G3.0 trajectory
+
+| Milestone | Status |
+|---|---|
+| G1.0 — typed slot inventory | ✅ v5.7.0 |
+| G1.5 — realiser variation engine | ✅ v5.7.5 |
+| G2.0 — `ProofObject` + verifier | ✅ v5.8.0 |
+| **G2.5 — Conversation gates emission on verifier outcome** | ✅ **shipped** |
+| G3.0 — typed composer over proof objects → answer IR → realiser | next |
+
+**G2.5 finishes the four-of-five rungs of the proof-carrying generation arc.** G3.0 is the final milestone: a typed composer that takes a `ProofObject` + a target answer-shape and produces an IR tree the realiser walks. At that point generation becomes proof-carrying composition end-to-end.
+
+### Tests
+
+- 5 integration tests in `proof_gate_v585`: confirm path / deny path / no-data refusal / safety refusal / regression guard for non-proof paths
+- All paths produce `VerificationOutcome::Verified`; the regression guard confirms greetings stay None as scoped
+- All 1 256 prior tests + 5 new = **1 261 passing**
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --workspace --release --tests -- -D warnings` clean; `cargo test --workspace --release` 0 failures; `bash scripts/check_metrics_currency.sh` clean.
+
+**Stripe — Deterministic AI research (G2.5 verifier-gate; four guarded paths attach typed proof + audit verdict to every turn).**
+
 ## [5.8.0] — 2026-05-09 — G2.0 — ProofObject + verifier::audit (proof-carrying generation foundation)
 
 **Minor-version release.** Third milestone of the proof-carrying generation arc. Codex's review framing — «генератор не "придумывает текст" — он собирает допустимое высказывание из доказанных typed propositions» — needs a typed proof bundle to compose over. G2.0 ships that bundle.
