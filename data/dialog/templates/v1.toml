@@ -879,6 +879,20 @@ templates = [
     "{city} — {geo_kind}; соған жақын жақтансыз",
 ]
 
+# v5.9.5 — Codex follow-up review (B1). Honest "I don't know your
+# city yet" family when the user asked about THEIR OWN location
+# (1sg self-recall query) but no city is in session. Pre-v5.9.5
+# this fell to the assistant-self family above («Мен сандық әлемде
+# тұрамын») — wrong addressee. All variants explicitly invite the
+# user to share their location so future turns can answer.
+[[families]]
+key = "ask_location.user_self.no_data"
+templates = [
+    "сіз маған әлі қалаңызды айтпадыңыз",
+    "сіздің қалаңыз менде сақталмаған — қалаған кезде маған айта аласыз",
+    "білмеймін — сіз қай қалада тұратыныңызды маған айтсаңыз, есте сақтаймын",
+]
+
 # v4.4.9 — every variant interpolates `{city}`. Pre-v4.4.9 the
 # bare «түсіндім» variant at index 0 broke the seed-0 read in the
 # v4.4.6 REPL replay battery and made the

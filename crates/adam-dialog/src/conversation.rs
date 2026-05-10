@@ -1179,6 +1179,21 @@ impl Conversation {
         if crate::discourse::is_political_recommendation(input) {
             extra_slots.insert("__political_safety__".into(), "1".into());
         }
+        // **v5.9.5 — Codex follow-up review (B1).** AskLocation user-
+        // self disambiguation. When the intent is AskLocation AND the
+        // input is a 1sg self-recall query AND no city is in session,
+        // the user asked «where do I live?» and got the assistant-self
+        // template («Мен сандық әлемде тұрамын» / «Қазақстан елімде»)
+        // — wrong addressee. Mark so the planner routes to a user-
+        // self honest no-data family. Skipped when city IS in session
+        // because the existing `ask_location.with_known_user` family
+        // already answers correctly («Сіз Алматыда тұрасыз»).
+        if matches!(intent, crate::intent::Intent::AskLocation)
+            && !self.session.contains_key("city")
+            && crate::discourse::is_user_self_location_query(input)
+        {
+            extra_slots.insert("__user_self_no_city__".into(), "1".into());
+        }
         // **v5.6.5** — Codex 2026-05-09 review. Medical / legal /
         // financial / current-data safety layer. Pre-v5.6.5 «Басым
         // ауырып тұр, қандай дәрі ішейін?» surfaced the curated noun

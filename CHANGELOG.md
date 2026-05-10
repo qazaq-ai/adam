@@ -21,6 +21,59 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.9.5] — 2026-05-10 — Codex follow-up review fixes (B1 + B2) — AskLocation user-self disambiguation + safety-paraphrase extensions
+
+**Patch milestone.** Closes 4 dialog defects Codex surfaced in the post-v5.9.0 live REPL audit. All fixes are detector-layer; no kernel-architecture changes.
+
+### What changed
+
+**1. B1 — AskLocation user-self vs assistant-self disambiguation.** Pre-v5.9.5 the canonical Codex scenario:
+
+```text
+User: Мен Астанада тұрамын.
+User: Мен Алматыда тұрамын.
+User: Жоқ, екеуі де емес.
+User: Мен қайда тұрамын?
+adam: Менің мекенім жоқ.   ← assistant-self answer to a user-self question
+```
+
+Three fixes work together:
+
+- New [`discourse::is_user_self_location_query`](crates/adam-dialog/src/discourse.rs) — token-set membership across non-alphabetic boundaries; requires 1sg pronoun («мен / менің / маған / мені») OR 1sg verb («тұрамын / тұрамыз / қайдамын / қайдамыз») AND a locative interrogative («қайда / қайдан / қай қала / қай аудан»), AND no 2nd-person marker. The 2nd-person guard preserves correct routing for system probes («Сіз қайда тұрасыз?»).
+- Semantics short-circuit in [`semantics.rs`](crates/adam-dialog/src/semantics.rs) — checks `is_user_self_location_query(input)` BEFORE `detect_statement_of_location`, so «Қайдамын?» can't be parsed as a noun «Қай» + Locative + P1Sg and routed to `StatementOfLocation { city: "Қай" }` (a phantom-city belief-pollution bug).
+- Conversation marker `__user_self_no_city__` set when `Intent::AskLocation` AND no city in session AND user-self query; planner override routes to a new `ask_location.user_self.no_data` family in [`v1.toml`](data/dialog/templates/v1.toml) with three honest no-data templates («Сіз маған әлі қалаңызды айтпадыңыз» / «Сіздің қалаңыз менде сақталмаған» / «Білмеймін — сіз қай қалада тұратыныңызды маған айтсаңыз, есте сақтаймын»).
+
+Also fixes `detect_ask_location` to use token-set membership (was `split_whitespace` — bare «Қайдамын?» didn't match because of trailing punctuation).
+
+**2. B2.medical — pediatric / vaccination paraphrase coverage.** «Балама антибиотик берейін бе?» pre-v5.9.5 missed advice gating because:
+- «берейін» (1sg.HORT of «беру» = give) wasn't in the asks_for_advice cluster
+- «бала / нәресте / сәби / дәрумен / вакцина / екпе» weren't in MEDICAL_TOPICS
+
+Both gaps closed. Six new pediatric topic terms (бала / балама / балаға / нәресте / сәби / жасөспірім), four vaccination terms (вакцина / вакцинация / екпе / дәрумен), three specialist routes (терапевт / педиатр / невропатолог), and five new hortative-advice surfaces (берейін / берсем / егейін / екпейін / еккенім дұрыс па).
+
+**3. B2.legal — divorce-paperwork paraphrase coverage.** «Ажырасуға арыз берейін бе?» fell to retrieval on the literal token «арыз» pre-v5.9.5. The «ажырас» topic was already in LEGAL_TOPICS (since v5.6.6); the new «берейін» advice verb completes the gating chain.
+
+**4. B2.political — extended `is_political_recommendation` for evaluative imperatives.** Pre-v5.9.5 «Үкіметті сынап бер» / «Партияны мақта» / «Президентті жаманда» fell to retrieval and surfaced neutral institution facts — the user is asking for a partisan opinion, and a neutral fact is not the right refusal.
+
+- POLITICAL_TOPICS extended with institution / office terms (үкімет / үкіметті / президент / президентті / министр / министрді / депутат / депутатты / парламент / парламентті / мәжіліс / сенат / премьер / билік / билікті / әкім / губернатор / мемлекет басшысы)
+- RECOMMENDATION_VERBS extended with evaluative imperatives (сынап бер / сынап беріңіз / сынап / мақтап бер / мақтап беріңіз / мақта / жаманда / жамандап / қарсы шық / қарсы шықсам / жақта / жақтап / қолдап бер / қолдап / бағала / бағалап бер)
+
+### Tests
+
+- 3 new unit-test groups in `discourse`: `user_self_location_tests` (3 cases), `political_recommendation_tests_v595` (2 cases), and `safety_topic_tests::detects_pediatric_medical_advice_v595` + `detects_divorce_legal_advice_v595` (2 cases) — 7 unit tests
+- New live holdout [`live_holdout_v5950_codex.json`](data/eval/live_holdout_v5950_codex.json) — 13 cases across 6 categories (ask_location_user_self / regression_assistant_self / medical_paraphrase_v595 / legal_paraphrase_v595 / political_paraphrase_v595 / regression_definition_not_political), 100 % pass-rate floor enforced by [`live_holdout_v5950_codex.rs`](crates/adam-dialog/tests/live_holdout_v5950_codex.rs) — counts as 1 runner test
+- 8 new tests total (7 unit + 1 holdout runner); workspace **1 232 passing**, 17 ignored, 0 failures (`cargo test --workspace`)
+
+### Why `x.y.5` not `x.y.0`
+
+Per cadence policy: detector-layer paraphrase / disambiguation patches plus one new sentinel + one new template family. No new public APIs; no new crate; no architectural shift. The B4 generation-mode arc (proof-chain / countable propositions / honest «дәлелсіз» refusal) is held back to v5.10.5+ where it builds atop the v5.9.0 G3.0 substrate.
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --all-targets -- -D warnings` clean; `cargo test --workspace --release` 0 failures; `bash scripts/check_metrics_currency.sh` clean.
+
+**Stripe — Deterministic AI research (Codex follow-up; user-self addressee disambiguation + safety paraphrase coverage extensions).**
+
 ## [5.9.0] — 2026-05-09 — G3.0 — Typed answer IR + proof-carrying composer (final milestone of the proof-carrying generation arc)
 
 **Minor-version release.** Closes the **proof-carrying generation arc** end-to-end. Codex's seven-step pipeline («facts + rules + constraints → derived proof object → structured answer IR → FST/morphology realiser → final answer → verifier») is now wired through the kernel for the four shapes the kernel can prove today.

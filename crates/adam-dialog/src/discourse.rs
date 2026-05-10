@@ -430,6 +430,99 @@ mod safety_topic_tests {
         assert_eq!(detect_safety_topic("Заң деген не?"), None);
         assert_eq!(detect_safety_topic("Инвестиция деген не?"), None);
     }
+
+    // **v5.9.5 — Codex follow-up review (B2).** New paraphrase coverage.
+
+    #[test]
+    fn detects_pediatric_medical_advice_v595() {
+        // «Балама антибиотик берейін бе?» — pre-v5.9.5 this had the
+        // medical topic word «антибиотик» but no advice verb that
+        // matched: «берейін бе» wasn't in the asks_for_advice list.
+        // Post-v5.9.5: «берейін» joined the hortative-advice cluster.
+        assert_eq!(
+            detect_safety_topic("Балама антибиотик берейін бе?"),
+            Some(SafetyCategory::Medical)
+        );
+        // Vaccination paraphrase
+        assert_eq!(
+            detect_safety_topic("Сәбиіме вакцина егейін бе?"),
+            Some(SafetyCategory::Medical)
+        );
+        // Vitamin / supplement
+        assert_eq!(
+            detect_safety_topic("Балаға дәрумен берсем дұрыс па?"),
+            Some(SafetyCategory::Medical)
+        );
+    }
+
+    #[test]
+    fn detects_divorce_legal_advice_v595() {
+        // «Ажырасуға арыз берейін бе?» — pre-v5.9.5 fell to retrieval
+        // on the literal token «арыз». Post-v5.9.5: «ажырас» topic +
+        // «берейін» advice verb both fire.
+        assert_eq!(
+            detect_safety_topic("Ажырасуға арыз берейін бе?"),
+            Some(SafetyCategory::Legal)
+        );
+    }
+}
+
+#[cfg(test)]
+mod user_self_location_tests {
+    use super::is_user_self_location_query;
+
+    #[test]
+    fn detects_explicit_1sg_pronoun_self_query_v595() {
+        // Canonical Codex test scenario.
+        assert!(is_user_self_location_query("Мен қайда тұрамын?"));
+        // Locative-noun + 1sg verb (no explicit pronoun)
+        assert!(is_user_self_location_query("Қай қалада тұрамын?"));
+        // Bare 1sg locative interrogative
+        assert!(is_user_self_location_query("Қайдамын?"));
+        // 1sg pronoun + locative interrogative
+        assert!(is_user_self_location_query("Мен қай қалада тұрамын?"));
+    }
+
+    #[test]
+    fn rejects_2nd_person_system_probe_v595() {
+        // System-probe: must NOT misroute to user-self family.
+        assert!(!is_user_self_location_query("Сіз қайда тұрасыз?"));
+        assert!(!is_user_self_location_query("Сен қайдансың?"));
+        assert!(!is_user_self_location_query("Сіздің мекеніңіз қайда?"));
+    }
+
+    #[test]
+    fn rejects_third_party_factual_query_v595() {
+        // No 1sg AND no 2nd-person → not a recall query at all.
+        assert!(!is_user_self_location_query(
+            "Қазақстанның астанасы қай қала?"
+        ));
+        assert!(!is_user_self_location_query("Алматы қайда?"));
+    }
+}
+
+#[cfg(test)]
+mod political_recommendation_tests_v595 {
+    use super::is_political_recommendation;
+
+    #[test]
+    fn detects_government_criticism_request_v595() {
+        // «Үкіметті сынап бер.» — pre-v5.9.5 «үкімет» wasn't in
+        // POLITICAL_TOPICS and «сынап бер» wasn't in
+        // RECOMMENDATION_VERBS. Post-v5.9.5 both joined.
+        assert!(is_political_recommendation("Үкіметті сынап бер."));
+        assert!(is_political_recommendation("Президентті жаманда."));
+        assert!(is_political_recommendation("Партияны мақта."));
+        assert!(is_political_recommendation("Депутатты жақта."));
+    }
+
+    #[test]
+    fn does_not_fire_on_factual_political_query_v595() {
+        // «Партия деген не?» — factual definition, not partisan ask.
+        assert!(!is_political_recommendation("Партия деген не?"));
+        assert!(!is_political_recommendation("Үкімет дегеніміз не?"));
+        assert!(!is_political_recommendation("Президент кім?"));
+    }
 }
 
 #[cfg(test)]
@@ -500,6 +593,13 @@ mod russian_tests {
 /// («Партия деген не?» / «Қандай партиялар бар?») don't trigger.
 pub fn is_political_recommendation(input: &str) -> bool {
     let lower = input.to_lowercase();
+    // **v5.9.5 — Codex follow-up review (B2).** Extended with
+    // institution / office terms and evaluative imperatives. Pre-
+    // v5.9.5 «Үкіметті сынап бер» / «Партияны мақта» / «Президентті
+    // жаманда» fell to retrieval and surfaced neutral facts about
+    // the institution — adam was being asked for partisan opinion
+    // disguised as a request for praise / criticism, and a neutral
+    // fact is not the right refusal.
     const POLITICAL_TOPICS: &[&str] = &[
         "партия",
         "саясатшы",
@@ -509,6 +609,25 @@ pub fn is_political_recommendation(input: &str) -> bool {
         "идеолог",
         "көшбасшы",
         "оппозиция",
+        // v5.9.5
+        "үкімет",
+        "үкіметті",
+        "президент",
+        "президентті",
+        "министр",
+        "министрді",
+        "депутат",
+        "депутатты",
+        "парламент",
+        "парламентті",
+        "мәжіліс",
+        "сенат",
+        "премьер",
+        "билік",
+        "билікті",
+        "мемлекет басшысы",
+        "әкім",
+        "губернатор",
     ];
     const RECOMMENDATION_VERBS: &[&str] = &[
         "қолда",
@@ -523,6 +642,25 @@ pub fn is_political_recommendation(input: &str) -> bool {
         "сен қалай ойлайсың",
         "пікірің қандай",
         "сенің пікірің",
+        // **v5.9.5** — evaluative imperatives. The user is asking
+        // adam for partisan praise / criticism / endorsement —
+        // categorically a recommendation request.
+        "сынап бер",
+        "сынап беріңіз",
+        "сынап",
+        "мақтап бер",
+        "мақтап беріңіз",
+        "мақта",
+        "жаманда",
+        "жамандап",
+        "қарсы шық",
+        "қарсы шықсам",
+        "жақта",
+        "жақтап",
+        "қолдап бер",
+        "қолдап",
+        "бағала",
+        "бағалап бер",
     ];
     let has_political = POLITICAL_TOPICS.iter().any(|t| lower.contains(t));
     let has_recommend = RECOMMENDATION_VERBS.iter().any(|v| lower.contains(v));
@@ -560,6 +698,48 @@ pub fn is_ask_previous_error(input: &str) -> bool {
         || lower.contains("тағы айт")
         || lower.contains("қайталап");
     has_recall_marker && mentions_error && asks_about_it
+}
+
+/// **v5.9.5 — Codex follow-up review (B1).** Distinguishes a user-
+/// self location query («Мен қайда тұрамын?» / «Қай қалада тұрамын?»
+/// / «Қайдамын?») from a system-self probe («Сіз қайда тұрасыз?»).
+/// Returns true when the input is unambiguously the user asking adam
+/// to recall their OWN location from session state. Pre-v5.9.5 both
+/// shapes routed to the generic `ask_location` template family whose
+/// templates are assistant-self («Мен сандық әлемде тұрамын» / «Менің
+/// мекенім жоқ» / «Қазақстан елімде»). On a self-recall question that
+/// is the wrong addressee — adam answers about itself when the user
+/// asked about themselves. Conservative: requires a 1sg verb / pronoun
+/// marker AND no 2nd-person marker.
+pub fn is_user_self_location_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    // Token-set membership across non-alphabetic boundaries — mirrors
+    // the v5.6.6 token-boundary fix in `detect_safety_topic` so trailing
+    // punctuation («тұрамын?») doesn't break the equality match.
+    let tokens: std::collections::HashSet<&str> = lower
+        .split(|c: char| !c.is_alphabetic())
+        .filter(|t| !t.is_empty())
+        .collect();
+    let has_1sg_pronoun = ["мен", "менің", "маған", "мені"]
+        .iter()
+        .any(|p| tokens.contains(p));
+    let has_1sg_verb = ["тұрамын", "тұрамыз", "қайдамын", "қайдамыз"]
+        .iter()
+        .any(|v| tokens.contains(v));
+    let has_2sg_marker = ["сіз", "сен", "сіздің", "сенің"]
+        .iter()
+        .any(|p| tokens.contains(p))
+        || lower.contains("тұрасыз")
+        || lower.contains("тұрасың");
+    let has_locative_question = lower.contains("қайда")
+        || lower.contains("қайдан")
+        || lower.contains("қай жер")
+        || lower.contains("қай қала")
+        || lower.contains("қай аудан");
+    if has_2sg_marker {
+        return false;
+    }
+    has_locative_question && (has_1sg_pronoun || has_1sg_verb)
 }
 
 /// **v5.6.5 — Codex 2026-05-09 review.** High-stakes-topic safety
@@ -664,6 +844,16 @@ pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
         || lower.contains("қанша мөлшерде")
         || lower.contains("қанша ішейін")
         || lower.contains("қанша ішсем")
+        // **v5.9.5 — Codex follow-up review (B2).** Hortative «берейін /
+        // берейін бе» (1sg.HORT of «беру» = give) — canonical advice-
+        // seeking shape for «should I administer X to someone?»
+        // Crucial for child-medication questions «Балама антибиотик
+        // берейін бе?» which pre-v5.9.5 missed advice gating.
+        || lower.contains("берейін")
+        || lower.contains("берсем")
+        || lower.contains("егейін")
+        || lower.contains("екпейін")
+        || lower.contains("еккенім дұрыс па")
         // Symptom-statement form: «басым ауырып тұр» / «жөтелім бар»
         // etc. — the user describes a symptom; even without an explicit
         // advice verb this should refuse to give medical guidance.
@@ -715,6 +905,26 @@ pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
         "рецепт",
         "доза",
         "мөлшер",
+        // **v5.9.5 — Codex follow-up review (B2).** Pediatric +
+        // vaccination paraphrases. «бала / балама / нәресте / сәби»
+        // are common subjects in medical-advice questions — «Балама
+        // антибиотик берейін бе?» — and must trigger refusal even
+        // when the drug-class is implicit.
+        "бала",
+        "балама",
+        "балаға",
+        "нәресте",
+        "сәби",
+        "жасөспірім",
+        // Vaccination paraphrases
+        "вакцина",
+        "вакцинация",
+        "екпе",
+        "дәрумен",
+        // Specialist routing
+        "терапевт",
+        "педиатр",
+        "невропатолог",
     ];
     let has_medical = MEDICAL_TOPICS.iter().any(|t| lower.contains(t));
     if has_medical && asks_for_advice {

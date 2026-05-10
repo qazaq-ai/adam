@@ -702,6 +702,40 @@ pub fn plan_response_with_epistemic(
             };
         }
     }
+    // **v5.9.5 — Codex follow-up review (B1).** AskLocation user-self
+    // disambiguation. When the conversation layer detected a 1sg
+    // self-recall location query AND no city is in session, route
+    // to the new `ask_location.user_self.no_data` family which
+    // honestly says "I don't know your city yet" rather than the
+    // assistant-self fallbacks («Мен сандық әлемде тұрамын» / «Менің
+    // мекенім жоқ» / «Қазақстан елімде» — those answer about adam,
+    // not the user, and the third makes a false claim).
+    if extra_slots.contains_key("__user_self_no_city__") {
+        let key = "ask_location.user_self.no_data";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: user_self_no_city override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
+            trace.push(format!(
+                "planner: applicable_total={} chosen_index={} text='{}'",
+                applicable_all.len(),
+                idx,
+                chosen,
+            ));
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
     // **v4.77.0** — code-snippet refusal. Routes to dedicated
     // `code_refusal` family BEFORE math_refusal so Python-style
     // code «for i in range(3): print(i)» doesn't fall to «can't

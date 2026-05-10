@@ -243,6 +243,21 @@ pub fn interpret_text_with_lexicon(
     // statements; if input contains one, leave intent as Unknown so
     // the existing v4.13.0 anaphora-resolution path (lines 668-708 of
     // conversation.rs) can surface the prior topic.
+    // **v5.9.5 — Codex follow-up review (B1).** Short-circuit on user-
+    // self location query BEFORE detect_statement_of_location runs.
+    // Pre-v5.9.5 «Қайдамын?» was parsed by the FST as `Қай` (a noun
+    // mistakenly extracted as a city root) + Locative + P1Sg, then
+    // `has_first_person_location_context` returned true on the P1Sg
+    // marker, the question-pronoun guard didn't fire because the «?»
+    // in `joined` had been stripped, and the turn ended up as
+    // `StatementOfLocation { city: "Қай" }` — polluting belief state
+    // with a phantom city. The user-self detector is conservative
+    // (1sg pronoun/verb + locative interrogative + no 2nd-person
+    // marker), so firing it first preserves correct intent for the
+    // narrow self-recall shape without affecting any other path.
+    if crate::discourse::is_user_self_location_query(input) {
+        return Intent::AskLocation;
+    }
     if !crate::discourse::input_contains_discourse_anaphor(input)
         && let Some(city) = detect_statement_of_location(&tokens, &raw_tokens, &joined, parses)
     {
@@ -2257,10 +2272,18 @@ fn detect_ask_location(joined: &str) -> bool {
     // addressing markers: 2nd-person pronoun «сіз / сен» as
     // separate token, possessive «сіздің / сенің», or live-verb
     // forms «тұрасыз / тұрасың / қайдансыз / қайдансың».
-    let tokens: Vec<&str> = joined.split_whitespace().collect();
-    let has_user_marker = tokens
+    // **v5.9.5 — Codex follow-up review (B1).** Token-set membership
+    // across non-alphabetic boundaries — pre-v5.9.5 trailing
+    // punctuation («Қайдамын?» → ["қайдамын?"]) broke equality match
+    // on the self-recall verb forms. Mirror the same fix the v5.6.6
+    // safety detector uses.
+    let tokens: std::collections::HashSet<&str> = joined
+        .split(|c: char| !c.is_alphabetic())
+        .filter(|t| !t.is_empty())
+        .collect();
+    let has_user_marker = ["сіз", "сен", "сіздің", "сенің"]
         .iter()
-        .any(|t| matches!(*t, "сіз" | "сен" | "сіздің" | "сенің"))
+        .any(|p| tokens.contains(p))
         || joined.contains("тұрасыз")
         || joined.contains("тұрасың")
         || joined.contains("қайдансыз")
@@ -2270,9 +2293,9 @@ fn detect_ask_location(joined: &str) -> bool {
     // — user asking adam to recall their own location from session.
     // Without this branch the question fell through to a definitional
     // surface ("Қала — елді мекен") instead of «Сіз Алматыда тұрасыз».
-    let has_self_recall_marker = tokens
+    let has_self_recall_marker = ["тұрамын", "тұрамыз", "қайдамын", "қайдамыз"]
         .iter()
-        .any(|t| matches!(*t, "тұрамын" | "тұрамыз" | "қайдамын" | "қайдамыз"));
+        .any(|v| tokens.contains(v));
     if !has_user_marker && !has_self_recall_marker {
         return false;
     }
@@ -2289,7 +2312,13 @@ fn detect_ask_location(joined: &str) -> bool {
         // both the locative interrogative AND a self-recall verb
         // («тұрамын / тұрамыз»).
         || (has_self_recall_marker
-            && tokens.iter().any(|t| *t == "қайда" || *t == "қайдан"))
+            && (tokens.contains("қайда") || tokens.contains("қайдан")))
+        // **v5.9.5 — Codex follow-up review (B1).** Bare «Қайдамын?»
+        // / «Қайдамыз?» — the verb form alone is a complete self-
+        // recall question. Pre-v5.9.5 needed a co-occurring «қай *»
+        // anchor; post-v5.9.5 the form is sufficient.
+        || tokens.contains("қайдамын")
+        || tokens.contains("қайдамыз")
 }
 
 /// User states location: "мен Алматыданмын", "астанада тұрамын",
