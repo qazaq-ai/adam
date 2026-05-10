@@ -21,6 +21,48 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.4.6] — 2026-05-09 — Detector edge-case fixes — em-dash absorption + 2nd-person system polysemy
+
+**Surgical detector release.** Closes the three highest user-impact edge cases the v5.4.5 64-turn audit deferred. Pass-rate **57/64 → 60/64 (89 % → 94 %)** on the same audit.
+
+### What changed
+
+**1. Em-dash StatementOfOccupation absorber.** Pre-v5.4.6 «Мамандығым — бағдарламашы.» tokenised as `[«мамандығым», «—», «бағдарламашы»]`; the v5.3.5 possessive-anchor pattern read `tokens[i+1]` directly, hit the em-dash, called the alphabetic-filter which returned an empty string, and bailed. The user's occupation never reached `session.occupation`, so downstream «Менің мамандығым есіңізде ме?» fell to a generic noun-definition surface. Fix: walk past punctuation-only tokens between the possessive anchor and the value. Sister fix in `extract_secondary_profile_facts` so the secondary-extraction code path benefits the same way.
+
+**2. System-identity polysemy on AskName.** Pre-v5.4.6 «Сіздің атыңыз кім?» («What is YOUR name?» — about adam) routed to `Intent::AskName` and surfaced the user's stored name («Дәулет деп танысқан едіңіз»). Two-half fix:
+- [`detect_ask_name`](crates/adam-dialog/src/semantics.rs) now bails when 2nd-person possessive «сіздің» / «сенің» appears WITHOUT 1st-person «менің» — that pattern is unambiguously about adam, not the user.
+- [`detect_ask_about_system`](crates/adam-dialog/src/semantics.rs) gains an `asks_system_name` predicate routing the same surface forms to `SystemAspect::General`. The canonical adam-introduction template («Менің атым адам, толық атауым Agglutinative Reasoning Kernel (ARK)…») now fires.
+
+**3. System-identity for speaking-language.** Pre-v5.4.6 «Сіз қандай тілде сөйлейсіз?» routed to `Definition` over the noun «тіл» and surfaced the anatomical-organ definition («Тіл — сөйлеу мүшесі.»). Distinct from the existing `Implementation` aspect (programming language → "what code stack are you written in"). New `asks_speaking_language` predicate matching `(сөйлейсің / сөйлейсіз / білесіз / білесің) + (қандай тілде / қай тілде / қай тіл / …)` routes to `SystemAspect::General` for the canonical Kazakh-only declaration.
+
+### Live REPL — before / after
+
+| Query | Pre-v5.4.6 | Post-v5.4.6 |
+|---|---|---|
+| Мамандығым — бағдарламашы. | (occupation never absorbed) | (absorbed; downstream «есіңізде ме?» recalls «Бағдарламашы — сіздің кәсібіңіз.») |
+| Сіздің атыңыз кім? | «Дәулет деп танысқан едіңіз.» (returns user's name) | «Менің атым адам, толық атауым Agglutinative Reasoning Kernel (ARK).» |
+| Сіз қандай тілде сөйлейсіз? | «Тіл — сөйлеу мүшесі.» (anatomical organ) | «ARK — Agglutinative Reasoning Kernel, мен адам атты қазақша тілдік модельмін.» |
+
+### Tests
+
+- New live holdout [`live_holdout_v5460_detector.json`](data/eval/live_holdout_v5460_detector.json) + [Rust runner](crates/adam-dialog/tests/live_holdout_v5460_detector.rs) — **5 cases**: em-dash absorption, 2 system-name variants («Сіздің атыңыз кім?» / «Сенің атың не?»), 2 speaking-language variants («Сіз қандай тілде сөйлейсіз?» / «Сен қай тілде сөйлейсің?»). Pass-rate floor 100 %.
+- 2 new unit tests in [`codex_round3_v5035`](crates/adam-dialog/tests/codex_round3_v5035.rs) for `extract_secondary_profile_facts` em-dash handling: `secondary_extraction_handles_em_dash_form_v546`, `secondary_extraction_handles_em_dash_form_with_compound_v546`.
+
+### Deferred to v5.4.7+
+
+4 detector edge cases from the v5.4.5 audit remain:
+- «Адам — тірі ме?» (адам polysemy: system identity vs human concept)
+- Possessive multiword «X-нің Y-ы» (e.g. «Бас — дененің бөлігі ме?» genitive form vs the registered «дене бөлігі»)
+- Curriculum-stage routing «Өмір кезеңі деген не?» / «Қасиеттер қалай жұмыс істейді?»
+
+### Verified
+
+- Workspace 1 155 + 7 new (5 live-holdout + 2 unit) = **1 162 passing**
+- 64-turn live REPL audit pass-rate **94 % (60/64)** — up from 89 % at v5.4.5
+- `cargo fmt --all --check` clean; `cargo clippy --workspace --release --tests -- -D warnings` clean
+
+**Stripe — Deterministic AI research (third audit-feedback iteration; cumulative pass-rate climbs 81 % → 89 % → 94 % across v5.4.0 → v5.4.5 → v5.4.6).**
+
 ## [5.4.5] — 2026-05-09 — Detector hardening + 64-turn live REPL audit + Kazakh cuisine domain
 
 **Substantive engineering release.** v5.4.5 lands the second half of the week-plan: multi-word topic extraction fixes, a 64-turn live REPL audit, 12 IsA-gap fixes surfaced by it, and the long-deferred kazakh_cuisine domain.

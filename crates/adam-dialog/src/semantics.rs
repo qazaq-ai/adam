@@ -1139,25 +1139,36 @@ pub fn extract_secondary_profile_facts(input: &str) -> Vec<(String, String)> {
         let tl = alpha_only(tok).to_lowercase();
         // Occupation: «мамандығым X» / «кәсібім X»
         if tl == "мамандығым" || tl == "кәсібім" {
-            if let Some(next) = tokens.get(i + 1) {
+            // **v5.4.6** — walk past punctuation-only tokens so the
+            // em-dash form «Мамандығым — бағдарламашы» reaches the
+            // value just like the bare form. Sister fix to the same
+            // walk in `detect_occupation_in_compound`.
+            let mut j = i + 1;
+            while let Some(next) = tokens.get(j) {
                 let value = alpha_only(next);
+                if value.is_empty() {
+                    j += 1;
+                    continue;
+                }
                 let value_lc = value.to_lowercase();
-                if !value.is_empty()
-                    && value_lc != "болып"
-                    && value_lc != "ретінде"
-                    && value_lc != "екен"
+                if value_lc != "болып" && value_lc != "ретінде" && value_lc != "екен"
                 {
                     facts.push(("occupation".into(), value));
                 }
+                break;
             }
         }
         // Age: «жасым 30» / «жасым отыз»
         if tl == "жасым" {
-            if let Some(next) = tokens.get(i + 1) {
+            let mut j = i + 1;
+            while let Some(next) = tokens.get(j) {
                 let value = alpha_or_digit(next);
-                if !value.is_empty() {
-                    facts.push(("age".into(), value));
+                if value.is_empty() {
+                    j += 1;
+                    continue;
                 }
+                facts.push(("age".into(), value));
+                break;
             }
         }
     }
@@ -1871,6 +1882,41 @@ fn detect_ask_about_system(
             || joined.contains("қалай атайсыз")
             || joined.contains("кім дейсің")
             || joined.contains("кім дейсіз"));
+    // **v5.4.6** — 2nd-person name question: «Сіздің атыңыз кім?» /
+    // «Сенің атың не?» / «Сіздің есіміңіз қандай?». Pre-v5.4.6 these
+    // routed to `Intent::AskName` and surfaced the *user's* stored
+    // name ("Дәулет деп танысқан едіңіз") instead of adam's. The bug
+    // was a 1st/2nd-person polysemy in detect_ask_name. The fix has
+    // two halves: detect_ask_name now bails when the 2nd-person
+    // possessive «сіздің / сенің» appears without 1st-person «менің»;
+    // here we route the same pattern to `SystemAspect::General` so
+    // the canonical adam-introduction template fires.
+    let asks_system_name = (joined.contains("сіздің") || joined.contains("сенің"))
+        && (joined.contains("атыңыз")
+            || joined.contains("атың")
+            || joined.contains("есіміңіз")
+            || joined.contains("есімің"))
+        && (joined.contains("кім") || joined.contains("не") || joined.contains("қандай"))
+        && !joined.contains("менің");
+    // **v5.4.6** — 2nd-person speaking-language question:
+    // «Сіз қандай тілде сөйлейсіз?» / «Сен қай тілде сөйлейсің?».
+    // Pre-v5.4.6 these routed to Definition over the noun «тіл» and
+    // surfaced «Тіл — сөйлеу мүшесі.» (anatomical organ definition).
+    // The speaking-language question is a system-self property —
+    // adam speaks Kazakh only — so route to General. Distinct from
+    // Implementation (programming language) which uses
+    // «жазылғансыз» / «жасалғансыз» verb stems.
+    let asks_speaking_language = pronoun
+        && (joined.contains("сөйлейсің")
+            || joined.contains("сөйлейсіз")
+            || joined.contains("білесіз")
+            || joined.contains("білесің"))
+        && (joined.contains("қандай тілде")
+            || joined.contains("қай тілде")
+            || joined.contains("қандай тілдерде")
+            || joined.contains("қай тілдерде")
+            || joined.contains("қандай тіл")
+            || joined.contains("қай тіл"));
     if pronoun
         && (joined.contains("кімсің")
             || joined.contains("кімсіз")
@@ -1884,6 +1930,8 @@ fn detect_ask_about_system(
             || joined.contains("немен айналысасыз"))
         || self_intro_request
         || reflexive_self_question
+        || asks_system_name
+        || asks_speaking_language
     {
         return Some(SystemAspect::General);
     }
@@ -1892,6 +1940,17 @@ fn detect_ask_about_system(
 }
 
 fn detect_ask_name(joined: &str) -> bool {
+    // **v5.4.6** — 2nd-person possessive disambiguation. When the
+    // input has «сіздің» / «сенің» (2nd-person possessive) WITHOUT
+    // «менің» (1st-person), the name question is about ADAM, not
+    // the user. Bail so `detect_ask_about_system` picks it up via
+    // `SystemAspect::General` and the canonical adam-introduction
+    // template fires instead of surfacing the user's stored name.
+    let asks_system_name =
+        (joined.contains("сіздің") || joined.contains("сенің")) && !joined.contains("менің");
+    if asks_system_name {
+        return false;
+    }
     (joined.contains("атың") && joined.contains("кім"))
         || (joined.contains("атыңыз") && joined.contains("кім"))
         || joined.contains("есімің")
@@ -3024,12 +3083,28 @@ pub(crate) fn detect_occupation_in_compound(
     for (i, t) in tokens.iter().enumerate() {
         let alpha: String = t.chars().filter(|c| c.is_alphabetic()).collect();
         if alpha == "мамандығым" || alpha == "кәсібім" {
-            if let Some(next) = tokens.get(i + 1) {
-                let value: String = next.chars().filter(|c| c.is_alphabetic()).collect();
-                if !value.is_empty() && value != "болып" && value != "ретінде" && value != "екен"
-                {
-                    return Some(Some(value));
+            // **v5.4.6** — skip punctuation-only tokens between the
+            // possessive anchor and the value. Pre-v5.4.6 «Мамандығым
+            // — бағдарламашы.» tokenised as
+            // [«мамандығым», «—», «бағдарламашы»]; the detector read
+            // tokens[i+1] = «—» (em-dash), the alphabetic-filter
+            // returned the empty string, and the fact was never
+            // absorbed. Walk forward through punctuation glyphs so
+            // both bare («Мамандығым бағдарламашы») and dash-separated
+            // («Мамандығым — бағдарламашы») forms reach the same code
+            // path.
+            let mut j = i + 1;
+            while let Some(tok) = tokens.get(j) {
+                let alpha_only: String = tok.chars().filter(|c| c.is_alphabetic()).collect();
+                if alpha_only.is_empty() {
+                    j += 1;
+                    continue;
                 }
+                if alpha_only != "болып" && alpha_only != "ретінде" && alpha_only != "екен"
+                {
+                    return Some(Some(alpha_only));
+                }
+                break;
             }
         }
     }

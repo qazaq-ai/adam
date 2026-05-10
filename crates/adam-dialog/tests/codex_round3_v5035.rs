@@ -44,6 +44,23 @@ fn secondary_extraction_finds_age() {
 }
 
 #[test]
+fn secondary_extraction_handles_em_dash_form_v546() {
+    // **v5.4.6** — em-dash separator was lost pre-v5.4.6 because the
+    // detector read `tokens[i+1]` directly; with em-dash splitting
+    // tokens as [«мамандығым», «—», «бағдарламашы»] the detector
+    // returned the empty string and failed. Post-v5.4.6 it walks
+    // past punctuation-only tokens.
+    let facts = extract_secondary_profile_facts("Мамандығым — бағдарламашы.");
+    assert!(facts.contains(&("occupation".into(), "бағдарламашы".into())));
+}
+
+#[test]
+fn secondary_extraction_handles_em_dash_form_with_compound_v546() {
+    let facts = extract_secondary_profile_facts("Менің атым Дәулет, мамандығым — инженер.");
+    assert!(facts.contains(&("occupation".into(), "инженер".into())));
+}
+
+#[test]
 fn secondary_extraction_skips_filler_words() {
     // «мамандығым болып бағдарламашы» should NOT capture «болып» as
     // value (filler word); should skip to «бағдарламашы».

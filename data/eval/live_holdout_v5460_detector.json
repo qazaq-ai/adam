@@ -1,0 +1,10 @@
+{
+  "_comment": "v5.4.6 — detector edge-case live holdout. Captures the three priority detector fixes shipped in v5.4.6: (1) em-dash StatementOfOccupation absorber «Мамандығым — бағдарламашы.» pre-fix tokenized as [«мамандығым», «—», «бағдарламашы»] and the v5.3.5 possessive-anchor pattern read tokens[i+1] = em-dash and bailed; post-fix it walks past punctuation tokens. (2) System-identity polysemy on AskName: «Сіздің атыңыз кім?» pre-fix returned the user's stored name; post-fix detect_ask_name bails when 2nd-person possessive «сіздің / сенің» appears without 1st-person «менің», and detect_ask_about_system routes the same pattern to General aspect. (3) System-identity for speaking-language: «Сіз қандай тілде сөйлейсіз?» pre-fix routed to Definition over the noun «тіл» and surfaced the anatomical-organ definition; post-fix routes to General self-introduction. The 4 deferred edge cases (адам polysemy, possessive «X-нің Y-ы» multiword, curriculum-stage routing for өмір кезеңі / қасиеттер) remain for v5.4.7+.",
+  "cases": [
+    {"id": "occ_em_dash_001", "category": "occupation_em_dash_absorption", "query": "Мамандығым — бағдарламашы.", "any_substring": ["бағдарлама", "кәсіп", "мамандық"], "none_substring": ["{occupation}"]},
+    {"id": "system_name_001", "category": "system_identity_name", "query": "Сіздің атыңыз кім?", "any_substring": ["адам", "ark", "agglutinative", "тілдік"], "none_substring": ["дәулет деп танысқан"]},
+    {"id": "system_name_002", "category": "system_identity_name", "query": "Сенің атың не?", "any_substring": ["адам", "тілдік", "ark"], "none_substring": []},
+    {"id": "system_lang_001", "category": "system_identity_speaking_language", "query": "Сіз қандай тілде сөйлейсіз?", "any_substring": ["қазақ", "адам", "тілдік", "ark"], "none_substring": ["сөйлеу мүшесі"]},
+    {"id": "system_lang_002", "category": "system_identity_speaking_language", "query": "Сен қай тілде сөйлейсің?", "any_substring": ["қазақ", "адам", "тілдік", "ark"], "none_substring": ["сөйлеу мүшесі"]}
+  ]
+}
