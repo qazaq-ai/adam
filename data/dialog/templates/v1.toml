@@ -427,6 +427,21 @@ templates = [
     "Бұл сұраққа сенімді жауап беру үшін {subject_term} мен {predicate_term} арасындағы байланыс деректерім жетпейді.",
 ]
 
+# v5.4.8 — closed-class antonym denial. When the chain query for
+# (subject, predicate) found no positive evidence BUT the subject
+# reaches the antonym hub of the predicate (e.g. тірі ↔ жансыз),
+# answer with an explicit "no" + the antonym chain. The slot
+# `chain` carries the antonym path; `predicate_term` is what the
+# user asked about. The planner branches on
+# `__yes_no_outcome__ == "deny"`.
+[[families]]
+key = "unknown.yes_no_check.deny"
+templates = [
+    "Жоқ, {subject_term} — {predicate_term} емес. Себебі: {chain}.",
+    "{subject_term} — {predicate_term} емес. Дәлел тізбегі: {chain}.",
+    "Терісі рас: {subject_term} — {predicate_term} емес ({chain}).",
+]
+
 [[families]]
 key = "unknown.causal.with_fact"
 templates = [

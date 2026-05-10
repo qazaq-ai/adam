@@ -564,6 +564,8 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "қарызға алу",
     "rust ұғымы",
     "бағдарламалау ұғымы",
+    // **v5.4.8** — closed-class antonym hub for тірі.
+    "өлі сипат",
     "орталық азия",
     "жүк машинасы",
     "аспан денесі",

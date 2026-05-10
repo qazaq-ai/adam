@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3345,
+    "facts_total": 3367,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,9 +27,9 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2780,
+      "is_a": 2801,
       "lives_in": 8,
-      "part_of": 243,
+      "part_of": 244,
       "related_to": 123
     },
     "by_pack": {
@@ -51,7 +51,7 @@
       "world_core/clothing.jsonl": 35,
       "world_core/colors.jsonl": 38,
       "world_core/computer_science_basics.jsonl": 30,
-      "world_core/concept_bridges.jsonl": 26,
+      "world_core/concept_bridges.jsonl": 48,
       "world_core/constellations_kz.jsonl": 6,
       "world_core/cooking_methods.jsonl": 18,
       "world_core/directions.jsonl": 9,
@@ -14822,6 +14822,446 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Кәсіп — әрекет."
+    },
+    {
+      "subject": {
+        "surface": "бағдарламашы",
+        "root": "бағдарламашы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "кәсіп",
+        "root": "кәсіп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_027"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бағдарламашы — кәсіп атауы."
+    },
+    {
+      "subject": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_028"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Маман — адам."
+    },
+    {
+      "subject": {
+        "surface": "дәрігер",
+        "root": "дәрігер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "кәсіп",
+        "root": "кәсіп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_029"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дәрігер — кәсіп."
+    },
+    {
+      "subject": {
+        "surface": "дәрігер",
+        "root": "дәрігер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_029"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дәрігер — кәсіп."
+    },
+    {
+      "subject": {
+        "surface": "мұғалім",
+        "root": "мұғалім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "кәсіп",
+        "root": "кәсіп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_030"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мұғалім — кәсіп."
+    },
+    {
+      "subject": {
+        "surface": "мұғалім",
+        "root": "мұғалім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_030"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мұғалім — кәсіп."
+    },
+    {
+      "subject": {
+        "surface": "инженер",
+        "root": "инженер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "кәсіп",
+        "root": "кәсіп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_031"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Инженер — кәсіп."
+    },
+    {
+      "subject": {
+        "surface": "инженер",
+        "root": "инженер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_031"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Инженер — кәсіп."
+    },
+    {
+      "subject": {
+        "surface": "ғалым",
+        "root": "ғалым",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "кәсіп",
+        "root": "кәсіп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_032"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ғалым — кәсіп."
+    },
+    {
+      "subject": {
+        "surface": "ғалым",
+        "root": "ғалым",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_032"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ғалым — кәсіп."
+    },
+    {
+      "subject": {
+        "surface": "жансыз нәрсе",
+        "root": "жансыз нәрсе",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жансыз",
+        "root": "жансыз",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_033"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жансыз — өлі сипат."
+    },
+    {
+      "subject": {
+        "surface": "жансыз",
+        "root": "жансыз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өлі сипат",
+        "root": "өлі сипат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_033"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жансыз — өлі сипат."
+    },
+    {
+      "subject": {
+        "surface": "темір",
+        "root": "темір",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жансыз нәрсе",
+        "root": "жансыз нәрсе",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_034"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Темір — жансыз нәрсе."
+    },
+    {
+      "subject": {
+        "surface": "ағаш",
+        "root": "ағаш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өсімдік",
+        "root": "өсімдік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_035"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ағаш — өсімдік."
+    },
+    {
+      "subject": {
+        "surface": "биология",
+        "root": "биология",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ғылым саласы",
+        "root": "ғылым саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_036"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Биология — ғылым саласы."
+    },
+    {
+      "subject": {
+        "surface": "жаратылыстану ғылымы",
+        "root": "жаратылыстану ғылымы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ғылым саласы",
+        "root": "ғылым саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_037"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жаратылыстану ғылымы — ғылым саласы."
+    },
+    {
+      "subject": {
+        "surface": "тіршілік бірлігі",
+        "root": "тіршілік бірлігі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тірі",
+        "root": "тірі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_038"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тіршілік бірлігі — тірі."
+    },
+    {
+      "subject": {
+        "surface": "жасуша",
+        "root": "жасуша",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "тіршілік иесі",
+        "root": "тіршілік иесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_039"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жасуша — тіршілік иесінің бөлшегі."
+    },
+    {
+      "subject": {
+        "surface": "дельфин",
+        "root": "дельфин",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сүтқоректі",
+        "root": "сүтқоректі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_040"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дельфин — сүтқоректі жануар."
+    },
+    {
+      "subject": {
+        "surface": "дельфин",
+        "root": "дельфин",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жануар",
+        "root": "жануар",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_040"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дельфин — сүтқоректі жануар."
+    },
+    {
+      "subject": {
+        "surface": "кит",
+        "root": "кит",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сүтқоректі",
+        "root": "сүтқоректі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_041"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кит — сүтқоректі жануар."
+    },
+    {
+      "subject": {
+        "surface": "кит",
+        "root": "кит",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жануар",
+        "root": "жануар",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_041"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кит — сүтқоректі жануар."
     },
     {
       "subject": {

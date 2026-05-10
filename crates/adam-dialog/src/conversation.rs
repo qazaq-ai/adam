@@ -1537,7 +1537,27 @@ impl Conversation {
                         extra_slots.insert("chain".into(), path.join(" → "));
                     }
                     _ => {
-                        extra_slots.insert("__yes_no_outcome__".into(), "unknown".into());
+                        // **v5.4.8** — closed-class antonym denial.
+                        // For known antonym pairs (тірі / жансыз),
+                        // when the positive chain failed BUT the
+                        // subject reaches the antonym hub, return an
+                        // explicit "no" instead of "honest unknown".
+                        // Pre-v5.4.8 «Тас — тірі ме?» fell to honest
+                        // unknown despite reachable chain тас → жансыз
+                        // нәрсе → жансыз. Conservative — only fires
+                        // for the тірі / жансыз pair today.
+                        let denial = check_antonym_denial(
+                            &self.extracted_facts,
+                            &self.derived_facts,
+                            &subject,
+                            &predicate,
+                        );
+                        if let Some(antonym_chain) = denial {
+                            extra_slots.insert("__yes_no_outcome__".into(), "deny".into());
+                            extra_slots.insert("chain".into(), antonym_chain.join(" → "));
+                        } else {
+                            extra_slots.insert("__yes_no_outcome__".into(), "unknown".into());
+                        }
                     }
                 }
             }
@@ -2441,7 +2461,80 @@ pub(crate) fn find_isa_chain(
     }
     if let Some(normalised) = strip_izafet_genitive(target) {
         if normalised != target {
-            return find_isa_chain_inner(extracted, derived, subject, &normalised);
+            if let Some(chain) = find_isa_chain_inner(extracted, derived, subject, &normalised) {
+                return Some(chain);
+            }
+        }
+    }
+    // **v5.4.8** — «X түрі» / «X-тың түрі» head-extraction. The user
+    // phrasing «Кітап — заттың түрі ме?» asks "is a book a kind of
+    // object?" — semantically equivalent to "is a book an object?"
+    // The head noun is what the chain should match. Strip the
+    // trailing «түрі» / «түр» marker and any preceding genitive,
+    // then retry. Sister fix to izafet stripping above; reduces
+    // possessive-of meaning to plain IsA.
+    if let Some(normalised) = strip_kind_of_marker(target) {
+        if normalised != target {
+            if let Some(chain) = find_isa_chain_inner(extracted, derived, subject, &normalised) {
+                return Some(chain);
+            }
+        }
+    }
+    None
+}
+
+/// **v5.4.8** — strip the trailing «X (-тың)? түрі» / «X (-тың)? түр»
+/// "kind-of" marker. Returns `Some(head)` when the input matches the
+/// pattern; `None` otherwise. Conservative — only fires on two-word
+/// phrases ending with the marker word, and the head must be ≥ 3 chars.
+fn strip_kind_of_marker(phrase: &str) -> Option<String> {
+    let trimmed = phrase.trim();
+    let parts: Vec<&str> = trimmed.split_whitespace().collect();
+    if parts.len() != 2 {
+        return None;
+    }
+    if parts[1] != "түрі" && parts[1] != "түр" {
+        return None;
+    }
+    // Strip optional genitive on the head before returning.
+    if let Some(stripped) = strip_izafet_genitive(&format!("{} {}", parts[0], parts[1])) {
+        let bare: Vec<&str> = stripped.split_whitespace().collect();
+        if bare.len() == 2 && bare[0].chars().count() >= 3 {
+            return Some(bare[0].to_string());
+        }
+    }
+    if parts[0].chars().count() >= 3 {
+        return Some(parts[0].to_string());
+    }
+    None
+}
+
+/// **v5.4.8** — closed-class antonym denial. When the positive IsA
+/// chain failed for `(subject, predicate)`, check whether the
+/// subject reaches the antonym hub of the predicate; if so, return
+/// the antonym chain so the planner can render an explicit "no".
+///
+/// Antonym table (intentionally tiny — only architecturally clear
+/// closed-class pairs):
+///
+///   - тірі ↔ жансыз / жансыз нәрсе
+///
+/// Future pairs need a curator decision; we don't speculate.
+fn check_antonym_denial(
+    extracted: &[ReasFact],
+    derived: &[DerivedFact],
+    subject: &str,
+    predicate: &str,
+) -> Option<Vec<String>> {
+    const ANTONYMS: &[(&str, &[&str])] = &[("тірі", &["жансыз", "жансыз нәрсе"])];
+    let predicate_lc = predicate.to_lowercase();
+    for (positive, antonym_targets) in ANTONYMS {
+        if predicate_lc == *positive {
+            for antonym in *antonym_targets {
+                if let Some(chain) = find_isa_chain_inner(extracted, derived, subject, antonym) {
+                    return Some(chain);
+                }
+            }
         }
     }
     None

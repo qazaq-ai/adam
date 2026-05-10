@@ -1,0 +1,19 @@
+{
+  "_comment": "v5.4.8 — bundled patches release closing the 3 conceptually-subtle deferrals from v5.4.7 + 5 new bugs surfaced by a 30-turn extended audit on novel phrasings. (1) Closed-class antonym denial: тірі ↔ жансыз / жансыз нәрсе. When the positive chain fails AND the subject reaches the antonym hub, return explicit 'no'. (2) «X түрі» / «X-тың түрі» head-extraction: «Кітап — заттың түрі ме?» now reduces to «Кітап IsA зат» via strip_kind_of_marker. (3) Profession bridges: бағдарламашы / дәрігер / мұғалім / инженер / ғалым → кәсіп. (4) Antonym data: тас / темір → жансыз нәрсе. (5) Cell biology: жасуша → тірі (via тіршілік бірлігі IsA тірі). (6) Marine mammals: дельфин / кит → сүтқоректі / жануар. (7) Science domain: биология / жаратылыстану ғылымы → ғылым саласы. (8) Plant taxonomy: ағаш → өсімдік. The bundle pattern is a deliberate departure from per-patch releases — the user requested all remaining detector fixes ship together. Two failures from the extended audit defer to v5.5+: comparison-shape FST tokenization on proper-noun pairs («Алматы мен Астана айырмашылығы»), and adjective-as-predicate yes/no questions («Айдың дөңгелек пе?»). Both need architectural changes outside the bundle's surgical-data scope.",
+  "cases": [
+    {"id": "antonym_001", "category": "closed_class_antonym_denial", "query": "Тас — тірі ме?", "any_substring": ["емес", "жансыз"], "none_substring": ["иә, тас", "дұрыс, тас"]},
+    {"id": "antonym_002", "category": "closed_class_antonym_denial", "query": "Темір — тірі ме?", "any_substring": ["емес", "жансыз"], "none_substring": []},
+    {"id": "kind_of_001", "category": "kind_of_marker_extraction", "query": "Кітап — заттың түрі ме?", "any_substring": ["зат"], "none_substring": ["табылмады", "жетпейді"]},
+    {"id": "profession_001", "category": "profession_bridge", "query": "Бағдарламашы — кәсіп пе?", "any_substring": ["кәсіп"], "none_substring": ["табылмады", "дерек жоқ"]},
+    {"id": "profession_002", "category": "profession_bridge", "query": "Дәрігер — кәсіп пе?", "any_substring": ["кәсіп"], "none_substring": []},
+    {"id": "profession_003", "category": "profession_bridge", "query": "Мұғалім — маман ба?", "any_substring": ["маман"], "none_substring": []},
+    {"id": "profession_004", "category": "profession_bridge", "query": "Инженер — кәсіп пе?", "any_substring": ["кәсіп"], "none_substring": []},
+    {"id": "antonym_data_001", "category": "antonym_hub_membership", "query": "Темір — жансыз нәрсе ме?", "any_substring": ["жансыз нәрсе"], "none_substring": []},
+    {"id": "cell_biology_001", "category": "cell_biology", "query": "Жасуша — тірі ме?", "any_substring": ["тірі"], "none_substring": ["табылмады", "емес"]},
+    {"id": "marine_001", "category": "marine_mammal", "query": "Дельфин — жануар ма?", "any_substring": ["жануар"], "none_substring": ["табылмады"]},
+    {"id": "marine_002", "category": "marine_mammal", "query": "Дельфин — сүтқоректі ме?", "any_substring": ["сүтқоректі"], "none_substring": []},
+    {"id": "marine_003", "category": "marine_mammal", "query": "Кит — сүтқоректі ме?", "any_substring": ["сүтқоректі"], "none_substring": []},
+    {"id": "science_001", "category": "science_domain", "query": "Биология — ғылым саласы ма?", "any_substring": ["ғылым саласы"], "none_substring": ["табылмады", "жетпейді"]},
+    {"id": "plant_taxonomy_001", "category": "plant_taxonomy", "query": "Ағаш — өсімдік пе?", "any_substring": ["өсімдік"], "none_substring": []}
+  ]
+}

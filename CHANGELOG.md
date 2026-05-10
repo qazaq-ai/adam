@@ -21,6 +21,65 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.4.8] — 2026-05-09 — Bundled detector patches — antonym denial + «X түрі» + 6 IsA-gap closures
+
+**Bundled-patches release.** Per the user's directive to ship all remaining detector patches together rather than one-per-release, this lands 8 fixes in a single tag. Closes the 3 deferrals from v5.4.7 + 5 new bugs surfaced by a 30-turn extended audit on novel phrasings.
+
+### Bundle: 8 patches
+
+**1. Closed-class antonym denial — first negation reasoning in the kernel.** «Тас — тірі ме?» pre-v5.4.8 fell to honest unknown despite the chain тас → жансыз нәрсе → жансыз being trivially derivable. New [`check_antonym_denial`](crates/adam-dialog/src/conversation.rs) helper: when the positive `(subject, predicate)` chain fails AND the subject reaches the antonym hub of the predicate, return an explicit "no" with the antonym chain. Antonym table is intentionally tiny — only `тірі ↔ жансыз / жансыз нәрсе` ships today. New planner outcome `__yes_no_outcome__ = "deny"` routes to a new template family `unknown.yes_no_check.deny` (3 variants).
+
+**2. «X түрі» / «X-тың түрі» head-extraction.** «Кітап — заттың түрі ме?» asks "is a book a kind of object?" — semantically `Кітап IsA зат`. Pre-v5.4.8 the predicate «заттың түрі» was looked up literally and missed. New [`strip_kind_of_marker`](crates/adam-dialog/src/conversation.rs) — sister fallback to `strip_izafet_genitive`. Reduces `<X (-тың)? түрі>` to its head `X` and retries the chain.
+
+**3. Profession bridges.** `concept_bridges.jsonl` extended with бағдарламашы / дәрігер / мұғалім / инженер / ғалым → кәсіп (and маман → адам). Closes «Бағдарламашы — кәсіп пе?» / «Дәрігер — кәсіп пе?» / «Мұғалім — маман ба?» / «Инженер — кәсіп пе?».
+
+**4. Antonym hub data.** `жансыз нәрсе IsA жансыз`, `жансыз IsA өлі сипат`, plus members `тас`, `темір IsA жансыз нәрсе` so the negation chain has data to traverse.
+
+**5. Cell biology.** `тіршілік бірлігі IsA тірі`, `жасуша part_of тіршілік иесі` — closes «Жасуша — тірі ме?» (cells are alive via their type).
+
+**6. Marine mammals.** `дельфин`, `кит → сүтқоректі / жануар`. Closes «Дельфин — жануар ма?» / «Дельфин — сүтқоректі ме?» / «Кит — сүтқоректі ме?».
+
+**7. Science domain.** `биология IsA ғылым саласы`, `жаратылыстану ғылымы IsA ғылым саласы`. Closes «Биология — ғылым саласы ма?».
+
+**8. Plant taxonomy.** `ағаш IsA өсімдік`. Closes «Ағаш — өсімдік пе?».
+
+### Live REPL — before / after
+
+| Query | Pre-v5.4.8 | Post-v5.4.8 |
+|---|---|---|
+| Тас — тірі ме? | «Тас — тірі деген тікелей дерек қорымда табылмады» (honest unknown) | «Жоқ, Тас — тірі емес. Себебі: тас → жансыз.» |
+| Кітап — заттың түрі ме? | «...жетпейді» | «Иә, Кітап — заттың түрі. Дәлел тізбегі: кітап → зат.» |
+| Бағдарламашы — кәсіп пе? | «...табылмады» | «Дұрыс, Бағдарламашы шынында да кәсіп.» |
+| Жасуша — тірі ме? | «...табылмады» | «Дұрыс, Жасуша шынында да тірі. Тізбек: жасуша → тірі.» |
+| Дельфин — сүтқоректі ме? | «...жетпейді» | «Дельфин — сүтқоректі. Бұл дельфин → сүтқоректі тізбегі арқылы расталады.» |
+| Биология — ғылым саласы ма? | «...жетпейді» | «Биология — ғылым саласы. Бұл биология → ғылым саласы тізбегі арқылы расталады.» |
+
+### Tests
+
+New live holdout [`live_holdout_v5480_bundle.json`](data/eval/live_holdout_v5480_bundle.json) + [Rust runner](crates/adam-dialog/tests/live_holdout_v5480_bundle.rs) — **14 cases** across 9 categories (closed_class_antonym_denial / kind_of_marker_extraction / profession_bridge / antonym_hub_membership / cell_biology / marine_mammal / science_domain / plant_taxonomy). Pass-rate floor 100 %.
+
+### Measurable impact
+
+| Metric | v5.4.7 | v5.4.8 | Delta |
+|---|---|---|---|
+| Initial facts | 3 345 | 3 367 | +22 |
+| Derived facts | 36 396 | **36 918** | +522 |
+| MULTIWORD_ENTITIES | 1 782 | 1 783 | +1 (өлі сипат) |
+| Workspace tests | 1 173 | **1 187** | +14 (live-holdout) |
+
+### Remaining audit deferrals (architectural, not surgical)
+
+- **Comparison-shape FST tokenization on proper-noun pairs** — «Алматы мен Астана айырмашылығы» tokenises as «алма» + «аста» (proper-noun stripping bug). Needs FST proper-noun handling work.
+- **Adjective-as-predicate yes/no questions** — «Айдың дөңгелек пе?» where the predicate is an adjective, not a noun phrase. Detector + reasoner expansion.
+
+Both defer to v5.5+ where they fit a kernel-signature scope.
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --workspace --release --tests -- -D warnings` clean; `cargo test --workspace --release` 0 failures.
+
+**Stripe — Deterministic AI research (first negation reasoning lands; v5.4.x detector arc complete with 8 bundled patches).**
+
 ## [5.4.7] — 2026-05-09 — Detector edge-case closure — адам polysemy + izafet genitive + Rust curriculum concepts
 
 **Closing release for the v5.4.5 audit.** Fixes the 4 deferred detector edge cases. **Audit pass-rate 60/64 → 61/64 (94 % → 95 %)**. Cumulative: 81 % → 89 % → 94 % → 95 % across v5.4.0 → v5.4.5 → v5.4.6 → v5.4.7.

@@ -262,6 +262,7 @@ pub fn plan_response_with_epistemic(
             .unwrap_or("unknown");
         let key = match outcome {
             "confirm" => "unknown.yes_no_check.confirm",
+            "deny" => "unknown.yes_no_check.deny",
             _ => "unknown.yes_no_check.unknown",
         };
         if !repo.get(key).is_empty() {
