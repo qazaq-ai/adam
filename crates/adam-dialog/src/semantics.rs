@@ -2411,6 +2411,32 @@ fn detect_ask_location(joined: &str) -> bool {
     let has_self_recall_marker = ["тұрамын", "тұрамыз", "қайдамын", "қайдамыз"]
         .iter()
         .any(|v| tokens.contains(v));
+    // **v5.17.5 — adversarial D1 mta_03 + mta_08 closure.** Memory-
+    // probe self-recall via 1sg-PART-ACC verb forms:
+    //   «Қай қалада тұратынымды білесіз бе?» — «the fact that I
+    //   live in which city, do you know?» (mta_03)
+    //   «Қайдан келгенімді білесіз бе?» — «from where I came, do
+    //   you know?» (mta_08)
+    // Pattern: nominalised 1sg verb («тұратынымды»/«келгенімді») +
+    // memory-probe verb («білесіз»/«есіңізде»/«ұмыт»). Mirrors the
+    // v4.54.5 detect_ask_name memory-probe extension. Both queries
+    // are equivalent to «Where do I live?» / «Where am I from?»
+    // and should recall session.city via `ask_location.with_known_user`.
+    let has_location_memory_probe = (joined.contains("тұратынымды")
+        || joined.contains("тұратын жерімді")
+        || joined.contains("келгенімді")
+        || joined.contains("мекенімді"))
+        && (joined.contains("есіңізде")
+            || joined.contains("есіңде")
+            || joined.contains("білесіз")
+            || joined.contains("білесің")
+            || joined.contains("білдіңіз")
+            || joined.contains("білдің")
+            || joined.contains("ұмытпа")
+            || joined.contains("ұмытты"));
+    if has_location_memory_probe {
+        return true;
+    }
     if !has_user_marker && !has_self_recall_marker {
         return false;
     }
@@ -2903,6 +2929,21 @@ fn detect_ask_occupation(joined: &str) -> bool {
                 || joined.contains("білесің")
                 || joined.contains("білдіңіз")
                 || joined.contains("білдің")))
+        // **v5.17.5 — adversarial D1 mta_05 closure.** 1sg-PART-ACC
+        // verb form: «Кім болып жұмыс істейтінімді есіңізде ме?»
+        // («the fact that I work as whom, do you remember?»). Verb
+        // stem «іс-те-йт-ін-ім-ді» (1sg.PRES.PART.ACC). Pattern:
+        // job-action nominalisation + memory-probe verb. Mirrors
+        // the mta_03 / mta_08 location-recall extension above.
+        || ((joined.contains("істейтінімді")
+            || joined.contains("жұмыс істейтінімді")
+            || joined.contains("айналысатынымды"))
+            && (joined.contains("есіңізде")
+                || joined.contains("есіңде")
+                || joined.contains("білесіз")
+                || joined.contains("білесің")
+                || joined.contains("ұмытпа")
+                || joined.contains("ұмытты")))
 }
 
 /// User states occupation.
