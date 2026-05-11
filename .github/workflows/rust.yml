@@ -1,30 +1,64 @@
 name: Rust
 
-# v4.7.10 — auto-trigger disabled. GitHub Actions billing was
-# blocking runs on every push to main, causing failed-job noise.
-# All gates this workflow enforces (cargo fmt, cargo test,
-# validate_foundation) are also run locally before every commit
-# per `feedback_cargo_fmt_pre_commit` / `feedback_release_docs`,
-# so disabling auto-trigger does not lose real safety. Keeping the
-# YAML so it can be re-enabled with a one-line revert when billing
-# is fully restored. Manual runs available via Actions tab →
-# "Rust" workflow → Run workflow.
+# **v5.16.5 — public-repo CI re-armed.** Auto-trigger was disabled in
+# v4.7.10 to silence Actions-billing noise; restored now that the
+# repository is public and external contributors / casual visitors
+# expect a green badge on the README. Fast path: cache + clippy +
+# default-features test; the voice-feature gate (cpal/hound/whisper
+# shell-out) is checked separately so a missing audio dev-package on
+# the runner can never block the kernel pipeline.
 on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   verify:
+    name: fmt + clippy + test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo fmt --all --check
+        run: cargo fmt --all --check
+
+      - name: cargo clippy --all-targets -- -D warnings
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: cargo test --workspace --locked
+        run: cargo test --workspace --locked
+
+      - name: validate_foundation.sh
+        run: bash ./scripts/validate_foundation.sh
+        if: ${{ hashFiles('scripts/validate_foundation.sh') != '' }}
+
+      - name: check_metrics_currency.sh
+        run: bash ./scripts/check_metrics_currency.sh
+        if: ${{ hashFiles('scripts/check_metrics_currency.sh') != '' }}
+
+  voice-feature-check:
+    name: --features voice (build only)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - uses: dtolnay/rust-toolchain@stable
 
-      - name: Cargo fmt
-        run: cargo fmt --all --check
+      - uses: Swatinem/rust-cache@v2
 
-      - name: Cargo test
-        run: cargo test --workspace --locked
+      - name: install ALSA dev headers for cpal
+        run: sudo apt-get update && sudo apt-get install -y libasound2-dev
 
-      - name: Validate foundation manifests
-        run: ./scripts/validate_foundation.sh
+      - name: cargo check --features voice -p adam-dialog
+        run: cargo check -p adam-dialog --features voice --bin adam_chat
+
+      - name: cargo test -p adam-voice
+        run: cargo test -p adam-voice --locked

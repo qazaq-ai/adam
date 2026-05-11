@@ -1,17 +1,18 @@
 name: Release
 
-# v4.7.10 — auto-trigger disabled. GitHub Actions billing was
-# blocking auto-runs on every tag push, causing failed-job noise
-# in the Actions tab on every release. Releases are created via
-# direct GitHub REST API POST (see CHANGELOG entries from v4.7.9
-# onward), so this workflow is not on the critical path. Keeping
-# the YAML in the repo so that:
-#   (1) the validation scripts (verify_release_version.sh,
-#       validate_foundation.sh) remain auditable;
-#   (2) re-enabling auto-trigger is one revert when billing is
-#       fully restored. To run manually: Actions tab →
-#       "Release" workflow → Run workflow.
+# **v5.16.5 — public-repo release auto-trigger re-armed.** Fires on
+# any annotated tag matching `v*` (the repo's release convention).
+# Pre-v5.16.5 this was workflow_dispatch-only (v4.7.10 billing-era
+# quiet mode); now that the repo is public, an automated release
+# note plus a verified version match gives external readers a clean
+# audit trail. CHANGELOG-driven release notes from the GitHub API
+# POST (per `feedback_no_gh_cli`) continue to be the source of
+# truth for the body text; this workflow generates a complementary
+# "generate_release_notes: true" digest as a fallback.
 on:
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 permissions:
@@ -25,11 +26,14 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
+      - uses: Swatinem/rust-cache@v2
+
       - name: Verify release version matches tag
         run: bash ./scripts/verify_release_version.sh "${GITHUB_REF_NAME#v}"
 
       - name: Validate foundation
         run: bash ./scripts/validate_foundation.sh
+        if: ${{ hashFiles('scripts/validate_foundation.sh') != '' }}
 
       - name: Publish release
         uses: softprops/action-gh-release@v2

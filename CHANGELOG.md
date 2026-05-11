@@ -21,6 +21,32 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.16.5] — 2026-05-11 — Public-repo CI re-armed (rust.yml + release.yml auto-triggers)
+
+**Patch milestone.** The repository was made public; GitHub Actions auto-triggers (disabled in v4.7.10 to quiet Actions-billing noise) are now restored so external contributors and casual visitors see a live CI badge.
+
+### What changed
+
+**1. `.github/workflows/rust.yml` — auto-trigger restored, gates extended.** Triggers on `push: branches: [main]` + `pull_request` + manual `workflow_dispatch`. Two jobs:
+
+- **verify** — `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test --workspace --locked`, plus `validate_foundation.sh` and `check_metrics_currency.sh` (gated by `hashFiles` so the workflow stays green if a script is renamed). Uses `Swatinem/rust-cache@v2` for incremental compilation cache across runs.
+- **voice-feature-check** — separate job that installs `libasound2-dev` (cpal needs ALSA headers on Linux runners), then `cargo check --features voice -p adam-dialog --bin adam_chat` + `cargo test -p adam-voice`. Kept on its own runner so a missing audio dev-package can never block the kernel pipeline.
+
+**2. `.github/workflows/release.yml` — tag auto-trigger restored.** Triggers on annotated tag push matching `v*` (the repo convention). Steps: `verify_release_version.sh "${GITHUB_REF_NAME#v}"` → `validate_foundation.sh` → `softprops/action-gh-release@v2` (publishes a GitHub release with auto-generated notes as a fallback; CHANGELOG-driven release bodies via the REST API POST per `feedback_no_gh_cli` remain the source of truth for the body text).
+
+**3. CI badge added to README.** Below the version badge, before the license badge: `https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main`. Visible green/red signal for anyone reading the project landing page.
+
+### Why `x.y.5`
+
+CI infrastructure change — no code path touched, no public API, no test count delta. Standard `x.y.5` hygiene release.
+
+### Verified
+
+- Workflow YAML linted manually; both files cleanly parse `on:` / `jobs:` / `runs-on:` sections
+- Local `cargo fmt + clippy --all-targets + test --workspace + check_metrics_currency.sh` clean (mirrors what CI will run)
+
+**Stripe — Deterministic AI research (public-repo CI re-armed; visible build signal for external readers).**
+
 ## [5.16.0] — 2026-05-10 — V2 — Whisper confidence gate + clarification template family
 
 **Minor-version release.** Third voice-arc milestone. Closes the «adam confidently answered to a garbled transcript» class of bug — the V1 release was happy to feed any whisper output into the deterministic kernel, including transcripts like «Сәлем әсіпі» where the user actually said «Сәлеметсіз бе» but whisper-medium guessed badly. v5.16.0 surfaces the engine's own uncertainty and routes low-confidence turns to a honest clarification template.
