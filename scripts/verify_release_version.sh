@@ -33,23 +33,15 @@ if [[ "$workspace_version" != "$expected_version" ]]; then
   exit 1
 fi
 
-manifest_files=(
-  "data/eval/benchmark_manifest.json"
-  "data/eval/kazakh_foundation_eval_dataset.json"
-  "data/eval/tokenizer_experiment_manifest.json"
-  "data/eval/tokenizer_segmentation_eval_dataset.json"
-  "data/tokenizer/segmentation_roots.json"
-  "data/tokenizer/segmentation_rules.json"
-  "data/training/baseline_training_manifest.json"
-)
-
-for file in "${manifest_files[@]}"; do
-  file_version="$(jq -r '.version' "$file")"
-  if [[ "$file_version" != "$expected_version" ]]; then
-    echo "manifest version mismatch in $file: expected $expected_version, got $file_version" >&2
-    exit 1
-  fi
-done
+# **v5.16.5** — JSON manifest version-coupling removed. Pre-v5.16.5
+# this script also required each `data/*.json` manifest to carry the
+# workspace version in its `"version"` field. Those manifests were
+# frozen at v5.3.10 after a 2026-04 audit decided they describe
+# **dataset schema versions**, not release versions — bumping them on
+# every release was carrying the convention without semantic value.
+# CI release.yml started failing here on the public-repo CI re-arm;
+# the fix is to make this script reflect what we actually care about
+# (workspace + Cargo.lock package versions match the tag).
 
 lock_packages=(
   "adam-kernel"
