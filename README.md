@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-5.17.7-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-5.18.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -144,7 +144,7 @@ For a full evidence dump on any Kazakh root, run [`adam_inspect`](crates/adam-di
 
 | Metric | Value | Notes |
 |---|---|---|
-| Workspace tests | **1 344 passing** | + 17 ignored slow integration + adversarial_dialog_v1 (50 cases, 100% all 6 categories); CI on every release |
+| Workspace tests | **1 344 passing** | + 17 ignored + adversarial_dialog_v1 (95 cases, 90.5% baseline; v1 50/50 still 100%, v5.18.0 D2a +45 math surfaced 9 new bugs); CI on every release |
 | Release cadence | **487+ versioned releases in 5 weeks** | every release CI-verified |
 | p50 turn latency | **21 ms** | vs Llama-3 8B fp16 800–1500 ms; vs GPT-4 50–200 ms |
 | Memory footprint | **~300 MB RSS** | vs LLM 16+ GB VRAM |

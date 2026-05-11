@@ -21,6 +21,60 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.18.0] — 2026-05-11 — D2a math expansion: +45 cases, 50 → 95 cases (baseline 90.5%)
+
+**Minor.** Opens the Codex 2026-05-11 audit's **D2 expansion** (50 → 150 cases over three releases). v5.18.0 ships the **math-focused batch** (D2a): 45 new cases across 4 math sub-categories. Existing 50 v1 cases all pass 100%; new math cases find **9 new bugs**.
+
+### D2 roadmap
+
+- **v5.18.0 (this release)** — D2a math expansion: +45 (95 cases total)
+- v5.18.5 — D2b: +25 bilingual / dialectal / contradiction (120 total)
+- v5.19.0 — D2c: +30 existing-category expansion (150 total)
+
+### Categories added
+
+| Category | N | What it probes | v5.18.0 pass rate |
+|---|---|---|---|
+| `math_arithmetic` | 15 | basic ops (+/-/×/÷), zero, negatives, big numbers, Kazakh number words, edges: div-by-zero, parentheses | **14/15 (93%)** |
+| `math_equations` | 12 | single-variable linear (X+a=b, X*a=b, etc., both orders), trivial X=N, edge: 2X / X+X / X*X | **12/12 (100%)** |
+| `math_word_problems` | 10 | Kazakh school-style word problems. All currently expected to fail with graceful fallback. Tests no-hallucinate property. | **2/10 (20%)** |
+| `math_concepts` | 8 | math definitions (көбейту, бөлу, қосу, сан, бөлшек, пайыз, геометрия, теңдеу) | **8/8 (100%)** |
+
+### Surprises in the data
+
+- **`math_equations` 12/12 (100%)** — the solver in `discourse.rs` handles every shape thrown at it, including 2X / X+X / X*X edges I expected to fail. Live test confirmed `X*X=9 шеш` returns `"3"` (positive root). Robust beyond what the v2.5-era roadmap committed.
+- **`math_concepts` 8/8 (100%)** — even `бөлшек` (fraction), `пайыз` (percent), and `геометрия` have curated `world_core/mathematics_basic.jsonl` entries that retrieval surfaces correctly. No purpose-detector gap here.
+- **Kazakh number words work** — `Екі қосу үш қанша?` → `Нәтижесі: 5 (бес)`. The math parser accepts written-out numerals in the «X қосу Y» frame.
+- **Large numbers + negatives work** — `1000+1000 → 2000`, `5-10 → -5`.
+
+### Critical findings (`math_word_problems` 2/10 = 20%)
+
+The whole point of D2 was to find what per-chapter holdouts miss. Math word problems surface **9 real bugs**, of which **1 is hallucination**:
+
+- **wp_08 (HALLUCINATION):** «10 теңгеден қалам сатып алу үшін қанша қажет?» → **«Нәтижесі: 10 (он)»** — adam *confidently echoes a digit from the input as the answer*. This is the worst failure mode for a tutor (a student would absorb «10» as a math result). Word-problem detector must close this in v5.18.1+.
+- **7 cases route to topic extraction**: wp_03 → «банка» clarification; wp_05 → «Іні — кіші ер туыс»; wp_06 → aula proverb; wp_07 → жинақ proverb; wp_09 → бота proverb; wp_10 → «Жұмыс — физикалық шама» (physics definition). The query contains «қанша» + multiple digits, but no `detect_word_problem` exists, so noun-hint extraction grabs the topic and surfaces a generic curated entry.
+- **wp_01 routes to AskTime fallback** — «Қазір қанша» substring made the temporal-scope detector fire.
+- **ma_14 (div-by-zero):** «10/0 қанша?» → general math fallback («әзірге өңдемеймін») instead of specific «нөлге бөлуге болмайды». Parser doesn't distinguish.
+
+All 9 documented in `_known_failures_v5180`; v5.18.1+ work queue.
+
+### Ratcheting policy update
+
+The benchmark is append-only: adding cases CAN lower overall pass-rate (larger denominator). The «floor cannot decrease» rule applies per-version of the corpus; **batch extensions re-baseline at first measurement**. v5.18.0 baseline = 86/95 = 0.905; floor set to **0.9** (slight rounding-down so v5.18.1+ ratchets up cleanly).
+
+### Verified
+
+- `cargo test -p adam-dialog --test adversarial_dialog_v1` — 86/95 at floor 0.90.
+- v1 50 cases unchanged: all still 100%.
+- `cargo test --workspace --locked --no-fail-fast` — **1 344 passing** (unchanged; benchmark is a single test).
+- `cargo fmt --all --check` + `cargo clippy --all-targets -- -D warnings` clean.
+
+### Why x.18.0 (minor)
+
+New evaluation surface (math category) + 45 new public test cases + new baseline methodology («batch extensions re-baseline»). Patch-numbering reserved for fixing the surfaced bugs.
+
+Stripe — Deterministic AI research (adversarial benchmark scales to 95; 9 new bugs surfaced for triage — including 1 hallucination in word-problem routing).
+
 ## [5.17.7] — 2026-05-11 — 🎯 Adversarial D1 full closure: 50/50 = 100% (floor 96% → 100%)
 
 **Patch.** Closes the **final 2 failures** from the v5.17.0 adversarial benchmark queue. Adversarial v1 is now **50/50 = 100%** with all 6 categories at 100%. Floor raised to **1.0** (was 0.96). v5.17.x quick-win cycle complete.

@@ -4,13 +4,31 @@
   "captured_date": "2026-05-11",
   "source": "Codex 2026-05-11 audit priority D, batch 1 of 4",
   "name": "adversarial_dialog_v1",
-  "_floor_policy": "ratcheting baseline: floor cannot decrease across releases. v5.17.0 baseline 0.84. v5.17.4 floor 0.86 (srf_04). v5.17.5 floor 0.92 (mta_03/05/08 anaphora batch). v5.17.6 floor 0.96 (mta_02 + ctt_04). v5.17.7 floor 1.0 — full closure of the 50-case v1 benchmark. Next: D2 extends to 150 cases.",
-  "_known_failures_v5177": [],
-  "_closed_v5177": [
-    "fr_01: «Алматы қайда орналасқан?» — closed by suppressing Hearsay routing when input has a question_shape. The Kazakh suffix `-қан/-ген` is morphologically ambiguous between past-evidential and perfective participle; in a question the participle reading is canonical. Planner fall-through now reaches the standard unknown.with_grounded_fact family which surfaces the curated geography_kz entry.",
-    "mta_06: «Тағы біреуін бер» — closed by two-part fix: (a) detect_ask_exercise accepts the anaphoric «тағы біреу-/біреуін/біреуі + give-verb» pattern (no practice noun); (b) Conversation::turn binds session.last_exercise_topic into the empty-topic AskExercise before planning."
+  "_floor_policy": "ratcheting baseline: floor cannot decrease across releases. v5.17.0 baseline 0.84 (50 cases). v5.17.4-7 climbed to 1.0 on the 50-case v1. **v5.18.0 D2a extends to 95 cases (+45 math).** The benchmark is append-only, so adding new cases CAN lower the overall pass-rate (it's a larger denominator). Each batch-extension re-baselines the floor at the new measured pass-rate; subsequent fix releases ratchet it up. v5.18.0 baseline measured at first run.",
+  "_d2a_categories": {
+    "math_arithmetic": "15 cases — basic ops (+, -, *, /), zero, negatives, big numbers, Kazakh number words, edge: div-by-zero (graceful fallback expected), parentheses (likely fails)",
+    "math_equations": "12 cases — single-var linear (X+a=b, X-a=b, X*a=b, X/a=b in both orders), trivial X=N, edge: 2X notation, X+X, X*X (quadratic — graceful fallback expected)",
+    "math_word_problems": "10 cases — Kazakh school-style word problems. All currently expected to FAIL with graceful fallback («шеше алмаймын... қарапайым сандық өрнекті...»). Tests the no-hallucinate property: ANY substantive number-answer here would be made up.",
+    "math_concepts": "8 cases — math definitions (көбейту, бөлу, қосу, сан, бөлшек, пайыз, геометрия, теңдеу). Some expected to fail (бөлшек/пайыз/геометрия likely no curated entry yet)."
+  },
+  "_d2_roadmap": "D2a (this release): +45 math. D2b (v5.18.5): +25 bilingual/dialectal/contradiction. D2c (v5.19.0): +30 existing-category expansion. Total target: 150 cases by v5.19.0.",
+  "_known_failures_v5180": [
+    "ma_14: «10/0 қанша?» — adam returns general math fallback («әзірге өңдемеймін») instead of specific zero-division message («нөлге бөлуге болмайды»). Math parser should detect div-by-zero and route to a dedicated hedge.",
+    "wp_01: «Ботада 5 алма бар, оған тағы 3 алма бердім. Қазір қанша алма?» — routes to AskTime fallback («уақытқа байланысты сұрақтарға жауап беруге деректерім жоқ»). Word-problem detector missing entirely.",
+    "wp_03: «3 банкадағы әр банкада 4 кәмпит. Барлығы қанша?» — falls to topic extraction on «банка» → clarification «Бәлкім, банка туралы айтасыз ба».",
+    "wp_05: «Маған 20 жас. Інім 5 жасқа кіші. Інімнің жасы қанша?» — topic extraction surfaces «Іні — кіші ер туыс» (curated definition); ignores the math entirely.",
+    "wp_06: «Ауланың ұзындығы 8 метр. Ені 5 метр. Ауданы қанша?» — topic extraction surfaces a proverb about «аула».",
+    "wp_07: «Бір жинақта 12 кітап. Үш жинақта қанша кітап?» — proverb about «жинақ».",
+    "wp_08: «10 теңгеден қалам сатып алу үшін қанша қажет?» — **adam HALLUCINATES**: returns «Нәтижесі: 10 (он)» echoing the digit from the input as the answer. This is the worst failure mode — confident wrong number.",
+    "wp_09: «Ботаның жасы 10. Айдананың жасы Ботадан 5 жасқа үлкен. Айдананың жасы қанша?» — proverb about «бота».",
+    "wp_10: «Бір жұмыста 7 күн бар. Үш жұмыста қанша күн?» — surfaces curated «Жұмыс — күштің әсер ету бағытында...» (physics work)."
   ],
-  "pass_rate_floor": 1.0,
+  "_action_items_v5181_plus": [
+    "Implement detect_word_problem in discourse.rs: heuristics — multiple digits + Kazakh quantity question («қанша» / «барлығы») + noun phrases. Route to a dedicated graceful-refusal template family.",
+    "Update math parser to detect div-by-zero specifically (10/0, X/0 pattern) and emit «нөлге бөлуге болмайды» instead of general fallback.",
+    "Critical: wp_08 hallucination — ensure that when adam returns «Нәтижесі: N», N must come from an actual computation, not echoed from input. Word-problem detector closing this would fix it."
+  ],
+  "pass_rate_floor": 0.9,
   "cases": [
     {"id": "fr_01", "category": "factual_retrieval", "query": "Алматы қайда орналасқан?", "any_substring": ["қазақстан"]},
     {"id": "fr_02", "category": "factual_retrieval", "query": "Қазақстанның астанасы қай қала?", "any_substring": ["астана", "нұр-сұлтан"]},
@@ -66,6 +84,55 @@
     {"id": "af_07", "category": "ambiguous_followup", "query": "Жалғастыр.", "none_substring": ["{slot}", "{topic}"]},
     {"id": "af_08", "category": "ambiguous_followup", "query": "Айтыңыз.", "none_substring": ["{slot}", "{topic}"]},
     {"id": "af_09", "category": "ambiguous_followup", "query": "Қалай?", "none_substring": ["{slot}", "{topic}"]},
-    {"id": "af_10", "category": "ambiguous_followup", "query": "Сонда?", "none_substring": ["{slot}", "{topic}"]}
+    {"id": "af_10", "category": "ambiguous_followup", "query": "Сонда?", "none_substring": ["{slot}", "{topic}"]},
+
+    {"id": "ma_01", "category": "math_arithmetic", "query": "5+3 қанша?", "any_substring": ["8"]},
+    {"id": "ma_02", "category": "math_arithmetic", "query": "12-7 қанша?", "any_substring": ["5"]},
+    {"id": "ma_03", "category": "math_arithmetic", "query": "6*7 қанша?", "any_substring": ["42"]},
+    {"id": "ma_04", "category": "math_arithmetic", "query": "20/4 қанша?", "any_substring": ["5"]},
+    {"id": "ma_05", "category": "math_arithmetic", "query": "100-37 қанша?", "any_substring": ["63"]},
+    {"id": "ma_06", "category": "math_arithmetic", "query": "25+75 қанша?", "any_substring": ["100"]},
+    {"id": "ma_07", "category": "math_arithmetic", "query": "9*9 қанша?", "any_substring": ["81"]},
+    {"id": "ma_08", "category": "math_arithmetic", "query": "144/12 қанша?", "any_substring": ["12"]},
+    {"id": "ma_09", "category": "math_arithmetic", "query": "0+5 қанша?", "any_substring": ["5"]},
+    {"id": "ma_10", "category": "math_arithmetic", "query": "5*0 қанша?", "any_substring": ["0"]},
+    {"id": "ma_11", "category": "math_arithmetic", "query": "5-10 қанша?", "any_substring": ["-5"]},
+    {"id": "ma_12", "category": "math_arithmetic", "query": "1000+1000 қанша?", "any_substring": ["2000"]},
+    {"id": "ma_13", "category": "math_arithmetic", "query": "Екі қосу үш қанша?", "any_substring": ["5", "бес"]},
+    {"id": "ma_14", "category": "math_arithmetic", "query": "10/0 қанша?", "any_substring": ["шеше алмаймын", "анықталмаған", "бөл", "нөл"], "none_substring": ["infinity", "∞"]},
+    {"id": "ma_15", "category": "math_arithmetic", "query": "(5+3)*2 қанша?", "none_substring": ["{slot}", "{topic}"]},
+
+    {"id": "me_01", "category": "math_equations", "query": "X+5=12 теңдеуін шеш", "any_substring": ["7"]},
+    {"id": "me_02", "category": "math_equations", "query": "X-3=10 шеш", "any_substring": ["13"]},
+    {"id": "me_03", "category": "math_equations", "query": "X*4=20 шеш", "any_substring": ["5"]},
+    {"id": "me_04", "category": "math_equations", "query": "X/2=8 шеш", "any_substring": ["16"]},
+    {"id": "me_05", "category": "math_equations", "query": "5+X=11 теңдеуін шешіп бер", "any_substring": ["6"]},
+    {"id": "me_06", "category": "math_equations", "query": "X-7=0 шеш", "any_substring": ["7"]},
+    {"id": "me_07", "category": "math_equations", "query": "X*3=21 шеш", "any_substring": ["7"]},
+    {"id": "me_08", "category": "math_equations", "query": "10/X=2 шеш", "any_substring": ["5"]},
+    {"id": "me_09", "category": "math_equations", "query": "X=42 шеш", "any_substring": ["42"]},
+    {"id": "me_10", "category": "math_equations", "query": "2X=14 шеш", "none_substring": ["{slot}", "{topic}"]},
+    {"id": "me_11", "category": "math_equations", "query": "X+X=10 теңдеуін шеш", "none_substring": ["{slot}", "{topic}"]},
+    {"id": "me_12", "category": "math_equations", "query": "X*X=9 шеш", "none_substring": ["{slot}", "{topic}"]},
+
+    {"id": "wp_01", "category": "math_word_problems", "query": "Ботада 5 алма бар, оған тағы 3 алма бердім. Қазір қанша алма?", "any_substring": ["шеше алмаймын", "қарапайым сандық", "анық"], "none_substring": ["{slot}", "{topic}"]},
+    {"id": "wp_02", "category": "math_word_problems", "query": "Класта 25 оқушы. Олардан 10-ы қыз. Қанша ұл?", "any_substring": ["шеше алмаймын", "қарапайым сандық", "анық"], "none_substring": ["{slot}", "{topic}"]},
+    {"id": "wp_03", "category": "math_word_problems", "query": "3 банкадағы әр банкада 4 кәмпит. Барлығы қанша?", "any_substring": ["шеше алмаймын", "қарапайым сандық", "анық"], "none_substring": ["{slot}", "{topic}"]},
+    {"id": "wp_04", "category": "math_word_problems", "query": "Үш алманы алып, бес алманы беремін. Қанша қалды?", "any_substring": ["шеше алмаймын", "қарапайым сандық", "анық"], "none_substring": ["{slot}", "{topic}"]},
+    {"id": "wp_05", "category": "math_word_problems", "query": "Маған 20 жас. Інім 5 жасқа кіші. Інімнің жасы қанша?", "any_substring": ["шеше алмаймын", "қарапайым сандық", "анық"], "none_substring": ["{slot}", "{topic}"]},
+    {"id": "wp_06", "category": "math_word_problems", "query": "Ауланың ұзындығы 8 метр. Ені 5 метр. Ауданы қанша?", "any_substring": ["шеше алмаймын", "қарапайым сандық", "анық"], "none_substring": ["{slot}", "{topic}"]},
+    {"id": "wp_07", "category": "math_word_problems", "query": "Бір жинақта 12 кітап. Үш жинақта қанша кітап?", "any_substring": ["шеше алмаймын", "қарапайым сандық", "анық"], "none_substring": ["{slot}", "{topic}"]},
+    {"id": "wp_08", "category": "math_word_problems", "query": "10 теңгеден қалам сатып алу үшін қанша қажет?", "any_substring": ["шеше алмаймын", "қарапайым сандық", "анық"], "none_substring": ["{slot}", "{topic}"]},
+    {"id": "wp_09", "category": "math_word_problems", "query": "Ботаның жасы 10. Айдананың жасы Ботадан 5 жасқа үлкен. Айдананың жасы қанша?", "any_substring": ["шеше алмаймын", "қарапайым сандық", "анық"], "none_substring": ["{slot}", "{topic}"]},
+    {"id": "wp_10", "category": "math_word_problems", "query": "Бір жұмыста 7 күн бар. Үш жұмыста қанша күн?", "any_substring": ["шеше алмаймын", "қарапайым сандық", "анық"], "none_substring": ["{slot}", "{topic}"]},
+
+    {"id": "mc_01", "category": "math_concepts", "query": "Көбейту деген не?", "any_substring": ["қосу", "сан", "арифметика"]},
+    {"id": "mc_02", "category": "math_concepts", "query": "Бөлу деген не?", "any_substring": ["сан", "бөл"]},
+    {"id": "mc_03", "category": "math_concepts", "query": "Қосу деген не?", "any_substring": ["сан", "қос", "арифметика"]},
+    {"id": "mc_04", "category": "math_concepts", "query": "Сан деген не?", "any_substring": ["сан", "натурал", "мөлшер"]},
+    {"id": "mc_05", "category": "math_concepts", "query": "Бөлшек деген не?", "none_substring": ["{slot}", "{topic}"]},
+    {"id": "mc_06", "category": "math_concepts", "query": "Пайыз деген не?", "none_substring": ["{slot}", "{topic}"]},
+    {"id": "mc_07", "category": "math_concepts", "query": "Геометрия деген не?", "none_substring": ["{slot}", "{topic}"]},
+    {"id": "mc_08", "category": "math_concepts", "query": "Теңдеу деген не?", "any_substring": ["теңдеу", "сан", "тең"], "none_substring": ["{slot}", "{topic}"]}
   ]
 }

@@ -15,7 +15,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "5.17.7"
+version = "5.18.0"
 edition = "2024"
 license = "BUSL-1.1"
 
