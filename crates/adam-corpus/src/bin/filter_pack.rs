@@ -17,7 +17,6 @@
 use std::{env, fs, path::PathBuf, process::ExitCode};
 
 use adam_kernel::{SegmentationLexicon, SegmentationRuleSet, deterministic_segment_token};
-use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 const ROOTS_PATH: &str = "data/tokenizer/segmentation_roots.json";
@@ -101,12 +100,6 @@ const LOANWORD_BLOCKLIST: &[&str] = &[
     "республика",
     "республикасы",
 ];
-
-#[derive(Debug, Deserialize, Serialize, Clone)]
-struct Sample {
-    #[serde(flatten)]
-    extra: serde_json::Map<String, Value>,
-}
 
 fn main() -> ExitCode {
     let input_path: PathBuf = match env::args().nth(1) {
