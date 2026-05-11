@@ -121,7 +121,11 @@ fn main() -> ExitCode {
     //   --whisper-bin <path>     override env ADAM_WHISPER_BIN
     //   --whisper-model <path>   GGML model file
     //   --whisper-language <kk>  Whisper language code (defaults to kk)
+    // **v5.15.0 (V1).** `--push-to-talk` opts out of VAD continuous
+    // listening — falls back to v5.14.0 behaviour where Enter stops
+    // the recording.
     let voice_input = voice_input_flag;
+    let push_to_talk = args.iter().any(|a| a == "--push-to-talk");
     let whisper_bin_arg = args
         .windows(2)
         .find(|w| w[0] == "--whisper-bin")
@@ -387,7 +391,7 @@ fn main() -> ExitCode {
         "adam-chat v{} — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.\n\
          Multi-line code blocks: open with ``` and close with ``` on its own line.\n\
          Voice output: pass --tts (default OS voice; or --tts-backend piper --tts-model <path>).\n\
-         Voice input (build with --features voice): pass --voice-input (push-to-talk + whisper.cpp shell-out; TTS auto-on, --no-tts-on-voice to disable).",
+         Voice input (build with --features voice): --voice-input enables VAD continuous listening + whisper.cpp + auto-TTS; --push-to-talk for Enter-stops mode, --no-tts-on-voice to disable TTS.",
         env!("CARGO_PKG_VERSION")
     );
     let stdin = io::stdin();
@@ -422,6 +426,7 @@ fn main() -> ExitCode {
             whisper_bin_arg.as_deref(),
             whisper_model_arg.as_deref(),
             whisper_language_arg.as_deref(),
+            push_to_talk,
         );
     }
 
@@ -429,10 +434,20 @@ fn main() -> ExitCode {
     for line in stdin.lock().lines() {
         let Ok(line) = line else { break };
         if let Some(assembled) = absorb_line(&line, &mut block_buf) {
-            turn += 1;
-            let seed = turn_seed(turn);
-            run_turn(&mut conv, &assembled, &lex, &repo, trace, seed, tts_handle);
-            stdout.lock().flush().ok();
+            // **v5.15.0 (V1).** Multi-clause user utterances
+            // («Сәлеметсіз бе, қалыңыз қалай, танысайық») are split
+            // into per-clause pieces here; each clause runs as its
+            // own kernel turn so every sub-intent (greeting +
+            // wellbeing + introduction proposal) reaches its
+            // template family. Single-clause inputs come back as a
+            // one-element vec, so the loop covers both shapes
+            // uniformly.
+            for piece in adam_dialog::discourse::split_compound_utterance(&assembled) {
+                turn += 1;
+                let seed = turn_seed(turn);
+                run_turn(&mut conv, &piece, &lex, &repo, trace, seed, tts_handle);
+                stdout.lock().flush().ok();
+            }
         }
     }
     ExitCode::SUCCESS
@@ -455,8 +470,9 @@ fn run_voice_repl(
     whisper_bin_arg: Option<&str>,
     whisper_model_arg: Option<&str>,
     whisper_language_arg: Option<&str>,
+    push_to_talk: bool,
 ) -> ExitCode {
-    use adam_voice::{MicCapture, MicConfig, WhisperCli, write_wav};
+    use adam_voice::{MicCapture, MicConfig, VadStopReason, WhisperCli, write_wav};
 
     let bin: std::path::PathBuf = match whisper_bin_arg
         .map(std::path::PathBuf::from)
@@ -507,10 +523,21 @@ fn run_voice_repl(
         cli = cli.with_language(lang);
     }
 
+    // **v5.15.0 (V1).** VAD continuous listening is the default;
+    // `--push-to-talk` opts out to v5.14.0 Enter-stops behaviour.
+    let mic_cfg_template = if push_to_talk {
+        MicConfig::push_to_talk()
+    } else {
+        MicConfig::default()
+    };
     eprintln!(
-        "adam-chat --voice-input: push-to-talk active. Press Enter to record, \
-         say what you want, press Enter again to stop. Recording auto-stops \
-         after 30 s. ^D to quit."
+        "adam-chat --voice-input: {} mode active. {} ^D to quit.",
+        if push_to_talk { "push-to-talk" } else { "VAD" },
+        if push_to_talk {
+            "Press Enter to start recording, say what you want, press Enter again to stop. Recording auto-stops after 30 s."
+        } else {
+            "Press Enter to start listening, speak naturally — recording auto-stops when you go silent for 1.5 s. Hard cap 30 s."
+        }
     );
     let stdin = io::stdin();
     let mut prompt_line = String::new();
@@ -521,27 +548,43 @@ fn run_voice_repl(
         if stdin.lock().read_line(&mut prompt_line).is_err() || prompt_line.is_empty() {
             return ExitCode::SUCCESS;
         }
-        let cap = match MicCapture::start(MicConfig::default()) {
+        let cap = match MicCapture::start(mic_cfg_template.clone()) {
             Ok(c) => c,
             Err(e) => {
                 eprintln!("[voice] mic start failed: {e}");
                 continue;
             }
         };
-        // **v5.14.5** — explicit user-driven stop signal. Pre-v5.14.5
-        // the mic stopped on a 100 ms inter-chunk drain timeout,
-        // which fired during natural speech pauses on low-load CPU
-        // and cut recordings before the user finished a word. Now
-        // the loop blocks on `read_line` until the user explicitly
-        // hits Enter, with a 30 s safety cap polled separately.
         eprintln!(
-            "[voice] ● recording — speak now in Kazakh; press Enter when done \
-             (auto-stop in {} s)",
+            "[voice] ● recording — speak now in Kazakh{} (hard cap {} s)",
+            if push_to_talk {
+                "; press Enter when done"
+            } else {
+                "; auto-stop on 1.5 s of silence"
+            },
             cap.max_duration().as_secs()
         );
         io::stderr().lock().flush().ok();
-        let mut stop_line = String::new();
-        let _ = stdin.lock().read_line(&mut stop_line);
+        // Two stop paths depending on mode:
+        // - VAD: wait_for_vad_stop blocks the main thread until
+        //   silence-after-speech > 1.5 s OR max_duration hits
+        // - push-to-talk: blocking read_line() on stdin (Enter
+        //   stops; same as v5.14.5)
+        if push_to_talk {
+            let mut stop_line = String::new();
+            let _ = stdin.lock().read_line(&mut stop_line);
+        } else {
+            match cap.wait_for_vad_stop() {
+                Ok(VadStopReason::Silence) => {}
+                Ok(VadStopReason::MaxDuration) => {
+                    eprintln!("[voice] hard cap reached; transcribing what was captured");
+                }
+                Err(e) => {
+                    eprintln!("[voice] VAD wait failed: {e}");
+                    continue;
+                }
+            }
+        }
         let samples = match cap.stop() {
             Ok(s) => s,
             Err(e) => {
@@ -574,10 +617,17 @@ fn run_voice_repl(
             continue;
         }
         eprintln!("[voice] heard: «{}»", transcript.text);
-        *turn += 1;
-        let seed = turn_seed(*turn);
-        run_turn(conv, &transcript.text, lex, repo, trace, seed, tts_handle);
-        io::stdout().lock().flush().ok();
+        // **v5.15.0 (V1).** Voice path uses the same compound-
+        // utterance splitter as text REPL — STT often returns a long
+        // string when the user speaks several sentences in one
+        // breath; per-clause kernel turns let every sub-intent reach
+        // its template family.
+        for piece in adam_dialog::discourse::split_compound_utterance(&transcript.text) {
+            *turn += 1;
+            let seed = turn_seed(*turn);
+            run_turn(conv, &piece, lex, repo, trace, seed, tts_handle);
+            io::stdout().lock().flush().ok();
+        }
     }
 }
 
@@ -593,6 +643,7 @@ fn run_voice_repl(
     _whisper_bin_arg: Option<&str>,
     _whisper_model_arg: Option<&str>,
     _whisper_language_arg: Option<&str>,
+    _push_to_talk: bool,
 ) -> ExitCode {
     eprintln!(
         "adam-chat --voice-input requires the `voice` feature. \

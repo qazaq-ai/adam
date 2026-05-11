@@ -952,6 +952,135 @@ pub fn is_ask_previous_error(input: &str) -> bool {
     has_recall_marker && mentions_error && asks_about_it
 }
 
+/// **v5.15.0 (V1).** Split a compound user utterance into per-clause
+/// pieces. The Codex live-test surfaced this gap: a user saying
+/// «Здравствуйте, как ваши дела, давайте познакомимся» on voice
+/// produced one composite intent that lost two of the three clauses.
+/// This helper splits on Kazakh / Cyrillic sentence-boundary
+/// punctuation (`,` / `.` / `;` / `!` / `?` / `…` / `—` when sentence-
+/// initial); the caller (adam_chat REPL) then runs `Conversation::turn`
+/// once per clause and joins the responses.
+///
+/// The split is at the **utterance wrapper** level, not in the
+/// kernel — `Conversation::turn` still consumes a single string per
+/// call, and the deterministic-kernel contract is unchanged.
+///
+/// Returns a `Vec<String>` with at least one entry. Single-clause
+/// inputs come back as a one-element vec (caller treats both cases
+/// uniformly). Whitespace-only entries are filtered out.
+///
+/// **Conservative.** Does NOT split inside code blocks (` ``` ` fences)
+/// or quoted strings («…», "…"). Code submission and quoted speech
+/// stay intact.
+pub fn split_compound_utterance(input: &str) -> Vec<String> {
+    let trimmed = input.trim();
+    if trimmed.is_empty() {
+        return Vec::new();
+    }
+    // Bail out on code blocks: leave the whole snippet intact for the
+    // SubmitSolution path.
+    if trimmed.contains("```") {
+        return vec![trimmed.to_string()];
+    }
+    let mut parts: Vec<String> = Vec::new();
+    let mut buf = String::new();
+    let mut in_quote = false;
+    for ch in trimmed.chars() {
+        // Toggle quote state; quoted content stays as one piece.
+        if matches!(ch, '«' | '"' | '\'') {
+            in_quote = true;
+            buf.push(ch);
+            continue;
+        }
+        if matches!(ch, '»' | '"') {
+            in_quote = false;
+            buf.push(ch);
+            continue;
+        }
+        if !in_quote && matches!(ch, ',' | '.' | ';' | '!' | '?' | '…') {
+            let piece = buf.trim().to_string();
+            if !piece.is_empty() {
+                parts.push(piece);
+            }
+            buf.clear();
+            continue;
+        }
+        buf.push(ch);
+    }
+    let tail = buf.trim().to_string();
+    if !tail.is_empty() {
+        parts.push(tail);
+    }
+    if parts.is_empty() {
+        return vec![trimmed.to_string()];
+    }
+    parts
+}
+
+#[cfg(test)]
+mod compound_utterance_tests_v5150 {
+    use super::split_compound_utterance;
+
+    #[test]
+    fn single_sentence_returns_one_piece_v5150() {
+        assert_eq!(
+            split_compound_utterance("Қасқыр — тірі ме?"),
+            vec!["Қасқыр — тірі ме".to_string()]
+        );
+        assert_eq!(
+            split_compound_utterance("Сәлеметсіз бе"),
+            vec!["Сәлеметсіз бе".to_string()]
+        );
+    }
+
+    #[test]
+    fn splits_compound_greeting_v5150() {
+        // Codex live-test scenario.
+        let parts = split_compound_utterance("Сәлеметсіз бе, қалыңыз қалай, танысайық");
+        assert_eq!(
+            parts,
+            vec![
+                "Сәлеметсіз бе".to_string(),
+                "қалыңыз қалай".to_string(),
+                "танысайық".to_string(),
+            ]
+        );
+    }
+
+    #[test]
+    fn splits_period_and_question_marks_v5150() {
+        let parts = split_compound_utterance("Қасқыр — тірі ме? Ал тас?");
+        assert_eq!(
+            parts,
+            vec!["Қасқыр — тірі ме".to_string(), "Ал тас".to_string()]
+        );
+    }
+
+    #[test]
+    fn preserves_quoted_speech_v5150() {
+        // Quoted content stays as one piece even with internal commas.
+        // The colon isn't a split char, so the whole utterance is a
+        // single piece (the quote pair suppresses the interior comma).
+        let parts = split_compound_utterance("Ол айтты «жоқ, дұрыс емес»");
+        assert_eq!(parts, vec!["Ол айтты «жоқ, дұрыс емес»".to_string()]);
+    }
+
+    #[test]
+    fn preserves_code_block_intact_v5150() {
+        let input = "```rust\nfn main() { let s = String::from(\"hi\"); }\n```";
+        assert_eq!(
+            split_compound_utterance(input),
+            vec![input.trim().to_string()]
+        );
+    }
+
+    #[test]
+    fn empty_input_returns_empty_vec_v5150() {
+        assert!(split_compound_utterance("").is_empty());
+        assert!(split_compound_utterance("   ").is_empty());
+    }
+}
+
 /// **v5.11.0 — Codex follow-up review (B4.2).** Countable
 /// propositions detector. Pre-v5.11.0 the user request «Қасқыр
 /// туралы үш сөйлем құрастыр» / «Жер жайлы 3 сөйлем айт» fell to

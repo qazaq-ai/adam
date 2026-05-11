@@ -53,5 +53,5 @@ pub mod mic;
 pub mod stt;
 
 pub use error::{Result, VoiceError};
-pub use mic::{MicCapture, MicConfig, write_wav};
+pub use mic::{MicCapture, MicConfig, VadStopReason, write_wav};
 pub use stt::{Transcript, WhisperCli};

@@ -21,6 +21,77 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.15.0] — 2026-05-10 — V1 — VAD continuous listening + compound-utterance split
+
+**Minor-version release.** Second voice-arc milestone. Two complementary capabilities that together close the «I have to press Enter» / «it understood only the first clause» class of bugs the live-test surfaced.
+
+### What changed
+
+**1. Energy-based VAD continuous listening.** New fields on [`MicConfig`](crates/adam-voice/src/mic.rs):
+- `vad_enabled: bool` — default `true`; `MicConfig::push_to_talk()` preset disables it
+- `vad_silence_after_speech: Duration` — default 1500 ms
+- `vad_amplitude_threshold: f32` — default 0.02 × i16::MAX (≈ −34 dBFS, comfortably above quiet-room noise floor on laptop mics)
+- `vad_min_speech_before_silence: Duration` — default 600 ms (covers «Сәлеметсіз бе» intra-utterance gaps)
+
+New public method [`MicCapture::wait_for_vad_stop`](crates/adam-voice/src/mic.rs) blocks the main thread until either a natural end-of-utterance (silence > threshold after observed speech) OR `max_duration` fires. Returns the new [`VadStopReason`] enum so the caller can show a different UX prompt for each trigger.
+
+Algorithm: polls the shared sample buffer every 30 ms, slices the new tail into ~30 ms frames, computes RMS amplitude per frame. Frames below `vad_amplitude_threshold` count as silence; frames above count as speech. Silence detection arms only after `vad_min_speech_before_silence` of cumulative speech — prevents the first intra-syllable pause from prematurely stopping. Zero new dependencies; pure CPU; deterministic given the input audio buffer.
+
+**2. Multi-clause utterance splitter.** New [`discourse::split_compound_utterance`](crates/adam-dialog/src/discourse.rs) splits user input on Kazakh sentence-boundary punctuation (`,` / `.` / `;` / `!` / `?` / `…`) into a `Vec<String>` of per-clause pieces. Quote-aware (content inside «…» / "…" / '…' stays intact) and code-block-aware (` ``` ` fences pass through unmodified).
+
+The Codex live-test scenario «Здравствуйте, как ваши дела, давайте познакомимся» on the equivalent Kazakh «Сәлеметсіз бе, қалыңыз қалай, танысайық» now splits into three clauses; the REPL runs each as a separate kernel turn so every sub-intent (Polite greeting + wellbeing + IntroProposal) reaches its template family. Single-clause inputs come back as a one-element vec, so the REPL loops cover both shapes uniformly.
+
+The split is at the **utterance wrapper** level (adam_chat REPL), not in the kernel — `Conversation::turn` still consumes one string per call and the deterministic-kernel contract is unchanged.
+
+**3. New `--push-to-talk` flag.** Opts out of VAD continuous listening, falls back to v5.14.0 Enter-stops behaviour. Combined with the v5.14.5 auto-TTS-on-voice from v5.14.6, the default voice REPL is now:
+
+```text
+[voice] press Enter to start recording …
+[voice] ● recording — speak now in Kazakh; auto-stop on 1.5 s of silence (hard cap 30 s)
+[voice] captured 4.2 s of audio; transcribing …
+[voice] heard: «Сәлеметсіз бе, қалыңыз қалай»
+<adam responds to greeting>
+<adam responds to wellbeing>
+```
+
+### Why `x.y.0`
+
+Per cadence policy: new public APIs (`MicConfig::push_to_talk` / `MicCapture::wait_for_vad_stop` / `VadStopReason` / `discourse::split_compound_utterance`) + new CLI surface (`--push-to-talk`) + new behavioural shape (VAD-driven recording end + multi-clause kernel turns per user utterance) + closes the V1 voice-arc milestone. Algorithm change (Enter-stops → VAD-stops) is a capability addition, not patch material.
+
+### Tests
+
+- 11 unit tests in `adam-voice`:
+  - `mic::tests` — downmix / resample (4 tests, unchanged from V0)
+  - **new in V1:** `rms_amplitude_zero_for_silence_v5150` / `rms_amplitude_empty_is_zero_v5150` / `rms_amplitude_grows_with_signal_v5150` / `push_to_talk_preset_disables_vad_v5150` / `default_config_enables_vad_v5150`
+  - `stt::tests` — argv / env var (5 tests, unchanged from V0)
+- 6 unit tests in `discourse::compound_utterance_tests_v5150`:
+  - single sentence → 1 piece
+  - compound greeting → 3 pieces (Codex scenario)
+  - period + question marks
+  - quoted speech preserved
+  - code blocks preserved intact
+  - empty input → empty vec
+- Workspace **1 295 passing** (+11), 17 ignored, 0 failures
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --all-targets --features voice -- -D warnings` clean; `cargo test --workspace` 0 failures; `bash scripts/check_metrics_currency.sh` clean.
+
+### Voice arc roadmap
+
+| Release | Status | Milestone |
+|---|---|---|
+| v5.14.0 | ✅ | V0 — push-to-talk + whisper shell-out |
+| v5.14.5 | ✅ | V0.1 — live-test fixes (mic stop bug + model pre-flight) |
+| v5.14.6 | ✅ | V0.2 — greeting variants + auto-TTS |
+| **v5.15.0 (this)** | ✅ | **V1 — VAD + compound-utterance split** |
+| v5.16.0 | next | V2 — confidence gate + clarification template family |
+| v5.17.0 | future | V3 — Kazakh transcript normalizer |
+| v5.18.0 | future | V4 — barge-in (TTS interruption) |
+| v5.19.0 | future | V5 — golden audio corpus + replay harness |
+
+**Stripe — Deterministic AI research (V1 voice-arc; VAD continuous listening + compound-utterance split).**
+
 ## [5.14.6] — 2026-05-10 — V0.2 — Voice-input live-test fixes (greeting variants + auto-TTS)
 
 **Patch milestone.** Two follow-ups from the second live-test of the voice transducer.
