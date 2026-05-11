@@ -4,19 +4,16 @@
   "captured_date": "2026-05-11",
   "source": "Codex 2026-05-11 audit priority D, batch 1 of 4",
   "name": "adversarial_dialog_v1",
-  "_floor_policy": "ratcheting baseline: floor cannot decrease across releases. v5.17.0 baseline = 42/50 (84%). v5.17.4 floor 0.86 (srf_04 closure). v5.17.5 floor 0.92 (mta_03/05/08 anaphora batch). Each follow-up release must fix ≥1 failure and raise the floor.",
-  "_known_failures_v5175": [
-    "fr_01: Алматы факт-lookup fails (geography_kz entry should match but retrieval misses)",
-    "mta_02: «Жасымды білесіз бе» — anaphora recall fail; session.age not bound after StatementOfAge { years: Some(N) }. Template-leak symptom CLOSED v5.17.1-3 by realiser safety net; root anaphora bug — different path from mta_03/05/08 (detect_ask_age recall surface is different from mta_03 paradigm).",
-    "mta_06: «Тағы біреуін бер» does not recall session.last_exercise_topic — different mechanism (anaphoric «біреуін» = «one more»), needs anaphora resolver, not detector extension.",
-    "ctt_04: traits purpose detector misses on «не үшін керек?» surface form (purpose_for needs trigger broadening)"
+  "_floor_policy": "ratcheting baseline: floor cannot decrease across releases. v5.17.0 baseline 0.84. v5.17.4 floor 0.86 (srf_04). v5.17.5 floor 0.92 (mta_03/05/08 anaphora batch). v5.17.6 floor 0.96 (mta_02 age recall + ctt_04 purpose trigger).",
+  "_known_failures_v5176": [
+    "fr_01: Алматы факт-lookup fails (geography_kz entry should match but retrieval misses) — deeper investigation (domain index? morpheme index? retrieval scoring?)",
+    "mta_06: «Тағы біреуін бер» does not recall session.last_exercise_topic — different mechanism (anaphoric «біреуін» = «one more»), needs anaphora resolver, not detector extension"
   ],
-  "_closed_v5175": [
-    "mta_03: «Қай қалада тұратынымды білесіз бе» — closed by detect_ask_location memory-probe extension (1sg-PART-ACC + memory-verb pattern)",
-    "mta_05: «Кім болып жұмыс істейтінімді есіңізде ме» — closed by detect_ask_occupation 1sg-PART-ACC extension",
-    "mta_08: «Қайдан келгенімді білесіз бе» — closed by same location memory-probe pattern as mta_03"
+  "_closed_v5176": [
+    "mta_02: «Жасымды білесіз бе» — closed in two parts: (a) detect_statement_of_age now accepts dative-experiential «Маған N жас» (Turn 1 was leaving session.age unset); (b) detect_ask_age memory-probe extension catches «жасымды + білесіз/есіңізде/ұмыт» (Turn 2 1sg-poss-ACC + memory-verb)",
+    "ctt_04: «traits деген не үшін керек?» — closed by adding «не үшін керек» + «неге керек» to detect_ask_purpose has_why_marker (was only catching «не үшін арналған» / «неге арналған»)"
   ],
-  "pass_rate_floor": 0.92,
+  "pass_rate_floor": 0.96,
   "cases": [
     {"id": "fr_01", "category": "factual_retrieval", "query": "Алматы қайда орналасқан?", "any_substring": ["қазақстан"]},
     {"id": "fr_02", "category": "factual_retrieval", "query": "Қазақстанның астанасы қай қала?", "any_substring": ["астана", "нұр-сұлтан"]},

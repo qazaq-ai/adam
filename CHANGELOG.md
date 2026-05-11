@@ -21,6 +21,81 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.17.6] — 2026-05-11 — Quick-win batch: age recall + traits purpose (mta_02 + ctt_04 closure, floor 92% → 96%)
+
+**Patch.** Closes 2 of the 4 remaining open failures from the v5.17.0 adversarial benchmark queue with trigger extensions. Adversarial baseline 46/50 (92%) → **48/50 (96%)**. Five of six categories now at 100% — only `factual_retrieval` (7/8) and `multi_turn_anaphora` (7/8) remain imperfect.
+
+### What was wrong
+
+**`mta_02` — age recall.** Two-part failure:
+
+1. Turn 1 «Маған 25 жас» (dative-experiential «I am 25 years old») did NOT match `detect_statement_of_age` — the matcher required 1sg-poss «жасым» or 1sg-COP verbs (`жастамын` / `жаспын`). The dative shape fell to Unknown, leaving `session.age` unset.
+2. Turn 2 «Жасымды білесіз бе?» — `detect_ask_age` covered «жасым + қанша/неше», but not the 1sg-poss-ACC «жасымды» + memory-probe verb shape. (Even with Turn 1 fixed, this would still miss.)
+
+**`ctt_04` — traits purpose.** «traits деген не үшін керек?» — `detect_ask_purpose::has_why_marker` listed «не үшін арналған» (intended for), «неге арналған», «себебі қандай» — but not «не үшін керек» (needed for) / «неге керек». Semantic distinction is null in the tutor context — both ask for purpose.
+
+### What changed
+
+**`detect_statement_of_age` (semantics.rs:2329)** — accept dative-experiential «Маған N жас»:
+
+```rust
+|| (tokens.iter().any(|t| t == "маған")
+    && tokens.iter().any(|t| t == "жас"))
+```
+
+**`detect_ask_age` (semantics.rs:2259)** — memory-probe extension mirroring v5.17.5 location/occupation pattern:
+
+```rust
+|| ((joined.contains("жасым") || joined.contains("жасымды"))
+    && (joined.contains("есіңізде") | joined.contains("есіңде")
+        | joined.contains("білесіз") | joined.contains("білесің")
+        | joined.contains("білдіңіз") | joined.contains("білдің")
+        | joined.contains("ұмытпа") | joined.contains("ұмытты")))
+```
+
+**`detect_ask_purpose` (semantics.rs:1085)** — extended `has_why_marker` with two equivalent surfaces:
+
+```rust
+|| joined.contains("не үшін керек")
+|| joined.contains("неге керек")
+```
+
+### Adversarial benchmark progress
+
+| Category | v5.17.5 | v5.17.6 |
+|---|---|---|
+| factual_retrieval | 7/8 | 7/8 |
+| **multi_turn_anaphora** | **6/8 (75%)** | **7/8 (88%)** |
+| safety_refusal | 8/8 | 8/8 |
+| **code_tutor_traps** | **7/8 (88%)** | **8/8 (100%)** |
+| language_guards | 8/8 | 8/8 |
+| ambiguous_followup | 10/10 | 10/10 |
+| **Overall** | **46/50 (92%)** | **48/50 (96%)** |
+
+Floor in JSON: 0.92 → **0.96**.
+
+### Live-verified
+
+| Input | Pre-v5.17.6 | Post-v5.17.6 |
+|---|---|---|
+| Turn 1 «Маған 25 жас.» → Turn 2 «Жасымды білесіз бе?» | «Сұрағыңызды толық түсінбедім...» (post-realiser-guard fallback) | «25 жас — тамаша кезең.» → «Сіздің жасыңыз 25» ✅ |
+| «traits деген не үшін керек?» | Clarification | «Trait-тің мақсаты — типтер арасында ортақ мінез-құлықты білдіру…» ✅ |
+
+### Verified
+
+- 6 new tests in `tests/recall_batch_v5176.rs`: intent-routing for both fixes + end-to-end mta_02 recall + 1 factual regression guard.
+- `cargo test --workspace --locked --no-fail-fast` — **1 341 passing** (+6).
+- `cargo fmt --all --check` + `cargo clippy --all-targets -- -D warnings` clean.
+
+### Remaining v5.17.x queue
+
+Only 2 failures left:
+
+- **`fr_01`** — Алматы factual retrieval miss; deeper investigation (domain index? morpheme index? retrieval scoring?). Not a trigger-extension fix — needs to trace why `geography_kz` entry doesn't surface.
+- **`mta_06`** — «Тағы біреуін бер» recalls `session.last_exercise_topic`; different mechanism (anaphoric «біреуін» = «one more»), needs anaphora resolver, not detector extension.
+
+Stripe — Deterministic AI research (5/6 adversarial categories at 100%; tutor multi-turn recall paradigm now complete on name/age/city/occupation/origin).
+
 ## [5.17.5] — 2026-05-11 — Anaphora recall batch: city + occupation + origin (mta_03/05/08 closure, floor 86% → 92%)
 
 **Patch.** Closes 3 of the 5 remaining open failures from the v5.17.0 adversarial-benchmark queue with a single paradigm fix. Largest single-release floor raise: 0.86 → 0.92 (+6 pp, +3 cases). `multi_turn_anaphora` category: 3/8 (38%) → 6/8 (75%).

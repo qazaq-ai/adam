@@ -1091,9 +1091,17 @@ fn detect_ask_purpose(joined: &str) -> bool {
         || joined.contains("мақсат")
         || joined.contains("міндеті")
         || joined.contains("пайдасы");
+    // **v5.17.6 — adversarial D1 ctt_04 closure.** Added «не үшін
+    // керек» — canonical Kazakh «what is X needed for?» shape. Codex
+    // 2026-05-11 query «traits деген не үшін керек?» fell through
+    // because the previous list only had «не үшін арналған» (=
+    // «what is X intended for?»). The semantic distinction is null
+    // in this context — both ask for purpose.
     let has_why_marker = joined.contains("не үшін арналған")
         || joined.contains("неге арналған")
-        || joined.contains("себебі қандай");
+        || joined.contains("себебі қандай")
+        || joined.contains("не үшін керек")
+        || joined.contains("неге керек");
     has_purpose_noun || has_why_marker
 }
 
@@ -2294,6 +2302,23 @@ fn detect_ask_age(joined: &str) -> bool {
         // the slot, and semantically misclassifying the user's
         // question as a statement.
         || (joined.contains("жасым") && has_q)
+        // **v5.17.6 — adversarial D1 mta_02 closure.** Memory-probe
+        // self-recall: «Жасымды білесіз бе?» / «Жасымды есіңізде
+        // ме?» — 1sg-poss + ACC «жасымды» + memory-probe verb.
+        // Mirrors the v5.17.5 location/occupation extensions; the
+        // v4.4.5 path above only covered «жасым» + interrogative,
+        // missing the memory-probe shape that pre-v5.17.6 fell to
+        // StatementOfAge { years: None } (and pre-v5.17.1 leaked
+        // {age} placeholder before the realiser guard caught it).
+        || ((joined.contains("жасым") || joined.contains("жасымды"))
+            && (joined.contains("есіңізде")
+                || joined.contains("есіңде")
+                || joined.contains("білесіз")
+                || joined.contains("білесің")
+                || joined.contains("білдіңіз")
+                || joined.contains("білдің")
+                || joined.contains("ұмытпа")
+                || joined.contains("ұмытты")))
 }
 
 /// User reports age: "менің жасым N", "N жастамын", "N жасында".
@@ -2305,7 +2330,16 @@ fn detect_statement_of_age(tokens: &[String], joined: &str) -> Option<Option<u32
     let matched = joined.contains("жасым")
         || tokens
             .iter()
-            .any(|t| t == "жастамын" || t == "жастаймын" || t == "жаспын");
+            .any(|t| t == "жастамын" || t == "жастаймын" || t == "жаспын")
+        // **v5.17.6 — adversarial D1 mta_02 closure (part 2).**
+        // Dative-experiential «Маған N жас» — canonical Kazakh «I
+        // am N years old» (lit. «to me N years»). Pre-v5.17.6 the
+        // detector required either 1sg-poss «жасым» or a 1sg-COP
+        // verb (`жастамын` / `жаспын`); the dative-experiential
+        // shape fell through to Unknown, leaving session.age unset
+        // and breaking every downstream age-recall question.
+        || (tokens.iter().any(|t| t == "маған")
+            && tokens.iter().any(|t| t == "жас"));
     if !matched {
         return None;
     }
