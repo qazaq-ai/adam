@@ -21,6 +21,39 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.17.3] — 2026-05-11 — Realiser guard skips inline-backtick code spans (v5.17.2 follow-up)
+
+**Hotfix #2.** v5.17.2 added `≥ 3-char identifier` rule to distinguish Rust format placeholders (`{s}`, `{x}`) from adam slots. CI surfaced the next case: Rust idiomatic format names of 3+ chars (`result_a`, `result_b`, `value`, `count`) embedded in pedagogical answers also collide with the same length window. The clean separator isn't length — it's **code-span scope**.
+
+### Live failure (CI v5.17.2)
+
+`rust_async_book_chapter_06::async6_select` — query «select! макросы деген не?». The curated answer reads:
+
+> «… `select! { result_a = fut_a.fuse() => println!("a: {result_a}"), result_b = fut_b.fuse() => println!("b: {result_b}") }` …»
+
+`{result_a}` and `{result_b}` are Rust format placeholders inside a **single-backtick inline code span** (CommonMark `` `code` `` notation, not the triple-backtick fence v5.17.2 handled). Guard saw them, declared a leak, replaced the entire answer with the fallback.
+
+### What changed
+
+`contains_unfilled_placeholder` rewritten as a 3-state scanner: `outside` / `inside_fence` (``` boundary toggles, multi-line) / `inside_inline` (single ` toggles, auto-closes at newline per CommonMark). Only the `outside` state checks for adam slot placeholders; both code-span states skip every `{...}` they see. The min-3-char identifier rule from v5.17.2 stays — defense in depth.
+
+### Why a scanner, not a regex
+
+`contains_unfilled_placeholder` runs on **every realised template** (every conv.turn). Regex would force one allocation + one compile per call (or shared lazy_static infra); a hand-written state machine is allocation-free and stays under 80 lines. Adam's deterministic kernel philosophy: keep hot-path code inspectable and cheap.
+
+### Verified
+
+- `cargo test -p adam-dialog --test rust_async_book_chapter_06` — **18/18** (was 17/1 failed).
+- 3 new guard regression tests: `skips_inline_backtick_code_spans_v5173`, `inline_span_auto_closes_at_newline_v5173`, `still_flags_real_slot_outside_code_fence_v5173`.
+- `cargo test --workspace --locked --no-fail-fast` — **1 324 passing** (+5).
+- Adversarial baseline unchanged: 42/50 at floor.
+- Adaptive-difficulty 8/8.
+- fmt + clippy + check_metrics_currency clean.
+
+### Why x.17.3
+
+Sequential cadence (.2 → .3). Pure hotfix on a one-release regression chain. The realiser guard is now properly scoped. v5.17.0 D1 queue progress unchanged.
+
 ## [5.17.2] — 2026-05-11 — Realiser guard distinguishes Rust format placeholders from adam slots (v5.17.1 follow-up)
 
 **Hotfix.** v5.17.1 shipped the realiser template-leak guard with a too-eager rule: any `{alpha…}` substring triggered the fallback. CI surfaced the false positive immediately — `curriculum_v4995_adaptive_difficulty::askexercise_with_two_failures_serves_easy_variant` failed because the «Easy» ownership exercise content contains the Rust format string `println!("{s}");`. The guard saw `{s}` and replaced the entire response with the «Сұрағыңызды толық түсінбедім…» fallback, breaking adaptive-difficulty content delivery.

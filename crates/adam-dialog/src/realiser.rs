@@ -100,37 +100,88 @@ const TEMPLATE_LEAK_FALLBACK: &str = "Сұрағыңызды толық түсі
 fn contains_unfilled_placeholder(rendered: &str) -> bool {
     // Every unfilled adam placeholder leaves a literal `{name}` or
     // `{name|features}` substring (see `expand_placeholder`'s
-    // `return format!("{{{inner}}}")` path). The identifier part
-    // (everything before the optional `|`) is ASCII alphabetic +
-    // underscore.
+    // `return format!("{{{inner}}}")` path).
     //
-    // **Min-length gate (v5.17.2):** Rust pedagogical exercises
-    // embed format-string placeholders like `println!("{s}")` and
-    // `{:?}` — these are part of the *content*, not unfilled adam
-    // slots. Adam slot names in `data/dialog/templates/v1.toml`
-    // are all ≥ 3 chars (`age`, `name`, `topic`, `fact`, ...), so a
-    // 3-char minimum on the identifier separates the two
-    // namespaces without losing any real slot. If a 2-char slot
-    // is ever introduced, relax this here and rename the colliding
-    // Rust example to use a longer variable name.
+    // **Code-span skip (v5.17.3):** Rust pedagogical exercises embed
+    // format-string placeholders like `println!("{result_a}")` —
+    // these look identical to adam slot placeholders by syntax and
+    // length. The clean separator is the markdown convention: adam
+    // template slots only live in PROSE; Rust code lives inside
+    // either ` ``` ` triple-backtick fences OR ` ` ` ` single-
+    // backtick inline spans. Skip everything inside both. State
+    // machine: scan byte-by-byte, toggle `inside_fence` on a triple
+    // backtick AND `inside_inline` on a single backtick (with the
+    // inline scope auto-closing at the next backtick OR newline,
+    // mirroring CommonMark inline-code).
     let mut search_from = 0;
-    while let Some(open_rel) = rendered[search_from..].find('{') {
-        let open = search_from + open_rel;
-        let Some(rel_close) = rendered[open..].find('}') else {
-            return false;
-        };
-        let close = open + rel_close;
-        let inner = &rendered[open + 1..close];
-        let identifier_end = inner.find('|').unwrap_or(inner.len());
-        let identifier = &inner[..identifier_end];
-        if identifier.len() >= 3
-            && identifier
-                .chars()
-                .all(|c| c.is_ascii_alphabetic() || c == '_')
-        {
-            return true;
+    let mut inside_fence = false;
+    let mut inside_inline = false;
+    let bytes = rendered.as_bytes();
+    while search_from < bytes.len() {
+        // Triple-backtick toggles the fence first (longest match).
+        if rendered[search_from..].starts_with("```") {
+            inside_fence = !inside_fence;
+            inside_inline = false; // fence resets inline state
+            search_from += 3;
+            continue;
         }
-        search_from = close + 1;
+        if inside_fence {
+            // Inside a fenced block: advance one UTF-8 char and move
+            // on without inspecting `{`.
+            let ch = rendered[search_from..]
+                .chars()
+                .next()
+                .expect("non-empty slice");
+            search_from += ch.len_utf8();
+            continue;
+        }
+        // Single-backtick toggles inline-code state (only when
+        // not already inside a fence).
+        if bytes[search_from] == b'`' {
+            inside_inline = !inside_inline;
+            search_from += 1;
+            continue;
+        }
+        // CommonMark: inline-code closes at end of line if no
+        // matching backtick was found. A leftover open inline span
+        // shouldn't swallow the rest of a multi-paragraph response.
+        if inside_inline && bytes[search_from] == b'\n' {
+            inside_inline = false;
+            search_from += 1;
+            continue;
+        }
+        if inside_inline {
+            let ch = rendered[search_from..]
+                .chars()
+                .next()
+                .expect("non-empty slice");
+            search_from += ch.len_utf8();
+            continue;
+        }
+        // Outside any code span — check for an adam slot.
+        if bytes[search_from] == b'{' {
+            let Some(rel_close) = rendered[search_from..].find('}') else {
+                return false;
+            };
+            let close = search_from + rel_close;
+            let inner = &rendered[search_from + 1..close];
+            let identifier_end = inner.find('|').unwrap_or(inner.len());
+            let identifier = &inner[..identifier_end];
+            if identifier.len() >= 3
+                && identifier
+                    .chars()
+                    .all(|c| c.is_ascii_alphabetic() || c == '_')
+            {
+                return true;
+            }
+            search_from = close + 1;
+            continue;
+        }
+        let ch = rendered[search_from..]
+            .chars()
+            .next()
+            .expect("non-empty slice");
+        search_from += ch.len_utf8();
     }
     false
 }
@@ -252,6 +303,51 @@ mod template_leak_guard_tests_v5171 {
         assert!(contains_unfilled_placeholder(
             "println!(\"{s}\") демо ал {age} жасыңыз"
         ));
+    }
+
+    #[test]
+    fn skips_multi_letter_rust_formats_inside_code_fence_v5173() {
+        // v5.17.3 regression: Rust pedagogical Easy variants embed
+        // multi-letter format placeholders inside code fences, e.g.
+        // `println!("{result}")`, `println!("{value}")`. These look
+        // identical to adam slot placeholders by syntax and length.
+        // Solution: skip everything inside ``` fences.
+        let pedagogical = "Иелік мысалы:\n```rust\nlet result = compute();\nprintln!(\"{result}\");\n```\nКеңес: иелік ережесін бұзбайды.";
+        assert!(!contains_unfilled_placeholder(pedagogical));
+    }
+
+    #[test]
+    fn still_flags_real_slot_outside_code_fence_v5173() {
+        // Prose with a real unfilled slot AND a code fence:
+        // prose-level slot must still fire.
+        let leaked = "{topic} мысалы:\n```rust\nlet result = 1;\nprintln!(\"{result}\");\n```";
+        assert!(contains_unfilled_placeholder(leaked));
+    }
+
+    #[test]
+    fn handles_multiple_fences_v5173() {
+        // Two separate code blocks, both with Rust format strings;
+        // no real slot leak.
+        let two_blocks = "Бірінші:\n```rust\nprintln!(\"{value}\");\n```\nекіншісі:\n```rust\nprintln!(\"{count}\");\n```";
+        assert!(!contains_unfilled_placeholder(two_blocks));
+    }
+
+    #[test]
+    fn skips_inline_backtick_code_spans_v5173() {
+        // Live failure: `rust_async_book_chapter_06::async6_select`.
+        // Curated answer embeds Rust format placeholders inside
+        // single-backtick spans, not triple-fence blocks.
+        let inline = "Select! макросы: `select! { result_a = fut_a.fuse() => println!(\"{result_a}\"), result_b = fut_b.fuse() => println!(\"{result_b}\") }` — drop кезі.";
+        assert!(!contains_unfilled_placeholder(inline));
+    }
+
+    #[test]
+    fn inline_span_auto_closes_at_newline_v5173() {
+        // CommonMark inline-code spans don't cross line boundaries.
+        // An unclosed inline backtick on one line must not swallow
+        // a real {slot} on the next.
+        let unclosed = "Қарапайым `пример без закрытия\n{topic} нақты слот";
+        assert!(contains_unfilled_placeholder(unclosed));
     }
 }
 
