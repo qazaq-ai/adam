@@ -21,6 +21,35 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.17.1] — 2026-05-11 — Realiser template-leak safety net (mta_02 critical-leak closure)
+
+**Patch.** First fix from the v5.17.0 adversarial benchmark's open-failure queue. Closes the **critical** sub-symptom of `mta_02`: leaked `{Age} — жақсы жас.` placeholder when `StatementOfAge { years: None }` was misrouted to the `statement_of_age` family. The user-visible failure mode (literal `{Slot}` text rendered to the screen with a capitalised first letter) is now structurally impossible from the realiser layer down.
+
+### What changed
+
+**`crates/adam-dialog/src/realiser.rs`** — new private `contains_unfilled_placeholder` guard runs immediately after `expand_template` in both `realise` and `realise_with_inventory`. Any leftover `{name}` / `{name|features}` substring triggers a fallback to a fixed Kazakh clarification string («Сұрағыңызды толық түсінбедім. Аздап нақтылап жіберіңізші.»). Six unit tests in `template_leak_guard_tests_v5171` cover positive cases (bare slot, capitalised slot, slot with FST features) and negative cases (plain text, empty braces, punctuation-only braces).
+
+The guard is intentionally last-line-of-defense: the real fix for the underlying routing bug (`StatementOfAge { years: None }` for an interrogative input) lives in the planner / slot extractor, not here. But by gating the realiser, we make every future planner regression of this class **structurally impossible to leak to users**.
+
+### Adversarial benchmark status (v5.17.0 D1)
+
+- `mta_02` template-leak **symptom** — ✅ closed.
+- `mta_02` test case itself — still fails: it asserts `"25"` in the response (anaphora recall), which requires `session.age` binding after `StatementOfAge { years: Some(25) }`. That's a separate planner/session bug queued for v5.17.2+.
+- Baseline pass rate unchanged at **42/50 (84 %)** because `mta_02` is still failing (now for the right reason — missing anaphora — not the wrong one — leaked literal).
+
+### Workspace tests
+
+- `cargo test -p adam-dialog --lib template_leak_guard_tests_v5171` — 6/6.
+- `cargo test --workspace --locked --no-fail-fast` — **1 317 passing** (+6 from realiser guard tests).
+- `cargo fmt --all --check` + `cargo clippy --all-targets -- -D warnings` clean.
+- `scripts/check_metrics_currency.sh` clean.
+
+### Why x.17.1
+
+Sequential cadence (.0 → .1). Patch — pure defensive guard + 6 unit tests; no public API change beyond the private helper. The fallback string is a string constant (`TEMPLATE_LEAK_FALLBACK`) and may be promoted to a template-family lookup in a future release for variation.
+
+Stripe — Deterministic AI research (no template-leak class of bug can reach a user from v5.17.1 onward).
+
 ## [5.17.0] — 2026-05-11 — Adversarial dialog benchmark D1 (Codex audit priority D, batch 1 of 4)
 
 **Minor.** Opens the Codex 2026-05-11 audit's medium-term priority **D** — «adversarial dialog benchmark на 200–500 реальных запросов, где проверяется не substring, а answer relevance». v5.17.0 ships the scaffold + first 50 queries; v5.17.1/2/5 will extend to 150/300/500 and add relevance scoring + CI gate.

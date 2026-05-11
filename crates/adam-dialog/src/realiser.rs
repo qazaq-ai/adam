@@ -40,6 +40,9 @@ use crate::slot_syntax::{parse_noun_features, parse_placeholder};
 /// into the first alphabetic codepoint past the opening quote.
 pub fn realise(plan: &ResponsePlan) -> String {
     let raw = expand_template(&plan.literal, &plan.slots, None, 0);
+    if contains_unfilled_placeholder(&raw) {
+        return TEMPLATE_LEAK_FALLBACK.to_string();
+    }
     let cased = capitalise_first_letter(&raw);
     ensure_sentence_final(&cased)
 }
@@ -68,8 +71,49 @@ pub fn realise_with_inventory(
     rng_seed: u64,
 ) -> String {
     let raw = expand_template(&plan.literal, &plan.slots, inventory, rng_seed);
+    if contains_unfilled_placeholder(&raw) {
+        return TEMPLATE_LEAK_FALLBACK.to_string();
+    }
     let cased = capitalise_first_letter(&raw);
     ensure_sentence_final(&cased)
+}
+
+/// **v5.17.1 — adversarial D1 fix (mta_02 critical).** Last-line
+/// safety net for the realiser. Any `{slot}` placeholder still
+/// present in the expanded template means a planner / slot-extraction
+/// bug routed an intent to a template whose required slots were not
+/// populated (e.g. `StatementOfAge { years: None }` routed to the
+/// `statement_of_age` family whose templates all reference `{age}`).
+/// Pre-v5.17.1 the unfilled placeholder leaked to the user as
+/// literal text — and worse, `capitalise_first_letter` then
+/// uppercased the placeholder's first letter, producing strings
+/// like `{Age} — жақсы жас.`. v5.17.0 adversarial_dialog_v1
+/// surfaced this in `mta_02`.
+///
+/// This guard is **defensive** — it doesn't try to recover the
+/// missing data, only to keep the user-facing output trustworthy.
+/// The real fix lives in the planner / slot extractor (don't route
+/// to `statement_of_age` without an `age` slot); this is the last
+/// line of defense.
+const TEMPLATE_LEAK_FALLBACK: &str = "Сұрағыңызды толық түсінбедім. Аздап нақтылап жіберіңізші.";
+
+fn contains_unfilled_placeholder(rendered: &str) -> bool {
+    // Single canonical signal: every unfilled placeholder leaves a
+    // literal `{name}` or `{name|features}` substring (see
+    // `expand_placeholder`'s `return format!("{{{inner}}}")` path).
+    // No false positives from natural Kazakh text — `{` and `}` are
+    // not used in normal prose.
+    if let Some(open) = rendered.find('{')
+        && let Some(rel_close) = rendered[open..].find('}')
+    {
+        let inner = &rendered[open + 1..open + rel_close];
+        return !inner.is_empty()
+            && inner
+                .chars()
+                .next()
+                .is_some_and(|c| c.is_ascii_alphabetic());
+    }
+    false
 }
 
 /// **v4.6.5** — declarative replies should end with a sentence-
@@ -125,6 +169,51 @@ fn capitalise_first_letter(s: &str) -> String {
         }
     }
     out
+}
+
+#[cfg(test)]
+mod template_leak_guard_tests_v5171 {
+    use super::contains_unfilled_placeholder;
+
+    #[test]
+    fn flags_bare_slot_v5171() {
+        assert!(contains_unfilled_placeholder("{age} — жақсы жас"));
+    }
+
+    #[test]
+    fn flags_capitalized_slot_v5171() {
+        // Realiser's `capitalise_first_letter` runs after expansion,
+        // so a leaked `{age}` at the start of the string becomes
+        // `{Age}` by the time the user sees it. Both shapes must be
+        // caught here — the guard runs BEFORE the casing pass.
+        assert!(contains_unfilled_placeholder("{Age} — жақсы жас"));
+    }
+
+    #[test]
+    fn flags_slot_with_features_v5171() {
+        assert!(contains_unfilled_placeholder("{city|locative} тұрасыз ба"));
+    }
+
+    #[test]
+    fn does_not_flag_plain_text_v5171() {
+        assert!(!contains_unfilled_placeholder("Сәлем, Дәулет!"));
+    }
+
+    #[test]
+    fn does_not_flag_empty_braces_v5171() {
+        // Empty `{}` is suspicious but not a template placeholder
+        // (placeholders always have an alphabetic identifier inside).
+        // Better to let it through than to spuriously fire the guard.
+        assert!(!contains_unfilled_placeholder("{}"));
+    }
+
+    #[test]
+    fn does_not_flag_punctuation_inside_braces_v5171() {
+        // Defensive: braces around non-alphabetic content (Kazakh
+        // typesetting rarely uses curly braces, but they could appear
+        // in user-pasted code/math).
+        assert!(!contains_unfilled_placeholder("{1+2}"));
+    }
 }
 
 #[cfg(test)]
