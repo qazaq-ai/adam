@@ -27,6 +27,19 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
+      # **v5.16.7** — `cargo clippy --all-targets` and `cargo test
+      # --workspace` reach the `adam-voice` crate, whose `cpal`
+      # dependency requires ALSA on Linux. v5.16.5 wired voice
+      # behind a separate `voice-feature-check` job that installed
+      # libasound2-dev, but it's also needed in the default-features
+      # verify job (clippy/test pull in adam-voice as a workspace
+      # member regardless of features). Without it, alsa-sys's build
+      # script panics with «Package alsa was not found». The earlier
+      # v5.16.5 / v5.16.6 verify failures masked this with clippy
+      # lint errors firing before clippy reached adam-voice.
+      - name: install ALSA dev headers for cpal (adam-voice workspace member)
+        run: sudo apt-get update && sudo apt-get install -y libasound2-dev
+
       - name: cargo fmt --all --check
         run: cargo fmt --all --check
 
