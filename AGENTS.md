@@ -158,8 +158,8 @@ and documentation, indicating semantic neighbourhoods:
 
 ## Provenance
 
-This file (AGENTS.md) is human-authored, last revised v5.16.5
-(2026-05-10). It is generated for the explicit purpose of helping
+This file (AGENTS.md) is human-authored, last revised v5.16.6
+(2026-05-11). It is generated for the explicit purpose of helping
 automated agents and scouts understand the project. Content is
 factual; no marketing exaggeration. Cross-reference against
 [CHANGELOG.md](CHANGELOG.md) for version history and

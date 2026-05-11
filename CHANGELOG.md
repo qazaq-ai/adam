@@ -21,6 +21,30 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.16.6] — 2026-05-11 — CI clippy follow-up (collapsible_match + unnecessary_sort_by allow)
+
+**Patch.** v5.16.5 re-armed public-repo CI, but the first auto-run on `main` surfaced two clippy lints that older toolchains never flagged. Both are stylistic-preference, same family as the already-allowed `collapsible_if` and `manual_checked_ops`. This patch adds them to the workspace `[lints.clippy]` allow list so the verify job goes green.
+
+### What changed
+
+**1. `Cargo.toml` — two new `allow` entries.**
+
+- `collapsible_match = "allow"` — 8 occurrences in `crates/adam-dialog/src/{quality.rs,sentence_decomp.rs}` where `match Role::X => { if guard { ... } }` reads more clearly than match-arm guards (`Role::X if guard => ...`). Same family as the already-allowed `collapsible_if`: nested form is clearer for the planner / role-assignment layers.
+- `unnecessary_sort_by = "allow"` — 1 occurrence in `crates/adam-dialog/src/dialog_context.rs:207` where `tally.sort_by(|a, b| b.1.cmp(&a.1))` makes the descending intent obvious without importing `std::cmp::Reverse`. Stylistic preference, not a correctness issue.
+
+**2. Version bump.** Workspace `5.16.5` → `5.16.6`; Cargo.lock regenerated; CITATION.cff / codemeta.json / README badge / AGENTS.md / docs/performance.md refreshed per `feedback_release_docs`.
+
+### Why x.y.6 (not x.y.10)
+
+The user's `feedback_sequential_versioning` rule applies: next tag = previous + one step. Previous patch was `.5`, so this is `.6`. Pure CI-housekeeping; no code paths touched.
+
+### Verified
+
+- `cargo clippy --all-targets -- -D warnings` clean locally (`unknown lint` warnings on older toolchain for `manual_checked_ops` are benign and don't escalate; CI runs newer Rust where every workspace lint resolves).
+- `cargo test --workspace --locked` unchanged from v5.16.5.
+
+Stripe — Deterministic AI research (CI hygiene; visible green build signal).
+
 ## [5.16.5] — 2026-05-11 — Public-repo CI re-armed (rust.yml + release.yml auto-triggers)
 
 **Patch milestone.** The repository was made public; GitHub Actions auto-triggers (disabled in v4.7.10 to quiet Actions-billing noise) are now restored so external contributors and casual visitors see a live CI badge.
