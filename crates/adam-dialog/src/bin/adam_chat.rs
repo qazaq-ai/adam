@@ -91,7 +91,14 @@ fn main() -> ExitCode {
     // printing it. `--tts-voice <name>` overrides voice detection.
     // **v5.1.0** — `--tts-backend piper --tts-model <path>` opts
     // into the optional Piper neural backend.
-    let tts_enabled = args.iter().any(|a| a == "--tts");
+    // **v5.14.6** — `--voice-input` implies `--tts`. A voice
+    // conversation that replies only in text is half a conversation;
+    // the user's first live-test reported this gap. We keep the
+    // ability to opt out (`--no-tts-on-voice`) for headless / CI
+    // contexts where the audio device is busy with capture.
+    let voice_input_flag = args.iter().any(|a| a == "--voice-input");
+    let no_tts_on_voice = args.iter().any(|a| a == "--no-tts-on-voice");
+    let tts_enabled = args.iter().any(|a| a == "--tts") || (voice_input_flag && !no_tts_on_voice);
     let tts_voice = args
         .windows(2)
         .find(|w| w[0] == "--tts-voice")
@@ -114,7 +121,7 @@ fn main() -> ExitCode {
     //   --whisper-bin <path>     override env ADAM_WHISPER_BIN
     //   --whisper-model <path>   GGML model file
     //   --whisper-language <kk>  Whisper language code (defaults to kk)
-    let voice_input = args.iter().any(|a| a == "--voice-input");
+    let voice_input = voice_input_flag;
     let whisper_bin_arg = args
         .windows(2)
         .find(|w| w[0] == "--whisper-bin")
@@ -380,7 +387,7 @@ fn main() -> ExitCode {
         "adam-chat v{} — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.\n\
          Multi-line code blocks: open with ``` and close with ``` on its own line.\n\
          Voice output: pass --tts (default OS voice; or --tts-backend piper --tts-model <path>).\n\
-         Voice input (build with --features voice): pass --voice-input (push-to-talk + whisper.cpp shell-out).",
+         Voice input (build with --features voice): pass --voice-input (push-to-talk + whisper.cpp shell-out; TTS auto-on, --no-tts-on-voice to disable).",
         env!("CARGO_PKG_VERSION")
     );
     let stdin = io::stdin();

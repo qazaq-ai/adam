@@ -21,6 +21,38 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.14.6] — 2026-05-10 — V0.2 — Voice-input live-test fixes (greeting variants + auto-TTS)
+
+**Patch milestone.** Two follow-ups from the second live-test of the voice transducer.
+
+### What changed
+
+**1. Greeting detector widened.** The user's live-test surfaced two gaps:
+
+- «Сәлеметсіз бе» was either fused by whisper-medium into «сәлеметсізба» / «сәлеметсізбе» (the «-сіз бе» tail merging into one token) or transcribed as «сәлямет…» / «саламет…» (vowel-quality drift). Pre-v5.14.6 the detector only matched the canonical Cyrillic surfaces; post-v5.14.6 it accepts the noisy variants.
+- Muslim/Arabic greetings («Ассалаумағалейкум» / «Уағалейкумассалам» / «ассалам алейкум») were not recognised at all. Common in spoken Kazakh; now route to `GreetingKind::Polite`.
+
+The casual branch («Сәлем») now also accepts the Russian-flavoured «Салем» / «Салам» / «Сәлемдер» mis-transcriptions whisper-medium produces.
+
+**2. Auto-TTS on `--voice-input`.** A voice conversation that replies only in text is half a conversation; the user's first live-test reported this. Post-v5.14.6 `--voice-input` implies `--tts` (OS-native backend by default, `say` on macOS, `espeak-ng` on Linux). Opt-out via `--no-tts-on-voice` for headless / CI contexts where the audio device is busy with capture.
+
+### Why `x.y.6`
+
+Pure follow-up patch on top of v5.14.5: detector-layer additions + one CLI-default change. No new public APIs; no architectural shift; voice arc roadmap unchanged. The remaining live-test ask — multi-sentence understanding («Здравствуйте, как ваши дела, давайте познакомимся») — is a capability (sentence-splitter + multi-intent composer) that belongs to v5.15.0 alongside the planned VAD work.
+
+### Tests
+
+- 2 unit tests in `semantics::tests::detect_greeting_*_v5146`:
+  - Muslim/Arabic surfaces (5 variants) → `Polite`
+  - Whisper mis-transcriptions (7 variants: fused «сәлеметсізба», dropped diacritics, Russian-flavoured «салем» / «салам») → `Polite` or `Casual` per shape
+- Workspace 1 284 passing (+2)
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --all-targets --features voice -- -D warnings` clean; `cargo test --workspace` 0 failures; `bash scripts/check_metrics_currency.sh` clean.
+
+**Stripe — Deterministic AI research (V0.2 voice-input live-test fixes; greeting variants + auto-TTS).**
+
 ## [5.14.5] — 2026-05-10 — V0.1 — Voice-input live-test fixes (mic stop bug + whisper model pre-flight)
 
 **Patch milestone.** Two real bugs surfaced by the first live test of v5.14.0 voice input. Architecturally minor; UX-critical.

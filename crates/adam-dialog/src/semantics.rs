@@ -532,14 +532,52 @@ fn detect_greeting(tokens: &[String], joined: &str) -> Option<Intent> {
             kind: GreetingKind::TimeOfDay(tod),
         });
     }
-    // Polite: "сәлеметсіз бе" / "сәлеметсің бе".
-    if joined.contains("сәлеметсіз") || joined.contains("сәлеметсің") {
+    // **v5.14.6** — Muslim/Arabic greeting surfaces (very common in
+    // spoken Kazakh, especially in religious or rural contexts).
+    // Whisper's Kazakh model tends to transcribe these in multiple
+    // ways: «ассалаумағалейкум» / «ассалам алейкум» / «асалам
+    // алейкум» / etc. We accept any «ассал…» / «алейкум» surface
+    // plus the reply form «уағалейкумассалам».
+    if joined.contains("ассал")
+        || joined.contains("асалам")
+        || joined.contains("алейкум")
+        || joined.contains("уағалейкум")
+        || joined.contains("уалейкум")
+    {
         return Some(Intent::Greeting {
             kind: GreetingKind::Polite,
         });
     }
-    // Casual: "сәлем".
-    if tokens.first().is_some_and(|t| t == "сәлем") {
+    // Polite: "сәлеметсіз бе" / "сәлеметсің бе".
+    // **v5.14.6** — extended to accept Whisper's common
+    // transcription variants («сәлем әсіпі» / «сәлямәтсізба» /
+    // «cәлеметсізба» — the «-сіз бе» tail spliced into one token
+    // is the dominant mis-tokenisation on small / medium models)
+    // plus the bare «сәлеметсізба» / «сәлеметсізбе» fused forms.
+    if joined.contains("сәлеметсіз")
+        || joined.contains("сәлеметсің")
+        || joined.contains("сәлеметсіз бе")
+        || joined.contains("сәлеметсізбе")
+        || joined.contains("сәлеметсізба")
+        || joined.contains("сәлямет")
+        || joined.contains("саламет")
+        || joined.contains("салеметсіз")
+    {
+        return Some(Intent::Greeting {
+            kind: GreetingKind::Polite,
+        });
+    }
+    // Casual: "сәлем" / Whisper-friendly variants («салем» / «салам»).
+    // **v5.14.6** — accept token starting positions other than
+    // index 0 because Whisper sometimes pads transcripts with
+    // hesitation noise tokens; the canonical greeting still wins
+    // when present anywhere in the first three tokens.
+    let casual_surfaces = ["сәлем", "салем", "салам", "сәлемдер"];
+    let casual_hit = tokens
+        .iter()
+        .take(3)
+        .any(|t| casual_surfaces.contains(&t.as_str()));
+    if casual_hit {
         return Some(Intent::Greeting {
             kind: GreetingKind::Casual,
         });
@@ -3452,6 +3490,73 @@ fn detect_insult(tokens: &[String], joined: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **v5.14.6** — extended greeting surfaces (Codex live-test
+    /// follow-up). Whisper-medium's Kazakh transcription is noisy
+    /// (the «-сіз бе» tail fuses into one token, «сәлем» often comes
+    /// back as «салем»), and Muslim Arabic surfaces «ассалаумағалейкум»
+    /// were missing entirely. v5.14.6 widens the detector for both
+    /// families and accepts mis-tokenised variants.
+    #[test]
+    fn detect_greeting_recognises_muslim_arabic_v5146() {
+        for surface in [
+            "ассалаумағалейкум",
+            "ассалам алейкум",
+            "асалам алейкум",
+            "ассалаумалейкум",
+            "уағалейкумассалам",
+        ] {
+            let joined = surface.to_lowercase();
+            let tokens: Vec<String> = joined.split_whitespace().map(String::from).collect();
+            let got = detect_greeting(&tokens, &joined);
+            assert!(
+                matches!(
+                    got,
+                    Some(Intent::Greeting {
+                        kind: GreetingKind::Polite
+                    })
+                ),
+                "expected Polite Greeting for {surface:?}, got {got:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn detect_greeting_recognises_whisper_mistranscriptions_v5146() {
+        // «Сәлеметсіз бе» often comes back fused as «сәлеметсізба» /
+        // «сәлеметсізбе» on whisper-medium; «сәлем» frequently
+        // surfaces as the Russian-flavoured «салем». All should
+        // route to a Polite or Casual greeting, never Unknown.
+        for (surface, expected_polite) in [
+            ("сәлеметсізба", true),
+            ("сәлеметсізбе", true),
+            ("сәлямет жатырсыз ба", true),
+            ("саламет ба", true),
+            ("салем", false),
+            ("салам", false),
+            ("сәлемдер", false),
+        ] {
+            let joined = surface.to_lowercase();
+            let tokens: Vec<String> = joined.split_whitespace().map(String::from).collect();
+            let got = detect_greeting(&tokens, &joined);
+            let ok = if expected_polite {
+                matches!(
+                    got,
+                    Some(Intent::Greeting {
+                        kind: GreetingKind::Polite
+                    })
+                )
+            } else {
+                matches!(
+                    got,
+                    Some(Intent::Greeting {
+                        kind: GreetingKind::Casual
+                    })
+                )
+            };
+            assert!(ok, "surface {surface:?} routed to {got:?}");
+        }
+    }
 
     /// v3.9.5 regression: «Неліктен» / «Неге» / «Қашан» etc. must not be
     /// extracted as a topic-noun. Pre-v3.9.5 the REPL would reply with
