@@ -66,6 +66,13 @@ unnecessary_get_then_check = "allow"
 # Redundant guards in match arms: keeping explicit guards for
 # self-documenting branches; trace clarity > terseness.
 redundant_guards = "allow"
+# **v5.16.5** — `manual_checked_ops` flagged by newer clippy in
+# adam-tokenizer; the existing arithmetic guards (`if denom != 0
+# { x / denom }`) are explicit and self-documenting. The clippy
+# suggestion (`x.checked_div(denom)`) returns Option<T> and would
+# force a let-Some / unwrap_or pattern that hides the zero-guard
+# intent. Stylistic preference, not a correctness issue.
+manual_checked_ops = "allow"
 
 [workspace.dependencies]
 serde = { version = "1.0", features = ["derive"] }
