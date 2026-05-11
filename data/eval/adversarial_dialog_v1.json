@@ -4,16 +4,13 @@
   "captured_date": "2026-05-11",
   "source": "Codex 2026-05-11 audit priority D, batch 1 of 4",
   "name": "adversarial_dialog_v1",
-  "_floor_policy": "ratcheting baseline: floor cannot decrease across releases. v5.17.0 baseline 0.84. v5.17.4 floor 0.86 (srf_04). v5.17.5 floor 0.92 (mta_03/05/08 anaphora batch). v5.17.6 floor 0.96 (mta_02 age recall + ctt_04 purpose trigger).",
-  "_known_failures_v5176": [
-    "fr_01: Алматы факт-lookup fails (geography_kz entry should match but retrieval misses) — deeper investigation (domain index? morpheme index? retrieval scoring?)",
-    "mta_06: «Тағы біреуін бер» does not recall session.last_exercise_topic — different mechanism (anaphoric «біреуін» = «one more»), needs anaphora resolver, not detector extension"
+  "_floor_policy": "ratcheting baseline: floor cannot decrease across releases. v5.17.0 baseline 0.84. v5.17.4 floor 0.86 (srf_04). v5.17.5 floor 0.92 (mta_03/05/08 anaphora batch). v5.17.6 floor 0.96 (mta_02 + ctt_04). v5.17.7 floor 1.0 — full closure of the 50-case v1 benchmark. Next: D2 extends to 150 cases.",
+  "_known_failures_v5177": [],
+  "_closed_v5177": [
+    "fr_01: «Алматы қайда орналасқан?» — closed by suppressing Hearsay routing when input has a question_shape. The Kazakh suffix `-қан/-ген` is morphologically ambiguous between past-evidential and perfective participle; in a question the participle reading is canonical. Planner fall-through now reaches the standard unknown.with_grounded_fact family which surfaces the curated geography_kz entry.",
+    "mta_06: «Тағы біреуін бер» — closed by two-part fix: (a) detect_ask_exercise accepts the anaphoric «тағы біреу-/біреуін/біреуі + give-verb» pattern (no practice noun); (b) Conversation::turn binds session.last_exercise_topic into the empty-topic AskExercise before planning."
   ],
-  "_closed_v5176": [
-    "mta_02: «Жасымды білесіз бе» — closed in two parts: (a) detect_statement_of_age now accepts dative-experiential «Маған N жас» (Turn 1 was leaving session.age unset); (b) detect_ask_age memory-probe extension catches «жасымды + білесіз/есіңізде/ұмыт» (Turn 2 1sg-poss-ACC + memory-verb)",
-    "ctt_04: «traits деген не үшін керек?» — closed by adding «не үшін керек» + «неге керек» to detect_ask_purpose has_why_marker (was only catching «не үшін арналған» / «неге арналған»)"
-  ],
-  "pass_rate_floor": 0.96,
+  "pass_rate_floor": 1.0,
   "cases": [
     {"id": "fr_01", "category": "factual_retrieval", "query": "Алматы қайда орналасқан?", "any_substring": ["қазақстан"]},
     {"id": "fr_02", "category": "factual_retrieval", "query": "Қазақстанның астанасы қай қала?", "any_substring": ["астана", "нұр-сұлтан"]},

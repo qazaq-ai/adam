@@ -643,6 +643,21 @@ impl Conversation {
         // purposes (planner picks a response without asking back).
         let mut intent = resolve_follow_up(raw_intent, input, self.active_intent);
 
+        // **v5.17.7 — adversarial D1 mta_06 closure.** Anaphoric
+        // exercise recall: «Тағы біреуін бер» («give one more») —
+        // detect_ask_exercise's v5.17.7 anaphor branch routes the
+        // turn to `AskExercise { topic: None }`; here we bind the
+        // missing topic from `session.last_exercise_topic`, recorded
+        // by the prior AskExercise turn (v4.95.5 plumbing). Without
+        // this hook the empty-topic AskExercise routes to
+        // `ask_exercise.no_topic` (clarification), making the user
+        // re-type the topic instead of getting one more exercise.
+        if matches!(intent, Intent::AskExercise { topic: None })
+            && let Some(last) = self.session.get("last_exercise_topic").cloned()
+        {
+            intent = Intent::AskExercise { topic: Some(last) };
+        }
+
         // **v4.76.5** — comparison shape detection. «X пен Y
         // айырмашылығы қандай?» — extract X as primary topic so the
         // existing retrieval pipeline finds X's definition; carry Y

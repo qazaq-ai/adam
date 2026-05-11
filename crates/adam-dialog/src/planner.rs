@@ -2072,7 +2072,29 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             // polarity + modality checks (those have higher
             // priority — when both fire, the more salient signal
             // wins).
-            if matches!(input_evidence, Some(adam_kernel_fst::EvidenceKind::Hearsay)) {
+            // **v5.17.7 — adversarial D1 fr_01 closure.** Suppress
+            // Hearsay routing when the input is a QUESTION. The
+            // Kazakh suffix `-қан/-ген` is morphologically ambiguous
+            // between past-evidential («I heard it happened») and
+            // perfective participle / relative clause («which is
+            // located»). FST tags both as `EvidenceKind::Hearsay`
+            // by default, but in a question shape («X **қайда**
+            // орналасқан?» = «where is X located?») the participle
+            // reading is canonical — the user is asking a factual
+            // question, not reporting hearsay. Pre-v5.17.7 «Алматы
+            // қайда орналасқан?» routed to `unknown.with_hearsay_hedge`
+            // and surfaced «Сіз естіген сөз болса керек, бірақ мен
+            // тексере алмаймын», suppressing a perfectly available
+            // grounded_fact («Алматы — Қазақстанның республикалық
+            // маңызы бар қаласы»). Codex 2026-05-11 adversarial
+            // benchmark fr_01.
+            //
+            // The fall-through proceeds to the standard
+            // `unknown.with_grounded_fact` family below, which
+            // surfaces the actual curated answer.
+            if matches!(input_evidence, Some(adam_kernel_fst::EvidenceKind::Hearsay))
+                && question_shape.is_none()
+            {
                 return "unknown.with_hearsay_hedge";
             }
             // **v4.23.0** — `temporal_scope: true` short-circuits to

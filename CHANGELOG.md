@@ -21,6 +21,71 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.17.7] — 2026-05-11 — 🎯 Adversarial D1 full closure: 50/50 = 100% (floor 96% → 100%)
+
+**Patch.** Closes the **final 2 failures** from the v5.17.0 adversarial benchmark queue. Adversarial v1 is now **50/50 = 100%** with all 6 categories at 100%. Floor raised to **1.0** (was 0.96). v5.17.x quick-win cycle complete.
+
+### What was wrong
+
+**`fr_01` — «Алматы қайда орналасқан?»** routed to `unknown.with_hearsay_hedge` («Сіз естіген сөз болса керек, бірақ мен тексере алмаймын») instead of surfacing the curated `geography_kz` entry («Алматы — Қазақстанның республикалық маңызы бар қаласы»). The Kazakh suffix `-қан/-ген` is morphologically ambiguous between past-evidential («I heard it happened») and perfective participle / relative clause («which is located»). FST tags both as `EvidenceKind::Hearsay`, but inside a question the participle reading is canonical — the user is asking a factual question, not reporting hearsay.
+
+**`mta_06` — «Тағы біреуін бер»** routed to `Unknown` because `detect_ask_exercise` required a practice noun («жаттығу» / «тапсырма» / «есеп»). The anaphoric request («give one more (of those)») doesn't have a practice noun — it's anaphoric to the previous exercise turn. Session already carries `last_exercise_topic` (v4.95.5 plumbing), but no detector/resolver bridged the gap.
+
+### What changed
+
+**`planner.rs:2075` — Hearsay-suppression hook.** When `input_evidence == Some(Hearsay)` AND `question_shape.is_none()` → route to `unknown.with_hearsay_hedge`. Otherwise (any question shape) fall through to the standard `unknown.with_grounded_fact` path. Single-line condition change; preserves Hearsay routing for non-question inputs (regression-guarded).
+
+**`semantics.rs:detect_ask_exercise` — anaphor branch.** After the standard practice-noun + give-verb gate, a fallback: `«тағы» + («біреуін» | «біреуі» | «біреу»)` + give-verb → `AskExercise { topic: None }`. Detector intentionally returns no topic — resolution to session happens later.
+
+**`conversation.rs:Conversation::turn` — anaphor resolution hook.** Immediately after `resolve_follow_up`, if `intent == AskExercise { topic: None }` AND `session.last_exercise_topic` is set, bind the missing topic. This makes the «one more» request reuse the active lesson context without re-typing.
+
+### Adversarial benchmark final state
+
+| Category | v5.17.6 | **v5.17.7** |
+|---|---|---|
+| factual_retrieval | 7/8 (88%) | **8/8 (100%)** |
+| multi_turn_anaphora | 7/8 (88%) | **8/8 (100%)** |
+| safety_refusal | 8/8 | 8/8 |
+| code_tutor_traps | 8/8 | 8/8 |
+| language_guards | 8/8 | 8/8 |
+| ambiguous_followup | 10/10 | 10/10 |
+| **Overall** | **48/50 (96%)** | **🎯 50/50 (100%)** |
+
+### Adversarial v1 cycle summary
+
+| Release | Overall | Floor | Closed cases |
+|---|---|---|---|
+| v5.17.0 | 42/50 (84%) | 0.84 | baseline established |
+| v5.17.1-3 | 42/50 | 0.84 | mta_02 leak symptom (structural realiser guard) |
+| v5.17.4 | 43/50 (86%) | 0.86 | srf_04 (legal safety leak) |
+| v5.17.5 | 46/50 (92%) | 0.92 | mta_03/05/08 (anaphora paradigm) |
+| v5.17.6 | 48/50 (96%) | 0.96 | mta_02 + ctt_04 |
+| **v5.17.7** | **50/50 (100%)** | **1.0** | **fr_01 + mta_06** |
+
+8 production bugs surfaced and fixed across one v5.17.x cycle, with the realiser guard as a structural shield against the entire template-leak class.
+
+### Verified
+
+- 3 new tests in `tests/d1_closure_v5177.rs` (intent routing + end-to-end mta_06 recall; fr_01 end-to-end is covered by the adversarial benchmark which loads the full retrieval runtime).
+- `cargo test --workspace --locked --no-fail-fast` — **1 344 passing** (+3).
+- `cargo fmt --all --check` + `cargo clippy --all-targets -- -D warnings` clean.
+
+### What's next
+
+D1 (50 cases, 6 categories) is closed at 100%. Codex's medium-term D-track continues:
+
+- **D2** — extend to 150 cases (next priorities: bilingual code-switching, dialectal Kazakh variants, multi-step math reasoning, contradiction-resolution scenarios).
+- **D3** — extend to 300 cases + add per-case `relevance_score` (topic-overlap + fact_id citation + hedge presence) instead of pure substring matching.
+- **D4** — extend to 500 cases + CI gate on per-category floor.
+
+Parallel tracks (also from Codex audit):
+
+- **E** — voice golden audio corpus + WER/CER metrics (voice arc V3, v5.18+).
+- **F** — school pilot (outreach, requires school MOU).
+- **G** — second-language spike (Karakalpak or Kyrgyz porting estimate).
+
+Stripe — Deterministic AI research (first adversarial benchmark fully closed; 100% all categories; investor-grade signal).
+
 ## [5.17.6] — 2026-05-11 — Quick-win batch: age recall + traits purpose (mta_02 + ctt_04 closure, floor 92% → 96%)
 
 **Patch.** Closes 2 of the 4 remaining open failures from the v5.17.0 adversarial benchmark queue with trigger extensions. Adversarial baseline 46/50 (92%) → **48/50 (96%)**. Five of six categories now at 100% — only `factual_retrieval` (7/8) and `multi_turn_anaphora` (7/8) remain imperfect.

@@ -985,7 +985,20 @@ fn detect_ask_exercise(joined: &str) -> bool {
         || joined.contains("мақұл")
         || joined.contains("келісемін")
         || joined.contains("қабыл алам");
-    has_practice_noun && has_give_verb && !is_definitional && !is_acknowledgement
+    if has_practice_noun && has_give_verb && !is_definitional && !is_acknowledgement {
+        return true;
+    }
+    // **v5.17.7 — adversarial D1 mta_06 closure.** Anaphoric exercise
+    // request: «Тағы біреуін бер» / «Тағы біреуін ұсын» / «Тағы
+    // біреу бер» — «give one more (of those)». The practice noun
+    // is missing because it's anaphoric to the previous turn's
+    // exercise. Pair the anaphor («тағы» + «біреу-» = «one more»)
+    // with the give-verb only. The session's `last_exercise_topic`
+    // slot — set by the prior `AskExercise` turn — supplies the
+    // topic at the planner stage (conversation.rs hook).
+    let has_anaphor = joined.contains("тағы")
+        && (joined.contains("біреуін") || joined.contains("біреуі") || joined.contains("біреу"));
+    has_anaphor && has_give_verb && !is_definitional && !is_acknowledgement
 }
 
 /// **v4.93.5** — Codex P2: detect "write code / show example" requests.
