@@ -1422,7 +1422,8 @@ fn pedagogical_topic_hint(input: &str) -> Option<String> {
     // canonicalise to the stage id BEFORE the generic latin /
     // multiword hints fire (otherwise multiword_entity_hint catches
     // «қарыз алу» as the literal phrase before we get a chance to
-    // map it to "borrow"). Order: kazakh_aliases > latin > multiword.
+    // map it to "borrow"). Order: kazakh_aliases > latin_aliases >
+    // latin > multiword.
     let lower = input.to_lowercase();
     let kazakh_aliases: &[(&str, &str)] = &[
         ("иелік", "ownership"),
@@ -1437,6 +1438,33 @@ fn pedagogical_topic_hint(input: &str) -> Option<String> {
         ("асинхрон", "async"),
     ];
     for (alias, canonical) in kazakh_aliases {
+        if lower.contains(alias) {
+            return Some(canonical.to_string());
+        }
+    }
+    // **v5.16.10 — Codex 2026-05-11 audit priority C.** Latin
+    // surface forms of the same 5 curriculum stages, checked BEFORE
+    // `latin_subject_hint` (which would otherwise grab the first
+    // latin token — typically `rust` from «Rust-та …» — and stop).
+    // Without this list, «Rust-та borrowing бойынша жаттығу бер»
+    // returned `topic = Some("rust")`, which doesn't match any
+    // curriculum stage; `exercise_body` stayed empty and the
+    // planner routed to `ask_exercise.no_topic` (clarification),
+    // exactly the failure Codex flagged: «не вытащил topic и
+    // попросил уточнить». Order: longer surface forms first so
+    // «ownership» wins over a future «own…» prefix, etc.
+    let latin_aliases: &[(&str, &str)] = &[
+        ("ownership", "ownership"),
+        ("borrowing", "borrow"),
+        ("borrow", "borrow"),
+        ("lifetimes", "lifetime"),
+        ("lifetime", "lifetime"),
+        ("traits", "traits"),
+        ("trait", "traits"),
+        ("asynchronous", "async"),
+        ("async", "async"),
+    ];
+    for (alias, canonical) in latin_aliases {
         if lower.contains(alias) {
             return Some(canonical.to_string());
         }

@@ -21,6 +21,56 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.16.10] — 2026-05-11 — Latin curriculum aliases for AskExercise (Codex audit priority C)
+
+**Patch.** Closes priority **C** (last of the Codex 2026-05-11 audit's three quick-win priorities). Fixes the «Учебный домен пока brittle: `Rust-та borrowing бойынша жаттығу бер` не вытащил topic» failure mode.
+
+### What was wrong
+
+The `AskExercise` intent recognizer (v4.93.5) and the canonical Kazakh aliases — `иелік→ownership`, `қарыз→borrow`, `өмір кезеңі→lifetime`, `қасиет→traits`, `асинхрон→async` (v5.2.5) — all worked. **But latin surface forms of the same five curriculum stages fell through.** «borrowing» / «ownership» / «lifetimes» / «traits» / «async» were never mapped to canonical stage ids; the topic extractor's `latin_subject_hint` then grabbed the first latin token in the input — for the Codex test phrase «Rust-та borrowing бойынша жаттығу бер», that token was `rust`. Topic `Some("rust")` matched no curriculum stage; `curriculum.stage(t)` returned `None`; `exercise_body` stayed empty; planner routed to `ask_exercise.no_topic` (clarification) instead of `ask_exercise.with_topic` (real exercise).
+
+User-visible failure exactly as Codex described: «попросил уточнить, хотя человек ожидает упражнение».
+
+### What changed
+
+**1. `semantics::pedagogical_topic_hint` — new `latin_aliases` list.** Checked AFTER Kazakh aliases (kept for backward compatibility — «иелік» still wins) but BEFORE `latin_subject_hint` (so `rust` from «Rust-та …» no longer captures the topic slot). Mappings:
+
+| Latin surface | Canonical stage |
+|---|---|
+| `ownership` | `ownership` |
+| `borrowing`, `borrow` | `borrow` |
+| `lifetimes`, `lifetime` | `lifetime` |
+| `traits`, `trait` | `traits` |
+| `asynchronous`, `async` | `async` |
+
+Longer surface forms appear first (`lifetimes` before `lifetime`, `borrowing` before `borrow`, `asynchronous` before `async`) so the more specific form wins on `contains`-based matching.
+
+**2. Seven unit tests in `tests/codex_priority_c_v5_16_10.rs`** — one per stage (covering the exact Codex phrase + four siblings), plus a regression-guard test verifying that a bare «Rust бойынша жаттығу бер» (no stage) is *not* misclaimed as a curriculum stage.
+
+### Live-verified
+
+| Input | Pre-v5.16.10 | Post-v5.16.10 |
+|---|---|---|
+| `Rust-та borrowing бойынша жаттығу бер` | «Жаттығу қандай тақырып бойынша қалайсыз? Мысалы: ownership, lifetimes, traits, async, error handling, iterators.» (clarification) | «Қазір borrow жаттығуын беремін: …» + broken Rust snippet + Kazakh hint |
+| `Иелік бойынша жаттығу беріңізші` (Kazakh, regression check) | ownership exercise | ownership exercise — unchanged |
+
+### Verified
+
+- `cargo test --workspace --locked --no-fail-fast` — **1 309 passing** (+6: 7 new latin-alias tests; -1 corrected for the new expected behavior).
+- `cargo fmt --all --check` + `cargo clippy --all-targets -- -D warnings` clean.
+- `scripts/check_metrics_currency.sh` clean.
+- `scripts/verify_release_version.sh 5.16.10` passes.
+
+### Codex audit closed
+
+- ✅ A (validate_world_core CI gate) — v5.16.8.
+- ✅ B (multi-clause safety short-circuit) — v5.16.9.
+- ✅ **C (Rust-tutor latin curriculum aliases)** — this release.
+
+All three Codex 2026-05-11 quick-win priorities closed in <24 h. Medium-term items (D adversarial benchmark, E voice golden corpus, F school pilot, G second-language spike) remain on the roadmap.
+
+Stripe — Deterministic AI research (tutor surface fluent in Kazakh AND latin curriculum vocabulary).
+
 ## [5.16.9] — 2026-05-11 — Multi-clause splitter safety-refusal short-circuit (Codex audit priority B)
 
 **Patch.** Closes priority **B** of the Codex 2026-05-11 audit. Fixes the «отказал правильно, потом выдал нерелевантные уточнения/пословицу» failure mode where a compound user utterance with a safety-refused first clause still emitted irrelevant follow-ups for the remaining clauses.
