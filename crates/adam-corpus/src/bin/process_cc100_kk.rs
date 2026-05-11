@@ -131,7 +131,7 @@ fn main() -> ExitCode {
         if state.is_finished() {
             break;
         }
-        if state.lines_scanned() % 500_000 == 0 {
+        if state.lines_scanned().is_multiple_of(500_000) {
             eprintln!(
                 "progress: scanned={} accepted={} shards_written={}",
                 state.lines_scanned(),

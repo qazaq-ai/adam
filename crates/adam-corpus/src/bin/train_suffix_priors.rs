@@ -231,7 +231,7 @@ fn main() -> ExitCode {
     let mut analysed_forms: u64 = 0;
     for token in unique_tokens.keys() {
         analysed_forms += 1;
-        if analysed_forms % 25_000 == 0 {
+        if analysed_forms.is_multiple_of(25_000) {
             eprintln!(
                 "train_suffix_priors: analysed {} / {} unique forms",
                 analysed_forms, unique_total

@@ -164,7 +164,7 @@ fn main() -> ExitCode {
     let mut analysed = 0u64;
     for token in &unique_tokens {
         analysed += 1;
-        if analysed % 25_000 == 0 {
+        if analysed.is_multiple_of(25_000) {
             eprintln!(
                 "train_root_affinity: analysed {} / {} unique forms",
                 analysed, unique_total
