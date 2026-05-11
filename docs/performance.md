@@ -1,4 +1,4 @@
-# Performance — adam v5.16.7
+# Performance — adam v5.16.8
 
 ## Headline KPI: cost per correct answer
 
@@ -39,7 +39,7 @@ The new `adam_resource_bench` binary runs a representative 30-query batch (10 fa
 | peak RSS | ~300 MB |
 | **GPU usage** | **0.0 %** |
 
-**Note:** the historical 1.07 ms / ~80 MB figures elsewhere reflect a leaner subset (single-fact retrieval without full reasoning runtime). The resource_bench loads the entire production runtime (morpheme index + 3 384 facts + 37 014 derived facts + suffix priors + root affinity + domain index + world_core), so its RSS / latency numbers are higher and represent the production worst case.
+**Note:** the historical 1.07 ms / ~80 MB figures elsewhere reflect a leaner subset (single-fact retrieval without full reasoning runtime). The resource_bench loads the entire production runtime (morpheme index + 3 404 facts + 37 062 derived facts + suffix priors + root affinity + domain index + world_core), so its RSS / latency numbers are higher and represent the production worst case.
 
 ### Comparison vs. published probabilistic LLM baselines
 

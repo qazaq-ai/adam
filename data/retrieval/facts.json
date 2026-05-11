@@ -1,7 +1,7 @@
 {
-  "version": "5.4.6",
-  "status": "world_core_refresh",
-  "elapsed_s": 0,
+  "version": "5.16.7",
+  "status": "completed",
+  "elapsed_s": 34,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3384,
+    "facts_total": 3404,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2818,
+      "is_a": 2838,
       "lives_in": 8,
       "part_of": 244,
       "related_to": 123
@@ -80,7 +80,7 @@
       "world_core/physics_school.jsonl": 138,
       "world_core/plants.jsonl": 35,
       "world_core/preschool_alphabet.jsonl": 48,
-      "world_core/preschool_numbers.jsonl": 16,
+      "world_core/preschool_numbers.jsonl": 36,
       "world_core/preschool_routine.jsonl": 13,
       "world_core/preschool_shapes.jsonl": 12,
       "world_core/preschool_sizes.jsonl": 13,
@@ -42443,6 +42443,406 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Оныншы — реттің он санды білдіретін реттік сан есімі. Мысал: оныншы сынып, оныншы парақ."
+    },
+    {
+      "subject": {
+        "surface": "бір",
+        "root": "бір",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бір — қазақ тіліндегі бірінші есептік сан есім. Заттың саны бір екенін көрсетеді. Реттік түрі: бірінші. Мысал: бір алма, бір қала."
+    },
+    {
+      "subject": {
+        "surface": "екі",
+        "root": "екі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Екі — қазақ тіліндегі екінші есептік сан есім. Заттың саны екі екенін көрсетеді. Реттік түрі: екінші. Мысал: екі бала, екі күн."
+    },
+    {
+      "subject": {
+        "surface": "үш",
+        "root": "үш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үш — қазақ тіліндегі үшінші есептік сан есім. Заттың саны үш екенін көрсетеді. Реттік түрі: үшінші. Мысал: үш ағаш, үш сағат."
+    },
+    {
+      "subject": {
+        "surface": "төрт",
+        "root": "төрт",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Төрт — қазақ тіліндегі төртінші есептік сан есім. Реттік түрі: төртінші. Мысал: төрт дөңгелек, төрт мезгіл."
+    },
+    {
+      "subject": {
+        "surface": "бес",
+        "root": "бес",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бес — қазақ тіліндегі бесінші есептік сан есім. Реттік түрі: бесінші. Мысал: бес саусақ, бес минут."
+    },
+    {
+      "subject": {
+        "surface": "алты",
+        "root": "алты",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Алты — қазақ тіліндегі алтыншы есептік сан есім. Реттік түрі: алтыншы. Мысал: алты адам, алты ай."
+    },
+    {
+      "subject": {
+        "surface": "жеті",
+        "root": "жеті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жеті — қазақ тіліндегі жетінші есептік сан есім. Реттік түрі: жетінші. Мысал: жеті күн, жеті түрі."
+    },
+    {
+      "subject": {
+        "surface": "сегіз",
+        "root": "сегіз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сегіз — қазақ тіліндегі сегізінші есептік сан есім. Реттік түрі: сегізінші. Мысал: сегіз кітап, сегіз қанатты үй."
+    },
+    {
+      "subject": {
+        "surface": "тоғыз",
+        "root": "тоғыз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тоғыз — қазақ тіліндегі тоғызыншы есептік сан есім. Реттік түрі: тоғызыншы. Мысал: тоғыз планета, тоғыз сан."
+    },
+    {
+      "subject": {
+        "surface": "он",
+        "root": "он",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Он — қазақ тіліндегі оныншы есептік сан есім. Ондық санау жүйесінің негізі. Реттік түрі: оныншы. Мысал: он саусақ, он жыл."
+    },
+    {
+      "subject": {
+        "surface": "жиырма",
+        "root": "жиырма",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жиырма — қазақ тіліндегі есептік сан есім, мәні 20. Реттік түрі: жиырмасыншы. Мысал: жиырма күн, жиырма теңге."
+    },
+    {
+      "subject": {
+        "surface": "отыз",
+        "root": "отыз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Отыз — қазақ тіліндегі есептік сан есім, мәні 30. Реттік түрі: отызыншы. Мысал: отыз минут, отыз шақырым."
+    },
+    {
+      "subject": {
+        "surface": "қырық",
+        "root": "қырық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қырық — қазақ тіліндегі есептік сан есім, мәні 40. Реттік түрі: қырқыншы. Мысал: қырық жыл, қырық бала."
+    },
+    {
+      "subject": {
+        "surface": "елу",
+        "root": "елу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Елу — қазақ тіліндегі есептік сан есім, мәні 50. Реттік түрі: елуінші. Мысал: елу жыл, елу теңге."
+    },
+    {
+      "subject": {
+        "surface": "алпыс",
+        "root": "алпыс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Алпыс — қазақ тіліндегі есептік сан есім, мәні 60. Реттік түрі: алпысыншы. Мысал: алпыс минут, алпыс жыл."
+    },
+    {
+      "subject": {
+        "surface": "жетпіс",
+        "root": "жетпіс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жетпіс — қазақ тіліндегі есептік сан есім, мәні 70. Реттік түрі: жетпісінші. Мысал: жетпіс түсті кемпірқосақ."
+    },
+    {
+      "subject": {
+        "surface": "сексен",
+        "root": "сексен",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сексен — қазақ тіліндегі есептік сан есім, мәні 80. Реттік түрі: сексенінші. Мысал: сексен жасар қария."
+    },
+    {
+      "subject": {
+        "surface": "тоқсан",
+        "root": "тоқсан",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тоқсан — қазақ тіліндегі есептік сан есім, мәні 90. Реттік түрі: тоқсаныншы. Мысал: тоқсан тоғыз, тоқсан жыл."
+    },
+    {
+      "subject": {
+        "surface": "жүз",
+        "root": "жүз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жүз — қазақ тіліндегі есептік сан есім, мәні 100. Ондықтардың жоғарғы шегі. Реттік түрі: жүзінші. Мысал: жүз жыл, жүз теңге."
+    },
+    {
+      "subject": {
+        "surface": "мың",
+        "root": "мың",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "pn_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мың — қазақ тіліндегі есептік сан есім, мәні 1000. Үлкен сандардың негізі. Реттік түрі: мыңыншы. Мысал: мың теңге, мың кітап."
     },
     {
       "subject": {

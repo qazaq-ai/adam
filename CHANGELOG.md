@@ -21,6 +21,55 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.16.8] — 2026-05-11 — `validate_world_core` CI gate + duplicate-ID fix (Codex 2026-05-11 audit response)
+
+**Patch.** Closes the first of three quick wins from the Codex 2026-05-11 audit (A+B+C). Fixes the «validate_world_core silently broken» class of bug that lets duplicate IDs accumulate without ever surfacing in CI.
+
+### What was wrong
+
+Codex ran `cargo run --release -p adam-reasoning --bin validate_world_core` and the binary exited **1** with «20 entry/entries rejected»:
+
+```
+- duplicate id `num_001` (first seen in data/world_core/numbers.jsonl,
+                          again in data/world_core/preschool_numbers.jsonl)
+… num_001 .. num_020 …
+```
+
+`numbers.jsonl` (committed v3.x, the canonical cardinal-number pack) uses IDs `num_001..num_045`. `preschool_numbers.jsonl` (committed v4.98 for the curriculum arc) introduced 20 pedagogical entries with the same `num_001..num_020` IDs by accident — different content (the preschool pack carries extended «есептік сан есім / реттік түрі / мысал» explanations), same ID namespace. The validator correctly rejected them but **nothing in CI was running the validator**, so every release between v4.98 and v5.16.7 shipped with 20 silently-rejected entries.
+
+This is the exact kind of failure mode that breaks investor / auditor trust the moment they run the binary themselves — README claimed «3 384 curated facts», but the validator's accepted count was 3 364 because 20 were dropped on load.
+
+### What changed
+
+**1. ID rename in `preschool_numbers.jsonl`.** `num_001..num_020` → `pn_001..pn_020`. Only the conflicting prefix renamed; `num_bridge_*`, `num_compound_*`, `num_ord_*` IDs in the same file kept their existing names (no conflict with `numbers.jsonl`).
+
+**2. Derived artefacts regenerated.** `extract_facts` + `build_lexical_graph` + `run_reasoner` re-run against the cleaned world core:
+
+- facts.json: 3 384 → **3 404** facts (+20 — the 20 preschool entries now load)
+- derived_facts.json: 37 014 → **37 062** derivations (+48)
+- 10 active rules unchanged (R1/R2/R3/R5/R6/R7/R8/R9/R10/R11)
+
+**3. CI gate added.** `.github/workflows/rust.yml` verify job now runs `cargo run --release -p adam-reasoning --bin validate_world_core` between `validate_foundation.sh` and `check_metrics_currency.sh`. From v5.16.8 forward, any duplicate ID / missing field / non-Kazakh character in `kk` text is a hard CI failure.
+
+**4. Docs refresh.** README badges + table, AGENTS provenance, docs/performance.md resource_bench note, data/README.md world_core / retrieval rows, `adam-reasoning/src/lib.rs` doc-comment — all bumped to the new counts. `validate_world_core` CI-enforcement called out explicitly in data/README.md.
+
+### Why x.y.8
+
+Sequential cadence: previous patch was `.7`, this is `.8`. Patch increment because: data correction + CI hygiene; no public API change; no behavioural shift in the kernel path. The +20 facts / +48 derivations are data-correctness improvements, not capability additions.
+
+### Verified
+
+- `cargo run --release -p adam-reasoning --bin validate_world_core` exits **0**: «OK — 3144 entries / 3144 approved / 3404 facts».
+- `cargo fmt --all --check` clean.
+- `cargo clippy --all-targets -- -D warnings` clean.
+- `scripts/verify_release_version.sh 5.16.8` passes.
+
+### What's next from the Codex audit
+
+This release closes priority **A** (validate_world_core gate). Priority **B** (multi-clause splitter overreach on safety-refused turns) and **C** (Rust-tutor «жаттығу бер» intent miss) are scheduled for v5.16.9 / v5.16.10.
+
+Stripe — Deterministic AI research (auditor-grade data integrity; first response to external Codex audit closed in <24 h).
+
 ## [5.16.7] — 2026-05-11 — Docs currency refresh (1 155 → 1 300 tests; 35 469 → 37 014 derived facts; voice arc V0→V2 scope)
 
 **Patch.** v5.16.6 closed the public-repo CI restoration cycle (green on commit 4ebbc95). This patch refreshes documentation across the repo so every numeric / version / scope claim matches the actual state of the codebase. Pure docs-only — no code paths touched.

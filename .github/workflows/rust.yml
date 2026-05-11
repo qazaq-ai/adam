@@ -53,6 +53,16 @@ jobs:
         run: bash ./scripts/validate_foundation.sh
         if: ${{ hashFiles('scripts/validate_foundation.sh') != '' }}
 
+      # **v5.16.8** — `validate_world_core` is the hard gate for the
+      # «curated graph» claim in the README / MISSION / AGENTS. The
+      # binary rejects duplicate IDs, missing required fields, and
+      # non-Kazakh characters in `kk` text. Codex 2026-05-11 audit
+      # found 20 duplicate IDs (`num_001..num_020`) that escaped CI
+      # because this binary was never gated. Fixed in v5.16.8;
+      # gating from this release forward.
+      - name: validate_world_core
+        run: cargo run --release -p adam-reasoning --bin validate_world_core
+
       - name: check_metrics_currency.sh
         run: bash ./scripts/check_metrics_currency.sh
         if: ${{ hashFiles('scripts/check_metrics_currency.sh') != '' }}

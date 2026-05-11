@@ -22,8 +22,8 @@
 //!   IsA-transitivity, R2 Has-inheritance, R3 Has-via-PartOf, R5
 //!   shared-IsA → RelatedTo, R6 LivesIn-via-PartOf, R7 GoesTo-via-PartOf,
 //!   R8 After-transitivity, R9 PartOf-transitivity, R10 InDomain-
-//!   inheritance, R11 InDomain-shared-target. Yields 37 014 derivations
-//!   over the committed 3 384-fact graph. See [`reasoner`].
+//!   inheritance, R11 InDomain-shared-target. Yields 37 062 derivations
+//!   over the committed 3 404-fact graph. See [`reasoner`].
 //! - **World Core** (v3.9.0+): human-authored Kazakh knowledge packs
 //!   merged into the committed fact set with `ConfidenceKind::HumanApproved`
 //!   as the exclusive tier marker. See [`world_core`].
