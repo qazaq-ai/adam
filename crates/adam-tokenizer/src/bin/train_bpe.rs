@@ -249,7 +249,7 @@ fn main() -> ExitCode {
             *sentence = new_sentence;
         }
 
-        if rank % 200 == 0 {
+        if rank.is_multiple_of(200) {
             eprintln!(
                 "  rank {} / {}: merged '{}'+'{}' -> '{}' (freq {})",
                 rank, target_merges, best_left, best_right, merged, best_count

@@ -720,7 +720,7 @@ fn absorb_line(raw_line: &str, block_buf: &mut Option<String>) -> Option<String>
     if let Some(buf) = block_buf.as_mut() {
         buf.push('\n');
         buf.push_str(line);
-        if count_fences(buf) % 2 == 0 {
+        if count_fences(buf).is_multiple_of(2) {
             let assembled = std::mem::take(buf);
             *block_buf = None;
             return Some(assembled.trim().to_string());
