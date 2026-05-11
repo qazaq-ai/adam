@@ -21,6 +21,43 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.16.7] — 2026-05-11 — Docs currency refresh (1 155 → 1 300 tests; 35 469 → 37 014 derived facts; voice arc V0→V2 scope)
+
+**Patch.** v5.16.6 closed the public-repo CI restoration cycle (green on commit 4ebbc95). This patch refreshes documentation across the repo so every numeric / version / scope claim matches the actual state of the codebase. Pure docs-only — no code paths touched.
+
+### What changed
+
+**Numeric claims aligned to actual artefacts.** The following counts were last refreshed at v5.4.5 / v5.6.0 and had drifted:
+
+- **Tests**: `1 155` (and `1 150+`, `1 155+`) → `1 300` — actual workspace test count per CHANGELOG since v5.16.0. Touched README.md (badge + What's measurable table), AGENTS.md (vapourware-list + Measurable metrics table), MISSION.md (Three goals + scales-to-real-codebase paragraph), COLLABORATION.md (Why now + Test coverage).
+- **Derived facts**: `35 469` → `37 014` — actual count in `data/retrieval/derived_facts.json` (R1–R11, 10 active rules over the 3 384 committed facts). Touched README.md (badge) and docs/performance.md (resource_bench runtime note).
+- **Curated facts**: `3 325` → `3 384` — README.md «Curated facts» row (counts row in `facts.json`).
+- **Versioned releases**: `451+`, `461+` → `487+`, with «1 month» replaced by «5 weeks» (first commit 2026-04-07; today 2026-05-11). Touched same files.
+- **MISSION.md** «Current state (v5.3.5)» → `v5.16.6`.
+
+**Per-crate `lib.rs` doc-comment refresh.**
+
+- `adam-reasoning/src/lib.rs` — Forward-chaining reasoner: «5 active rules (R1/R2/R3/R5/R6/R7)» → «10 active rules (R1/R2/R3/R5/R6/R7/R8/R9/R10/R11) yielding 37 014 derivations over the committed 3 384-fact graph».
+- `adam-kernel-fst/src/lib.rs` — Lexicon: «~4.4 k curated + 11 919 Apertium imports» → «~25.5 k roots (13.6 k pure Kazakh + 11.9 k Apertium imports)».
+- `adam-voice/src/lib.rs` — Scope header «v5.14.0 (V0)» → «v5.16.0 (V2 shipped; V3–V5 pending)». Added VAD continuous listening (V1, v5.15.0), confidence gate (V2, v5.16.0), removed the «no confidence gate» bullet that V2 closed, and listed V3/V4/V5 milestones with their target releases.
+
+**Mission/voice-surface framing.** MISSION.md voice-surface bullet expanded from output-only («macOS Aru / Linux espeak-ng / optional Piper») to peripheral transducer for **both** directions, naming the Whisper STT + energy-VAD + confidence-gate input path (v5.14.0–v5.16.0).
+
+**Local cleanup (off-repo).** `target/` directory removed via `cargo clean` (22.4 GiB freed); gitignored data-artefacts (shards / external corpora / training checkpoints / derived packs) left in place per user direction.
+
+### Why x.y.7
+
+Sequential cadence: previous patch was `.6`, this is `.7`. Pure docs/positioning refresh — no public API change, no behavioural shift. Per `feedback_release_docs` + `feedback_docs_currency`: every release must keep all docs current; this patch closes the gap that had grown across the v5.4.x → v5.16.x corridor.
+
+### Verified
+
+- `cargo fmt --all --check` clean.
+- `cargo clippy --all-targets -- -D warnings` clean.
+- `scripts/verify_release_version.sh 5.16.7` passes.
+- All numeric claims cross-checked against `data/retrieval/facts.json` (counts.facts_total = 3 384), `data/retrieval/derived_facts.json` (counts.derived_facts = 37 014, by_rule keys → 10 rules), CHANGELOG.md headline counts (1 300 tests since v5.16.0), and `git tag | wc -l` (487).
+
+Stripe — Deterministic AI research (docs hygiene; every public number traceable to a current artefact).
+
 ## [5.16.6] — 2026-05-11 — CI clippy follow-up (collapsible_match + unnecessary_sort_by allow)
 
 **Patch.** v5.16.5 re-armed public-repo CI, but the first auto-run on `main` surfaced two clippy lints that older toolchains never flagged. Both are stylistic-preference, same family as the already-allowed `collapsible_if` and `manual_checked_ops`. This patch adds them to the workspace `[lints.clippy]` allow list so the verify job goes green.

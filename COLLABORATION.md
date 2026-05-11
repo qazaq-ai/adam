@@ -195,8 +195,8 @@ path forward.
   metrics by end of 12-month horizon, leading to seed round in 2027
 
 **Why now:**
-- Working demonstrator (adam) with 1 150+ tests, 451+ versioned
-  releases, public repo
+- Working demonstrator (adam) with 1 300+ tests, 487+ versioned
+  releases, public repo with green CI
 - 30-language generalisation frontier already mapped
 - Clear measurable goals (predictability / cheapness / safety) with
   current metrics (300 MB / 21 ms p50 / 0% GPU)
@@ -221,7 +221,7 @@ permission). Pull requests are welcome on:
 - **Rust performance optimisations** (we run on M2 8GB; tighter
   loops always welcome)
 - **CI / tooling** (GitHub Actions workflows, lint setups)
-- **Test coverage** (current: 1 150+ tests; we don't reject test-only
+- **Test coverage** (current: 1 300+ tests; we don't reject test-only
   PRs)
 - **Documentation** (typos, clarifications, examples)
 - **New language ports** (per linguist collaboration above)

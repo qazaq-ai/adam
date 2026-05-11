@@ -25,9 +25,9 @@
 //!   Generate-and-test over every Lexicon root; O(lex × features ×
 //!   word_len) per parse, ~1.2 ms / word on M2.
 //! - [`lexicon`] — loader for the curated + Apertium Lexicon. Current
-//!   count: ~4.4k curated + 11,919 Apertium imports; v2.2 purged 87
-//!   intervocalic-voicing duplicates that were Apertium-import
-//!   artefacts.
+//!   count: **~25.5 k roots** (13.6 k pure Kazakh + 11.9 k Apertium
+//!   imports); v2.2 purged 87 intervocalic-voicing duplicates that
+//!   were Apertium-import artefacts.
 
 pub mod lexicon;
 pub mod morphotactics;

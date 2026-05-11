@@ -18,10 +18,12 @@
 //!   demonstrative / fragment-root filters.
 //! - **Lexical Graph** (v2.3+): pure projection of facts into a directed
 //!   typed graph with per-edge provenance. See [`graph`].
-//! - **Forward-chaining reasoner** (v2.4 → v3.9.5): 5 active rules (R1
+//! - **Forward-chaining reasoner** (v2.4 → v5.x): 10 active rules — R1
 //!   IsA-transitivity, R2 Has-inheritance, R3 Has-via-PartOf, R5
-//!   shared-IsA → RelatedTo, R6 LivesIn-via-PartOf, R7 GoesTo-via-PartOf).
-//!   See [`reasoner`].
+//!   shared-IsA → RelatedTo, R6 LivesIn-via-PartOf, R7 GoesTo-via-PartOf,
+//!   R8 After-transitivity, R9 PartOf-transitivity, R10 InDomain-
+//!   inheritance, R11 InDomain-shared-target. Yields 37 014 derivations
+//!   over the committed 3 384-fact graph. See [`reasoner`].
 //! - **World Core** (v3.9.0+): human-authored Kazakh knowledge packs
 //!   merged into the committed fact set with `ConfidenceKind::HumanApproved`
 //!   as the exclusive tier marker. See [`world_core`].

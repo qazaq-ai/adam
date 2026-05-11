@@ -21,21 +21,31 @@
 //!     → Conversation::turn(text, ...)   ← deterministic kernel from here
 //! ```
 //!
-//! ## Scope at v5.14.0 (V0)
+//! ## Scope at v5.16.0 (V2 shipped; V3–V5 pending)
 //!
-//! - **Push-to-talk:** user presses Enter to start recording, Enter
-//!   again (or 30 s timeout) to stop. No VAD / continuous listening
-//!   yet — that's v5.15.0.
-//! - **WhisperCli:** shell-out to an external `whisper-cli` (or
-//!   `main` from whisper.cpp build) binary. No FFI — keeps the build
-//!   surface small and avoids `unsafe`. Binary path is configurable
-//!   via env var or constructor argument.
-//! - **No confidence gate / clarification turn:** the v5.16.0
-//!   milestone routes low-confidence transcripts through a
-//!   clarification template family. v5.14.0 surfaces the raw
-//!   transcript directly — the user-visible loop is honest about
-//!   what the engine returned.
-//! - **No barge-in / TTS interruption** — v5.18.0.
+//! - **Push-to-talk** (V0, v5.14.0): user presses Enter to start
+//!   recording, Enter again to stop. Configurable via
+//!   [`MicConfig::push_to_talk`].
+//! - **Energy-VAD continuous listening** (V1, v5.15.0): default mode.
+//!   30 ms RMS frames; silence after speech > 1500 ms ends the turn,
+//!   armed only after 600 ms cumulative speech. Returns
+//!   [`mic::VadStopReason`]. Multi-clause utterances split by
+//!   `adam_dialog::discourse::split_compound_utterance`.
+//! - **WhisperCli** (v5.14.0+): shell-out to an external
+//!   `whisper-cli` (or `main` from whisper.cpp build) binary. No FFI —
+//!   keeps the build surface small and avoids `unsafe`. Binary path
+//!   is configurable via env var or constructor argument.
+//! - **Confidence gate** (V2, v5.16.0): WhisperCli defaults to
+//!   `--output-json`; [`stt::parse_whisper_json`] computes a
+//!   duration-weighted geometric mean of `exp(avg_logprob)` and
+//!   populates [`stt::Transcript::confidence`]. Low-confidence
+//!   transcripts route through the `voice_low_confidence`
+//!   clarification template family in `adam-dialog`. Default
+//!   threshold 0.5 (configurable via `--whisper-confidence-threshold`).
+//!   Use [`stt::WhisperCli::with_text_mode`] to opt out.
+//! - **No Kazakh transcript normalizer** — V3, v5.17.0.
+//! - **No barge-in / TTS interruption** — V4, v5.18.0.
+//! - **No golden audio corpus** — V5, v5.19.0.
 //!
 //! ## Why a separate crate, not a module in `adam-dialog`?
 //!

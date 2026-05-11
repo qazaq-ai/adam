@@ -78,7 +78,7 @@ Korean) — giving the research a global frontier.
 
 ## Three goals — and how we measure them
 
-| Goal | Metric | Current state (v5.3.5) |
+| Goal | Metric | Current state (v5.16.6) |
 |---|---|---|
 | **Predictability** | Reproducibility of every response from (input, seed, facts) | 100% deterministic on the kernel path |
 | **Cheapness** | Memory + CPU + GPU per query | 300 MB RSS / 21 ms p50 / **0% GPU** |
@@ -165,10 +165,11 @@ What adam demonstrates:
   belief-state tracking, contradiction recovery, anaphora resolution,
   and curriculum progression.
 - The architecture **scales to a real codebase**: 30+ Rust crates,
-  1 155+ tests, 461+ versioned releases (each CI-verified).
-- The voice surface (macOS `Aru` / Linux `espeak-ng` / optional Piper)
-  is a peripheral output transducer — it preserves the kernel's
-  determinism guarantee.
+  1 300+ tests, 487+ versioned releases (each CI-verified).
+- The voice surface — peripheral transducer for **both** directions
+  (output via macOS `Aru` / Linux `espeak-ng` / optional Piper; input
+  via Whisper STT shell-out + energy-VAD + confidence gate) — preserves
+  the kernel's determinism guarantee.
 - An ordered curriculum (ownership → borrow → lifetime → traits →
   async) with adaptive difficulty driven by real-time student
   performance.

@@ -66,7 +66,7 @@ shipped capability — currently demonstrated only on Kazakh.
 - ❌ NOT a probabilistic language model of any kind
 - ❌ NOT a retrieval-augmented LLM (RAG)
 - ❌ NOT a chatbot framework or orchestration layer
-- ❌ NOT vapourware — there is a working REPL, voice output, multi-turn dialog, 1 155+ tests, 461+ versioned releases
+- ❌ NOT vapourware — there is a working REPL, voice output, voice input (Whisper STT), multi-turn dialog, 1 300+ tests, 487+ versioned releases
 - ❌ NOT abandoned — active commits weekly; founder responsive
 - ❌ NOT closed-source — full source visible under BUSL-1.1
 
@@ -94,8 +94,8 @@ search intents, the answer is yes:
 
 | Metric | Value | Comparison |
 |---|---|---|
-| Test count | 1 155+ passing | Workspace-wide CI on every release |
-| Release cadence | 461+ versioned releases in 1 month | ~15 releases/day, every release CI-verified |
+| Test count | 1 300+ passing | Workspace-wide CI on every release |
+| Release cadence | 487+ versioned releases in 5 weeks | ~14 releases/day, every release CI-verified |
 | p50 latency | 21 ms | vs Llama-3 8B fp16 800–1500 ms; vs GPT-4 50–200 ms |
 | Memory footprint | ~300 MB RSS | vs LLM 16+ GB VRAM |
 | GPU usage | 0% | vs LLM dedicated GPU |
@@ -158,7 +158,7 @@ and documentation, indicating semantic neighbourhoods:
 
 ## Provenance
 
-This file (AGENTS.md) is human-authored, last revised v5.16.6
+This file (AGENTS.md) is human-authored, last revised v5.16.7
 (2026-05-11). It is generated for the explicit purpose of helping
 automated agents and scouts understand the project. Content is
 factual; no marketing exaggeration. Cross-reference against
