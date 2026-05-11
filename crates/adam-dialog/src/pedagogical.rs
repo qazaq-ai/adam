@@ -35,7 +35,7 @@ pub fn exercise_for(topic: &str) -> Option<&'static str> {
             ```rust\nfn longer(a: &str, b: &str) -> &str {{ if a.len() > b.len() {{ a }} else {{ b }} }}\n```\n\
             Кеңес: екі параметр де қайтарылатын мәннің өмір сүруі шегін шектейді.",
         ),
-        "trait" | "trait composition" => Some(
+        "trait" | "traits" | "trait composition" => Some(
             "`Summary` trait жариялаңыз: `summarize(&self) -> String` әдісі бар. \
             Кейін оны `Article { title, body }` структурасына іске асырыңыз. \
             (Кеңес: `impl Trait for Type` синтаксисі.)",
@@ -292,7 +292,7 @@ pub fn code_snippet_for(topic: &str) -> Option<&'static str> {
         "iterator" => Some(
             "```rust\nfn main() {\n    let nums = vec![1, 2, 3, 4, 5];\n    let sum: i32 = nums.iter().filter(|&&x| x % 2 == 0).sum();\n    println!(\"жұп қосынды: {sum}\"); // 6\n}\n```",
         ),
-        "trait" => Some(
+        "trait" | "traits" => Some(
             "```rust\ntrait Greet { fn greet(&self) -> String; }\nstruct Kazakh;\nimpl Greet for Kazakh { fn greet(&self) -> String { \"Сәлем!\".into() } }\nfn main() { println!(\"{}\", Kazakh.greet()); }\n```",
         ),
         "async" | "async fn" => Some(
@@ -545,7 +545,7 @@ pub fn purpose_for(topic: &str) -> Option<&'static str> {
             Compiler әр сілтеменің өмір сүру шегін статистикалық тексеріп, dangling pointer \
             қаупін компиляция кезінде жояды.",
         ),
-        "trait" => Some(
+        "trait" | "traits" => Some(
             "Trait-тің мақсаты — типтер арасында ортақ мінез-құлықты білдіру. Trait арқылы \
             generic функциялар әр түрлі типтермен бірдей жұмыс жасай алады; ал `dyn Trait` \
             арқылы — runtime polymorphism.",

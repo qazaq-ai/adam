@@ -21,6 +21,30 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.16.11] — 2026-05-11 — `pedagogical` matchers accept `traits` as well as `trait` (v5.16.10 follow-up)
+
+**Hotfix.** v5.16.10 mapped latin `trait`/`traits` → canonical `traits` (matching the curriculum stage id used in `data/dialog/curriculum/rust_progression.json`). But `pedagogical::{purpose_for, exercise_for, code_for}` matchers were keyed on **singular** `"trait"`. Result: `live_holdout_codex_2026_05_07::codex_p2_purpose_trait` regressed — input «Trait не үшін арналған?» now produced topic `Some("traits")`, which `purpose_for` did not recognise, and the planner fell back to clarification («Қандай ұғымның мақсатын білгіңіз келеді? Мысалы: ownership, borrow, lifetimes, trait, future, pin.»). 39/40 holdout passed instead of 40/40.
+
+The disconnect was pre-existing: curriculum stage id is `traits` (plural) but pedagogical matchers used `trait` (singular). Pre-v5.16.10 the `latin_subject_hint` fallback happened to pass the input's singular `trait` straight through, so the AskPurpose path stayed accidentally green. v5.16.10's canonical-stage mapping made the disconnect visible.
+
+### Fix
+
+`pedagogical.rs` matchers now accept **both** keys via or-patterns:
+
+- `purpose_for`: `"trait" | "traits" | "trait composition" =>`
+- `code_for`: `"trait" | "traits" =>`
+- `exercise_for`: already used `"traits"` (it was the one matcher consistent with the curriculum stage id all along)
+
+### Verified
+
+- `cargo test -p adam-dialog --test live_holdout_codex_2026_05_07` — 40/40 passing, back to 100 %.
+- `cargo test --workspace --locked --no-fail-fast` — **1 310 passing** (+1: the previously-failing holdout case).
+- `cargo fmt --all --check` + `scripts/check_metrics_currency.sh` clean.
+
+### Why x.y.11
+
+Sequential cadence (.10 → .11). Pure hotfix on a one-release regression. Codex audit status unchanged: A/B/C all closed; D/E/F/G remain on roadmap.
+
 ## [5.16.10] — 2026-05-11 — Latin curriculum aliases for AskExercise (Codex audit priority C)
 
 **Patch.** Closes priority **C** (last of the Codex 2026-05-11 audit's three quick-win priorities). Fixes the «Учебный домен пока brittle: `Rust-та borrowing бойынша жаттығу бер` не вытащил topic» failure mode.
