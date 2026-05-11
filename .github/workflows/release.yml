@@ -3,12 +3,19 @@ name: Release
 # **v5.16.5 — public-repo release auto-trigger re-armed.** Fires on
 # any annotated tag matching `v*` (the repo's release convention).
 # Pre-v5.16.5 this was workflow_dispatch-only (v4.7.10 billing-era
-# quiet mode); now that the repo is public, an automated release
-# note plus a verified version match gives external readers a clean
-# audit trail. CHANGELOG-driven release notes from the GitHub API
-# POST (per `feedback_no_gh_cli`) continue to be the source of
-# truth for the body text; this workflow generates a complementary
-# "generate_release_notes: true" digest as a fallback.
+# quiet mode); now that the repo is public, the workflow acts as a
+# **verification gate** for the tag: it confirms the workspace
+# version matches the tag and that validate_foundation.sh passes.
+#
+# **v5.16.6 — Publish step removed.** The first auto-run on the
+# v5.16.6 tag failed at `softprops/action-gh-release@v2` because
+# the release was already created via curl POST (per
+# `feedback_no_gh_cli`) before this workflow ran; GitHub rejected
+# the update with «target_commitish cannot be changed when release
+# is immutable». Per `feedback_no_gh_cli` the curl POST is the
+# source of truth — there is no fallback path through this
+# workflow. Keeping the workflow as a verify-only gate avoids the
+# conflict and still produces a green tag-level CI signal.
 on:
   push:
     tags:
@@ -16,7 +23,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   release:
@@ -34,9 +41,3 @@ jobs:
       - name: Validate foundation
         run: bash ./scripts/validate_foundation.sh
         if: ${{ hashFiles('scripts/validate_foundation.sh') != '' }}
-
-      - name: Publish release
-        uses: softprops/action-gh-release@v2
-        with:
-          generate_release_notes: true
-          name: ${{ github.ref_name }}

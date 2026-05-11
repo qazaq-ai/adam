@@ -251,7 +251,7 @@ fn main() -> ExitCode {
             if contributed_any_morpheme {
                 index.remember_text(&sref, sample.text.clone());
             }
-            if total_samples % PROGRESS_EVERY == 0 {
+            if total_samples.is_multiple_of(PROGRESS_EVERY) {
                 eprintln!(
                     "progress: samples={} words={} unique_parsed={} no_hit={} elapsed={:.1}s",
                     total_samples,

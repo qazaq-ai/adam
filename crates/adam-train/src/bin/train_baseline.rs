@@ -158,7 +158,7 @@ fn main() -> ExitCode {
         running_loss += loss_val;
         running_count += 1;
 
-        if step % log_every == 0 || step == 1 {
+        if step.is_multiple_of(log_every) || step == 1 {
             let avg = running_loss / running_count as f32;
             let elapsed = start.elapsed().as_secs_f64();
             let steps_per_sec = step as f64 / elapsed;
