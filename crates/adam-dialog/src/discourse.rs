@@ -1017,6 +1017,28 @@ pub fn split_compound_utterance(input: &str) -> Vec<String> {
     parts
 }
 
+/// **v5.16.9 — Codex 2026-05-11 audit priority B.** True iff `proof`
+/// carries a `SafetyRefusal { domain }` conclusion. The REPL loop
+/// uses this after each clause of a [`split_compound_utterance`]
+/// result to short-circuit the remainder: if a multi-clause input
+/// triggered a safety refusal on the first clause (medical / legal /
+/// financial / current-data / political), the remaining clauses
+/// almost always belong to the same topic and would emit irrelevant
+/// follow-ups (proverbs / unrelated facts) — the exact failure mode
+/// Codex's «отказал правильно, потом выдал пословицу» observation
+/// describes. Pre-v5.16.9 the splitter happily fed every clause
+/// through; this gate stops it.
+///
+/// Single canonical signal: every safety refusal goes through
+/// [`crate::proof_object::ProofObject::safety_refusal`], which is the
+/// only call site that constructs `ClaimPredicate::SafetyRefusal`.
+pub fn is_safety_refusal_proof(proof: Option<&crate::proof_object::ProofObject>) -> bool {
+    matches!(
+        proof.map(|p| &p.conclusion.predicate),
+        Some(crate::proof_object::ClaimPredicate::SafetyRefusal { .. })
+    )
+}
+
 #[cfg(test)]
 mod compound_utterance_tests_v5150 {
     use super::split_compound_utterance;
@@ -1078,6 +1100,41 @@ mod compound_utterance_tests_v5150 {
     fn empty_input_returns_empty_vec_v5150() {
         assert!(split_compound_utterance("").is_empty());
         assert!(split_compound_utterance("   ").is_empty());
+    }
+}
+
+#[cfg(test)]
+mod safety_refusal_proof_detector_tests_v5169 {
+    use super::is_safety_refusal_proof;
+    use crate::proof_object::{Claim, ClaimPredicate, Polarity, ProofObject, SafetyDomain};
+
+    #[test]
+    fn detects_safety_refusal_proof_v5169() {
+        let proof =
+            ProofObject::safety_refusal("дәрі".into(), "қанша".into(), SafetyDomain::Medical);
+        assert!(is_safety_refusal_proof(Some(&proof)));
+    }
+
+    #[test]
+    fn ignores_regular_proof_v5169() {
+        let proof = ProofObject {
+            conclusion: Claim {
+                subject: "қасқыр".into(),
+                predicate: ClaimPredicate::IsA,
+                object: "тірі".into(),
+                polarity: Polarity::Affirmative,
+            },
+            support: vec![],
+            derivation: None,
+            hedges: vec![],
+            unsupported_claims: vec![],
+        };
+        assert!(!is_safety_refusal_proof(Some(&proof)));
+    }
+
+    #[test]
+    fn none_proof_is_not_safety_refusal_v5169() {
+        assert!(!is_safety_refusal_proof(None));
     }
 }
 

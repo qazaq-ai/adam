@@ -21,6 +21,43 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.16.9] — 2026-05-11 — Multi-clause splitter safety-refusal short-circuit (Codex audit priority B)
+
+**Patch.** Closes priority **B** of the Codex 2026-05-11 audit. Fixes the «отказал правильно, потом выдал нерелевантные уточнения/пословицу» failure mode where a compound user utterance with a safety-refused first clause still emitted irrelevant follow-ups for the remaining clauses.
+
+### What was wrong
+
+v5.15.0 introduced `discourse::split_compound_utterance` + a REPL loop that runs each clause as its own kernel turn. This was correct for normal compound greetings («Сәлеметсіз бе, қалыңыз қалай, танысайық» → three intents). But for safety-refusal cases, the same loop fed every subsequent clause through the kernel even after the first one triggered a medical / legal / financial / current-data / political refusal. Codex's scenario: «жауапкершілік өзімде» style medical plan → kernel correctly refused, then the loop kept going and pulled a tangential proverb / IsA fact.
+
+The clauses after a safety refusal almost always belong to the same topic; emitting unrelated knowledge alongside «I refuse» is the worst-of-both: noisy, distracting from the refusal, and easy for an auditor to read as «the safety guard leaked».
+
+### What changed
+
+**1. `discourse::is_safety_refusal_proof`** — new public helper. Single signal: every safety refusal goes through `ProofObject::safety_refusal()` (the only constructor of `ClaimPredicate::SafetyRefusal { domain }`); the helper inspects `Option<&ProofObject>` and returns `true` iff that's what we got.
+
+**2. `adam_chat::run_turn`** — return type `()` → `bool` (was safety-refusal). Both the trace and non-trace branches now use `Conversation::turn_with_trace` (zero overhead — `turn` is already a wrapper) so the proof object is always available.
+
+**3. REPL loops short-circuit.** Both the text REPL (`run_text_repl`) and the voice REPL (`run_voice_repl`) `break` out of the per-clause loop the moment a clause renders a safety refusal. Single-clause inputs are unaffected; multi-clause inputs without a safety refusal still run every clause as before.
+
+**4. Three unit tests in `discourse::safety_refusal_proof_detector_tests_v5169`** — positive (medical refusal proof → true), negative (regular IsA proof → false), and `None` → false.
+
+### Verified
+
+- Live test: `Басым ауырып тұр, қандай дәрі ішейін, ал Қасқыр туралы айт` → only the medical refusal renders; the «Қасқыр туралы» clause is correctly suppressed.
+- Regression: `Сәлеметсіз бе, қалыңыз қалай, танысайық` still triggers all three sub-intents (greeting + wellbeing + introduction).
+- `cargo test --workspace --locked` — **1 303 passing** (+3: the new detector tests).
+- `cargo fmt --all --check` + `cargo clippy --all-targets -- -D warnings` clean.
+- `scripts/check_metrics_currency.sh` clean.
+- `scripts/verify_release_version.sh 5.16.9` passes.
+
+### Codex audit status
+
+- ✅ A (validate_world_core gate) — v5.16.8.
+- ✅ **B (multi-clause splitter safety short-circuit)** — this release.
+- ⏭ C (Rust-tutor «жаттығу бер» intent miss) → v5.16.10 / v5.17.0.
+
+Stripe — Deterministic AI research (safety surface stays clean across compound utterances).
+
 ## [5.16.8] — 2026-05-11 — `validate_world_core` CI gate + duplicate-ID fix (Codex 2026-05-11 audit response)
 
 **Patch.** Closes the first of three quick wins from the Codex 2026-05-11 audit (A+B+C). Fixes the «validate_world_core silently broken» class of bug that lets duplicate IDs accumulate without ever surfacing in CI.

@@ -455,11 +455,24 @@ fn main() -> ExitCode {
             // template family. Single-clause inputs come back as a
             // one-element vec, so the loop covers both shapes
             // uniformly.
+            //
+            // **v5.16.9 — Codex 2026-05-11 audit priority B.**
+            // Short-circuit on safety refusal: if a clause renders
+            // a medical / legal / financial / current-data /
+            // political refusal, the remaining clauses almost
+            // always belong to the same topic and would emit
+            // irrelevant follow-ups (proverbs / unrelated facts).
+            // Pre-v5.16.9 the loop kept going through every
+            // sentence after the refusal.
             for piece in adam_dialog::discourse::split_compound_utterance(&assembled) {
                 turn += 1;
                 let seed = turn_seed(turn);
-                run_turn(&mut conv, &piece, &lex, &repo, trace, seed, tts_handle);
+                let safety_refused =
+                    run_turn(&mut conv, &piece, &lex, &repo, trace, seed, tts_handle);
                 stdout.lock().flush().ok();
+                if safety_refused {
+                    break;
+                }
             }
         }
     }
@@ -671,11 +684,18 @@ fn run_voice_repl(
         // string when the user speaks several sentences in one
         // breath; per-clause kernel turns let every sub-intent reach
         // its template family.
+        //
+        // **v5.16.9 — Codex 2026-05-11 audit priority B.**
+        // Short-circuit on safety refusal. Same rationale as the
+        // text REPL above.
         for piece in adam_dialog::discourse::split_compound_utterance(&transcript.text) {
             *turn += 1;
             let seed = turn_seed(*turn);
-            run_turn(conv, &piece, lex, repo, trace, seed, tts_handle);
+            let safety_refused = run_turn(conv, &piece, lex, repo, trace, seed, tts_handle);
             io::stdout().lock().flush().ok();
+            if safety_refused {
+                break;
+            }
         }
     }
 }
@@ -788,6 +808,10 @@ fn load_reasoning_chains() -> (Vec<ReasFact>, Vec<DerivedFact>) {
     (extracted, derived)
 }
 
+/// Runs one kernel turn and prints the result. Returns `true` iff the
+/// turn rendered a safety refusal — used by the REPL loops to
+/// short-circuit the remaining clauses of a compound utterance per
+/// `discourse::is_safety_refusal_proof` (v5.16.9, Codex audit B).
 fn run_turn(
     conv: &mut Conversation,
     input: &str,
@@ -796,7 +820,7 @@ fn run_turn(
     trace: bool,
     seed: u64,
     tts: Option<&dyn adam_dialog::tts::TtsBackend>,
-) {
+) -> bool {
     if trace {
         // v4.0.25 — trace through the REAL runtime path via
         // `turn_with_trace`. Pre-v4.0.25 this branch manually
@@ -960,14 +984,20 @@ fn run_turn(
         {
             eprintln!("[tts] speak failed: {e}");
         }
+        adam_dialog::discourse::is_safety_refusal_proof(trace.proof_object.as_ref())
     } else {
-        let out = conv.turn(input, lex, repo, seed);
+        // **v5.16.9** — switch from `conv.turn` to `conv.turn_with_trace`
+        // so the safety-refusal short-circuit (`is_safety_refusal_proof`)
+        // has access to the proof object. Zero runtime overhead — `turn`
+        // is already a wrapper that discards the trace.
+        let (out, trace) = conv.turn_with_trace(input, lex, repo, seed);
         println!("{out}");
         if let Some(tts) = tts
             && let Err(e) = tts.speak(&out)
         {
             eprintln!("[tts] speak failed: {e}");
         }
+        adam_dialog::discourse::is_safety_refusal_proof(trace.proof_object.as_ref())
     }
 }
 
