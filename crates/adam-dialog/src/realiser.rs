@@ -98,20 +98,39 @@ pub fn realise_with_inventory(
 const TEMPLATE_LEAK_FALLBACK: &str = "Сұрағыңызды толық түсінбедім. Аздап нақтылап жіберіңізші.";
 
 fn contains_unfilled_placeholder(rendered: &str) -> bool {
-    // Single canonical signal: every unfilled placeholder leaves a
-    // literal `{name}` or `{name|features}` substring (see
-    // `expand_placeholder`'s `return format!("{{{inner}}}")` path).
-    // No false positives from natural Kazakh text — `{` and `}` are
-    // not used in normal prose.
-    if let Some(open) = rendered.find('{')
-        && let Some(rel_close) = rendered[open..].find('}')
-    {
-        let inner = &rendered[open + 1..open + rel_close];
-        return !inner.is_empty()
-            && inner
+    // Every unfilled adam placeholder leaves a literal `{name}` or
+    // `{name|features}` substring (see `expand_placeholder`'s
+    // `return format!("{{{inner}}}")` path). The identifier part
+    // (everything before the optional `|`) is ASCII alphabetic +
+    // underscore.
+    //
+    // **Min-length gate (v5.17.2):** Rust pedagogical exercises
+    // embed format-string placeholders like `println!("{s}")` and
+    // `{:?}` — these are part of the *content*, not unfilled adam
+    // slots. Adam slot names in `data/dialog/templates/v1.toml`
+    // are all ≥ 3 chars (`age`, `name`, `topic`, `fact`, ...), so a
+    // 3-char minimum on the identifier separates the two
+    // namespaces without losing any real slot. If a 2-char slot
+    // is ever introduced, relax this here and rename the colliding
+    // Rust example to use a longer variable name.
+    let mut search_from = 0;
+    while let Some(open_rel) = rendered[search_from..].find('{') {
+        let open = search_from + open_rel;
+        let Some(rel_close) = rendered[open..].find('}') else {
+            return false;
+        };
+        let close = open + rel_close;
+        let inner = &rendered[open + 1..close];
+        let identifier_end = inner.find('|').unwrap_or(inner.len());
+        let identifier = &inner[..identifier_end];
+        if identifier.len() >= 3
+            && identifier
                 .chars()
-                .next()
-                .is_some_and(|c| c.is_ascii_alphabetic());
+                .all(|c| c.is_ascii_alphabetic() || c == '_')
+        {
+            return true;
+        }
+        search_from = close + 1;
     }
     false
 }
@@ -213,6 +232,26 @@ mod template_leak_guard_tests_v5171 {
         // typesetting rarely uses curly braces, but they could appear
         // in user-pasted code/math).
         assert!(!contains_unfilled_placeholder("{1+2}"));
+    }
+
+    #[test]
+    fn does_not_flag_rust_format_placeholders_v5172() {
+        // v5.17.2 regression: Rust pedagogical exercises embed
+        // format-string placeholders. They are CONTENT, not
+        // unfilled adam slots.
+        assert!(!contains_unfilled_placeholder("println!(\"{s}\");"));
+        assert!(!contains_unfilled_placeholder("println!(\"{}\", s);"));
+        assert!(!contains_unfilled_placeholder("println!(\"{:?}\", s);"));
+        assert!(!contains_unfilled_placeholder("dbg!(\"{x}\")"));
+    }
+
+    #[test]
+    fn still_flags_real_slot_after_rust_format_v5172() {
+        // Mixed content: a real unfilled adam slot AFTER Rust format
+        // placeholders must still trigger the guard (scan-through).
+        assert!(contains_unfilled_placeholder(
+            "println!(\"{s}\") демо ал {age} жасыңыз"
+        ));
     }
 }
 

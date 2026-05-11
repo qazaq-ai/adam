@@ -21,6 +21,26 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.17.2] — 2026-05-11 — Realiser guard distinguishes Rust format placeholders from adam slots (v5.17.1 follow-up)
+
+**Hotfix.** v5.17.1 shipped the realiser template-leak guard with a too-eager rule: any `{alpha…}` substring triggered the fallback. CI surfaced the false positive immediately — `curriculum_v4995_adaptive_difficulty::askexercise_with_two_failures_serves_easy_variant` failed because the «Easy» ownership exercise content contains the Rust format string `println!("{s}");`. The guard saw `{s}` and replaced the entire response with the «Сұрағыңызды толық түсінбедім…» fallback, breaking adaptive-difficulty content delivery.
+
+### What changed
+
+`contains_unfilled_placeholder` now requires the identifier inside the braces to be **at least 3 ASCII alphabetic / underscore characters**. Every adam slot name in `data/dialog/templates/v1.toml` is ≥ 3 chars (`age`, `name`, `topic`, `fact`, …) — verified by grep over the template file. Rust format placeholders embedded in exercises (`{s}`, `{x}`, `{}`, `{:?}`) are 0–2 chars and pass through cleanly. The scan also walks the whole string instead of bailing on the first `{` — so a string like `«println!("{s}") … {age} …»` (Rust example followed by a real leaked slot) still fires the guard.
+
+### Verified
+
+- `cargo test -p adam-dialog --test curriculum_v4995_adaptive_difficulty` — **8/8** (was 7/1 failed).
+- 2 new regression tests in `template_leak_guard_tests_v5171`: `does_not_flag_rust_format_placeholders_v5172` (positive: `{s}`, `{}`, `{:?}`, `{x}`) and `still_flags_real_slot_after_rust_format_v5172` (mixed Rust + adam slot).
+- `cargo test --workspace --locked --no-fail-fast` — **1 319 passing** (+2 regression tests).
+- Adversarial baseline unchanged: 42/50 at floor.
+- `cargo fmt --all --check` + `cargo clippy --all-targets -- -D warnings` clean.
+
+### Why x.17.2
+
+Sequential cadence (.1 → .2). Pure hotfix on a one-release regression. v5.17.0 D1 adversarial benchmark queue progress unchanged.
+
 ## [5.17.1] — 2026-05-11 — Realiser template-leak safety net (mta_02 critical-leak closure)
 
 **Patch.** First fix from the v5.17.0 adversarial benchmark's open-failure queue. Closes the **critical** sub-symptom of `mta_02`: leaked `{Age} — жақсы жас.` placeholder when `StatementOfAge { years: None }` was misrouted to the `statement_of_age` family. The user-visible failure mode (literal `{Slot}` text rendered to the screen with a capitalised first letter) is now structurally impossible from the realiser layer down.
