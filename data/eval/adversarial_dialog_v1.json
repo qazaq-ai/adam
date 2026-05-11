@@ -12,23 +12,13 @@
     "math_concepts": "8 cases — math definitions (көбейту, бөлу, қосу, сан, бөлшек, пайыз, геометрия, теңдеу). Some expected to fail (бөлшек/пайыз/геометрия likely no curated entry yet)."
   },
   "_d2_roadmap": "D2a (this release): +45 math. D2b (v5.18.5): +25 bilingual/dialectal/contradiction. D2c (v5.19.0): +30 existing-category expansion. Total target: 150 cases by v5.19.0.",
-  "_known_failures_v5180": [
-    "ma_14: «10/0 қанша?» — adam returns general math fallback («әзірге өңдемеймін») instead of specific zero-division message («нөлге бөлуге болмайды»). Math parser should detect div-by-zero and route to a dedicated hedge.",
-    "wp_01: «Ботада 5 алма бар, оған тағы 3 алма бердім. Қазір қанша алма?» — routes to AskTime fallback («уақытқа байланысты сұрақтарға жауап беруге деректерім жоқ»). Word-problem detector missing entirely.",
-    "wp_03: «3 банкадағы әр банкада 4 кәмпит. Барлығы қанша?» — falls to topic extraction on «банка» → clarification «Бәлкім, банка туралы айтасыз ба».",
-    "wp_05: «Маған 20 жас. Інім 5 жасқа кіші. Інімнің жасы қанша?» — topic extraction surfaces «Іні — кіші ер туыс» (curated definition); ignores the math entirely.",
-    "wp_06: «Ауланың ұзындығы 8 метр. Ені 5 метр. Ауданы қанша?» — topic extraction surfaces a proverb about «аула».",
-    "wp_07: «Бір жинақта 12 кітап. Үш жинақта қанша кітап?» — proverb about «жинақ».",
-    "wp_08: «10 теңгеден қалам сатып алу үшін қанша қажет?» — **adam HALLUCINATES**: returns «Нәтижесі: 10 (он)» echoing the digit from the input as the answer. This is the worst failure mode — confident wrong number.",
-    "wp_09: «Ботаның жасы 10. Айдананың жасы Ботадан 5 жасқа үлкен. Айдананың жасы қанша?» — proverb about «бота».",
-    "wp_10: «Бір жұмыста 7 күн бар. Үш жұмыста қанша күн?» — surfaces curated «Жұмыс — күштің әсер ету бағытында...» (physics work)."
+  "_known_failures_v5181": [],
+  "_closed_v5181": [
+    "wp_08 HALLUCINATION: «10 теңгеден қалам сатып алу үшін қанша қажет?» — closed structurally by `try_evaluate_arithmetic` binary-operator guard. A bare integer (e.g. «10» after stripping non-arith chars) no longer parses as a valid expression — must have an operator BETWEEN two digits.",
+    "wp_01/03/05/06/07/09/10 (7 routing misses): all closed by new `is_kazakh_word_problem` heuristic in discourse.rs + planner override on `__word_problem__` slot. Heuristic: «қанша/барлығы/неше» + ≥ 2 digits (or 1 digit + Kazakh number word) + input length ≥ 20 + no binary arithmetic operator. Routes to `unknown.word_problem` template family.",
+    "ma_14: «10/0 қанша?» — closed by new `input_has_division_by_zero` detector + dedicated `math_refusal.div_by_zero` template. The student sees «Нөлге бөлуге болмайды — арифметикада бұл анықталмаған амал», a math-education message rather than a generic «I don't process math» hedge."
   ],
-  "_action_items_v5181_plus": [
-    "Implement detect_word_problem in discourse.rs: heuristics — multiple digits + Kazakh quantity question («қанша» / «барлығы») + noun phrases. Route to a dedicated graceful-refusal template family.",
-    "Update math parser to detect div-by-zero specifically (10/0, X/0 pattern) and emit «нөлге бөлуге болмайды» instead of general fallback.",
-    "Critical: wp_08 hallucination — ensure that when adam returns «Нәтижесі: N», N must come from an actual computation, not echoed from input. Word-problem detector closing this would fix it."
-  ],
-  "pass_rate_floor": 0.9,
+  "pass_rate_floor": 1.0,
   "cases": [
     {"id": "fr_01", "category": "factual_retrieval", "query": "Алматы қайда орналасқан?", "any_substring": ["қазақстан"]},
     {"id": "fr_02", "category": "factual_retrieval", "query": "Қазақстанның астанасы қай қала?", "any_substring": ["астана", "нұр-сұлтан"]},

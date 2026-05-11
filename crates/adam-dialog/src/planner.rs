@@ -406,6 +406,61 @@ pub fn plan_response_with_epistemic(
     // flagged from a live REPL trace on 2026-04-27. Slots
     // `{old_value}` / `{new_value}` are already populated by
     // `Conversation` from the latest `BeliefConflict`.
+    // **v5.18.1 — adversarial D2a ma_14 closure.** Explicit
+    // division-by-zero in input → dedicated math-education
+    // message «нөлге бөлуге болмайды». Highest priority among
+    // math-related overrides because it's a concrete teachable
+    // moment, not a generic «I don't process» hedge.
+    if extra_slots.contains_key("__div_by_zero__") {
+        let key = "math_refusal.div_by_zero";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: div_by_zero override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
+    // **v5.18.1 — adversarial D2a word-problem routing.** If
+    // `Conversation::turn` set `__word_problem__` via
+    // `discourse::is_kazakh_word_problem`, route to the dedicated
+    // honest-refusal family BEFORE topic-extraction (which lives
+    // inside the `Unknown` branch deep in `intent_key`-driven
+    // fallback) surfaces a tangential proverb or definition of a
+    // random noun in the question. Closes wp_01/03/05/06/07/09/10
+    // routing misses from v5.18.0 benchmark (wp_08 hallucination
+    // closed separately by the binary-operator guard in
+    // `discourse::try_evaluate_arithmetic`).
+    if extra_slots.contains_key("__word_problem__") {
+        let key = "unknown.word_problem";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: word_problem override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
     if extra_slots.contains_key("__check_contradiction__") {
         let key = "check_contradiction";
         if !repo.get(key).is_empty() {

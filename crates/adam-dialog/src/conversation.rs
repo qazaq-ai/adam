@@ -1065,6 +1065,31 @@ impl Conversation {
         // re-contradictions replace older ones, and the
         // single-active-fact invariant (v4.0.28) is respected.
         let mut extra_slots: HashMap<String, String> = HashMap::new();
+        // **v5.18.1 — adversarial D2a word-problem routing.** Tag
+        // the turn as a Kazakh school-style word problem so the
+        // planner routes to `unknown.word_problem` instead of
+        // letting topic extraction surface a tangential proverb or
+        // definition of the random noun in the question (the
+        // failure mode of wp_01/03/05/06/07/09/10 in the v5.18.0
+        // benchmark). The detector is conservative: needs «қанша» /
+        // «барлығы» + ≥ 2 digits + length ≥ 20 chars + no binary
+        // arithmetic operator. Only set the slot if the intent
+        // didn't already route to a math computation; the math
+        // cascade runs further down and takes precedence when it
+        // produces an answer.
+        if matches!(intent, Intent::Unknown { .. })
+            && crate::discourse::is_kazakh_word_problem(input)
+        {
+            extra_slots.insert("__word_problem__".into(), "1".into());
+        }
+        // **v5.18.1 — adversarial D2a ma_14 closure.** Explicit
+        // div-by-zero pattern in input (e.g. «10/0 қанша?»). Route
+        // to dedicated template with the math-education message
+        // «нөлге бөлуге болмайды» instead of the generic math_refusal
+        // fallback.
+        if crate::discourse::input_has_division_by_zero(input) {
+            extra_slots.insert("__div_by_zero__".into(), "1".into());
+        }
         // v4.4.5 — populate conflict slots whenever either the
         // epistemic policy landed on Conflicted OR the action plan
         // chose CheckContradiction. The two used to coincide, but

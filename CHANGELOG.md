@@ -21,6 +21,71 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.18.1] — 2026-05-11 — 🎯 D2a math closure: 95/95 = 100% (wp_08 hallucination + 7 routing misses + ma_14 div-by-zero closed)
+
+**Patch.** Closes all 9 open failures from the v5.18.0 D2a math expansion in one release through three architectural fixes. Adversarial 86/95 (90.5%) → **95/95 = 100%**, all 10 categories at 100%. Floor 0.90 → **1.0**.
+
+### Three architectural fixes
+
+**Fix 1 — wp_08 hallucination (the worst case)**
+
+Pre-v5.18.1 `try_evaluate_arithmetic("10 теңгеден қалам сатып алу үшін қанша қажет?")` returned `Some(10)` because after stripping non-arith characters the cleaned string was just «10» — a valid integer the parser happily accepted. The caller then rendered «Нәтижесі: 10 (он)», echoing the digit from the input as a confident wrong answer.
+
+`discourse::try_evaluate_arithmetic` now requires either:
+1. A binary arithmetic operator between two digits, OR
+2. A leading unary minus (`-` followed by digit) — preserved for the `handles_unary_minus` invariant.
+
+A bare positive integer like «10» no longer parses as an expression. The structural shield makes this entire class of hallucination impossible from the arithmetic parser.
+
+**Fix 2 — Word-problem routing (7 cases: wp_01/03/05/06/07/09/10)**
+
+Pre-v5.18.1 these queries fell to topic extraction. «Ботада 5 алма бар, оған тағы 3 алма бердім. Қазір қанша алма?» surfaced an AskTime fallback (substring «Қазір қанша»); «3 банкадағы әр банкада 4 кәмпит. Барлығы қанша?» surfaced a «банка» clarification; etc.
+
+New `discourse::is_kazakh_word_problem` heuristic: `«қанша» / «барлығы» / «неше» quantity question + ≥ 2 Arabic digits (or 1 digit + Kazakh number word) + input length ≥ 20 chars + NO binary arithmetic operator`. When matched, `Conversation::turn` sets the `__word_problem__` extra-slot; `planner::plan_response_with_epistemic` routes to the new `unknown.word_problem` template family BEFORE topic-extraction fallback. The family explicitly says: «Бұл мәтін есеп тәрізді — әзірге сөзбен берілген есептерді шеше алмаймын. Сандарды арифметикалық өрнекпен жазып берсеңіз («5+3»), есептеп беремін.»
+
+**Fix 3 — ma_14 div-by-zero (math-education message)**
+
+«10/0 қанша?» previously routed to the generic `math_refusal` family («әзірге өңдемеймін»). For a tutor that's a missed teaching moment — the student should learn that division by zero is undefined.
+
+New `discourse::input_has_division_by_zero` detector + new `math_refusal.div_by_zero` template family: «Нөлге бөлуге болмайды — арифметикада бұл анықталмаған амал.» The detector requires exact pattern `<digit>/<optional whitespace><0><word-boundary>` so it doesn't false-fire on dates or larger numbers ending in 0.
+
+### Adversarial benchmark final state
+
+| Category | v5.18.0 | **v5.18.1** |
+|---|---|---|
+| factual_retrieval | 8/8 | 8/8 |
+| multi_turn_anaphora | 8/8 | 8/8 |
+| safety_refusal | 8/8 | 8/8 |
+| code_tutor_traps | 8/8 | 8/8 |
+| language_guards | 8/8 | 8/8 |
+| ambiguous_followup | 10/10 | 10/10 |
+| **math_arithmetic** | **14/15 (93%)** | **15/15 (100%)** |
+| math_equations | 12/12 | 12/12 |
+| **math_word_problems** | **2/10 (20%)** | **10/10 (100%)** |
+| math_concepts | 8/8 | 8/8 |
+| **Overall** | **86/95 (90.5%)** | **🎯 95/95 (100%)** |
+
+Floor in JSON: 0.90 → **1.0**.
+
+### Why x.18.1
+
+Sequential cadence (.18.0 → .18.1). Patch — 3 surgical fixes + 2 new template families + 2 new public detector functions in `discourse`; no API-breaking change. The structural shield in `try_evaluate_arithmetic` makes future word-problem hallucinations of this class impossible by construction.
+
+### What's next
+
+D2 continues:
+
+- **v5.18.5 (D2b)** — +25 bilingual / dialectal / contradiction cases (120 total).
+- **v5.19.0 (D2c)** — +30 existing-category expansion (150 total).
+
+### Verified
+
+- `cargo test -p adam-dialog --test adversarial_dialog_v1` — 95/95 at floor 1.0.
+- `cargo test --workspace --locked --no-fail-fast` — **1 344 passing** (`handles_unary_minus` regression-guard still passes via the `starts_with_unary_minus` accommodation).
+- `cargo fmt --all --check` + `cargo clippy --all-targets -- -D warnings` clean.
+
+Stripe — Deterministic AI research (95-case adversarial benchmark fully closed; hallucination class shielded structurally).
+
 ## [5.18.0] — 2026-05-11 — D2a math expansion: +45 cases, 50 → 95 cases (baseline 90.5%)
 
 **Minor.** Opens the Codex 2026-05-11 audit's **D2 expansion** (50 → 150 cases over three releases). v5.18.0 ships the **math-focused batch** (D2a): 45 new cases across 4 math sub-categories. Existing 50 v1 cases all pass 100%; new math cases find **9 new bugs**.

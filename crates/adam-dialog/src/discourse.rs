@@ -2087,6 +2087,137 @@ pub fn input_is_math_expression(input: &str) -> bool {
 ///   when this returns `None`.
 ///
 /// Limitations (intentional — keep the v4.6.15 scope tight):
+/// **v5.18.1 — adversarial D2a ma_14 closure.** Detect inputs that
+/// contain a literal division by zero (e.g. «10/0 қанша?»). When
+/// matched, the planner routes to a dedicated `math_refusal.div_by_zero`
+/// template that says «нөлге бөлуге болмайды» — a math-education
+/// concept the student should learn, not a generic «I don't process
+/// math» refusal. Conservative: requires the precise pattern
+/// `<digit>` `/` `<optional whitespace>` `0` `<word-boundary or
+/// non-digit>` so it doesn't false-fire on `10/01/2024` or `100`.
+pub fn input_has_division_by_zero(input: &str) -> bool {
+    let bytes = input.as_bytes();
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] == b'/' {
+            // Skip optional whitespace after '/'.
+            let mut j = i + 1;
+            while j < bytes.len() && bytes[j] == b' ' {
+                j += 1;
+            }
+            // Need at least one '0' followed by a word boundary
+            // (end-of-input or non-digit). Forbid following digit
+            // so «10/0» fires but «10/01» does not.
+            if j < bytes.len() && bytes[j] == b'0' {
+                let next = bytes.get(j + 1).copied().unwrap_or(b' ');
+                if !next.is_ascii_digit() {
+                    // Need at least one digit BEFORE the '/'.
+                    let mut k = i;
+                    while k > 0 && bytes[k - 1] == b' ' {
+                        k -= 1;
+                    }
+                    if k > 0 && bytes[k - 1].is_ascii_digit() {
+                        return true;
+                    }
+                }
+            }
+        }
+        i += 1;
+    }
+    false
+}
+
+/// **v5.18.1 — adversarial D2a closure (word-problem hallucination).**
+/// Heuristic detector for Kazakh school-style math word problems.
+/// Used to short-circuit the topic-extraction fallback so a query
+/// like «Ботада 5 алма бар, оған тағы 3 алма бердім. Қазір қанша
+/// алма?» routes to a dedicated graceful-refusal template instead
+/// of surfacing a proverb about «бота» / definition of «алма» /
+/// hallucinated digit echo.
+///
+/// Conservative fingerprint:
+/// 1. Contains the Kazakh quantity-question word «қанша» / «барлығы»
+///    / «жалпы» — every school word problem asks one of these.
+/// 2. Contains AT LEAST TWO digits (Arabic numerals 0-9) OR at
+///    least one digit AND at least one Kazakh number word
+///    (бір/екі/үш/...). Single-digit prose like «Бір алма» is
+///    not a math problem.
+/// 3. Input length ≥ 20 codepoints — filters bare arithmetic
+///    («5+3 қанша?») which the standard parser handles.
+/// 4. NO standard arithmetic operator between two digits — if
+///    such an operator exists, `try_evaluate_arithmetic` already
+///    handles it; we shouldn't intercept.
+///
+/// This detector intentionally returns `bool`, not `Option<...>` —
+/// adam does not yet HAVE a word-problem solver. The point is to
+/// route the turn to an HONEST refusal instead of pretending an
+/// answer exists.
+pub fn is_kazakh_word_problem(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    let asks_quantity = lower.contains("қанша")
+        || lower.contains("барлығы")
+        || lower.contains("жалпы")
+        || lower.contains("неше");
+    if !asks_quantity {
+        return false;
+    }
+    if input.chars().count() < 20 {
+        return false;
+    }
+    let digit_count = input.chars().filter(|c| c.is_ascii_digit()).count();
+    let kazakh_number_words = [
+        "бір",
+        "екі",
+        "үш",
+        "төрт",
+        "бес",
+        "алты",
+        "жеті",
+        "сегіз",
+        "тоғыз",
+        "он",
+        "жиырма",
+        "отыз",
+        "қырық",
+        "елу",
+        "алпыс",
+        "жетпіс",
+        "сексен",
+        "тоқсан",
+        "жүз",
+        "мың",
+    ];
+    let kw_count = kazakh_number_words
+        .iter()
+        .filter(|w| lower.contains(*w))
+        .count();
+    let has_enough_numbers =
+        digit_count >= 2 || (digit_count >= 1 && kw_count >= 1) || kw_count >= 2;
+    if !has_enough_numbers {
+        return false;
+    }
+    // Skip if input is essentially pure arithmetic with question
+    // word — `try_evaluate_arithmetic` already handles those.
+    let cleaned: String = input
+        .chars()
+        .filter(|c| {
+            c.is_ascii_digit() || matches!(*c, '+' | '-' | '*' | '/' | '(' | ')' | '=' | ' ')
+        })
+        .collect();
+    let has_binary_op = cleaned.chars().enumerate().any(|(i, c)| {
+        matches!(c, '+' | '-' | '*' | '/')
+            && i > 0
+            && cleaned
+                .chars()
+                .nth(i - 1)
+                .is_some_and(|p| p.is_ascii_digit() || p == ')')
+    });
+    if has_binary_op {
+        return false;
+    }
+    true
+}
+
 /// - Integer-only; no fractions / decimals.
 /// - No parentheses.
 /// - No Kazakh-language phrasings («Алтыны екіге бөліңіз») — those
@@ -2120,7 +2251,29 @@ pub fn try_evaluate_arithmetic(input: &str) -> Option<i64> {
         return None;
     }
 
+    // **v5.18.1 — adversarial D2a wp_08 hallucination closure.**
+    // Require at least one binary arithmetic operator BETWEEN two
+    // digits, OR a leading unary minus («-5»). Pre-v5.18.1 a bare
+    // POSITIVE integer like «10» (after stripping surrounding
+    // Kazakh prose) parsed as a valid expression returning
+    // `Some(10)` — the caller surfaced it as «Нәтижесі: 10 (он)»,
+    // a confidently wrong word-problem answer. Bare unary-minus
+    // («-5») is preserved as a special case because pre-v5.18.1
+    // `handles_unary_minus` invariant depends on it (callers that
+    // explicitly compute and display negative literals).
     let chars: Vec<char> = cleaned.chars().collect();
+    let has_binary_op = chars.iter().enumerate().any(|(i, c)| {
+        matches!(c, '+' | '-' | '*' | '/')
+            && i > 0
+            && chars
+                .get(i - 1)
+                .is_some_and(|p| p.is_ascii_digit() || *p == ')')
+    });
+    let starts_with_unary_minus = chars.first().is_some_and(|c| *c == '-');
+    if !has_binary_op && !starts_with_unary_minus {
+        return None;
+    }
+
     let mut pos = 0;
     let value = parse_expr(&chars, &mut pos)?;
     if pos != chars.len() {

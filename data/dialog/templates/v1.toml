@@ -550,6 +550,37 @@ templates = [
     "Қазақ тілінде өрнектелген математикалық есепті әлі шеше алмаймын — қарапайым сандық өрнекті жазсаңыз («5+5», «12/4»), есептейтін боламын",
 ]
 
+# **v5.18.1** — adversarial D2a ma_14 closure. Division by zero is
+# undefined in arithmetic; this is a math-education concept the
+# student should learn explicitly. Routed via `__div_by_zero__`
+# slot set by `Conversation::turn` when
+# `discourse::input_has_division_by_zero` matches.
+[[families]]
+key = "math_refusal.div_by_zero"
+templates = [
+    "Нөлге бөлуге болмайды — арифметикада бұл анықталмаған амал.",
+    "Бөлгіш нөл болса, нәтиже анықталмайды. Нөлге бөлу математикада тыйым салынған.",
+    "Нөлге бөлу мүмкін емес. Кез келген санды нөлге бөлсек, нәтиже анықталмайды (undefined).",
+]
+
+# **v5.18.1** — adversarial D2a word-problem closure. Distinct
+# from `math_refusal`: applies to school-style word problems
+# («Ботада 5 алма бар, тағы 3 алма бердім. Қанша?») where the
+# input has narrative context AROUND the numbers, not just bare
+# arithmetic. The honest refusal says explicitly that the model
+# does not solve word problems (still!) and asks for the bare
+# arithmetic instead. Routes via `__word_problem__` slot set by
+# `Conversation::turn` when `discourse::is_kazakh_word_problem`
+# fingerprint matches. Closes wp_01/03/05/06/07/09/10 routing
+# misses + wp_08 hallucination from v5.18.0 D2a baseline.
+[[families]]
+key = "unknown.word_problem"
+templates = [
+    "Бұл мәтін есеп тәрізді — әзірге сөзбен берілген есептерді шеше алмаймын. Сандарды арифметикалық өрнекпен жазып берсеңіз («5+3», «12/4»), есептеп беремін.",
+    "Мәтінді есепті әлі шеше алмаймын. Қарапайым сандық өрнекті жазып берсеңіз («5+3» түрінде), есептейтін боламын.",
+    "Сөзбен берілген есепті жауаптауды әзірге үйренген жоқпын. Сандарды операторлармен жазып берсеңіз, нәтижесін шығарып беремін.",
+]
+
 # v4.6.15 — Math answer template family. When
 # `discourse::try_evaluate_arithmetic` parses the input as pure
 # integer arithmetic and computes a value, the planner injects
