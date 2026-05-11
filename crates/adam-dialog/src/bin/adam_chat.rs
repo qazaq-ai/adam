@@ -138,6 +138,18 @@ fn main() -> ExitCode {
         .windows(2)
         .find(|w| w[0] == "--whisper-language")
         .map(|w| w[1].clone());
+    // **v5.16.0 (V2).** Confidence threshold for the voice gate.
+    // Whisper-cli's JSON-mode output exposes per-segment
+    // `avg_logprob`; we collapse to a single 0..1 score and route
+    // sub-threshold transcripts through the `voice_low_confidence`
+    // template family instead of feeding the kernel. Default 0.5
+    // (rejects roughly the worst quartile of medium-model output
+    // on Kazakh in our live-test).
+    let voice_confidence_threshold: f32 = args
+        .windows(2)
+        .find(|w| w[0] == "--whisper-confidence-threshold")
+        .and_then(|w| w[1].parse().ok())
+        .unwrap_or(0.5);
 
     // **v5.6.0** — parallel cold-start load. Heavy I/O resources
     // (retrieval index ~18 MB, derived facts ~22 MB, root affinity
@@ -391,7 +403,7 @@ fn main() -> ExitCode {
         "adam-chat v{} — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.\n\
          Multi-line code blocks: open with ``` and close with ``` on its own line.\n\
          Voice output: pass --tts (default OS voice; or --tts-backend piper --tts-model <path>).\n\
-         Voice input (build with --features voice): --voice-input enables VAD continuous listening + whisper.cpp + auto-TTS; --push-to-talk for Enter-stops mode, --no-tts-on-voice to disable TTS.",
+         Voice input (build with --features voice): --voice-input enables VAD continuous listening + whisper.cpp + auto-TTS + confidence gate (default threshold 0.5); --push-to-talk for Enter-stops, --no-tts-on-voice to disable TTS, --whisper-confidence-threshold <0..1> to tune the gate.",
         env!("CARGO_PKG_VERSION")
     );
     let stdin = io::stdin();
@@ -427,6 +439,7 @@ fn main() -> ExitCode {
             whisper_model_arg.as_deref(),
             whisper_language_arg.as_deref(),
             push_to_talk,
+            voice_confidence_threshold,
         );
     }
 
@@ -471,6 +484,7 @@ fn run_voice_repl(
     whisper_model_arg: Option<&str>,
     whisper_language_arg: Option<&str>,
     push_to_talk: bool,
+    confidence_threshold: f32,
 ) -> ExitCode {
     use adam_voice::{MicCapture, MicConfig, VadStopReason, WhisperCli, write_wav};
 
@@ -612,11 +626,46 @@ fn run_voice_repl(
         };
         let _ = std::fs::remove_file(&wav_path);
         let _ = std::fs::remove_file(format!("{}.txt", wav_path.display()));
+        let _ = std::fs::remove_file(format!("{}.json", wav_path.display()));
         if transcript.text.trim().is_empty() {
             eprintln!("[voice] empty transcript — try again.");
             continue;
         }
-        eprintln!("[voice] heard: «{}»", transcript.text);
+        let conf_label = transcript
+            .confidence
+            .map(|c| format!(" (confidence ≈ {:.2})", c))
+            .unwrap_or_default();
+        eprintln!("[voice] heard{}: «{}»", conf_label, transcript.text);
+        // **v5.16.0 (V2).** Confidence gate. When whisper-cli's
+        // per-segment `avg_logprob` averaged below the configured
+        // threshold, surface the `voice_low_confidence` clarification
+        // family directly (bypassing the kernel) — a low-quality
+        // transcript would otherwise poison belief state and waste a
+        // kernel turn. The clarification template is rendered inline:
+        // pick a variant by rng_seed, substitute `{raw_transcript}`,
+        // print + speak.
+        if let Some(c) = transcript.confidence
+            && c < confidence_threshold
+        {
+            *turn += 1;
+            let seed = turn_seed(*turn);
+            let variants = repo.get("voice_low_confidence");
+            let chosen = if variants.is_empty() {
+                format!(
+                    "Кешіріңіз, дауысыңызды дұрыс ести алмадым: «{}». Қайталай аласыз ба?",
+                    transcript.text
+                )
+            } else {
+                variants[(seed as usize) % variants.len()]
+                    .replace("{raw_transcript}", &transcript.text)
+            };
+            println!("{chosen}");
+            if let Some(tts) = tts_handle {
+                let _ = tts.speak(&chosen);
+            }
+            io::stdout().lock().flush().ok();
+            continue;
+        }
         // **v5.15.0 (V1).** Voice path uses the same compound-
         // utterance splitter as text REPL — STT often returns a long
         // string when the user speaks several sentences in one
@@ -644,6 +693,7 @@ fn run_voice_repl(
     _whisper_model_arg: Option<&str>,
     _whisper_language_arg: Option<&str>,
     _push_to_talk: bool,
+    _confidence_threshold: f32,
 ) -> ExitCode {
     eprintln!(
         "adam-chat --voice-input requires the `voice` feature. \

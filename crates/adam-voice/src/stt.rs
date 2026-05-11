@@ -69,12 +69,19 @@ pub struct Transcript {
 
 /// Shell-out runner for whisper.cpp's `whisper-cli` (or the legacy
 /// `main` binary, both work). Configured by builder methods.
+///
+/// **v5.16.0 (V2).** Defaults to JSON-mode invocation
+/// (`--output-json`) so we can extract per-segment `avg_logprob`
+/// and surface a confidence score in [`Transcript::confidence`].
+/// Pre-v5.16.0 the runner used text-mode (`--output-txt`) and
+/// `confidence` was always `None`.
 #[derive(Debug, Clone)]
 pub struct WhisperCli {
     binary: PathBuf,
     model: Option<PathBuf>,
     language: String,
     threads: Option<u32>,
+    json_mode: bool,
 }
 
 impl WhisperCli {
@@ -88,7 +95,18 @@ impl WhisperCli {
             model: None,
             language: DEFAULT_LANGUAGE.to_string(),
             threads: None,
+            json_mode: true,
         }
+    }
+
+    /// **v5.16.0 (V2).** Force text-mode (`--output-txt`) instead of
+    /// the default JSON mode. `confidence` will be `None` in the
+    /// resulting [`Transcript`]; useful for testing the legacy code
+    /// path or when whisper-cli's JSON output is broken on the
+    /// installed binary.
+    pub fn with_text_mode(mut self) -> Self {
+        self.json_mode = false;
+        self
     }
 
     /// Construct from the `ADAM_WHISPER_BIN` env var.
@@ -121,9 +139,13 @@ impl WhisperCli {
             wav_path.display().to_string(),
             "--language".to_string(),
             self.language.clone(),
-            "--output-txt".to_string(),
             "--no-prints".to_string(),
         ];
+        if self.json_mode {
+            argv.push("--output-json".to_string());
+        } else {
+            argv.push("--output-txt".to_string());
+        }
         if let Some(model) = &self.model {
             argv.push("-m".to_string());
             argv.push(model.display().to_string());
@@ -136,8 +158,11 @@ impl WhisperCli {
     }
 
     /// Transcribe a WAV file. Spawns the configured binary, waits
-    /// for completion, reads the `<wav>.txt` artifact whisper.cpp
-    /// emits when `--output-txt` is set, returns the [`Transcript`].
+    /// for completion, reads either the `<wav>.json` or `<wav>.txt`
+    /// artifact whisper.cpp emits (depending on `json_mode`), and
+    /// returns the [`Transcript`]. JSON mode populates
+    /// `Transcript::confidence` from per-segment `avg_logprob`;
+    /// text mode leaves it `None`.
     pub fn transcribe(&self, wav_path: &Path) -> Result<Transcript> {
         if !self.binary.exists() {
             return Err(VoiceError::WhisperBinaryMissing(self.binary.clone()));
@@ -150,26 +175,103 @@ impl WhisperCli {
                 stderr: String::from_utf8_lossy(&output.stderr).into_owned(),
             });
         }
-        // whisper.cpp writes `<wav>.txt` next to the input WAV when
-        // --output-txt is passed. Read it.
-        let txt_path = {
-            let mut p = wav_path.to_path_buf();
-            let mut name = p.file_name().map(|n| n.to_os_string()).unwrap_or_default();
-            name.push(".txt");
-            p.set_file_name(name);
-            p
-        };
-        if !txt_path.exists() {
-            return Err(VoiceError::WhisperOutputMissing(txt_path));
+        let stderr = String::from_utf8_lossy(&output.stderr).into_owned();
+        if self.json_mode {
+            let json_path = sibling_path_with_extra_ext(wav_path, "json");
+            if !json_path.exists() {
+                return Err(VoiceError::WhisperOutputMissing(json_path));
+            }
+            let raw = std::fs::read_to_string(&json_path)?;
+            let (text, confidence) = parse_whisper_json(&raw);
+            Ok(Transcript {
+                text,
+                language: self.language.clone(),
+                confidence,
+                stderr,
+            })
+        } else {
+            let txt_path = sibling_path_with_extra_ext(wav_path, "txt");
+            if !txt_path.exists() {
+                return Err(VoiceError::WhisperOutputMissing(txt_path));
+            }
+            let text = std::fs::read_to_string(&txt_path)?.trim().to_string();
+            Ok(Transcript {
+                text,
+                language: self.language.clone(),
+                confidence: None,
+                stderr,
+            })
         }
-        let text = std::fs::read_to_string(&txt_path)?.trim().to_string();
-        Ok(Transcript {
-            text,
-            language: self.language.clone(),
-            confidence: None,
-            stderr: String::from_utf8_lossy(&output.stderr).into_owned(),
-        })
     }
+}
+
+/// `<wav>.txt` / `<wav>.json` — whisper.cpp appends the artifact
+/// extension to the *full* input file name, not to its stem. So
+/// `/tmp/foo.wav` produces `/tmp/foo.wav.txt`, not `/tmp/foo.txt`.
+fn sibling_path_with_extra_ext(wav_path: &Path, ext: &str) -> PathBuf {
+    let mut p = wav_path.to_path_buf();
+    let mut name = p.file_name().map(|n| n.to_os_string()).unwrap_or_default();
+    name.push(".");
+    name.push(ext);
+    p.set_file_name(name);
+    p
+}
+
+/// **v5.16.0 (V2).** Parse whisper.cpp `--output-json` artefact and
+/// extract `(text, confidence)`. `confidence` is the duration-
+/// weighted geometric mean of per-segment `exp(avg_logprob)` —
+/// approximates the average probability per token across the whole
+/// utterance. Returns `(text, None)` when no segments carry
+/// `avg_logprob` (older whisper.cpp builds, or extreme edge cases).
+///
+/// Pure / no I/O — kept crate-public so tests can inject synthetic
+/// JSON without spawning whisper.
+pub(crate) fn parse_whisper_json(raw: &str) -> (String, Option<f32>) {
+    let Ok(root) = serde_json::from_str::<serde_json::Value>(raw) else {
+        return (String::new(), None);
+    };
+    let segments = root
+        .get("transcription")
+        .and_then(|v| v.as_array())
+        .cloned()
+        .unwrap_or_default();
+    let mut texts: Vec<String> = Vec::new();
+    let mut logprob_sum: f64 = 0.0;
+    let mut weight_sum: f64 = 0.0;
+    for seg in &segments {
+        if let Some(t) = seg.get("text").and_then(|v| v.as_str()) {
+            texts.push(t.trim().to_string());
+        }
+        let logp = seg.get("avg_logprob").and_then(|v| v.as_f64());
+        let from = seg
+            .get("offsets")
+            .and_then(|o| o.get("from"))
+            .and_then(|v| v.as_i64())
+            .unwrap_or(0);
+        let to = seg
+            .get("offsets")
+            .and_then(|o| o.get("to"))
+            .and_then(|v| v.as_i64())
+            .unwrap_or(0);
+        let duration = (to - from).max(1) as f64;
+        if let Some(lp) = logp {
+            logprob_sum += lp * duration;
+            weight_sum += duration;
+        }
+    }
+    let text = texts
+        .iter()
+        .filter(|s| !s.is_empty())
+        .cloned()
+        .collect::<Vec<_>>()
+        .join(" ");
+    let confidence = if weight_sum > 0.0 {
+        let avg_logprob = logprob_sum / weight_sum;
+        Some(avg_logprob.exp() as f32)
+    } else {
+        None
+    };
+    (text.trim().to_string(), confidence)
 }
 
 #[cfg(test)]
@@ -179,6 +281,8 @@ mod tests {
 
     #[test]
     fn build_argv_minimal_v5140() {
+        // **v5.16.0** — default mode is now JSON (was text in V0/V1).
+        // Text-mode argv is exercised by `build_argv_text_mode_v5160`.
         let cli = WhisperCli::new("/opt/whisper/whisper-cli");
         let argv = cli.build_argv(&PathBuf::from("/tmp/in.wav"));
         assert_eq!(
@@ -188,10 +292,72 @@ mod tests {
                 "/tmp/in.wav",
                 "--language",
                 "kk",
-                "--output-txt",
                 "--no-prints",
+                "--output-json",
             ]
         );
+    }
+
+    #[test]
+    fn build_argv_text_mode_v5160() {
+        let cli = WhisperCli::new("/opt/whisper/whisper-cli").with_text_mode();
+        let argv = cli.build_argv(&PathBuf::from("/tmp/in.wav"));
+        assert!(argv.iter().any(|a| a == "--output-txt"));
+        assert!(!argv.iter().any(|a| a == "--output-json"));
+    }
+
+    #[test]
+    fn parse_whisper_json_extracts_text_and_confidence_v5160() {
+        // Synthetic JSON shaped after whisper.cpp 1.8.4 output.
+        let raw = r#"{
+            "result": {"language": "kk"},
+            "transcription": [
+                {
+                    "text": "Сәлеметсіз",
+                    "avg_logprob": -0.1,
+                    "offsets": {"from": 0, "to": 1000}
+                },
+                {
+                    "text": "бе",
+                    "avg_logprob": -0.2,
+                    "offsets": {"from": 1000, "to": 1500}
+                }
+            ]
+        }"#;
+        let (text, conf) = parse_whisper_json(raw);
+        assert_eq!(text, "Сәлеметсіз бе");
+        // Weighted avg logprob = (-0.1*1000 + -0.2*500) / 1500 ≈ -0.133
+        // exp(-0.133) ≈ 0.875
+        let c = conf.expect("confidence populated");
+        assert!(c > 0.85 && c < 0.90, "confidence ≈ 0.87, got {c}");
+    }
+
+    #[test]
+    fn parse_whisper_json_missing_logprobs_yields_none_confidence_v5160() {
+        let raw = r#"{
+            "transcription": [
+                {"text": "Сәлем", "offsets": {"from": 0, "to": 500}}
+            ]
+        }"#;
+        let (text, conf) = parse_whisper_json(raw);
+        assert_eq!(text, "Сәлем");
+        assert_eq!(conf, None);
+    }
+
+    #[test]
+    fn parse_whisper_json_malformed_returns_empty_v5160() {
+        let raw = "this is not json";
+        let (text, conf) = parse_whisper_json(raw);
+        assert_eq!(text, "");
+        assert_eq!(conf, None);
+    }
+
+    #[test]
+    fn parse_whisper_json_empty_transcription_v5160() {
+        let raw = r#"{"transcription": []}"#;
+        let (text, conf) = parse_whisper_json(raw);
+        assert_eq!(text, "");
+        assert_eq!(conf, None);
     }
 
     #[test]

@@ -681,6 +681,21 @@ templates = [
     "Қандай қатені түзетуді сұрап жатқаныңыз нақты белгісіз — менде осы сұхбатта тіркелген сәтсіз тапсырыс жоқ. Кодты бере салыңыз, қарап шығамын.",
 ]
 
+# **v5.16.0 (V2).** Voice-input clarification family. Fires when the
+# whisper-cli transcript confidence falls below the threshold
+# (default 0.5). adam_chat's voice REPL routes here BEFORE the
+# kernel turn so a low-confidence transcript never poisons belief
+# state. Slot {raw_transcript} is the literal STT output so the
+# user can see what adam *heard* (often surfaces «I thought you
+# said X — was that right?» dynamics).
+[[families]]
+key = "voice_low_confidence"
+templates = [
+    "Кешіріңіз, дауысыңызды дұрыс ести алмадым: «{raw_transcript}». Қайталай аласыз ба?",
+    "Сізді анық естімедім — қолымдағы нұсқа: «{raw_transcript}». Сұрағыңызды басқаша айтсаңыз болады.",
+    "Сөздеріңіз нақты түсіп алмады («{raw_transcript}»). Тағы бір рет, біршама баяу айтып көріңіз.",
+]
+
 # **v5.12.5 — Codex follow-up review (B5.3).** Corrected-code surface.
 # Pre-v5.12.5 «Түзетілген кодты көрсет» / «Тағы бір мысал бер» after a
 # failed SubmitSolution repeated the generic explanation family;

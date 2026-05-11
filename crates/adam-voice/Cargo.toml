@@ -7,6 +7,7 @@ description = "Voice I/O transducer for the Qazaq IR research kernel — periphe
 
 [dependencies]
 serde.workspace = true
+serde_json.workspace = true
 thiserror.workspace = true
 cpal = "0.15"
 hound = "3.5"

@@ -167,6 +167,14 @@ description = "Pre-rendered sequence of `{subject_term} — {object}.` propositi
 example = "Қасқыр — жыртқыш. Қасқыр — жануар. Қасқыр — тіршілік иесі."
 variants = ["literal"]
 
+# ── v5.16.0 (V2) — Voice clarification slot ───────────────────────
+[[slots]]
+name = "raw_transcript"
+kind = "noun_term"
+description = "Raw whisper.cpp transcript surfaced verbatim to the user when the confidence score fell below the threshold. Lets the user see what adam *heard* and decide whether to repeat or rephrase. Set by `adam_chat --voice-input` only; text-input turns never carry this slot."
+example = "Сәлем әсіпі"
+variants = ["literal"]
+
 # ── Reasoning + retrieval slots ────────────────────────────────────
 [[slots]]
 name = "fact"

@@ -21,6 +21,73 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.16.0] — 2026-05-10 — V2 — Whisper confidence gate + clarification template family
+
+**Minor-version release.** Third voice-arc milestone. Closes the «adam confidently answered to a garbled transcript» class of bug — the V1 release was happy to feed any whisper output into the deterministic kernel, including transcripts like «Сәлем әсіпі» where the user actually said «Сәлеметсіз бе» but whisper-medium guessed badly. v5.16.0 surfaces the engine's own uncertainty and routes low-confidence turns to a honest clarification template.
+
+### What changed
+
+**1. `WhisperCli` defaults to JSON mode.** Pre-v5.16.0 the runner invoked whisper-cli with `--output-txt` and parsed the resulting `<wav>.txt`; `Transcript::confidence` was always `None`. Post-v5.16.0 the default is `--output-json`, the runner parses the resulting `<wav>.json`, and populates confidence from per-segment `avg_logprob`. `WhisperCli::with_text_mode()` restores legacy behaviour (useful for testing or when JSON output is broken on the installed binary).
+
+**2. Confidence calculation.** New `parse_whisper_json` helper (crate-public for unit-testability) — duration-weighted geometric mean of `exp(avg_logprob)` across all transcription segments. Returns `(text, Option<f32>)`:
+- `Some(c)` where `c ∈ (0, 1)` — usable signal
+- `None` — JSON malformed, empty transcription, or all segments missing `avg_logprob` (older whisper builds)
+
+Empirically on whisper-medium + Kazakh: clean recordings score 0.7–0.95, ambiguous recordings 0.3–0.55, garbled recordings <0.25.
+
+**3. Voice REPL routing.** When `transcript.confidence < threshold`, the REPL bypasses the kernel entirely and renders a `voice_low_confidence` template variant with `{raw_transcript}` substituted in. Low-confidence transcripts never reach `Conversation::turn`, so belief state can't be poisoned by mis-recognised entity names.
+
+**4. New CLI flag `--whisper-confidence-threshold <0..1>`.** Default 0.5 — rejects roughly the worst quartile of medium-model output on Kazakh per our live-test. Tunable per-environment: 0.3 in noisy contexts (accept more), 0.7 in clean (reject more).
+
+**5. New `voice_low_confidence` template family.** Three Kazakh variants quoting the raw transcript verbatim so the user sees what adam *heard* and can decide whether to repeat or rephrase. New `raw_transcript` slot registered in `data/dialog/slot_inventory.toml`.
+
+### Live demo
+
+```text
+[user mumbles «Сәлеметсіз бе» away from the mic]
+[voice] heard (confidence ≈ 0.32): «Сәлем әсіпі»
+Кешіріңіз, дауысыңызды дұрыс ести алмадым: «Сәлем әсіпі». Қайталай аласыз ба?
+[adam speaks the clarification via TTS]
+
+[user repeats clearly]
+[voice] heard (confidence ≈ 0.91): «Сәлеметсіз бе»
+Сәлеметсіз бе! Қалыңыз қалай?
+```
+
+### Why `x.y.0`
+
+New public APIs (`WhisperCli::with_text_mode`, `parse_whisper_json`) + new CLI flag + new behavioural shape (transcript gate rejects sub-threshold input before kernel) + closes V2 voice-arc milestone.
+
+### Tests
+
+- 20 unit tests in `adam-voice` (5 new for V2):
+  - `build_argv_text_mode_v5160` — legacy mode preserved
+  - `parse_whisper_json_extracts_text_and_confidence_v5160` — synthetic JSON with two segments + weighted avg
+  - `parse_whisper_json_missing_logprobs_yields_none_confidence_v5160` — older whisper artifacts
+  - `parse_whisper_json_malformed_returns_empty_v5160`
+  - `parse_whisper_json_empty_transcription_v5160`
+- 1 new slot registered in `slot_inventory.toml` (`raw_transcript`); `slot_inventory_coverage_v570` invariant test confirms all template-referenced slots are registered
+- Workspace **1 300 passing** (+5), 17 ignored, 0 failures
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --all-targets --features voice -- -D warnings` clean; `cargo test --workspace` 0 failures; `bash scripts/check_metrics_currency.sh` clean.
+
+### Voice arc roadmap
+
+| Release | Status | Milestone |
+|---|---|---|
+| v5.14.0 | ✅ | V0 — push-to-talk + whisper shell-out |
+| v5.14.5 | ✅ | V0.1 — live-test fixes |
+| v5.14.6 | ✅ | V0.2 — greeting variants + auto-TTS |
+| v5.15.0 | ✅ | V1 — VAD + compound-utterance split |
+| **v5.16.0 (this)** | ✅ | **V2 — confidence gate + clarification** |
+| v5.17.0 | next | V3 — Kazakh transcript normalizer |
+| v5.18.0 | future | V4 — barge-in (TTS interruption) |
+| v5.19.0 | future | V5 — golden audio corpus + replay harness |
+
+**Stripe — Deterministic AI research (V2 voice-arc; confidence gate + clarification template family).**
+
 ## [5.15.0] — 2026-05-10 — V1 — VAD continuous listening + compound-utterance split
 
 **Minor-version release.** Second voice-arc milestone. Two complementary capabilities that together close the «I have to press Enter» / «it understood only the first clause» class of bugs the live-test surfaced.
