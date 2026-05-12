@@ -3158,6 +3158,41 @@ fn detect_ask_activity(joined: &str) -> bool {
 /// stripped of Accusative/Comitative case suffixes when possible.
 /// Multi-word phrases like «жасанды интеллект» are kept whole.
 fn detect_statement_of_activity(tokens: &[String], joined: &str) -> Option<Option<String>> {
+    // **v5.24.0 — Codex 2026-05-12 audit bug 4.** Reject inputs that
+    // are QUESTIONS, not statements. The walk-back logic captures
+    // anything between «мен» and the activity verb as the object;
+    // for «Мен немен айналысамын?» («What do I do?») that anything
+    // is «немен» — the wh-word — and the system happily wrote
+    // `activity = "немен"` to the session, then never recovered.
+    // A wh-word ANYWHERE in the input means the speaker is asking,
+    // not stating; the activity scan should bail.
+    const WH_TOKENS: &[&str] = &[
+        "не",
+        "нені",
+        "неге",
+        "немен",
+        "неліктен",
+        "не үшін",
+        "қандай",
+        "қайсы",
+        "кім",
+        "қайда",
+        "қашан",
+        "қалай",
+        "қанша",
+    ];
+    if tokens.iter().any(|t| {
+        WH_TOKENS.contains(
+            &t.trim_end_matches(['.', '!', '?', ','])
+                .to_string()
+                .as_str(),
+        )
+    }) {
+        return None;
+    }
+    if joined.ends_with('?') {
+        return None;
+    }
     const ACTIVITY_VERBS: &[&str] = &[
         // v4.51.0 — finite 1sg present-future forms.
         "әзірлеймін",

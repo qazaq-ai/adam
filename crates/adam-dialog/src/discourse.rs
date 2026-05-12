@@ -102,7 +102,12 @@ const DISCOURSE_ANAPHORS: &[&str] = &[
 /// intentionally surface-level — we don't want to lean on the
 /// FST here because the FST's analysis of these forms is exactly
 /// what `NOT_A_TOPIC` suppresses.
-pub fn input_contains_discourse_anaphor(input: &str) -> bool {
+/// **v5.24.0** — Returns true ONLY for inputs containing an explicit
+/// `DISCOURSE_ANAPHORS` lexical token (онда/ол/оны/бұл-determiner+…).
+/// Distinguishes "real" anaphor from the wh-first heuristic so the
+/// conversation layer can decide whether to override the current-turn
+/// noun_hint. Codex 2026-05-12 audit bug 3 fix needs this split.
+pub fn input_contains_explicit_anaphor(input: &str) -> bool {
     let lower = input.to_lowercase();
     if lower
         .split(|c: char| !c.is_alphabetic())
@@ -110,6 +115,14 @@ pub fn input_contains_discourse_anaphor(input: &str) -> bool {
     {
         return true;
     }
+    input_contains_adnominal_demonstrative(input)
+}
+
+pub fn input_contains_discourse_anaphor(input: &str) -> bool {
+    if input_contains_explicit_anaphor(input) {
+        return true;
+    }
+    let lower = input.to_lowercase();
     // **v4.73.0** — bare-interrogative follow-up coreference. Codex
     // 2026-05-06 review surfaced multi-turn gaps:
     //   «Қазақ хандығы қашан құрылды?» → answered, then
@@ -124,22 +137,11 @@ pub fn input_contains_discourse_anaphor(input: &str) -> bool {
     // last_query_topic. The token-count gate prevents false-positives
     // on «Кім [Х туралы кітап жазды]?» where X is supplied in the
     // same turn.
-    if is_short_interrogative_followup(&lower) {
-        return true;
-    }
-    // **v4.30.0** — adnominal-demonstrative coreference. Live REPL
-    // 2026-05-02 turn 11: «Бұл тілдегі кілт сөздер қандай?» — the
-    // intended referent is the language being discussed in prior
-    // turns (Rust). The bare-pronoun anaphor list (v4.13.0) doesn't
-    // catch this because «бұл» here is a determiner modifying a
-    // generic head noun («тіл / тілдегі») — not a standalone Acc/
-    // Loc/Dat pronoun. The pattern is a strong coreference signal:
-    // demonstrative determiner («бұл / осы / сол») + generic head
-    // («тіл / нәрсе / зат / тақырып / сала / ұғым / бағыт / жүйе»)
-    // means "the X we just discussed". Routes to the same
-    // `dialog_context.resolve_anaphor()` substitution path as the
-    // bare-pronoun anaphors.
-    input_contains_adnominal_demonstrative(input)
+    is_short_interrogative_followup(&lower)
+    // **v5.24.0** — adnominal-demonstrative coreference (бұл / осы /
+    // сол + generic head) now lives inside `input_contains_explicit_anaphor`
+    // and runs at the top of this function — checked above before we
+    // get here.
 }
 
 /// **v4.73.0** — Detects bare wh-interrogative follow-up questions
@@ -158,7 +160,16 @@ pub fn input_contains_discourse_anaphor(input: &str) -> bool {
 /// canonical anaphoric form is wh-word FIRST («Кім құрды? Қайда
 /// жүреді? Неге маңызды?»). When wh-word is in second / later
 /// position, the preceding content names the topic.
-fn is_short_interrogative_followup(lower: &str) -> bool {
+///
+/// **v5.24.0** — promoted to `pub(crate)` so the conversation layer
+/// can distinguish heuristic-anaphora (wh-first) from explicit-anaphor
+/// (DISCOURSE_ANAPHORS hit). Codex 2026-05-12 audit bug 3 fix needs
+/// the distinction: «Неге аспан көк?» triggers heuristic-anaphora but
+/// names its own subject «аспан» (should NOT override the current
+/// noun_hint), while «Ал онда қанша аймақ бар?» triggers explicit
+/// anaphor «онда» (SHOULD override — «аймақ» is the question
+/// predicate, not the topic).
+pub(crate) fn is_short_interrogative_followup(lower: &str) -> bool {
     const WH_INTERROGATIVES: &[&str] = &["кім", "қайда", "қашан", "неге", "неліктен", "қалай"];
     let tokens: Vec<&str> = lower
         .split(|c: char| !c.is_alphabetic())
@@ -1039,7 +1050,19 @@ pub fn split_compound_utterance(input: &str) -> Vec<String> {
             continue;
         }
         if !in_quote && matches!(ch, ',' | '.' | ';' | '!' | '?' | '…') {
-            let piece = buf.trim().to_string();
+            // **v5.24.0** — Codex 2026-05-12 audit bug 1. Terminal `?` and
+            // `!` carry the question-shape / exclamation signal that
+            // `semantics::detect_question_shape` relies on. Pre-v5.24.0
+            // they were dropped at split time and the live REPL silently
+            // re-classified «Қасқыр — тірі ме?» as a declarative
+            // statement, surfacing the definition «Қасқыр — жыртқыш.»
+            // instead of the yes-no answer. Preserve them by appending
+            // to the trimmed piece; `,` `.` `;` `…` stay informational
+            // and are dropped (they don't change intent shape).
+            let mut piece = buf.trim().to_string();
+            if matches!(ch, '?' | '!') && !piece.is_empty() {
+                piece.push(ch);
+            }
             if !piece.is_empty() {
                 parts.push(piece);
             }
@@ -1086,9 +1109,12 @@ mod compound_utterance_tests_v5150 {
 
     #[test]
     fn single_sentence_returns_one_piece_v5150() {
+        // **v5.24.0** — Codex 2026-05-12 audit bug 1 changed splitter
+        // semantics: terminal `?`/`!` now preserved on the piece so
+        // semantics::detect_question_shape sees the interrogative.
         assert_eq!(
             split_compound_utterance("Қасқыр — тірі ме?"),
-            vec!["Қасқыр — тірі ме".to_string()]
+            vec!["Қасқыр — тірі ме?".to_string()]
         );
         assert_eq!(
             split_compound_utterance("Сәлеметсіз бе"),
@@ -1113,9 +1139,35 @@ mod compound_utterance_tests_v5150 {
     #[test]
     fn splits_period_and_question_marks_v5150() {
         let parts = split_compound_utterance("Қасқыр — тірі ме? Ал тас?");
+        // **v5.24.0** — both pieces keep their terminal `?` so each
+        // individual turn re-detects yes-no question shape.
         assert_eq!(
             parts,
-            vec!["Қасқыр — тірі ме".to_string(), "Ал тас".to_string()]
+            vec!["Қасқыр — тірі ме?".to_string(), "Ал тас?".to_string()]
+        );
+    }
+
+    #[test]
+    fn preserves_terminal_exclamation_v5240() {
+        // **v5.24.0** — Codex audit bug 1: `!` also preserved.
+        let parts = split_compound_utterance("Сәлем! Қалайсыз?");
+        assert_eq!(parts, vec!["Сәлем!".to_string(), "Қалайсыз?".to_string()]);
+    }
+
+    #[test]
+    fn drops_non_terminal_punctuation_v5240() {
+        // Comma / period / semicolon / ellipsis stay informational
+        // (no intent shape encoded) and ARE dropped, unchanged from
+        // pre-v5.24.0 behaviour.
+        let parts = split_compound_utterance("Бір, екі. Үш; төрт…");
+        assert_eq!(
+            parts,
+            vec![
+                "Бір".to_string(),
+                "екі".to_string(),
+                "Үш".to_string(),
+                "төрт".to_string()
+            ]
         );
     }
 

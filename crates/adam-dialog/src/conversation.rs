@@ -804,21 +804,50 @@ impl Conversation {
                     ..
                 } = intent
                 {
-                    *noun_hint = Some(prev_topic);
-                    // **v4.37.5** — discourse-anaphora resolution is a
-                    // structural recovery of the topic from the
-                    // dialog context. The current turn's confidence
-                    // band reflects the surface-form pick (often Low
-                    // when the only token left is a pronoun like
-                    // `олар`); promoting to High here lets the
-                    // resolved topic continue to drive the standard
-                    // confident path instead of being intercepted by
-                    // the `clarify_low_confidence` fork. Without this
-                    // promotion, multi-turn anaphor cases like
-                    // «Оларды тізімдей аласыз ба?» following an
-                    // established list-class topic would clarify
-                    // instead of listing.
-                    *noun_hint_confidence = crate::topic_extraction::TopicConfidence::High;
+                    // **v5.24.0 — Codex 2026-05-12 audit bug 3.** Don't
+                    // overwrite a High-confidence current-turn noun_hint
+                    // with the prior topic WHEN anaphora was triggered
+                    // only by the wh-first heuristic (no explicit
+                    // discourse-anaphor token). Example: «Неге аспан
+                    // көк?» after a turn about `ownership` — wh-first
+                    // triggers `is_short_interrogative_followup`, but
+                    // «аспан» is the new topic, not the predicate.
+                    // Live transcript 2026-05-12.
+                    //
+                    // Gate ONLY the heuristic path. When the input
+                    // contains an explicit DISCOURSE_ANAPHORS token
+                    // («онда», «ол», «оны», «бұл тілдегі», …), the
+                    // override still wins: the current-turn content
+                    // noun is the question predicate and the prior
+                    // topic IS the subject (e.g. «Ал онда қанша аймақ
+                    // бар?» about Қазақстан — аймақ is predicate).
+                    let lower = input.to_lowercase();
+                    let only_heuristic_anaphora =
+                        crate::discourse::is_short_interrogative_followup(&lower)
+                            && !crate::discourse::input_contains_explicit_anaphor(input);
+                    let current_overrides_prior = only_heuristic_anaphora
+                        && matches!(
+                            noun_hint_confidence,
+                            crate::topic_extraction::TopicConfidence::High
+                        )
+                        && noun_hint.as_ref().is_some_and(|n| n != &prev_topic);
+                    if !current_overrides_prior {
+                        *noun_hint = Some(prev_topic);
+                        // **v4.37.5** — discourse-anaphora resolution is a
+                        // structural recovery of the topic from the
+                        // dialog context. The current turn's confidence
+                        // band reflects the surface-form pick (often Low
+                        // when the only token left is a pronoun like
+                        // `олар`); promoting to High here lets the
+                        // resolved topic continue to drive the standard
+                        // confident path instead of being intercepted by
+                        // the `clarify_low_confidence` fork. Without this
+                        // promotion, multi-turn anaphor cases like
+                        // «Оларды тізімдей аласыз ба?» following an
+                        // established list-class topic would clarify
+                        // instead of listing.
+                        *noun_hint_confidence = crate::topic_extraction::TopicConfidence::High;
+                    }
                 }
             }
         }
@@ -1081,6 +1110,34 @@ impl Conversation {
             && crate::discourse::is_kazakh_word_problem(input)
         {
             extra_slots.insert("__word_problem__".into(), "1".into());
+        }
+        // **v5.24.0 — Codex 2026-05-12 audit bug 4.** Self/other
+        // disambiguation for occupation queries. `detect_ask_occupation`
+        // fires on «немен айналыс» for BOTH directions:
+        //   - «Сен немен айналысасың?» (asking adam — 2sg)
+        //   - «Мен немен айналысамын?» (asking about self — 1sg)
+        // Without disambiguation the same `ask_occupation` family
+        // responds with adam's identity («Мен сөйлесуге жаралғанмын»)
+        // in both cases — self/other confusion. Detect 1sg morphology
+        // («менің / мен / -мын / -мін / -ым / -ім») and inject a
+        // sentinel that routes to the new `ask_occupation.unknown_user`
+        // family (honest «I don't know your occupation yet»). The
+        // existing `with_known_user` override (planner.rs:1184) still
+        // wins when the session has an `occupation` slot — recall path.
+        if matches!(intent, Intent::AskOccupation)
+            && !self.session.contains_key("occupation")
+            && !self.session.contains_key("activity")
+        {
+            let lower = input.to_lowercase();
+            let asks_about_self = lower.contains("менің")
+                || lower.contains("мамандығым")
+                || lower.contains("кәсібім")
+                || lower.contains("айналысамын")
+                || lower.contains("істеймін")
+                || lower.contains("жұмысым");
+            if asks_about_self {
+                extra_slots.insert("__self_unknown_profile__".into(), "occupation".into());
+            }
         }
         // **v5.21.5 — universal raw-input echo.** When the intent
         // is Unknown without a high-confidence noun_hint AND the

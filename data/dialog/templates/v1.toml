@@ -1221,6 +1221,21 @@ templates = [
     "мен тілдерді үйренемін",
 ]
 
+# **v5.24.0 — Codex 2026-05-12 audit bug 4.** Honest fallback when
+# the user asks about THEIR OWN occupation/activity («Мен немен
+# айналысамын?», «Менің кәсібім қандай?») but no `occupation` or
+# `activity` slot is stored. Pre-v5.24.0 this routed to bare
+# `ask_occupation` and adam replied «Мен сөйлесуге жаралғанмын» —
+# answering about itself instead of admitting it doesn't know
+# the user. Self/other confusion. Live transcript 2026-05-12.
+[[families]]
+key = "ask_occupation.unknown_user"
+templates = [
+    "сіздің кәсібіңізді әлі білмеймін; қалаған кезде «мен X-пын» деп айтсаңыз — есте сақтаймын",
+    "сіздің қызметіңіз менің есімде жоқ; кәсібіңізді айтсаңыз, келесі жолы білемін",
+    "не істейтініңізді әлі айтпағансыз; «менің мамандығым X» деп бөліссеңіз — есепке аламын",
+]
+
 # v4.2.5 — slot-aware variant for Intent::AskOccupation when
 # session.occupation is set.
 [[families]]

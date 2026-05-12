@@ -464,7 +464,25 @@ fn main() -> ExitCode {
             // irrelevant follow-ups (proverbs / unrelated facts).
             // Pre-v5.16.9 the loop kept going through every
             // sentence after the refusal.
-            for piece in adam_dialog::discourse::split_compound_utterance(&assembled) {
+            //
+            // **v5.24.0 — Codex 2026-05-12 audit bug 2.** Pre-scan
+            // the assembled utterance for safety category BEFORE
+            // splitting. Live failure: «Баламның қызуы бар, қандай
+            // дәрі берейін?» split at comma → first clause «Баламның
+            // қызуы бар» (statement, not advice-shape) was answered
+            // «Бала — адам.», and only the second clause «қандай дәрі
+            // берейін» fired safety refusal. The student saw the
+            // unsafe-tone definition before the refusal. The fix:
+            // if any safety topic is detected in the assembled
+            // input, run the WHOLE input as one piece so the kernel
+            // sees the full context and the refusal fires first.
+            let pieces: Vec<String> =
+                if adam_dialog::discourse::detect_safety_topic(&assembled).is_some() {
+                    vec![assembled.clone()]
+                } else {
+                    adam_dialog::discourse::split_compound_utterance(&assembled)
+                };
+            for piece in pieces {
                 turn += 1;
                 let seed = turn_seed(turn);
                 let safety_refused =
@@ -690,7 +708,19 @@ fn run_voice_repl(
         // **v5.16.9 — Codex 2026-05-11 audit priority B.**
         // Short-circuit on safety refusal. Same rationale as the
         // text REPL above.
-        for piece in adam_dialog::discourse::split_compound_utterance(&transcript.text) {
+        //
+        // **v5.24.0 — Codex 2026-05-12 audit bug 2.** Same safety
+        // pre-scan as the text REPL: if the STT transcript carries a
+        // safety topic anywhere, route the WHOLE transcript as one
+        // turn so the kernel-level safety refusal fires before any
+        // non-safety clause can answer.
+        let pieces: Vec<String> =
+            if adam_dialog::discourse::detect_safety_topic(&transcript.text).is_some() {
+                vec![transcript.text.clone()]
+            } else {
+                adam_dialog::discourse::split_compound_utterance(&transcript.text)
+            };
+        for piece in pieces {
             *turn += 1;
             let seed = turn_seed(*turn);
             let safety_refused = run_turn(conv, &piece, lex, repo, trace, seed, tts_handle);

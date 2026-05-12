@@ -1184,6 +1184,20 @@ pub fn plan_response_with_epistemic(
         (Intent::AskOccupation, _) if session.contains_key("occupation") => {
             Some("ask_occupation.with_known_user")
         }
+        // **v5.24.0 — Codex 2026-05-12 audit bug 4.** Self-asked
+        // occupation query with no stored profile: route to honest
+        // unknown-user family instead of bare ask_occupation (which
+        // answers about adam's identity — self/other confusion).
+        // The conversation layer sets `__self_unknown_profile__` when
+        // 1sg morphology is detected and no slot exists.
+        (Intent::AskOccupation, _)
+            if extra_slots
+                .get("__self_unknown_profile__")
+                .map(|s| s == "occupation")
+                .unwrap_or(false) =>
+        {
+            Some("ask_occupation.unknown_user")
+        }
         // **v4.51.0** — companion known-user override for
         // `Intent::AskActivity`. Surfaces the stored activity slot.
         (Intent::AskActivity, _) if session.contains_key("activity") => {

@@ -1,5 +1,7 @@
 # adam v3.0 — architecture reference
 
+> **⚠️ Historical snapshot (frozen v4.4.7).** This file documents the v3.0 commitment plus a v4.x continuity note frozen at v4.4.7 (numbers below: 30 domains / 874 entries / 995 facts, 10 reasoning rules, 26 recognisers, 54 cognitive-eval canonical, 27+3 REPL-replay dialogs). The deterministic retrieval-and-reasoning core described here is still load-bearing in v5.x, but the **live numeric claims and behavioural shape moved on**. For current state: [`README.md`](../README.md) (live metrics: 41 intents, 3124 / 3404 entries, 1402 tests), [`CHANGELOG.md`](../CHANGELOG.md) (post-v4.4.7 release history), [`docs/roadmap.md`](roadmap.md) (per-release deltas), [`docs/performance.md`](performance.md) (current latency / RSS). Codex 2026-05-12 audit recommended (rec. 7) this header so future readers don't read v4.4.7 numbers as current.
+
 This is the **single canonical description** of the v3.0 system. It freezes the architectural commitment assembled over the v2.5 → v2.9 reasoning ladder on top of the v2.0 retrieval foundation.
 
 > **v3.0 is not a trained neural model.** It is a deterministic **retrieval + composition + reasoning** engine over a curated Kazakh corpus. See [`project_retrieval_not_neural_v2`](roadmap.md#post-v10-direction). The v3.0 addition to v2.0's commitment: **adam now concludes, not just retrieves.** Every derivation is produced by an explicit rule and carries full source-chain provenance.

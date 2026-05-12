@@ -21,6 +21,78 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.24.0] — 2026-05-12 — Codex 2026-05-12 audit: 4 dialog-routing bug fixes + docs reconciliation
+
+**Minor.** Closes all 4 concrete bugs from the 2026-05-12 Codex audit. Each bug had a live failing transcript; each fix verified live post-rebuild.
+
+### Bug 1 — REPL `?`/`!` stripped at clause splitter
+
+**Symptom:** `--once 'Қасқыр — тірі ме?'` correctly answered «Иә, Қасқыр — тірі» (yes-no chain). Live REPL on the same input answered «Қасқыр — жыртқыш.» (definition statement). Pre-fix `discourse::split_compound_utterance` dropped terminal `?`/`!` along with informational `,`/`.`/`;`/`…`, so `semantics::detect_question_shape` saw no interrogative signal and re-classified the input as declarative.
+
+**Fix:** preserve terminal `?` and `!` on the piece. `,`/`.`/`;`/`…` still dropped (no intent shape encoded). [discourse.rs:1041](crates/adam-dialog/src/discourse.rs#L1041).
+
+**Live-verified:** REPL «Қасқыр — тірі ме?» → «Қасқыр — тірі. Бұл қасқыр → тірі тізбегі арқылы расталады.» ✓
+
+### Bug 2 — Multi-clause safety fires AFTER non-safety clause
+
+**Symptom (safety-critical):** «Баламның қызуы бар, қандай дәрі берейін?» in live REPL split at the comma. First clause «Баламның қызуы бар» (statement, no advice-shape) returned «Бала — адам.». Second clause «қандай дәрі берейін» fired safety refusal. Student saw the unsafe-tone definition BEFORE the refusal.
+
+**Fix:** REPL pre-scans the assembled input for safety topic via `detect_safety_topic` BEFORE clause splitting. If any safety category fires on the full input, route the WHOLE input as one piece so the kernel-level safety refusal fires first. Same pre-scan applied to the voice-input REPL (`run_voice_repl`). [adam_chat.rs:467](crates/adam-dialog/src/bin/adam_chat.rs#L467).
+
+**Live-verified:** «Баламның қызуы бар, қандай дәрі берейін?» → immediate medical refusal «Денсаулық туралы шешімді дәрігермен бірге қабылдау керек …» ✓
+
+### Bug 3 — wh-first anaphora over-eager
+
+**Symptom:** After «Python-да ownership бар ма?», the question «Неге аспан көк?» returned the previous ownership answer. Pre-fix `is_short_interrogative_followup` flagged wh-first short interrogatives as anaphoric, and `Conversation::turn` then unconditionally overwrote the current-turn `noun_hint` with the prior topic — even when the current turn named its own subject «аспан» at High confidence.
+
+**Fix:** split anaphor detection into two paths:
+
+- **Explicit anaphor** (DISCOURSE_ANAPHORS token «онда» / «ол» / «оны» / adnominal-demonstrative): override unconditionally (the prior topic IS the subject; current-turn content noun is the question predicate). Example: «Ал онда қанша аймақ бар?» after «Қазақстан туралы…» — preserve old behaviour.
+- **Wh-first heuristic** (no explicit anaphor token, just short wh-first interrogative): gate the override on `noun_hint_confidence`. If the current-turn FST already extracted a High-confidence noun_hint that differs from the prior topic, the current turn names its own subject — don't override.
+
+[discourse.rs:121](crates/adam-dialog/src/discourse.rs#L121) (new `input_contains_explicit_anaphor` helper), [conversation.rs:783](crates/adam-dialog/src/conversation.rs#L783) (gated override).
+
+**Live-verified:** Python+ownership turn, then «Неге аспан көк?» → «Аспан себебін нақты айта алмаймын — менің білім қорымда бұл туралы дерек жоқ.» (answers about аспан, not ownership) ✓. Regression check: «Қазақстан туралы…» then «Ал онда қанша аймақ бар?» → «Қазақстанның аймақтары — 17 облыс пен 3 республикалық маңызы бар қала.» (explicit anaphor still resolves) ✓
+
+### Bug 4 — Self/other confusion in profile queries
+
+**Symptom:** «Мен немен айналысамын?» (user asks about themselves) returned «Мен сөйлесуге жаралғанмын.» (adam's own identity), and the activity-statement compound scanner stored `activity = "немен"` (the wh-word, not real content).
+
+**Fix:** two-part:
+
+1. **`detect_statement_of_activity`** now rejects inputs containing wh-words («не / нені / неге / немен / қандай / қайсы / кім / қайда / қашан / қалай / қанша») or ending in `?`. A wh-word means the speaker is asking, not stating. Closes the `activity = "немен"` storage. [semantics.rs:3160](crates/adam-dialog/src/semantics.rs#L3160).
+2. **`Intent::AskOccupation` with 1sg morphology + empty profile slot** routes to new `ask_occupation.unknown_user` template family: «Сіздің кәсібіңізді әлі білмеймін; қалаған кезде «мен X-пын» деп айтсаңыз — есте сақтаймын.» Conversation sets `__self_unknown_profile__=occupation` when input has 1sg markers («менің / мамандығым / кәсібім / айналысамын / істеймін / жұмысым») AND no `occupation`/`activity` in session. Planner branches on the sentinel. [conversation.rs:1106](crates/adam-dialog/src/conversation.rs#L1106), [planner.rs:1184](crates/adam-dialog/src/planner.rs#L1184).
+
+**Live-verified:** `--once 'Мен немен айналысамын?'` → «Сіздің кәсібіңізді әлі білмеймін; қалаған кезде «мен X-пын» деп айтсаңыз — есте сақтаймын.» ✓
+
+### Docs reconciliation (Codex recommendation 7)
+
+`docs/architecture_v3.md` carried a v4.x continuity note frozen at v4.4.7 (30 domains / 874 entries / 995 facts, 10 reasoning rules, 26 recognisers, 54 cognitive-eval, 27+3 REPL-replay). v5.x has moved on (41 intents, 3124 / 3404 entries, 1402 tests). Added a clear "Historical snapshot (frozen v4.4.7)" header at the top pointing to README / CHANGELOG / roadmap / performance for current state. Document remains as the canonical description of the deterministic retrieval-and-reasoning core architecture, which is still load-bearing.
+
+### Verified
+
+- 1 new `discourse` test (drop_non_terminal_punctuation), 1 new `discourse` test (preserves_terminal_exclamation), plus updated 3 existing tests to match new splitter contract.
+- `cargo test --workspace --locked --no-fail-fast` — **1 402 passing** (+2 from v5.23.5).
+- Adversarial 95 / 95 unchanged.
+- fmt + clippy + `verify_release_version.sh` + `check_metrics_currency.sh` clean.
+
+### Why x.24.0 (minor)
+
+New public API surface (`discourse::input_contains_explicit_anaphor`, `discourse::is_short_interrogative_followup` promoted to `pub(crate)`). Plus new template family `ask_occupation.unknown_user` and new planner override key. Plus 4 behavioural changes visible to ALL multi-clause / wh-first / safety-prefix / self-asked routings.
+
+### Not in this release (Codex recommendations deferred)
+
+- **Rec. 5** — adversarial benchmark 200-500 cases with relevance scoring: separate week-scale arc.
+- **Rec. 6** — voice golden audio corpus: already on roadmap as Voice arc V5 (post-V4 barge-in).
+
+### Next
+
+- **v5.24.5** — small follow-ups from this audit if surfaced live.
+- **v5.25.0+** — Voice arc V4 (barge-in / TTS interruption).
+- **v5.x** — Voice arc V5 (golden audio + WER / CER baseline).
+
+Stripe — Deterministic AI research (Codex audit P0/P1 routing fixes; safety pre-scan; anaphora discipline; self/other disambiguation).
+
 ## [5.23.5] — 2026-05-12 — CI hotfix: clippy `manual_pattern_char_comparison` on `capitalize_proper_name`
 
 **Patch.** v5.23.0 cleared local clippy but tripped CI's stricter Rust 1.95 toolchain on the new `nlg::capitalize_proper_name` helper. The closure form `|c: char| c == ' ' || c == '-'` in `split_inclusive` is now flagged by `clippy::manual_pattern_char_comparison` (added in clippy 1.95). Replaced with array literal `[' ', '-']` per the lint suggestion. No behavioural change.
