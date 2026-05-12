@@ -21,6 +21,32 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.23.5] — 2026-05-12 — CI hotfix: clippy `manual_pattern_char_comparison` on `capitalize_proper_name`
+
+**Patch.** v5.23.0 cleared local clippy but tripped CI's stricter Rust 1.95 toolchain on the new `nlg::capitalize_proper_name` helper. The closure form `|c: char| c == ' ' || c == '-'` in `split_inclusive` is now flagged by `clippy::manual_pattern_char_comparison` (added in clippy 1.95). Replaced with array literal `[' ', '-']` per the lint suggestion. No behavioural change.
+
+### Why a new release (not a force-moved tag)
+
+Repository rules protect release tags from force-push (`refs/tags/v*` immutable). Per project convention `.0 / .5` cadence (`feedback_versioning_post_1_0`), the next sequential step is `.5` — v5.23.5 ships the CI hotfix without skipping or rewriting history. v5.23.0 tag remains at `cb8a29a`; v5.23.5 picks up the clippy fix at `3031999` plus this release-packaging commit.
+
+### Verified
+
+- `cargo test --workspace --locked --no-fail-fast` — **1 400 passing** (unchanged from v5.23.0).
+- Adversarial 95/95 unchanged.
+- fmt + verify_release_version + check_metrics_currency clean.
+- (CI on this commit will confirm Rust 1.95 clippy is green.)
+
+### Why x.23.5 (patch)
+
+One-character change to a `split_inclusive` call. Pure clippy hygiene; no public API or behavioural impact.
+
+### Next
+
+- **v5.24.0+** — Voice arc V4 (barge-in / TTS interruption).
+- **v5.x** — Voice arc V5 (golden audio + WER/CER baseline).
+
+Stripe — Deterministic AI research.
+
 ## [5.23.0] — 2026-05-12 — Realistic answers: meta-opener strip + proper-name capitalisation + first-president routing
 
 **Minor.** Triple fix from the 2026-05-12 live voice transcript. Three concrete dialog failures and a v5.22.5 regression closed in one release:
