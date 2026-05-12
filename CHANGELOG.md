@@ -21,6 +21,66 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.21.0] — 2026-05-12 — Math echo specificity (transparent refusal)
+
+**Minor.** First release in the **specificity-through-transparency** arc — replaces generic «I can't compute that» refusals with echoes that show the user exactly what adam parsed. User feedback after v5.20.0: «он на многие диалоги отвечает шаблонно… он должен попросить уточнить **то, что он не понял** — а не дежурное предложение на все случаи жизни, как робот».
+
+### What was wrong
+
+Live test caught: «Елу алты төртке көбейтіп екіге бөл» (= 56 × 4 / 2) → adam returned the generic `math_refusal` family («Санақ-есептеу әлі қазақша сөйлемдер арқылы менің мүмкіндігімде жоқ; «X+Y» немесе «X*Y» түрінде сандармен жазып берсеңіз»). Student sees a **black box**: doesn't know whether adam heard the numbers, the operators, or anything at all. Hard to reformulate without that signal.
+
+### What changed
+
+**1. `discourse::extract_kazakh_math_summary`** — new public function. Returns a `KazakhMathSummary { numbers, operators, looks_like_math }` even when `try_evaluate_kazakh_word_math` can't compute (multi-step chains, partial mishearings, exotic verb forms). The extractor:
+- Reads Arabic digits and Kazakh number words (units «бір–тоғыз», tens «он–тоқсан»).
+- Recognises Kazakh math verbs via the existing `detect_kazakh_math_op` (Add / Sub / Mul / Div).
+- Merges tens + units only when the units token is **bare** («елу алты» → 56), not when case-marked («елу үшке» → [50, 3] as separate operands).
+- Strips case suffixes (Acc / Dat / Abl / Loc) only when a bare lookup fails — protects short forms like «алты» (6) from over-trimming.
+
+**2. `discourse::render_math_summary_as_arithmetic`** — turns a summary into a canonical arithmetic echo («56 * 7 / 3»).
+
+**3. `KazakhMathOpName` public surface** — exposed enum + `glyph()` so callers building user-facing prose don't need the private `KazakhMathOp`.
+
+**4. `Conversation::turn`** — after the existing math-eval cascade fails, calls `extract_kazakh_math_summary`. When ≥ 2 numbers or ≥ 1 operator were recognised, sets `__math_partial_summary__` extra-slot with the rendered arithmetic.
+
+**5. Planner override** — routes turns with `__math_partial_summary__` to the new template family, populating `{partial}` slot from the rendered echo.
+
+**6. `math_refusal.with_understood` template family** (3 variants):
+> «Сіздің сұрағыңызды «{partial}» деп ұқтым, бірақ көп қадамды есепті әлі қазақша сөйлемдер арқылы шеше алмаймын. Арифметика түрінде жазсаңыз — есептеп беремін.»
+
+**7. `partial` slot registered** in `slot_inventory.toml`.
+
+### Live-verified
+
+| Input | Pre-v5.21.0 | Post-v5.21.0 |
+|---|---|---|
+| «Елу алты төртке көбейтіп екіге бөл.» | «Санақ-есептеу әлі қазақша сөйлемдер арқылы менің мүмкіндігімде жоқ» (generic) | «Мен «56 * 4 / 2» деп ұқтым. Бірақ көп қадамды сөйлеммен берілген есепті қазақша өрнектен шығаруды әлі үйренген жоқпын. Арифметика түрінде жазсаңыз, нәтижесін бірден шығарамын.» ✅ |
+| «Елу үшке көбейт.» | Same generic | «Мен «50 * 3» деп ұқтым…» ✅ |
+| «Елу алты қанша?» (fusion case — single number) | Topic-extraction (correct) | Topic-extraction (unchanged — no need for echo) ✅ |
+
+### Verified
+
+- 6 new unit tests in `math_summary_tests_v5210` (multi-step extraction, arithmetic rendering, non-math no-trigger, Arabic-digit + word-op mix, tens-units fusion, standalone tens guard).
+- `cargo test --workspace --locked --no-fail-fast` — **1 378 passing** (+11 from v5.20.0: 6 unit + 5 incidental on related paths).
+- `cargo test -p adam-dialog --test adversarial_dialog_v1` — 95/95 unchanged at floor 1.0.
+- `cargo fmt --all --check` + `cargo clippy --all-targets -- -D warnings` clean.
+
+### Architecture: specificity-through-transparency
+
+Same pattern will apply to other refusal paths in upcoming releases:
+
+| Release | Path | Specific echo |
+|---|---|---|
+| **v5.21.0** (this) | Multi-step Kazakh math | «Мен «56 * 4 / 2» деп ұқтым» |
+| v5.21.5 (planned) | Ambiguous noun follow-up | «Сіздің [topic] туралы сұрағаныңызды ұқтым» |
+| v5.22.0 (planned) | Unknown-word clarification | «Менің естуімде «X» болды, бірақ танымадым — басқаша айтсаңыз?» |
+
+### Why x.21.0 (minor)
+
+New public APIs (`KazakhMathSummary`, `KazakhMathOpName`, `extract_kazakh_math_summary`, `render_math_summary_as_arithmetic`) + new public template family + new architectural surface («transparent refusal echoes»). Patch reserved for follow-up specificity work on related paths.
+
+Stripe — Deterministic AI research (transparent refusal foundation; user sees what adam parsed even when it can't fully compute).
+
 ## [5.20.0] — 2026-05-12 — Kazakh fuzzy entity matcher (universal voice + text)
 
 **Minor.** Foundation release for **universal fuzzy entity recovery** — applies to both voice-input (Whisper mishearings) and text-input (typos, alternate spellings, dialectal variants). User feedback after v5.19.0 live test: «не у всех людей хорошая дикция и произношение… если пользователь говорит "Сарсенбай", а модель не разобрала имя, то она должна понимать, что человек произнес свое имя». Extended to text too: «человек может написать с ошибкой».

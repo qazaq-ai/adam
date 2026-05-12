@@ -2937,6 +2937,243 @@ pub fn try_evaluate_kazakh_word_math(input: &str) -> Option<i64> {
 /// Both forms attach to the four math-verb roots: көбейт, бөл, қос,
 /// азайт.
 ///
+/// **v5.21.0 — math echo specificity.** Summary of what the
+/// Kazakh-word-math layer was able to extract from an utterance,
+/// even when full evaluation failed. Used to convert a generic
+/// «I can't compute that» refusal into a transparent echo that
+/// shows the user which numbers and operators were understood
+/// and asks for a specific format the parser CAN evaluate.
+#[derive(Debug, Clone, PartialEq)]
+pub struct KazakhMathSummary {
+    /// Numbers recognised in the input, in order of appearance.
+    /// Includes both Arabic digits and Kazakh number words; tens +
+    /// units are merged («елу алты» → 56).
+    pub numbers: Vec<i64>,
+    /// Math operators recognised, in order of appearance.
+    pub operators: Vec<KazakhMathOpName>,
+    /// Whether the input contains at least one indicator that this
+    /// IS a math request — a Kazakh math verb stem, an Arabic
+    /// operator (+/-/*), or a question word about computation.
+    pub looks_like_math: bool,
+}
+
+/// Public surface form of [`KazakhMathOp`]. The internal `enum`
+/// stays private (other modules don't need to construct one); this
+/// variant set is exposed for callers building user-facing prose
+/// like «56-ны 7-ге көбейтіп 3-ке бөл».
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KazakhMathOpName {
+    Add,
+    Sub,
+    Mul,
+    Div,
+}
+
+impl KazakhMathOpName {
+    /// The Arabic-arithmetic glyph for this operator. Used when
+    /// echoing back a partial parse to the user in the «56*7/3»
+    /// canonical form they can re-type.
+    pub fn glyph(self) -> char {
+        match self {
+            Self::Add => '+',
+            Self::Sub => '-',
+            Self::Mul => '*',
+            Self::Div => '/',
+        }
+    }
+}
+
+impl From<KazakhMathOp> for KazakhMathOpName {
+    fn from(op: KazakhMathOp) -> Self {
+        match op {
+            KazakhMathOp::Add => Self::Add,
+            KazakhMathOp::Sub => Self::Sub,
+            KazakhMathOp::Mul => Self::Mul,
+            KazakhMathOp::Div => Self::Div,
+        }
+    }
+}
+
+/// **v5.21.0 — math echo specificity.** Extract a [`KazakhMathSummary`]
+/// from a Kazakh-language math request even when
+/// [`try_evaluate_kazakh_word_math`] can't fully evaluate it.
+///
+/// The goal is **transparent refusal**: rather than emitting the
+/// generic `math_refusal` family («Санақ-есептеу әлі қазақша
+/// сөйлемдер арқылы менің мүмкіндігімде жоқ»), the dialog layer
+/// uses this summary to compose «56-ны 7-ге көбейтіп 3-ке бөл деп
+/// ұқтым — арифметика түрінде жазсаңыз («56*7/3»), есептеп
+/// беремін». The user sees that adam parsed the request and knows
+/// exactly which format the system accepts.
+///
+/// Returns `None` when nothing math-like is visible in the input —
+/// no Kazakh math verbs, no digits, no math-question words. That
+/// case falls through to the existing topic-extraction path.
+pub fn extract_kazakh_math_summary(input: &str) -> Option<KazakhMathSummary> {
+    let lower = input.to_lowercase();
+    let tokens: Vec<&str> = lower
+        .split(|c: char| !c.is_alphanumeric() && c != '_')
+        .filter(|t| !t.is_empty())
+        .collect();
+
+    let mut numbers: Vec<i64> = Vec::new();
+    let mut operators: Vec<KazakhMathOpName> = Vec::new();
+    let mut i = 0;
+    while i < tokens.len() {
+        let t = tokens[i];
+        // Arabic digit literal.
+        if let Ok(n) = t.parse::<i64>() {
+            numbers.push(n);
+            i += 1;
+            continue;
+        }
+        // Look up the bare token first. Only fall back to case-strip
+        // for tokens that don't match a bare numeral — case-strip
+        // can over-trim short forms like «алты» (6), where the «ты»
+        // suffix is part of the stem, not a case marker.
+        let bare_units = kazakh_units_value_local(t);
+        let bare_tens = kazakh_tens_value_local(t);
+        let used_bare = bare_units.is_some() || bare_tens.is_some();
+        let stripped = if used_bare {
+            t
+        } else {
+            strip_kazakh_numeral_case(t)
+        };
+        if let Some(units) = bare_units.or_else(|| kazakh_units_value_local(stripped)) {
+            // Tens + units fusion: «елу алты» → 56 only when the
+            // units token is BARE (no case-marker stripped off).
+            // Case-marked units like «үшке» («to three», Dative) are
+            // operands in their own right — they go into a separate
+            // numbers slot for the math evaluator. Without this
+            // guard, «Елу үшке көбейт» fuses into 53 and loses the
+            // 50 × 3 structure.
+            if used_bare
+                && let Some(last) = numbers.last_mut()
+                && (10..=90).contains(last)
+                && *last % 10 == 0
+                && i > 0
+                && kazakh_tens_value_local(strip_kazakh_numeral_case(tokens[i - 1])).is_some()
+            {
+                *last += units as i64;
+            } else {
+                numbers.push(units as i64);
+            }
+            i += 1;
+            continue;
+        }
+        if let Some(tens) = bare_tens.or_else(|| kazakh_tens_value_local(stripped)) {
+            numbers.push(tens as i64);
+            i += 1;
+            continue;
+        }
+        // Math operator: try the existing detector on a one-token
+        // and two-token window.
+        if let Some(op) = detect_kazakh_math_op(&[t]) {
+            operators.push(op.into());
+            i += 1;
+            continue;
+        }
+        if i + 1 < tokens.len()
+            && let Some(op) = detect_kazakh_math_op(&[t, tokens[i + 1]])
+        {
+            operators.push(op.into());
+            i += 2;
+            continue;
+        }
+        i += 1;
+    }
+
+    let arabic_op = lower.chars().any(|c| matches!(c, '+' | '-' | '*' | '/'));
+    let math_question =
+        lower.contains("қанша") || lower.contains("нәтиже") || lower.contains("есепте");
+    let looks_like_math = !operators.is_empty() || arabic_op || math_question;
+
+    if numbers.is_empty() && operators.is_empty() && !looks_like_math {
+        return None;
+    }
+    if numbers.is_empty() {
+        return None;
+    }
+
+    Some(KazakhMathSummary {
+        numbers,
+        operators,
+        looks_like_math,
+    })
+}
+
+/// Strip common Kazakh case-marking suffixes from a numeral token
+/// so the lookup tables (which list bare stems) match. Conservative
+/// — only handles the case set the math evaluator already supports.
+fn strip_kazakh_numeral_case(token: &str) -> &str {
+    for suffix in [
+        "ны", "ні", "ды", "ді", "ты", "ті", // Accusative
+        "ға", "ге", "қа", "ке", // Dative
+        "нан", "нен", "дан", "ден", "тан", "тен", // Ablative
+        "да", "де", "та", "те", // Locative
+    ] {
+        if let Some(stripped) = token.strip_suffix(suffix)
+            && !stripped.is_empty()
+        {
+            return stripped;
+        }
+    }
+    token
+}
+
+fn kazakh_units_value_local(token: &str) -> Option<u32> {
+    match token {
+        "бір" => Some(1),
+        "екі" => Some(2),
+        "үш" => Some(3),
+        "төрт" => Some(4),
+        "бес" => Some(5),
+        "алты" => Some(6),
+        "жеті" => Some(7),
+        "сегіз" => Some(8),
+        "тоғыз" => Some(9),
+        _ => None,
+    }
+}
+
+fn kazakh_tens_value_local(token: &str) -> Option<u32> {
+    match token {
+        "он" => Some(10),
+        "жиырма" => Some(20),
+        "отыз" => Some(30),
+        "қырық" => Some(40),
+        "елу" => Some(50),
+        "алпыс" => Some(60),
+        "жетпіс" => Some(70),
+        "сексен" => Some(80),
+        "тоқсан" => Some(90),
+        _ => None,
+    }
+}
+
+/// **v5.21.0** — render a `KazakhMathSummary` into a canonical
+/// arithmetic expression for the echo template («56 × 7 ÷ 3» style).
+/// Returns `None` when the summary doesn't have enough numbers
+/// (N) and operators (N-1) to form a sensible chain.
+pub fn render_math_summary_as_arithmetic(summary: &KazakhMathSummary) -> Option<String> {
+    if summary.numbers.is_empty() {
+        return None;
+    }
+    let mut out = String::new();
+    out.push_str(&summary.numbers[0].to_string());
+    let mut op_iter = summary.operators.iter();
+    for n in summary.numbers.iter().skip(1) {
+        if let Some(op) = op_iter.next() {
+            out.push_str(&format!(" {} ", op.glyph()));
+        } else {
+            // Numbers without enough operators: separator-only.
+            out.push_str(" ? ");
+        }
+        out.push_str(&n.to_string());
+    }
+    Some(out)
+}
+
 /// Conservative: only inserts AFTER a token that's recognisable as
 /// a math-verb gerund/converb, so non-math gerund forms in the
 /// input are left alone.
@@ -4153,5 +4390,66 @@ mod tests {
         // Sanity: legacy 2sg-verb vocative still strips because the
         // residual doesn't end in a yes/no IsA particle.
         assert_eq!(strip_addressee("Адам — қаласың?"), "қаласың?");
+    }
+}
+
+#[cfg(test)]
+mod math_summary_tests_v5210 {
+    use super::*;
+
+    #[test]
+    fn extracts_multi_step_kazakh_word_math_v5210() {
+        // User's live-test failure: 56 × 4 / 2.
+        let summary = extract_kazakh_math_summary("Елу алты төртке көбейтіп екіге бөл.").unwrap();
+        assert_eq!(summary.numbers, vec![56, 4, 2]);
+        assert_eq!(
+            summary.operators,
+            vec![KazakhMathOpName::Mul, KazakhMathOpName::Div]
+        );
+        assert!(summary.looks_like_math);
+    }
+
+    #[test]
+    fn renders_arithmetic_echo_v5210() {
+        let summary = KazakhMathSummary {
+            numbers: vec![56, 7, 3],
+            operators: vec![KazakhMathOpName::Mul, KazakhMathOpName::Div],
+            looks_like_math: true,
+        };
+        let rendered = render_math_summary_as_arithmetic(&summary).unwrap();
+        assert_eq!(rendered, "56 * 7 / 3");
+    }
+
+    #[test]
+    fn no_summary_for_non_math_input_v5210() {
+        // Plain dialog turn, no numbers / operators / quantity question.
+        assert!(extract_kazakh_math_summary("Сәлем! Қалыңыз қалай?").is_none());
+    }
+
+    #[test]
+    fn extracts_arabic_digits_with_word_op_v5210() {
+        let summary = extract_kazakh_math_summary("56 төртке көбейтіп екіге бөл").unwrap();
+        // 56 explicit digit + 4 + 2; ops Mul, Div.
+        assert!(summary.numbers.contains(&56));
+        assert!(summary.numbers.contains(&4));
+        assert!(summary.numbers.contains(&2));
+        assert!(summary.operators.contains(&KazakhMathOpName::Mul));
+        assert!(summary.operators.contains(&KazakhMathOpName::Div));
+    }
+
+    #[test]
+    fn tens_units_merge_v5210() {
+        // «елу алты» = 56, not 50 + 6 as separate numbers.
+        let summary = extract_kazakh_math_summary("Елу алты қанша?").unwrap();
+        assert_eq!(summary.numbers, vec![56]);
+    }
+
+    #[test]
+    fn standalone_tens_kept_when_followed_by_op_v5210() {
+        // «Елу үшке көбейт» = 50 × 3 (no units follow «елу»; «үш» is
+        // the next number not part of «елу алты» fusion).
+        let summary = extract_kazakh_math_summary("Елу үшке көбейт").unwrap();
+        assert_eq!(summary.numbers, vec![50, 3]);
+        assert_eq!(summary.operators, vec![KazakhMathOpName::Mul]);
     }
 }

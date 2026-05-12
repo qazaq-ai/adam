@@ -1613,6 +1613,22 @@ impl Conversation {
                 self.session.insert("last_math_steps".into(), steps);
             } else {
                 extra_slots.insert("__math_input__".into(), "1".into());
+                // **v5.21.0 — math echo specificity.** Even when the
+                // evaluator can't compute a result, try to extract a
+                // summary of what was understood (numbers + operators).
+                // The planner uses this to compose a transparent
+                // refusal that echoes back the parsed parts and shows
+                // the user exactly which arithmetic form adam accepts.
+                // Prefer this over the generic `math_refusal` family
+                // when ≥ 2 numbers or ≥ 1 operator were recognised.
+                if let Some(summary) =
+                    crate::discourse::extract_kazakh_math_summary(resolved_input.as_ref())
+                    && (summary.numbers.len() >= 2 || !summary.operators.is_empty())
+                    && let Some(arithmetic) =
+                        crate::discourse::render_math_summary_as_arithmetic(&summary)
+                {
+                    extra_slots.insert("__math_partial_summary__".into(), arithmetic);
+                }
             }
         }
         // **v4.76.0** — explain_steps post-pass. After the math-eval

@@ -550,6 +550,26 @@ templates = [
     "Қазақ тілінде өрнектелген математикалық есепті әлі шеше алмаймын — қарапайым сандық өрнекті жазсаңыз («5+5», «12/4»), есептейтін боламын",
 ]
 
+# **v5.21.0 — math echo specificity.** Routed via
+# `__math_partial_summary__` extra-slot when
+# `discourse::extract_kazakh_math_summary` recognised numbers +
+# operators but `try_evaluate_kazakh_word_math` couldn't compute
+# (multi-step chains, partial mishearings, exotic verb forms).
+# Echoes the parsed arithmetic back to the user — transparent
+# refusal that shows what adam understood and asks for a specific
+# arithmetic-glyph form the parser accepts. Distinct from the
+# generic `math_refusal` family which has no echo.
+#
+# The `{partial}` slot is set by the planner from
+# `render_math_summary_as_arithmetic` (e.g., «56 * 7 / 3»).
+[[families]]
+key = "math_refusal.with_understood"
+templates = [
+    "Сіздің сұрағыңызды «{partial}» деп ұқтым, бірақ көп қадамды есепті әлі қазақша сөйлемдер арқылы шеше алмаймын. Арифметика түрінде жазсаңыз — есептеп беремін.",
+    "Сіз «{partial}» деген есепті айтыңыз ба? Көп амалды қазақша сөйлеммен әлі шеше алмаймын; сандармен жазсаңыз («{partial}» түрінде) — бірден есептеймін.",
+    "Мен «{partial}» деп ұқтым. Бірақ көп қадамды сөйлеммен берілген есепті қазақша өрнектен шығаруды әлі үйренген жоқпын. Арифметика түрінде жазсаңыз, нәтижесін бірден шығарамын.",
+]
+
 # **v5.18.1** — adversarial D2a ma_14 closure. Division by zero is
 # undefined in arithmetic; this is a math-education concept the
 # student should learn explicitly. Routed via `__div_by_zero__`

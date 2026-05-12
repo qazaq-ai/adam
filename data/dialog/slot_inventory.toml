@@ -220,6 +220,17 @@ description = "Pre-rendered exercise prompt body for AskExercise / CodeRequest, 
 example = "Мына кодта қате бар: ..."
 variants = ["literal"]
 
+# v5.21.0 — math echo specificity. Pre-rendered arithmetic
+# expression («56 * 7 / 3») echoed back to the user in the
+# `math_refusal.with_understood` template when the Kazakh-word-math
+# evaluator can extract numbers + operators but can't compute.
+[[slots]]
+name = "partial"
+kind = "curriculum_topic"
+description = "Pre-rendered arithmetic echo of a partially-parsed Kazakh math request, e.g. «56 * 7 / 3»."
+example = "56 * 7 / 3"
+variants = ["literal"]
+
 [[slots]]
 name = "purpose_body"
 kind = "curriculum_topic"

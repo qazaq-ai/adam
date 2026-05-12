@@ -1004,6 +1004,38 @@ pub fn plan_response_with_epistemic(
             };
         }
     }
+    // **v5.21.0 — math echo specificity.** When the evaluator could
+    // not compute but `extract_kazakh_math_summary` recognised
+    // numbers + operators, prefer the echo template that shows the
+    // user exactly what was parsed. Routes BEFORE the generic
+    // `math_refusal` family so users see «56*7/3 деп ұқтым» instead
+    // of «Санақ-есептеу әлі мүмкіндігімде жоқ». The `{partial}` slot
+    // is filled by `render_math_summary_as_arithmetic` upstream.
+    if extra_slots.contains_key("__math_partial_summary__") {
+        let key = "math_refusal.with_understood";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: math_partial echo → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            // Make the partial summary available to the template as
+            // `{partial}` without the `__` prefix.
+            if let Some(summary) = extra_slots.get("__math_partial_summary__") {
+                slots.insert("partial".into(), summary.clone());
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
     // **v4.6.12** — Math-input marker. Routes to the dedicated
     // `math_refusal` template family explaining adam doesn't
     // compute arithmetic. Mirrors the non-Kazakh override below.
