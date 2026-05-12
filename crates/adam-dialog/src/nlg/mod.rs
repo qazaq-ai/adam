@@ -298,7 +298,7 @@ pub(crate) fn capitalize_first(s: &str) -> String {
 /// тоқаев» — student noted И.Ф.О. wrote lowercase. This helper fixes
 /// the rendering without touching storage.
 pub(crate) fn capitalize_proper_name(s: &str) -> String {
-    s.split_inclusive(|c: char| c == ' ' || c == '-')
+    s.split_inclusive([' ', '-'])
         .map(|chunk| {
             // Each chunk ends with its trailing separator (or is the
             // last token without one). Capitalise everything up to the
