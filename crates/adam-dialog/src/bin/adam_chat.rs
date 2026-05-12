@@ -534,7 +534,9 @@ fn run_voice_repl(
                 "adam-chat --voice-input: whisper model not found at {model_path:?}. \
                  Download a Kazakh-supporting model from \
                  https://huggingface.co/ggerganov/whisper.cpp/tree/main \
-                 (e.g. `ggml-medium.bin`) and pass --whisper-model <path>."
+                 — recommended: `ggml-large-v3-q5_0.bin` (1.0 GB, ~3× more \
+                 accurate on Kazakh phonemes than ggml-medium); minimum: \
+                 `ggml-medium.bin` (1.4 GB) — and pass --whisper-model <path>."
             );
             return ExitCode::FAILURE;
         }
