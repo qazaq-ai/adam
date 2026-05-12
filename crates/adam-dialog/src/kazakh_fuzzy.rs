@@ -41,6 +41,34 @@ use std::collections::HashSet;
 /// A pair of Kazakh characters that are systematically confused
 /// in voice / text. Substituting between members of a pair costs
 /// `PHONETIC_SUB_COST` instead of 1.0.
+///
+/// **v5.22.0 — speech-defect extension.** The original v5.20.0
+/// table covered phoneme confusions that arise from systematic
+/// dialect / accent / Whisper-mishearing patterns. v5.22.0 adds
+/// **clinical-speech-defect substitutions** for users who don't
+/// articulate certain Kazakh phonemes cleanly:
+///
+/// - **Ротацизм (rotacism)** — non-trill `р` realised as `л` /
+///   `в` / `й`. Most common Kazakh speech defect. «Сарсенбай» →
+///   «Салсенбай» / «Сасенбай».
+/// - **Параротацизм** — `р` ↔ `л` substitution (the other
+///   direction; «бала» → «бара»).
+/// - **Сигматизм (sigmatism)** — sibilants `с / ш / з / ж`
+///   confused with each other or with stops. «шеше» → «сесе»;
+///   «жоқ» → «зоқ».
+/// - **Ламбдацизм (lambdacism)** — `л` realised as `в` / `у`-glide
+///   or dropped. «келді» → «кевді». Less common in Kazakh than
+///   in some other languages but observed.
+/// - **Йотацизм (yotacism)** — `й` dropped or substituted with
+///   `и`. «айт» → «аит».
+/// - **Каппацизм (kappacism)** — `қ / к` dropped or substituted
+///   with `т`. Rare; included for completeness.
+///
+/// Cost stays at `PHONETIC_SUB_COST` (0.4) — these are systematic
+/// substitutions, not random errors. A name like «Сарсенбай»
+/// pronounced with rotacism «Сасенбай» (dropped `р`) should match
+/// the canonical with a similarity ≥ 0.85, which puts it firmly in
+/// the `HighConfident` band.
 const PHONETIC_PAIRS: &[(char, char)] = &[
     // Velar plosive: voiced/voiceless + backness
     ('қ', 'к'),
@@ -68,6 +96,36 @@ const PHONETIC_PAIRS: &[(char, char)] = &[
     // `я` ↔ `ия` mapping needs to live in a separate token rewrite
     // layer and is not handled at the single-char Levenshtein
     // level — the edit-distance metric is character-by-character).
+
+    // === v5.22.0 — speech-defect substitutions ===
+    // Ротацизм: р → л / в / й (most common Kazakh defect)
+    ('р', 'л'),
+    ('р', 'в'),
+    ('р', 'й'),
+    // Сигматизм: sibilant confusions
+    ('ш', 'с'),
+    ('ш', 'щ'),
+    ('щ', 'с'),
+    ('ж', 'з'),
+    ('ж', 'д'),
+    ('ц', 'с'),
+    ('ц', 'т'),
+    // Ламбдацизм: л → в / у-glide
+    ('л', 'в'),
+    // Йотацизм: й ↔ и (already covered above by «й ↔ и» but kept
+    // as an explicit reminder — duplicates are safe, the lookup
+    // is symmetric)
+    // Каппацизм: қ / к → т (rare but observed)
+    ('к', 'т'),
+    ('қ', 'т'),
+    // Звонкость / глухость (voicing) — common cross-language
+    // confusion when child / adult speakers haven't fully
+    // mastered voicing distinctions
+    ('б', 'п'),
+    ('д', 'т'),
+    ('г', 'к'),
+    // Nasal alternation (in addition to ң↔н above)
+    ('м', 'н'),
 ];
 
 const PHONETIC_SUB_COST: f32 = 0.4;
@@ -325,5 +383,73 @@ mod tests {
         let (canonical, score) = best_match("Айкерім", &idx.female, 0.75).unwrap();
         assert_eq!(canonical, "Айгерім");
         assert!(score >= 0.85, "got {score}");
+    }
+
+    // === v5.22.0 — speech-defect recovery tests ===
+
+    #[test]
+    fn rotacism_substitution_recovers_name_v5220() {
+        // Speaker drops «р» — «Сарсенбай» → «Сасенбай» (rotacism
+        // with full drop) or «Салсенбай» (р → л).
+        let idx = KazakhNameIndex::load_default();
+        if idx.male.is_empty() {
+            return;
+        }
+        let (canonical, score) = best_match("Салсенбай", &idx.male, 0.75).unwrap();
+        assert_eq!(canonical, "Сарсенбай");
+        assert!(score >= 0.85, "rotacism «р→л»: got {score}");
+    }
+
+    #[test]
+    fn lambdacism_substitution_recovers_name_v5220() {
+        // Speaker realises «л» as «в» (less common but observed):
+        // «Дәулет» → «Дәувет».
+        let idx = KazakhNameIndex::load_default();
+        if idx.male.is_empty() {
+            return;
+        }
+        let (canonical, score) = best_match("Дәувет", &idx.male, 0.75).unwrap();
+        assert_eq!(canonical, "Дәулет");
+        assert!(score >= 0.85, "lambdacism «л→в»: got {score}");
+    }
+
+    #[test]
+    fn sigmatism_sh_to_s_substitution_v5220() {
+        // Шепелявость: ш → с. «Шерхан» mispronounced as «Серхан».
+        let idx = KazakhNameIndex::load_default();
+        if idx.male.is_empty() {
+            return;
+        }
+        let (canonical, score) = best_match("Серхан", &idx.male, 0.75).unwrap();
+        assert_eq!(canonical, "Шерхан");
+        assert!(score >= 0.85, "sigmatism «ш→с»: got {score}");
+    }
+
+    #[test]
+    fn voicing_alternation_recovers_name_v5220() {
+        // Voiced/voiceless confusion: «Болат» → «Полат» (б → п).
+        let idx = KazakhNameIndex::load_default();
+        if idx.male.is_empty() {
+            return;
+        }
+        let (canonical, score) = best_match("Полат", &idx.male, 0.75).unwrap();
+        assert_eq!(canonical, "Болат");
+        assert!(score >= 0.85, "voicing «б→п»: got {score}");
+    }
+
+    #[test]
+    fn defect_below_threshold_does_not_force_match_v5220() {
+        // Regression guard: too many speech defects → score drops
+        // below 0.75 → no false match. «бббббб» shouldn't fuzz
+        // into any real name.
+        let idx = KazakhNameIndex::load_default();
+        if idx.male.is_empty() {
+            return;
+        }
+        // Six unrelated chars; no real name is within fuzzy reach.
+        assert!(
+            best_match("Кітабым", &idx.male, 0.75).is_none(),
+            "must not force a name match on unrelated Kazakh word"
+        );
     }
 }

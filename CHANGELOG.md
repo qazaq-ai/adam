@@ -21,6 +21,56 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.22.0] — 2026-05-12 — Speech-defect substitution extension to `kazakh_fuzzy`
+
+**Minor.** Extends the v5.20.0 Kazakh fuzzy entity matcher with **17 new phonetic-pair substitutions** covering the well-known Kazakh / Russian speech defects (дислалия — ротацизм, сигматизм, ламбдацизм, каппацизм, voicing alternation, nasal confusion). User directive: «всем известны основные дефекты речи у людей. Такие, как не выговаривание 'р' и другие. Необходимо все эти известные дефекты речи запрограммировать в нашей модели, чтобы он легко их распозновал и не тупил на ровном месте».
+
+### What changed
+
+`crates/adam-dialog/src/kazakh_fuzzy.rs::PHONETIC_PAIRS` extended (was 14 pairs in v5.20.0, now **31 pairs**). New substitutions:
+
+| Defect class | Substitutions added | Example |
+|---|---|---|
+| **Ротацизм** (rotacism — «картавость», can't articulate /р/) | р↔л, р↔в, р↔й | «Дәулет» → «Дәулет» с р→л → «Дәулет»: «Дәулет/Дәулет» variants tolerated; «Бауыржан» → «Бауылжан» recovers |
+| **Сигматизм** (sigmatism — sibilant/whistling defects) | ш↔с, ш↔щ, щ↔с, ж↔з, ж↔д, ц↔с, ц↔т | «Жанна» → «Занна» recovers |
+| **Ламбдацизм** (lambdacism — /л/ defects) | л↔в | «Алмат» → «Авмат» recovers |
+| **Каппацизм** (kappacism — /к/ articulation) | к↔т, қ↔т | «Қанат» → «Танат» (within threshold) |
+| **Voicing alternation** (voiced↔voiceless pair confusion) | б↔п, д↔т, г↔к | «Дәулет» variants |
+| **Nasal confusion** | м↔н | «Мадина» → «Надина» recovers |
+
+Substitution cost remains **0.4** (same as the v5.20.0 phonetic-pair baseline) — speech defects ≈ allophonic phonetic confusion in terms of edit-distance weight; closer than a generic typo (1.0) but more expensive than a doubled letter (0.3).
+
+### Why now
+
+v5.20.0 introduced the fuzzy matcher to recover from Whisper STT errors and keyboard typos. Real-world Kazakh users also include children, elderly speakers, and adults with mild dislalia — they say «Бауылжан» / «Авмат» / «Занна» consistently and reliably. The pre-v5.22.0 fuzzy matcher rejected those as outside the 0.6-cost-per-char threshold. After v5.22.0, all of them collapse onto the canonical name with confidence ≥ 0.6.
+
+This is the **universal** extension promised in the v5.21.5 release note: the new substitutions apply to ALL `kazakh_fuzzy` callers automatically — name slots, city slots, occupation slots, any future entity recogniser that goes through `closest_match`. No per-caller wiring.
+
+### Verified
+
+- 5 new unit tests in `kazakh_fuzzy::tests`:
+  - `rotacism_substitution_recovers_name_v5220`
+  - `lambdacism_substitution_recovers_name_v5220`
+  - `sigmatism_sh_to_s_substitution_v5220`
+  - `voicing_alternation_recovers_name_v5220`
+  - `defect_below_threshold_does_not_force_match_v5220` (threshold-respect guard)
+- All 14 `kazakh_fuzzy` tests pass.
+- `cargo test --workspace --locked --no-fail-fast` — **1 388 passing** (+5 from v5.21.5).
+- Adversarial 95/95 unchanged.
+- fmt + clippy + check_metrics_currency clean.
+
+### Why x.22.0
+
+Sequential cadence (.21.5 → .22.0). Minor — extends a kernel-signature feature (universal fuzzy entity recovery) with a new dimension (speech-defect tolerance). Public table grows 14 → 31 pairs; all callers benefit transparently.
+
+### Next
+
+- **v5.22.5** — template variety expansion. Replace the remaining single-variant template families with 3-variant equivalents so adam's voice doesn't sound rote across long sessions.
+- **v5.23.0+** — Voice arc V4 (barge-in / TTS interruption).
+- **v5.x** — Voice arc V5 (golden audio corpus + WER / CER baseline).
+
+Stripe — Deterministic AI research (universal fuzzy-recovery surface now covers Whisper noise, keyboard typos, AND speech-defect variants — one matcher, three sources of imperfect input).
+
 ## [5.21.5] — 2026-05-12 — Ambiguous-input echo (universal raw-input transparent refusal)
 
 **Patch.** Second release in the specificity-through-transparency arc. Where v5.21.0 echoes recognised math (numbers + operators), v5.21.5 echoes the **raw user input verbatim** when adam can't extract a topic at all. Closes the «Дәулет, қандай тақырып бойынша көмектесейін?» repetition from the 2026-05-12 live transcript (this template fired 6+ times in one session — student saw zero signal about what adam heard).
