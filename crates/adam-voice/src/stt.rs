@@ -82,13 +82,32 @@ pub struct WhisperCli {
     language: String,
     threads: Option<u32>,
     json_mode: bool,
+    prompt: Option<String>,
 }
+
+/// **v5.19.0 (V3).** Default Whisper `--prompt` priming for Kazakh.
+/// Whisper-medium consistently mishears Kazakh-specific phonemes —
+/// «Сәлем» → «Салим» (drops `қ`, adds Arabic-style `и`), «Дәулет» →
+/// «дау лет» (splits ә-vowel + word boundary), «Танысайық» →
+/// «Танысайыр» (drops `ң`, adds artifact). Priming the decoder with
+/// a short Kazakh sentence sets the prior for these exact words.
+///
+/// The priming list is intentionally short: every additional token
+/// in the prompt cuts into the 224-token context window Whisper
+/// reserves for the actual transcription. Each word here is one
+/// that we've observed Whisper mishear in real live-test sessions.
+pub const KAZAKH_PRIMING_PROMPT: &str = "Қазақ тілінде сөйлеу. Сәлем. Сау бол. Менің атым Дәулет. \
+     Танысайық. Сіздің атыңыз кім? Мен Алматыда тұрамын. Маған 25 жас.";
 
 impl WhisperCli {
     /// Construct from an explicit binary path. Path is NOT validated
     /// here — that happens lazily in [`transcribe`] so test code can
     /// build a `WhisperCli` with a fake path for argv-construction
     /// assertions without touching the filesystem.
+    ///
+    /// **v5.19.0 (V3):** Constructor wires the Kazakh priming prompt
+    /// by default. Callers that want a different prompt (or no
+    /// prompt) override via [`with_prompt`].
     pub fn new(binary: impl Into<PathBuf>) -> Self {
         Self {
             binary: binary.into(),
@@ -96,7 +115,17 @@ impl WhisperCli {
             language: DEFAULT_LANGUAGE.to_string(),
             threads: None,
             json_mode: true,
+            prompt: Some(KAZAKH_PRIMING_PROMPT.to_string()),
         }
+    }
+
+    /// **v5.19.0 (V3).** Override the `--prompt` text passed to
+    /// whisper-cli. `None` clears the prompt entirely (use only for
+    /// non-Kazakh test scenarios — the default Kazakh priming closes
+    /// many of the medium-model mishearings observed in live tests).
+    pub fn with_prompt(mut self, prompt: Option<String>) -> Self {
+        self.prompt = prompt;
+        self
     }
 
     /// **v5.16.0 (V2).** Force text-mode (`--output-txt`) instead of
@@ -154,6 +183,10 @@ impl WhisperCli {
             argv.push("--threads".to_string());
             argv.push(n.to_string());
         }
+        if let Some(prompt) = &self.prompt {
+            argv.push("--prompt".to_string());
+            argv.push(prompt.clone());
+        }
         argv
     }
 
@@ -182,7 +215,18 @@ impl WhisperCli {
                 return Err(VoiceError::WhisperOutputMissing(json_path));
             }
             let raw = std::fs::read_to_string(&json_path)?;
-            let (text, confidence) = parse_whisper_json(&raw);
+            let (raw_text, confidence) = parse_whisper_json(&raw);
+            // **v5.19.0 (V3).** Apply the Kazakh transcript normalizer
+            // before returning. Only fires when language is the Kazakh
+            // default — for non-Kazakh test scenarios the normalizer
+            // would be a no-op for cleanly Kazakh text but might
+            // mis-handle Russian/English transcripts that happen to
+            // contain similar-looking Cyrillic tokens.
+            let text = if self.language == DEFAULT_LANGUAGE {
+                crate::normalizer::normalize_kazakh_transcript(&raw_text)
+            } else {
+                raw_text
+            };
             Ok(Transcript {
                 text,
                 language: self.language.clone(),
@@ -194,7 +238,12 @@ impl WhisperCli {
             if !txt_path.exists() {
                 return Err(VoiceError::WhisperOutputMissing(txt_path));
             }
-            let text = std::fs::read_to_string(&txt_path)?.trim().to_string();
+            let raw_text = std::fs::read_to_string(&txt_path)?.trim().to_string();
+            let text = if self.language == DEFAULT_LANGUAGE {
+                crate::normalizer::normalize_kazakh_transcript(&raw_text)
+            } else {
+                raw_text
+            };
             Ok(Transcript {
                 text,
                 language: self.language.clone(),
@@ -282,7 +331,7 @@ mod tests {
     #[test]
     fn build_argv_minimal_v5140() {
         // **v5.16.0** — default mode is now JSON (was text in V0/V1).
-        // Text-mode argv is exercised by `build_argv_text_mode_v5160`.
+        // **v5.19.0 (V3)** — Kazakh priming prompt added by default.
         let cli = WhisperCli::new("/opt/whisper/whisper-cli");
         let argv = cli.build_argv(&PathBuf::from("/tmp/in.wav"));
         assert_eq!(
@@ -294,8 +343,25 @@ mod tests {
                 "kk",
                 "--no-prints",
                 "--output-json",
+                "--prompt",
+                KAZAKH_PRIMING_PROMPT,
             ]
         );
+    }
+
+    #[test]
+    fn build_argv_with_prompt_none_drops_prompt_arg_v5190() {
+        let cli = WhisperCli::new("/opt/whisper/whisper-cli").with_prompt(None);
+        let argv = cli.build_argv(&PathBuf::from("/tmp/in.wav"));
+        assert!(!argv.iter().any(|a| a == "--prompt"));
+    }
+
+    #[test]
+    fn build_argv_with_custom_prompt_v5190() {
+        let cli = WhisperCli::new("/opt/whisper/whisper-cli")
+            .with_prompt(Some("custom test prompt".to_string()));
+        let argv = cli.build_argv(&PathBuf::from("/tmp/in.wav"));
+        assert!(argv.iter().any(|a| a == "custom test prompt"));
     }
 
     #[test]

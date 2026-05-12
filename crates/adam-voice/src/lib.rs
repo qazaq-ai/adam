@@ -21,7 +21,7 @@
 //!     → Conversation::turn(text, ...)   ← deterministic kernel from here
 //! ```
 //!
-//! ## Scope at v5.16.0 (V2 shipped; V3–V5 pending)
+//! ## Scope at v5.19.0 (V3 shipped; V4–V5 pending)
 //!
 //! - **Push-to-talk** (V0, v5.14.0): user presses Enter to start
 //!   recording, Enter again to stop. Configurable via
@@ -43,9 +43,17 @@
 //!   clarification template family in `adam-dialog`. Default
 //!   threshold 0.5 (configurable via `--whisper-confidence-threshold`).
 //!   Use [`stt::WhisperCli::with_text_mode`] to opt out.
-//! - **No Kazakh transcript normalizer** — V3, v5.17.0.
-//! - **No barge-in / TTS interruption** — V4, v5.18.0.
-//! - **No golden audio corpus** — V5, v5.19.0.
+//! - **Kazakh transcript normalizer** (V3, v5.19.0): default
+//!   `--prompt` priming via [`KAZAKH_PRIMING_PROMPT`] + post-processor
+//!   [`normalize_kazakh_transcript`] that fixes common Whisper-medium
+//!   mishearings («Салим» → «Сәлем» in greeting context, «дау лет» →
+//!   «Дәулет», «менім» → «менің», «Танысайыр (тим)» → «Танысайық»,
+//!   «есіңің» → «есімде» in name-statement context). Layered: word-
+//!   boundary mergers + context-conditional phoneme substitutions +
+//!   artifact trimming. Per-rule unit tests. Pure pattern rewriting,
+//!   no ML.
+//! - **No barge-in / TTS interruption** — V4, v5.20.0+.
+//! - **No golden audio corpus** — V5, v5.21.0+.
 //!
 //! ## Why a separate crate, not a module in `adam-dialog`?
 //!
@@ -60,8 +68,10 @@
 
 pub mod error;
 pub mod mic;
+pub mod normalizer;
 pub mod stt;
 
 pub use error::{Result, VoiceError};
 pub use mic::{MicCapture, MicConfig, VadStopReason, write_wav};
-pub use stt::{Transcript, WhisperCli};
+pub use normalizer::normalize_kazakh_transcript;
+pub use stt::{KAZAKH_PRIMING_PROMPT, Transcript, WhisperCli};

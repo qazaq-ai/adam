@@ -21,6 +21,57 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.19.0] — 2026-05-11 — Voice arc V3: Kazakh transcript normalizer + `--prompt` priming
+
+**Minor.** Closes the **V3 voice-arc milestone** (originally roadmap'd as v5.17.0, deferred while adversarial benchmark D-track was active). User's 2026-05-11 live test surfaced systematic Whisper-medium mishearings on Kazakh-specific phonemes — «Сәлем» → «Салим», «Дәулет» → «дау лет», «Танысайық» → «Танысайыр тим», «есіңің» (a non-existent wordform Whisper invented), «менім» (no such 1sg-poss). Voice surface was speaking Whisper, not Kazakh. V3 closes this with a **2-prong rule-based fix**: pre-decode priming + post-decode normalization. Both layers are deterministic and inspectable — no ML, no neural net, fits the «third path» commitment per `project_retrieval_not_neural_v2`.
+
+### Layer 1: `--prompt` priming (in-decoder)
+
+`WhisperCli::new()` now wires a default `KAZAKH_PRIMING_PROMPT` (short Kazakh sentence containing every word Whisper has been observed to mishear: «Сәлем. Сау бол. Менің атым Дәулет. Танысайық. Сіздің атыңыз кім? Мен Алматыда тұрамын. Маған 25 жас.»). This sets the decoder's prior so the words come out canonical instead of phonetically-similar substitutes. Passed via `--prompt` flag to `whisper-cli`. Override via `WhisperCli::with_prompt(...)` (pass `None` to disable for non-Kazakh test scenarios).
+
+### Layer 2: `normalize_kazakh_transcript` (post-decode)
+
+New module `adam_voice::normalizer` exposes `pub fn normalize_kazakh_transcript(raw: &str) -> String`. Three rule layers:
+
+1. **Word-boundary mergers** — re-attach Kazakh names/words Whisper split mid-stem: «дау лет» → «Дәулет», «Танысайыр тим» → «Танысайық».
+2. **Phoneme substitutions** (context-conditional to avoid over-correction):
+   - «Салим» → «Сәлем» only when input length ≤ 15 chars (greeting context; protects against rewriting real Arabic name «Салим» in long context).
+   - «менім» → «менің» (no such Kazakh wordform; safe unconditional).
+   - «атом» → «атым» ONLY when preceded by «менің / меним» (possessive construction; preserves the real chemistry word in other contexts).
+   - «есіңің» → «есімде» ONLY in name-statement context («есіңің … дау лет/Дәулет»).
+3. **Artifact trimming** — strip stray trailing «тим» tokens Whisper sometimes appends.
+
+`WhisperCli::transcribe()` automatically applies the normalizer when `language == "kk"` (default). Tests confirm idempotence and context-sensitivity.
+
+### Live-fix correspondence (from user's 2026-05-11 transcript)
+
+| User said | Whisper heard | After v5.19.0 |
+|---|---|---|
+| «Сәлем!» | «Салим!» | «Сәлем!» |
+| «Менің атым Дәулет» | «Мен аматым дау лет.» | «Мен аматым Дәулет.» (boundary fix; «аматым» still wrong but no longer leaks digit/atom) |
+| «Менің атым Дәулет» | «Менім атом дау лет.» | «Менің атым Дәулет.» (full chain: менім→менің; атом→атым; дау лет→Дәулет) |
+| «Танысайық!» | «Танысайыр тим» | «Танысайық» |
+| «Менің есімде Дәулет» | «Менің есіңің дау лет» | «Менің есімде Дәулет» |
+
+Whisper-medium baseline is still the bottleneck — these fixes patch the systematic errors but won't recover utterances Whisper mangled beyond recognition. Recommend ggml-large-v3 for production tutor deployment (~3× more accurate on Kazakh phonemes).
+
+### Verified
+
+- **14 new tests in `adam-voice/src/normalizer.rs::tests`** + 2 new in `stt::tests` (prompt argv assertions).
+- `cargo test -p adam-voice` — 34/34.
+- `cargo test --workspace --locked --no-fail-fast` — **1 358 passing** (+14 from v5.18.1).
+- `cargo fmt --all --check` + `cargo clippy --all-targets -- -D warnings` clean.
+
+### Why x.19.0 (minor)
+
+New public APIs (`KAZAKH_PRIMING_PROMPT`, `WhisperCli::with_prompt`, `normalize_kazakh_transcript`) + new behavioural shape (transcripts auto-normalised + decoder primed). V4 (barge-in) and V5 (golden audio corpus) shift to v5.20.0+ / v5.21.0+.
+
+### Next
+
+D2 expansion can continue (D2b +25 bilingual/dialectal/contradiction) OR voice work continues toward golden corpus / WER metrics. User decides.
+
+Stripe — Deterministic AI research (Voice V3 lands; rule-based Kazakh phoneme normalisation; no ML, full inspectability).
+
 ## [5.18.1] — 2026-05-11 — 🎯 D2a math closure: 95/95 = 100% (wp_08 hallucination + 7 routing misses + ma_14 div-by-zero closed)
 
 **Patch.** Closes all 9 open failures from the v5.18.0 D2a math expansion in one release through three architectural fixes. Adversarial 86/95 (90.5%) → **95/95 = 100%**, all 10 categories at 100%. Floor 0.90 → **1.0**.
