@@ -85,6 +85,13 @@ collapsible_match = "allow"
 # the descending intent obvious without importing `Reverse`;
 # stylistic preference, not a correctness issue. 1 occurrence.
 unnecessary_sort_by = "allow"
+# **v5.20.0** — `needless_range_loop` flagged on Wagner-Fischer
+# DP in `kazakh_fuzzy::kazakh_edit_distance`. The index-based
+# `for i in 0..=n { ... dp[i][j] = ... dp[i-1][j-1] ... }` form
+# is the canonical edit-distance recurrence; rewriting with
+# `enumerate()` for a 2D matrix with i±1/j±1 references would be
+# noisier, not clearer. 2 occurrences (outer + inner). Allowing.
+needless_range_loop = "allow"
 
 [workspace.dependencies]
 serde = { version = "1.0", features = ["derive"] }
