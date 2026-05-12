@@ -1082,6 +1082,33 @@ impl Conversation {
         {
             extra_slots.insert("__word_problem__".into(), "1".into());
         }
+        // **v5.21.5 — universal raw-input echo.** When the intent
+        // is Unknown without a high-confidence noun_hint AND the
+        // raw input passes the safe-echo filter
+        // (`discourse::safe_echo_input`), expose the verbatim
+        // user text as `user_input_echo`. The planner prefers the
+        // dedicated `unknown.with_raw_echo` family over the generic
+        // session-diagnostic clarify when this slot is set,
+        // converting «Сұрағыңызды толық түсінбедім» into «Сізді
+        // «X» деп ұқтым…».
+        let needs_raw_echo = match &intent {
+            Intent::Unknown {
+                noun_hint,
+                noun_hint_confidence,
+                ..
+            } => {
+                noun_hint.is_none()
+                    || matches!(
+                        noun_hint_confidence,
+                        crate::topic_extraction::TopicConfidence::Low
+                    )
+            }
+            _ => false,
+        };
+        if needs_raw_echo && let Some(echo) = crate::discourse::safe_echo_input(input) {
+            extra_slots.insert("__user_input_echo__".into(), echo.clone());
+            extra_slots.insert("user_input_echo".into(), echo);
+        }
         // **v5.18.1 — adversarial D2a ma_14 closure.** Explicit
         // div-by-zero pattern in input (e.g. «10/0 қанша?»). Route
         // to dedicated template with the math-education message

@@ -231,6 +231,21 @@ description = "Pre-rendered arithmetic echo of a partially-parsed Kazakh math re
 example = "56 * 7 / 3"
 variants = ["literal"]
 
+# v5.21.5 — universal raw-input echo (voice + text). Surfaced
+# back to the user in the `unknown.with_raw_echo` clarification
+# family when adam couldn't extract a topic but the input is in a
+# safe-to-echo shape (short, mostly Cyrillic, no digits or code).
+# Makes the refusal transparent — the student sees adam heard «X»
+# and instantly knows whether the issue is Whisper noise, a typo,
+# or a real meaning gap. Replaces the generic «Сұрағыңызды толық
+# түсінбедім» that fires repeatedly with no signal.
+[[slots]]
+name = "user_input_echo"
+kind = "noun_term"
+description = "Verbatim echo of the user's input (voice transcript or typed text), surfaced in transparent-refusal templates when adam couldn't extract a topic but the input is safe to quote."
+example = "Несте аласын"
+variants = ["literal"]
+
 [[slots]]
 name = "purpose_body"
 kind = "curriculum_topic"

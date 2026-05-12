@@ -3102,6 +3102,56 @@ pub fn extract_kazakh_math_summary(input: &str) -> Option<KazakhMathSummary> {
     })
 }
 
+/// **v5.21.5 — universal raw-input echo.** Returns the user's input
+/// trimmed and ready to quote inside a transparent-refusal template
+/// when:
+///
+/// - Length is between 3 and 60 codepoints (single-char
+///   interjections carry no signal; long inputs cite too much and
+///   may leak PII).
+/// - Majority of letters are Kazakh Cyrillic (Kazakh-only directive
+///   per `project_kazakh_only_directive`; non-Kazakh inputs route to
+///   the dedicated language guard `unknown.non_kazakh`).
+/// - No digits, no curly braces, no `` ` `` backticks (would risk
+///   echoing pasted code or sensitive numerics).
+/// - No URLs, emails, or `@` markers — too risky.
+///
+/// Returns `None` when the input doesn't qualify, so the caller
+/// falls through to the existing session-aware / generic clarify
+/// path. This is intentionally conservative — the cost of NOT
+/// echoing is one extra «Сұрағыңызды толық түсінбедім» turn; the
+/// cost of echoing wrong content is a privacy / hallucination leak.
+pub fn safe_echo_input(input: &str) -> Option<String> {
+    let trimmed = input.trim();
+    let cp_count = trimmed.chars().count();
+    if !(3..=60).contains(&cp_count) {
+        return None;
+    }
+    if trimmed.contains(['{', '}', '`'])
+        || trimmed.contains("http")
+        || trimmed.contains("://")
+        || trimmed.contains('@')
+    {
+        return None;
+    }
+    if trimmed.chars().any(|c| c.is_ascii_digit()) {
+        return None;
+    }
+    let letter_count = trimmed.chars().filter(|c| c.is_alphabetic()).count();
+    if letter_count == 0 {
+        return None;
+    }
+    let cyrillic_count = trimmed
+        .chars()
+        .filter(|c| c.is_alphabetic() && (*c as u32) >= 0x0400 && (*c as u32) <= 0x04FF)
+        .count();
+    // Require ≥ 70 % Cyrillic among alphabetic chars.
+    if (cyrillic_count as f32) / (letter_count as f32) < 0.70 {
+        return None;
+    }
+    Some(trimmed.to_string())
+}
+
 /// Strip common Kazakh case-marking suffixes from a numeral token
 /// so the lookup tables (which list bare stems) match. Conservative
 /// — only handles the case set the math evaluator already supports.
@@ -4451,5 +4501,86 @@ mod math_summary_tests_v5210 {
         let summary = extract_kazakh_math_summary("Елу үшке көбейт").unwrap();
         assert_eq!(summary.numbers, vec![50, 3]);
         assert_eq!(summary.operators, vec![KazakhMathOpName::Mul]);
+    }
+}
+
+#[cfg(test)]
+mod safe_echo_tests_v5215 {
+    use super::safe_echo_input;
+
+    #[test]
+    fn accepts_typical_kazakh_short_input_v5215() {
+        assert_eq!(
+            safe_echo_input("Несте аласын").as_deref(),
+            Some("Несте аласын")
+        );
+        assert_eq!(
+            safe_echo_input("Сен қазақша түсінесің бе"),
+            Some("Сен қазақша түсінесің бе".to_string())
+        );
+    }
+
+    #[test]
+    fn trims_whitespace_v5215() {
+        assert_eq!(
+            safe_echo_input("   Несте аласын   ").as_deref(),
+            Some("Несте аласын")
+        );
+    }
+
+    #[test]
+    fn rejects_too_short_v5215() {
+        assert!(safe_echo_input("а").is_none());
+        assert!(safe_echo_input("Ах").is_none());
+        assert!(safe_echo_input("").is_none());
+    }
+
+    #[test]
+    fn rejects_too_long_v5215() {
+        let long = "А".repeat(100);
+        assert!(safe_echo_input(&long).is_none());
+    }
+
+    #[test]
+    fn rejects_digits_v5215() {
+        assert!(safe_echo_input("Менің атым Дәулет 25").is_none());
+        assert!(safe_echo_input("123 қанша").is_none());
+    }
+
+    #[test]
+    fn rejects_urls_and_emails_v5215() {
+        assert!(safe_echo_input("Сайтың https://example.com").is_none());
+        assert!(safe_echo_input("Mail: foo@bar.com").is_none());
+        assert!(safe_echo_input("Адресі test://abc").is_none());
+    }
+
+    #[test]
+    fn rejects_code_markers_v5215() {
+        assert!(safe_echo_input("Сұрағым `let x = 5`").is_none());
+        assert!(safe_echo_input("Қандай {slot} керек").is_none());
+    }
+
+    #[test]
+    fn rejects_non_kazakh_input_v5215() {
+        // Latin-heavy text. Routes to language guard, not echo.
+        assert!(safe_echo_input("Hello how are you").is_none());
+        assert!(safe_echo_input("Como estas amigo").is_none());
+    }
+
+    #[test]
+    fn accepts_mostly_cyrillic_with_some_latin_v5215() {
+        // «Сен Rust туралы білесің бе?» — code-switching but
+        // dominated by Cyrillic. OK to echo.
+        assert!(
+            safe_echo_input("Сен Rust туралы білесің бе").is_some(),
+            "code-switched query with Cyrillic majority should echo"
+        );
+    }
+
+    #[test]
+    fn rejects_punctuation_only_v5215() {
+        assert!(safe_echo_input("???").is_none());
+        assert!(safe_echo_input("!!!!").is_none());
+        assert!(safe_echo_input("---").is_none());
     }
 }

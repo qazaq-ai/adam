@@ -1228,7 +1228,22 @@ pub fn plan_response_with_epistemic(
         || session.contains_key("occupation")
         || session.contains_key("activity")
         || session.contains_key("city");
-    let key = if is_clarify_key
+    // **v5.21.5 — universal raw-input echo.** Prefer the transparent-
+    // refusal family that echoes the verbatim user input over the
+    // generic session-diagnostic clarify when `Conversation::turn`
+    // set the `__user_input_echo__` extra-slot. The slot is only
+    // populated when `discourse::safe_echo_input` confirms the input
+    // is safe to quote (length 3-60, ≥70 % Cyrillic, no digits / URLs /
+    // backticks / @). Highest precedence among clarify-* overrides:
+    // showing the user adam's read of their input gives more signal
+    // than echoing session state alone.
+    let has_raw_echo = extra_slots.contains_key("__user_input_echo__");
+    let key = if is_clarify_key && has_raw_echo && !repo.get("unknown.with_raw_echo").is_empty() {
+        trace.push(format!(
+            "planner: clarify_diagnostic override → unknown.with_raw_echo (was {key})",
+        ));
+        "unknown.with_raw_echo"
+    } else if is_clarify_key
         && has_session_context
         && !repo.get("unknown.with_session_diagnostic").is_empty()
     {

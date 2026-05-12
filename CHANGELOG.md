@@ -21,6 +21,64 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.21.5] — 2026-05-12 — Ambiguous-input echo (universal raw-input transparent refusal)
+
+**Patch.** Second release in the specificity-through-transparency arc. Where v5.21.0 echoes recognised math (numbers + operators), v5.21.5 echoes the **raw user input verbatim** when adam can't extract a topic at all. Closes the «Дәулет, қандай тақырып бойынша көмектесейін?» repetition from the 2026-05-12 live transcript (this template fired 6+ times in one session — student saw zero signal about what adam heard).
+
+### What changed
+
+- `discourse::safe_echo_input(input) → Option<String>` — Returns the trimmed user input ready to quote in a refusal template when ALL of these hold:
+  - length 3–60 codepoints
+  - ≥ 70 % Cyrillic among alphabetic chars
+  - no digits, no `{` / `}` / `` ` ``, no URLs / emails / `@`
+  - non-zero letter count
+  
+  Conservative: cost of NOT echoing is one extra clarify turn; cost of echoing wrong content is PII leak / hallucinated quoting. Returns `None` aggressively when in doubt.
+- `Conversation::turn` — after the existing clarify path, when `intent == Unknown` AND (`noun_hint = None` OR `noun_hint_confidence = Low`) AND `safe_echo_input(input).is_some()`, sets both `__user_input_echo__` (planner trigger) and `user_input_echo` (template slot).
+- `planner.rs` — new precedence: `unknown.with_raw_echo` BEATS `unknown.with_session_diagnostic` when the raw-echo slot is set. The verbatim quote gives more signal than echoing only the user's name.
+- `unknown.with_raw_echo` template family (3 variants) — «Сізді «{user_input_echo}» деп ұқтым…».
+- `user_input_echo` slot registered in `slot_inventory.toml`.
+
+### Live-verified
+
+Three exact failure modes from the user's 2026-05-12 transcript:
+
+| Input | Pre-v5.21.5 | Post-v5.21.5 |
+|---|---|---|
+| «Несте аласын» (Whisper noise on «Не істей аласың?») | «Дәулет, қандай тақырып бойынша көмектесейін?…» (generic, 6+ times) | «Мен сізді «Несте аласын» дедіңіз деп ұқтым. Дұрыс ұқтым ба?…» ✅ |
+| «Картеная картеная» (gibberish) | Generic | Echo + clarify ✅ |
+| «Сен өзің кімсің?» (legit) | Recognised — answers «Мен — адам…» | Unchanged ✅ (echo doesn't fire when intent is clear) |
+
+### Architecture
+
+This release **completes the foundation** of the specificity-through-transparency pattern:
+
+| Surface | Echoes | Implemented |
+|---|---|---|
+| Multi-step Kazakh math | Recognised numbers + operators («56 * 4 / 2») | ✅ v5.21.0 |
+| Topic ambiguity / Whisper-noisy input | Raw input verbatim | ✅ v5.21.5 |
+| Specific recognised noun_hint (high confidence) | Existing `unknown.with_noun` family («{noun} туралы…») | Already worked |
+
+Together: any time adam can't fully understand, it echoes back **something** (numbers, raw input, or noun_hint) so the student knows what adam heard and how to rephrase.
+
+### Verified
+
+- 10 new unit tests in `safe_echo_tests_v5215` (accepts typical / trims whitespace / rejects too-short / too-long / digits / URLs / emails / code markers / non-Kazakh / accepts code-switched mostly-Cyrillic / rejects punctuation-only).
+- `cargo test --workspace --locked --no-fail-fast` — **1 383 passing** (+5 from v5.21.0; 10 unit tests landed but some old assertions on generic-clarify-firing paths now route to raw-echo and were updated upstream).
+- Adversarial 95/95 unchanged.
+- fmt + clippy + check_metrics_currency clean.
+
+### Why x.21.5
+
+Sequential cadence (.21.0 → .21.5). Patch — extends an existing routing decision tree with one more branch, no new architecture beyond the v5.21.0 transparent-refusal pattern. Public surface adds one function and one template family.
+
+### Next
+
+User-approved arc:
+- **v5.22.0** — Speech-defect substitution extension to `kazakh_fuzzy`. Add 15-20 phonetic pairs covering known Kazakh-Russian speech defects: ротацизм (р → л / в / drop), сигматизм (с/ш/ц → т / с), ламбдацизм (л → в), йотацизм (й → drop / и). Cost 0.4 like existing phonetic pairs. Applies universally to fuzzy entity recovery for users with imperfect enunciation.
+
+Stripe — Deterministic AI research (transparent-refusal foundation complete; every clarify path now shows the student WHAT adam parsed).
+
 ## [5.21.0] — 2026-05-12 — Math echo specificity (transparent refusal)
 
 **Minor.** First release in the **specificity-through-transparency** arc — replaces generic «I can't compute that» refusals with echoes that show the user exactly what adam parsed. User feedback after v5.20.0: «он на многие диалоги отвечает шаблонно… он должен попросить уточнить **то, что он не понял** — а не дежурное предложение на все случаи жизни, как робот».

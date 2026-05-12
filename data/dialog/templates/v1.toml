@@ -1605,6 +1605,33 @@ templates = [
     "Сізді дұрыс түсіну үшін сұрағыңызды нақтылай түсіңізші — қандай тақырып туралы сұрап тұрсыз?",
 ]
 
+# **v5.21.5 — specificity-through-transparency / ambiguous-input echo.**
+# When adam couldn't extract a topic but the user's input is in a
+# safe-to-echo shape (short, mostly Cyrillic, no digits / code),
+# echo the verbatim text back so the student sees what adam heard.
+# Three failure-mode flavours covered:
+# 1. Voice transcript came out as nonsense (Whisper noise on user's
+#    dialect / accent / speech defect) — student needs to know
+#    enunciation drifted.
+# 2. Typed text contains misspellings the fuzzy-matcher (v5.20.0)
+#    couldn't recover — student sees their own typo.
+# 3. Input parses as legitimate Kazakh but adam doesn't have a
+#    matching topic in `world_core` — student sees adam's read of
+#    the surface and can rephrase toward something covered.
+#
+# Slot: `user_input_echo` (registered in slot_inventory.toml).
+# Routed via `__user_input_echo__` extra-slot set by
+# `Conversation::turn`. Takes precedence over
+# `unknown.with_session_diagnostic` (the name-only generic) when
+# both could fire — echo is more informative than name-only chat.
+[[families]]
+key = "unknown.with_raw_echo"
+templates = [
+    "Сізді «{user_input_echo}» деп ұқтым, бірақ нақты мағынасын аңғара алмадым. Басқа сөздермен айтып жіберсеңіз — нақтырақ жауап беремін.",
+    "Менің естуімде «{user_input_echo}» болды. Бірақ бұл туралы нақты дерек таппадым. Сұрағыңызды басқаша қойсаңыз — көмектесуге тырысамын.",
+    "Мен сізді «{user_input_echo}» дедіңіз деп ұқтым. Дұрыс ұқтым ба? Қайта айтсаңыз немесе сұрағыңызды басқаша тұжырымдасаңыз — нақтырақ жауап беремін.",
+]
+
 # **v4.53.5** — Context-aware clarify. Routes from the planner when
 # `unknown.clarify_no_topic` / `unknown.clarify_low_confidence` would
 # normally fire AND the session has stored slots
