@@ -14,8 +14,8 @@
 //! skeleton.
 
 use super::{
-    Introducer, NlgRule, SentenceFrame, SentenceMood, capitalize_first, compose_introducer,
-    preferred_surface,
+    Introducer, NlgRule, SentenceFrame, SentenceMood, capitalize_first, capitalize_proper_name,
+    compose_introducer, preferred_surface,
 };
 use adam_reasoning::Predicate as ReasPredicate;
 
@@ -390,11 +390,11 @@ impl NlgRule for RelatedToOfficeHolderDeclarative {
 
     fn render(&self, frame: &SentenceFrame) -> Option<String> {
         let subject_cap = capitalize_first(preferred_surface(&frame.fact.subject));
-        let body = ensure_period(format!(
-            "{} — {}",
-            subject_cap,
-            preferred_surface(&frame.fact.object)
-        ));
+        // v5.23.0 — capitalise the office holder's name (object slot
+        // for OfficeHolder is always a person; storage form is
+        // canonical-lowercase).
+        let object_cap = capitalize_proper_name(preferred_surface(&frame.fact.object));
+        let body = ensure_period(format!("{subject_cap} — {object_cap}"));
         Some(wrap_introducer(
             frame.introducer,
             &frame.fact.subject.root,

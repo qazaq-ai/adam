@@ -3479,6 +3479,16 @@ pub(crate) fn best_noun_hint_with_confidence(
     input: &str,
     parses: &[Analysis],
 ) -> Option<(String, TopicConfidence)> {
+    // **v5.23.0** — first-president normaliser. Live-feedback
+    // 2026-05-12: «Ең бірше қазақстанның президенті кім болды?» and
+    // «Алдымен қазақстанның президенті кім болды?» both surfaced
+    // Tokayev (current) instead of Nazarbayev (first). The data
+    // existed («тұңғыш президент» → Nazarbayev in world_core); only
+    // the synonym mapping was missing. Recognise the «ordinal-first»
+    // markers and rewrite to the canonical multiword topic.
+    if let Some(topic) = detect_first_office_query(input) {
+        return Some((topic, TopicConfidence::High));
+    }
     if let Some(latin) = latin_with_generic_head_marker(input) {
         return Some((latin, TopicConfidence::High));
     }
@@ -3523,6 +3533,49 @@ pub(crate) fn best_noun_hint_with_confidence(
         return Some(pair);
     }
     accusative_form_hint(input).map(|s| (s, TopicConfidence::Low))
+}
+
+/// **v5.23.0** — recognise «ordinal-first + office» queries and
+/// rewrite them to the canonical multiword topic. Live-feedback
+/// 2026-05-12 surfaced three failing rephrasings of «who was the
+/// first president of Kazakhstan?»:
+///
+/// - «Ең бірше қазақстанның президенті кім болды?» (Whisper for «ең
+///   бірінші»)
+/// - «Алдымен қазақстанның президенті кім болды?»
+/// - «Ең бірінші қазақстанның президенті кім?»
+///
+/// world_core already carries the fact («тұңғыш президент → Назарбаев»);
+/// the gap was synonym mapping. This function pre-normalises the
+/// surface to the canonical multiword topic the retrieval layer
+/// already indexes.
+///
+/// Returns `Some("тұңғыш президент")` when the input contains BOTH a
+/// first-ordinal marker AND a `президент` token; otherwise `None`.
+/// Symmetric construction allows future extensions to other office
+/// markers (e.g. first prime-minister) without rewriting the
+/// dispatcher.
+pub(crate) fn detect_first_office_query(input: &str) -> Option<String> {
+    let lowered = input.to_lowercase();
+    const FIRST_MARKERS: &[&str] = &[
+        "тұңғыш",
+        "алғашқы",
+        "бірінші",
+        "ең бірінші",
+        "ең бірше", // Whisper-medium / large mishearing of «ең бірінші»
+        "алдымен",
+        "1-ші",
+        "1ші",
+        "1-ыншы",
+    ];
+    let has_first = FIRST_MARKERS.iter().any(|m| lowered.contains(m));
+    if !has_first {
+        return None;
+    }
+    if lowered.contains("президент") {
+        return Some("тұңғыш президент".to_string());
+    }
+    None
 }
 
 /// **v4.37.5** — confidence-stripping wrapper over
@@ -3816,5 +3869,56 @@ mod tests {
         // is 5 chars ≥ 4); window[1]="денесі" starts with "ден" ✓.
         let hit = multiword_entity_hint("аспанның денесі туралы");
         assert_eq!(hit.as_deref(), Some("аспан денесі"));
+    }
+
+    // **v5.23.0** — first-president normaliser tests.
+
+    #[test]
+    fn detect_first_office_query_recognises_tungysh() {
+        let hit = detect_first_office_query("тұңғыш президент кім?");
+        assert_eq!(hit.as_deref(), Some("тұңғыш президент"));
+    }
+
+    #[test]
+    fn detect_first_office_query_recognises_algashqy() {
+        let hit = detect_first_office_query("Алғашқы қазақстан президенті кім болды?");
+        assert_eq!(hit.as_deref(), Some("тұңғыш президент"));
+    }
+
+    #[test]
+    fn detect_first_office_query_recognises_birinshi() {
+        let hit = detect_first_office_query("Ең бірінші Қазақстанның президенті кім?");
+        assert_eq!(hit.as_deref(), Some("тұңғыш президент"));
+    }
+
+    #[test]
+    fn detect_first_office_query_recognises_whisper_mishearing() {
+        // «Ең бірше» — Whisper-medium / large mishearing of «ең бірінші»
+        // surfaced in live transcript 2026-05-12.
+        let hit = detect_first_office_query("Ең бірше қазақстанның президенті кім болды?");
+        assert_eq!(hit.as_deref(), Some("тұңғыш президент"));
+    }
+
+    #[test]
+    fn detect_first_office_query_recognises_aldymen() {
+        let hit = detect_first_office_query("Алдымен қазақстанның президенті кім болды?");
+        assert_eq!(hit.as_deref(), Some("тұңғыш президент"));
+    }
+
+    #[test]
+    fn detect_first_office_query_ignores_current() {
+        // No first-marker → return None; lets the existing
+        // «қазіргі президент» / «қазақстан президенті» multiword
+        // handle current-president questions.
+        let hit = detect_first_office_query("Қазір қазақстанның президенті кім?");
+        assert!(hit.is_none());
+    }
+
+    #[test]
+    fn detect_first_office_query_ignores_first_without_president() {
+        // Marker present but no «президент» — return None to avoid
+        // false positives on «алғашқы көмек» / «бірінші орын» / etc.
+        let hit = detect_first_office_query("Алғашқы көмек туралы айт.");
+        assert!(hit.is_none());
     }
 }

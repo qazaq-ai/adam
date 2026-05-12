@@ -137,7 +137,10 @@ impl TemplateRepository {
         );
         by_key.insert(
             "unknown.with_grounded_fact".into(),
-            vec!["{noun} туралы қысқаша айтсам: {fact}".into()],
+            // v5.23.0 — drop the «{noun} туралы қысқаша айтсам:» meta-opener
+            // (live-feedback anti-meta-opener pass). The body already mentions
+            // the topic; the wrapper sounded like a Wikipedia citation.
+            vec!["{fact}".into()],
         );
         // fallback
         by_key.insert("unknown".into(), vec!["түсінбедім".into()]);

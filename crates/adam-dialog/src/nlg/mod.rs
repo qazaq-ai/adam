@@ -253,40 +253,66 @@ pub fn pick_introducer(seed: u64, has_name_respect: bool) -> Introducer {
 /// crash if a caller composes manually without checking).
 pub fn compose_introducer(
     introducer: Introducer,
-    topic: &str,
+    _topic: &str,
     name_respect: Option<&str>,
     body: &str,
 ) -> String {
-    let topic_cap = capitalize_first(topic);
     match introducer {
+        // **v5.23.0** — anti-meta-opener pass. The body already
+        // mentions the topic; repeating «X туралы …» / «X жайында …»
+        // at the start sounds like a Wikipedia citation, not
+        // conversation. 3 of 5 variants now emit the body directly;
+        // 1 keeps a light «Қысқаша айтсам,» frame; 1 personalises
+        // with the respectful name when available. Live feedback
+        // 2026-05-12: «Білгенім бойынша: X туралы ең әуелі мынаны
+        // айтуға болады: …» (three-layer stacking) flagged as
+        // «шаблонно» — student wants direct answers.
         Introducer::Direct => body.to_string(),
-        Introducer::BrieflyAbout => {
-            format!("{topic_cap} туралы қысқаша айтсам: {body}")
-        }
-        Introducer::OnTheSubjectMain => {
-            format!("{topic_cap} жайында негізгі дерек мынау: {body}")
-        }
-        Introducer::AboutTopicFirst => {
-            format!("{topic_cap} туралы ең әуелі мынаны айтуға болады: {body}")
-        }
+        Introducer::BrieflyAbout => body.to_string(),
+        Introducer::OnTheSubjectMain => body.to_string(),
+        Introducer::AboutTopicFirst => format!("Қысқаша айтсам, {body}"),
         Introducer::NameRespectAnswer => match name_respect {
-            Some(name) => format!("{name}, {topic_cap} туралы қысқа жауап: {body}"),
-            None => format!("{topic_cap} туралы қысқаша айтсам: {body}"),
+            Some(name) => format!("{name}, {body}"),
+            None => body.to_string(),
         },
-        Introducer::ExactFact => {
-            format!("{topic_cap} жайында нақты дерек: {body}")
-        }
+        Introducer::ExactFact => body.to_string(),
     }
 }
 
 /// Capitalise the first character (Kazakh-aware — uppercase
 /// preserves Cyrillic semantics).
-fn capitalize_first(s: &str) -> String {
+pub(crate) fn capitalize_first(s: &str) -> String {
     let mut chars = s.chars();
     match chars.next() {
         Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
         None => String::new(),
     }
+}
+
+/// **v5.23.0** — capitalise every token (space- and hyphen-separated)
+/// of a proper name. world_core stores canonical-lowercase surfaces
+/// («қасым-жомарт тоқаев») for lookup uniformity; render-time
+/// presentation needs «Қасым-Жомарт Тоқаев».
+///
+/// Live feedback 2026-05-12: «Қазақстанның президенті — қасым-жомарт
+/// тоқаев» — student noted И.Ф.О. wrote lowercase. This helper fixes
+/// the rendering without touching storage.
+pub(crate) fn capitalize_proper_name(s: &str) -> String {
+    s.split_inclusive(|c: char| c == ' ' || c == '-')
+        .map(|chunk| {
+            // Each chunk ends with its trailing separator (or is the
+            // last token without one). Capitalise everything up to the
+            // separator; pass the separator through unchanged.
+            let (word, sep): (&str, &str) = match chunk.chars().last() {
+                Some(c) if c == ' ' || c == '-' => {
+                    let split_at = chunk.len() - c.len_utf8();
+                    (&chunk[..split_at], &chunk[split_at..])
+                }
+                _ => (chunk, ""),
+            };
+            format!("{}{}", capitalize_first(word), sep)
+        })
+        .collect()
 }
 
 /// Pick the best surface form from a SlotRef — prefer the curated
@@ -361,10 +387,10 @@ mod tests {
             name_respect: None,
         };
         let out = render_sentence(&frame).expect("rule should match");
-        assert_eq!(
-            out,
-            "Қазақстан туралы ең әуелі мынаны айтуға болады: Қазақстан — мемлекет."
-        );
+        // v5.23.0 — AboutTopicFirst now emits a light «Қысқаша
+        // айтсам, …» frame; the older «X туралы ең әуелі мынаны
+        // айтуға болады:» phrasing dropped per anti-meta-opener pass.
+        assert_eq!(out, "Қысқаша айтсам, Қазақстан — мемлекет.");
     }
 
     #[test]
@@ -616,7 +642,9 @@ mod tests {
             None,
             "Алгоритм — ереже.",
         );
-        assert_eq!(out, "Алгоритм туралы қысқаша айтсам: Алгоритм — ереже.");
+        // v5.23.0 — bare body (the «X туралы қысқаша айтсам:» frame
+        // dropped per live-feedback anti-meta-opener pass).
+        assert_eq!(out, "Алгоритм — ереже.");
     }
 
     #[test]
@@ -627,10 +655,9 @@ mod tests {
             None,
             "Алгоритм — ереже.",
         );
-        assert_eq!(
-            out,
-            "Алгоритм жайында негізгі дерек мынау: Алгоритм — ереже."
-        );
+        // v5.23.0 — bare body (the «X жайында негізгі дерек мынау:»
+        // frame dropped per anti-meta-opener pass).
+        assert_eq!(out, "Алгоритм — ереже.");
     }
 
     #[test]
@@ -641,10 +668,9 @@ mod tests {
             None,
             "Алгоритм — ереже.",
         );
-        assert_eq!(
-            out,
-            "Алгоритм туралы ең әуелі мынаны айтуға болады: Алгоритм — ереже."
-        );
+        // v5.23.0 — light «Қысқаша айтсам,» frame; the older «X
+        // туралы ең әуелі мынаны айтуға болады:» phrasing dropped.
+        assert_eq!(out, "Қысқаша айтсам, Алгоритм — ереже.");
     }
 
     #[test]
@@ -655,16 +681,17 @@ mod tests {
             Some("Дәулет мырза"),
             "Алгоритм — ереже.",
         );
-        assert_eq!(
-            out,
-            "Дәулет мырза, Алгоритм туралы қысқа жауап: Алгоритм — ереже."
-        );
+        // v5.23.0 — personalisation kept but the meta «X туралы
+        // қысқа жауап:» frame dropped.
+        assert_eq!(out, "Дәулет мырза, Алгоритм — ереже.");
     }
 
     #[test]
     fn compose_introducer_exact_fact() {
         let out = compose_introducer(Introducer::ExactFact, "алгоритм", None, "Алгоритм — ереже.");
-        assert_eq!(out, "Алгоритм жайында нақты дерек: Алгоритм — ереже.");
+        // v5.23.0 — bare body (the «X жайында нақты дерек:» frame
+        // dropped per anti-meta-opener pass).
+        assert_eq!(out, "Алгоритм — ереже.");
     }
 
     #[test]
@@ -673,18 +700,51 @@ mod tests {
         assert_eq!(out, "Алгоритм — ереже.");
     }
 
+    // **v5.23.0** — proper-name capitalisation tests.
+
+    #[test]
+    fn capitalize_proper_name_handles_single_word() {
+        assert_eq!(capitalize_proper_name("тоқаев"), "Тоқаев");
+    }
+
+    #[test]
+    fn capitalize_proper_name_handles_two_words() {
+        assert_eq!(
+            capitalize_proper_name("нұрсұлтан назарбаев"),
+            "Нұрсұлтан Назарбаев"
+        );
+    }
+
+    #[test]
+    fn capitalize_proper_name_handles_hyphenated_first_name() {
+        assert_eq!(
+            capitalize_proper_name("қасым-жомарт тоқаев"),
+            "Қасым-Жомарт Тоқаев"
+        );
+    }
+
+    #[test]
+    fn capitalize_proper_name_preserves_already_capitalised() {
+        assert_eq!(capitalize_proper_name("Тоқаев"), "Тоқаев");
+    }
+
+    #[test]
+    fn capitalize_proper_name_empty_string() {
+        assert_eq!(capitalize_proper_name(""), "");
+    }
+
     #[test]
     fn compose_introducer_name_respect_answer_falls_back_when_name_missing() {
-        // Defensive fallback: if a caller forgets to supply
-        // name_respect for NameRespectAnswer, use BrieflyAbout
-        // surface (template idx 0) rather than crash.
+        // v5.23.0 — when name_respect is None, NameRespectAnswer
+        // degrades to bare body (matches BrieflyAbout / Direct /
+        // OnTheSubjectMain / ExactFact post anti-meta-opener pass).
         let out = compose_introducer(
             Introducer::NameRespectAnswer,
             "алгоритм",
             None,
             "Алгоритм — ереже.",
         );
-        assert_eq!(out, "Алгоритм туралы қысқаша айтсам: Алгоритм — ереже.");
+        assert_eq!(out, "Алгоритм — ереже.");
     }
 
     #[test]

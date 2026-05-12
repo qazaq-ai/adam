@@ -1448,8 +1448,6 @@ templates = [
 key = "unknown.with_grounded_fact"
 templates = [
     "{fact}",
-    "Білгенім бойынша: {fact}",
-    "Мынадай мәлімет бар: {fact}",
 ]
 
 # v4.33.5 — first SemFrame-driven response family. When the input

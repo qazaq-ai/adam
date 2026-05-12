@@ -21,6 +21,97 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.23.0] — 2026-05-12 — Realistic answers: meta-opener strip + proper-name capitalisation + first-president routing
+
+**Minor.** Triple fix from the 2026-05-12 live voice transcript. Three concrete dialog failures and a v5.22.5 regression closed in one release:
+
+| # | Live failure | Fix |
+|---|---|---|
+| 1 | «Білгенім бойынша: Қазақстанның президенті туралы ең әуелі мынаны айтуға болады: …» (three-layer stacking) | Strip meta-openers in `nlg::compose_introducer`; revert v5.22.5 wrappers on `unknown.with_grounded_fact` |
+| 2 | «қасым-жомарт тоқаев» (lowercase И.Ф.О.) | New `nlg::capitalize_proper_name` helper applied in `RelatedToOfficeHolderDeclarative` |
+| 3 | «Алғашқы / Алдымен / Ең бірінші президент» → Tokayev (current) instead of Nazarbayev (first) | New `topic_extraction::detect_first_office_query` pre-normaliser |
+
+### 1. Anti-meta-opener pass (v5.22.5 regression fix)
+
+Live transcript surfaced three-layer stacking: «Білгенім бойынша:» (added v5.22.5) wrapped around «X туралы ең әуелі мынаны айтуға болады:» (older) wrapped around the actual fact. User feedback: «постоянно отвечает шаблонно… вместо того, чтобы просто сказать "В данный момент президентом Казахстана является Касым-Жомарт Токаев."» — student wants direct answers.
+
+**`nlg::compose_introducer` rewritten.** All 5 Introducer variants emit either the bare body or a single light frame. The body already mentions the topic; repeating «X туралы …» / «X жайында …» at the start sounded like a Wikipedia citation, not conversation.
+
+| Variant | Pre-v5.23.0 | Post-v5.23.0 |
+|---|---|---|
+| `Direct` | `{body}` | `{body}` (unchanged) |
+| `BrieflyAbout` | «X туралы қысқаша айтсам: {body}» | `{body}` |
+| `OnTheSubjectMain` | «X жайында негізгі дерек мынау: {body}» | `{body}` |
+| `AboutTopicFirst` | «X туралы ең әуелі мынаны айтуға болады: {body}» | «Қысқаша айтсам, {body}» |
+| `NameRespectAnswer` | «{name}, X туралы қысқа жауап: {body}» | «{name}, {body}» |
+| `ExactFact` | «X жайында нақты дерек: {body}» | `{body}` |
+
+The rotation pool now produces direct answers 3 of 5 times, a light «Қысқаша айтсам,» 1 of 5, and a personalised «{name}, …» 1 of 5 when the session has a respectful name. No meta-citation framing.
+
+**Reverted v5.22.5 expansion on `unknown.with_grounded_fact`** (templates/v1.toml): back to single bare-slot variant. The v5.22.5 wrappers («Білгенім бойынша:» / «Мынадай мәлімет бар:») were the OUTER layer of the three-stack — adding them on top of the existing introducer system was the root cause of the regression.
+
+**Updated `templates.rs` fallback registry** to also drop the «{noun} туралы қысқаша айтсам: {fact}» wrapper.
+
+### 2. Proper-name capitalisation
+
+world_core stores canonical-lowercase facts («қасым-жомарт тоқаев», «нұрсұлтан назарбаев») for lookup uniformity — string matching is case-insensitive at retrieval and ordering needs deterministic comparison. The cost is render-time presentation: the office-holder rule joined the lowercase object slot directly into the surface sentence.
+
+**New `nlg::capitalize_proper_name`** helper handles space-separated names AND hyphenated first names: «қасым-жомарт тоқаев» → «Қасым-Жомарт Тоқаев», «нұрсұлтан назарбаев» → «Нұрсұлтан Назарбаев».
+
+**Applied in `RelatedToOfficeHolderDeclarative::render`** — the rule that handles all office→person facts (president, premier, minister, etc.). Already-capitalised inputs pass through unchanged.
+
+### 3. First-president routing
+
+Live transcript surfaced three failing rephrasings of «who was the first president of Kazakhstan?»:
+
+- «Ең бірше қазақстанның президенті кім болды?» (Whisper mishearing of «ең бірінші»)
+- «Алдымен қазақстанның президенті кім болды?»
+- «Ең бірінші Қазақстанның президенті кім?»
+
+world_core already carried the fact (`gov_kz_005` and `notable_001`: «тұңғыш президент → Нұрсұлтан Назарбаев»); the gap was synonym mapping. The retrieval layer saw only «қазақстан президенті» (no «first» modifier) and surfaced the CURRENT president fact (Tokayev).
+
+**New `topic_extraction::detect_first_office_query`** — runs at the top of `best_noun_hint_with_confidence`. Recognises 9 first-ordinal markers («тұңғыш / алғашқы / бірінші / ең бірінші / ең бірше / алдымен / 1-ші / 1ші / 1-ыншы») in combination with «президент» and rewrites the topic to the canonical multiword `тұңғыш президент` that the retrieval layer indexes.
+
+**Symmetric construction** — adding first prime-minister / first chairman / etc. is a one-line MULTIWORD_TOPIC + OFFICE_TOKEN extension when the data arrives.
+
+### Live-verified
+
+Same 5 queries from the 2026-05-12 transcript, post-fix:
+
+| Input | Output |
+|---|---|
+| «Қазір қазақстанның президенті кім?» | «Қысқаша айтсам, Қазақстанның президенті — Қасым-Жомарт Тоқаев.» |
+| «Алғашқы қазақстан президенті кім болды?» | «Қысқаша айтсам, Тұңғыш президент — Нұрсұлтан Назарбаев.» |
+| «Алдымен қазақстанның президенті кім болды?» | «Тұңғыш президент — Нұрсұлтан Назарбаев.» |
+| «Ең бірінші Қазақстанның президенті кім?» | «Тұңғыш президент — Нұрсұлтан Назарбаев.» |
+| «Химия туралы не білесің?» | «Химия — заттардың құрамын, … (no meta-opener)» |
+
+All four user-reported failures closed.
+
+### Verified
+
+- 12 new unit tests: 5 `capitalize_proper_name` cases (single word / two words / hyphenated / already-capitalised / empty), 7 `detect_first_office_query` cases (5 positive synonyms + 2 negatives for current / non-president topics).
+- `cargo test --workspace --locked --no-fail-fast` — **1 400 passing** (+12 from v5.22.5).
+- Adversarial 95 / 95 unchanged.
+- fmt + clippy + `verify_release_version.sh` + `check_metrics_currency.sh` clean.
+
+### Why x.23.0 (minor)
+
+New public-API surfaces:
+- `nlg::capitalize_proper_name` (new helper)
+- `nlg::capitalize_first` promoted from private to `pub(crate)`
+- `topic_extraction::detect_first_office_query` (new pre-normaliser)
+
+Plus a behavioural shape change visible to ALL retrieval-grounded answers (introducer rewrite). Qualifies as minor.
+
+### Next
+
+- **v5.23.5** — extend the first-office synonym mapping when more office facts arrive in world_core (premier, chairman, hokim).
+- **v5.24.0+** — Voice arc V4 (barge-in / TTS interruption).
+- **v5.x** — Voice arc V5 (golden audio + WER / CER baseline).
+
+Stripe — Deterministic AI research (realistic answers; meta-citation framing removed; И.Ф.О. capitalised; first-president distinguished from current).
+
 ## [5.22.5] — 2026-05-12 — Single-variant template families expanded to 3-variant (anti-rote)
 
 **Patch.** Closes the 6 single-variant template families surfaced by the v5.20.0→v5.22.0 template-variety audit. Direct follow-on to the user's earlier complaint: «он на многие диалоги отвечает шаблонно… он должен попросить уточнить **то, что он не понял** — а не дежурное предложение на все случаи жизни». v5.21.0 / v5.21.5 fixed the «дежурное предложение» part by adding transparent-refusal echoes; v5.22.5 reduces the «шаблонно» part by giving rotational variety to families that previously had only one rendering.
