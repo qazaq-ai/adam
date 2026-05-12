@@ -298,6 +298,8 @@ templates = [
 key = "ask_about_system.self_comparison"
 templates = [
     "{system_self_comparison}",
+    "Қысқа жауап беремін: {system_self_comparison}",
+    "Бұл жайында ашық айтайын — {system_self_comparison}",
 ]
 
 # v4.12.0 — Implementation aspect: "what programming language are
@@ -313,6 +315,8 @@ templates = [
 key = "ask_about_system.implementation"
 templates = [
     "{system_implementation}",
+    "Іске асыру жағы туралы айтсам: {system_implementation}",
+    "Техникалық тұрғыда: {system_implementation}",
 ]
 
 # v4.13.5 — Generic capability honest fallback. Triggered when the
@@ -327,6 +331,8 @@ templates = [
 key = "ask_about_system.generic_capability"
 templates = [
     "{system_generic_capability}",
+    "Ашық айтайын: {system_generic_capability}",
+    "Шынын айтсам, {system_generic_capability}",
 ]
 
 # v4.14.0 — Curriculum-content honest fallback. Triggered by the
@@ -368,6 +374,8 @@ templates = [
 key = "ask_about_system.multi_topic_capability"
 templates = [
     "{system_multi_topic_capability}",
+    "Пәндер жөнінде: {system_multi_topic_capability}",
+    "Қысқаша мүмкіндіктерім: {system_multi_topic_capability}",
 ]
 
 # v4.18.5 — Composite identity + capabilities aspect. Triggered by
@@ -1440,6 +1448,8 @@ templates = [
 key = "unknown.with_grounded_fact"
 templates = [
     "{fact}",
+    "Білгенім бойынша: {fact}",
+    "Мынадай мәлімет бар: {fact}",
 ]
 
 # v4.33.5 — first SemFrame-driven response family. When the input

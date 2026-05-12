@@ -21,6 +21,57 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.22.5] — 2026-05-12 — Single-variant template families expanded to 3-variant (anti-rote)
+
+**Patch.** Closes the 6 single-variant template families surfaced by the v5.20.0→v5.22.0 template-variety audit. Direct follow-on to the user's earlier complaint: «он на многие диалоги отвечает шаблонно… он должен попросить уточнить **то, что он не понял** — а не дежурное предложение на все случаи жизни». v5.21.0 / v5.21.5 fixed the «дежурное предложение» part by adding transparent-refusal echoes; v5.22.5 reduces the «шаблонно» part by giving rotational variety to families that previously had only one rendering.
+
+### Audit baseline
+
+`data/dialog/templates/v1.toml` had 6 single-variant families (always-identical responses). After this release: 0 user-reachable single-variant families (the legacy `compare_topics` alias is untouched — not reached by the post-v4.77.0 planner). Variant histogram shifts: 1-variant 6 → 1 (legacy only), 3-variant 63 → 68.
+
+### Families expanded
+
+Each expanded from 1 to 3 variants. The original bare-slot phrasing is preserved as the first variant — `rng_seed=0` still emits the unchanged form, so existing tests with seed-0 assertions stay green. Variants 2 and 3 add subtle conversational openers:
+
+| Family | New variants (var 2 / var 3) |
+|---|---|
+| `ask_about_system.self_comparison` | «Қысқа жауап беремін: {…}» / «Бұл жайында ашық айтайын — {…}» |
+| `ask_about_system.implementation` | «Іске асыру жағы туралы айтсам: {…}» / «Техникалық тұрғыда: {…}» |
+| `ask_about_system.generic_capability` | «Ашық айтайын: {…}» / «Шынын айтсам, {…}» |
+| `ask_about_system.multi_topic_capability` | «Пәндер жөнінде: {…}» / «Қысқаша мүмкіндіктерім: {…}» |
+| `unknown.with_grounded_fact` | «Білгенім бойынша: {fact}» / «Мынадай мәлімет бар: {fact}» |
+
+### Live-verified
+
+3-turn smoke (`adam_chat` REPL, same query «Сіз қандай бағдарламалау тілінде жазылғансыз?» asked three times in one session):
+
+| Turn | rng_seed | Rendered variant |
+|---|---|---|
+| 1 | turn_seed(1) | «Техникалық тұрғыда: Мен `Rust` бағдарламалау тілінде жазылғанмын. …» |
+| 2 | turn_seed(2) | bare slot (variant 1) |
+| 3 | turn_seed(3) | «Техникалық тұрғыда: …» |
+
+The student no longer sees byte-identical text across repeat queries within a session.
+
+### Verified
+
+- No new tests needed — this is data-only (TOML) expansion; existing seed-0 assertions unchanged because the bare variant remains at index 0.
+- `cargo test --workspace --locked --no-fail-fast` — **1 388 passing** (unchanged from v5.22.0).
+- Adversarial 95/95 unchanged.
+- fmt + clippy + `verify_release_version.sh` + `check_metrics_currency.sh` clean.
+
+### Why x.22.5 (patch)
+
+Pure data-pack expansion. No new public APIs, no architectural shift, no behavioural change for seed-0 callers. Bumps to .22.5 per sequential cadence.
+
+### Next
+
+- **v5.23.0+** — Voice arc V4 (barge-in / TTS interruption).
+- **v5.x** — Voice arc V5 (golden audio + WER/CER baseline).
+- **Future template variety** — 38 families currently have 2 variants; whether to expand any to 3 is a judgement call per family (some are intentionally binary, e.g. polite-vs-casual greetings). Not gated by this release.
+
+Stripe — Deterministic AI research (rote-response reduction; same content, three voices).
+
 ## [5.22.0] — 2026-05-12 — Speech-defect substitution extension to `kazakh_fuzzy`
 
 **Minor.** Extends the v5.20.0 Kazakh fuzzy entity matcher with **17 new phonetic-pair substitutions** covering the well-known Kazakh / Russian speech defects (дислалия — ротацизм, сигматизм, ламбдацизм, каппацизм, voicing alternation, nasal confusion). User directive: «всем известны основные дефекты речи у людей. Такие, как не выговаривание 'р' и другие. Необходимо все эти известные дефекты речи запрограммировать в нашей модели, чтобы он легко их распозновал и не тупил на ровном месте».
