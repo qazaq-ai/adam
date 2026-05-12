@@ -55,6 +55,7 @@ pub mod dialog_context;
 pub mod discourse;
 pub mod domain_index;
 pub mod intent;
+pub mod kazakh_fuzzy;
 pub mod language_core;
 pub mod nlg;
 pub mod pedagogical;

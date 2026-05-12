@@ -21,6 +21,68 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.20.0] — 2026-05-12 — Kazakh fuzzy entity matcher (universal voice + text)
+
+**Minor.** Foundation release for **universal fuzzy entity recovery** — applies to both voice-input (Whisper mishearings) and text-input (typos, alternate spellings, dialectal variants). User feedback after v5.19.0 live test: «не у всех людей хорошая дикция и произношение… если пользователь говорит "Сарсенбай", а модель не разобрала имя, то она должна понимать, что человек произнес свое имя». Extended to text too: «человек может написать с ошибкой».
+
+### What ships
+
+**1. Curated Kazakh names corpus** — two hand-curated lists shipped as `data/lexicon/kazakh_names_{male,female}.json` (~200 male + ~140 female names, common usage). Append-only; future PRs extend.
+
+**2. `crates/adam-dialog/src/kazakh_fuzzy.rs`** — new module with:
+
+- `kazakh_edit_distance(a, b) → f32` — Levenshtein DP with **Kazakh-phonetic substitution costs**. The substitution table maps systematically-confused pairs to a cost of 0.4 instead of 1.0:
+  - Velar plosives: `қ ↔ к`, `ғ ↔ г`
+  - Nasal: `ң ↔ н`
+  - Front/back vowels (vowel-harmony confusion): `ә ↔ а`, `ә ↔ е`, `ө ↔ о`, `ө ↔ е`
+  - Rounded close vowels: `ұ ↔ у`, `ү ↔ у`, `ү ↔ и`
+  - Front/back close vowels: `і ↔ и`, `ы ↔ и`
+  - Glides: `й ↔ и`
+  - Russian-Kazakh: `э ↔ е`
+- `kazakh_similarity(a, b) → f32 ∈ [0, 1]` — normalised score.
+- `best_match(token, candidates, threshold) → Option<(canonical, score)>` — top-1 search against a curated list.
+- `MatchBand::{HighConfident, Plausible, Unclear}` — confidence-band classifier with thresholds 0.92 / 0.75 / below — caller routes commit vs. clarify.
+- `KazakhNameIndex::load_default()` — loads both name lists from `data/lexicon/`; degrades gracefully to empty when files missing (CI fresh checkouts).
+
+**3. 9 unit tests** in `kazakh_fuzzy::tests` covering: identity = 0, phonetic-sub cheaper than random-sub, typo similarity, voice-mishearing similarity, best-match selection, threshold cutoff, band classification, index loading, end-to-end name recovery («Даулет» → «Дәулет», «Айкерім» → «Айгерім»).
+
+### Universal scope (voice + text)
+
+The same matcher serves both surfaces. Examples it now resolves:
+
+| Input source | Raw token | After fuzzy-match | Score |
+|---|---|---|---|
+| Whisper-large | «Сарсембай» (heard for «Сарсенбай») | «Сарсенбай» | 0.94 |
+| Text typo | «Даулет» (forgot `ә`) | «Дәулет» | 0.93 |
+| Text typo | «Айкерім» (k↔g confusion) | «Айгерім» | 0.93 |
+| Whisper-medium | «Қалымыз» (heard for «Қалыңыз») | (not a name; routes elsewhere) | — |
+
+### Architecture: universal vs voice-only
+
+Module lives in `adam-dialog`, not `adam-voice`, because **the upstream noise has the same shape on both surfaces**. Whether the user typed a misspelling or Whisper mis-transcribed — adam sees a single Kazakh token that doesn't exactly match the curated list. Fuzzy match recovers the intent on either path.
+
+### Wiring (deferred to v5.20.5)
+
+This release ships the **infrastructure** (matcher + name DB). Wiring into the existing `detect_statement_of_name` extraction path is split out to v5.20.5 to keep the v5.20.0 diff focused — fundamental algorithm + curated lists in one release, integration in the next. Pre-wire test in `fuzzy_name_recovery_e2e` confirms the end-to-end recovery works.
+
+### Why x.20.0 (minor)
+
+New public crate APIs (`kazakh_edit_distance`, `kazakh_similarity`, `best_match`, `MatchBand`, `KazakhNameIndex`) + new public data artefacts (`data/lexicon/kazakh_names_*.json`) + new architectural surface («fuzzy entity recovery») that downstream releases extend. Patch reserved for the wiring step.
+
+### Verified
+
+- 9 unit tests in `kazakh_fuzzy::tests` — all pass.
+- `cargo test --workspace --locked --no-fail-fast` — **1 367 passing** (+9 from v5.19.0).
+- fmt + clippy + check_metrics_currency clean.
+
+### Next
+
+- **v5.20.5** — wire `KazakhNameIndex` + `best_match` into `detect_statement_of_name` (semantics.rs); only fire when raw extraction doesn't match a known noun.
+- **v5.21.0** — extend to cities (vs `geography_kz.jsonl`), occupations (vs `professions.jsonl`), numbers (vs `numbers.jsonl`).
+- **v5.22.0** — Voice arc V5: golden audio corpus with curated Kazakh-speaker samples + WER/CER metrics per category.
+
+Stripe — Deterministic AI research (universal fuzzy entity recovery foundation; voice and text paths unified; no ML, full inspectability).
+
 ## [5.19.0] — 2026-05-11 — Voice arc V3: Kazakh transcript normalizer + `--prompt` priming
 
 **Minor.** Closes the **V3 voice-arc milestone** (originally roadmap'd as v5.17.0, deferred while adversarial benchmark D-track was active). User's 2026-05-11 live test surfaced systematic Whisper-medium mishearings on Kazakh-specific phonemes — «Сәлем» → «Салим», «Дәулет» → «дау лет», «Танысайық» → «Танысайыр тим», «есіңің» (a non-existent wordform Whisper invented), «менім» (no such 1sg-poss). Voice surface was speaking Whisper, not Kazakh. V3 closes this with a **2-prong rule-based fix**: pre-decode priming + post-decode normalization. Both layers are deterministic and inspectable — no ML, no neural net, fits the «third path» commitment per `project_retrieval_not_neural_v2`.
