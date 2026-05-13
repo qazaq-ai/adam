@@ -48,6 +48,18 @@ pub trait TtsBackend: Send + Sync {
     /// Human-readable name of the backend, for `--trace` /
     /// startup banners. e.g. "macOS say (voice: Aru)".
     fn describe(&self) -> String;
+
+    /// **v5.24.5 — Voice arc V4 (push-to-talk barge-in).** Stop any
+    /// currently-playing synthesis immediately. No-op when nothing is
+    /// playing. Called from the voice REPL when the user starts a new
+    /// turn while the previous response is still being spoken — this
+    /// makes the dialog feel responsive instead of «walkie-talkie».
+    ///
+    /// Default implementation is a no-op (covers `NoOpTts` and any
+    /// future synchronous backend that can't be interrupted). Real
+    /// backends override to kill the child synthesiser / audio
+    /// player process.
+    fn interrupt(&self) {}
 }
 
 /// No-op backend for tests and disabled-TTS callers.
@@ -199,6 +211,18 @@ impl TtsBackend for OsTtsBackend {
         match &self.voice {
             Some(v) => format!("{} (voice: {})", self.program, v),
             None => format!("{} (default voice)", self.program),
+        }
+    }
+
+    /// **v5.24.5** — kill any in-flight synthesiser child. Mirrors the
+    /// `speak()` kill-previous semantics (line 183-186) but exposed
+    /// as an explicit API so the voice REPL can stop TTS without
+    /// having to start new speech.
+    fn interrupt(&self) {
+        let mut guard = self.current.lock().unwrap_or_else(|p| p.into_inner());
+        if let Some(mut prev) = guard.take() {
+            let _ = prev.kill();
+            let _ = prev.wait();
         }
     }
 }
@@ -382,6 +406,17 @@ impl TtsBackend for PiperTtsBackend {
                 self.model_path.display(),
                 self.audio_player.display()
             ),
+        }
+    }
+
+    /// **v5.24.5** — kill the in-flight audio player. The piper
+    /// synthesis step itself is synchronous (already finished by the
+    /// time playback starts), so only the player child needs killing.
+    fn interrupt(&self) {
+        let mut guard = self.current.lock().unwrap_or_else(|p| p.into_inner());
+        if let Some(mut prev) = guard.take() {
+            let _ = prev.kill();
+            let _ = prev.wait();
         }
     }
 }
@@ -661,6 +696,70 @@ mod tests {
         assert!(backend.speak("").is_ok());
         assert!(backend.speak("\n\n").is_ok());
         // No child was spawned.
+        let guard = backend.current.lock().unwrap();
+        assert!(guard.is_none());
+    }
+
+    // ─── v5.24.5 — Voice arc V4 (push-to-talk barge-in) ──────────────
+
+    /// `interrupt()` on a backend with no in-flight child is a no-op
+    /// and must NOT panic. Covers the common case where the user
+    /// presses Enter for the next turn after TTS has already finished.
+    #[test]
+    fn interrupt_on_idle_backend_is_noop_v5245() {
+        let backend = OsTtsBackend::new("say".into(), vec![], None);
+        backend.interrupt(); // first call — nothing playing
+        backend.interrupt(); // double-call still fine
+        let guard = backend.current.lock().unwrap();
+        assert!(guard.is_none());
+    }
+
+    /// NoOp backend (used when `--tts` is off): `interrupt()` must be
+    /// safe to call. Covers the REPL path where tts_handle is Some
+    /// but points at NoOpTts.
+    #[test]
+    fn interrupt_on_noop_backend_is_safe_v5245() {
+        let backend = NoOpTts;
+        backend.interrupt();
+        backend.interrupt();
+    }
+
+    /// `interrupt()` while a real child is playing must kill it and
+    /// leave the registered slot empty. macOS-only (requires `say`).
+    #[test]
+    fn interrupt_kills_active_child_on_macos_v5245() {
+        if !cfg!(target_os = "macos") || !command_on_path("say") {
+            return;
+        }
+        let backend = OsTtsBackend::detect(None).expect("macOS detect");
+        // Long enough that the child is still running when we
+        // interrupt — say takes ~2s per sentence at default rate.
+        backend
+            .speak("Бұл өте ұзын сөйлем; барж-ин тестінде үзіледі.")
+            .expect("speak should spawn");
+        // Confirm a child was registered.
+        {
+            let guard = backend.current.lock().unwrap();
+            assert!(guard.is_some(), "speak must register a child");
+        }
+        backend.interrupt();
+        // After interrupt, slot is empty.
+        let guard = backend.current.lock().unwrap();
+        assert!(guard.is_none(), "interrupt must clear the registered child");
+    }
+
+    /// Piper backend `interrupt()` parity test (mock paths — no real
+    /// piper / audio player needed, the trait method just clears the
+    /// Mutex slot for whatever child was registered).
+    #[test]
+    fn piper_interrupt_on_idle_is_noop_v5245() {
+        let backend = PiperTtsBackend::new(
+            PathBuf::from("/p/piper"),
+            PathBuf::from("/p/afplay"),
+            PathBuf::from("/m/voice.onnx"),
+            Some("voice".into()),
+        );
+        backend.interrupt();
         let guard = backend.current.lock().unwrap();
         assert!(guard.is_none());
     }

@@ -21,6 +21,55 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.24.5] — 2026-05-13 — Voice arc V4: push-to-talk barge-in (TTS interruption)
+
+**Patch.** First half of Voice arc V4. Closes the «walkie-talkie» feel of the voice REPL — the user can now interrupt a still-playing TTS response by starting a new turn (Enter in push-to-talk mode, or typing in the text REPL). Pre-v5.24.5 the previous TTS kept playing for 50-500 ms while the kernel processed the new turn, so the dialog felt unnatural.
+
+### What changed
+
+- **New trait method `TtsBackend::interrupt()`** on [tts.rs](crates/adam-dialog/src/tts.rs#L52). Default impl is a no-op (covers `NoOpTts`). Real backends override to kill the in-flight synthesiser / audio-player child.
+- **`OsTtsBackend::interrupt()`** — kills the macOS `say` / Linux `espeak-ng` child process and clears the registered slot. Mirrors the existing `speak()` kill-previous semantics, exposed as an explicit API.
+- **`PiperTtsBackend::interrupt()`** — kills the audio player child (piper synthesis is already finished by the time playback starts; only the player needs interrupting).
+- **Wired into voice push-to-talk loop** at [adam_chat.rs](crates/adam-dialog/src/bin/adam_chat.rs): immediately after `read_line` returns (user pressed Enter to start a new recording), `tts.interrupt()` is called. No-op when TTS is idle; otherwise the previous response is silenced before mic capture begins.
+- **Wired into text REPL loop** for the same UX. The text REPL is the «equivalent of starting a new voice turn» when the user types and submits.
+
+### Why push-to-talk first
+
+Push-to-talk barge-in has **no acoustic echo problem**: the mic only opens when the user presses the button, never during TTS playback. So no AEC needed, no VAD-during-TTS, no extra crates. Pure state-machine fix.
+
+VAD-during-TTS barge-in (where the system listens during TTS and cuts when it detects user speech) is deferred to **v5.25.0** — that path needs acoustic echo cancellation. Pure-Rust AEC is now feasible (the `sonora` crate ports WebRTC AEC3 to pure Rust with full SIMD; `aec3` is an alternative). v5.25.0 will integrate one of these without C-bindings; v5.24.5 keeps scope tight.
+
+### Live-verified
+
+Two-turn test in text REPL with `--tts` on:
+
+1. Turn 1: «Сен не білесің?» → long capability dump (~30 s of TTS audio)
+2. Turn 2 (typed immediately): «Сәлем.» → previous TTS killed, new short response plays
+
+Process snapshot: only 1 `say` child active at any moment (vs. 2 if barge-in had failed). Confirmed clean exit (no zombies).
+
+### Verified
+
+- 4 new unit tests in `tts::tests`:
+  - `interrupt_on_idle_backend_is_noop_v5245`
+  - `interrupt_on_noop_backend_is_safe_v5245`
+  - `interrupt_kills_active_child_on_macos_v5245`
+  - `piper_interrupt_on_idle_is_noop_v5245`
+- `cargo test --workspace --locked --no-fail-fast` — **1 406 passing** (+4 from v5.24.0).
+- Adversarial 95 / 95 unchanged.
+- fmt + clippy + `verify_release_version.sh` + `check_metrics_currency.sh` clean.
+
+### Why x.24.5 (patch)
+
+One new trait method with a default no-op + 4 lines of REPL integration. No architectural shift, no behavioural change for `--tts`-off / NoOpTts callers. Public API surface grows by one method on `TtsBackend`.
+
+### Next
+
+- **v5.25.0** — Voice arc V4 part 2: VAD-during-TTS barge-in with pure-Rust AEC (`sonora` integration).
+- **v5.x** — Voice arc V5 (golden audio + WER / CER baseline).
+
+Stripe — Deterministic AI research (voice channel V4 part 1; «walkie-talkie» feel removed).
+
 ## [5.24.0] — 2026-05-12 — Codex 2026-05-12 audit: 4 dialog-routing bug fixes + docs reconciliation
 
 **Minor.** Closes all 4 concrete bugs from the 2026-05-12 Codex audit. Each bug had a live failing transcript; each fix verified live post-rebuild.

@@ -447,6 +447,17 @@ fn main() -> ExitCode {
     for line in stdin.lock().lines() {
         let Ok(line) = line else { break };
         if let Some(assembled) = absorb_line(&line, &mut block_buf) {
+            // **v5.24.5 — Voice arc V4 (push-to-talk barge-in).** The
+            // user just submitted a new turn. If TTS from the previous
+            // turn is still playing, kill it immediately so it
+            // doesn't talk over the upcoming response. No-op when TTS
+            // is idle (typical case after a short response or when
+            // --tts is off). Applied here in the TEXT REPL too —
+            // pressing Enter to type a new query is the text-mode
+            // analogue of starting a new voice turn.
+            if let Some(tts) = tts_handle {
+                tts.interrupt();
+            }
             // **v5.15.0 (V1).** Multi-clause user utterances
             // («Сәлеметсіз бе, қалыңыз қалай, танысайық») are split
             // into per-clause pieces here; each clause runs as its
@@ -594,6 +605,15 @@ fn run_voice_repl(
         io::stderr().lock().flush().ok();
         if stdin.lock().read_line(&mut prompt_line).is_err() || prompt_line.is_empty() {
             return ExitCode::SUCCESS;
+        }
+        // **v5.24.5 — Voice arc V4 (push-to-talk barge-in).** The user
+        // just pressed Enter to start a new turn. If TTS from the
+        // previous turn is still playing, kill it immediately so the
+        // mic doesn't pick up the tail of the previous response and
+        // the dialog feels responsive instead of «walkie-talkie».
+        // No-op when TTS is idle (typical case after a short response).
+        if let Some(tts) = tts_handle {
+            tts.interrupt();
         }
         let cap = match MicCapture::start(mic_cfg_template.clone()) {
             Ok(c) => c,
