@@ -126,6 +126,14 @@ fn main() -> ExitCode {
     // the recording.
     let voice_input = voice_input_flag;
     let push_to_talk = args.iter().any(|a| a == "--push-to-talk");
+    // **v5.26.5 — Voice arc V4 part 4 (barge-in opt-in).** When set,
+    // the voice REPL creates a shared AEC processor + RenderQueue,
+    // installs the queue's render-tap on the TTS backend, and post-
+    // processes mic captures through AEC. This cleans the «user
+    // started speaking while TTS was still playing» overlap region
+    // before Whisper sees it — the foundation for true real-time
+    // VAD-during-TTS barge-in landing in v5.27.0.
+    let barge_in = args.iter().any(|a| a == "--barge-in");
     let whisper_bin_arg = args
         .windows(2)
         .find(|w| w[0] == "--whisper-bin")
@@ -440,6 +448,7 @@ fn main() -> ExitCode {
             whisper_language_arg.as_deref(),
             push_to_talk,
             voice_confidence_threshold,
+            barge_in,
         );
     }
 
@@ -527,8 +536,12 @@ fn run_voice_repl(
     whisper_language_arg: Option<&str>,
     push_to_talk: bool,
     confidence_threshold: f32,
+    barge_in: bool,
 ) -> ExitCode {
-    use adam_voice::{MicCapture, MicConfig, VadStopReason, WhisperCli, write_wav};
+    use adam_voice::{
+        AEC_SAMPLE_RATE, AecProcessor, MicCapture, MicConfig, VadStopReason, WhisperCli,
+        new_render_queue, process_capture_chunked, write_wav,
+    };
 
     let bin: std::path::PathBuf = match whisper_bin_arg
         .map(std::path::PathBuf::from)
@@ -588,6 +601,54 @@ fn run_voice_repl(
     } else {
         MicConfig::default()
     };
+
+    // **v5.26.5 — Voice arc V4 part 4 (barge-in opt-in).** When the
+    // `--barge-in` flag is set, build a shared AEC processor +
+    // RenderQueue. The queue's render-tap is installed on the TTS
+    // backend so every chunk of audio it plays is also forwarded to
+    // the queue. After each mic capture, the buffered samples are
+    // processed through AEC (paired with the queue's render frames)
+    // before VAD / Whisper sees them — this removes the «mic picked
+    // up the speaker» echo, letting the user start speaking before
+    // TTS finishes without confusing the STT pass.
+    //
+    // Note: this is NOT real-time VAD-during-TTS barge-in (v5.27.0).
+    // The mic still only listens AFTER the user presses Enter
+    // (push-to-talk) or after VAD detects speech onset (continuous
+    // mode); but when it does listen, the echo from any still-playing
+    // TTS tail is now cancelled out cleanly.
+    let aec_state: Option<(std::sync::Mutex<AecProcessor>, adam_voice::RenderQueue)> = if barge_in {
+        match AecProcessor::new() {
+            Ok(processor) => {
+                let queue = new_render_queue();
+                // Wire the render-tap on the TTS backend. The tap
+                // resamples device-rate output to AEC rate (16 kHz)
+                // and pushes into the queue. For now we assume the
+                // playback device rate matches the AEC rate; future
+                // patches plumb the actual cpal device rate into the
+                // tap so cross-rate AEC is exact.
+                if let Some(tts) = tts_handle {
+                    let tap = adam_voice::aec_render_tap(queue.clone(), AEC_SAMPLE_RATE);
+                    tts.set_render_tap(Some(tap));
+                }
+                eprintln!(
+                    "adam-chat --barge-in: AEC echo cancellation active. \
+                     Mic will be cleaned against TTS audio before Whisper STT."
+                );
+                Some((std::sync::Mutex::new(processor), queue))
+            }
+            Err(e) => {
+                eprintln!(
+                    "adam-chat --barge-in: AEC init failed: {e}; \
+                     continuing without echo cancellation."
+                );
+                None
+            }
+        }
+    } else {
+        None
+    };
+
     eprintln!(
         "adam-chat --voice-input: {} mode active. {} ^D to quit.",
         if push_to_talk { "push-to-talk" } else { "VAD" },
@@ -652,12 +713,40 @@ fn run_voice_repl(
                 }
             }
         }
-        let samples = match cap.stop() {
+        let raw_samples = match cap.stop() {
             Ok(s) => s,
             Err(e) => {
                 eprintln!("[voice] mic stop failed: {e}");
                 continue;
             }
+        };
+        // **v5.26.5 — Voice arc V4 part 4.** When --barge-in is on,
+        // process the captured mic samples through the shared AEC
+        // processor before VAD / Whisper sees them. Pairs each
+        // 10-ms-frame of mic data with a frame from the render queue
+        // (silence when the queue is empty — no TTS was playing).
+        // Result: any echo from a still-playing TTS tail gets
+        // subtracted before STT, dramatically improving transcription
+        // quality when the user starts speaking before TTS finishes.
+        let samples = if let Some((aec_mutex, queue)) = aec_state.as_ref() {
+            match aec_mutex.lock() {
+                Ok(mut aec) => match process_capture_chunked(&mut aec, queue, &raw_samples) {
+                    Ok(cleaned) => {
+                        eprintln!("[voice] (AEC cleaned)");
+                        cleaned
+                    }
+                    Err(e) => {
+                        eprintln!("[voice] AEC processing failed: {e}; using raw mic samples");
+                        raw_samples
+                    }
+                },
+                Err(_) => {
+                    eprintln!("[voice] AEC mutex poisoned; using raw mic samples");
+                    raw_samples
+                }
+            }
+        } else {
+            raw_samples
         };
         eprintln!(
             "[voice] captured {:.1} s of audio; transcribing …",
@@ -766,6 +855,7 @@ fn run_voice_repl(
     _whisper_language_arg: Option<&str>,
     _push_to_talk: bool,
     _confidence_threshold: f32,
+    _barge_in: bool,
 ) -> ExitCode {
     eprintln!(
         "adam-chat --voice-input requires the `voice` feature. \

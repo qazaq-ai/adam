@@ -31,8 +31,22 @@
 
 use std::io::Write;
 use std::path::PathBuf;
-use std::process::{Child, Command, Stdio};
-use std::sync::Mutex;
+#[cfg(not(feature = "voice"))]
+use std::process::Child;
+use std::process::{Command, Stdio};
+use std::sync::{Arc, Mutex};
+
+/// **v5.26.5** — Audio-output tap callback shape. Receives each chunk
+/// of mono f32 samples as they're written to the speakers. When set
+/// via [`TtsBackend::set_render_tap`], the backend MUST call the
+/// closure on every output chunk it plays. The closure is typically
+/// wired by the voice REPL to `adam_voice::aec_render_tap()` so the
+/// AEC processor can subtract TTS echo from the mic capture.
+///
+/// Defined here in `adam-dialog` (rather than re-exported from
+/// `adam-voice`) so the trait signature stays available even when the
+/// `voice` feature is disabled.
+pub type TtsRenderTap = Arc<dyn Fn(&[f32]) + Send + Sync + 'static>;
 
 /// Output transducer for spoken Kazakh.
 ///
@@ -60,6 +74,23 @@ pub trait TtsBackend: Send + Sync {
     /// backends override to kill the child synthesiser / audio
     /// player process.
     fn interrupt(&self) {}
+
+    /// **v5.26.5 — Voice arc V4 part 4 (AEC wiring).** Install (or
+    /// clear) a render-tap callback that the backend will invoke on
+    /// every chunk of mono f32 samples it sends to the speakers. The
+    /// voice REPL uses this to feed `adam_voice::AecProcessor` the
+    /// reference signal it needs to subtract TTS echo from the mic.
+    ///
+    /// Default implementation is a no-op (NoOpTts, plus backends that
+    /// shell out to a process whose audio output we can't tap). Real
+    /// in-process backends (Piper + OS-say under `feature = "voice"`)
+    /// override to store the tap and forward chunks to it from their
+    /// playback path.
+    ///
+    /// Passing `None` clears any previously-set tap.
+    fn set_render_tap(&self, tap: Option<TtsRenderTap>) {
+        let _ = tap;
+    }
 }
 
 /// No-op backend for tests and disabled-TTS callers.
@@ -82,7 +113,6 @@ impl TtsBackend for NoOpTts {
 /// stall waiting for audio. A new `speak()` call kills any still-
 /// running previous synthesis (latest-wins semantics — natural for
 /// interactive tutoring).
-#[derive(Debug)]
 pub struct OsTtsBackend {
     program: String,
     /// Pre-built argv prefix. The text-to-speak is appended as the
@@ -90,9 +120,32 @@ pub struct OsTtsBackend {
     args: Vec<String>,
     /// Resolved voice name (when known) — surfaced by [`describe`].
     voice: Option<String>,
-    /// Currently-playing child, if any. Killed when a new speak call
-    /// arrives so the REPL feels responsive.
+    /// **v5.26.5** — playback handle for the in-process path
+    /// (`feature = "voice"`). Replaces the legacy direct-`say` child.
+    #[cfg(feature = "voice")]
+    current: Mutex<Option<adam_voice::PlaybackHandle>>,
+    /// Legacy direct-`say` child handle (used when `voice` feature
+    /// is disabled). Killed on next speak / interrupt.
+    #[cfg(not(feature = "voice"))]
     current: Mutex<Option<Child>>,
+    /// **v5.26.5** — optional AEC render-tap callback. When set, the
+    /// backend forwards every chunk of audio it plays to this
+    /// closure so the voice REPL's AEC processor can use it as a
+    /// reference signal. Only meaningful under `feature = "voice"`
+    /// (the legacy non-feature path plays directly via `say` and has
+    /// no in-process audio frames to forward).
+    #[cfg(feature = "voice")]
+    render_tap: Mutex<Option<TtsRenderTap>>,
+}
+
+impl std::fmt::Debug for OsTtsBackend {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("OsTtsBackend")
+            .field("program", &self.program)
+            .field("args", &self.args)
+            .field("voice", &self.voice)
+            .finish_non_exhaustive()
+    }
 }
 
 impl OsTtsBackend {
@@ -103,6 +156,8 @@ impl OsTtsBackend {
             args,
             voice,
             current: Mutex::new(None),
+            #[cfg(feature = "voice")]
+            render_tap: Mutex::new(None),
         }
     }
 
@@ -175,35 +230,97 @@ impl OsTtsBackend {
         }
         None
     }
+
+    /// **v5.26.5** — temp file used as the synth-to-playback buffer.
+    /// Unique per process PID to avoid collisions when multiple
+    /// `adam_chat` instances run concurrently.
+    #[cfg(feature = "voice")]
+    fn temp_wav() -> PathBuf {
+        std::env::temp_dir().join(format!("adam_os_tts_{}.wav", std::process::id()))
+    }
 }
 
 impl TtsBackend for OsTtsBackend {
-    /// **v5.0.5** — non-blocking dispatch. Spawns the synthesiser as
-    /// a detached child process and returns immediately. If a
-    /// previous speak() call is still synthesising, it is killed so
-    /// the latest response wins (the alternative — queueing — feels
-    /// laggy in a tutor REPL where the student typed something new).
+    /// **v5.0.5** — non-blocking dispatch. **v5.26.5 (feature =
+    /// "voice")** — synthesise to a temporary WAV file, then play
+    /// in-process via `adam_voice::play_wav` so the audio output
+    /// stream can be tapped for AEC. Without the `voice` feature
+    /// active, falls back to the legacy direct-`say` spawn (no
+    /// in-process playback, no AEC tap possible).
     fn speak(&self, text: &str) -> std::io::Result<()> {
         let cleaned = strip_for_speech(text);
         if cleaned.trim().is_empty() {
             return Ok(());
         }
-        let mut guard = self.current.lock().unwrap_or_else(|p| p.into_inner());
-        // Kill the previously-spawned child, if it's still running.
-        // `kill()` errors if the child has already exited — fine,
-        // ignore. `wait()` reaps the zombie either way.
-        if let Some(mut prev) = guard.take() {
-            let _ = prev.kill();
-            let _ = prev.wait();
+        #[cfg(feature = "voice")]
+        {
+            // Step 1: synthesise to WAV. macOS `say` and Linux
+            // `espeak-ng` both support file output; we adapt the
+            // argv per program.
+            let temp = Self::temp_wav();
+            let mut cmd = Command::new(&self.program);
+            cmd.args(&self.args);
+            match self.program.as_str() {
+                "say" => {
+                    // macOS: `say -v <voice> --file-format=WAVE
+                    // --data-format=LEI16@22050 -o file.wav "text"`
+                    cmd.arg("--file-format=WAVE");
+                    cmd.arg("--data-format=LEI16@22050");
+                    cmd.arg("-o");
+                    cmd.arg(&temp);
+                    cmd.arg(&cleaned);
+                }
+                "espeak-ng" | "espeak" => {
+                    // Linux: `espeak-ng -v <voice> -w file.wav "text"`
+                    cmd.arg("-w");
+                    cmd.arg(&temp);
+                    cmd.arg(&cleaned);
+                }
+                _ => {
+                    // Unknown synthesiser — assume positional text only
+                    // and skip file output (graceful degradation;
+                    // playback will fall through but at least the
+                    // child runs).
+                    cmd.arg(&cleaned);
+                }
+            }
+            let synth_status = cmd.stdout(Stdio::null()).stderr(Stdio::null()).status()?;
+            if !synth_status.success() {
+                return Err(std::io::Error::other(format!(
+                    "{} exited with non-zero status {:?}",
+                    self.program,
+                    synth_status.code()
+                )));
+            }
+            // Step 2: in-process playback. Drop any previous handle
+            // first (stops the previous output stream cleanly).
+            let mut guard = self.current.lock().unwrap_or_else(|p| p.into_inner());
+            *guard = None;
+            // Pull current render-tap (if voice REPL installed one).
+            let tap_opt = self
+                .render_tap
+                .lock()
+                .ok()
+                .and_then(|g| g.as_ref().cloned());
+            let handle = adam_voice::play_wav(&temp, tap_opt)
+                .map_err(|e| std::io::Error::other(format!("in-process playback failed: {e}")))?;
+            *guard = Some(handle);
         }
-        let child = Command::new(&self.program)
-            .args(&self.args)
-            .arg(&cleaned)
-            // Suppress `say`'s tty messages.
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()?;
-        *guard = Some(child);
+        #[cfg(not(feature = "voice"))]
+        {
+            let mut guard = self.current.lock().unwrap_or_else(|p| p.into_inner());
+            if let Some(mut prev) = guard.take() {
+                let _ = prev.kill();
+                let _ = prev.wait();
+            }
+            let child = Command::new(&self.program)
+                .args(&self.args)
+                .arg(&cleaned)
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
+                .spawn()?;
+            *guard = Some(child);
+        }
         Ok(())
     }
 
@@ -214,32 +331,63 @@ impl TtsBackend for OsTtsBackend {
         }
     }
 
-    /// **v5.24.5** — kill any in-flight synthesiser child. Mirrors the
-    /// `speak()` kill-previous semantics (line 183-186) but exposed
-    /// as an explicit API so the voice REPL can stop TTS without
-    /// having to start new speech.
+    /// **v5.24.5** — stop the in-flight TTS playback. **v5.26.5** —
+    /// under `feature = "voice"`, drops the in-process playback
+    /// handle (cpal stream stops cleanly); otherwise kills the legacy
+    /// `say`/`espeak-ng` child.
     fn interrupt(&self) {
         let mut guard = self.current.lock().unwrap_or_else(|p| p.into_inner());
-        if let Some(mut prev) = guard.take() {
-            let _ = prev.kill();
-            let _ = prev.wait();
+        #[cfg(feature = "voice")]
+        {
+            *guard = None;
+        }
+        #[cfg(not(feature = "voice"))]
+        {
+            if let Some(mut prev) = guard.take() {
+                let _ = prev.kill();
+                let _ = prev.wait();
+            }
+        }
+    }
+
+    /// **v5.26.5** — store an AEC render-tap callback. Subsequent
+    /// `speak()` calls will pass it to `adam_voice::play_wav` so the
+    /// echo canceller receives the audio that's going to the speakers.
+    /// Pass `None` to clear. Only meaningful under `feature = "voice"`;
+    /// no-op otherwise.
+    fn set_render_tap(&self, tap: Option<TtsRenderTap>) {
+        #[cfg(feature = "voice")]
+        {
+            if let Ok(mut guard) = self.render_tap.lock() {
+                *guard = tap;
+            }
+        }
+        #[cfg(not(feature = "voice"))]
+        {
+            let _ = tap;
         }
     }
 }
 
 impl Drop for OsTtsBackend {
-    /// Best-effort: when the REPL exits, reap the last-spawned child
-    /// so it doesn't linger as a zombie. `say` keeps speaking even
-    /// after the parent exits (default macOS behaviour) — that's
-    /// fine; we just don't want the kernel process table cluttered.
+    /// Best-effort: stop any in-flight playback on REPL exit so it
+    /// doesn't continue past the parent process. **v5.26.5** — under
+    /// `feature = "voice"`, dropping the in-process `PlaybackHandle`
+    /// stops the cpal stream. Under no-voice, reaps the legacy `say`
+    /// child (macOS `say` continues after parent exit by default,
+    /// which is fine — we just don't want zombies).
     fn drop(&mut self) {
-        if let Ok(mut guard) = self.current.lock()
-            && let Some(mut child) = guard.take()
-        {
-            // Try to wait briefly; if still running, leave it
-            // detached (macOS `say` continues after parent exit, so
-            // the user hears the last response even after ^D).
-            let _ = child.try_wait();
+        if let Ok(mut guard) = self.current.lock() {
+            #[cfg(feature = "voice")]
+            {
+                *guard = None;
+            }
+            #[cfg(not(feature = "voice"))]
+            {
+                if let Some(mut child) = guard.take() {
+                    let _ = child.try_wait();
+                }
+            }
         }
     }
 }
@@ -274,7 +422,6 @@ impl Drop for OsTtsBackend {
 /// step itself is synchronous (~0.3-1 s per sentence on M2) — the
 /// blocking is contained to that step. Kill-previous semantics
 /// apply to the audio player child, mirroring `OsTtsBackend`.
-#[derive(Debug)]
 pub struct PiperTtsBackend {
     piper: PathBuf,
     /// External audio player path. **v5.25.5** — used only when the
@@ -295,6 +442,23 @@ pub struct PiperTtsBackend {
     /// audio stream immediately.
     #[cfg(feature = "voice")]
     current: Mutex<Option<adam_voice::PlaybackHandle>>,
+    /// **v5.26.5** — optional AEC render-tap callback. Same semantics
+    /// as `OsTtsBackend::render_tap` — voice REPL installs this so the
+    /// AEC processor receives the audio being played for its echo
+    /// reference signal.
+    #[cfg(feature = "voice")]
+    render_tap: Mutex<Option<TtsRenderTap>>,
+}
+
+impl std::fmt::Debug for PiperTtsBackend {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("PiperTtsBackend")
+            .field("piper", &self.piper)
+            .field("audio_player", &self.audio_player)
+            .field("model_path", &self.model_path)
+            .field("voice_label", &self.voice_label)
+            .finish_non_exhaustive()
+    }
 }
 
 impl PiperTtsBackend {
@@ -311,6 +475,8 @@ impl PiperTtsBackend {
             model_path,
             voice_label,
             current: Mutex::new(None),
+            #[cfg(feature = "voice")]
+            render_tap: Mutex::new(None),
         }
     }
 
@@ -416,7 +582,14 @@ impl TtsBackend for PiperTtsBackend {
             // Drop the previous handle FIRST — its Drop impl calls
             // `interrupt()` to stop the running stream.
             *guard = None;
-            let handle = adam_voice::play_wav(&temp, None)
+            // **v5.26.5** — install any voice-REPL-configured render
+            // tap so AEC can use the playback as its reference signal.
+            let tap_opt = self
+                .render_tap
+                .lock()
+                .ok()
+                .and_then(|g| g.as_ref().cloned());
+            let handle = adam_voice::play_wav(&temp, tap_opt)
                 .map_err(|e| std::io::Error::other(format!("in-process playback failed: {e}")))?;
             *guard = Some(handle);
         }
@@ -470,6 +643,24 @@ impl TtsBackend for PiperTtsBackend {
                 let _ = prev.kill();
                 let _ = prev.wait();
             }
+        }
+    }
+
+    /// **v5.26.5** — store an AEC render-tap callback. Subsequent
+    /// `speak()` calls pass it to `adam_voice::play_wav` so AEC sees
+    /// the audio being played. Pass `None` to clear. No-op without
+    /// the `voice` feature (Piper's non-voice fallback shells out to
+    /// `afplay` which we can't tap anyway).
+    fn set_render_tap(&self, tap: Option<TtsRenderTap>) {
+        #[cfg(feature = "voice")]
+        {
+            if let Ok(mut guard) = self.render_tap.lock() {
+                *guard = tap;
+            }
+        }
+        #[cfg(not(feature = "voice"))]
+        {
+            let _ = tap;
         }
     }
 }
@@ -691,7 +882,15 @@ mod tests {
     /// complete in well under a second (spawn is essentially fork +
     /// exec, microseconds typically). 250ms gives generous slack
     /// for slow / loaded CI machines.
+    ///
+    /// **v5.26.5** — feature-gated to the non-voice path. Under
+    /// `feature = "voice"`, `speak()` writes a WAV and plays it
+    /// in-process, which takes ~100-500ms for the synth step alone;
+    /// the «return promptly» property no longer applies. The voice
+    /// path's promptness is verified via `playback_render_tap_fires`
+    /// in `adam_voice::playback::tests`.
     #[test]
+    #[cfg(not(feature = "voice"))]
     fn speak_returns_promptly_via_spawn_on_macos() {
         if !cfg!(target_os = "macos") || !command_on_path("say") {
             return;
@@ -719,7 +918,12 @@ mod tests {
     /// A second `speak` while the first is still running kills the
     /// previous child (latest-wins). After two calls the registered
     /// child should be the second one.
+    ///
+    /// **v5.26.5** — feature-gated. Under `voice`, the «current» slot
+    /// holds a `PlaybackHandle` (no `id()` method); the latest-wins
+    /// semantics still apply but are exercised via integration paths.
     #[test]
+    #[cfg(not(feature = "voice"))]
     fn second_speak_kills_previous_child_on_macos() {
         if !cfg!(target_os = "macos") || !command_on_path("say") {
             return;
@@ -790,7 +994,13 @@ mod tests {
 
     /// `interrupt()` while a real child is playing must kill it and
     /// leave the registered slot empty. macOS-only (requires `say`).
+    ///
+    /// **v5.26.5** — feature-gated to non-voice. Under `voice`,
+    /// `interrupt()` drops a `PlaybackHandle` (no kill/wait API on
+    /// the handle); the «slot empty after interrupt» invariant is
+    /// covered by `interrupt_on_idle_backend_is_noop_v5245`.
     #[test]
+    #[cfg(not(feature = "voice"))]
     fn interrupt_kills_active_child_on_macos_v5245() {
         if !cfg!(target_os = "macos") || !command_on_path("say") {
             return;

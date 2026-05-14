@@ -21,6 +21,53 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.26.5] — 2026-05-14 — Voice arc V4 part 4: REPL integration, macOS `say` migration, `--barge-in` flag
+
+**Patch milestone.** Lands the **user-facing AEC integration** that v5.25.0 / v5.25.5 / v5.26.0 built up to. New `--barge-in` CLI flag, in-process WAV playback for macOS `say` + Linux `espeak-ng`, automatic render-tap installation on TTS backends, and post-stop AEC processing of mic captures.
+
+This is NOT yet the full «real-time mic interrupts TTS» state machine — that's v5.27.0. What v5.26.5 ships is: **when the user starts speaking before TTS finishes**, the mic samples are cleaned through AEC against the still-playing TTS audio before Whisper STT sees them. The student no longer has to wait for the TTS tail to finish to start the next turn.
+
+### What changed
+
+**1. TtsBackend trait extended:** new `set_render_tap(tap: Option<TtsRenderTap>)` method (default no-op). Backends that own their playback (Piper + OS-say under `feature = "voice"`) override to store the tap; subsequent `speak()` calls forward every audio chunk to it. The voice REPL uses this to wire the playback → AEC render path.
+
+New public type alias: `TtsRenderTap = Arc<dyn Fn(&[f32]) + Send + Sync + 'static>` (defined in `adam-dialog` so it's available without the `voice` feature).
+
+**2. macOS `say` migration to in-process WAV playback:** under `feature = "voice"`, `OsTtsBackend::speak()` for macOS now invokes `say --file-format=WAVE --data-format=LEI16@22050 -o /tmp/file.wav "text"` and plays the resulting WAV via `adam_voice::play_wav`. Symmetric pattern for Linux `espeak-ng -w file.wav` and `espeak -w file.wav`. The legacy direct-`say` shellout is preserved when the `voice` feature is off.
+
+**3. `--barge-in` CLI flag:** opt-in for AEC echo cancellation in the voice REPL. When set:
+- Creates a shared `AecProcessor` + `RenderQueue`
+- Calls `tts.set_render_tap(Some(aec_render_tap(queue, ...)))` on the active TTS backend
+- After each mic capture, processes the captured i16 samples through `process_capture_chunked(&mut aec, &queue, &samples)` before VAD / Whisper
+- Surfaces a startup line: «adam-chat --barge-in: AEC echo cancellation active. …»
+
+**4. Debug-derive fix:** `OsTtsBackend` and `PiperTtsBackend` Debug impls are now manual (the new `render_tap: Mutex<Option<TtsRenderTap>>` field holds a `dyn Fn` which isn't Debug). The manual impls skip the closure and emit `finish_non_exhaustive()`.
+
+### Architecture: rear-view AEC for now
+
+v5.26.5 cleans the mic samples **after recording stops**, not in real time. The render queue accumulates samples from the TTS playback for as long as it plays; at mic-stop time, those buffered renders pair up with the captured mic frames inside `process_capture_chunked`. This is sufficient for «user spoke during the TTS tail» — the overlap region is cleaned before Whisper sees it.
+
+True real-time AEC (mic VAD evaluates AEC-cleaned signal continuously while TTS is playing → triggers TTS interrupt on user speech) needs a different concurrency model: a continuous-listening mic that's open during TTS, with VAD running on cleaned frames. That's v5.27.0.
+
+### Verified
+
+- 1 425 default-feature tests passing (unchanged from v5.26.0; data-flow changes only).
+- 904 voice-feature tests passing (`cargo test -p adam-dialog --features voice`).
+- Two tests gated to non-voice path: `speak_returns_promptly_via_spawn_on_macos`, `second_speak_kills_previous_child_on_macos`, `interrupt_kills_active_child_on_macos_v5245` — these exercised the legacy `Child` semantics that don't exist under the voice feature.
+- Adversarial 95 / 95 unchanged.
+- fmt + clippy (both feature configurations) + `verify_release_version.sh` + `check_metrics_currency.sh` clean.
+
+### Why x.26.5 (patch milestone)
+
+New public API surface: `TtsBackend::set_render_tap`, `TtsRenderTap` type alias, `--barge-in` CLI flag, behavioural change in `OsTtsBackend::speak()` under the voice feature. Bundle ships the user-facing barge-in entry point, matching the patch-milestone band.
+
+### Next
+
+- **v5.27.0** — Voice arc V5 (or V4 part 5): real-time VAD-during-TTS. Continuous-listening mic + state machine (Idle / UserSpeaking / Thinking / Speaking / Interrupted); mic interrupts TTS on detected user speech onset.
+- **v5.x** — Voice arc V5 (golden audio corpus + WER / CER baseline).
+
+Stripe — Deterministic AI research (V4 part 4: user-facing AEC barge-in entry point shipped).
+
 ## [5.26.0] — 2026-05-14 — Voice arc V4 part 3: AEC wiring (RenderQueue + paired pipeline)
 
 **Minor.** Wires v5.25.0's AEC processor to v5.25.5's in-process playback. **AEC now runs end-to-end on paired render + capture frames**, proven by an integration test that feeds synthetic echo through the full public pipeline and verifies the cancelled output has measurably lower energy than the input.
