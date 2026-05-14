@@ -661,74 +661,159 @@ fn run_voice_repl(
     let stdin = io::stdin();
     let mut prompt_line = String::new();
     loop {
-        prompt_line.clear();
-        eprint!("[voice] press Enter to start recording … ");
-        io::stderr().lock().flush().ok();
-        if stdin.lock().read_line(&mut prompt_line).is_err() || prompt_line.is_empty() {
-            return ExitCode::SUCCESS;
-        }
-        // **v5.24.5 — Voice arc V4 (push-to-talk barge-in).** The user
-        // just pressed Enter to start a new turn. If TTS from the
-        // previous turn is still playing, kill it immediately so the
-        // mic doesn't pick up the tail of the previous response and
-        // the dialog feels responsive instead of «walkie-talkie».
-        // No-op when TTS is idle (typical case after a short response).
-        if let Some(tts) = tts_handle {
-            tts.interrupt();
-        }
-        let cap = match MicCapture::start(mic_cfg_template.clone()) {
-            Ok(c) => c,
-            Err(e) => {
-                eprintln!("[voice] mic start failed: {e}");
-                continue;
-            }
-        };
-        eprintln!(
-            "[voice] ● recording — speak now in Kazakh{} (hard cap {} s)",
-            if push_to_talk {
-                "; press Enter when done"
-            } else {
-                "; auto-stop on 1.5 s of silence"
-            },
-            cap.max_duration().as_secs()
-        );
-        io::stderr().lock().flush().ok();
-        // Two stop paths depending on mode:
-        // - VAD: wait_for_vad_stop blocks the main thread until
-        //   silence-after-speech > 1.5 s OR max_duration hits
-        // - push-to-talk: blocking read_line() on stdin (Enter
-        //   stops; same as v5.14.5)
-        if push_to_talk {
-            let mut stop_line = String::new();
-            let _ = stdin.lock().read_line(&mut stop_line);
-        } else {
-            match cap.wait_for_vad_stop() {
-                Ok(VadStopReason::Silence) => {}
-                Ok(VadStopReason::MaxDuration) => {
-                    eprintln!("[voice] hard cap reached; transcribing what was captured");
+        // **v5.27.0 — Voice arc V5 (real-time barge-in).** When the
+        // `--barge-in` flag is on AND we have a shared AEC processor,
+        // use the continuous-listen polling path: `MicCapture::
+        // barge_in_capture` opens the mic immediately (no Enter
+        // prompt), polls + AEC-cleans new samples every 50 ms, fires
+        // `tts.interrupt()` the moment user speech onset is detected
+        // (interrupting any still-playing TTS), then continues
+        // capturing the utterance to its end-of-VAD-silence terminus.
+        //
+        // The mic stays open for up to 60 s of silence before we
+        // assume the user has stepped away; at that point we loop
+        // back and re-open for the next utterance.
+        // **v5.27.0 — Voice arc V5 (real-time barge-in).** When
+        // `--barge-in` is on AND we have a shared AEC processor,
+        // skip the Enter prompt + legacy capture and use
+        // `MicCapture::barge_in_capture` for continuous-listen with
+        // real-time onset detection. The samples returned are
+        // already AEC-cleaned, so we bypass the post-stop AEC pass
+        // further down via the `samples_already_clean` flag.
+        let mut samples_already_clean = false;
+        let raw_samples_from_barge_in: Option<Vec<i16>> = if let Some((aec_mutex, queue)) =
+            aec_state.as_ref().filter(|_| barge_in)
+        {
+            let cap = match MicCapture::start(MicConfig::default()) {
+                Ok(c) => c,
+                Err(e) => {
+                    eprintln!("[voice] mic start failed: {e}");
+                    continue;
+                }
+            };
+            eprintln!(
+                "[voice] ● listening (real-time barge-in) — speak whenever you want; \
+                     mic auto-stops on silence after speech."
+            );
+            io::stderr().lock().flush().ok();
+            let mut aec_guard = match aec_mutex.lock() {
+                Ok(g) => g,
+                Err(_) => {
+                    eprintln!("[voice] AEC mutex poisoned");
+                    continue;
+                }
+            };
+            let outcome = cap.barge_in_capture(
+                &mut aec_guard,
+                queue,
+                std::time::Duration::from_secs(60),
+                || {
+                    if let Some(tts) = tts_handle {
+                        tts.interrupt();
+                        eprintln!("[voice] (barge-in: TTS interrupted)");
+                    }
+                },
+            );
+            drop(aec_guard);
+            match outcome {
+                Ok(adam_voice::BargeInOutcome::Captured(s)) => {
+                    eprintln!("[voice] (AEC-cleaned utterance captured)");
+                    samples_already_clean = true;
+                    Some(s)
+                }
+                Ok(adam_voice::BargeInOutcome::MaxDuration(s)) => {
+                    eprintln!("[voice] hard cap reached during utterance; transcribing partial");
+                    samples_already_clean = true;
+                    Some(s)
+                }
+                Ok(adam_voice::BargeInOutcome::NoSpeech) => {
+                    eprintln!("[voice] (no speech in 60 s; restarting mic)");
+                    continue;
                 }
                 Err(e) => {
-                    eprintln!("[voice] VAD wait failed: {e}");
+                    eprintln!("[voice] barge-in capture failed: {e}");
                     continue;
                 }
             }
-        }
-        let raw_samples = match cap.stop() {
-            Ok(s) => s,
-            Err(e) => {
-                eprintln!("[voice] mic stop failed: {e}");
-                continue;
-            }
+        } else {
+            None
         };
-        // **v5.26.5 — Voice arc V4 part 4.** When --barge-in is on,
-        // process the captured mic samples through the shared AEC
-        // processor before VAD / Whisper sees them. Pairs each
-        // 10-ms-frame of mic data with a frame from the render queue
-        // (silence when the queue is empty — no TTS was playing).
-        // Result: any echo from a still-playing TTS tail gets
-        // subtracted before STT, dramatically improving transcription
-        // quality when the user starts speaking before TTS finishes.
-        let samples = if let Some((aec_mutex, queue)) = aec_state.as_ref() {
+
+        // If barge-in path produced samples, skip the legacy capture
+        // entirely by jumping past it. Otherwise fall through to the
+        // legacy Enter-prompt + mic flow.
+        let raw_samples: Vec<i16> = if let Some(s) = raw_samples_from_barge_in {
+            s
+        } else {
+            prompt_line.clear();
+            eprint!("[voice] press Enter to start recording … ");
+            io::stderr().lock().flush().ok();
+            if stdin.lock().read_line(&mut prompt_line).is_err() || prompt_line.is_empty() {
+                return ExitCode::SUCCESS;
+            }
+            // **v5.24.5 — Voice arc V4 (push-to-talk barge-in).** The user
+            // just pressed Enter to start a new turn. If TTS from the
+            // previous turn is still playing, kill it immediately so the
+            // mic doesn't pick up the tail of the previous response and
+            // the dialog feels responsive instead of «walkie-talkie».
+            // No-op when TTS is idle (typical case after a short response).
+            if let Some(tts) = tts_handle {
+                tts.interrupt();
+            }
+            let cap = match MicCapture::start(mic_cfg_template.clone()) {
+                Ok(c) => c,
+                Err(e) => {
+                    eprintln!("[voice] mic start failed: {e}");
+                    continue;
+                }
+            };
+            eprintln!(
+                "[voice] ● recording — speak now in Kazakh{} (hard cap {} s)",
+                if push_to_talk {
+                    "; press Enter when done"
+                } else {
+                    "; auto-stop on 1.5 s of silence"
+                },
+                cap.max_duration().as_secs()
+            );
+            io::stderr().lock().flush().ok();
+            // Two stop paths depending on mode:
+            // - VAD: wait_for_vad_stop blocks the main thread until
+            //   silence-after-speech > 1.5 s OR max_duration hits
+            // - push-to-talk: blocking read_line() on stdin (Enter
+            //   stops; same as v5.14.5)
+            if push_to_talk {
+                let mut stop_line = String::new();
+                let _ = stdin.lock().read_line(&mut stop_line);
+            } else {
+                match cap.wait_for_vad_stop() {
+                    Ok(VadStopReason::Silence) => {}
+                    Ok(VadStopReason::MaxDuration) => {
+                        eprintln!("[voice] hard cap reached; transcribing what was captured");
+                    }
+                    Err(e) => {
+                        eprintln!("[voice] VAD wait failed: {e}");
+                        continue;
+                    }
+                }
+            }
+            match cap.stop() {
+                Ok(s) => s,
+                Err(e) => {
+                    eprintln!("[voice] mic stop failed: {e}");
+                    continue;
+                }
+            }
+        }; // end of `else` branch of barge-in / legacy if-let
+        // **v5.26.5 — Voice arc V4 part 4.** When --barge-in is on
+        // and we took the LEGACY path (push-to-talk or vad-end-of-turn),
+        // process the captured samples through AEC before VAD / Whisper.
+        // When the barge-in path was taken, `samples_already_clean`
+        // is true and we skip this pass (the barge_in_capture method
+        // already cleaned each frame in real-time).
+        let samples = if samples_already_clean {
+            raw_samples
+        } else if let Some((aec_mutex, queue)) = aec_state.as_ref() {
             match aec_mutex.lock() {
                 Ok(mut aec) => match process_capture_chunked(&mut aec, queue, &raw_samples) {
                     Ok(cleaned) => {

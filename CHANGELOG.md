@@ -21,6 +21,84 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.27.0] — 2026-05-14 — Voice arc V5: real-time barge-in (continuous-listen polling + onset detection)
+
+**Minor.** First release in Voice arc V5. Lands the **actual real-time barge-in UX**: the mic stays open continuously during TTS playback, AEC-cleans each new frame, runs VAD onset detection, and **fires `tts.interrupt()` the moment the user starts speaking** — no Enter prompt required, no need to wait for TTS to finish.
+
+This completes what v5.25.0 / v5.25.5 / v5.26.0 / v5.26.5 built up to: from «AEC processor exists in isolation» (v5.25.0) → «in-process playback with render-tap hook» (v5.25.5) → «paired AEC pipeline» (v5.26.0) → «rear-view AEC after stop» (v5.26.5) → **«real-time AEC + VAD + barge-in interrupt»** (v5.27.0).
+
+### What ships
+
+**New `MicCapture::barge_in_capture(aec, queue, onset_timeout, on_onset)` method.** Continuous-listen capture for the voice REPL's `--barge-in` mode:
+
+1. **Polling loop (every 50 ms):** reads the new tail of the shared sample buffer, downmixes to mono, resamples to AEC's 16 kHz, runs the result through AEC chunked (paired with render frames from the queue), and applies RMS-based VAD on the cleaned output.
+2. **Onset detection:** when ≥ 100 ms of cumulative speech-band energy is detected on the AEC-cleaned signal, fires the `on_onset` callback IMMEDIATELY (the voice REPL wires this to `tts.interrupt()` so any still-playing TTS stops before continuing the utterance).
+3. **End-of-utterance:** continues the same poll loop after onset, tracking silence-after-speech via the standard VAD logic; returns the accumulated AEC-cleaned 16 kHz mono i16 samples once silence exceeds the threshold.
+
+Returns `BargeInOutcome::{Captured, NoSpeech, MaxDuration}` for the three resolution paths.
+
+### New public API
+
+```rust
+pub enum BargeInOutcome {
+    Captured(Vec<i16>),    // full utterance captured
+    NoSpeech,              // onset timeout elapsed; no speech
+    MaxDuration(Vec<i16>), // hard cap fired mid-utterance
+}
+
+impl MicCapture {
+    pub fn barge_in_capture(
+        self,
+        aec: &mut AecProcessor,
+        queue: &RenderQueue,
+        onset_timeout: Duration,
+        on_onset: impl FnOnce(),
+    ) -> Result<BargeInOutcome>;
+}
+```
+
+Re-exported from `adam_voice::BargeInOutcome`.
+
+### Voice REPL integration
+
+In `adam_chat`, when `--barge-in` is on AND the AEC processor is active (v5.26.5 path), the loop:
+1. Opens a fresh `MicCapture` (no Enter prompt)
+2. Locks the shared `AecProcessor`
+3. Calls `barge_in_capture` with a 60 s onset timeout and an `on_onset` closure that fires `tts.interrupt()`
+4. Returns the AEC-cleaned samples directly to the transcription pipeline (`samples_already_clean = true` flag skips the legacy post-stop AEC pass)
+
+The user experience:
+- TTS plays a response
+- User starts speaking mid-TTS
+- Within ~100 ms, the AEC-cleaned mic signal triggers VAD onset → `tts.interrupt()` fires → TTS stops
+- User continues speaking; mic captures until silence-after-speech (1.5 s)
+- Transcription, kernel turn, next TTS response, loop
+
+No Enter, no walkie-talkie. Phone-like turn-taking.
+
+### Verified
+
+- `cargo test --workspace --locked --no-fail-fast` — **1 425 passing** (unchanged from v5.26.5).
+- `cargo test -p adam-dialog --features voice --locked --no-fail-fast` — **904 passing**.
+- `cargo test -p adam-voice` — **53 passing** (includes existing AEC + playback + STT tests).
+- Adversarial 95 / 95 unchanged.
+- fmt + clippy (both feature configurations) + `verify_release_version.sh` + `check_metrics_currency.sh` clean.
+
+### Why x.27.0 (minor)
+
+New public API surface: `MicCapture::barge_in_capture` method + `BargeInOutcome` enum re-export. New REPL behaviour (continuous-listen polling) under `--barge-in`. Foundation for the V5 golden-audio corpus + WER/CER baseline that's next.
+
+### Architectural framing — still deterministic
+
+The barge-in path is real-time but **stays peripheral**. AEC + VAD live on the mic side of the architecture boundary (where the probabilistic STT is); the kernel turn is the same deterministic 21 ms p50 pipeline. The state machine is in the REPL binary, not in the kernel library. Per `project_retrieval_not_neural_v2`: weights / learning happen only when discrete, inspectable, and cheap — AEC's adaptive filter qualifies (DSP algorithm, not a neural net).
+
+### What's next
+
+- **v5.27.5** — testing + tuning: live verification on real mic / speaker hardware; latency measurements; threshold tuning for onset / silence; documentation of barge-in limitations and the «AirPods recommended» advisory for built-in mic users.
+- **v5.x** — Voice arc V5 golden audio corpus + WER / CER baseline (the canonical scoring infrastructure for STT quality).
+
+Stripe — Deterministic AI research (real-time barge-in shipped; full Voice V4-V5 arc operational; deterministic kernel unchanged).
+
 ## [5.26.5] — 2026-05-14 — Voice arc V4 part 4: REPL integration, macOS `say` migration, `--barge-in` flag
 
 **Patch milestone.** Lands the **user-facing AEC integration** that v5.25.0 / v5.25.5 / v5.26.0 built up to. New `--barge-in` CLI flag, in-process WAV playback for macOS `say` + Linux `espeak-ng`, automatic render-tap installation on TTS backends, and post-stop AEC processing of mic captures.

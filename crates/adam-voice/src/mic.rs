@@ -57,6 +57,25 @@ pub enum VadStopReason {
     MaxDuration,
 }
 
+/// **v5.27.0 — Voice arc V5.** Outcome of
+/// [`MicCapture::barge_in_capture`]. Distinguishes the three
+/// successful paths: full utterance captured (Captured), onset
+/// timeout fired with no speech (NoSpeech), or the hard cap fired
+/// mid-utterance (MaxDuration with partial samples).
+#[derive(Debug)]
+pub enum BargeInOutcome {
+    /// User spoke; full utterance captured to end-of-utterance.
+    /// Samples are AEC-cleaned 16 kHz mono i16, ready for STT.
+    Captured(Vec<i16>),
+    /// `onset_timeout` elapsed without detecting speech. The caller
+    /// can simply continue the outer REPL loop. No samples returned.
+    NoSpeech,
+    /// `config.max_duration` fired DURING an utterance (user spoke
+    /// longer than the safety cap). Returns whatever samples were
+    /// accumulated so far so the caller can still attempt STT.
+    MaxDuration(Vec<i16>),
+}
+
 /// User-tunable mic capture parameters.
 #[derive(Debug, Clone)]
 pub struct MicConfig {
@@ -297,6 +316,161 @@ impl MicCapture {
                     silence_accum += frame_duration;
                     if silence_accum >= silence_target {
                         return Ok(VadStopReason::Silence);
+                    }
+                }
+            }
+        }
+    }
+
+    /// **v5.27.0 — Voice arc V5 (real-time barge-in).** Continuous-
+    /// listen capture for the voice REPL's `--barge-in` mode. Polls
+    /// the shared sample buffer every 50 ms, runs the new tail
+    /// through AEC + RMS-VAD, and:
+    ///
+    /// 1. **Waits for speech onset** — first frame above the VAD
+    ///    energy threshold after a brief warm-up. When detected,
+    ///    invokes the `on_onset` callback IMMEDIATELY (typically
+    ///    fires `tts.interrupt()` to stop any still-playing TTS) and
+    ///    transitions to the next phase.
+    /// 2. **Captures the utterance** — continues polling, AEC-
+    ///    cleaning, and accumulating samples until the standard VAD-
+    ///    silence-after-speech threshold fires (same logic as
+    ///    [`wait_for_vad_stop`]).
+    /// 3. **Returns** the AEC-cleaned 16 kHz mono i16 samples.
+    ///
+    /// Or, if `onset_timeout` elapses with no speech onset detected:
+    /// returns [`BargeInOutcome::NoSpeech`] without firing the
+    /// callback. The caller can simply continue the outer REPL loop.
+    ///
+    /// Consumes `self` — the cpal stream is dropped at end (success
+    /// or no-speech) so a fresh `MicCapture::start` is needed for the
+    /// next turn.
+    pub fn barge_in_capture(
+        self,
+        aec: &mut crate::AecProcessor,
+        queue: &crate::RenderQueue,
+        onset_timeout: Duration,
+        on_onset: impl FnOnce(),
+    ) -> Result<BargeInOutcome> {
+        use crate::aec::{AEC_SAMPLE_RATE, FRAME_SAMPLES, f32_frame_to_i16, i16_frame_to_f32};
+
+        // VAD frame duration matches the AEC 10 ms frame the inner
+        // loop processes; that's the natural cadence.
+        let frame_duration = Duration::from_millis(10);
+        let threshold = self.config.vad_amplitude_threshold;
+        let silence_target = self.config.vad_silence_after_speech;
+        let min_speech = self.config.vad_min_speech_before_silence;
+
+        let mut speech_accum = Duration::ZERO;
+        let mut silence_accum = Duration::ZERO;
+        let mut last_read_pos: usize = 0;
+        let mut onset_fired = false;
+        let mut on_onset_holder = Some(on_onset);
+        let mut accumulated_clean: Vec<i16> = Vec::new();
+        let mut aec_in_buf: Vec<f32> = Vec::new();
+        let onset_deadline = Instant::now() + onset_timeout;
+        let poll_interval = Duration::from_millis(50);
+
+        // Phase 1 + 2 share the same poll loop; the `onset_fired`
+        // flag governs which sub-state we're in.
+        loop {
+            std::thread::sleep(poll_interval);
+            if self.elapsed() >= self.config.max_duration {
+                if onset_fired {
+                    // Speech started but capture hit the hard cap.
+                    self.running.store(false, Ordering::Relaxed);
+                    drop(self.stream);
+                    return Ok(BargeInOutcome::MaxDuration(accumulated_clean));
+                } else {
+                    // No speech detected — nothing useful to keep.
+                    self.running.store(false, Ordering::Relaxed);
+                    drop(self.stream);
+                    return Ok(BargeInOutcome::NoSpeech);
+                }
+            }
+            if !onset_fired && Instant::now() >= onset_deadline {
+                self.running.store(false, Ordering::Relaxed);
+                drop(self.stream);
+                return Ok(BargeInOutcome::NoSpeech);
+            }
+
+            // Read the new tail of the shared sample buffer.
+            let tail = {
+                let g = match self.samples.lock() {
+                    Ok(g) => g,
+                    Err(_) => continue,
+                };
+                if g.len() <= last_read_pos {
+                    continue;
+                }
+                let start = last_read_pos;
+                last_read_pos = g.len();
+                g[start..].to_vec()
+            };
+
+            // Downmix to mono + resample to AEC's 16 kHz.
+            let mono = downmix_to_mono(&tail, self.device_channels);
+            let aec_rate_chunk = resample_linear(&mono, self.device_sample_rate, AEC_SAMPLE_RATE);
+
+            // Convert to f32 + buffer until we have full 160-sample frames.
+            let mut f32_chunk = vec![0.0f32; aec_rate_chunk.len()];
+            i16_frame_to_f32(&aec_rate_chunk, &mut f32_chunk);
+            aec_in_buf.extend_from_slice(&f32_chunk);
+
+            let mut frame_out = vec![0.0f32; FRAME_SAMPLES];
+            while aec_in_buf.len() >= FRAME_SAMPLES {
+                let frame: Vec<f32> = aec_in_buf.drain(..FRAME_SAMPLES).collect();
+                // Pair this capture frame with a render frame from the queue.
+                let render_frame: Vec<f32> = {
+                    let mut q = match queue.lock() {
+                        Ok(q) => q,
+                        Err(_) => continue,
+                    };
+                    if q.len() >= FRAME_SAMPLES {
+                        q.drain(..FRAME_SAMPLES).collect()
+                    } else {
+                        vec![0.0f32; FRAME_SAMPLES]
+                    }
+                };
+                if aec.process_render(&render_frame).is_err() {
+                    continue;
+                }
+                let produced = aec.process_capture(&frame, &mut frame_out).unwrap_or(false);
+                let clean_frame: Vec<f32> = if produced {
+                    frame_out.clone()
+                } else {
+                    // AEC still warming up — use raw frame.
+                    frame.clone()
+                };
+                // Accumulate cleaned samples for the final output.
+                let mut clean_i16 = vec![0i16; FRAME_SAMPLES];
+                f32_frame_to_i16(&clean_frame, &mut clean_i16);
+                if onset_fired {
+                    accumulated_clean.extend_from_slice(&clean_i16);
+                }
+                // Run VAD on the cleaned frame.
+                let rms = rms_amplitude(&clean_i16);
+                if rms >= threshold {
+                    speech_accum += frame_duration;
+                    silence_accum = Duration::ZERO;
+                    if !onset_fired && speech_accum >= Duration::from_millis(100) {
+                        // **Onset detected.** Fire the callback
+                        // (typically tts.interrupt()) and start
+                        // accumulating from this frame onward.
+                        onset_fired = true;
+                        if let Some(cb) = on_onset_holder.take() {
+                            cb();
+                        }
+                        accumulated_clean.extend_from_slice(&clean_i16);
+                    }
+                } else if onset_fired && speech_accum >= min_speech {
+                    silence_accum += frame_duration;
+                    if silence_accum >= silence_target {
+                        // End of utterance — return accumulated
+                        // cleaned samples.
+                        self.running.store(false, Ordering::Relaxed);
+                        drop(self.stream);
+                        return Ok(BargeInOutcome::Captured(accumulated_clean));
                     }
                 }
             }
