@@ -80,5 +80,7 @@ pub use aec::{
 pub use error::{Result, VoiceError};
 pub use mic::{BargeInOutcome, MicCapture, MicConfig, VadStopReason, write_wav};
 pub use normalizer::normalize_kazakh_transcript;
-pub use playback::{PlaybackHandle, RenderTap, play_samples, play_wav};
+pub use playback::{
+    PlaybackHandle, RenderTap, play_samples, play_samples_at_volume, play_wav, play_wav_at_volume,
+};
 pub use stt::{KAZAKH_PRIMING_PROMPT, Transcript, WhisperCli};

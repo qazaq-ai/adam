@@ -92,6 +92,9 @@ struct PlaybackState {
     cursor: usize,
     /// Optional tap — receives each chunk as it's played.
     tap: Option<RenderTap>,
+    /// **v5.27.5** — output gain (0.0 = silent, 1.0 = unchanged).
+    /// Applied to every emitted sample AND to the tap chunk.
+    volume_gain: f32,
 }
 
 /// Public entry: play a WAV file through the default output device.
@@ -103,8 +106,23 @@ struct PlaybackState {
 /// typically wired to [`crate::aec::AecProcessor::process_render`] so
 /// the echo canceller knows what's being played.
 pub fn play_wav(path: &Path, render_tap: Option<RenderTap>) -> Result<PlaybackHandle> {
+    play_wav_at_volume(path, render_tap, 1.0)
+}
+
+/// **v5.27.5** — play a WAV file at a custom volume gain (0.0 = silent,
+/// 1.0 = normal, > 1.0 = amplified — clipped). The gain is applied to
+/// every output sample **and to the render-tap chunk**, so the AEC
+/// processor's reference signal matches what's actually playing
+/// through the speakers — critical for echo cancellation when the
+/// REPL ducks TTS volume to give AEC headroom (built-in laptop
+/// speaker + mic case).
+pub fn play_wav_at_volume(
+    path: &Path,
+    render_tap: Option<RenderTap>,
+    volume_gain: f32,
+) -> Result<PlaybackHandle> {
     let mono_samples = read_wav_mono_f32(path)?;
-    play_samples(mono_samples, render_tap)
+    play_samples_at_volume(mono_samples, render_tap, volume_gain)
 }
 
 /// Play raw mono f32 samples. Exposed for tests + future synthetic
@@ -118,6 +136,16 @@ pub fn play_wav(path: &Path, render_tap: Option<RenderTap>) -> Result<PlaybackHa
 pub fn play_samples(
     mono_samples: Vec<f32>,
     render_tap: Option<RenderTap>,
+) -> Result<PlaybackHandle> {
+    play_samples_at_volume(mono_samples, render_tap, 1.0)
+}
+
+/// **v5.27.5** — play raw mono f32 samples at a custom volume gain.
+/// See [`play_wav_at_volume`] for rationale.
+pub fn play_samples_at_volume(
+    mono_samples: Vec<f32>,
+    render_tap: Option<RenderTap>,
+    volume_gain: f32,
 ) -> Result<PlaybackHandle> {
     let running = Arc::new(AtomicBool::new(true));
     let finished = Arc::new(AtomicBool::new(false));
@@ -138,6 +166,7 @@ pub fn play_samples(
             render_tap,
             Arc::clone(&running_owner),
             Arc::clone(&finished_owner),
+            volume_gain,
         ) {
             Ok(s) => s,
             Err(e) => {
@@ -172,6 +201,7 @@ fn open_output_stream(
     render_tap: Option<RenderTap>,
     running: Arc<AtomicBool>,
     finished: Arc<AtomicBool>,
+    volume_gain: f32,
 ) -> Result<cpal::Stream> {
     let host = cpal::default_host();
     let device = host
@@ -188,6 +218,9 @@ fn open_output_stream(
         samples: mono_samples,
         cursor: 0,
         tap: render_tap,
+        // **v5.27.5** — clamp to a sane range. > 1.0 will clip
+        // (since cpal expects [-1.0, 1.0]); < 0 makes no sense.
+        volume_gain: volume_gain.clamp(0.0, 2.0),
     }));
 
     let stream = match sample_format {
@@ -285,9 +318,15 @@ fn fill_output(
     let mut mono_chunk = vec![0.0f32; frames_needed];
     let mut wrote_any = false;
     if let Ok(mut st) = state.lock() {
+        let gain = st.volume_gain;
         for frame in mono_chunk.iter_mut() {
             if st.cursor < st.samples.len() {
-                *frame = st.samples[st.cursor];
+                // **v5.27.5** — apply volume gain at the boundary.
+                // Both speakers AND the AEC reference signal must
+                // see the same (attenuated) waveform, otherwise AEC
+                // would over-cancel (subtract more than what's
+                // actually being played). Same gain applied to tap.
+                *frame = st.samples[st.cursor] * gain;
                 st.cursor += 1;
                 wrote_any = true;
             } else {
@@ -298,11 +337,8 @@ fn fill_output(
         if cursor_at_end {
             finished.store(true, Ordering::Relaxed);
         }
-        // Fire tap with the mono chunk we just wrote. AEC processor
-        // expects mono frames at its configured rate (16 kHz). The
-        // cpal device rate is typically 48 kHz — at this layer we
-        // pass the device-rate samples; the caller's tap is
-        // responsible for resampling / framing if needed.
+        // Fire tap with the SAME mono_chunk (already gain-applied)
+        // so AEC sees the actual speaker signal.
         if let Some(tap) = st.tap.as_ref() {
             tap(&mono_chunk);
         }

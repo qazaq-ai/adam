@@ -45,9 +45,19 @@ pub fn normalize_kazakh_transcript(raw: &str) -> String {
     if trimmed.is_empty() {
         return String::new();
     }
-    let lower = trimmed.to_lowercase();
 
-    let mut out = trimmed.to_string();
+    // ── Layer 0: collapse doubled vowels ────────────────────────
+    // **v5.27.5** — fold consecutive identical Kazakh vowels into a
+    // single instance. Whisper-medium/large routinely inserts a
+    // ghost extra vowel when the prosody stretches a syllable —
+    // «Танысайық» → «Танысаайық», «Сәлеемм» → «Сәлеем», etc. Native
+    // Kazakh has no geminated vowels in the standard orthography
+    // (loanwords aside), so collapsing «аа»→«а» / «оо»→«о» / etc.
+    // is safe across the lexicon. Live test 2026-05-14: «Танысаайық»
+    // failed routing to introduction-proposal intent; after this
+    // fold it becomes «Танысайық» which the recogniser knows.
+    let mut out = collapse_doubled_vowels(trimmed);
+    let lower = out.to_lowercase();
 
     // ── Layer 1: word-boundary mergers ──────────────────────────
     // «дау лет» / «Дау лет» → «Дәулет» (most common Whisper-medium
@@ -155,6 +165,40 @@ fn replace_token_pair(input: &str, a: &str, b: &str, replacement: &str) -> Strin
 /// trim-and-replace patterns where the casing is fixed.
 fn replace_phrase(input: &str, needle: &str, replacement: &str) -> String {
     input.replace(needle, replacement)
+}
+
+/// **v5.27.5** — collapse consecutive identical Kazakh vowels into
+/// a single instance. Operates over codepoints (not bytes) — Kazakh
+/// Cyrillic chars are 2-byte UTF-8 so a byte-based fold would corrupt.
+///
+/// The Kazakh vowel inventory (both lowercase and uppercase variants):
+/// а ә е и о ө у ұ ү ы і э. Each is folded with itself only —
+/// «аә» (different vowels) stays as is.
+///
+/// Case-preserving: «АА» → «А», «аА» → «а» (keeps the first occurrence).
+fn collapse_doubled_vowels(input: &str) -> String {
+    const VOWELS: &[char] = &[
+        'а', 'А', 'ә', 'Ә', 'е', 'Е', 'и', 'И', 'о', 'О', 'ө', 'Ө', 'у', 'У', 'ұ', 'Ұ', 'ү', 'Ү',
+        'ы', 'Ы', 'і', 'І', 'э', 'Э',
+    ];
+    let mut out = String::with_capacity(input.len());
+    let mut prev: Option<char> = None;
+    for ch in input.chars() {
+        if let Some(p) = prev {
+            // Fold only when same vowel doubled (case-insensitive
+            // matching prev → current).
+            if VOWELS.contains(&ch)
+                && VOWELS.contains(&p)
+                && ch.to_lowercase().next() == p.to_lowercase().next()
+            {
+                // Skip — keep just the first instance.
+                continue;
+            }
+        }
+        out.push(ch);
+        prev = Some(ch);
+    }
+    out
 }
 
 /// Replace `needle` with `replacement` everywhere, preserving the
@@ -279,5 +323,52 @@ mod tests {
         // Whisper sometimes emits stray «тим» as a token. Drop it.
         let out = normalize_kazakh_transcript("Сәлем тим");
         assert!(!out.contains("тим"), "got: {out}");
+    }
+
+    // ── v5.27.5 — doubled-vowel collapse tests ─────────────────────
+
+    #[test]
+    fn collapses_doubled_a_in_tanysaiyq_v5275() {
+        // Live test 2026-05-14: Whisper produced «Танысаайық».
+        let out = normalize_kazakh_transcript("Танысаайық");
+        assert_eq!(out, "Танысайық");
+    }
+
+    #[test]
+    fn collapses_doubled_a_in_aldymen_tanysaiyq_v5275() {
+        let out = normalize_kazakh_transcript("Алдымен танысаайық");
+        assert_eq!(out, "Алдымен танысайық");
+    }
+
+    #[test]
+    fn collapses_doubled_e_in_salem_v5275() {
+        let out = normalize_kazakh_transcript("Сәлеем");
+        assert_eq!(out, "Сәлем");
+    }
+
+    #[test]
+    fn does_not_collapse_distinct_vowels_v5275() {
+        // «иә», «ұа», «оы» — different vowels in sequence, must NOT
+        // be folded. (Real Kazakh has digraphs.)
+        let raw = "Иәді. Ұа жоқ. Оың.";
+        let out = normalize_kazakh_transcript(raw);
+        assert_eq!(out, raw);
+    }
+
+    #[test]
+    fn collapses_doubled_yy_v5275() {
+        let out = normalize_kazakh_transcript("қызыыл");
+        // Note: doesn't match Layer 1/2 patterns; just collapse.
+        assert!(
+            out.contains("қызыл"),
+            "expected «қызыл» in output, got: {out}"
+        );
+    }
+
+    #[test]
+    fn idempotent_after_doubled_vowel_fold_v5275() {
+        let once = normalize_kazakh_transcript("Танысаайық");
+        let twice = normalize_kazakh_transcript(&once);
+        assert_eq!(once, twice);
     }
 }

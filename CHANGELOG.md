@@ -21,6 +21,71 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.27.5] — 2026-05-14 — Voice arc V5 tuning: TTS rate, VAD silence, volume duck, doubled-vowel fold
+
+**Patch milestone.** Four targeted fixes for the v5.27.0 barge-in UX based on live-test feedback (2026-05-14). Addresses speech rate, response latency, echo-loop on built-in speakers, and «Танысаайық»-class STT mishearings.
+
+### Live feedback (2026-05-14 transcript)
+
+User reported on built-in MacBook Air mic + speakers:
+1. **«говорит очень быстро, что ничего не разобрать… тараторит как лилипут»** — TTS speech rate too fast
+2. **Echo loop on every iteration** — `[voice] (barge-in: TTS interrupted)` fires on adam's own voice; mic captures «Сәлем. Сәлем. Сәлем.» as user input; AEC3 can't fully suppress built-in-speaker echo
+3. **«после моего диалога он долго думает»** — 1.5 s VAD silence threshold made every turn feel laggy
+4. **«Танысаайық»** (Whisper extra-vowel artifact) misrouted to «I don't understand» templates
+
+### What changed
+
+**1. TTS rate 150 wpm (macOS `say`).** Default rate was ~175 wpm — too fast for Kazakh clarity. `OsTtsBackend::detect_macos` now appends `-r 150` to args. ~15 % slower, noticeably clearer on the Aru voice.
+
+**2. VAD silence threshold 1500 → 800 ms.** `MicConfig::default().vad_silence_after_speech` cut nearly in half. End-of-turn fires ~700 ms sooner. Still safely covers Kazakh intra-utterance pauses («Сәлеметсіз бе» has ~200 ms gap mid-phrase).
+
+**3. Doubled-vowel collapse in Kazakh normalizer.** New Layer 0 pass in `normalize_kazakh_transcript`: folds consecutive identical vowels (а/ә/е/и/о/ө/у/ұ/ү/ы/і/э, lowercase + uppercase) to a single instance. «Танысаайық» → «Танысайық»; «Сәлеемм» → «Сәлем». Native Kazakh has no geminated vowels in standard orthography, so the fold is safe across the lexicon. 6 new unit tests.
+
+**4. Volume duck to 40 % in barge-in mode.** New public API:
+
+```rust
+// adam_voice
+pub fn play_wav_at_volume(path, render_tap, volume_gain) -> Result<PlaybackHandle>;
+pub fn play_samples_at_volume(samples, render_tap, volume_gain) -> Result<PlaybackHandle>;
+
+// TtsBackend trait
+fn set_volume_gain(&self, gain: f32) { ... }  // default no-op
+```
+
+`PlaybackState` gained a `volume_gain: f32` field; `fill_output` multiplies every sample by it BEFORE writing to cpal AND BEFORE firing the render tap (so AEC's reference signal matches what speakers actually emit). `OsTtsBackend` and `PiperTtsBackend` (under `feature = "voice"`) store the gain in `Mutex<f32>` and pass it to `play_wav_at_volume` on each `speak()` call.
+
+REPL: when `--barge-in` is set, calls `tts.set_volume_gain(0.4)`. Lower output amplitude gives AEC more margin against built-in-speaker echo — the loudest worst-case where speaker and mic sit < 30 cm apart with no acoustic isolation.
+
+### Architectural note — why volume duck (not «full AEC tuning»)
+
+The echo loop in v5.27.0's live transcript was symptomatic of AEC3's known limits on consumer laptop hardware: speaker ↔ mic round-trip is ~10 ms, but echo path is complex (room reflections, mic AGC, speaker compression), and AEC3's adaptive filter needs ≥ 200 frames of warmup to converge. On AirPods / USB headset the hardware isolation makes AEC nearly trivial; on built-in mic + speakers, it's borderline. Ducking output to 40 % drops the echo amplitude below the VAD onset threshold so AEC's residual error doesn't false-trigger. Pragmatic; not «correct» AEC tuning (which would require months of DSP work).
+
+### Verified
+
+- 6 new normalizer tests (`collapses_doubled_a_in_tanysaiyq_v5275`, `collapses_doubled_e_in_salem_v5275`, `does_not_collapse_distinct_vowels_v5275`, `collapses_doubled_yy_v5275`, `idempotent_after_doubled_vowel_fold_v5275`, plus the «Алдымен танысайық» phrase test).
+- Updated `default_config_enables_vad_v5150` lower bound for the new 800 ms silence threshold.
+- `cargo test --workspace --locked --no-fail-fast` — **1 431 passing** (+6 from v5.27.0).
+- `cargo test -p adam-dialog --features voice` — **904 passing**.
+- Adversarial 95 / 95 unchanged.
+- fmt + clippy (both feature configurations) + `verify_release_version.sh` + `check_metrics_currency.sh` clean.
+
+### Why x.27.5 (patch milestone)
+
+New public API surface (`play_wav_at_volume`, `play_samples_at_volume`, `TtsBackend::set_volume_gain`), tuned defaults (TTS rate, VAD silence threshold), new normalizer pass. No architectural shift.
+
+### Known limitations carried forward
+
+- **Multi-clause TTS** still speaks each clause separately; consecutive `speak()` calls interrupt each other under the v5.24.5 kill-previous semantics. Live transcript showed «Сәлем достым» three times overlapping — each clause's TTS killed the previous before it could finish. Fix planned for v5.28.0 (join response clauses into one `speak()` call).
+- **«Сізді X деп ұқтым» echo template** still fires on valid Kazakh words when topic extraction misroutes. Fix planned for v5.28.0 (raise confidence threshold for the raw-input-echo template family).
+- **No male Kazakh voice** on macOS; users can pass `--tts-voice Yuri` for a Russian male voice as a workaround.
+
+### Next
+
+- **v5.28.0** — multi-clause TTS join + echo-template confidence gating.
+- **v5.x** — Voice arc V5 golden audio corpus + WER / CER baseline.
+
+Stripe — Deterministic AI research (Voice V5 production hardening: 4 quick wins for the «is it usable?» threshold).
+
 ## [5.27.0] — 2026-05-14 — Voice arc V5: real-time barge-in (continuous-listen polling + onset detection)
 
 **Minor.** First release in Voice arc V5. Lands the **actual real-time barge-in UX**: the mic stays open continuously during TTS playback, AEC-cleans each new frame, runs VAD onset detection, and **fires `tts.interrupt()` the moment the user starts speaking** — no Enter prompt required, no need to wait for TTS to finish.

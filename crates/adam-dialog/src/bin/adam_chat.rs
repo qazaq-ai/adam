@@ -630,9 +630,21 @@ fn run_voice_repl(
                 if let Some(tts) = tts_handle {
                     let tap = adam_voice::aec_render_tap(queue.clone(), AEC_SAMPLE_RATE);
                     tts.set_render_tap(Some(tap));
+                    // **v5.27.5** — duck TTS volume to 40% in
+                    // barge-in mode. Lower output level gives AEC
+                    // more headroom against the loudest case
+                    // (built-in laptop speaker + mic ~30 cm apart,
+                    // where AEC3 sometimes can't suppress fully and
+                    // the mic false-triggers on adam's own voice
+                    // mid-response — the «echo loop» bug user
+                    // reported 2026-05-14). With AirPods or a USB
+                    // headset, hardware isolation makes this
+                    // unnecessary; users can override via env var
+                    // `ADAM_TTS_VOLUME_GAIN` (future flag).
+                    tts.set_volume_gain(0.4);
                 }
                 eprintln!(
-                    "adam-chat --barge-in: AEC echo cancellation active. \
+                    "adam-chat --barge-in: AEC echo cancellation active (TTS volume ducked to 40%). \
                      Mic will be cleaned against TTS audio before Whisper STT."
                 );
                 Some((std::sync::Mutex::new(processor), queue))

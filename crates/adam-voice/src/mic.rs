@@ -109,7 +109,15 @@ impl Default for MicConfig {
     fn default() -> Self {
         Self {
             max_duration: Duration::from_secs(30),
-            vad_silence_after_speech: Duration::from_millis(1500),
+            // **v5.27.5** — reduced from 1500 ms to 800 ms. User
+            // feedback (2026-05-14): «после моего диалога он долго
+            // думает». 1500 ms made the system feel laggy after every
+            // utterance because the end-of-turn detector waited a
+            // full 1.5 s of silence before declaring the utterance
+            // complete. 800 ms still covers natural intra-utterance
+            // pauses (Kazakh «Сәлеметсіз бе» has a ~200 ms gap mid-
+            // phrase) but cuts the perceived response delay by ~700 ms.
+            vad_silence_after_speech: Duration::from_millis(800),
             vad_amplitude_threshold: 0.02 * (i16::MAX as f32),
             vad_min_speech_before_silence: Duration::from_millis(600),
             vad_enabled: true,
@@ -641,7 +649,9 @@ mod tests {
     fn default_config_enables_vad_v5150() {
         let cfg = MicConfig::default();
         assert!(cfg.vad_enabled);
-        assert!(cfg.vad_silence_after_speech >= Duration::from_millis(1000));
+        // **v5.27.5** — silence threshold tightened from 1500ms to
+        // 800ms; lower bound updated.
+        assert!(cfg.vad_silence_after_speech >= Duration::from_millis(500));
         assert!(cfg.vad_amplitude_threshold > 0.0);
     }
 }

@@ -91,6 +91,19 @@ pub trait TtsBackend: Send + Sync {
     fn set_render_tap(&self, tap: Option<TtsRenderTap>) {
         let _ = tap;
     }
+
+    /// **v5.27.5** — set the output volume gain for subsequent
+    /// `speak()` calls. `1.0` = normal (default); `0.4` = duck to 40%
+    /// for AEC headroom; `0.0` = silent. The voice REPL ducks volume
+    /// when `--barge-in` is on so AEC has more margin to suppress the
+    /// echo from built-in laptop speakers (which sit < 30 cm from the
+    /// built-in mic — the worst-case echo geometry).
+    ///
+    /// Default no-op. Backends that own their playback (Piper +
+    /// OS-say under `feature = "voice"`) override.
+    fn set_volume_gain(&self, gain: f32) {
+        let _ = gain;
+    }
 }
 
 /// No-op backend for tests and disabled-TTS callers.
@@ -136,6 +149,12 @@ pub struct OsTtsBackend {
     /// no in-process audio frames to forward).
     #[cfg(feature = "voice")]
     render_tap: Mutex<Option<TtsRenderTap>>,
+    /// **v5.27.5** — output volume gain. Default 1.0 (normal).
+    /// REPL sets to 0.4 when `--barge-in` is on so AEC has headroom
+    /// against built-in-speaker echo. Only consulted under the voice
+    /// feature (legacy direct-`say` path plays at system volume).
+    #[cfg(feature = "voice")]
+    volume_gain: Mutex<f32>,
 }
 
 impl std::fmt::Debug for OsTtsBackend {
@@ -158,6 +177,8 @@ impl OsTtsBackend {
             current: Mutex::new(None),
             #[cfg(feature = "voice")]
             render_tap: Mutex::new(None),
+            #[cfg(feature = "voice")]
+            volume_gain: Mutex::new(1.0),
         }
     }
 
@@ -209,6 +230,15 @@ impl OsTtsBackend {
             args.push("-v".into());
             args.push(v.into());
         }
+        // **v5.27.5** — default speech rate 150 wpm. macOS `say`
+        // default is ~175 wpm, which user feedback (2026-05-14)
+        // described as «тараторит как лилипут, ничего не разобрать».
+        // 150 wpm = ~15% slower; clearer Kazakh pronunciation on the
+        // Aru voice without dragging dialog pacing. Callers who want
+        // a different rate can override by re-constructing the
+        // backend with explicit args.
+        args.push("-r".into());
+        args.push("150".into());
         Some(Self::new("say".into(), args, voice))
     }
 
@@ -302,7 +332,10 @@ impl TtsBackend for OsTtsBackend {
                 .lock()
                 .ok()
                 .and_then(|g| g.as_ref().cloned());
-            let handle = adam_voice::play_wav(&temp, tap_opt)
+            // **v5.27.5** — pull current volume gain (1.0 default;
+            // 0.4 when REPL has ducked for barge-in).
+            let gain = self.volume_gain.lock().map(|g| *g).unwrap_or(1.0);
+            let handle = adam_voice::play_wav_at_volume(&temp, tap_opt, gain)
                 .map_err(|e| std::io::Error::other(format!("in-process playback failed: {e}")))?;
             *guard = Some(handle);
         }
@@ -365,6 +398,22 @@ impl TtsBackend for OsTtsBackend {
         #[cfg(not(feature = "voice"))]
         {
             let _ = tap;
+        }
+    }
+
+    /// **v5.27.5** — store output volume gain. Subsequent `speak()`
+    /// calls play at this gain. Clamped to `[0.0, 2.0]` by the
+    /// playback module on use. No-op without `voice` feature.
+    fn set_volume_gain(&self, gain: f32) {
+        #[cfg(feature = "voice")]
+        {
+            if let Ok(mut guard) = self.volume_gain.lock() {
+                *guard = gain;
+            }
+        }
+        #[cfg(not(feature = "voice"))]
+        {
+            let _ = gain;
         }
     }
 }
@@ -448,6 +497,10 @@ pub struct PiperTtsBackend {
     /// reference signal.
     #[cfg(feature = "voice")]
     render_tap: Mutex<Option<TtsRenderTap>>,
+    /// **v5.27.5** — output volume gain. Same semantics as
+    /// `OsTtsBackend::volume_gain`.
+    #[cfg(feature = "voice")]
+    volume_gain: Mutex<f32>,
 }
 
 impl std::fmt::Debug for PiperTtsBackend {
@@ -477,6 +530,8 @@ impl PiperTtsBackend {
             current: Mutex::new(None),
             #[cfg(feature = "voice")]
             render_tap: Mutex::new(None),
+            #[cfg(feature = "voice")]
+            volume_gain: Mutex::new(1.0),
         }
     }
 
@@ -589,7 +644,9 @@ impl TtsBackend for PiperTtsBackend {
                 .lock()
                 .ok()
                 .and_then(|g| g.as_ref().cloned());
-            let handle = adam_voice::play_wav(&temp, tap_opt)
+            // **v5.27.5** — pull current volume gain.
+            let gain = self.volume_gain.lock().map(|g| *g).unwrap_or(1.0);
+            let handle = adam_voice::play_wav_at_volume(&temp, tap_opt, gain)
                 .map_err(|e| std::io::Error::other(format!("in-process playback failed: {e}")))?;
             *guard = Some(handle);
         }
@@ -661,6 +718,21 @@ impl TtsBackend for PiperTtsBackend {
         #[cfg(not(feature = "voice"))]
         {
             let _ = tap;
+        }
+    }
+
+    /// **v5.27.5** — store output volume gain. Same semantics as
+    /// [`OsTtsBackend::set_volume_gain`].
+    fn set_volume_gain(&self, gain: f32) {
+        #[cfg(feature = "voice")]
+        {
+            if let Ok(mut guard) = self.volume_gain.lock() {
+                *guard = gain;
+            }
+        }
+        #[cfg(not(feature = "voice"))]
+        {
+            let _ = gain;
         }
     }
 }
