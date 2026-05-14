@@ -21,6 +21,113 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.26.0] — 2026-05-14 — Voice arc V4 part 3: AEC wiring (RenderQueue + paired pipeline)
+
+**Minor.** Wires v5.25.0's AEC processor to v5.25.5's in-process playback. **AEC now runs end-to-end on paired render + capture frames**, proven by an integration test that feeds synthetic echo through the full public pipeline and verifies the cancelled output has measurably lower energy than the input.
+
+This is the missing piece between «AEC exists in isolation» and «AEC actually filters mic data during TTS playback». The state machine + barge-in UX (mic interrupts TTS automatically) lands in v5.26.5.
+
+### What ships
+
+**`RenderQueue` type alias + `new_render_queue()` constructor:**
+
+```rust
+pub type RenderQueue = Arc<Mutex<Vec<f32>>>;
+
+pub fn new_render_queue() -> RenderQueue;
+```
+
+The queue is the cross-thread bridge between the **playback callback** (audio thread, pushes samples) and the **mic processor** (main thread, drains and pairs with capture).
+
+### Architecture: queue, not shared AEC
+
+The natural design — `Arc<Mutex<AecProcessor>>` shared across threads — doesn't compile: `aec3::Runtime` is `!Send` (its node trait objects don't carry a `Send` bound). The AEC processor must live in a single thread.
+
+The fix: a **resampled-render queue** flowing from the playback callback to the mic-processor. The audio thread does resample + push; the mic thread does drain + AEC.process_render + AEC.process_capture in pairs. All AEC state stays on one thread; only `Vec<f32>` data crosses the boundary.
+
+### `aec_render_tap()` — playback → queue
+
+```rust
+pub fn aec_render_tap(queue: RenderQueue, device_rate: u32) -> RenderTap;
+```
+
+Builds a `RenderTap` closure (the `playback::RenderTap` type from v5.25.5) that:
+1. Resamples each device-rate chunk down to 16 kHz via linear interpolation
+2. Pushes resampled samples to the queue
+3. Silently skips on lock-poison (audio thread must never panic)
+
+Hand directly to `playback::play_wav(..., Some(tap))`.
+
+### `process_capture_chunked()` — mic + AEC + paired render
+
+```rust
+pub fn process_capture_chunked(
+    aec: &mut AecProcessor,
+    queue: &RenderQueue,
+    capture_i16: &[i16],
+) -> Result<Vec<i16>>;
+```
+
+Process a mic buffer through AEC, frame by frame:
+1. Split capture into 160-sample (10 ms) frames
+2. For each frame: drain matching 160 render samples from queue (silence if queue is empty — no TTS was playing)
+3. Call `AEC.process_render` then `AEC.process_capture`
+4. Emit echo-cancelled i16 (or pass-through i16 when AEC is still warming up)
+5. Tail < 160 samples passed through unchanged
+
+### `resample_to_aec_rate()` — also exposed
+
+```rust
+pub fn resample_to_aec_rate(input: &[f32], src_rate: u32) -> Vec<f32>;
+```
+
+Linear-interpolation resampler from any source rate to 16 kHz. Used internally by `aec_render_tap`; exposed in case external callers need to inject pre-resampled frames.
+
+### End-to-end paired test
+
+`end_to_end_paired_render_capture_reduces_echo_v5260`:
+
+1. Build `AecProcessor` + `RenderQueue` + `aec_render_tap`
+2. Generate 1 kHz tone (render) + 50%-amplitude copy (echo via mic)
+3. Feed 200 paired (tap, process_capture_chunked) cycles to warm up the adaptive filter
+4. One more cycle as the measurement
+5. Assert cleaned-output energy < original-capture energy
+
+This is the integration test that proves the full pipeline works — not just the AEC processor in isolation (v5.25.0) or the playback module in isolation (v5.25.5), but the **paired flow** that VAD-during-TTS barge-in will rely on.
+
+### Verified
+
+- 8 new unit tests in `aec::tests`:
+  - `resample_to_aec_rate_passthrough_when_already_16k_v5260`
+  - `resample_to_aec_rate_downsamples_48k_to_16k_v5260`
+  - `resample_to_aec_rate_handles_empty_input_v5260`
+  - `render_tap_pushes_to_queue_v5260`
+  - `render_tap_resamples_device_rate_to_aec_rate_v5260`
+  - `end_to_end_paired_render_capture_reduces_echo_v5260`
+  - `process_capture_chunked_handles_tail_smaller_than_frame_v5260`
+  - `process_capture_falls_back_to_silent_render_when_queue_empty_v5260`
+- `cargo test --workspace --locked --no-fail-fast` — **1 425 passing** (+8 from v5.25.5).
+- Adversarial 95 / 95 unchanged.
+- fmt + clippy + `verify_release_version.sh` + `check_metrics_currency.sh` clean.
+
+### Why x.26.0 (minor)
+
+New public API surface: `RenderQueue`, `new_render_queue`, `aec_render_tap`, `process_capture_chunked`, `resample_to_aec_rate`. Plus the architectural commitment that AEC stays single-threaded with queue-based cross-thread coordination. Foundation for v5.26.5 state machine + actual barge-in UX.
+
+### What's NOT yet in v5.26.0
+
+- **Voice REPL integration** — mic capture still runs unmodified through VAD. The new `process_capture_chunked` is exported but not yet called from `adam_chat`. v5.26.5 adds the integration.
+- **VAD-during-TTS state machine** — the user-facing «barge-in» where mic interrupts TTS. v5.26.5.
+- **`--barge-in` CLI flag** — v5.26.5.
+- **macOS `say` migration** — `say` doesn't write to a file by default and bypasses cpal entirely. Migrating to `say -o file.aiff` + in-process playback lands in v5.26.5 alongside the state machine.
+
+### Next
+
+- **v5.26.5** — Voice REPL integration: shared `RenderQueue` between playback and mic; `--barge-in` flag; VAD-during-TTS state machine that interrupts TTS on detected user speech; macOS `say` migration.
+- **v5.x** — Voice arc V5 (golden audio + WER / CER baseline).
+
+Stripe — Deterministic AI research (V4 part 3 lands; paired render+capture AEC pipeline operational and tested).
+
 ## [5.25.5] — 2026-05-14 — Voice arc V4 part 2.5: in-process WAV playback (cpal output) + Piper migration
 
 **Patch milestone.** Builds on v5.25.0's AEC processor by adding the **in-process audio output stream** that the AEC needs as its render reference. Piper TTS migrated off the `afplay`/`aplay` shellout to the new playback path. macOS `say` migration deferred to v5.26.5 (separate complexity).

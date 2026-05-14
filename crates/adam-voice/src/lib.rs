@@ -73,7 +73,10 @@ pub mod normalizer;
 pub mod playback;
 pub mod stt;
 
-pub use aec::{AEC_SAMPLE_RATE, AecProcessor, FRAME_SAMPLES};
+pub use aec::{
+    AEC_SAMPLE_RATE, AecProcessor, FRAME_SAMPLES, RenderQueue, aec_render_tap, new_render_queue,
+    process_capture_chunked, resample_to_aec_rate,
+};
 pub use error::{Result, VoiceError};
 pub use mic::{MicCapture, MicConfig, VadStopReason, write_wav};
 pub use normalizer::normalize_kazakh_transcript;
