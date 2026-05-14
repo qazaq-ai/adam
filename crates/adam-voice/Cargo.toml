@@ -11,6 +11,13 @@ serde_json.workspace = true
 thiserror.workspace = true
 cpal = "0.15"
 hound = "3.5"
+# **v5.25.0** — Voice arc V4 part 2. Pure-Rust WebRTC AEC3 port for
+# acoustic echo cancellation; needed so the mic doesn't pick up TTS
+# audio during VAD-during-TTS barge-in. Chose `aec3` (RubyBit) over
+# `sonora` because sonora requires rustc 1.91 and we're on 1.89; aec3
+# has no MSRV constraint and exposes a clean `pipelines::linear`
+# builder API for 10 ms-frame f32 processing. No C-bindings.
+aec3 = "0.2"
 
 [dev-dependencies]
 

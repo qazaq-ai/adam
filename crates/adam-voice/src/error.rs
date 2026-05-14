@@ -57,6 +57,24 @@ pub enum VoiceError {
     /// Hound (WAV writer) error.
     #[error("wav encoder error: {0}")]
     Hound(#[from] hound::Error),
+
+    /// **v5.25.0** — AEC pipeline construction failure. Wraps the
+    /// underlying `aec3` builder error (typically a format mismatch
+    /// between render / capture configs).
+    #[error("AEC pipeline build failed: {0}")]
+    AecBuild(String),
+
+    /// **v5.25.0** — AEC frame-processing failure. Wraps any runtime
+    /// error from `process_render_frame` / `process_capture_frame`
+    /// (format mismatch, internal queue overflow, etc.).
+    #[error("AEC processing failed: {0}")]
+    AecProcess(String),
+
+    /// **v5.25.0** — Frame size mismatch on AEC input. Both render and
+    /// capture frames must be exactly 10 ms at the configured sample
+    /// rate; the AEC processor rejects mis-sized buffers.
+    #[error("AEC frame-size mismatch: expected {expected} samples, got {actual}")]
+    FrameSize { expected: usize, actual: usize },
 }
 
 pub type Result<T> = std::result::Result<T, VoiceError>;

@@ -21,6 +21,84 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.25.0] — 2026-05-14 — Voice arc V4 part 2: AEC infrastructure (pure-Rust `aec3` integration)
+
+**Minor.** First half of full-duplex barge-in: ships the **Acoustic Echo Cancellation processor** as a tested building block. v5.25.5 wires it into in-process TTS playback; v5.26.0 lands the VAD-during-TTS state machine that turns this into actual barge-in UX.
+
+### What changed
+
+New module **[`adam_voice::aec`](crates/adam-voice/src/aec.rs)** wrapping the [`aec3`](https://crates.io/crates/aec3) crate — RubyBit's pure-Rust port of WebRTC AEC3. No C-bindings, no FFI, no GPU.
+
+Public API surface:
+
+```rust
+pub struct AecProcessor { /* ... */ }
+
+impl AecProcessor {
+    pub fn new() -> Result<Self>;
+    pub fn process_render(&mut self, frame: &[f32]) -> Result<()>;
+    pub fn process_capture(&mut self, capture: &[f32], output: &mut [f32]) -> Result<bool>;
+}
+
+pub const FRAME_SAMPLES: usize = 160;     // 10 ms at 16 kHz
+pub const AEC_SAMPLE_RATE: u32 = 16_000;
+pub fn i16_frame_to_f32(input: &[i16], output: &mut [f32]);
+pub fn f32_frame_to_i16(input: &[f32], output: &mut [i16]);
+```
+
+3 new `VoiceError` variants: `AecBuild` (pipeline construction failure), `AecProcess` (frame-processing failure), `FrameSize` (mis-sized input rejected).
+
+### Why `aec3` (not `sonora`)
+
+The original plan called for `sonora` (dignifiedquire), but its MSRV is rustc 1.91; we're on 1.89. `aec3` (RubyBit) has no MSRV constraint, exposes a clean `pipelines::linear` builder API, and ships the same AEC3 algorithm. Functional parity for our use case.
+
+### Frame contract
+
+10 ms frames at 16 kHz mono (`FRAME_SAMPLES = 160`). This matches Whisper's input format, so AEC output feeds VAD / STT without extra resampling. f32 internally; i16↔f32 conversion helpers included for boundaries with cpal / WAV.
+
+### Live-verified via synthetic-signal tests
+
+- **`aec_reduces_echo_energy_on_synthetic_signal_v5250`** — feed a 1 kHz tone as both render AND capture (echo proxy); after 200 frames of warmup, AEC output energy is strictly less than original capture energy. Proves the algorithm subtracts the echo.
+- **`aec_preserves_capture_when_render_silent_v5250`** — feed silent render + 300 Hz speech-band capture; AEC preserves > 25 % of speech energy (within 6 dB). Proves AEC doesn't destroy genuine speech when no echo is present.
+
+### Verified
+
+- 7 new unit tests in `aec::tests`:
+  - `processor_constructs_v5250`
+  - `process_render_rejects_wrong_frame_size_v5250`
+  - `process_capture_rejects_wrong_frame_size_v5250`
+  - `aec_reduces_echo_energy_on_synthetic_signal_v5250`
+  - `aec_preserves_capture_when_render_silent_v5250`
+  - `i16_to_f32_round_trip_within_quantisation_v5250`
+  - `f32_to_i16_clamps_out_of_range_v5250`
+- `cargo test --workspace --locked --no-fail-fast` — **1 413 passing** (+7 from v5.24.6).
+- Adversarial 95 / 95 unchanged.
+- fmt + clippy + `verify_release_version.sh` + `check_metrics_currency.sh` clean.
+
+### Why x.25.0 (minor)
+
+New public API surface in `adam-voice` (`AecProcessor`, `FRAME_SAMPLES`, `AEC_SAMPLE_RATE`, conversion helpers, 3 new `VoiceError` variants). New external dependency (`aec3 = 0.2`). Foundation for V4 part 2.
+
+### What's deferred to v5.25.5
+
+- **In-process TTS playback** — currently `say` / `afplay` is a child process; we don't have access to the audio stream being played to the speakers. v5.25.5 will replace shell-out playback with in-process cpal output streams so the render signal can be tapped and fed to AEC.
+
+### What's deferred to v5.26.0
+
+- **VAD-during-TTS state machine** — Idle / UserSpeaking / Thinking / Speaking / Interrupted. Mic stays open during TTS playback; AEC suppresses echo; VAD detects real user speech; TTS gets interrupted on detection.
+
+### Architectural framing — AEC stays peripheral
+
+Per `project_retrieval_not_neural_v2`, the kernel stays deterministic. AEC is a **DSP algorithm** (adaptive filter + delay estimator), not a neural network. It runs on the input transducer boundary — same architectural layer as the mic, before VAD / Whisper. The kernel's proof / verifier path is unchanged.
+
+### Next
+
+- **v5.25.5** — in-process TTS playback + actual AEC wiring.
+- **v5.26.0** — VAD-during-TTS state machine + full barge-in UX.
+- **v5.x** — Voice arc V5 (golden audio + WER / CER).
+
+Stripe — Deterministic AI research (V4 part 2 foundation; pure-Rust echo cancellation now available).
+
 ## [5.24.6] — 2026-05-13 — Template variety: 34 of 38 double-variant families expanded to 3-variant
 
 **Patch.** Continuation of the v5.22.5 anti-rote arc. Where v5.22.5 closed all 6 single-variant families, v5.24.6 closes 34 of the 38 double-variant families: each gets a third tonal variant so the dialog feels less mechanical across long sessions.
