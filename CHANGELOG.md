@@ -21,6 +21,77 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.25.5] — 2026-05-14 — Voice arc V4 part 2.5: in-process WAV playback (cpal output) + Piper migration
+
+**Patch milestone.** Builds on v5.25.0's AEC processor by adding the **in-process audio output stream** that the AEC needs as its render reference. Piper TTS migrated off the `afplay`/`aplay` shellout to the new playback path. macOS `say` migration deferred to v5.26.5 (separate complexity).
+
+### What changed
+
+**New module `adam_voice::playback`** wrapping cpal output streams:
+
+```rust
+pub struct PlaybackHandle { /* Send + Sync */ }
+
+impl PlaybackHandle {
+    pub fn interrupt(&self);
+    pub fn is_finished(&self) -> bool;
+}
+
+pub type RenderTap = Arc<dyn Fn(&[f32]) + Send + Sync + 'static>;
+
+pub fn play_wav(path: &Path, render_tap: Option<RenderTap>) -> Result<PlaybackHandle>;
+pub fn play_samples(mono_samples: Vec<f32>, render_tap: Option<RenderTap>) -> Result<PlaybackHandle>;
+```
+
+**Architecture:** the cpal `Stream` type is `!Send` on macOS (CoreAudio constraint), which would make it unusable in a `Send + Sync` TTS backend. The playback module keeps the stream on a **dedicated owner thread**; the returned `PlaybackHandle` only holds `Send + Sync` `Arc<AtomicBool>` flags. Dropping the handle flips the running flag and the owner thread releases the stream cleanly.
+
+**Render tap hook:** an optional `RenderTap` callback fires from the audio thread with each chunk of mono f32 samples as they're written to the output device. This is the hook that AEC will use in v5.26.0 — feed the render frames to `AecProcessor::process_render` so echo can be subtracted from the mic capture.
+
+### PiperTtsBackend migration
+
+`speak()` now follows two code paths via `#[cfg(feature = "voice")]`:
+
+- **`voice` feature ON** (production voice REPL build): playback runs in-process via `adam_voice::play_wav`. No `afplay` / `aplay` child process. `PlaybackHandle` stored in the backend's `current` slot; dropped on next `speak()` or `interrupt()`.
+- **`voice` feature OFF** (lean build without audio I/O): falls back to the legacy v5.1.0 shellout to `audio_player`. Preserves backward compatibility.
+
+`PiperTtsBackend::uses_in_process_playback()` const-checks which path is active for callers that want to surface the choice in their banners / traces.
+
+`interrupt()` and `Drop` follow the same cfg-split:
+- `voice` ON: drops the `PlaybackHandle` → cpal stream stops within ~50 ms (poll interval).
+- `voice` OFF: kills the `afplay` child process.
+
+### Why this incremental release
+
+Splitting the work in two has a tangible engineering benefit: v5.25.5 ships a tested in-process playback module that BOTH (a) replaces the shellout for Piper (visible UX improvement: no external `afplay` process, cleaner Drop semantics, fewer moving parts) AND (b) provides the `RenderTap` hook that v5.26.0 will wire to the AEC processor for the actual barge-in feature. Each release is independently shippable; each release stays small.
+
+### Live-verified
+
+`adam_voice::playback::tests::playback_render_tap_fires_v5255` runs the actual cpal output stream with a synthetic 200 ms silent buffer + render tap, verifies the tap callback was invoked from the audio thread.
+
+### Verified
+
+- 4 new unit tests in `playback::tests`:
+  - `read_wav_mono_f32_decodes_16bit_v5255`
+  - `playback_handle_drops_cleanly_without_panicking_v5255`
+  - `playback_render_tap_fires_v5255` (skipped when no audio device available)
+  - `interrupt_is_idempotent_v5255`
+- `cargo test --workspace --locked --no-fail-fast` — **1 417 passing** (+4 from v5.25.0; default features).
+- `cargo test -p adam-dialog --features voice --locked --no-fail-fast` — **907 passing** (voice-feature subset, includes Piper migration tests).
+- Adversarial 95 / 95 unchanged.
+- fmt + clippy (both feature configurations) + `verify_release_version.sh` + `check_metrics_currency.sh` clean.
+
+### Why x.25.5 (patch milestone)
+
+New public API surface in `adam-voice` (`PlaybackHandle`, `RenderTap`, `play_wav`, `play_samples`). New const accessor in `PiperTtsBackend` (`uses_in_process_playback`). Behavioural change in Piper TTS playback path (under the feature gate). Fits the patch-milestone band.
+
+### Next
+
+- **v5.26.0** — wire `AecProcessor` to the playback's `RenderTap` and the mic capture path; full VAD-during-TTS state machine; barge-in UX.
+- **v5.26.5** — macOS `say` migration to in-process playback (currently still shells out to `say` which we can't tap; will use `say -o file.aiff` + in-process playback).
+- **v5.x** — Voice arc V5 (golden audio + WER / CER).
+
+Stripe — Deterministic AI research (V4 part 2 progresses; in-process audio output now available; Piper no longer needs external player).
+
 ## [5.25.0] — 2026-05-14 — Voice arc V4 part 2: AEC infrastructure (pure-Rust `aec3` integration)
 
 **Minor.** First half of full-duplex barge-in: ships the **Acoustic Echo Cancellation processor** as a tested building block. v5.25.5 wires it into in-process TTS playback; v5.26.0 lands the VAD-during-TTS state machine that turns this into actual barge-in UX.

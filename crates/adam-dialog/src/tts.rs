@@ -277,10 +277,24 @@ impl Drop for OsTtsBackend {
 #[derive(Debug)]
 pub struct PiperTtsBackend {
     piper: PathBuf,
+    /// External audio player path. **v5.25.5** — used only when the
+    /// `voice` feature is OFF (fallback shellout). When the feature is
+    /// ON, playback runs in-process via [`adam_voice::play_wav`] and
+    /// this field is stored only for `describe()` provenance.
     audio_player: PathBuf,
     model_path: PathBuf,
     voice_label: Option<String>,
+    /// **v5.25.5** — afplay/aplay child handle for the legacy
+    /// (non-voice-feature) shellout playback path. Only populated when
+    /// the `voice` feature is OFF.
+    #[cfg(not(feature = "voice"))]
     current: Mutex<Option<Child>>,
+    /// **v5.25.5** — in-process playback handle for the modern
+    /// `adam-voice` path. Only populated when the `voice` feature is
+    /// ON. Killing the handle (Drop or explicit interrupt) stops the
+    /// audio stream immediately.
+    #[cfg(feature = "voice")]
+    current: Mutex<Option<adam_voice::PlaybackHandle>>,
 }
 
 impl PiperTtsBackend {
@@ -298,6 +312,14 @@ impl PiperTtsBackend {
             voice_label,
             current: Mutex::new(None),
         }
+    }
+
+    /// **v5.25.5** — returns `true` when this binary was built with
+    /// the `voice` feature, which means `speak()` uses in-process
+    /// playback via [`adam_voice::play_wav`]. When `false`, falls back
+    /// to shellout via `audio_player` (legacy v5.1.0 path).
+    pub const fn uses_in_process_playback() -> bool {
+        cfg!(feature = "voice")
     }
 
     /// Detect a usable Piper installation. Returns `None` when:
@@ -377,20 +399,41 @@ impl TtsBackend for PiperTtsBackend {
                 piper_status.code()
             )));
         }
-        // Step 2: kill any in-flight playback, then spawn the new one
-        // (non-blocking — same kill-previous semantics as
-        // `OsTtsBackend`).
-        let mut guard = self.current.lock().unwrap_or_else(|p| p.into_inner());
-        if let Some(mut prev) = guard.take() {
-            let _ = prev.kill();
-            let _ = prev.wait();
+        // Step 2: kill any in-flight playback, then start the new
+        // one. **v5.25.5** — the playback path depends on whether the
+        // `voice` feature is on:
+        //
+        // - `voice` ON: in-process via `adam_voice::play_wav`. The
+        //   playback module owns a cpal output stream we can later
+        //   tap for AEC render frames (v5.26.0+). No shellout, no
+        //   audio-player process to manage.
+        // - `voice` OFF: legacy shellout to `audio_player` (afplay /
+        //   aplay / etc.). Preserves the v5.1.0 build target where
+        //   adam-voice is not compiled in.
+        #[cfg(feature = "voice")]
+        {
+            let mut guard = self.current.lock().unwrap_or_else(|p| p.into_inner());
+            // Drop the previous handle FIRST — its Drop impl calls
+            // `interrupt()` to stop the running stream.
+            *guard = None;
+            let handle = adam_voice::play_wav(&temp, None)
+                .map_err(|e| std::io::Error::other(format!("in-process playback failed: {e}")))?;
+            *guard = Some(handle);
         }
-        let player = Command::new(&self.audio_player)
-            .arg(&temp)
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()?;
-        *guard = Some(player);
+        #[cfg(not(feature = "voice"))]
+        {
+            let mut guard = self.current.lock().unwrap_or_else(|p| p.into_inner());
+            if let Some(mut prev) = guard.take() {
+                let _ = prev.kill();
+                let _ = prev.wait();
+            }
+            let player = Command::new(&self.audio_player)
+                .arg(&temp)
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
+                .spawn()?;
+            *guard = Some(player);
+        }
         Ok(())
     }
 
@@ -409,24 +452,45 @@ impl TtsBackend for PiperTtsBackend {
         }
     }
 
-    /// **v5.24.5** — kill the in-flight audio player. The piper
-    /// synthesis step itself is synchronous (already finished by the
-    /// time playback starts), so only the player child needs killing.
+    /// **v5.24.5** — stop the in-flight playback. v5.25.5 split: when
+    /// the `voice` feature is ON, dropping the `PlaybackHandle` stops
+    /// the cpal output stream; when OFF, kill the legacy `afplay`
+    /// child process.
     fn interrupt(&self) {
         let mut guard = self.current.lock().unwrap_or_else(|p| p.into_inner());
-        if let Some(mut prev) = guard.take() {
-            let _ = prev.kill();
-            let _ = prev.wait();
+        #[cfg(feature = "voice")]
+        {
+            // Drop the handle — its impl calls `interrupt()` to stop
+            // the cpal stream cleanly.
+            *guard = None;
+        }
+        #[cfg(not(feature = "voice"))]
+        {
+            if let Some(mut prev) = guard.take() {
+                let _ = prev.kill();
+                let _ = prev.wait();
+            }
         }
     }
 }
 
 impl Drop for PiperTtsBackend {
     fn drop(&mut self) {
-        if let Ok(mut guard) = self.current.lock()
-            && let Some(mut child) = guard.take()
-        {
-            let _ = child.try_wait();
+        if let Ok(mut guard) = self.current.lock() {
+            #[cfg(feature = "voice")]
+            {
+                // Drop the PlaybackHandle → interrupt() the stream.
+                // Unlike `say` on macOS, in-process playback CAN'T
+                // continue after parent exits (the audio thread is
+                // in-process), so this cleanup matters.
+                *guard = None;
+            }
+            #[cfg(not(feature = "voice"))]
+            {
+                if let Some(mut child) = guard.take() {
+                    let _ = child.try_wait();
+                }
+            }
         }
     }
 }

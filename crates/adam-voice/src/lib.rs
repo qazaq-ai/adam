@@ -70,10 +70,12 @@ pub mod aec;
 pub mod error;
 pub mod mic;
 pub mod normalizer;
+pub mod playback;
 pub mod stt;
 
 pub use aec::{AEC_SAMPLE_RATE, AecProcessor, FRAME_SAMPLES};
 pub use error::{Result, VoiceError};
 pub use mic::{MicCapture, MicConfig, VadStopReason, write_wav};
 pub use normalizer::normalize_kazakh_transcript;
+pub use playback::{PlaybackHandle, RenderTap, play_samples, play_wav};
 pub use stt::{KAZAKH_PRIMING_PROMPT, Transcript, WhisperCli};
