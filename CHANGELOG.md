@@ -21,6 +21,70 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.24.6] — 2026-05-13 — Template variety: 34 of 38 double-variant families expanded to 3-variant
+
+**Patch.** Continuation of the v5.22.5 anti-rote arc. Where v5.22.5 closed all 6 single-variant families, v5.24.6 closes 34 of the 38 double-variant families: each gets a third tonal variant so the dialog feels less mechanical across long sessions.
+
+### Audit baseline
+
+Pre-v5.24.6 the variant histogram was:
+- 2 variants: 38 families
+- 3 variants: 68 families
+- 4-10 variants: 36 families
+
+Post-v5.24.6:
+- 2 variants: **4 families** (only `ask_fix_previous_error.with_corrected_code.{E0382,E0596,E0277,E0308}` — multi-line code-snippet templates; each new variant requires a new tested Rust example, deferred to a dedicated future release)
+- 3 variants: **102 families** (+34)
+- 4-10 variants: 36 families unchanged
+
+### Families expanded (34)
+
+The new third variants preserve the tone of the existing two; the bare-slot or canonical phrasing in slot 0 remains unchanged so existing seed-0 tests stay green.
+
+| Category | Families | New-variant style |
+|---|---|---|
+| **Conversational core** (5) | `greeting.day`, `greeting.evening`, `negation`, `ask_name`, `ask_willingness` | Third casual / formal variant |
+| **System / capability** (3) | `ask_curriculum_content`, `ask_about_system.intro_and_capabilities`, `proof_chain.empty` | Alternative phrasing |
+| **Unknown / honest** (5) | `unknown.causal.bare`, `unknown.compositional_function.bare`, `propositions.with_data`, `propositions.honest`, `propositions.empty` | Variant openers («жайында», «не үшін») |
+| **Compiler errors** (5) | `ask_fix_previous_error.{E0382,E0596,E0277,E0308,with_data}` | Concise alternative explanation per error code |
+| **Empty / no-topic** (5) | `ask_previous_error.empty`, `ask_fix_previous_error.empty`, `ask_exercise.no_topic`, `code_request.no_topic`, `explain_compiler_error.no_explanation` | Alternative invitation phrasing |
+| **Safety refusals** (3) | `safety_refusal.{legal,financial,current_data}` | Third concise refusal frame |
+| **Ask-purpose** (2) | `ask_purpose.with_topic`, `ask_purpose.no_topic` | Variant question form |
+| **Submit / progress** (4) | `submit_solution.{env_error,passed_curriculum_complete}`, `next_topic.complete`, `current_progress.empty` | Alternative completion / status phrasing |
+| **Cross-language contrast** (2) | `cross_language_contrast.{with_body,no_body}` | Variant compare framing |
+
+### Live-verified
+
+`ask_name` across multiple seeds:
+- seed 0 → «Атым — адам.»
+- seed 1 → «Менің атым адам.»
+- seed 2 → «Мені адам деп атайды.»
+
+Rotational distribution confirmed.
+
+### Verified
+
+- Updated 2 tests (`response_ask_name`, `response_ask_name_polite`) to include the new «атым — адам» variant in the allowed set.
+- `cargo test --workspace --locked --no-fail-fast` — **1 406 passing** (unchanged from v5.24.5; pure data + 2 test updates).
+- Adversarial 95 / 95 unchanged.
+- fmt + clippy + `verify_release_version.sh` + `check_metrics_currency.sh` clean.
+
+### Why x.24.6 (off-cadence patch)
+
+Project cadence is `.0 / .5` (significant / patch-milestone). v5.25.0 is reserved for **Voice V4 part 2 (VAD-during-TTS + sonora AEC)** per the v5.24.5 release notes. v5.24.6 takes the next sequential step in the patch-increment band (.1-.4 / .6-.9) — usually reserved for text/docs but stretched here to cover this data-only TOML expansion. No code change, no functional shift; pure rotational widening.
+
+### Deferred
+
+- 4 `ask_fix_previous_error.with_corrected_code.{E0382,E0596,E0277,E0308}` families remain at 2-variant. Each new variant requires a new tested, runnable Rust code snippet. Dedicated release planned post-v5.25.0.
+
+### Next
+
+- **v5.25.0** — Voice arc V4 part 2: VAD-during-TTS barge-in + pure-Rust AEC (`sonora` integration).
+- **v5.x** — Voice arc V5 (golden audio + WER / CER baseline).
+- **Future** — corrected-code template variant expansion (4 families × new Rust snippets).
+
+Stripe — Deterministic AI research (anti-rote arc: 6 → 0 single-variant, 38 → 4 double-variant; 102 families now ≥ 3-variant).
+
 ## [5.24.5] — 2026-05-13 — Voice arc V4: push-to-talk barge-in (TTS interruption)
 
 **Patch.** First half of Voice arc V4. Closes the «walkie-talkie» feel of the voice REPL — the user can now interrupt a still-playing TTS response by starting a new turn (Enter in push-to-talk mode, or typing in the text REPL). Pre-v5.24.5 the previous TTS kept playing for 50-500 ms while the kernel processed the new turn, so the dialog felt unnatural.

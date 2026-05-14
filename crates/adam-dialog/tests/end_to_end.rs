@@ -475,12 +475,20 @@ fn response_statement_of_wellbeing() {
 
 #[test]
 fn response_ask_name() {
-    assert_response_with_toml("атың кім", &["менің атым адам", "мені адам деп атайды"]);
+    // **v5.24.6** — `ask_name` family expanded to 3 variants (added
+    // «атым — адам» for tonal variety). Allowed set widened to match.
+    assert_response_with_toml(
+        "атың кім",
+        &["менің атым адам", "мені адам деп атайды", "атым — адам"],
+    );
 }
 
 #[test]
 fn response_ask_name_polite() {
-    assert_response_with_toml("атыңыз кім", &["менің атым адам", "мені адам деп атайды"]);
+    assert_response_with_toml(
+        "атыңыз кім",
+        &["менің атым адам", "мені адам деп атайды", "атым — адам"],
+    );
 }
 
 #[test]
