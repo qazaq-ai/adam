@@ -1,7 +1,7 @@
 {
-  "version": "5.16.7",
+  "version": "5.31.0",
   "status": "completed",
-  "elapsed_s": 34,
+  "elapsed_s": 59,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,19 +18,19 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3404,
+    "facts_total": 3566,
     "by_predicate": {
       "after": 8,
-      "causes": 27,
+      "causes": 28,
       "does_to": 1,
       "goes_to": 26,
-      "has": 68,
-      "has_quantity": 37,
+      "has": 75,
+      "has_quantity": 55,
       "in_domain": 24,
-      "is_a": 2838,
+      "is_a": 2925,
       "lives_in": 8,
       "part_of": 244,
-      "related_to": 123
+      "related_to": 172
     },
     "by_pack": {
       "abai_wikisource_pack.json": 6,
@@ -72,6 +72,7 @@
       "world_core/mathematics_basic.jsonl": 93,
       "world_core/measurements.jsonl": 18,
       "world_core/medicine_basic.jsonl": 12,
+      "world_core/military_kz.jsonl": 162,
       "world_core/music_kz.jsonl": 24,
       "world_core/natural_phenomena.jsonl": 28,
       "world_core/notable_kazakhstanis.jsonl": 55,
@@ -34023,6 +34024,3246 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Антибиотик — бактериялық инфекцияны емдеуге арналған дәрі (мысалы: пенициллин, амоксициллин). Вирусқа қарсы әсер етпейді. Тек дәрігер тағайындауымен — өзбетімен қабылдау резистенттікке әкеледі."
+    },
+    {
+      "subject": {
+        "surface": "әскери қызмет",
+        "root": "әскери қызмет",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекеттік функция",
+        "root": "мемлекеттік функция",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери қызмет — егемендікті, аумақтық тұтастықты және Қазақстан Республикасы Мемлекеттік шекарасының қол сұғылмаушылығын қарулы қорғаумен байланысты əскери қауіпсіздікті тікелей қамтамасыз етуге бағытталған мемлекеттік маңызы бар функция."
+    },
+    {
+      "subject": {
+        "surface": "әскери қызмет",
+        "root": "әскери қызмет",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери қауіпсіздік",
+        "root": "әскери қауіпсіздік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери қызмет — егемендікті, аумақтық тұтастықты және Қазақстан Республикасы Мемлекеттік шекарасының қол сұғылмаушылығын қарулы қорғаумен байланысты əскери қауіпсіздікті тікелей қамтамасыз етуге бағытталған мемлекеттік маңызы бар функция."
+    },
+    {
+      "subject": {
+        "surface": "әскери қызметші",
+        "root": "әскери қызметші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қазақстан азаматы",
+        "root": "қазақстан азаматы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери қызметшілер — Қарулы Күштерде, басқа да әскерлер мен әскери құралымдарда əскери қызметте болатын Қазақстан Республикасының азаматтары."
+    },
+    {
+      "subject": {
+        "surface": "әскери қызметші",
+        "root": "әскери қызметші",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери қызметшілер — Қарулы Күштерде, басқа да әскерлер мен әскери құралымдарда əскери қызметте болатын Қазақстан Республикасының азаматтары."
+    },
+    {
+      "subject": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери айырым белгісі",
+        "root": "әскери айырым белгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери атақ — әскери қызметшіге және әскери міндеттіге берілетін әскери айырым белгісі."
+    },
+    {
+      "subject": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери қызметші",
+        "root": "әскери қызметші",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери атақ — әскери қызметшіге және әскери міндеттіге берілетін әскери айырым белгісі."
+    },
+    {
+      "subject": {
+        "surface": "әскери билет",
+        "root": "әскери билет",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жеке құжат",
+        "root": "жеке құжат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери билет — азаматтың әскери қызметке тиесілігін және әскери міндеттілікке қатыстылығын айқындайтын бірыңғай мерзімсіз жеке есептік-әскери құжат."
+    },
+    {
+      "subject": {
+        "surface": "әскери билет",
+        "root": "әскери билет",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери қызмет",
+        "root": "әскери қызмет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери билет — азаматтың әскери қызметке тиесілігін және әскери міндеттілікке қатыстылығын айқындайтын бірыңғай мерзімсіз жеке есептік-әскери құжат."
+    },
+    {
+      "subject": {
+        "surface": "әскери лауазым",
+        "root": "әскери лауазым",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "штаттық бірлік",
+        "root": "штаттық бірлік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери лауазым — әскери қызмет функцияларын орындау үшін лауазымдық өкілеттіктер мен міндеттер жүктелген Қарулы Күштердің штаттық бірлігі."
+    },
+    {
+      "subject": {
+        "surface": "әскери лауазым",
+        "root": "әскери лауазым",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери лауазым — әскери қызмет функцияларын орындау үшін лауазымдық өкілеттіктер мен міндеттер жүктелген Қарулы Күштердің штаттық бірлігі."
+    },
+    {
+      "subject": {
+        "surface": "әскерге шақырылушы",
+        "root": "әскерге шақырылушы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қазақстан азаматы",
+        "root": "қазақстан азаматы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскерге шақырылушылар — жергілікті әскери басқару органдарында әскери есепте тұратын және мерзімді әскери қызметке шақырылуға жататын Қазақстан Республикасының ер азаматтары."
+    },
+    {
+      "subject": {
+        "surface": "әскерге шақырылушы",
+        "root": "әскерге шақырылушы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "мерзімді әскери қызмет",
+        "root": "мерзімді әскери қызмет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскерге шақырылушылар — жергілікті әскери басқару органдарында әскери есепте тұратын және мерзімді әскери қызметке шақырылуға жататын Қазақстан Республикасының ер азаматтары."
+    },
+    {
+      "subject": {
+        "surface": "әскери міндетті",
+        "root": "әскери міндетті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қазақстан азаматы",
+        "root": "қазақстан азаматы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери міндеттілер — әскери есепте тұратын және әскери есепте тұрудың шекті жасына дейін запаста болатын Қазақстан Республикасының азаматтары."
+    },
+    {
+      "subject": {
+        "surface": "әскери міндетті",
+        "root": "әскери міндетті",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери есеп",
+        "root": "әскери есеп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери міндеттілер — әскери есепте тұратын және әскери есепте тұрудың шекті жасына дейін запаста болатын Қазақстан Республикасының азаматтары."
+    },
+    {
+      "subject": {
+        "surface": "әскери жиын",
+        "root": "әскери жиын",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери шара",
+        "root": "әскери шара",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери жиындар — әскери міндеттілер мен азаматтардың әскери білім алуы және оны жетілдіруі мақсатында өткізілетін шаралар."
+    },
+    {
+      "subject": {
+        "surface": "әскери жиын",
+        "root": "әскери жиын",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери білім",
+        "root": "әскери білім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери жиындар — әскери міндеттілер мен азаматтардың әскери білім алуы және оны жетілдіруі мақсатында өткізілетін шаралар."
+    },
+    {
+      "subject": {
+        "surface": "келісімшарт",
+        "root": "келісімшарт",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери құжат",
+        "root": "әскери құжат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери қызмет өткеру туралы келісімшарт — уәкілетті орган мен Қазақстан Республикасының азаматы арасындағы келісімшарт."
+    },
+    {
+      "subject": {
+        "surface": "келісімшарт",
+        "root": "келісімшарт",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери қызмет",
+        "root": "әскери қызмет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери қызмет өткеру туралы келісімшарт — уәкілетті орган мен Қазақстан Республикасының азаматы арасындағы келісімшарт."
+    },
+    {
+      "subject": {
+        "surface": "әскери киім нысаны",
+        "root": "әскери киім нысаны",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ерекше киім",
+        "root": "ерекше киім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери киім нысаны — Қазақстан Республикасының Президенті бекіткен, әскери қызметшілердің Қарулы Күштерге тиесілігін айқындайтын ерекше киім."
+    },
+    {
+      "subject": {
+        "surface": "әскери киім нысаны",
+        "root": "әскери киім нысаны",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери қызметші",
+        "root": "әскери қызметші",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери киім нысаны — Қазақстан Республикасының Президенті бекіткен, әскери қызметшілердің Қарулы Күштерге тиесілігін айқындайтын ерекше киім."
+    },
+    {
+      "subject": {
+        "surface": "мерзімді әскери қызмет",
+        "root": "мерзімді әскери қызмет",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери қызмет түрі",
+        "root": "әскери қызмет түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскерге шақыру бойынша әскери қызмет — осы Заңда көзделген мерзімге Қарулы Күштерге шақырылған Қазақстан Республикасы азаматтарының өткеретін қызметі."
+    },
+    {
+      "subject": {
+        "surface": "мерзімді әскери қызмет",
+        "root": "мерзімді әскери қызмет",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскерге шақырылушы",
+        "root": "әскерге шақырылушы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскерге шақыру бойынша әскери қызмет — осы Заңда көзделген мерзімге Қарулы Күштерге шақырылған Қазақстан Республикасы азаматтарының өткеретін қызметі."
+    },
+    {
+      "subject": {
+        "surface": "әскери кафедра",
+        "root": "әскери кафедра",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оқу бөлімшесі",
+        "root": "оқу бөлімшесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери кафедра — запастағы офицерлер және сержанттар бағдарламалары бойынша студенттерді әскери даярлауды жүзеге асыратын Қазақстан Республикасының жоғары оқу орнының құрылымдық бөлімшесі."
+    },
+    {
+      "subject": {
+        "surface": "әскери кафедра",
+        "root": "әскери кафедра",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери даярлық",
+        "root": "әскери даярлық",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери кафедра — запастағы офицерлер және сержанттар бағдарламалары бойынша студенттерді әскери даярлауды жүзеге асыратын Қазақстан Республикасының жоғары оқу орнының құрылымдық бөлімшесі."
+    },
+    {
+      "subject": {
+        "surface": "әскери құрам",
+        "root": "әскери құрам",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "үш санат",
+        "root": "үш санат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери қызметшілер мен әскери міндеттілер қатардағы, сержанттық және офицерлік құрамдарға бөлінеді."
+    },
+    {
+      "subject": {
+        "surface": "қатардағы құрам",
+        "root": "қатардағы құрам",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери құрам санаты",
+        "root": "әскери құрам санаты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери қызметшілер мен әскери міндеттілер қатардағы, сержанттық және офицерлік құрамдарға бөлінеді."
+    },
+    {
+      "subject": {
+        "surface": "сержанттық құрам",
+        "root": "сержанттық құрам",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери құрам санаты",
+        "root": "әскери құрам санаты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сержанттық құрам — әскери қызметшілердің кіші, аға және жоғары сержанттар құрамдары кіретін санаты."
+    },
+    {
+      "subject": {
+        "surface": "сержанттық құрам",
+        "root": "сержанттық құрам",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сержанттық құрам — әскери қызметшілердің кіші, аға және жоғары сержанттар құрамдары кіретін санаты."
+    },
+    {
+      "subject": {
+        "surface": "офицерлер құрамы",
+        "root": "офицерлер құрамы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери құрам санаты",
+        "root": "әскери құрам санаты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Офицерлер құрамы — кіші, аға және жоғары офицерлер құрамдарын біріктіретін әскери қызметшілер санаты."
+    },
+    {
+      "subject": {
+        "surface": "офицер",
+        "root": "офицер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери қызметші",
+        "root": "әскери қызметші",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Офицерлер құрамы — кіші, аға және жоғары офицерлер құрамдарын біріктіретін әскери қызметшілер санаты."
+    },
+    {
+      "subject": {
+        "surface": "қатардағы жауынгер",
+        "root": "қатардағы жауынгер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қатардағы жауынгер — Қарулы Күштердегі қатардағы құрамның бірінші әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "қатардағы жауынгер",
+        "root": "қатардағы жауынгер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қатардағы құрам",
+        "root": "қатардағы құрам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қатардағы жауынгер — Қарулы Күштердегі қатардағы құрамның бірінші әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "ефрейтор",
+        "root": "ефрейтор",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ефрейтор — қатардағы құрамның жоғары әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "ефрейтор",
+        "root": "ефрейтор",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қатардағы құрам",
+        "root": "қатардағы құрам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ефрейтор — қатардағы құрамның жоғары әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "матрос",
+        "root": "матрос",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Матрос — Әскери-теңіз күштерінде қатардағы құрамға берілетін бірінші корабльдік әскери атақ."
+    },
+    {
+      "subject": {
+        "surface": "матрос",
+        "root": "матрос",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қатардағы құрам",
+        "root": "қатардағы құрам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Матрос — Әскери-теңіз күштерінде қатардағы құрамға берілетін бірінші корабльдік әскери атақ."
+    },
+    {
+      "subject": {
+        "surface": "кіші сержант",
+        "root": "кіші сержант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кіші сержант — сержанттық құрамның бірінші әскери атағы; кезекті атақ алу үшін бір жыл қызмет өткеру керек."
+    },
+    {
+      "subject": {
+        "surface": "кіші сержант",
+        "root": "кіші сержант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сержанттық құрам",
+        "root": "сержанттық құрам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кіші сержант — сержанттық құрамның бірінші әскери атағы; кезекті атақ алу үшін бір жыл қызмет өткеру керек."
+    },
+    {
+      "subject": {
+        "surface": "кіші сержант",
+        "root": "кіші сержант",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "бір жыл",
+        "root": "бір жыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кіші сержант — сержанттық құрамның бірінші әскери атағы; кезекті атақ алу үшін бір жыл қызмет өткеру керек."
+    },
+    {
+      "subject": {
+        "surface": "сержант",
+        "root": "сержант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сержант — сержанттық құрамның әскери атағы; кезекті атақ алу үшін екі жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "сержант",
+        "root": "сержант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сержанттық құрам",
+        "root": "сержанттық құрам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сержант — сержанттық құрамның әскери атағы; кезекті атақ алу үшін екі жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "сержант",
+        "root": "сержант",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "екі жыл",
+        "root": "екі жыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сержант — сержанттық құрамның әскери атағы; кезекті атақ алу үшін екі жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "аға сержант",
+        "root": "аға сержант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Аға сержант — сержанттық құрамның жоғары атағы; кезекті атақ алу үшін үш жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "аға сержант",
+        "root": "аға сержант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сержанттық құрам",
+        "root": "сержанттық құрам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Аға сержант — сержанттық құрамның жоғары атағы; кезекті атақ алу үшін үш жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "аға сержант",
+        "root": "аға сержант",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "үш жыл",
+        "root": "үш жыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Аға сержант — сержанттық құрамның жоғары атағы; кезекті атақ алу үшін үш жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "штаб-сержант",
+        "root": "штаб-сержант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Штаб-сержант — жоғары сержанттар құрамының әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "штаб-сержант",
+        "root": "штаб-сержант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жоғары сержанттық құрам",
+        "root": "жоғары сержанттық құрам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Штаб-сержант — жоғары сержанттар құрамының әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "шебер-сержант",
+        "root": "шебер-сержант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_023"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шебер-сержант — жоғары сержанттар құрамының жоғары әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "шебер-сержант",
+        "root": "шебер-сержант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жоғары сержанттық құрам",
+        "root": "жоғары сержанттық құрам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_023"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шебер-сержант — жоғары сержанттар құрамының жоғары әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "лейтенант",
+        "root": "лейтенант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_024"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Лейтенант — кіші офицерлер құрамының бірінші әскери атағы; кезекті атақ алу үшін екі жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "лейтенант",
+        "root": "лейтенант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "кіші офицер",
+        "root": "кіші офицер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_024"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Лейтенант — кіші офицерлер құрамының бірінші әскери атағы; кезекті атақ алу үшін екі жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "лейтенант",
+        "root": "лейтенант",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "екі жыл",
+        "root": "екі жыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_024"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Лейтенант — кіші офицерлер құрамының бірінші әскери атағы; кезекті атақ алу үшін екі жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "аға лейтенант",
+        "root": "аға лейтенант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_025"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Аға лейтенант — кіші офицерлер құрамының әскери атағы; кезекті атақ алу үшін үш жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "аға лейтенант",
+        "root": "аға лейтенант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "кіші офицер",
+        "root": "кіші офицер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_025"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Аға лейтенант — кіші офицерлер құрамының әскери атағы; кезекті атақ алу үшін үш жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "аға лейтенант",
+        "root": "аға лейтенант",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "үш жыл",
+        "root": "үш жыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_025"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Аға лейтенант — кіші офицерлер құрамының әскери атағы; кезекті атақ алу үшін үш жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "капитан",
+        "root": "капитан",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_026"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Капитан — кіші офицерлер құрамының жоғары әскери атағы; кезекті атақ алу үшін төрт жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "капитан",
+        "root": "капитан",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "кіші офицер",
+        "root": "кіші офицер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_026"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Капитан — кіші офицерлер құрамының жоғары әскери атағы; кезекті атақ алу үшін төрт жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "капитан",
+        "root": "капитан",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "төрт жыл",
+        "root": "төрт жыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_026"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Капитан — кіші офицерлер құрамының жоғары әскери атағы; кезекті атақ алу үшін төрт жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "майор",
+        "root": "майор",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_027"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Майор — аға офицерлер құрамының бірінші әскери атағы; кезекті атақ алу үшін бес жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "майор",
+        "root": "майор",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "аға офицер",
+        "root": "аға офицер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_027"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Майор — аға офицерлер құрамының бірінші әскери атағы; кезекті атақ алу үшін бес жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "майор",
+        "root": "майор",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "бес жыл",
+        "root": "бес жыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_027"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Майор — аға офицерлер құрамының бірінші әскери атағы; кезекті атақ алу үшін бес жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "подполковник",
+        "root": "подполковник",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_028"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Подполковник — аға офицерлер құрамының әскери атағы; кезекті атақ алу үшін жеті жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "подполковник",
+        "root": "подполковник",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "аға офицер",
+        "root": "аға офицер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_028"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Подполковник — аға офицерлер құрамының әскери атағы; кезекті атақ алу үшін жеті жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "подполковник",
+        "root": "подполковник",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "жеті жыл",
+        "root": "жеті жыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_028"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Подполковник — аға офицерлер құрамының әскери атағы; кезекті атақ алу үшін жеті жыл қызмет өткеру қажет."
+    },
+    {
+      "subject": {
+        "surface": "полковник",
+        "root": "полковник",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_029"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Полковник — аға офицерлер құрамының жоғары әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "полковник",
+        "root": "полковник",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "аға офицер",
+        "root": "аға офицер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_029"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Полковник — аға офицерлер құрамының жоғары әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "генерал-майор",
+        "root": "генерал-майор",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_030"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Генерал-майор — жоғары офицерлер құрамының әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "генерал-майор",
+        "root": "генерал-майор",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жоғары офицер",
+        "root": "жоғары офицер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_030"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Генерал-майор — жоғары офицерлер құрамының әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "генерал-лейтенант",
+        "root": "генерал-лейтенант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_031"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Генерал-лейтенант — жоғары офицерлер құрамының әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "генерал-лейтенант",
+        "root": "генерал-лейтенант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жоғары офицер",
+        "root": "жоғары офицер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_031"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Генерал-лейтенант — жоғары офицерлер құрамының әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "генерал-полковник",
+        "root": "генерал-полковник",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_032"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Генерал-полковник — жоғары офицерлер құрамының әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "генерал-полковник",
+        "root": "генерал-полковник",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жоғары офицер",
+        "root": "жоғары офицер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_032"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Генерал-полковник — жоғары офицерлер құрамының әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "армия генералы",
+        "root": "армия генералы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_033"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Армия генералы — Қазақстан Республикасы Қарулы Күштерінің ең жоғары әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "армия генералы",
+        "root": "армия генералы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жоғары офицер",
+        "root": "жоғары офицер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_033"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Армия генералы — Қазақстан Республикасы Қарулы Күштерінің ең жоғары әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "контр-адмирал",
+        "root": "контр-адмирал",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ",
+        "root": "әскери атақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_034"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Контр-адмирал — Әскери-теңіз күштеріндегі жоғары офицерлер құрамының әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "контр-адмирал",
+        "root": "контр-адмирал",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жоғары офицер",
+        "root": "жоғары офицер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_034"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Контр-адмирал — Әскери-теңіз күштеріндегі жоғары офицерлер құрамының әскери атағы."
+    },
+    {
+      "subject": {
+        "surface": "запастағы атақ",
+        "root": "запастағы атақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ түрі",
+        "root": "әскери атақ түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_035"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Запаста тұратын азаматтардың әскери атақтарының алдына «запастағы» деген сөз қосылады."
+    },
+    {
+      "subject": {
+        "surface": "запастағы атақ",
+        "root": "запастағы атақ",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "запастағы азамат",
+        "root": "запастағы азамат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_035"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Запаста тұратын азаматтардың әскери атақтарының алдына «запастағы» деген сөз қосылады."
+    },
+    {
+      "subject": {
+        "surface": "отставкадағы атақ",
+        "root": "отставкадағы атақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ түрі",
+        "root": "әскери атақ түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_036"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Отставкадағы әскери қызметшілердің әскери атақтарының алдына «отставкадағы» деген сөз қосылады."
+    },
+    {
+      "subject": {
+        "surface": "отставкадағы атақ",
+        "root": "отставкадағы атақ",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "отставкадағы әскери қызметші",
+        "root": "отставкадағы әскери қызметші",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_036"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Отставкадағы әскери қызметшілердің әскери атақтарының алдына «отставкадағы» деген сөз қосылады."
+    },
+    {
+      "subject": {
+        "surface": "медицина қызметінің атағы",
+        "root": "медицина қызметінің атағы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ түрі",
+        "root": "әскери атақ түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_037"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Медициналық немесе заңгер мамандығы бар офицерлердің атақтары алдына тиісінше «медицина қызметінің» немесе «әділет» деген сөздер қосылады."
+    },
+    {
+      "subject": {
+        "surface": "әділет атағы",
+        "root": "әділет атағы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери атақ түрі",
+        "root": "әскери атақ түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_037"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Медициналық немесе заңгер мамандығы бар офицерлердің атақтары алдына тиісінше «медицина қызметінің» немесе «әділет» деген сөздер қосылады."
+    },
+    {
+      "subject": {
+        "surface": "курсант",
+        "root": "курсант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери қызметші",
+        "root": "әскери қызметші",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_038"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Курсант — жоғары әскери оқу орнында білім алатын әскери қызметші, оны бітіргеннен кейін офицерлік құрамның бірінші әскери атағы беріледі."
+    },
+    {
+      "subject": {
+        "surface": "курсант",
+        "root": "курсант",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери оқу орны",
+        "root": "әскери оқу орны",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_038"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Курсант — жоғары әскери оқу орнында білім алатын әскери қызметші, оны бітіргеннен кейін офицерлік құрамның бірінші әскери атағы беріледі."
+    },
+    {
+      "subject": {
+        "surface": "жас сарбаз",
+        "root": "жас сарбаз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери даярлық оқушысы",
+        "root": "әскери даярлық оқушысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_039"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жас сарбаз — әскерге шақыруға дейінгі тереңдетілген даярлықты мамандандырылған жалпы білім беретін оқу бағдарламалары бойынша оқитын адам."
+    },
+    {
+      "subject": {
+        "surface": "жас сарбаз",
+        "root": "жас сарбаз",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскерге шақыруға дейінгі даярлық",
+        "root": "әскерге шақыруға дейінгі даярлық",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_039"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жас сарбаз — әскерге шақыруға дейінгі тереңдетілген даярлықты мамандандырылған жалпы білім беретін оқу бағдарламалары бойынша оқитын адам."
+    },
+    {
+      "subject": {
+        "surface": "әскери кафедра",
+        "root": "әскери кафедра",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "запастағы лейтенант",
+        "root": "запастағы лейтенант",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_040"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери кафедраны бітіргеннен кейін азаматтарға «запастағы лейтенант» немесе «запастағы сержант» әскери атағы беріледі."
+    },
+    {
+      "subject": {
+        "surface": "әскери кафедра",
+        "root": "әскери кафедра",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "запастағы сержант",
+        "root": "запастағы сержант",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_040"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери кафедраны бітіргеннен кейін азаматтарға «запастағы лейтенант» немесе «запастағы сержант» әскери атағы беріледі."
+    },
+    {
+      "subject": {
+        "surface": "кіші офицер",
+        "root": "кіші офицер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "офицер",
+        "root": "офицер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_041"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кіші офицер — офицерлер құрамының бастапқы санаты."
+    },
+    {
+      "subject": {
+        "surface": "кіші офицер",
+        "root": "кіші офицер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери қызметші",
+        "root": "әскери қызметші",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_041"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кіші офицер — офицерлер құрамының бастапқы санаты."
+    },
+    {
+      "subject": {
+        "surface": "аға офицер",
+        "root": "аға офицер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "офицер",
+        "root": "офицер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_042"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Аға офицер — офицерлер құрамының орташа санаты."
+    },
+    {
+      "subject": {
+        "surface": "аға офицер",
+        "root": "аға офицер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери қызметші",
+        "root": "әскери қызметші",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_042"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Аға офицер — офицерлер құрамының орташа санаты."
+    },
+    {
+      "subject": {
+        "surface": "жоғары офицер",
+        "root": "жоғары офицер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "офицер",
+        "root": "офицер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_043"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жоғары офицер — офицерлер құрамының жоғары санаты."
+    },
+    {
+      "subject": {
+        "surface": "жоғары офицер",
+        "root": "жоғары офицер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери қызметші",
+        "root": "әскери қызметші",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_043"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жоғары офицер — офицерлер құрамының жоғары санаты."
+    },
+    {
+      "subject": {
+        "surface": "офицер",
+        "root": "офицер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери қызметші",
+        "root": "әскери қызметші",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_044"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Офицер — Қазақстан Қарулы Күштерінің офицерлер құрамына жататын әскери қызметші."
+    },
+    {
+      "subject": {
+        "surface": "офицер",
+        "root": "офицер",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_044"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Офицер — Қазақстан Қарулы Күштерінің офицерлер құрамына жататын әскери қызметші."
+    },
+    {
+      "subject": {
+        "surface": "жеке құжат",
+        "root": "жеке құжат",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "құжат",
+        "root": "құжат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_045"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жеке құжат — азаматтың жеке басын немесе оның белгілі бір тиесілігін айқындайтын құжат."
+    },
+    {
+      "subject": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери ұйым",
+        "root": "әскери ұйым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_046"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарулы Күштер — мемлекетті қарулы қорғауға арналған әскери ұйым."
+    },
+    {
+      "subject": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_046"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарулы Күштер — мемлекетті қарулы қорғауға арналған әскери ұйым."
+    },
+    {
+      "subject": {
+        "surface": "қатардағы құрам",
+        "root": "қатардағы құрам",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери құрам санаты",
+        "root": "әскери құрам санаты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_047"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қатардағы құрам — қатардағы әскери атақтары бар әскери қызметшілер санаты."
+    },
+    {
+      "subject": {
+        "surface": "әскери даярлық",
+        "root": "әскери даярлық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекеттік іс-шара",
+        "root": "мемлекеттік іс-шара",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_048"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери даярлық — азаматтарды әскери қызметке және ел қорғауға дайындайтын мемлекеттік іс-шаралар жүйесі."
+    },
+    {
+      "subject": {
+        "surface": "әскери даярлық",
+        "root": "әскери даярлық",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери қызмет",
+        "root": "әскери қызмет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_048"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери даярлық — азаматтарды әскери қызметке және ел қорғауға дайындайтын мемлекеттік іс-шаралар жүйесі."
+    },
+    {
+      "subject": {
+        "surface": "әскери ант",
+        "root": "әскери ант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "салтанатты ант",
+        "root": "салтанатты ант",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_049"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери ант — Қазақстан Республикасы Қарулы Күштерінің әскери қызметшісі мен әскери міндеттісінің халыққа адалдығы туралы салтанатты түрде беретін анты."
+    },
+    {
+      "subject": {
+        "surface": "әскери ант",
+        "root": "әскери ант",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери қызметші",
+        "root": "әскери қызметші",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_049"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери ант — Қазақстан Республикасы Қарулы Күштерінің әскери қызметшісі мен әскери міндеттісінің халыққа адалдығы туралы салтанатты түрде беретін анты."
+    },
+    {
+      "subject": {
+        "surface": "әскери ант мәтіні",
+        "root": "әскери ант мәтіні",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "президент жарлығымен бекітілген құжат",
+        "root": "президент жарлығымен бекітілген құжат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_050"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери ант мәтіні Қазақстан Республикасы Президентінің 1992 жылғы 25 тамыздағы № 870 Жарлығымен бекітілген."
+    },
+    {
+      "subject": {
+        "surface": "әскери ант мәтіні",
+        "root": "әскери ант мәтіні",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "президент",
+        "root": "президент",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_050"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери ант мәтіні Қазақстан Республикасы Президентінің 1992 жылғы 25 тамыздағы № 870 Жарлығымен бекітілген."
+    },
+    {
+      "subject": {
+        "surface": "әскери қызметші",
+        "root": "әскери қызметші",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "халыққа адалдық міндеті",
+        "root": "халыққа адалдық міндеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_051"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери антты қабылдаған әскери қызметші Қазақстан халқы мен оның заңды сайланған Президентіне ақтық демі қалғанша адал болуға міндеттенеді."
+    },
+    {
+      "subject": {
+        "surface": "әскери ант",
+        "root": "әскери ант",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "халыққа адалдық",
+        "root": "халыққа адалдық",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_051"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери антты қабылдаған әскери қызметші Қазақстан халқы мен оның заңды сайланған Президентіне ақтық демі қалғанша адал болуға міндеттенеді."
+    },
+    {
+      "subject": {
+        "surface": "әскери қызметші",
+        "root": "әскери қызметші",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "конституцияны сақтау міндеті",
+        "root": "конституцияны сақтау міндеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_052"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери ант беруші азамат өзінің егемен мемлекетінің Конституциясы мен заңдарын қастерлеп сақтауға міндеттенеді."
+    },
+    {
+      "subject": {
+        "surface": "әскери ант",
+        "root": "әскери ант",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "конституция",
+        "root": "конституция",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_052"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери ант беруші азамат өзінің егемен мемлекетінің Конституциясы мен заңдарын қастерлеп сақтауға міндеттенеді."
+    },
+    {
+      "subject": {
+        "surface": "әскерге шақырылушы",
+        "root": "әскерге шақырылушы",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ант қабылдау міндеті",
+        "root": "ант қабылдау міндеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_053"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мерзімді әскери қызметке шақырылған әскери қызметшілер әскери антты қызметке кіргеннен кейінгі алғашқы екі айдың ішінде қабылдайды."
+    },
+    {
+      "subject": {
+        "surface": "әскери ант",
+        "root": "әскери ант",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "мерзімді әскери қызмет",
+        "root": "мерзімді әскери қызмет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_053"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мерзімді әскери қызметке шақырылған әскери қызметшілер әскери антты қызметке кіргеннен кейінгі алғашқы екі айдың ішінде қабылдайды."
+    },
+    {
+      "subject": {
+        "surface": "әскери кафедра студенті",
+        "root": "әскери кафедра студенті",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ант қабылдау міндеті",
+        "root": "ант қабылдау міндеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_054"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери кафедралардың студенттері әскери антты Отан қорғаушы күні қарсаңында қабылдайды."
+    },
+    {
+      "subject": {
+        "surface": "әскери ант",
+        "root": "әскери ант",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "отан қорғаушы күні",
+        "root": "отан қорғаушы күні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_054"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери кафедралардың студенттері әскери антты Отан қорғаушы күні қарсаңында қабылдайды."
+    },
+    {
+      "subject": {
+        "surface": "әскери міндетті",
+        "root": "әскери міндетті",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ант қабылдау міндеті",
+        "root": "ант қабылдау міндеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_055"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бұрын әскери ант қабылдамаған әскери міндеттілер оны әскери жиындарға шақырылған кезде қабылдайды."
+    },
+    {
+      "subject": {
+        "surface": "әскери ант",
+        "root": "әскери ант",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери жиын",
+        "root": "әскери жиын",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_055"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бұрын әскери ант қабылдамаған әскери міндеттілер оны әскери жиындарға шақырылған кезде қабылдайды."
+    },
+    {
+      "subject": {
+        "surface": "курсант",
+        "root": "курсант",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ант қабылдау міндеті",
+        "root": "ант қабылдау міндеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_056"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Курсант жоғары әскери оқу орнында оқу барысында әскери антты қабылдайды."
+    },
+    {
+      "subject": {
+        "surface": "әскери ант",
+        "root": "әскери ант",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "курсант",
+        "root": "курсант",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_056"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Курсант жоғары әскери оқу орнында оқу барысында әскери антты қабылдайды."
+    },
+    {
+      "subject": {
+        "surface": "әскери ант",
+        "root": "әскери ант",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жауынгерлік ту",
+        "root": "жауынгерлік ту",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_057"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери ант салтанатты жағдайда, әскери бөлімнің Жауынгерлік туы алдында қабылданады."
+    },
+    {
+      "subject": {
+        "surface": "әскери ант",
+        "root": "әскери ант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "салтанатты ант",
+        "root": "салтанатты ант",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_057"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери ант салтанатты жағдайда, әскери бөлімнің Жауынгерлік туы алдында қабылданады."
+    },
+    {
+      "subject": {
+        "surface": "отан қорғаушы күні",
+        "root": "отан қорғаушы күні",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекеттік мереке",
+        "root": "мемлекеттік мереке",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_058"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Отан қорғаушы күні — 7 мамырда тойланатын Қазақстан Республикасының мемлекеттік мерекесі."
+    },
+    {
+      "subject": {
+        "surface": "отан қорғаушы күні",
+        "root": "отан қорғаушы күні",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "7 мамыр",
+        "root": "7 мамыр",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_058"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Отан қорғаушы күні — 7 мамырда тойланатын Қазақстан Республикасының мемлекеттік мерекесі."
+    },
+    {
+      "subject": {
+        "surface": "жауынгерлік ту",
+        "root": "жауынгерлік ту",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери символ",
+        "root": "әскери символ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_059"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жауынгерлік ту — әскери бөлімнің сардары және оның жауынгерлік атағының символы."
+    },
+    {
+      "subject": {
+        "surface": "жауынгерлік ту",
+        "root": "жауынгерлік ту",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери бөлім",
+        "root": "әскери бөлім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_059"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жауынгерлік ту — әскери бөлімнің сардары және оның жауынгерлік атағының символы."
+    },
+    {
+      "subject": {
+        "surface": "әскери ант",
+        "root": "әскери ант",
+        "pos": "noun"
+      },
+      "predicate": "Causes",
+      "object": {
+        "surface": "қару беру құқығы",
+        "root": "қару беру құқығы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_060"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери антты қабылдағанға дейін әскери қызметшіге қару берілмейді және ол ұрыс міндеттерін орындауға тартылмайды."
+    },
+    {
+      "subject": {
+        "surface": "әскери ант",
+        "root": "әскери ант",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ұрыс міндеті",
+        "root": "ұрыс міндеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_060"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери антты қабылдағанға дейін әскери қызметшіге қару берілмейді және ол ұрыс міндеттерін орындауға тартылмайды."
+    },
+    {
+      "subject": {
+        "surface": "әскери қызметке шақыру",
+        "root": "әскери қызметке шақыру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекеттік іс-шара",
+        "root": "мемлекеттік іс-шара",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_061"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери қызметке шақыру — Қарулы Күштерді жеке құраммен жасақтауға бағытталған мемлекеттік органдар жүргізетін іс-шаралар кешені."
+    },
+    {
+      "subject": {
+        "surface": "әскери қызметке шақыру",
+        "root": "әскери қызметке шақыру",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_061"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери қызметке шақыру — Қарулы Күштерді жеке құраммен жасақтауға бағытталған мемлекеттік органдар жүргізетін іс-шаралар кешені."
+    },
+    {
+      "subject": {
+        "surface": "мерзімді әскери қызмет",
+        "root": "мерзімді әскери қызмет",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "18-27 жас",
+        "root": "18-27 жас",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_062"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мерзімді әскери қызметке он сегіз жастан жиырма жеті жасқа дейінгі ер азаматтар шақырылуға жатады."
+    },
+    {
+      "subject": {
+        "surface": "мерзімді әскери қызмет",
+        "root": "мерзімді әскери қызмет",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ер азамат",
+        "root": "ер азамат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_062"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мерзімді әскери қызметке он сегіз жастан жиырма жеті жасқа дейінгі ер азаматтар шақырылуға жатады."
+    },
+    {
+      "subject": {
+        "surface": "әскерге шақыру",
+        "root": "әскерге шақыру",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "жылына екі рет",
+        "root": "жылына екі рет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_063"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Азаматтарды мерзімді әскери қызметке шақыру жылына екі рет жүргізіледі."
+    },
+    {
+      "subject": {
+        "surface": "әскерге шақыру",
+        "root": "әскерге шақыру",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "мерзімді әскери қызмет",
+        "root": "мерзімді әскери қызмет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_063"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Азаматтарды мерзімді әскери қызметке шақыру жылына екі рет жүргізіледі."
+    },
+    {
+      "subject": {
+        "surface": "әскерге шақыру",
+        "root": "әскерге шақыру",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "президент жарлығы",
+        "root": "президент жарлығы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_064"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскерге шақыру Қазақстан Республикасы Президентінің Жарлығы және Үкімет қаулысы негізінде жүргізіледі."
+    },
+    {
+      "subject": {
+        "surface": "әскерге шақыру",
+        "root": "әскерге шақыру",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "үкімет қаулысы",
+        "root": "үкімет қаулысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_064"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскерге шақыру Қазақстан Республикасы Президентінің Жарлығы және Үкімет қаулысы негізінде жүргізіледі."
+    },
+    {
+      "subject": {
+        "surface": "шақыруды кейінге қалдыру",
+        "root": "шақыруды кейінге қалдыру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери жеңілдік",
+        "root": "әскери жеңілдік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_065"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери қызметке шақыруды кейінге қалдыру отбасы жағдайлары, білім алуы, денсаулық жағдайы және басқа да негіздер бойынша беріледі."
+    },
+    {
+      "subject": {
+        "surface": "шақыруды кейінге қалдыру",
+        "root": "шақыруды кейінге қалдыру",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "төрт негіз",
+        "root": "төрт негіз",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_065"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери қызметке шақыруды кейінге қалдыру отбасы жағдайлары, білім алуы, денсаулық жағдайы және басқа да негіздер бойынша беріледі."
+    },
+    {
+      "subject": {
+        "surface": "білім бойынша кейінге қалдыру",
+        "root": "білім бойынша кейінге қалдыру",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "деңгейіне бір рет",
+        "root": "деңгейіне бір рет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_066"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Білім алуды жалғастыру үшін әскери қызметке шақыруды кейінге қалдыру білім берудің әрбір деңгейі үшін бір рет беріледі."
+    },
+    {
+      "subject": {
+        "surface": "білім бойынша кейінге қалдыру",
+        "root": "білім бойынша кейінге қалдыру",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "шақыруды кейінге қалдыру",
+        "root": "шақыруды кейінге қалдыру",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_066"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Білім алуды жалғастыру үшін әскери қызметке шақыруды кейінге қалдыру білім берудің әрбір деңгейі үшін бір рет беріледі."
+    },
+    {
+      "subject": {
+        "surface": "денсаулық бойынша кейінге қалдыру",
+        "root": "денсаулық бойынша кейінге қалдыру",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "бір жыл",
+        "root": "бір жыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_067"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Денсаулық жағдайы бойынша шақыруды кейінге қалдыру бір жылға дейінгі мерзімге беріледі."
+    },
+    {
+      "subject": {
+        "surface": "денсаулық бойынша кейінге қалдыру",
+        "root": "денсаулық бойынша кейінге қалдыру",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "шақыруды кейінге қалдыру",
+        "root": "шақыруды кейінге қалдыру",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_067"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Денсаулық жағдайы бойынша шақыруды кейінге қалдыру бір жылға дейінгі мерзімге беріледі."
+    },
+    {
+      "subject": {
+        "surface": "әскерге шақыру комиссиясы",
+        "root": "әскерге шақыру комиссиясы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекеттік орган",
+        "root": "мемлекеттік орган",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_068"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскерге шақыру комиссиясы — азаматтарды әскери қызметке шақыруды ұйымдастыратын жергілікті орган."
+    },
+    {
+      "subject": {
+        "surface": "әскерге шақыру комиссиясы",
+        "root": "әскерге шақыру комиссиясы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскерге шақыру",
+        "root": "әскерге шақыру",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_068"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскерге шақыру комиссиясы — азаматтарды әскери қызметке шақыруды ұйымдастыратын жергілікті орган."
+    },
+    {
+      "subject": {
+        "surface": "азамат",
+        "root": "азамат",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "шағымдану құқығы",
+        "root": "шағымдану құқығы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_069"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Аудандық немесе облыстық маңызы бар қаланың әскерге шақыру комиссиясының шешіміне азамат заңда белгіленген тәртіппен шағым жасай алады."
+    },
+    {
+      "subject": {
+        "surface": "шағым",
+        "root": "шағым",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскерге шақыру комиссиясы",
+        "root": "әскерге шақыру комиссиясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_069"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Аудандық немесе облыстық маңызы бар қаланың әскерге шақыру комиссиясының шешіміне азамат заңда белгіленген тәртіппен шағым жасай алады."
+    },
+    {
+      "subject": {
+        "surface": "запастағы офицер",
+        "root": "запастағы офицер",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "29 жасқа дейін",
+        "root": "29 жасқа дейін",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_070"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Запастағы офицерлер бейбіт уақытта жиырма тоғыз жасқа дейін әскери қызметке шақырылуы мүмкін."
+    },
+    {
+      "subject": {
+        "surface": "запастағы офицер",
+        "root": "запастағы офицер",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "бейбіт уақыт шақыруы",
+        "root": "бейбіт уақыт шақыруы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_070"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Запастағы офицерлер бейбіт уақытта жиырма тоғыз жасқа дейін әскери қызметке шақырылуы мүмкін."
+    },
+    {
+      "subject": {
+        "surface": "медицина запастағы офицер",
+        "root": "медицина запастағы офицер",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "32 жасқа дейін",
+        "root": "32 жасқа дейін",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_071"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Медицина қызметінің запастағы офицерлері отыз екі жасқа дейін әскери қызметке шақырылуы мүмкін."
+    },
+    {
+      "subject": {
+        "surface": "медицина запастағы офицер",
+        "root": "медицина запастағы офицер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "запастағы офицер",
+        "root": "запастағы офицер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_071"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Медицина қызметінің запастағы офицерлері отыз екі жасқа дейін әскери қызметке шақырылуы мүмкін."
+    },
+    {
+      "subject": {
+        "surface": "жас сарбаз",
+        "root": "жас сарбаз",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "кемінде 2 жыл даярлық",
+        "root": "кемінде 2 жыл даярлық",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_072"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жас сарбаз — кемінде екі жыл әскерге шақыруға дейінгі тереңдетілген даярлықтан өткен жасөспірім."
+    },
+    {
+      "subject": {
+        "surface": "жас сарбаз",
+        "root": "жас сарбаз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери даярлық оқушысы",
+        "root": "әскери даярлық оқушысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_072"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жас сарбаз — кемінде екі жыл әскерге шақыруға дейінгі тереңдетілген даярлықтан өткен жасөспірім."
+    },
+    {
+      "subject": {
+        "surface": "жас айбын",
+        "root": "жас айбын",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери даярлық оқушысы",
+        "root": "әскери даярлық оқушысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_073"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жас айбын — әскерге шақыруға дейінгі даярлық бойынша қосымша білімнің бағдарламалары бойынша оқитын азамат."
+    },
+    {
+      "subject": {
+        "surface": "жас айбын",
+        "root": "жас айбын",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскерге шақыруға дейінгі даярлық",
+        "root": "әскерге шақыруға дейінгі даярлық",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_073"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жас айбын — әскерге шақыруға дейінгі даярлық бойынша қосымша білімнің бағдарламалары бойынша оқитын азамат."
+    },
+    {
+      "subject": {
+        "surface": "жұмылдыру шақыруы",
+        "root": "жұмылдыру шақыруы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "президент жарлығы",
+        "root": "президент жарлығы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_074"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жұмылдыру кезінде, соғыс жағдайында және соғыс уақытында әскерге шақыру Қазақстан Республикасы Президентінің Жарлығы негізінде жүргізіледі."
+    },
+    {
+      "subject": {
+        "surface": "жұмылдыру шақыруы",
+        "root": "жұмылдыру шақыруы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери шақыру түрі",
+        "root": "әскери шақыру түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_074"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жұмылдыру кезінде, соғыс жағдайында және соғыс уақытында әскерге шақыру Қазақстан Республикасы Президентінің Жарлығы негізінде жүргізіледі."
+    },
+    {
+      "subject": {
+        "surface": "жергілікті әскери басқару органы",
+        "root": "жергілікті әскери басқару органы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекеттік мекеме",
+        "root": "мемлекеттік мекеме",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_075"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жергілікті әскери басқару органы — азаматтардың әскери есебін жүргізетін аудандық немесе қалалық деңгейдегі мемлекеттік мекеме."
+    },
+    {
+      "subject": {
+        "surface": "жергілікті әскери басқару органы",
+        "root": "жергілікті әскери басқару органы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери есеп",
+        "root": "әскери есеп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_075"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жергілікті әскери басқару органы — азаматтардың әскери есебін жүргізетін аудандық немесе қалалық деңгейдегі мемлекеттік мекеме."
+    },
+    {
+      "subject": {
+        "surface": "шақыру қағазы",
+        "root": "шақыру қағазы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ресми құжат",
+        "root": "ресми құжат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_076"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шақыру қағазы — азаматты әскери қызметке шақыруды растайтын ресми құжат."
+    },
+    {
+      "subject": {
+        "surface": "шақыру қағазы",
+        "root": "шақыру қағазы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскерге шақыру",
+        "root": "әскерге шақыру",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_076"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шақыру қағазы — азаматты әскери қызметке шақыруды растайтын ресми құжат."
+    },
+    {
+      "subject": {
+        "surface": "контрактілік әскери қызмет",
+        "root": "контрактілік әскери қызмет",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери қызмет түрі",
+        "root": "әскери қызмет түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_077"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Контрактілік әскери қызмет — азамат пен уәкілетті орган арасындағы келісімшарт негізінде өткерілетін әскери қызмет."
+    },
+    {
+      "subject": {
+        "surface": "контрактілік әскери қызмет",
+        "root": "контрактілік әскери қызмет",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "келісімшарт",
+        "root": "келісімшарт",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_077"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Контрактілік әскери қызмет — азамат пен уәкілетті орган арасындағы келісімшарт негізінде өткерілетін әскери қызмет."
+    },
+    {
+      "subject": {
+        "surface": "шақырудан босату",
+        "root": "шақырудан босату",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери жеңілдік",
+        "root": "әскери жеңілдік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_078"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери қызметке шақырылудан босату — азаматтың денсаулық жағдайы немесе басқа заңда көзделген негіздер бойынша әскери қызметке шақырылмауы."
+    },
+    {
+      "subject": {
+        "surface": "шақырудан босату",
+        "root": "шақырудан босату",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскерге шақыру",
+        "root": "әскерге шақыру",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_078"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери қызметке шақырылудан босату — азаматтың денсаулық жағдайы немесе басқа заңда көзделген негіздер бойынша әскери қызметке шақырылмауы."
     },
     {
       "subject": {

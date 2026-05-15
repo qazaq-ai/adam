@@ -21,6 +21,62 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.31.5] — 2026-05-15 — New domain `military_kz`: 78 facts from open МО РК statutory documents
+
+**Patch milestone — content addition.** New world_core domain seeded with **78 curated facts** extracted from openly-available Kazakhstani military statutory documents. Prepares for МО РК pitch on 26 May 2026 with a working demo where a Kazakh-language military question gets a deterministic answer with a citation chain.
+
+### What's in `data/world_core/military_kz.jsonl`
+
+Source: **Law of the Republic of Kazakhstan No. 561-IV «On military service and the status of military servicemen»** ([adilet:Z1200000561](https://adilet.zan.kz/kaz/docs/Z1200000561), public domain under Art. 8 of the KZ Copyright Law). Plus oath text from Decree No. 870 of 25.08.1992.
+
+Coverage:
+
+- **Basic terms (12 facts)** — `әскери қызмет`, `әскери қызметші`, `әскери атақ`, `әскери билет`, `әскери лауазым`, conscription category nouns.
+- **Ranks (28 facts)** — full hierarchy of 16 ranks from `қатардағы жауынгер` to `армия генералы`, with tenure requirements (1y for кіші сержант, 2y сержант, … 7y подполковник).
+- **Bridge facts (8 facts)** — `кіші офицер` / `аға офицер` / `жоғары офицер` linking ranks → category → `әскери қызметші` (enables R1 transitivity chains).
+- **Military oath (12 facts)** — definition, who takes (срочники / контрактники / курсанты / military-faculty students / reservists), when (within 2 months of induction; Defender's Day eve for students), where (Battle Banner ceremony), consequences (no weapon issued before oath).
+- **Conscription (18 facts)** — age 18–27, twice a year, four deferment categories (family / education / health / other), conscription commission, fitness categories, contract service.
+
+### Demo verification
+
+20/20 demo questions return `Иә, X — Y. Дәлел тізбегі: X → … → Y.` with a valid citation chain. Best test of R1 transitivity:
+
+```
+Q: Лейтенант — офицер ме?
+A: Иә, Лейтенант — офицер. Дәлел тізбегі: лейтенант → кіші офицер → офицер.
+```
+
+The 2-hop chain proves the reasoner is composing inferences across our explicit bridge facts, not just looking up flat triples.
+
+### What changed numerically
+
+- `data/world_core/`: **3124 → 3202 entries** (+78), **3404 → 3487 raw jsonl facts** (+83), **60 → 61 domains** (new: `military_kz`).
+- `data/retrieval/facts.json`: **3404 → 3566 total facts** (world_core + text-extracted).
+- `data/retrieval/facts.json`: regenerated via `extract_facts world_core_refresh`; reasoning rules unchanged.
+- `data/retrieval/derived_facts.json`: 37 062 unchanged (the rules don't extend the curated military facts further on this scale; future batches will).
+- README + `data/README.md` + `data/world_core/README.md`: badge / live-totals refreshed.
+
+### Why patch milestone (x.31.5)
+
+No code change; pure data addition. Per the post-v1.0.0 cadence:  «patch milestone .5 = small / incremental functional changes». 78 facts in a new domain are incremental — though strategically significant because they unlock the МО РК pitch demo path.
+
+### Verified
+
+- `cargo fmt --all --check` clean.
+- `cargo run --release --bin validate_world_core` — **3202 / 3202 approved**.
+- `cargo run --release --bin extract_facts -- world_core_refresh` — clean rebuild.
+- `cargo test --workspace --locked` — green.
+- `cargo clippy --workspace --all-targets` — clean.
+- `verify_release_version.sh 5.31.5` + `check_metrics_currency.sh` green.
+- 20/20 demo questions pass with citation chains.
+- **GitHub Actions CI verified green** on push (Rust + Release workflows).
+
+### What's next (post-pitch / v5.32.0+)
+
+- Batch 5: ВС РК structure facts from Law 29-III «On defence and the Armed Forces».
+- Batch 6: basic discipline from the four общевоинских уставов (Decree No. 364).
+- NVTP school textbook terminology (Kazakh-language military vocabulary expansion).
+
 ## [5.31.0] — 2026-05-15 — Voice arc V7: drop barge_in_capture from REPL; remove raw-input echo from unknown fallback
 
 **Minor.** Two coupled live-test bugs from 2026-05-15 («Сколько бы я потом не говорил 'Сәлем', он похоже не слышал меня»):
