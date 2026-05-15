@@ -467,9 +467,9 @@
     {
       "id": "ask_knowledge_lists_what_adam_knows_v4_6_0",
       "category": "system_identity",
-      "description": "v4.6.0: «Не білесің?» (standalone, no `туралы`) routes to SystemAspect::Knowledge and surfaces the world_core inventory digest.",
+      "description": "v4.6.0: «Не білесің?» (standalone, no `туралы`) routes to SystemAspect::Knowledge and surfaces the world_core inventory digest. v5.30.0 rewrote knowledge_summary from the ~50-word wall (which started «Менің білімім 38 саладан құралған.») into a 2-sentence high-level handshake: «Қазақстан жайында (география, тарих, әдебиет, танымал тұлғалар), мектеп пәндері (...), бағдарламалау тілі және жалпы білім жайында деректерім бар. Қай тақырыпты нақтырақ қарасаңыз — сұрағыңызды қойыңыз.» Substring assertion follows the new shape — «деректерім бар» is structural to the brief invitation; detailed lists surface on-demand via retrieval when the user asks specifically.",
       "turns": [
-        {"user": "Не білесің?", "output_contains_lower_any": ["менің білімім"]}
+        {"user": "Не білесің?", "output_contains_lower_any": ["деректерім бар", "қазақстан жайында"]}
       ]
     },
     {

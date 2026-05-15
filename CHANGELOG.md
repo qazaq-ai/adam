@@ -21,6 +21,23 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.30.5] — 2026-05-15 — CI fix: repl_replay knowledge fixture aligned with v5.30.0 brief summary
+
+**Patch.** v5.30.0 shipped with green local tests but red GitHub CI — the `repl_replay_baseline` integration test pinned the substring «менің білімім» from the *pre*-v5.30.0 knowledge_summary wall, which no longer appears in the new 2-sentence brief overview («Қазақстан жайында … деректерім бар. Қай тақырыпты нақтырақ қарасаңыз — сұрағыңызды қойыңыз»). Local pre-push `cargo test --workspace` happened to skip `repl_replay` (some local Cargo state) while CI's `--locked` invocation ran it and surfaced the regression.
+
+### What changed
+
+[data/eval/repl_dialogs.json](data/eval/repl_dialogs.json) `ask_knowledge_lists_what_adam_knows_v4_6_0` assertion updated from `["менің білімім"]` to `["деректерім бар", "қазақстан жайында"]` — both structural to the new brief invitation; either matches.
+
+### Verified
+
+- `cargo test -p adam-dialog --test repl_replay --locked` — green locally (1 / 1 passed; the integration test reports a single aggregate result over 17 system_identity dialogs).
+- Process lesson: ALWAYS check CI conclusion via `gh`/curl after every push — Local + CI test environments diverge.
+
+### Why x.30.5 (patch)
+
+Pure CI-only fix; no behavioural change. v5.30.0's intent (brief invitation > full domain dump) stands.
+
 ## [5.30.0] — 2026-05-15 — Conversational responses: drop «достым», compact capabilities/knowledge summaries
 
 **Minor.** Three live-test dialog complaints from 2026-05-15:
