@@ -21,6 +21,63 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.29.0] — 2026-05-15 — Barge-in onset hardening: 500 ms continuous + 2.5× threshold during TTS playback
+
+**Minor.** Closes the «озвучивание всего текста ответа не происходит — произносится примерно два-три слова, а дальше остается не озвученным» complaint that survived v5.28.5's playback-rate fix. Speech rate is now correct, but with built-in MacBook Air speakers + mic, AEC3's residual echo was enough to false-fire the v5.27.0 onset detector after ~100 ms of TTS playback — TTS got killed by adam's own voice every turn, regardless of the v5.27.5 25 % volume duck.
+
+### Root cause
+
+[`MicCapture::barge_in_capture`](crates/adam-voice/src/mic.rs) onset criterion pre-v5.29.0:
+
+```rust
+if !onset_fired && speech_accum >= Duration::from_millis(100) {
+    onset_fired = true;
+    cb();  // tts.interrupt()
+}
+```
+
+100 ms of supra-threshold RMS fires onset. On a built-in laptop speaker + built-in mic ≈ 30 cm apart, AEC3 leaves enough residual after each TTS phoneme burst (~30–100 ms) to push RMS over the configured 0.02 × i16::MAX threshold. By the time `say` has emitted 2–3 words, residual energy crosses the bar and the on_onset callback fires `tts.interrupt()` on adam's own voice. The mic then captures the echo tail decay + any genuine user speech, Whisper transcribes the mostly-silence-or-echo, the kernel responds, and the loop repeats with TTS killed after 2–3 words every turn.
+
+### What changed
+
+Two combined defences in `barge_in_capture`:
+
+**1. Queue-aware threshold multiplier.** When the shared render queue holds at least one AEC frame of audio (160 samples at 16 kHz = 10 ms — i.e., TTS is actively producing samples right now), the effective RMS threshold is multiplied by **2.5×**:
+
+```rust
+let queue_active = queue.lock().map(|q| q.len() >= FRAME_SAMPLES).unwrap_or(false);
+let effective_threshold = if queue_active { threshold * 2.5 } else { threshold };
+```
+
+Real user speech captured by the near-mic during barge-in is much louder than the post-AEC echo residual, so the higher bar reliably filters out self-triggering while keeping genuine user-interrupts responsive.
+
+**2. Onset duration 100 ms → 500 ms continuous.** Echo residuals are bursty (microseconds of poorly-cancelled tail per cpal callback); requiring half a second of *sustained* speech energy filters out those bursts. Humans speaking through TTS sustain energy easily past 500 ms — the only barge-in cases that fail are «short single-word interrupts» («ок», «стоп»), which are rare in dialog and recoverable on the next listen cycle.
+
+Why both, not just one: the threshold-multiplier alone might leak if echo residual happens to be 2.5× the configured floor (loud playback + soft user voice); the duration alone might leak if AEC keeps emitting 700+ ms of continuous low-grade residual (the «long echo tail» case on poor acoustics). The conjunction handles both axes.
+
+### Why this didn't surface before v5.29.0 testing
+
+- **v5.27.0:** Initial real-time barge-in. Tested on AirPods (hardware isolation makes AEC trivial; residual is negligible). 100 ms threshold felt responsive.
+- **v5.27.5 / v5.28.0:** TTS rate slowed + duck deepened. But playback was at 2.18× speed (the v5.28.5 bug), so listeners couldn't tell whether the «TTS too short» symptom was the slow-down working or something else.
+- **v5.28.5:** Playback rate fixed → TTS now plays at intended tempo. With TTS lasting longer (real speed), the false-onset window is now clearly visible: TTS gets ~2–3 words out before residual energy crosses the 100 ms onset bar.
+
+### Verified
+
+- `cargo fmt --all --check` clean.
+- `cargo test --workspace` — workspace passes; adam-voice 63 unchanged (barge_in_capture is exercised via real cpal in integration, not unit-tested due to audio device dependency).
+- `cargo clippy --workspace --all-targets` — clean both feature configurations.
+- `verify_release_version.sh 5.29.0` + `check_metrics_currency.sh` green.
+
+### Why x.29.0 (minor)
+
+Kernel-signature feature (real-time barge-in detection) gets a substantial behavioural change. New `queue_active` defence + 5× longer onset duration shift the false-positive / false-negative trade-off significantly. Per the post-v1.0.0 cadence policy, kernel-signature tuning is minor-bump material.
+
+### Known limitations carried forward
+
+- **Short single-word barge-in interrupts (< 500 ms)** no longer fire onset; user has to sustain speech or wait for TTS to finish naturally. Acceptable trade for stable multi-sentence playback.
+- **AEC3 still imperfect on built-in MacBook Air speakers** — the conjunction defence handles the common case; pathological echo paths (very loud playback, mic gain auto-up) may still leak.
+- **No male Kazakh voice on macOS** — `--tts-voice Yuri` workaround until v5.x Piper voice bank.
+
 ## [5.28.5] — 2026-05-15 — Critical playback-rate bug fix: WAV samples now resampled to device rate
 
 **Patch milestone — critical bug fix.** Closes the «голос на большой скорости, что ничего не понятно» complaint that survived every TTS-rate flag tuning since v5.26.5 (when `say` migrated to WAV → cpal playback). The slow-down attempts in v5.27.5 (`-r 150`) and v5.28.0 (`-r 130`) had only ~10 % effect because the underlying playback was running ~2.18× too fast regardless — `say` writes WAV at 22050 Hz, the cpal output device runs at 48000 Hz, and `play_wav_at_volume` was feeding the 22050 Hz samples directly to a 48 kHz output stream without resampling. Effective playback speed: ~2.18×.

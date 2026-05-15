@@ -458,10 +458,48 @@ impl MicCapture {
                 }
                 // Run VAD on the cleaned frame.
                 let rms = rms_amplitude(&clean_i16);
-                if rms >= threshold {
+                // **v5.29.0** — TTS-active aware onset detection.
+                // Pre-v5.29.0 the onset detector fired after only
+                // 100 ms of supra-threshold energy with no awareness
+                // of whether TTS was currently playing. Live testing
+                // on built-in MacBook Air speakers (2026-05-15)
+                // showed AEC3 + 25 % duck still left enough residual
+                // echo to false-fire onset after ~100 ms, killing
+                // TTS after 2–3 words and re-entering the listen
+                // loop — the «озвучивание всего текста ответа не
+                // происходит» complaint.
+                //
+                // Two defences combined:
+                //
+                // 1. `queue_active` — when the shared render queue
+                //    has audio waiting (TTS actively producing
+                //    samples), require RMS 2.5× the configured
+                //    threshold. Real user speech captured by the
+                //    near-mic is much louder than the post-AEC echo
+                //    residual, so the higher bar reliably filters
+                //    out self-triggering while keeping genuine
+                //    barge-in responsive.
+                //
+                // 2. Onset duration 100 ms → 500 ms continuous.
+                //    Echo residuals are bursty (microseconds of
+                //    poorly-cancelled tail per cpal callback);
+                //    requiring half a second of *sustained* speech
+                //    energy filters out those bursts while still
+                //    feeling responsive — humans speaking through
+                //    TTS sustain energy easily past 500 ms.
+                let queue_active = queue
+                    .lock()
+                    .map(|q| q.len() >= FRAME_SAMPLES)
+                    .unwrap_or(false);
+                let effective_threshold = if queue_active {
+                    threshold * 2.5
+                } else {
+                    threshold
+                };
+                if rms >= effective_threshold {
                     speech_accum += frame_duration;
                     silence_accum = Duration::ZERO;
-                    if !onset_fired && speech_accum >= Duration::from_millis(100) {
+                    if !onset_fired && speech_accum >= Duration::from_millis(500) {
                         // **Onset detected.** Fire the callback
                         // (typically tts.interrupt()) and start
                         // accumulating from this frame onward.
