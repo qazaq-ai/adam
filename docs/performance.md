@@ -1,4 +1,4 @@
-# Performance — adam v5.31.5
+# Performance — adam v5.31.6
 
 ## Headline KPI: cost per correct answer
 

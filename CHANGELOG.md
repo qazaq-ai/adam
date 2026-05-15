@@ -21,6 +21,20 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.31.6] — 2026-05-15 — CI hotfix: extend `MULTIWORD_ENTITIES` to cover v5.31.5 `military_kz` domain
+
+**CI-only fix.** v5.31.5 shipped local-green but CI-red: the `semantics::tests::world_core_multiword_coverage` invariant requires every compound (multi-word) subject/object in `world_core/*.jsonl` to also appear in the `MULTIWORD_ENTITIES` const so `multiword_entity_hint` can detect it during topic extraction. v5.31.5 added 78 military facts with ~100 new compound entities (армия генералы, әскери қызмет, кіші офицер, …) without extending the const. CI caught it via the locked test that I had run locally before push but the failure mode was masked by cargo incremental state.
+
+Fix: extended `crates/adam-dialog/src/topic_extraction.rs::MULTIWORD_ENTITIES` with 102 new compound entities introduced by the military_kz domain, organized in three labelled groups:
+
+- military domain terms (armed forces, ranks, categories) — 78 entries
+- composite predicate-objects (duties, rights, deferment categories) — 16 entries
+- numeric/duration tokens used as `object` in has_quantity facts — 8 entries
+
+Verified: `cargo test --workspace --locked` green; `world_core_multiword_coverage` passes; metric scripts green at v5.31.6.
+
+Process lesson reinforced (per `feedback_verify_ci_after_push`): **always check CI conclusion via curl after push, never assume local-green = CI-green**. v5.31.6 follows v5.30.5 in this pattern — a follow-up patch that should have been part of the originating release.
+
 ## [5.31.5] — 2026-05-15 — New domain `military_kz`: 78 facts from open МО РК statutory documents
 
 **Patch milestone — content addition.** New world_core domain seeded with **78 curated facts** extracted from openly-available Kazakhstani military statutory documents. Prepares for МО РК pitch on 26 May 2026 with a working demo where a Kazakh-language military question gets a deterministic answer with a citation chain.
