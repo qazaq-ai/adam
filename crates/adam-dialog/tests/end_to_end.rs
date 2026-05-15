@@ -377,7 +377,15 @@ fn unknown_gibberish() {
 
 #[test]
 fn response_greeting_casual() {
-    assert_response_in_set("сәлем", &["сәлем", "сәлем достым"]);
+    // **v5.30.0** — «сәлем достым» dropped from the greeting.casual
+    // rotation; live test (2026-05-15) showed «друг»-style address
+    // felt presumptuous from a system that doesn't actually know
+    // the user. Replaced with «сәлем, қалыңыз қалай» (neutral well-
+    // being follow-up). The two slot-bearing variants
+    // («сәлем, {name_respect}» / «… {city|ablative} …») only fire
+    // when the session carries the corresponding entity, so the
+    // bare «сәлем» response holds for a no-session-state call.
+    assert_response_in_set("сәлем", &["сәлем", "сәлем, қалыңыз қалай"]);
 }
 
 #[test]
@@ -1043,11 +1051,15 @@ fn conversation_without_name_never_emits_unfilled_greeting() {
     let mut conv = Conversation::new();
     // No introduction: no name in session. Every seed must produce a
     // literal-only greeting. v4.6.5 — sentence-cased + period (≥10 chars).
+    // **v5.30.0** — «достым» variant replaced with the neutral well-
+    // being follow-up «сәлем, қалыңыз қалай» (live test surfaced
+    // «друг»-style address as presumptuous from a system that doesn't
+    // know the user).
     for seed in 0..16u64 {
         let out = conv.turn("сәлем", &lex, &repo, seed);
         assert!(!out.contains("{"), "slot placeholder leaked: {out:?}");
         assert!(
-            out == "Сәлем" || out == "Сәлем достым.",
+            out == "Сәлем" || out == "Сәлем, қалыңыз қалай.",
             "unexpected greeting w/o name: {out:?}"
         );
     }

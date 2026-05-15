@@ -21,6 +21,54 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.30.0] — 2026-05-15 — Conversational responses: drop «достым», compact capabilities/knowledge summaries
+
+**Minor.** Three live-test dialog complaints from 2026-05-15:
+
+1. **«Сәлем»** rotated to **«Сәлем достым»** on a second-iteration seed pick — «друг» felt presumptuous from a system that doesn't actually know the user.
+2. **«Сен не білесің?»** dumped the full 38-domain wall of text every time, instead of a 2–3 sentence overview with «спросите конкретнее».
+3. User directive: «нужно отвечать по короче и в общих чертах. А не перечислять все поименно, по фально и все подробности и детали. Это надо делать, когда спросят конкретно и детали.»
+
+### What changed
+
+**1. `greeting.casual` template** ([data/dialog/templates/v1.toml:21](data/dialog/templates/v1.toml)) — «сәлем достым» dropped from the 4-variant rotation; replaced with «сәлем, қалыңыз қалай» (neutral well-being follow-up). The remaining variants («сәлем», personalised with `{name_respect}`, personalised + city) all stay; bare «сәлем» is still the dominant pick when the session carries no entities.
+
+**2. `SystemIdentity::capabilities_summary` + `knowledge_summary`** ([crates/adam-dialog/src/system_identity.rs:155](crates/adam-dialog/src/system_identity.rs)) — rewrote both walls of text into 2-sentence handshakes that end with «Қай тақырыпты білгіңіз келеді?» / «Сұрағыңызды қойыңыз». The detailed per-domain lists still live in `world_core/*.jsonl` — when the user asks specifically («Қазақстанның өзендері?» / «Тарихтан не білесің?») the retrieval ranker surfaces the relevant subset via grounded fact citation. The high-level summary is now the *invitation*, not the *dump*.
+
+Before / after:
+
+```
+- "Менің білімім 38 саладан құралған. Мектеп пәндері: математика,
+   информатика, физика (механика, термодинамика, электр, оптика, атом
+   физикасы), химия (периодтық жүйе, химиялық байланыстар, реакциялар,
+   ерітінділер, органикалық химия), биология (жасуша, өсімдіктер,
+   жануарлар, адам ағзасы, генетика, экология), … (~30 more lines)"
+
++ "Қазақстан жайында (география, тарих, әдебиет, танымал тұлғалар),
+   мектеп пәндері (математика, физика, химия, биология, тарих),
+   бағдарламалау тілі және жалпы білім жайында деректерім бар. Қай
+   тақырыпты нақтырақ қарасаңыз — сұрағыңызды қойыңыз."
+```
+
+**3. Test fixture updated** — `response_greeting_casual` in [tests/end_to_end.rs:380](crates/adam-dialog/tests/end_to_end.rs) accepts the new variant set; doc-comment block in [src/templates.rs:9](crates/adam-dialog/src/templates.rs) updated to the new sample row.
+
+### Verified
+
+- `cargo fmt --all --check` clean.
+- `cargo test --workspace` — all green; `response_greeting_casual` + `conversation_without_name_never_emits_unfilled_greeting` fixtures updated to assert the new variant set («Сәлем» / «Сәлем, қалыңыз қалай.»).
+- `cargo clippy --workspace --all-targets` — clean both feature configurations.
+- `verify_release_version.sh 5.30.0` + `check_metrics_currency.sh` green.
+
+### Why minor (x.30.0)
+
+User-observable response shape changes for two of the most common dialog patterns (greeting, capabilities-self-introspection). Kernel signature feature (system_identity rendering) gets a substantial behavioural rewrite. Per the post-v1.0.0 cadence policy, behavioural changes visible to every relevant intent call qualify as minor.
+
+### Known limitations carried forward
+
+- **«Менің атым.» (Whisper-mishearing) → proverb fallback.** Live test still surfaced «Қысқаша айтсам, Ат бағасы иеленеді» when Whisper truncated a greeting to «Менің атым.». Root cause: retrieval ranker matches short input substrings (ат = «horse» in proverb) ahead of intent recognition. Fix planned v5.30.5 — short-input gating + name-introduction-without-name recognition.
+- **No mid-TTS barge-in** (carried from v5.29.5).
+- **No male Kazakh voice on macOS** (carried).
+
 ## [5.29.5] — 2026-05-15 — Voice arc V6.5: wait-then-listen + global Whisper dedup (real-time mode, no self-interrupt)
 
 **Patch milestone.** Closes two persistent user complaints from the 2026-05-15 live-test session — symptoms that survived every v5.27–v5.29.0 tuning attempt:

@@ -6,7 +6,7 @@
 //!
 //! [[families]]
 //! key = "greeting.casual"
-//! templates = ["сәлем", "сәлем достым"]
+//! templates = ["сәлем", "сәлем, қалыңыз қалай"]
 //! ```
 //!
 //! The repository is a flat `key → Vec<String>` map. Keys use dotted
