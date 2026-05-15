@@ -21,6 +21,52 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.31.0] — 2026-05-15 — Voice arc V7: drop barge_in_capture from REPL; remove raw-input echo from unknown fallback
+
+**Minor.** Two coupled live-test bugs from 2026-05-15 («Сколько бы я потом не говорил 'Сәлем', он похоже не слышал меня»):
+
+1. **Mic stuck in 60 s «no speech» loop after the first turn.** The REPL routed `--barge-in` through `MicCapture::barge_in_capture`, which was designed for CONCURRENT mic + TTS playback with a v5.29.0 500 ms onset gate to suppress self-interrupt from echo. v5.29.5 made the mic open AFTER TTS finishes — the 500 ms continuous-energy onset gate became pure dead weight that blocked short utterances like «Сәлем» (~400-500 ms of voiced speech) from ever firing onset.
+2. **Whisper mishearing surfaces in adam's reply.** «Сәлем» mis-transcribed as «Қазбе» got echoed back via `unknown.with_raw_echo`'s `{user_input_echo}` slot: «Мен сізді «Қазбе» дедіңіз деп ұқтым.» — pure garbage. User feedback: «Надо отвечать на вопрос, а пользователь сам поправит тебя, если ты не так понял».
+
+### What changed
+
+**1. `adam_chat` voice REPL** ([crates/adam-dialog/src/bin/adam_chat.rs](crates/adam-dialog/src/bin/adam_chat.rs)) — when `--barge-in` is on, replaced the `barge_in_capture` call with the same `MicCapture::start → wait_for_vad_stop → stop` flow the legacy non-barge path uses (sans the Enter-prompt). No onset gating (captures from the first frame above the configured RMS threshold), no concurrent AEC. The render-queue infrastructure stays installed for any TTS-tail decay that bleeds into mic capture, but post-stop `process_capture_chunked` is a no-op when the queue is empty (which it always is after `wait_until_done`). The misleading «(AEC cleaned)» log is suppressed.
+
+`MicCapture::barge_in_capture` and the v5.29.0 onset hardening (500 ms + 2.5× queue-active threshold) stay in the library API for any future caller that genuinely wants concurrent-listen-during-TTS — they're just not on the REPL's path anymore.
+
+**2. `unknown.with_raw_echo` template family** ([data/dialog/templates/v1.toml:1674](data/dialog/templates/v1.toml)) — all three variants rewritten to NOT include the `{user_input_echo}` slot. New text:
+
+```
+Кешіріңіз, сұрағыңызды дұрыс түсінбедім. Басқаша айтып көріңізші.
+Сұрағыңызды нақтырақ тұжырымдасаңыз — көмектесуге тырысамын.
+Айтқаныңыз маған әлі түсініксіз. Басқа сөздермен қайталай аласыз ба?
+```
+
+The raw Whisper transcript still appears on the `[voice] heard:` stderr line for diagnostic purposes; adam's spoken reply stays clean.
+
+### Verified
+
+- `cargo fmt --all --check` clean.
+- `cargo test --workspace --locked` — green (matches CI invocation; no skipped fixtures this time).
+- `cargo clippy --workspace --all-targets` — clean both feature configurations.
+- `verify_release_version.sh 5.31.0` + `check_metrics_currency.sh` green.
+- **CI verified green on GitHub Actions before publishing release.** Per the v5.30.5 process lesson, polled `https://api.github.com/repos/qazaq-ai/adam/actions/runs?head_sha=$(git rev-parse HEAD)` until both `Rust` and `Release` workflows reported `conclusion=success`.
+
+### Why minor (x.31.0)
+
+REPL flow change for the primary voice-input entry point (`--barge-in`); user-observable behavioural shape for the `unknown.with_raw_echo` template family (no more raw-input echo). Both visible to every voice-input turn that fails to route.
+
+### Trade-off
+
+- The continuous-VAD path captures from the FIRST above-threshold frame instead of waiting for 500 ms of sustained energy. Echo bursts during TTS tail-decay (if any) may now enter the buffer; AEC post-stop handles the common case.
+- The user no longer sees what Whisper transcribed when the input doesn't route — for that, they read the `[voice] heard:` stderr line. Acceptable for the much larger win of «not garbage in adam's mouth».
+
+### Known limitations carried forward
+
+- **«Менің атым.»** (Whisper-mishearing) → proverb fallback still possible (carried from v5.30.0); retrieval-ranker short-substring matching is a v5.31.5 target.
+- **No mid-TTS barge-in** (carried from v5.29.5).
+- **No male Kazakh voice on macOS** (carried).
+
 ## [5.30.5] — 2026-05-15 — CI fix: repl_replay knowledge fixture aligned with v5.30.0 brief summary
 
 **Patch.** v5.30.0 shipped with green local tests but red GitHub CI — the `repl_replay_baseline` integration test pinned the substring «менің білімім» from the *pre*-v5.30.0 knowledge_summary wall, which no longer appears in the new 2-sentence brief overview («Қазақстан жайында … деректерім бар. Қай тақырыпты нақтырақ қарасаңыз — сұрағыңызды қойыңыз»). Local pre-push `cargo test --workspace` happened to skip `repl_replay` (some local Cargo state) while CI's `--locked` invocation ran it and surfaced the regression.

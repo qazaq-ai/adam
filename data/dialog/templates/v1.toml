@@ -1672,10 +1672,24 @@ templates = [
 # both could fire — echo is more informative than name-only chat.
 [[families]]
 key = "unknown.with_raw_echo"
+# **v5.31.0** — drop the raw-input echo entirely. Pre-v5.31.0 the
+# three variants echoed the user's input via the {user_input_echo}
+# slot («Сізді «{user_input_echo}» деп ұқтым…»). On voice-input live
+# tests this fed Whisper-mishearings («Қазбе» for «Сәлем», «Танасыз
+# кім» for nothing-said) straight back to the user as if adam had
+# heard them confidently — pure garbage echo. User feedback
+# (2026-05-15): «Надо отвечать на вопрос, а пользователь сам
+# поправит тебя, если ты не так понял», then more directly: «На мое
+# приветствие ответил мне «Мен сізді 'Қазбе' дедіңіз деп ұқтым».
+# Replaced with three neutral «didn't catch that, please rephrase»
+# variants that do NOT include the raw input. The {user_input_echo}
+# slot is no longer consulted by this family. Detail-curious users
+# can still see the raw Whisper transcript on the `[voice] heard:`
+# stderr line — adam's spoken reply stays clean.
 templates = [
-    "Сізді «{user_input_echo}» деп ұқтым, бірақ нақты мағынасын аңғара алмадым. Басқа сөздермен айтып жіберсеңіз — нақтырақ жауап беремін.",
-    "Менің естуімде «{user_input_echo}» болды. Бірақ бұл туралы нақты дерек таппадым. Сұрағыңызды басқаша қойсаңыз — көмектесуге тырысамын.",
-    "Мен сізді «{user_input_echo}» дедіңіз деп ұқтым. Дұрыс ұқтым ба? Қайта айтсаңыз немесе сұрағыңызды басқаша тұжырымдасаңыз — нақтырақ жауап беремін.",
+    "Кешіріңіз, сұрағыңызды дұрыс түсінбедім. Басқаша айтып көріңізші.",
+    "Сұрағыңызды нақтырақ тұжырымдасаңыз — көмектесуге тырысамын.",
+    "Айтқаныңыз маған әлі түсініксіз. Басқа сөздермен қайталай аласыз ба?",
 ]
 
 # **v4.53.5** — Context-aware clarify. Routes from the planner when

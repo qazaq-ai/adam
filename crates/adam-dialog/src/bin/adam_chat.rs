@@ -715,10 +715,32 @@ fn run_voice_repl(
         // The mic stays open for up to 60 s of silence before we
         // assume the user has stepped away; at that point we loop
         // back and re-open for the next utterance.
-        let mut samples_already_clean = false;
-        let raw_samples_from_barge_in: Option<Vec<i16>> = if let Some((aec_mutex, queue)) =
-            aec_state.as_ref().filter(|_| barge_in)
-        {
+        // **v5.31.0 — Voice arc V7 (drop barge_in_capture from REPL).**
+        // Pre-v5.31.0 the REPL routed `--barge-in` through
+        // `MicCapture::barge_in_capture`, which was designed for
+        // CONCURRENT mic+TTS with 500 ms onset gating (v5.29.0)
+        // to avoid self-interrupt from echo. But v5.29.5 wait-then-
+        // listen means the mic NEVER opens during TTS playback any
+        // more — the 500 ms continuous-energy onset gate is now
+        // pure dead weight: short utterances like «Сәлем» (~400-
+        // 500 ms of voiced speech) sit right at the boundary and
+        // can fail to fire onset, leaving the mic in a 60-second
+        // «no speech» loop while the user speaks repeatedly.
+        //
+        // 2026-05-15 live-test bug: «Сколько бы я потом не говорил
+        // 'Сәлем', он похоже не слышал меня, потому что
+        // (no speech in 60 s; restarting mic)».
+        //
+        // Fix: route `--barge-in` through the same
+        // wait_for_vad_stop → stop flow the legacy non-barge path
+        // uses, just without the Enter-prompt. No onset gating
+        // (captures from the very first frame above threshold),
+        // no AEC during capture (the render queue is empty after
+        // wait_until_done anyway), but AEC post-stop processing
+        // still runs below for any TTS-tail decay reverb in the
+        // captured tail.
+        let samples_already_clean = false;
+        let raw_samples_from_barge_in: Option<Vec<i16>> = if barge_in {
             let cap = match MicCapture::start(MicConfig::default()) {
                 Ok(c) => c,
                 Err(e) => {
@@ -727,67 +749,24 @@ fn run_voice_repl(
                 }
             };
             eprintln!(
-                "[voice] ● listening (real-time barge-in) — speak whenever you want; \
+                "[voice] ● listening (continuous VAD) — speak whenever you want; \
                      mic auto-stops on silence after speech."
             );
             io::stderr().lock().flush().ok();
-            let mut aec_guard = match aec_mutex.lock() {
-                Ok(g) => g,
-                Err(_) => {
-                    eprintln!("[voice] AEC mutex poisoned");
-                    continue;
-                }
-            };
-            // **v5.29.5 — Voice arc V6.5 (wait-then-listen).**
-            // Pre-v5.29.5 the on_onset callback fired `tts.interrupt()`
-            // the moment user-speech onset was detected, killing
-            // adam's own TTS playback. The combination of (1)
-            // unavoidable AEC residual on built-in MacBook Air
-            // speakers and (2) Whisper hallucinating long fake
-            // dialog from short echo bursts caused two persistent
-            // user complaints:
-            //
-            //   1. «Произносится примерно два-три слова, а дальше
-            //      остается не озвученным» — TTS interrupted on its
-            //      own echo.
-            //   2. «Иногда говорит то, что я не спрашивал» — adam
-            //      replied to hallucinated user-clauses fabricated
-            //      from echo.
-            //
-            // Fix: the REPL now calls `tts.wait_until_done()` BEFORE
-            // entering this barge_in_capture loop (see the
-            // tts.speak(...) site below). By the time the mic
-            // opens, TTS is silent, the render queue is drained,
-            // and there's no echo to leak. The on_onset callback is
-            // now a pure no-op — we keep `barge_in_capture` for its
-            // continuous-listen + AEC-clean infrastructure, but
-            // never interrupt anything.
-            let outcome = cap.barge_in_capture(
-                &mut aec_guard,
-                queue,
-                std::time::Duration::from_secs(60),
-                || {
-                    // v5.29.5 — no-op. See above.
-                },
-            );
-            drop(aec_guard);
-            match outcome {
-                Ok(adam_voice::BargeInOutcome::Captured(s)) => {
-                    eprintln!("[voice] (AEC-cleaned utterance captured)");
-                    samples_already_clean = true;
-                    Some(s)
-                }
-                Ok(adam_voice::BargeInOutcome::MaxDuration(s)) => {
-                    eprintln!("[voice] hard cap reached during utterance; transcribing partial");
-                    samples_already_clean = true;
-                    Some(s)
-                }
-                Ok(adam_voice::BargeInOutcome::NoSpeech) => {
-                    eprintln!("[voice] (no speech in 60 s; restarting mic)");
-                    continue;
+            match cap.wait_for_vad_stop() {
+                Ok(VadStopReason::Silence) => {}
+                Ok(VadStopReason::MaxDuration) => {
+                    eprintln!("[voice] hard cap reached; transcribing what was captured");
                 }
                 Err(e) => {
-                    eprintln!("[voice] barge-in capture failed: {e}");
+                    eprintln!("[voice] VAD wait failed: {e}");
+                    continue;
+                }
+            }
+            match cap.stop() {
+                Ok(s) => Some(s),
+                Err(e) => {
+                    eprintln!("[voice] mic stop failed: {e}");
                     continue;
                 }
             }
@@ -867,15 +846,20 @@ fn run_voice_repl(
         // When the barge-in path was taken, `samples_already_clean`
         // is true and we skip this pass (the barge_in_capture method
         // already cleaned each frame in real-time).
+        // **v5.31.0** — post-stop AEC stays available for the
+        // legacy Enter-prompt path (in case the user's
+        // push-to-talk session overlapped the previous TTS tail),
+        // but on the continuous-VAD path the mic only opens AFTER
+        // `tts.wait_until_done()` returns, so the render queue is
+        // drained — AEC has silent reference frames to subtract
+        // against, equivalent to a no-op. The «(AEC cleaned)» log
+        // is suppressed in that case to avoid misleading the user.
         let samples = if samples_already_clean {
             raw_samples
         } else if let Some((aec_mutex, queue)) = aec_state.as_ref() {
             match aec_mutex.lock() {
                 Ok(mut aec) => match process_capture_chunked(&mut aec, queue, &raw_samples) {
-                    Ok(cleaned) => {
-                        eprintln!("[voice] (AEC cleaned)");
-                        cleaned
-                    }
+                    Ok(cleaned) => cleaned,
                     Err(e) => {
                         eprintln!("[voice] AEC processing failed: {e}; using raw mic samples");
                         raw_samples
