@@ -104,6 +104,25 @@ pub trait TtsBackend: Send + Sync {
     fn set_volume_gain(&self, gain: f32) {
         let _ = gain;
     }
+
+    /// **v5.29.5 — Voice arc V6.5 (wait-then-listen).** Block until
+    /// the most-recent `speak()` finishes playing. Default no-op.
+    ///
+    /// Why this exists: pre-v5.29.5 the voice REPL opened the mic
+    /// while TTS was still playing (the v5.27.0 «real-time barge-in»
+    /// design). Even with v5.29.0's onset-hardening (500 ms + 2.5×
+    /// threshold when render queue is active), AEC residual on
+    /// built-in MacBook speakers leaked enough echo into mic capture
+    /// that Whisper hallucinated nonsense («Менің атым Дәулет.
+    /// Танасыз кім?» × 8 from 0.9 s of echo) — and adam replied to
+    /// the hallucinations, saying things the user never asked.
+    ///
+    /// The fix: wait for TTS to fully finish, THEN open the mic. No
+    /// concurrent capture, no echo in the buffer, no fake clauses.
+    /// Trade-off: user can no longer interrupt mid-TTS (acceptable —
+    /// previous turn's reply plays fully). The «real-time mode» from
+    /// the user's perspective remains: no Enter-prompt to speak.
+    fn wait_until_done(&self) {}
 }
 
 /// No-op backend for tests and disabled-TTS callers.
@@ -415,6 +434,30 @@ impl TtsBackend for OsTtsBackend {
         #[cfg(not(feature = "voice"))]
         {
             let _ = gain;
+        }
+    }
+
+    /// **v5.29.5** — block until the in-flight playback finishes
+    /// naturally (cursor reaches end of buffer). Polls every 50 ms;
+    /// audio durations are seconds, so the polling overhead is
+    /// negligible. Only meaningful under `feature = "voice"` — the
+    /// legacy direct-`say` path returns immediately after spawning
+    /// the child and we have no handle to poll.
+    fn wait_until_done(&self) {
+        #[cfg(feature = "voice")]
+        {
+            loop {
+                let still_playing = self
+                    .current
+                    .lock()
+                    .ok()
+                    .map(|guard| guard.as_ref().is_some_and(|h| !h.is_finished()))
+                    .unwrap_or(false);
+                if !still_playing {
+                    return;
+                }
+                std::thread::sleep(std::time::Duration::from_millis(50));
+            }
         }
     }
 }
@@ -734,6 +777,27 @@ impl TtsBackend for PiperTtsBackend {
         #[cfg(not(feature = "voice"))]
         {
             let _ = gain;
+        }
+    }
+
+    /// **v5.29.5** — same polling-on-`PlaybackHandle.is_finished` as
+    /// [`OsTtsBackend::wait_until_done`]; see that doc-comment for
+    /// rationale.
+    fn wait_until_done(&self) {
+        #[cfg(feature = "voice")]
+        {
+            loop {
+                let still_playing = self
+                    .current
+                    .lock()
+                    .ok()
+                    .map(|guard| guard.as_ref().is_some_and(|h| !h.is_finished()))
+                    .unwrap_or(false);
+                if !still_playing {
+                    return;
+                }
+                std::thread::sleep(std::time::Duration::from_millis(50));
+            }
         }
     }
 }

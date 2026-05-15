@@ -21,6 +21,69 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.29.5] — 2026-05-15 — Voice arc V6.5: wait-then-listen + global Whisper dedup (real-time mode, no self-interrupt)
+
+**Patch milestone.** Closes two persistent user complaints from the 2026-05-15 live-test session — symptoms that survived every v5.27–v5.29.0 tuning attempt:
+
+1. **«Произносится примерно два-три слова, а дальше остается не озвученным»** — adam's TTS interrupted on its own echo.
+2. **«Иногда говорит то, что я не спрашивал»** — adam replied to Whisper-hallucinated clauses that never existed in user speech.
+
+User directive: «диалог в реальном режиме оставим, а вот фичу прерывание диалога уберем».
+
+### Root cause (combined)
+
+Pre-v5.29.5 the voice REPL opened the mic **while TTS was still playing** (the v5.27.0 «real-time barge-in» design). Even with v5.29.0's 500 ms / 2.5× onset hardening, residual echo on built-in MacBook Air speakers leaked into the captured buffer. Whisper-large-v3-turbo, given a 0.9 s clip of mostly-echo, hallucinated long interleaved repetition patterns like:
+
+```
+Сау бол. Менің атым Дәулет. Танасыз кім?
+Менің атым Дәулет. Танасыз кім?
+Менің атым Дәулет. Танасыз кім?
+Менің атым. Танасыз кім?
+…
+```
+
+The v5.28.0 `dedupe_whisper_repetitions` was adjacent-only, so the interleaved A.B.A.B.A.B. pattern slipped through. `split_compound_utterance` returned 8+ distinct pieces; each piece got its own kernel turn; the joined response was a long stream of replies to clauses the user never said.
+
+### What changed
+
+**1. `TtsBackend::wait_until_done(&self)`** — new trait method. Default no-op (legacy `say`-via-child path and `NoOpTts`). `OsTtsBackend` and `PiperTtsBackend` under `feature = "voice"` poll their `PlaybackHandle::is_finished` flag every 50 ms until the cursor reaches end-of-buffer.
+
+**2. REPL: `tts.wait_until_done()` BEFORE opening the mic.** Each iteration of the voice REPL now blocks on TTS finishing before entering `barge_in_capture`. Under «no overlap» semantics:
+
+- Mic opens only after TTS has emitted its last sample.
+- No echo in the captured buffer.
+- Whisper has no echo to hallucinate from.
+- AEC residual leakage is moot (mic doesn't run during TTS playback).
+
+The on_onset callback is now a **no-op** (kept for the continuous-listen infrastructure, but never interrupts anything — TTS is already silent by the time the callback could fire).
+
+**3. `dedupe_whisper_repetitions`: global seen-set.** Pre-v5.29.5 dropped consecutive identical clauses only; v5.29.5 maintains a `HashSet` of normalised clauses already emitted and drops any later match. Interleaved patterns A.B.A.B.A.B. now collapse to A.B. Trade-off: legitimate dialog particles like «Иә. Ал сіз? Иә.» collapse to «Иә. Ал сіз?» — acceptable; the user loses one filler particle but never sees fabricated dialog.
+
+### Why this didn't surface before
+
+- **v5.26.5 → v5.28.0:** TTS played at 2.18× speed (the v5.28.5 sample-rate bug); listeners couldn't tell whether the «TTS too short» symptom was the slow-down working or self-interrupt.
+- **v5.28.5:** Playback rate fixed → self-interrupt window became visible.
+- **v5.29.0:** Onset hardening (100 ms → 500 ms + 2.5× during queue-active) made onset less twitchy on long playback, but still leaked on short bursts and didn't address Whisper hallucination from echo.
+- **v5.29.0 live test (2026-05-15):** the conjunction of self-interrupt + Whisper-fabricated-dialog was now isolable — user explicitly named both issues.
+
+### Verified
+
+- `cargo fmt --all --check` clean.
+- `cargo test -p adam-dialog --lib dedupe` — **8 passing** (+3 new tests for interleaved / non-adjacent / mixed real-and-repeats; one v5.28.0 «keeps non-adjacent» test renamed and inverted to assert collapse).
+- `cargo test --workspace` — **1442 passing** (+2 from v5.29.0's 1440, net of one renamed test).
+- `cargo clippy --workspace --all-targets` — clean both feature configurations.
+- `verify_release_version.sh 5.29.5` + `check_metrics_currency.sh` green.
+
+### Why x.29.5 (patch milestone)
+
+Trait API gains a new method (`wait_until_done`), but with a default no-op so all existing backends remain valid without modification. Behavioural change in `dedupe_whisper_repetitions` is more aggressive (collapses more) — strictly safer. REPL flow change (`wait_until_done` before mic) is a pure regression fix for a UX-breaking interaction. No architectural shift; voice arc remains «AEC + VAD on input transducer, deterministic kernel in the middle, OS TTS on output transducer».
+
+### Known limitations carried forward
+
+- **No mid-TTS barge-in.** User can no longer interrupt adam mid-sentence; previous turn's reply plays fully. Acceptable for the «full response + accurate dialog» trade. The continuous-listen feel (no Enter prompt) is preserved.
+- **AEC3 still imperfect on built-in MacBook Air speakers** — now mostly moot because the mic doesn't open during TTS, but `--barge-in` still installs the AEC processor for any post-TTS tail-decay reverb cleanup.
+- **No male Kazakh voice on macOS** — `--tts-voice Yuri` workaround until v5.x Piper voice bank.
+
 ## [5.29.0] — 2026-05-15 — Barge-in onset hardening: 500 ms continuous + 2.5× threshold during TTS playback
 
 **Minor.** Closes the «озвучивание всего текста ответа не происходит — произносится примерно два-три слова, а дальше остается не озвученным» complaint that survived v5.28.5's playback-rate fix. Speech rate is now correct, but with built-in MacBook Air speakers + mic, AEC3's residual echo was enough to false-fire the v5.27.0 onset detector after ~100 ms of TTS playback — TTS got killed by adam's own voice every turn, regardless of the v5.27.5 25 % volume duck.

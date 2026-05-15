@@ -1039,10 +1039,22 @@ pub fn is_ask_previous_error(input: &str) -> bool {
 /// «Сіздің атыңыз Дәулет» rendered lines but only heard the LAST
 /// one fully played.
 ///
-/// This helper folds **consecutive identical clauses** (after light
-/// normalisation: lowercase + whitespace trim) into a single instance.
-/// Non-adjacent duplicates (e.g. legitimate «Иә. Ал сіз? Иә.») stay
-/// untouched because they aren't typical of the Whisper-loop artifact.
+/// This helper folds clauses **that have already been seen** (after
+/// light normalisation: lowercase + whitespace trim + alphabetic-only)
+/// into the first occurrence only. **v5.29.5:** switched from
+/// adjacent-only to global seen-set. Pre-v5.29.5 the dedup only
+/// merged neighbouring identical clauses, which left **interleaved**
+/// repetition patterns untouched. Live test 2026-05-15 produced
+/// «Сау бол. Менің атым Дәулет. Танасыз кім? Менің атым Дәулет.
+/// Танасыз кім? … (×4)» — adjacent dedup couldn't fold this because
+/// the A.B.A.B.A.B. pattern alternates two distinct clauses, but
+/// every clause beyond the first pair is a verbatim repeat. The
+/// fix: keep a `HashSet` of normalised clauses already emitted and
+/// drop any subsequent match.
+///
+/// The trade-off is that legitimate dialog patterns like «Иә. Ал
+/// сіз? Иә.» now collapse the second «Иә» — acceptable, the user
+/// loses one filler particle but never sees fabricated dialog.
 ///
 /// Operates on the raw transcript BEFORE splitting; the splitter then
 /// sees a clean «Мен Алматыда тұрамын. Менің атымыз кім?» pair.
@@ -1059,7 +1071,7 @@ pub fn dedupe_whisper_repetitions(input: &str) -> String {
         return trimmed.to_string();
     }
     let mut out: Vec<&str> = Vec::with_capacity(pieces.len());
-    let mut prev_normalised: Option<String> = None;
+    let mut seen: std::collections::HashSet<String> = std::collections::HashSet::new();
     for piece in pieces {
         let normalised: String = piece
             .chars()
@@ -1070,18 +1082,18 @@ pub fn dedupe_whisper_repetitions(input: &str) -> String {
             .collect::<Vec<_>>()
             .join(" ");
         if normalised.is_empty() {
-            // Pure punctuation slop — keep but don't update prev so
-            // the next clause can still dedupe against the LAST
-            // content-bearing piece.
+            // Pure punctuation slop — keep but don't pollute the
+            // seen-set with empty strings (would silently drop every
+            // legitimate sentence after the first empty marker).
             out.push(piece);
             continue;
         }
-        if prev_normalised.as_deref() == Some(normalised.as_str()) {
-            // Drop this duplicate.
+        if !seen.insert(normalised) {
+            // Already saw this clause earlier (adjacent or
+            // interleaved) — drop it.
             continue;
         }
         out.push(piece);
-        prev_normalised = Some(normalised);
     }
     out.join("")
 }
@@ -1298,13 +1310,51 @@ mod compound_utterance_tests_v5150 {
     }
 
     /// Non-adjacent duplicates stay (legitimate use of repeated
-    /// affirmation): «Иә. Дұрыс. Иә.» should keep both «Иә.»
+    /// **v5.29.5** — non-adjacent duplicates are now collapsed too.
+    /// Pre-v5.29.5 adjacent-only dedup left interleaved repetition
+    /// patterns A.B.A.B.A.B. untouched. The fix uses a global seen-
+    /// set; the trade-off is that legitimate echo affirmations like
+    /// «Иә. Дұрыс. Иә.» collapse to «Иә. Дұрыс.» — acceptable for
+    /// the much larger win of killing fabricated dialog.
     #[test]
-    fn dedupe_keeps_non_adjacent_duplicates_v5280() {
+    fn dedupe_collapses_non_adjacent_duplicates_v5295() {
         let raw = "Иә. Дұрыс. Иә.";
         let cleaned = dedupe_whisper_repetitions(raw);
-        // Both «Иә.» should remain — they're separated by «Дұрыс.»
-        assert_eq!(cleaned.matches("Иә").count(), 2);
+        // Only the first «Иә.» survives; the second is a repeat.
+        assert_eq!(cleaned.matches("Иә").count(), 1);
+        // The unique middle clause is preserved.
+        assert!(cleaned.contains("Дұрыс"));
+    }
+
+    /// **v5.29.5** — the interleaved Whisper-hallucination case
+    /// from the 2026-05-15 live test: A.B.A.B.A.B.A.B. → A.B.
+    #[test]
+    fn dedupe_collapses_interleaved_repetition_pattern_v5295() {
+        let raw = "Менің атым Дәулет. Танасыз кім? Менің атым Дәулет. Танасыз кім? \
+                   Менің атым Дәулет. Танасыз кім?";
+        let cleaned = dedupe_whisper_repetitions(raw);
+        // Each unique clause appears exactly once after dedup.
+        assert_eq!(cleaned.matches("Менің атым").count(), 1);
+        assert_eq!(cleaned.matches("Танасыз").count(), 1);
+    }
+
+    /// **v5.29.5** — short echo-hallucination that mixed two
+    /// independent clauses with three different ones from real
+    /// short audio. All distinct clauses pass through; repeats
+    /// drop.
+    #[test]
+    fn dedupe_keeps_distinct_real_clauses_when_some_repeat_v5295() {
+        let raw = "Сау бол. Менің атым Дәулет. Танасыз кім? Менің атым Дәулет. \
+                   Танасыз кім? Менің атым. Танасыз кім?";
+        let cleaned = dedupe_whisper_repetitions(raw);
+        // Sau bol (1), Менің атым Дәулет (1), Танасыз кім (1),
+        // Менің атым (1, distinct from "Менің атым Дәулет").
+        assert!(cleaned.contains("Сау бол"));
+        assert!(cleaned.contains("Менің атым Дәулет"));
+        assert!(cleaned.contains("Танасыз"));
+        // «Менің атым.» without «Дәулет» normalises differently and
+        // survives — but only the FIRST occurrence.
+        assert_eq!(cleaned.matches("Танасыз").count(), 1);
     }
 }
 

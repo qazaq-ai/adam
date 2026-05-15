@@ -687,25 +687,34 @@ fn run_voice_repl(
     let stdin = io::stdin();
     let mut prompt_line = String::new();
     loop {
-        // **v5.27.0 — Voice arc V5 (real-time barge-in).** When the
+        // **v5.29.5 — Voice arc V6.5 (wait-then-listen).** Before
+        // opening the mic for this iteration, block until any
+        // still-playing TTS from the previous turn has finished
+        // emitting samples. Without this, the mic captures echo of
+        // adam's own voice → AEC residual leaks into the buffer →
+        // Whisper hallucinates user-style clauses → adam replies to
+        // fabrications. Default `wait_until_done()` is a no-op
+        // (NoOpTts / legacy `say` path); the in-process backends
+        // (OS-say + Piper under `feature = "voice"`) poll their
+        // PlaybackHandle's `is_finished` flag every 50 ms until the
+        // cursor reaches end-of-buffer.
+        if let Some(tts) = tts_handle {
+            tts.wait_until_done();
+        }
+        // **v5.27.0 — Voice arc V5 (continuous listen).** When the
         // `--barge-in` flag is on AND we have a shared AEC processor,
         // use the continuous-listen polling path: `MicCapture::
         // barge_in_capture` opens the mic immediately (no Enter
-        // prompt), polls + AEC-cleans new samples every 50 ms, fires
-        // `tts.interrupt()` the moment user speech onset is detected
-        // (interrupting any still-playing TTS), then continues
-        // capturing the utterance to its end-of-VAD-silence terminus.
+        // prompt), polls + AEC-cleans new samples every 50 ms, then
+        // continues capturing the utterance to its end-of-VAD-silence
+        // terminus. **v5.29.5 — Voice arc V6.5:** the on_onset
+        // callback is now a no-op (TTS is already finished by the
+        // time we reach this loop body, so there's nothing to
+        // interrupt anyway).
         //
         // The mic stays open for up to 60 s of silence before we
         // assume the user has stepped away; at that point we loop
         // back and re-open for the next utterance.
-        // **v5.27.0 — Voice arc V5 (real-time barge-in).** When
-        // `--barge-in` is on AND we have a shared AEC processor,
-        // skip the Enter prompt + legacy capture and use
-        // `MicCapture::barge_in_capture` for continuous-listen with
-        // real-time onset detection. The samples returned are
-        // already AEC-cleaned, so we bypass the post-stop AEC pass
-        // further down via the `samples_already_clean` flag.
         let mut samples_already_clean = false;
         let raw_samples_from_barge_in: Option<Vec<i16>> = if let Some((aec_mutex, queue)) =
             aec_state.as_ref().filter(|_| barge_in)
@@ -729,15 +738,36 @@ fn run_voice_repl(
                     continue;
                 }
             };
+            // **v5.29.5 — Voice arc V6.5 (wait-then-listen).**
+            // Pre-v5.29.5 the on_onset callback fired `tts.interrupt()`
+            // the moment user-speech onset was detected, killing
+            // adam's own TTS playback. The combination of (1)
+            // unavoidable AEC residual on built-in MacBook Air
+            // speakers and (2) Whisper hallucinating long fake
+            // dialog from short echo bursts caused two persistent
+            // user complaints:
+            //
+            //   1. «Произносится примерно два-три слова, а дальше
+            //      остается не озвученным» — TTS interrupted on its
+            //      own echo.
+            //   2. «Иногда говорит то, что я не спрашивал» — adam
+            //      replied to hallucinated user-clauses fabricated
+            //      from echo.
+            //
+            // Fix: the REPL now calls `tts.wait_until_done()` BEFORE
+            // entering this barge_in_capture loop (see the
+            // tts.speak(...) site below). By the time the mic
+            // opens, TTS is silent, the render queue is drained,
+            // and there's no echo to leak. The on_onset callback is
+            // now a pure no-op — we keep `barge_in_capture` for its
+            // continuous-listen + AEC-clean infrastructure, but
+            // never interrupt anything.
             let outcome = cap.barge_in_capture(
                 &mut aec_guard,
                 queue,
                 std::time::Duration::from_secs(60),
                 || {
-                    if let Some(tts) = tts_handle {
-                        tts.interrupt();
-                        eprintln!("[voice] (barge-in: TTS interrupted)");
-                    }
+                    // v5.29.5 — no-op. See above.
                 },
             );
             drop(aec_guard);
