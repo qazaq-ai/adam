@@ -1,7 +1,7 @@
 {
-  "version": "5.31.0",
+  "version": "5.31.6",
   "status": "completed",
-  "elapsed_s": 59,
+  "elapsed_s": 70,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,19 +18,19 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3566,
+    "facts_total": 3650,
     "by_predicate": {
       "after": 8,
       "causes": 28,
       "does_to": 1,
       "goes_to": 26,
-      "has": 75,
-      "has_quantity": 55,
+      "has": 81,
+      "has_quantity": 56,
       "in_domain": 24,
-      "is_a": 2925,
+      "is_a": 2963,
       "lives_in": 8,
-      "part_of": 244,
-      "related_to": 172
+      "part_of": 260,
+      "related_to": 195
     },
     "by_pack": {
       "abai_wikisource_pack.json": 6,
@@ -72,7 +72,7 @@
       "world_core/mathematics_basic.jsonl": 93,
       "world_core/measurements.jsonl": 18,
       "world_core/medicine_basic.jsonl": 12,
-      "world_core/military_kz.jsonl": 162,
+      "world_core/military_kz.jsonl": 246,
       "world_core/music_kz.jsonl": 24,
       "world_core/natural_phenomena.jsonl": 28,
       "world_core/notable_kazakhstanis.jsonl": 55,
@@ -37264,6 +37264,1686 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Әскери қызметке шақырылудан босату — азаматтың денсаулық жағдайы немесе басқа заңда көзделген негіздер бойынша әскери қызметке шақырылмауы."
+    },
+    {
+      "subject": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "агрессияға тойтарыс беру міндеті",
+        "root": "агрессияға тойтарыс беру міндеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_079"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарулы Күштер агрессияға тойтарыс беруге және Қазақстан Республикасының аумақтық тұтастығы мен егемендігін қаруланып қорғауға арналған."
+    },
+    {
+      "subject": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "аумақтық тұтастық",
+        "root": "аумақтық тұтастық",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_079"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарулы Күштер агрессияға тойтарыс беруге және Қазақстан Республикасының аумақтық тұтастығы мен егемендігін қаруланып қорғауға арналған."
+    },
+    {
+      "subject": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "объект күзету міндеті",
+        "root": "объект күзету міндеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_080"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарулы Күштер мемлекеттік және әскери объектілерді күзетуге, әуе кеңістігін қорғауға және заңсыз қарулы құралымдарға қарсы күрес жүргізуге арналған."
+    },
+    {
+      "subject": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әуе кеңістігі",
+        "root": "әуе кеңістігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_080"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарулы Күштер мемлекеттік және әскери объектілерді күзетуге, әуе кеңістігін қорғауға және заңсыз қарулы құралымдарға қарсы күрес жүргізуге арналған."
+    },
+    {
+      "subject": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "әскери басқару органдары",
+        "root": "әскери басқару органдары",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_081"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарулы Күштер құрамына әскери басқару органдары, Қарулы Күштердің түрлері, Арнаулы операциялар күштері, әскерлер түрі, арнаулы әскерлер, аумақтық әскерлер, әскери оқу орындары және әскери-ғылыми мекемелер кіреді."
+    },
+    {
+      "subject": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "түрлері",
+        "root": "түрлері",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_081"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарулы Күштер құрамына әскери басқару органдары, Қарулы Күштердің түрлері, Арнаулы операциялар күштері, әскерлер түрі, арнаулы әскерлер, аумақтық әскерлер, әскери оқу орындары және әскери-ғылыми мекемелер кіреді."
+    },
+    {
+      "subject": {
+        "surface": "әскери басқару органы",
+        "root": "әскери басқару органы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекеттік орган",
+        "root": "мемлекеттік орган",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_082"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери басқару органы — Қарулы Күштердің құрамына кіретін, әскери қызметке басшылық ететін орган."
+    },
+    {
+      "subject": {
+        "surface": "әскери басқару органы",
+        "root": "әскери басқару органы",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_082"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери басқару органы — Қарулы Күштердің құрамына кіретін, әскери қызметке басшылық ететін орган."
+    },
+    {
+      "subject": {
+        "surface": "арнаулы операциялар күштері",
+        "root": "арнаулы операциялар күштері",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери бөлім",
+        "root": "әскери бөлім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_083"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Арнаулы операциялар күштері — Қарулы Күштер құрамына кіретін арнайы әскери бөлімдер."
+    },
+    {
+      "subject": {
+        "surface": "арнаулы операциялар күштері",
+        "root": "арнаулы операциялар күштері",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_083"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Арнаулы операциялар күштері — Қарулы Күштер құрамына кіретін арнайы әскери бөлімдер."
+    },
+    {
+      "subject": {
+        "surface": "аумақтық әскерлер",
+        "root": "аумақтық әскерлер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскер түрі",
+        "root": "әскер түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_084"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Аумақтық әскерлер — Қарулы Күштердің аумақтық қорғанысын қамтамасыз ететін әскерлер."
+    },
+    {
+      "subject": {
+        "surface": "аумақтық әскерлер",
+        "root": "аумақтық әскерлер",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_084"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Аумақтық әскерлер — Қарулы Күштердің аумақтық қорғанысын қамтамасыз ететін әскерлер."
+    },
+    {
+      "subject": {
+        "surface": "арнаулы әскерлер",
+        "root": "арнаулы әскерлер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскер түрі",
+        "root": "әскер түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_085"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Арнаулы әскерлер құрамына инженерлік, барлау, радиациялық, химиялық және биологиялық қорғаныс әскерлері кіреді."
+    },
+    {
+      "subject": {
+        "surface": "инженерлік әскерлер",
+        "root": "инженерлік әскерлер",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "арнаулы әскерлер",
+        "root": "арнаулы әскерлер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_085"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Арнаулы әскерлер құрамына инженерлік, барлау, радиациялық, химиялық және биологиялық қорғаныс әскерлері кіреді."
+    },
+    {
+      "subject": {
+        "surface": "барлау әскерлері",
+        "root": "барлау әскерлері",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскер түрі",
+        "root": "әскер түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_086"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Барлау әскерлері — арнаулы әскерлердің бір түрі."
+    },
+    {
+      "subject": {
+        "surface": "барлау әскерлері",
+        "root": "барлау әскерлері",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "арнаулы әскерлер",
+        "root": "арнаулы әскерлер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_086"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Барлау әскерлері — арнаулы әскерлердің бір түрі."
+    },
+    {
+      "subject": {
+        "surface": "мтқ әскерлері",
+        "root": "мтқ әскерлері",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскер түрі",
+        "root": "әскер түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_087"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Материалдық-техникалық қамтамасыз ету әскерлері — Қарулы Күштерді жабдықтаумен айналысатын әскерлер."
+    },
+    {
+      "subject": {
+        "surface": "мтқ әскерлері",
+        "root": "мтқ әскерлері",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_087"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Материалдық-техникалық қамтамасыз ету әскерлері — Қарулы Күштерді жабдықтаумен айналысатын әскерлер."
+    },
+    {
+      "subject": {
+        "surface": "әскери оқу орны",
+        "root": "әскери оқу орны",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оқу мекемесі",
+        "root": "оқу мекемесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_088"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери оқу орындары — Қарулы Күштер құрамына кіретін офицерлер мен сержанттарды даярлайтын мекемелер."
+    },
+    {
+      "subject": {
+        "surface": "әскери оқу орны",
+        "root": "әскери оқу орны",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_088"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери оқу орындары — Қарулы Күштер құрамына кіретін офицерлер мен сержанттарды даярлайтын мекемелер."
+    },
+    {
+      "subject": {
+        "surface": "әскери-ғылыми мекеме",
+        "root": "әскери-ғылыми мекеме",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ғылыми мекеме",
+        "root": "ғылыми мекеме",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_089"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери-ғылыми мекемелер — Қарулы Күштер құрамына кіретін әскери ғылыми зерттеулер жүргізетін ұйымдар."
+    },
+    {
+      "subject": {
+        "surface": "әскери-ғылыми мекеме",
+        "root": "әскери-ғылыми мекеме",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_089"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери-ғылыми мекемелер — Қарулы Күштер құрамына кіретін әскери ғылыми зерттеулер жүргізетін ұйымдар."
+    },
+    {
+      "subject": {
+        "surface": "жеке құрам",
+        "root": "жеке құрам",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "әскери қызметші",
+        "root": "әскери қызметші",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_090"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарулы Күштердің жеке құрамына әскери қызметшілер мен азаматтық персонал адамдары кіреді."
+    },
+    {
+      "subject": {
+        "surface": "жеке құрам",
+        "root": "жеке құрам",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "азаматтық персонал",
+        "root": "азаматтық персонал",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_090"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарулы Күштердің жеке құрамына әскери қызметшілер мен азаматтық персонал адамдары кіреді."
+    },
+    {
+      "subject": {
+        "surface": "азаматтық персонал",
+        "root": "азаматтық персонал",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қарулы күштер қызметкері",
+        "root": "қарулы күштер қызметкері",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_091"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Азаматтық персонал — Қарулы Күштерде еңбек заңнамасы негізінде жұмыс істейтін Қазақстан Республикасының азаматтары."
+    },
+    {
+      "subject": {
+        "surface": "азаматтық персонал",
+        "root": "азаматтық персонал",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "еңбек заңнамасы",
+        "root": "еңбек заңнамасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_091"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Азаматтық персонал — Қарулы Күштерде еңбек заңнамасы негізінде жұмыс істейтін Қазақстан Республикасының азаматтары."
+    },
+    {
+      "subject": {
+        "surface": "жоғарғы бас қолбасшы",
+        "root": "жоғарғы бас қолбасшы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "президент лауазымы",
+        "root": "президент лауазымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_092"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жоғарғы Бас Қолбасшы — Қазақстан Республикасы Қарулы Күштеріне әскери-саяси басшылықты жүзеге асыратын Қазақстан Республикасының Президенті."
+    },
+    {
+      "subject": {
+        "surface": "жоғарғы бас қолбасшы",
+        "root": "жоғарғы бас қолбасшы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_092"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жоғарғы Бас Қолбасшы — Қазақстан Республикасы Қарулы Күштеріне әскери-саяси басшылықты жүзеге асыратын Қазақстан Республикасының Президенті."
+    },
+    {
+      "subject": {
+        "surface": "бас штаб",
+        "root": "бас штаб",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери басқару органы",
+        "root": "әскери басқару органы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_093"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бас штаб — Қазақстан Республикасы Қарулы Күштеріне басшылықты жүзеге асыратын жоғарғы әскери орган."
+    },
+    {
+      "subject": {
+        "surface": "бас штаб",
+        "root": "бас штаб",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "қорғаныс министрлігі",
+        "root": "қорғаныс министрлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_093"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бас штаб — Қазақстан Республикасы Қарулы Күштеріне басшылықты жүзеге асыратын жоғарғы әскери орган."
+    },
+    {
+      "subject": {
+        "surface": "қорғаныс министрі",
+        "root": "қорғаныс министрі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекеттік лауазым",
+        "root": "мемлекеттік лауазым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_094"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қорғаныс министрі — бейбіт уақытта Қазақстан Республикасы Қарулы Күштерін Бас штаб арқылы басқаратын мемлекеттік қызметкер."
+    },
+    {
+      "subject": {
+        "surface": "қорғаныс министрі",
+        "root": "қорғаныс министрі",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "бас штаб",
+        "root": "бас штаб",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_094"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қорғаныс министрі — бейбіт уақытта Қазақстан Республикасы Қарулы Күштерін Бас штаб арқылы басқаратын мемлекеттік қызметкер."
+    },
+    {
+      "subject": {
+        "surface": "ставка",
+        "root": "ставка",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери-саяси орган",
+        "root": "әскери-саяси орган",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_095"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ставка — соғыс кезінде Қазақстан Республикасының әскери-саяси басшылығының жоғары органы болып табылатын Жоғарғы Бас қолбасшылық органы."
+    },
+    {
+      "subject": {
+        "surface": "ставка",
+        "root": "ставка",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "соғыс уақыты",
+        "root": "соғыс уақыты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_095"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ставка — соғыс кезінде Қазақстан Республикасының әскери-саяси басшылығының жоғары органы болып табылатын Жоғарғы Бас қолбасшылық органы."
+    },
+    {
+      "subject": {
+        "surface": "қорғаныс министрлігі",
+        "root": "қорғаныс министрлігі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "орталық атқарушы орган",
+        "root": "орталық атқарушы орган",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_096"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қорғаныс министрлігі — Қазақстан Республикасының қорғанысы саласындағы мемлекеттік саясатты іске асыратын орталық атқарушы орган."
+    },
+    {
+      "subject": {
+        "surface": "қорғаныс министрлігі",
+        "root": "қорғаныс министрлігі",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қорғаныс саясаты",
+        "root": "қорғаныс саясаты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_096"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қорғаныс министрлігі — Қазақстан Республикасының қорғанысы саласындағы мемлекеттік саясатты іске асыратын орталық атқарушы орган."
+    },
+    {
+      "subject": {
+        "surface": "запас",
+        "root": "запас",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери резерв",
+        "root": "әскери резерв",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_097"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Запас — мемлекетте Қарулы Күштерді жұмылдыруды өрістету үшін құрылған әскери оқып үйретілген резерв."
+    },
+    {
+      "subject": {
+        "surface": "запас",
+        "root": "запас",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жұмылдыру",
+        "root": "жұмылдыру",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_097"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Запас — мемлекетте Қарулы Күштерді жұмылдыруды өрістету үшін құрылған әскери оқып үйретілген резерв."
+    },
+    {
+      "subject": {
+        "surface": "басқа да әскерлер",
+        "root": "басқа да әскерлер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери ұйым",
+        "root": "әскери ұйым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_098"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Басқа да әскерлер мен әскери құралымдар — Қарулы Күштерден тыс, бірақ қорғаныс мақсаттарына қатысатын Қазақстан Республикасының әскери ұйымдары."
+    },
+    {
+      "subject": {
+        "surface": "басқа да әскерлер",
+        "root": "басқа да әскерлер",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қорғаныс",
+        "root": "қорғаныс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_098"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Басқа да әскерлер мен әскери құралымдар — Қарулы Күштерден тыс, бірақ қорғаныс мақсаттарына қатысатын Қазақстан Республикасының әскери ұйымдары."
+    },
+    {
+      "subject": {
+        "surface": "ұлттық гвардия",
+        "root": "ұлттық гвардия",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери ұйым",
+        "root": "әскери ұйым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_099"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан Республикасы Ұлттық гвардиясы — басқа да әскерлер мен әскери құралымдар құрамына кіретін әскери ұйым."
+    },
+    {
+      "subject": {
+        "surface": "ұлттық гвардия",
+        "root": "ұлттық гвардия",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "басқа да әскерлер",
+        "root": "басқа да әскерлер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_099"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан Республикасы Ұлттық гвардиясы — басқа да әскерлер мен әскери құралымдар құрамына кіретін әскери ұйым."
+    },
+    {
+      "subject": {
+        "surface": "жұмылдыру",
+        "root": "жұмылдыру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекеттік шара",
+        "root": "мемлекеттік шара",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_100"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жұмылдыру — мемлекеттік органдар мен ұйымдарды соғыс уақытының жұмыс істеу режиміне көшіру жөніндегі шаралар жүйесі."
+    },
+    {
+      "subject": {
+        "surface": "жұмылдыру",
+        "root": "жұмылдыру",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "соғыс уақыты",
+        "root": "соғыс уақыты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_100"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жұмылдыру — мемлекеттік органдар мен ұйымдарды соғыс уақытының жұмыс істеу режиміне көшіру жөніндегі шаралар жүйесі."
+    },
+    {
+      "subject": {
+        "surface": "жалпы әскери жарғылар",
+        "root": "жалпы әскери жарғылар",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "президент жарлығымен бекітілген құжат",
+        "root": "президент жарлығымен бекітілген құжат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_101"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жалпы әскери жарғылар — Қазақстан Республикасы Президентінің 2007 жылғы 5 шілдедегі № 364 Жарлығымен бекітілген төрт құжат жиынтығы."
+    },
+    {
+      "subject": {
+        "surface": "жалпы әскери жарғылар",
+        "root": "жалпы әскери жарғылар",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "төрт жарғы",
+        "root": "төрт жарғы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_101"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жалпы әскери жарғылар — Қазақстан Республикасы Президентінің 2007 жылғы 5 шілдедегі № 364 Жарлығымен бекітілген төрт құжат жиынтығы."
+    },
+    {
+      "subject": {
+        "surface": "ішкі қызмет жарғысы",
+        "root": "ішкі қызмет жарғысы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери жарғы",
+        "root": "әскери жарғы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_102"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ішкі қызмет жарғысы — әскери бөлімдегі күнделікті өмір мен қызмет тәртібін айқындайтын негізгі нормативтік құжат."
+    },
+    {
+      "subject": {
+        "surface": "ішкі қызмет жарғысы",
+        "root": "ішкі қызмет жарғысы",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "жалпы әскери жарғылар",
+        "root": "жалпы әскери жарғылар",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_102"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ішкі қызмет жарғысы — әскери бөлімдегі күнделікті өмір мен қызмет тәртібін айқындайтын негізгі нормативтік құжат."
+    },
+    {
+      "subject": {
+        "surface": "тәртіптік жарғы",
+        "root": "тәртіптік жарғы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери жарғы",
+        "root": "әскери жарғы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_103"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тәртіптік жарғы — әскери қызметшілердің тәртібі, көтермелеулері мен жазалары туралы талаптарды белгілейтін нормативтік құжат."
+    },
+    {
+      "subject": {
+        "surface": "тәртіптік жарғы",
+        "root": "тәртіптік жарғы",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "жалпы әскери жарғылар",
+        "root": "жалпы әскери жарғылар",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_103"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тәртіптік жарғы — әскери қызметшілердің тәртібі, көтермелеулері мен жазалары туралы талаптарды белгілейтін нормативтік құжат."
+    },
+    {
+      "subject": {
+        "surface": "гарнизондық жарғы",
+        "root": "гарнизондық жарғы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери жарғы",
+        "root": "әскери жарғы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_104"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Гарнизондық және қарауылдық қызметтер жарғысы — әскери бөлімдердің гарнизондағы және қарауылдағы қызметін айқындайтын жарғы."
+    },
+    {
+      "subject": {
+        "surface": "гарнизондық жарғы",
+        "root": "гарнизондық жарғы",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "жалпы әскери жарғылар",
+        "root": "жалпы әскери жарғылар",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_104"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Гарнизондық және қарауылдық қызметтер жарғысы — әскери бөлімдердің гарнизондағы және қарауылдағы қызметін айқындайтын жарғы."
+    },
+    {
+      "subject": {
+        "surface": "сапы жарғысы",
+        "root": "сапы жарғысы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери жарғы",
+        "root": "әскери жарғы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_105"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сапы жарғысы — әскери қызметшілердің сап тәртіптері мен жалпы әскери шеру әрекеттерін айқындайтын жарғы."
+    },
+    {
+      "subject": {
+        "surface": "сапы жарғысы",
+        "root": "сапы жарғысы",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "жалпы әскери жарғылар",
+        "root": "жалпы әскери жарғылар",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_105"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сапы жарғысы — әскери қызметшілердің сап тәртіптері мен жалпы әскери шеру әрекеттерін айқындайтын жарғы."
+    },
+    {
+      "subject": {
+        "surface": "әскери тәртіп",
+        "root": "әскери тәртіп",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери қағида",
+        "root": "әскери қағида",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_106"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери тәртіп — әскери қызметшілердің заңдар мен жарғыларда белгіленген тәртіпке қатаң және дәл бағынуы."
+    },
+    {
+      "subject": {
+        "surface": "әскери тәртіп",
+        "root": "әскери тәртіп",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "тәртіптік жарғы",
+        "root": "тәртіптік жарғы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_106"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери тәртіп — әскери қызметшілердің заңдар мен жарғыларда белгіленген тәртіпке қатаң және дәл бағынуы."
+    },
+    {
+      "subject": {
+        "surface": "әскери бұйрық",
+        "root": "әскери бұйрық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "командир талабы",
+        "root": "командир талабы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_107"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери бұйрық — командирдің бағынышты әскери қызметшілерге арналған міндетті орындалуға жататын талабы."
+    },
+    {
+      "subject": {
+        "surface": "әскери бұйрық",
+        "root": "әскери бұйрық",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери тәртіп",
+        "root": "әскери тәртіп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_107"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери бұйрық — командирдің бағынышты әскери қызметшілерге арналған міндетті орындалуға жататын талабы."
+    },
+    {
+      "subject": {
+        "surface": "командир",
+        "root": "командир",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери лауазым",
+        "root": "әскери лауазым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_108"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Командир — әскери бөлім немесе бөлімше басқарушысы лауазымы."
+    },
+    {
+      "subject": {
+        "surface": "командир",
+        "root": "командир",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери бөлім",
+        "root": "әскери бөлім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_108"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Командир — әскери бөлім немесе бөлімше басқарушысы лауазымы."
+    },
+    {
+      "subject": {
+        "surface": "бағыныстылық",
+        "root": "бағыныстылық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери қағида",
+        "root": "әскери қағида",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_109"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бағыныстылық — әскери қызметшілер арасындағы лауазым және атақ бойынша иерархия."
+    },
+    {
+      "subject": {
+        "surface": "бағыныстылық",
+        "root": "бағыныстылық",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери тәртіп",
+        "root": "әскери тәртіп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_109"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бағыныстылық — әскери қызметшілер арасындағы лауазым және атақ бойынша иерархия."
+    },
+    {
+      "subject": {
+        "surface": "тәуліктік наряд",
+        "root": "тәуліктік наряд",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери кезекшілік",
+        "root": "әскери кезекшілік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_110"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тәуліктік наряд — әскери бөлімнің ішкі тәртібін, қарудың, оқ-дәрінің және мүліктің сақталуын қамтамасыз ету үшін тағайындалатын кезекшілер құрамы."
+    },
+    {
+      "subject": {
+        "surface": "тәуліктік наряд",
+        "root": "тәуліктік наряд",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери бөлім",
+        "root": "әскери бөлім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_110"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тәуліктік наряд — әскери бөлімнің ішкі тәртібін, қарудың, оқ-дәрінің және мүліктің сақталуын қамтамасыз ету үшін тағайындалатын кезекшілер құрамы."
+    },
+    {
+      "subject": {
+        "surface": "бөлім бойынша кезекші",
+        "root": "бөлім бойынша кезекші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери кезекшілік",
+        "root": "әскери кезекшілік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_111"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бөлім бойынша кезекші — әскери бөлімнің тәуліктік нарядына басшылық ететін офицер."
+    },
+    {
+      "subject": {
+        "surface": "бөлім бойынша кезекші",
+        "root": "бөлім бойынша кезекші",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "тәуліктік наряд",
+        "root": "тәуліктік наряд",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_111"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бөлім бойынша кезекші — әскери бөлімнің тәуліктік нарядына басшылық ететін офицер."
+    },
+    {
+      "subject": {
+        "surface": "қарауыл",
+        "root": "қарауыл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери күзет",
+        "root": "әскери күзет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_112"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарауыл — қарулы күзет шарасы бойынша тағайындалатын әскери қызметшілер тобы."
+    },
+    {
+      "subject": {
+        "surface": "қарауыл",
+        "root": "қарауыл",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "гарнизондық жарғы",
+        "root": "гарнизондық жарғы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_112"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарауыл — қарулы күзет шарасы бойынша тағайындалатын әскери қызметшілер тобы."
+    },
+    {
+      "subject": {
+        "surface": "гарнизон",
+        "root": "гарнизон",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери бірлестік",
+        "root": "әскери бірлестік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_113"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Гарнизон — белгілі бір елді мекенде орналасқан бір немесе бірнеше әскери бөлімдер тобы."
+    },
+    {
+      "subject": {
+        "surface": "гарнизон",
+        "root": "гарнизон",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "гарнизондық жарғы",
+        "root": "гарнизондық жарғы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_113"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Гарнизон — белгілі бір елді мекенде орналасқан бір немесе бірнеше әскери бөлімдер тобы."
+    },
+    {
+      "subject": {
+        "surface": "көтермелеу",
+        "root": "көтермелеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәртіптік шара",
+        "root": "тәртіптік шара",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_114"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Көтермелеу — әскери қызметшіні үлгілі қызметі үшін көтермелейтін шара."
+    },
+    {
+      "subject": {
+        "surface": "көтермелеу",
+        "root": "көтермелеу",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "тәртіптік жарғы",
+        "root": "тәртіптік жарғы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_114"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Көтермелеу — әскери қызметшіні үлгілі қызметі үшін көтермелейтін шара."
+    },
+    {
+      "subject": {
+        "surface": "тәртіптік жаза",
+        "root": "тәртіптік жаза",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәртіптік шара",
+        "root": "тәртіптік шара",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_115"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тәртіптік жаза — әскери тәртіпті бұзған әскери қызметшіге қолданылатын шара."
+    },
+    {
+      "subject": {
+        "surface": "тәртіптік жаза",
+        "root": "тәртіптік жаза",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "тәртіптік жарғы",
+        "root": "тәртіптік жарғы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_115"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тәртіптік жаза — әскери тәртіпті бұзған әскери қызметшіге қолданылатын шара."
+    },
+    {
+      "subject": {
+        "surface": "әскери бөлім",
+        "root": "әскери бөлім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери ұйым",
+        "root": "әскери ұйым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_116"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери бөлім — Қарулы Күштердің ұйымдық-штаттық құрылымдық бірлігі болып табылатын әскери ұйым."
+    },
+    {
+      "subject": {
+        "surface": "әскери бөлім",
+        "root": "әскери бөлім",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_116"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери бөлім — Қарулы Күштердің ұйымдық-штаттық құрылымдық бірлігі болып табылатын әскери ұйым."
+    },
+    {
+      "subject": {
+        "surface": "сап",
+        "root": "сап",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери орналастыру",
+        "root": "әскери орналастыру",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_117"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сап — әскери қызметшілердің бекітілген тәртіппен орналасуы."
+    },
+    {
+      "subject": {
+        "surface": "сап",
+        "root": "сап",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "сапы жарғысы",
+        "root": "сапы жарғысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_117"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сап — әскери қызметшілердің бекітілген тәртіппен орналасуы."
+    },
+    {
+      "subject": {
+        "surface": "шеру",
+        "root": "шеру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери шара",
+        "root": "әскери шара",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_118"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шеру — мерекелік немесе салтанатты іс-шаралар кезінде сапта өткізілетін әскери шара."
+    },
+    {
+      "subject": {
+        "surface": "шеру",
+        "root": "шеру",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "сапы жарғысы",
+        "root": "сапы жарғысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_118"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шеру — мерекелік немесе салтанатты іс-шаралар кезінде сапта өткізілетін әскери шара."
+    },
+    {
+      "subject": {
+        "surface": "сейілдеме",
+        "root": "сейілдеме",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери жеңілдік",
+        "root": "әскери жеңілдік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_119"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сейілдеме — әскери қызметшіге командирдің рұқсатымен әскери бөлім аумағынан тыс уақытша шығу."
+    },
+    {
+      "subject": {
+        "surface": "сейілдеме",
+        "root": "сейілдеме",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ішкі қызмет жарғысы",
+        "root": "ішкі қызмет жарғысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_119"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сейілдеме — әскери қызметшіге командирдің рұқсатымен әскери бөлім аумағынан тыс уақытша шығу."
+    },
+    {
+      "subject": {
+        "surface": "демалыс",
+        "root": "демалыс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери жеңілдік",
+        "root": "әскери жеңілдік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_120"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Демалыс — әскери қызметшіге заңдар мен жарғыларға сәйкес берілетін уақыт."
+    },
+    {
+      "subject": {
+        "surface": "демалыс",
+        "root": "демалыс",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ішкі қызмет жарғысы",
+        "root": "ішкі қызмет жарғысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_120"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Демалыс — әскери қызметшіге заңдар мен жарғыларға сәйкес берілетін уақыт."
     },
     {
       "subject": {

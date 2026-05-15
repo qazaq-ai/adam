@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-5.31.6-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-5.32.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -26,7 +26,7 @@
   <img src="https://img.shields.io/badge/RSS-~160%20MB-2EA44F?style=flat-square" alt="rss">
   <img src="https://img.shields.io/badge/GPU-0%25-2EA44F?style=flat-square" alt="gpu">
   <img src="https://img.shields.io/badge/derived%20facts-37%20062-9CCC65?style=flat-square" alt="derived facts">
-  <img src="https://img.shields.io/badge/world%20core-3202%20curated%20/%203566%20facts%20%2F%2061%20domains-9CCC65?style=flat-square" alt="world core">
+  <img src="https://img.shields.io/badge/world%20core-3244%20curated%20/%203650%20facts%20%2F%2061%20domains-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/lexicon-25.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/intents-41-2EA44F?style=flat-square" alt="intents">
 </p>
@@ -151,7 +151,7 @@ For a full evidence dump on any Kazakh root, run [`adam_inspect`](crates/adam-di
 | GPU usage | **0%** | vs LLM dedicated GPU |
 | Hallucination rate | **0%** (architectural) | verified by graph admissibility tests |
 | Lexicon roots | **25.5 k** | 13.6 k pure Kazakh + 11.9 k Apertium imports |
-| Curated facts | **3 566** (3 202 entries) | across 61 world_core domains; `validate_world_core` enforced in CI |
+| Curated facts | **3 650** (3 244 entries) | across 61 world_core domains; `validate_world_core` enforced in CI |
 | Derived facts | **37 062** | from 10 forward-chaining rules over the curated graph |
 | Dialog intents | **41** | template planner with `{slot\|features}` FST-aware syntax |
 

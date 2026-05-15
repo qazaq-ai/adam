@@ -21,6 +21,77 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.32.0] — 2026-05-15 — `military_kz` doubled: ВС РК structure + discipline (42 new facts from Law 29-III + 4 уставы)
+
+**Minor.** Extends the `military_kz` domain seeded in v5.31.5 with two more thematic batches, **doubling its size** from 60 → 120 facts. Total demo coverage now: definitions / ranks / oath / conscription / **ВС structure / discipline** — a full first-contact knowledge surface for МО РК.
+
+### Batch 5 — ВС РК structure from Law 29-III (22 facts)
+
+Source: **Law 29-III «On defence and the Armed Forces of the Republic of Kazakhstan»** ([adilet:Z050000029_](https://adilet.zan.kz/kaz/docs/Z050000029_)).
+
+- **Purpose** of Armed Forces — repel aggression, protect territorial integrity, guard state objects + airspace.
+- **Composition** — military administration organs, types of АF, Special Operations Forces, special troops (engineer, intelligence, RKhBZ), territorial troops, MTO supply troops, military educational + scientific institutions.
+- **Leadership hierarchy** — President = Commander-in-Chief; wartime Ставка; Бас штаб = General Staff (working organ); Defence Minister commands peacetime via Бас штаб.
+- **Personnel** — military servicemen + civilian personnel.
+- **Reserve** (запас) for mobilization.
+- **Other forces** — National Guard etc., separate from but coordinating with АF.
+
+### Batch 6 — discipline + duties from 4 уставы (20 facts)
+
+Source: **Decree of the President of RK No. 364 of 05.07.2007** approving the four уставы ([adilet:U070000364_](https://adilet.zan.kz/kaz/docs/U070000364_)).
+
+- The 4 уставы themselves: **Ішкі қызмет жарғысы** (Internal Service), **Тәртіптік жарғы** (Disciplinary), **Гарнизондық және қарауылдық қызметтер жарғысы** (Garrison & Guard Service), **Сапы жарғысы** (Drill).
+- Core concepts: военная дисциплина, военный приказ, командир, бағыныстылық (subordination).
+- Daily life: тәуліктік наряд, бөлім бойынша кезекші, қарауыл, гарнизон, сап, шеру, сейілдеме, демалыс.
+- Awards & punishments: көтермелеу, тәртіптік жаза.
+
+### Demo verification
+
+**30/30** sample questions across all 6 batches pass with proof chains:
+
+```
+Q: Лейтенант — офицер ме?
+A: Иә, Лейтенант — офицер. Дәлел тізбегі: лейтенант → кіші офицер → офицер.
+
+Q: Бас штаб — әскери басқару органы ма?
+A: Иә, Бас штаб — әскери басқару органы. Дәлел тізбегі:
+   бас штаб → әскери басқару органы.
+
+Q: Тәртіптік жарғы — әскери жарғы ма?
+A: Иә, Тәртіптік жарғы — әскери жарғы. Дәлел тізбегі:
+   тәртіптік жарғы → әскери жарғы.
+```
+
+### Process discipline applied
+
+Per the new memory `feedback_world_core_multiword_entities_sync` (saved after v5.31.6 hotfix), every new compound subject/object was diffed against `topic_extraction.rs::MULTIWORD_ENTITIES` BEFORE push:
+
+- Batch 5: 33 new compounds added under a v5.32.0 labelled comment.
+- Batch 6: 19 new compounds added.
+- `cargo test world_core_multiword_coverage` green BEFORE commit.
+- `cargo test --workspace --locked` green (matches CI invocation).
+
+### Numerical changes
+
+- `data/world_core/military_kz.jsonl`: 60 → 120 entries (+60); raw facts 84 → 168.
+- `data/world_core/` total: 3202 → 3244 entries (+42); 3487 → 3571 raw jsonl facts (+84).
+- `data/retrieval/facts.json`: 3566 → 3650 total (+84).
+
+### Verified
+
+- `cargo fmt --all --check` clean.
+- `cargo run --release --bin validate_world_core` — 3244 / 3244 approved.
+- `cargo run --release --bin extract_facts -- world_core_refresh` — clean.
+- `cargo test --workspace --locked` — green.
+- `cargo clippy --workspace --all-targets` — clean.
+- `verify_release_version.sh 5.32.0` + `check_metrics_currency.sh` green.
+- 30/30 demo questions pass with citation chains.
+- **GitHub Actions CI green** on push (polled by full HEAD sha).
+
+### Why minor (x.32.0)
+
+Doubles a kernel-signature domain — the military knowledge surface goes from «seeded» to «demo-grade across 6 thematic axes». Per the post-v1.0.0 cadence: «minor = significant capability change». Adding 42 entries / 84 facts that unlock end-to-end demo for the МО РК pitch on 26 May qualifies.
+
 ## [5.31.6] — 2026-05-15 — CI hotfix: extend `MULTIWORD_ENTITIES` to cover v5.31.5 `military_kz` domain
 
 **CI-only fix.** v5.31.5 shipped local-green but CI-red: the `semantics::tests::world_core_multiword_coverage` invariant requires every compound (multi-word) subject/object in `world_core/*.jsonl` to also appear in the `MULTIWORD_ENTITIES` const so `multiword_entity_hint` can detect it during topic extraction. v5.31.5 added 78 military facts with ~100 new compound entities (армия генералы, әскери қызмет, кіші офицер, …) without extending the const. CI caught it via the locked test that I had run locally before push but the failure mode was masked by cargo incremental state.
