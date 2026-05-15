@@ -230,15 +230,16 @@ impl OsTtsBackend {
             args.push("-v".into());
             args.push(v.into());
         }
-        // **v5.27.5** — default speech rate 150 wpm. macOS `say`
-        // default is ~175 wpm, which user feedback (2026-05-14)
-        // described as «тараторит как лилипут, ничего не разобрать».
-        // 150 wpm = ~15% slower; clearer Kazakh pronunciation on the
-        // Aru voice without dragging dialog pacing. Callers who want
-        // a different rate can override by re-constructing the
-        // backend with explicit args.
+        // **v5.28.0** — default speech rate 130 wpm. v5.27.5 set
+        // 150 wpm, but live testing on 2026-05-15 still produced
+        // «говорит очень быстро и непонятно». macOS `say` default
+        // is ~175 wpm; 130 wpm = ~26% slower than default, ~13%
+        // slower than v5.27.5 — closer to a natural human pace on
+        // the Aru voice for Kazakh. Callers who want a different
+        // rate can override by re-constructing the backend with
+        // explicit args.
         args.push("-r".into());
-        args.push("150".into());
+        args.push("130".into());
         Some(Self::new("say".into(), args, voice))
     }
 

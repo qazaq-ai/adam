@@ -1024,6 +1024,68 @@ pub fn is_ask_previous_error(input: &str) -> bool {
 /// **Conservative.** Does NOT split inside code blocks (` ``` ` fences)
 /// or quoted strings («…», "…"). Code submission and quoted speech
 /// stay intact.
+/// **v5.28.0** — collapse Whisper repetition-hallucinations.
+///
+/// Whisper-medium / large occasionally enters a degenerate loop where
+/// it emits the same short clause multiple times in a row. Live test
+/// 2026-05-14 produced «Мен Алматыда тұрамын. Менің атымыз кім?
+/// Менің атымыз кім? … (×16)» when the actual user utterance was a
+/// brief «Менің атым Дәулет.»
+///
+/// The pre-v5.28.0 path passed this transcript verbatim through
+/// `split_compound_utterance` → 17 separate clauses → 17 kernel turns
+/// → 17 separate TTS calls, each one killing the previous (kill-prev
+/// semantics from v5.24.5). User saw 16 nearly-identical
+/// «Сіздің атыңыз Дәулет» rendered lines but only heard the LAST
+/// one fully played.
+///
+/// This helper folds **consecutive identical clauses** (after light
+/// normalisation: lowercase + whitespace trim) into a single instance.
+/// Non-adjacent duplicates (e.g. legitimate «Иә. Ал сіз? Иә.») stay
+/// untouched because they aren't typical of the Whisper-loop artifact.
+///
+/// Operates on the raw transcript BEFORE splitting; the splitter then
+/// sees a clean «Мен Алматыда тұрамын. Менің атымыз кім?» pair.
+pub fn dedupe_whisper_repetitions(input: &str) -> String {
+    let trimmed = input.trim();
+    if trimmed.is_empty() {
+        return String::new();
+    }
+    // Split on sentence-terminal punctuation while keeping the
+    // delimiters via `split_inclusive`. Each piece is a "clause + its
+    // terminating punctuation" (or just the tail).
+    let pieces: Vec<&str> = trimmed.split_inclusive(['.', '!', '?', '…']).collect();
+    if pieces.is_empty() {
+        return trimmed.to_string();
+    }
+    let mut out: Vec<&str> = Vec::with_capacity(pieces.len());
+    let mut prev_normalised: Option<String> = None;
+    for piece in pieces {
+        let normalised: String = piece
+            .chars()
+            .filter(|c| c.is_alphabetic() || c.is_whitespace())
+            .collect::<String>()
+            .to_lowercase()
+            .split_whitespace()
+            .collect::<Vec<_>>()
+            .join(" ");
+        if normalised.is_empty() {
+            // Pure punctuation slop — keep but don't update prev so
+            // the next clause can still dedupe against the LAST
+            // content-bearing piece.
+            out.push(piece);
+            continue;
+        }
+        if prev_normalised.as_deref() == Some(normalised.as_str()) {
+            // Drop this duplicate.
+            continue;
+        }
+        out.push(piece);
+        prev_normalised = Some(normalised);
+    }
+    out.join("")
+}
+
 pub fn split_compound_utterance(input: &str) -> Vec<String> {
     let trimmed = input.trim();
     if trimmed.is_empty() {
@@ -1105,7 +1167,7 @@ pub fn is_safety_refusal_proof(proof: Option<&crate::proof_object::ProofObject>)
 
 #[cfg(test)]
 mod compound_utterance_tests_v5150 {
-    use super::split_compound_utterance;
+    use super::{dedupe_whisper_repetitions, split_compound_utterance};
 
     #[test]
     fn single_sentence_returns_one_piece_v5150() {
@@ -1193,6 +1255,56 @@ mod compound_utterance_tests_v5150 {
     fn empty_input_returns_empty_vec_v5150() {
         assert!(split_compound_utterance("").is_empty());
         assert!(split_compound_utterance("   ").is_empty());
+    }
+
+    // ─── v5.28.0 — Whisper repetition dedup ──────────────────────────
+
+    /// Live-test 2026-05-14: Whisper hallucinated a 16x loop on a
+    /// short user utterance. After dedup, the 16 identical clauses
+    /// collapse to one.
+    #[test]
+    fn dedupe_collapses_whisper_runaway_loop_v5280() {
+        let raw = "Мен Алматыда тұрамын. Менің атымыз кім? Менің атымыз кім? \
+                   Менің атымыз кім? Менің атымыз кім? Менің атымыз кім? \
+                   Менің атымыз кім? Менің атымыз кім? Менің атымыз кім?";
+        let cleaned = dedupe_whisper_repetitions(raw);
+        // Should collapse to 2 distinct clauses.
+        let split_count = cleaned.matches('?').count() + cleaned.matches('.').count();
+        assert!(
+            split_count <= 3,
+            "expected ≤ 3 terminal-punct marks after dedup, got {split_count} in: {cleaned}"
+        );
+        assert!(cleaned.contains("Алматыда"));
+        assert!(cleaned.contains("Менің атымыз"));
+    }
+
+    #[test]
+    fn dedupe_preserves_distinct_clauses_v5280() {
+        let raw = "Сәлем. Қалыңыз қалай? Жақсы.";
+        let cleaned = dedupe_whisper_repetitions(raw);
+        assert_eq!(cleaned, raw);
+    }
+
+    #[test]
+    fn dedupe_handles_empty_input_v5280() {
+        assert_eq!(dedupe_whisper_repetitions(""), "");
+        assert_eq!(dedupe_whisper_repetitions("   "), "");
+    }
+
+    #[test]
+    fn dedupe_preserves_single_clause_v5280() {
+        let raw = "Менің атым Дәулет.";
+        assert_eq!(dedupe_whisper_repetitions(raw), raw);
+    }
+
+    /// Non-adjacent duplicates stay (legitimate use of repeated
+    /// affirmation): «Иә. Дұрыс. Иә.» should keep both «Иә.»
+    #[test]
+    fn dedupe_keeps_non_adjacent_duplicates_v5280() {
+        let raw = "Иә. Дұрыс. Иә.";
+        let cleaned = dedupe_whisper_repetitions(raw);
+        // Both «Иә.» should remain — they're separated by «Дұрыс.»
+        assert_eq!(cleaned.matches("Иә").count(), 2);
     }
 }
 

@@ -21,6 +21,50 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.28.0] — 2026-05-15 — Voice arc V6: multi-clause TTS join, Whisper repetition dedup, echo template removal, deeper duck + slower rate
+
+**Minor.** Four structural fixes addressing the v5.27.5 live-test failure modes («Говорит очень быстро и непонятно. Порой заклинивает и повторяет одно и то же. Диалог выглядит роботизированным»). New crate-public API (`discourse::dedupe_whisper_repetitions`); REPL `run_turn` signature returns `(safety_refused, response)` instead of speaking internally; voice path collects per-clause replies and emits ONE `tts.speak` per turn. Removal of the v5.16.0 «Сізді X деп ұқтым» low-confidence template family from the runtime path.
+
+### Live feedback (2026-05-15 transcript, v5.27.5 binary)
+
+User reported on built-in MacBook Air mic + speakers:
+
+1. **Whisper repetition runaway** — single «Менің атымыз кім?» surfaced 16× consecutively from whisper.cpp; 16 kernel turns fired; only the LAST clause survived the v5.24.5 kill-prev TTS semantics.
+2. **«Сізді [Whisper-garbage] дедіңіз деп ұқтым» templates** — fired on perfectly intelligible queries when avg_logprob dipped under 0.5: «Надо отвечать на вопрос, а пользователь сам поправит тебя, если ты не так понял».
+3. **«Говорит очень быстро и непонятно»** — 150 wpm from v5.27.5 still too fast on the Aru voice for natural-feel Kazakh dialog.
+4. **Echo loop persists with 40 % duck** — `[voice] (barge-in: TTS interrupted)` still fires on adam's own voice on built-in laptop hardware.
+
+### What changed
+
+**1. `discourse::dedupe_whisper_repetitions`.** New public helper. Splits input on sentence terminators (`. ! ? …`), normalises each piece (lowercase, alphabetic+whitespace only), and collapses adjacent equal-after-normalisation clauses. «Менің атымыз кім? Менің атымыз кім? … (×16)» → «Менің атымыз кім?». 5 new unit tests covering runaway collapse, distinct-clause preservation, empty input, single clause, and non-adjacent duplicate retention.
+
+**2. `run_turn` returns `(bool, String)`; voice REPL joins responses.** Pre-v5.28.0 `run_turn` accepted `tts: Option<&dyn TtsBackend>` and called `tts.speak(&out)` inside. On the voice path each per-clause kernel turn produced its own `say` invocation, and v5.24.5 kill-prev meant only the tail of a multi-piece answer survived. Now `run_turn` prints + returns the response; voice REPL collects all per-clause responses and emits a single `tts.speak(&joined)`. Text REPL inherits the same join purely for consistency.
+
+**3. Low-confidence template removed from runtime.** `voice_low_confidence` early-return deleted from `adam-chat`. Sub-threshold transcripts now log to stderr (`[voice] low confidence (0.42 < 0.50) — answering anyway`) but route to the kernel like any other input. The template family file stays for archival reference but is no longer wired into the dispatch path. The kernel's own «Кешіріңіз, түсінбедім» fallback handles genuinely-garbage transcripts gracefully.
+
+**4. Defaults tightened.** TTS rate 150 → 130 wpm (macOS `say` `-r 130`); barge-in volume duck 0.4 → 0.25. Both target the same complaint axis (perceived robot tempo + residual echo on built-in speakers) from opposite ends — slower TTS gives the AEC more time per sample to converge AND sounds more human; deeper duck gives the AEC another 15 pp of headroom against the worst-case built-in-speaker coupling.
+
+### Why minor (x.28.0) — not patch
+
+- New public API: `discourse::dedupe_whisper_repetitions`.
+- `run_turn` signature change in `adam_chat` (binary internal, but architecturally significant — separates kernel-emit from transducer-emit).
+- Removal of a documented v5.16.0 template family from runtime dispatch.
+- Multi-clause TTS join changes the user-observable timing model (one `speak` per turn instead of per clause).
+
+### Verified
+
+- 5 new `compound_utterance_tests_v5150` tests for `dedupe_whisper_repetitions`.
+- `cargo fmt --all --check` clean.
+- `cargo test --workspace` — **1436 passing** (+5 from v5.27.5's 1431).
+- `cargo test -p adam-dialog --features voice` — **909 passing** (+5 from v5.27.5's 904).
+- `cargo clippy --workspace --all-targets` — clean both feature configurations (default + adam-dialog `--features voice`).
+
+### Known limitations carried forward
+
+- **AEC3 still imperfect on built-in MacBook Air speakers.** Volume duck to 25 % is a pragmatic mitigation, not a DSP-correct AEC tuning. AirPods / USB headset users may want to override via `ADAM_TTS_VOLUME_GAIN` (flag landing v5.28.5).
+- **No male Kazakh voice on macOS** — `--tts-voice Yuri` (Russian male) remains the workaround until v5.29.0+ Piper voice bank.
+- **Whisper still hallucinates** on very short utterances; dedup catches the worst pathology (verbatim repeats) but not paraphrased loops. A confidence-weighted Whisper post-filter is a v5.28.5 candidate.
+
 ## [5.27.5] — 2026-05-14 — Voice arc V5 tuning: TTS rate, VAD silence, volume duck, doubled-vowel fold
 
 **Patch milestone.** Four targeted fixes for the v5.27.0 barge-in UX based on live-test feedback (2026-05-14). Addresses speech rate, response latency, echo-loop on built-in speakers, and «Танысаайық»-class STT mishearings.

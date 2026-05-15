@@ -385,15 +385,12 @@ fn main() -> ExitCode {
 
     if let Some(pos) = args.iter().position(|a| a == "--once") {
         if let Some(input) = args.get(pos + 1) {
-            run_turn(
-                &mut conv,
-                input,
-                &lex,
-                &repo,
-                trace,
-                turn_seed(0),
-                tts_handle,
-            );
+            let (_refused, out) = run_turn(&mut conv, input, &lex, &repo, trace, turn_seed(0));
+            if let Some(tts) = tts_handle
+                && let Err(e) = tts.speak(&out)
+            {
+                eprintln!("[tts] speak failed: {e}");
+            }
             return ExitCode::SUCCESS;
         } else {
             eprintln!("--once requires an argument");
@@ -502,14 +499,29 @@ fn main() -> ExitCode {
                 } else {
                     adam_dialog::discourse::split_compound_utterance(&assembled)
                 };
+            // **v5.28.0** — collect per-clause responses, speak the
+            // joined text in one TTS call. Pre-v5.28.0 we spoke each
+            // clause separately; on the voice path the v5.24.5 kill-
+            // prev semantics then truncated all but the last clause.
+            // The text REPL inherits the same join purely for
+            // consistency with voice.
+            let mut responses: Vec<String> = Vec::with_capacity(pieces.len());
             for piece in pieces {
                 turn += 1;
                 let seed = turn_seed(turn);
-                let safety_refused =
-                    run_turn(&mut conv, &piece, &lex, &repo, trace, seed, tts_handle);
+                let (safety_refused, out) = run_turn(&mut conv, &piece, &lex, &repo, trace, seed);
+                responses.push(out);
                 stdout.lock().flush().ok();
                 if safety_refused {
                     break;
+                }
+            }
+            if let Some(tts) = tts_handle
+                && !responses.is_empty()
+            {
+                let joined = responses.join(" ");
+                if let Err(e) = tts.speak(&joined) {
+                    eprintln!("[tts] speak failed: {e}");
                 }
             }
         }
@@ -630,21 +642,23 @@ fn run_voice_repl(
                 if let Some(tts) = tts_handle {
                     let tap = adam_voice::aec_render_tap(queue.clone(), AEC_SAMPLE_RATE);
                     tts.set_render_tap(Some(tap));
-                    // **v5.27.5** — duck TTS volume to 40% in
-                    // barge-in mode. Lower output level gives AEC
-                    // more headroom against the loudest case
-                    // (built-in laptop speaker + mic ~30 cm apart,
-                    // where AEC3 sometimes can't suppress fully and
-                    // the mic false-triggers on adam's own voice
-                    // mid-response — the «echo loop» bug user
-                    // reported 2026-05-14). With AirPods or a USB
-                    // headset, hardware isolation makes this
-                    // unnecessary; users can override via env var
-                    // `ADAM_TTS_VOLUME_GAIN` (future flag).
-                    tts.set_volume_gain(0.4);
+                    // **v5.28.0** — duck TTS volume to 25% in
+                    // barge-in mode. v5.27.5 set 40%, but live
+                    // testing on 2026-05-15 confirmed the echo
+                    // loop persisted: each
+                    // `[voice] (barge-in: TTS interrupted)` line
+                    // fired on adam's own voice. AEC3 alone can't
+                    // catch the worst built-in-speaker + built-in-
+                    // mic case (MacBook Air, ~30 cm coupling);
+                    // dropping another 15 pp of pre-AEC level
+                    // gives the canceler more headroom. With
+                    // AirPods or USB headset, hardware isolation
+                    // already handles this; users can override
+                    // via env var `ADAM_TTS_VOLUME_GAIN` (future).
+                    tts.set_volume_gain(0.25);
                 }
                 eprintln!(
-                    "adam-chat --barge-in: AEC echo cancellation active (TTS volume ducked to 40%). \
+                    "adam-chat --barge-in: AEC echo cancellation active (TTS volume ducked to 25%). \
                      Mic will be cleaned against TTS audio before Whisper STT."
                 );
                 Some((std::sync::Mutex::new(processor), queue))
@@ -875,36 +889,33 @@ fn run_voice_repl(
             .map(|c| format!(" (confidence ≈ {:.2})", c))
             .unwrap_or_default();
         eprintln!("[voice] heard{}: «{}»", conf_label, transcript.text);
-        // **v5.16.0 (V2).** Confidence gate. When whisper-cli's
-        // per-segment `avg_logprob` averaged below the configured
-        // threshold, surface the `voice_low_confidence` clarification
-        // family directly (bypassing the kernel) — a low-quality
-        // transcript would otherwise poison belief state and waste a
-        // kernel turn. The clarification template is rendered inline:
-        // pick a variant by rng_seed, substitute `{raw_transcript}`,
-        // print + speak.
+        // **v5.28.0** — soften the v5.16.0 confidence gate.
+        // Pre-v5.28.0 sub-threshold transcripts surfaced the
+        // `voice_low_confidence` template («Сізді X деп уқтым…»),
+        // which on live tests fired on perfectly-fine queries when
+        // Whisper's avg_logprob dipped, and felt robotic / annoying
+        // («Надо отвечать на вопрос, а пользователь сам поправит
+        // тебя, если ты не так понял»). Now: log the low confidence
+        // to stderr for diagnostics, but always route to the kernel
+        // — the dedup below catches the worst pathology (Whisper's
+        // 16× repetition runaway).
         if let Some(c) = transcript.confidence
             && c < confidence_threshold
         {
-            *turn += 1;
-            let seed = turn_seed(*turn);
-            let variants = repo.get("voice_low_confidence");
-            let chosen = if variants.is_empty() {
-                format!(
-                    "Кешіріңіз, дауысыңызды дұрыс ести алмадым: «{}». Қайталай аласыз ба?",
-                    transcript.text
-                )
-            } else {
-                variants[(seed as usize) % variants.len()]
-                    .replace("{raw_transcript}", &transcript.text)
-            };
-            println!("{chosen}");
-            if let Some(tts) = tts_handle {
-                let _ = tts.speak(&chosen);
-            }
-            io::stdout().lock().flush().ok();
-            continue;
+            eprintln!(
+                "[voice] low confidence ({c:.2} < {confidence_threshold:.2}) — answering anyway"
+            );
         }
+        // **v5.28.0** — dedup Whisper's repetition-hallucination
+        // before splitting. On short Kazakh utterances whisper.cpp
+        // sometimes emits the same clause 8–16 times in a row
+        // («Менің атымыз кім? × 16» on a single «Менің атымыз
+        // кім?»). Without this, split_compound returns 16 pieces,
+        // run_turn fires 16 kernel turns, the kill-prev TTS
+        // semantics chop everything except the last clause — and
+        // the dialog feels like a stuck robot. `dedupe_whisper_
+        // repetitions` collapses adjacent normalised-equal clauses.
+        let cleaned = adam_dialog::discourse::dedupe_whisper_repetitions(&transcript.text);
         // **v5.15.0 (V1).** Voice path uses the same compound-
         // utterance splitter as text REPL — STT often returns a long
         // string when the user speaks several sentences in one
@@ -920,19 +931,35 @@ fn run_voice_repl(
         // safety topic anywhere, route the WHOLE transcript as one
         // turn so the kernel-level safety refusal fires before any
         // non-safety clause can answer.
-        let pieces: Vec<String> =
-            if adam_dialog::discourse::detect_safety_topic(&transcript.text).is_some() {
-                vec![transcript.text.clone()]
-            } else {
-                adam_dialog::discourse::split_compound_utterance(&transcript.text)
-            };
+        let pieces: Vec<String> = if adam_dialog::discourse::detect_safety_topic(&cleaned).is_some()
+        {
+            vec![cleaned.clone()]
+        } else {
+            adam_dialog::discourse::split_compound_utterance(&cleaned)
+        };
+        // **v5.28.0** — collect per-clause responses + speak the
+        // joined text in ONE `tts.speak` call. Pre-v5.28.0 every
+        // piece called `tts.speak` directly, and v5.24.5 kill-prev
+        // semantics meant only the LAST clause survived to the
+        // speaker — the user heard only the tail of a multi-part
+        // answer. Joining lets the full reply through.
+        let mut responses: Vec<String> = Vec::with_capacity(pieces.len());
         for piece in pieces {
             *turn += 1;
             let seed = turn_seed(*turn);
-            let safety_refused = run_turn(conv, &piece, lex, repo, trace, seed, tts_handle);
+            let (safety_refused, out) = run_turn(conv, &piece, lex, repo, trace, seed);
+            responses.push(out);
             io::stdout().lock().flush().ok();
             if safety_refused {
                 break;
+            }
+        }
+        if let Some(tts) = tts_handle
+            && !responses.is_empty()
+        {
+            let joined = responses.join(" ");
+            if let Err(e) = tts.speak(&joined) {
+                eprintln!("[tts] speak failed: {e}");
             }
         }
     }
@@ -1051,6 +1078,14 @@ fn load_reasoning_chains() -> (Vec<ReasFact>, Vec<DerivedFact>) {
 /// turn rendered a safety refusal — used by the REPL loops to
 /// short-circuit the remaining clauses of a compound utterance per
 /// `discourse::is_safety_refusal_proof` (v5.16.9, Codex audit B).
+/// **v5.28.0** — returns `(safety_refused, response_text)` instead of
+/// emitting TTS internally. Pre-v5.28.0 each call spoke its own
+/// `out` string, which on the voice path turned every per-clause
+/// kernel response into a separate `say` invocation — the v5.24.5
+/// kill-prev semantics then truncated all but the LAST clause when
+/// Whisper split (or hallucinated) a query into pieces. The fix:
+/// hand the response back to the caller; the voice REPL joins all
+/// per-clause responses and speaks them as one utterance.
 fn run_turn(
     conv: &mut Conversation,
     input: &str,
@@ -1058,8 +1093,7 @@ fn run_turn(
     repo: &TemplateRepository,
     trace: bool,
     seed: u64,
-    tts: Option<&dyn adam_dialog::tts::TtsBackend>,
-) -> bool {
+) -> (bool, String) {
     if trace {
         // v4.0.25 — trace through the REAL runtime path via
         // `turn_with_trace`. Pre-v4.0.25 this branch manually
@@ -1218,12 +1252,8 @@ fn run_turn(
             println!("├─ {t}");
         }
         println!("└─ output:   {out}");
-        if let Some(tts) = tts
-            && let Err(e) = tts.speak(&out)
-        {
-            eprintln!("[tts] speak failed: {e}");
-        }
-        adam_dialog::discourse::is_safety_refusal_proof(trace.proof_object.as_ref())
+        let refused = adam_dialog::discourse::is_safety_refusal_proof(trace.proof_object.as_ref());
+        (refused, out)
     } else {
         // **v5.16.9** — switch from `conv.turn` to `conv.turn_with_trace`
         // so the safety-refusal short-circuit (`is_safety_refusal_proof`)
@@ -1231,12 +1261,8 @@ fn run_turn(
         // is already a wrapper that discards the trace.
         let (out, trace) = conv.turn_with_trace(input, lex, repo, seed);
         println!("{out}");
-        if let Some(tts) = tts
-            && let Err(e) = tts.speak(&out)
-        {
-            eprintln!("[tts] speak failed: {e}");
-        }
-        adam_dialog::discourse::is_safety_refusal_proof(trace.proof_object.as_ref())
+        let refused = adam_dialog::discourse::is_safety_refusal_proof(trace.proof_object.as_ref());
+        (refused, out)
     }
 }
 
