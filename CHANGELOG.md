@@ -21,6 +21,63 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.28.5] — 2026-05-15 — Critical playback-rate bug fix: WAV samples now resampled to device rate
+
+**Patch milestone — critical bug fix.** Closes the «голос на большой скорости, что ничего не понятно» complaint that survived every TTS-rate flag tuning since v5.26.5 (when `say` migrated to WAV → cpal playback). The slow-down attempts in v5.27.5 (`-r 150`) and v5.28.0 (`-r 130`) had only ~10 % effect because the underlying playback was running ~2.18× too fast regardless — `say` writes WAV at 22050 Hz, the cpal output device runs at 48000 Hz, and `play_wav_at_volume` was feeding the 22050 Hz samples directly to a 48 kHz output stream without resampling. Effective playback speed: ~2.18×.
+
+### Root cause
+
+Pre-v5.28.5 [crates/adam-voice/src/playback.rs](crates/adam-voice/src/playback.rs):
+
+- `read_wav_mono_f32` decoded the WAV but **discarded the sample rate**.
+- `play_samples_at_volume` built a cpal stream at the **device's default rate** (typically 48 kHz on M-series macOS) with `let cfg: StreamConfig = supported.into();`.
+- The 22050 Hz samples were then pumped into the 48 kHz output stream **with no rate conversion**.
+
+The module-level doc-comment even claimed «we resample to the device's rate via simple linear interpolation» — that claim was aspirational; the implementation never did it.
+
+### What changed
+
+**1. `read_wav_mono_f32_with_rate`** — new private function returns `(Vec<f32>, u32)` (samples + sample rate). The old `read_wav_mono_f32` is removed (was only used in one test, migrated).
+
+**2. `play_wav_at_volume`** — now:
+1. Reads WAV samples + rate.
+2. Queries device's default sample rate via new `device_default_sample_rate()`.
+3. If `src_rate != device_rate`, calls `resample_linear(samples, src_rate, device_rate)` (linear interpolation, same algorithm as `aec::resample_to_aec_rate`).
+4. Passes the rate-correct samples into the existing `play_samples_at_volume` flow.
+
+**3. Tests** — 4 new in `playback::tests`, plus one updated:
+- `read_wav_with_rate_preserves_22050_v5285` — round-trips WAV rate (regression guard against the v5.26.5–v5.28.0 silent drop).
+- `resample_linear_upsamples_24k_to_48k_v5285` — 2× upsampling sanity.
+- `resample_linear_downsamples_48k_to_24k_v5285` — 0.5× downsampling sanity.
+- `resample_linear_passthrough_when_rates_equal_v5285` — no-op when rates match.
+- Updated `read_wav_mono_f32_decodes_16bit_v5255` to assert the returned rate.
+
+### Why this slipped past every prior release
+
+- v5.25.0–v5.26.0: `play_wav` only used in `playback::tests` synthetic-WAV unit tests, which write at 16 kHz. Device rate on the test machine happened to be 48 kHz; tests would have detected 3× speed if they checked playback duration, but they only checked sample values.
+- v5.26.5: `say` migration to WAV path lands. Live tests show TTS works; the speed bug is invisible if you don't have a reference for «correct» tempo.
+- v5.27.5 / v5.28.0: `-r` tuning attempts. Each `-r 130` vs `-r 175` shifts duration ~10 %, masking the 2.18× constant offset as «still a bit fast».
+- 2026-05-15 live test: user reports «несколько дней назад до внедрения голосового диалога в режиме реального времени голос был очень хорошим… а сейчас тараторит». The «несколько дней назад» window aligns exactly with the v5.26.0 → v5.26.5 WAV-migration cut. That comparison is what surfaced the root cause.
+
+### Verified
+
+- `cargo fmt --all --check` clean.
+- `cargo test -p adam-voice` — **63 passing** (+4 from v5.28.0's 59).
+- `cargo test --workspace` — **1440 passing** (+4 from v5.28.0's 1436).
+- `cargo test -p adam-dialog --features voice` — voice slice green.
+- `cargo clippy --workspace --all-targets` — clean both feature configurations.
+- `verify_release_version 5.28.5` + `check_metrics_currency` green.
+
+### Why x.28.5 (patch milestone — not minor)
+
+No public API change (`play_wav_at_volume` signature stable); no architectural shift. A latent bug existed since v5.25.5 / v5.26.5; the fix restores the documented behaviour. Bug-fix only.
+
+### Known limitations carried forward
+
+- **AEC3 still imperfect on built-in MacBook Air speakers** — 25 % duck plus the now-correct playback speed should reduce echo-loop frequency, but won't eliminate it entirely.
+- **No male Kazakh voice on macOS** — `--tts-voice Yuri` workaround until v5.29.0+ Piper voice bank.
+- **Whisper paraphrased-loop hallucinations** — only verbatim adjacent repeats caught by `dedupe_whisper_repetitions`.
+
 ## [5.28.0] — 2026-05-15 — Voice arc V6: multi-clause TTS join, Whisper repetition dedup, echo template removal, deeper duck + slower rate
 
 **Minor.** Four structural fixes addressing the v5.27.5 live-test failure modes («Говорит очень быстро и непонятно. Порой заклинивает и повторяет одно и то же. Диалог выглядит роботизированным»). New crate-public API (`discourse::dedupe_whisper_repetitions`); REPL `run_turn` signature returns `(safety_refused, response)` instead of speaking internally; voice path collects per-clause replies and emits ONE `tts.speak` per turn. Removal of the v5.16.0 «Сізді X деп ұқтым» low-confidence template family from the runtime path.

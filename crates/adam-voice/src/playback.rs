@@ -121,8 +121,69 @@ pub fn play_wav_at_volume(
     render_tap: Option<RenderTap>,
     volume_gain: f32,
 ) -> Result<PlaybackHandle> {
-    let mono_samples = read_wav_mono_f32(path)?;
-    play_samples_at_volume(mono_samples, render_tap, volume_gain)
+    // **v5.28.5** — bug fix: resample WAV samples from their native
+    // rate to the device's rate. Pre-v5.28.5 `read_wav_mono_f32`
+    // returned samples without their sample rate, and the cpal output
+    // stream was built at the device's default rate (typically 48 kHz
+    // on M-series macOS). `say --data-format=LEI16@22050` produces a
+    // 22050 Hz WAV; feeding those samples to a 48 kHz output stream
+    // without resampling plays them ~2.18× faster than intended. User
+    // complaint (2026-05-15): «голос на большой скорости, что ничего
+    // не понятно» — the v5.27.5 `-r 150` / v5.28.0 `-r 130` slow-rate
+    // flags had only a 10 % effect because the underlying playback
+    // was running at 2× speed regardless. The doc-comment at the top
+    // of this module already claimed «we resample via linear
+    // interpolation» — that was aspirational; the implementation
+    // never did it. Now it does.
+    let (mono_samples, src_rate) = read_wav_mono_f32_with_rate(path)?;
+    let device_rate = device_default_sample_rate()?;
+    let resampled = if src_rate == device_rate {
+        mono_samples
+    } else {
+        resample_linear(&mono_samples, src_rate, device_rate)
+    };
+    play_samples_at_volume(resampled, render_tap, volume_gain)
+}
+
+/// **v5.28.5** — query the default output device's sample rate so
+/// callers can resample to it before submitting samples. Cheap
+/// (microseconds on macOS / Linux); the actual `cpal::Stream` is
+/// built later in [`play_samples_at_volume`].
+fn device_default_sample_rate() -> Result<u32> {
+    let host = cpal::default_host();
+    let device = host
+        .default_output_device()
+        .ok_or(VoiceError::NoInputDevice)?;
+    let supported = device
+        .default_output_config()
+        .map_err(|e| VoiceError::StreamBuild(e.to_string()))?;
+    Ok(supported.sample_rate().0)
+}
+
+/// **v5.28.5** — linear-interpolation resampler. Same algorithm as
+/// [`crate::aec::resample_to_aec_rate`], generalised to arbitrary
+/// source / target rates. Adequate for speech (Aru voice at 22 kHz
+/// has no content above 8 kHz; aliasing to 48 kHz is inaudible).
+fn resample_linear(input: &[f32], src_rate: u32, dst_rate: u32) -> Vec<f32> {
+    if src_rate == dst_rate || input.is_empty() {
+        return input.to_vec();
+    }
+    let ratio = src_rate as f64 / dst_rate as f64;
+    let out_len = ((input.len() as f64) / ratio).floor() as usize;
+    let mut out = Vec::with_capacity(out_len);
+    for i in 0..out_len {
+        let src_pos = i as f64 * ratio;
+        let idx = src_pos.floor() as usize;
+        let frac = (src_pos - idx as f64) as f32;
+        let a = input[idx];
+        let b = if idx + 1 < input.len() {
+            input[idx + 1]
+        } else {
+            a
+        };
+        out.push(a * (1.0 - frac) + b * frac);
+    }
+    out
 }
 
 /// Play raw mono f32 samples. Exposed for tests + future synthetic
@@ -364,11 +425,17 @@ fn fill_output(
 /// Currently returns ALL samples in one allocation; for the speech-
 /// length WAVs Piper produces (< 30 s typically) that's well under
 /// 2 MB and not worth streaming.
-fn read_wav_mono_f32(path: &Path) -> Result<Vec<f32>> {
+/// **v5.28.5** — read a WAV file into mono f32 samples + return its
+/// sample rate. The rate is required so callers can resample to the
+/// cpal output device's rate before submission — pre-v5.28.5 the
+/// rate was discarded and the device's default rate was assumed,
+/// which played 22050 Hz `say` output at 48000 Hz (~2.18× speed).
+fn read_wav_mono_f32_with_rate(path: &Path) -> Result<(Vec<f32>, u32)> {
     let mut reader = hound::WavReader::open(path).map_err(VoiceError::from)?;
     let spec = reader.spec();
     let channels = spec.channels as usize;
     let bits = spec.bits_per_sample as u32;
+    let sample_rate = spec.sample_rate;
     let mut mono: Vec<f32> = Vec::with_capacity(reader.len() as usize / channels.max(1));
     let scale = match bits {
         16 => 1.0 / (i16::MAX as f32),
@@ -408,7 +475,7 @@ fn read_wav_mono_f32(path: &Path) -> Result<Vec<f32>> {
             }
         }
     }
-    Ok(mono)
+    Ok((mono, sample_rate))
 }
 
 #[cfg(test)]
@@ -440,12 +507,64 @@ mod tests {
         // 100 samples of saw wave at 16 kHz.
         let s: Vec<i16> = (0..100).map(|i| (i * 300) as i16).collect();
         let path = write_temp_wav(&s, 16_000);
-        let read = read_wav_mono_f32(&path).unwrap();
+        let (read, rate) = read_wav_mono_f32_with_rate(&path).unwrap();
         assert_eq!(read.len(), 100);
+        assert_eq!(rate, 16_000);
         // First / last sample should match modulo quantisation.
         assert!((read[0] - 0.0).abs() < 0.01);
         assert!(read[99] > 0.5);
         let _ = std::fs::remove_file(&path);
+    }
+
+    /// **v5.28.5** — `read_wav_mono_f32_with_rate` returns the WAV's
+    /// declared sample rate, NOT a hard-coded constant. Regression
+    /// guard: pre-v5.28.5 the rate was discarded entirely, which is
+    /// what caused 22050 Hz `say` output to play ~2.18× too fast on
+    /// 48 kHz default cpal devices.
+    #[test]
+    fn read_wav_with_rate_preserves_22050_v5285() {
+        let s: Vec<i16> = (0..50).map(|i| (i * 500) as i16).collect();
+        let path = write_temp_wav(&s, 22_050);
+        let (samples, rate) = read_wav_mono_f32_with_rate(&path).unwrap();
+        assert_eq!(rate, 22_050, "WAV rate must round-trip");
+        assert_eq!(samples.len(), 50);
+        let _ = std::fs::remove_file(&path);
+    }
+
+    /// **v5.28.5** — `resample_linear` doubles a 24 kHz buffer when
+    /// resampled to 48 kHz (each input sample becomes ~2 output
+    /// samples via linear interpolation). Sanity-checks the resampler
+    /// for the typical `say` → device path.
+    #[test]
+    fn resample_linear_upsamples_24k_to_48k_v5285() {
+        let input: Vec<f32> = (0..100).map(|i| (i as f32) * 0.01).collect();
+        let out = resample_linear(&input, 24_000, 48_000);
+        // Doubling the rate doubles the length (within rounding).
+        assert!(out.len() >= 199 && out.len() <= 200);
+        // Boundary samples preserve the input shape.
+        assert!((out[0] - input[0]).abs() < 1e-6);
+        assert!((out[2] - input[1]).abs() < 1e-3);
+    }
+
+    /// **v5.28.5** — `resample_linear` halves the buffer length when
+    /// going 48 kHz → 24 kHz; sample shape preserved at sparse points.
+    #[test]
+    fn resample_linear_downsamples_48k_to_24k_v5285() {
+        let input: Vec<f32> = (0..200).map(|i| (i as f32) * 0.01).collect();
+        let out = resample_linear(&input, 48_000, 24_000);
+        assert_eq!(out.len(), 100);
+        // Every other input sample lines up on a non-fractional position.
+        assert!((out[0] - input[0]).abs() < 1e-6);
+        assert!((out[1] - input[2]).abs() < 1e-6);
+    }
+
+    /// **v5.28.5** — passthrough when source rate matches destination
+    /// rate. Bypasses the resampling loop for the no-op case.
+    #[test]
+    fn resample_linear_passthrough_when_rates_equal_v5285() {
+        let input: Vec<f32> = vec![0.1, 0.2, 0.3, 0.4];
+        let out = resample_linear(&input, 48_000, 48_000);
+        assert_eq!(out, input);
     }
 
     #[test]
