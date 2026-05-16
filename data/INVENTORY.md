@@ -57,6 +57,12 @@ Pre-pack stage, kept for traceability + regeneration.
 | `raw/source_scoring_rules.json` | Per-source quality weights | — | live |
 | `external/textbooks_kz/grade_NN/*.pdf` | School textbooks per grade — **7/95 present, 88 TODO** | 91 MB | partial (see `scripts/textbooks_kz_manifest.json`) |
 | `external/3к-20…`, `Алгебра 7…`, `Биология 8…` (loose PDFs) | Same 7 PDFs as above, pre-migration. **Can be deleted once migration is verified.** | 91 MB | duplicate |
+| `external/huggingface_kz/kazakhBooks.csv` | Hugging Face MDBKD `kazakhBooks` split — Kazakh-language books (literature + educational + reference). Apache-2.0. | ~3.97 GB | live (download in progress 2026-05-16) |
+| `external/huggingface_kz/kazakhNews.csv` | Hugging Face MDBKD `kazakhNews` split — news articles. Apache-2.0. | — | todo |
+| `external/huggingface_kz/leipzig.csv` | Hugging Face MDBKD `leipzig` split — Leipzig Corpora KZ. Apache-2.0. | — | todo |
+| `external/huggingface_kz/kaz_culture.parquet` | ISSAI KazCulture — 16 137 culture passage-QA triplets from 11 books. CC-BY-4.0. | — | todo |
+| `external/huggingface_kz/kazakh_ent_mc.parquet` | kz-transformers ЕНТ multiple-choice benchmark. Apache-2.0. | — | todo |
+| `external/huggingface_kz/kazparc.tsv` | IS2AI KazParC — KZ × EN/RU/TR parallel corpus. CC-BY-4.0. | — | todo |
 
 ## Tier 3 — Derived training artefacts (`curated/`)
 

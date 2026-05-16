@@ -61,10 +61,27 @@ copies are in place).
 Only fill `url` with sources you are LEGALLY allowed to fetch and
 process per their terms of service. Recommended sources:
 
-- **opiq.kz** — official MOIN RK e-textbook platform
-- **okulyk.kz** — official e-textbook archive
+- **opiq.kz** — official MOIN RK e-textbook platform (requires student
+  account; no direct PDF URLs)
+- **okulyk.kz** — viewer-only; PDFs hidden behind JavaScript viewer.
+  Scraping is brittle and ToS-ambiguous.
 - **bilim-all.kz** — open educational portal
-- Publisher pages: **Атамұра**, **Мектеп**, **Арман-ПВ**, **Білім**
+- Publisher pages: **Атамұра** (free.atamura.kz — EPUB only),
+  **Мектеп**, **Арман-ПВ** (armanpv.com/download), **Білім**
+
+### Preferred alternative: Hugging Face
+
+If you only need *Kazakh-language educational text content*, not the
+specific layout / images of a textbook PDF, prefer the Hugging Face
+route — see `scripts/huggingface_kazakh_manifest.json` and
+`data/external/huggingface_kz/`. The MDBKD `kazakhBooks` split
+(3.97 GB, Apache-2.0) covers most of what extracting per-grade
+textbooks would yield, with stable URLs and an explicit license.
+
+This `textbooks_kz/` tree exists so that *targeted per-grade
+coverage* can still be assembled when a specific MOIN RK textbook is
+needed (e.g. for a 6th-grade physics tutoring evaluation). It is
+**not** the primary pretraining source.
 
 PDFs are gitignored (see `.gitignore` next to this README). They never
 leave the local checkout. The manifest itself (with SHA + size, no

@@ -5,7 +5,12 @@
 *.log
 data/external/*
 !data/external/textbooks_kz/
+!data/external/huggingface_kz/
 data/external/textbooks_kz/*.pdf
+data/external/huggingface_kz/*.csv
+data/external/huggingface_kz/*.parquet
+data/external/huggingface_kz/*.tsv
+data/external/huggingface_kz/*.json
 .claude/
 
 # External reference material (Apertium-kaz source repo, etc.) — 39+ MB each.

@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "description": "Hugging Face Kazakh datasets manifest. Curated list of legitimately-licensed Kazakh-language datasets hosted on Hugging Face. Each entry is one file (CSV, parquet, JSON) downloadable by direct URL. `scripts/fetch_huggingface_kazakh.sh` reads this and downloads any entry where `url` is non-empty and `sha256` is null (or mismatches the on-disk file).",
+  "license_policy": "Only entries with Apache-2.0, MIT, CC-0, CC-BY-* licenses. No CC-BY-NC (incompatible with downstream commercial use), no licenses without redistribution clause. Each entry records its license in the `license` field — keep it accurate.",
+  "target_root": "data/external/huggingface_kz",
+  "sources": [
+    {
+      "dataset": "kz-transformers/multidomain-kazakh-dataset",
+      "split": "kazakhBooks",
+      "file": "kazakhBooks.csv",
+      "title": "MDBKD kazakhBooks split — Kazakh-language books (literature + educational + reference)",
+      "license": "Apache-2.0",
+      "url": "https://huggingface.co/datasets/kz-transformers/multidomain-kazakh-dataset/resolve/main/kazakhBooks.csv",
+      "filename": "kazakhBooks.csv",
+      "sha256": null,
+      "size_bytes": null,
+      "expected_size_bytes": 3969476025,
+      "notes": "Primary book corpus. Largest unstructured Kazakh-text source we'll ingest. Expect literary + educational + reference text."
+    },
+    {
+      "dataset": "kz-transformers/multidomain-kazakh-dataset",
+      "split": "kazakhNews",
+      "file": "kazakhNews.csv",
+      "title": "MDBKD kazakhNews split — Kazakh news articles",
+      "license": "Apache-2.0",
+      "url": "https://huggingface.co/datasets/kz-transformers/multidomain-kazakh-dataset/resolve/main/kazakhNews.csv",
+      "filename": "kazakhNews.csv",
+      "sha256": null,
+      "size_bytes": null,
+      "expected_size_bytes": null,
+      "notes": "Contemporary news language. Useful for domain coverage but lower priority than books."
+    },
+    {
+      "dataset": "kz-transformers/multidomain-kazakh-dataset",
+      "split": "leipzig",
+      "file": "leipzig.csv",
+      "title": "MDBKD leipzig split — Leipzig Corpora Collection Kazakh",
+      "license": "Apache-2.0",
+      "url": "https://huggingface.co/datasets/kz-transformers/multidomain-kazakh-dataset/resolve/main/leipzig.csv",
+      "filename": "leipzig.csv",
+      "sha256": null,
+      "size_bytes": null,
+      "expected_size_bytes": null,
+      "notes": "Mixed-source corpus from Leipzig Corpora Collection. We already have cc100 + wiki separately, so this is redundant unless we need extra volume."
+    },
+    {
+      "dataset": "issai/KazCulture",
+      "split": "train",
+      "file": "data/train-00000-of-00001.parquet",
+      "title": "KazCulture — 16 137 passage-question-answer triplets from 11 Kazakh culture books",
+      "license": "CC-BY-4.0",
+      "url": "",
+      "filename": "kaz_culture.parquet",
+      "sha256": null,
+      "size_bytes": null,
+      "expected_size_bytes": null,
+      "notes": "Evaluation dataset (passage-QA). TODO: get the exact resolve URL — HF page is https://huggingface.co/datasets/issai/KazCulture"
+    },
+    {
+      "dataset": "kz-transformers/kazakh-unified-national-testing-mc",
+      "split": "train",
+      "file": "data/train.parquet",
+      "title": "Kazakh Unified National Testing (ЕНТ) multiple-choice benchmark",
+      "license": "Apache-2.0",
+      "url": "",
+      "filename": "kazakh_ent_mc.parquet",
+      "sha256": null,
+      "size_bytes": null,
+      "expected_size_bytes": null,
+      "notes": "Real ЕНТ test items. Useful for tutor positioning evaluation. TODO: get exact resolve URL."
+    },
+    {
+      "dataset": "IS2AI/KazParC",
+      "split": "all",
+      "file": "kazparc.tsv",
+      "title": "KazParC — parallel corpus Kazakh × English/Russian/Turkish",
+      "license": "CC-BY-4.0",
+      "url": "",
+      "filename": "kazparc.tsv",
+      "sha256": null,
+      "size_bytes": null,
+      "expected_size_bytes": null,
+      "notes": "Aligned parallel corpus. Future use: translation pretraining. TODO: confirm URL — repo at https://github.com/IS2AI/KazParC"
+    }
+  ]
+}
