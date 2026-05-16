@@ -205,7 +205,6 @@ fn main() {
         let file = fs::File::open(csv_path).expect("open csv");
         let reader = BufReader::new(file);
         let mut books_read = 0usize;
-        let mut in_quoted_record = false;
         let mut current_record = String::new();
         for line in reader.lines() {
             let line = match line {
@@ -226,7 +225,7 @@ fn main() {
                 }
                 i += 1;
             }
-            in_quoted_record = quotes % 2 != 0;
+            let in_quoted_record = quotes % 2 != 0;
             if in_quoted_record {
                 continue;
             }

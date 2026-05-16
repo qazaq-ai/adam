@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc ef868ed2f27bdf6662853d102a105b381967d195c9614ac3b70703909f29ae67 # shrinks to root = "-де", tense = PastDefinite, person = First, number = Some(Plural)

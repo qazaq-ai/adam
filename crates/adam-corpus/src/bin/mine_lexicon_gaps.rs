@@ -144,31 +144,55 @@ fn main() -> ExitCode {
     // Pass 2: collect first-N contexts for each top-frequency candidate.
     // Doing it in two passes lets us keep the contexts Vec capped at
     // contexts_per, without retaining all sample texts in memory.
+    //
+    // Pass 1 is parallelised across packs: every pack worker builds
+    // a local freq map, then maps are merged at the boundary. With
+    // 10+ packs on M2 (8 cores) this is near-linear speedup, since
+    // the per-pack workload is dominated by has_known_prefix calls
+    // which are fully independent.
+    use rayon::prelude::*;
+    type PackStats = (HashMap<String, usize>, usize, usize, bool);
+    let pack_results: Vec<PackStats> = SOURCE_PACKS
+        .par_iter()
+        .map(|pack_name| {
+            let path = Path::new(CURATED_DIR).join(pack_name);
+            let Ok(pack) = load_pack(&path) else {
+                eprintln!("skipping {} (missing or malformed)", path.display());
+                return (HashMap::new(), 0, 0, false);
+            };
+            let mut local_freq: HashMap<String, usize> = HashMap::new();
+            let mut local_samples = 0usize;
+            let mut local_tokens = 0usize;
+            for s in &pack.samples {
+                local_samples += 1;
+                for word in s.text.split_whitespace() {
+                    let cleaned = normalise(word);
+                    if cleaned.chars().count() < MIN_TOKEN_LEN {
+                        continue;
+                    }
+                    local_tokens += 1;
+                    if has_known_prefix(&cleaned, &roots) {
+                        continue;
+                    }
+                    *local_freq.entry(cleaned).or_insert(0) += 1;
+                }
+            }
+            (local_freq, local_samples, local_tokens, true)
+        })
+        .collect();
+
     let mut freq: HashMap<String, usize> = HashMap::new();
     let mut packs_loaded = 0usize;
     let mut total_tokens = 0usize;
     let mut total_samples = 0usize;
-
-    for pack_name in SOURCE_PACKS {
-        let path = Path::new(CURATED_DIR).join(pack_name);
-        let Ok(pack) = load_pack(&path) else {
-            eprintln!("skipping {} (missing or malformed)", path.display());
-            continue;
-        };
-        packs_loaded += 1;
-        for s in &pack.samples {
-            total_samples += 1;
-            for word in s.text.split_whitespace() {
-                let cleaned = normalise(word);
-                if cleaned.chars().count() < MIN_TOKEN_LEN {
-                    continue;
-                }
-                total_tokens += 1;
-                if has_known_prefix(&cleaned, &roots) {
-                    continue;
-                }
-                *freq.entry(cleaned).or_insert(0) += 1;
-            }
+    for (local_freq, local_samples, local_tokens, loaded) in pack_results {
+        if loaded {
+            packs_loaded += 1;
+        }
+        total_samples += local_samples;
+        total_tokens += local_tokens;
+        for (k, v) in local_freq {
+            *freq.entry(k).or_insert(0) += v;
         }
     }
     eprintln!(
