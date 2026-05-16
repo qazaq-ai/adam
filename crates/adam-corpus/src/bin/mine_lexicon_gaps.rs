@@ -100,14 +100,6 @@ struct RootsFile {
 #[derive(Debug, Deserialize)]
 struct RootEntry {
     root: String,
-    /// `noun` / `verb` / `pronoun` / `particle` / `conjunction` /
-    /// `numeral` / `postposition` etc. Used to special-case the
-    /// closed-class short-root paradigm: pronouns like `ол` (2
-    /// chars) are real Kazakh roots whose inflected surfaces are
-    /// covered by the FST `pronoun_paradigm` table but would be
-    /// dropped by the global `MIN_ROOT_LEN = 3` filter.
-    #[serde(default)]
-    part_of_speech: String,
 }
 
 /// One uncovered token candidate aggregated across all source packs.
@@ -408,25 +400,6 @@ fn normalise(word: &str) -> String {
 fn load_pack(path: &PathBuf) -> Result<PackFile, String> {
     let raw = fs::read_to_string(path).map_err(|e| e.to_string())?;
     serde_json::from_str(&raw).map_err(|e| e.to_string())
-}
-
-/// Closed-class POS strings whose roots are accepted regardless of
-/// length. These items have well-known irregular paradigms in
-/// `adam-kernel-fst::pronoun_paradigm` (and forthcoming
-/// closed-class extensions); the gap-miner must not classify their
-/// inflected surfaces as "uncovered" just because the bare root is
-/// two characters long.
-const CLOSED_CLASS_POS: &[&str] = &[
-    "pronoun",
-    "particle",
-    "conjunction",
-    "postposition",
-    "interjection",
-    "numeral",
-];
-
-fn is_closed_class(pos: &str) -> bool {
-    CLOSED_CLASS_POS.iter().any(|p| p.eq_ignore_ascii_case(pos))
 }
 
 fn load_roots() -> Result<HashSet<String>, String> {
