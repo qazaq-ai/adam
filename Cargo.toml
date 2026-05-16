@@ -12,6 +12,8 @@ members = [
   "crates/adam-train",
   "crates/adam-voice",
   "crates/adam-agg-tokenizer",
+  "crates/adam-agg-synth",
+  "crates/adam-agg-model",
 ]
 resolver = "2"
 

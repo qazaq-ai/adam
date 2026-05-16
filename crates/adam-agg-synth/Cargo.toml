@@ -1,0 +1,17 @@
+[package]
+name = "adam-agg-synth"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Synthetic Kazakh training-data generator for the agglutinative-neural pipeline. Combines the production FST (adam-kernel-fst) and morpheme tokenizer (adam-agg-tokenizer) to emit millions of morphologically-valid (root, feature-bundle) → surface-form pairs with zero LLM-teacher dependence."
+
+[dependencies]
+adam-kernel = { path = "../adam-kernel" }
+adam-kernel-fst = { path = "../adam-kernel-fst" }
+adam-agg-tokenizer = { path = "../adam-agg-tokenizer" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

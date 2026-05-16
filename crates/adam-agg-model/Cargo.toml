@@ -1,0 +1,23 @@
+[package]
+name = "adam-agg-model"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Tiny pure-Rust transformer for the agglutinative-neural pipeline. Uses burn (CPU via ndarray; optional Metal/WGPU for local GPU acceleration). ≤ 10M params target."
+
+[dependencies]
+adam-kernel = { path = "../adam-kernel" }
+adam-kernel-fst = { path = "../adam-kernel-fst" }
+adam-agg-tokenizer = { path = "../adam-agg-tokenizer" }
+adam-agg-synth = { path = "../adam-agg-synth" }
+burn = { version = "0.17", default-features = false, features = ["std", "train", "autodiff", "ndarray"] }
+serde.workspace = true
+thiserror.workspace = true
+rand = "0.9"
+
+[[bin]]
+name = "poc_kazakh_train"
+path = "src/bin/poc_kazakh_train.rs"
+
+[lints]
+workspace = true
