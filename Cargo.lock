@@ -3,6 +3,17 @@
 version = 4
 
 [[package]]
+name = "adam-agg-tokenizer"
+version = "5.32.0"
+dependencies = [
+ "adam-kernel",
+ "adam-kernel-fst",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "adam-corpus"
 version = "5.32.0"
 dependencies = [

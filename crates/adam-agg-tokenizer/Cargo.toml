@@ -1,0 +1,16 @@
+[package]
+name = "adam-agg-tokenizer"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Agglutinative morpheme-level tokenizer for Kazakh — typed-morpheme vocab (~25.6k) + FST round-trip. Foundation for adam's experimental neural composition layer (≤10M params). EXPERIMENTAL — Phase 0 prototype."
+
+[dependencies]
+adam-kernel = { path = "../adam-kernel" }
+adam-kernel-fst = { path = "../adam-kernel-fst" }
+thiserror.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true
