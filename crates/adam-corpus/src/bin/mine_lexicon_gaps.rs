@@ -407,26 +407,44 @@ fn is_closed_class(pos: &str) -> bool {
 
 fn load_roots() -> Result<HashSet<String>, String> {
     let mut set = HashSet::new();
-    let mut short_closed_class_kept = 0usize;
+    let mut short_kept = 0usize;
+    let mut leading_dash_normalised = 0usize;
     for path in [CURATED_ROOTS, APERTIUM_ROOTS] {
         let raw = fs::read_to_string(path).map_err(|e| format!("{path}: {e}"))?;
         let file: RootsFile = serde_json::from_str(&raw).map_err(|e| format!("{path}: {e}"))?;
         for entry in &file.roots {
-            let r = entry.root.trim().to_lowercase();
-            let len = r.chars().count();
-            if len >= MIN_ROOT_LEN {
-                set.insert(r);
-            } else if is_closed_class(&entry.part_of_speech) {
-                // Short closed-class roots — keep regardless of length.
-                short_closed_class_kept += 1;
-                set.insert(r);
+            let mut r = entry.root.trim().to_lowercase();
+            // Normalise the legacy `-` prefix used in some lexicon
+            // entries (`-аят`, `-ба`) — that dash is a curator
+            // marker, not part of the surface. Stripping it lets
+            // prefix-match see «аяттың» / «бабалары» / etc.
+            if let Some(stripped) = r.strip_prefix('-') {
+                r = stripped.to_string();
+                leading_dash_normalised += 1;
             }
+            if r.is_empty() {
+                continue;
+            }
+            let len = r.chars().count();
+            // Trust the Lexicon curation. Both noun and verb stems
+            // ship at 2-character length for common Kazakh roots
+            // (`ал`, `бер`, `өт`, `ел`, `жыл`, ...); filtering them
+            // out misses millions of inflected surfaces. The previous
+            // MIN_ROOT_LEN = 3 dropped them; we keep every Lexicon
+            // entry regardless of length. False-positive prefix
+            // matches are bounded by the Lexicon curation itself.
+            if len < MIN_ROOT_LEN {
+                short_kept += 1;
+            }
+            set.insert(r);
         }
     }
     eprintln!(
-        "mine_lexicon_gaps: loaded {} Lexicon roots ({} short closed-class kept)",
+        "mine_lexicon_gaps: loaded {} Lexicon roots ({} short \
+         < {MIN_ROOT_LEN} chars kept, {} normalised `-` prefix)",
         set.len(),
-        short_closed_class_kept
+        short_kept,
+        leading_dash_normalised
     );
     Ok(set)
 }
