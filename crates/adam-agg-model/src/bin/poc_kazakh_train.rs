@@ -143,20 +143,27 @@ fn main() {
     );
 
     // -- Stage 4: build model -----------------------------------------------
+    // Hyperparameters are env-overridable so we can scale-up without
+    // recompiling: POC_D_MODEL, POC_N_LAYERS, POC_N_HEADS, POC_D_FF.
     let device = NdArrayDevice::default();
-    let model_cfg = TinyAgtConfig::new(vocab_size, 32, 64, 4, 2, 128);
+    let d_model = env_usize("POC_D_MODEL", 64);
+    let n_layers = env_usize("POC_N_LAYERS", 2);
+    let n_heads = env_usize("POC_N_HEADS", 4);
+    let d_ff = env_usize("POC_D_FF", 128);
+    let model_cfg = TinyAgtConfig::new(vocab_size, 32, d_model, n_heads, n_layers, d_ff);
     let model: TinyAgt<B> = model_cfg.init(&device);
     let param_count = estimate_params(&model_cfg);
     eprintln!(
-        "[4/6] Model built: ~{} params (vocab={}, d=64, layers=2)",
-        param_count, vocab_size
+        "[4/6] Model built: ~{} params (vocab={}, d={}, layers={})",
+        param_count, vocab_size, d_model, n_layers
     );
 
     // -- Stage 5: train -----------------------------------------------------
+    // Hyperparams overridable via env: POC_EPOCHS, POC_BATCH, POC_LR.
     let train_cfg = TrainConfig {
-        batch_size: 32,
-        n_epochs: 3,
-        lr: 3e-3,
+        batch_size: env_usize("POC_BATCH", 32),
+        n_epochs: env_usize("POC_EPOCHS", 3),
+        lr: env_f64("POC_LR", 3e-3),
         seed: 42,
     };
     eprintln!(
@@ -348,6 +355,10 @@ fn main() {
     );
 
     // -- Stage 8: train a SECOND model with algebraic loss; compare -------
+    if std::env::var("POC_SKIP_ALG").is_ok() {
+        eprintln!("\n[8/8] Skipping algebraic-loss A/B (POC_SKIP_ALG set).");
+        return;
+    }
     eprintln!("\n[8/8] Training a second model with ALGEBRAIC LOSS for A/B:");
     let invalid_table = build_invalid_mask_table(&compact_to_label, vocab_size);
     let state_ids_per_seq: Vec<Vec<u8>> = train_sequences
@@ -355,11 +366,11 @@ fn main() {
         .map(|s| compute_state_ids(s, &compact_to_label))
         .collect();
     let model2: TinyAgt<B> = model_cfg.init(&device);
-    let alpha = 0.5f32;
+    let alpha = env_f32("POC_ALPHA", 0.5);
     let alg_train_cfg = TrainConfig {
-        batch_size: 32,
-        n_epochs: 3,
-        lr: 3e-3,
+        batch_size: env_usize("POC_BATCH", 32),
+        n_epochs: env_usize("POC_EPOCHS", 3),
+        lr: env_f64("POC_LR", 3e-3),
         seed: 42,
     };
     eprintln!(
@@ -528,6 +539,25 @@ fn main() {
         100.0 * beam_exact as f32 / n_prefixes,
         100.0 * alg_beam_exact as f32 / n_prefixes,
     );
+}
+
+fn env_usize(key: &str, default: usize) -> usize {
+    std::env::var(key)
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(default)
+}
+fn env_f64(key: &str, default: f64) -> f64 {
+    std::env::var(key)
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(default)
+}
+fn env_f32(key: &str, default: f32) -> f32 {
+    std::env::var(key)
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(default)
 }
 
 /// Teacher-forced average cross-entropy over a held-out set. No
