@@ -1,5 +1,13 @@
 # adam Resource Benchmark — v4.93.5
 
+> **v6.0 forward-looking note (2026-05-16).** v4.93.5 resource
+> bench covers the deterministic pipeline only. v6.0 RSS / latency
+> contracts for the neural-enabled path are in
+> [`architecture_neural_v6.md`](architecture_neural_v6.md) §5;
+> measured numbers in
+> [`bench/neural_inference_2026_05_16.md`](bench/neural_inference_2026_05_16.md).
+> v6.0 must not regress the deterministic-path RSS recorded here.
+
 Loaded runtime; running 30 queries.
 
 ## Latency

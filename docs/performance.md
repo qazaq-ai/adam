@@ -1,5 +1,15 @@
 # Performance — adam v5.32.0
 
+> **v6.0 forward-looking note (2026-05-16).** The numbers below cover
+> the deterministic-only path (v5.x). For the v6.0 neural-
+> composition-layer latency numbers see
+> [`bench/neural_inference_2026_05_16.md`](bench/neural_inference_2026_05_16.md)
+> (M2 8 GB baseline; 88× headroom over the v6.0 target). The v6.0
+> release-blocking performance contracts are in
+> [`architecture_neural_v6.md`](architecture_neural_v6.md) §5; this
+> file remains the deterministic-path baseline that v6.0 must not
+> regress against.
+
 ## Headline KPI: cost per correct answer
 
 **`latency_ms_per_correct_answer = p50_turn_latency_ms / holdout_pass_rate`**
