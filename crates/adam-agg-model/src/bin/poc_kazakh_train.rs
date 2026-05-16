@@ -120,6 +120,28 @@ fn main() {
         eprintln!("   {:?}", labels);
     }
 
+    // -- Stage 3b: train / held-out split -----------------------------------
+    // Every 10th sequence goes to the held-out eval set. Deterministic so
+    // re-runs are comparable. The held-out set tests generalisation: the
+    // model never sees these (root, feature) combos during training, but
+    // since each root appears in many OTHER combos and each suffix in
+    // many other roots, a model that has learned the algebra should
+    // still produce valid continuations for the unseen combos.
+    let mut train_sequences: Vec<Vec<i64>> = Vec::new();
+    let mut eval_sequences: Vec<Vec<i64>> = Vec::new();
+    for (i, seq) in training_sequences.iter().enumerate() {
+        if i % 10 == 0 {
+            eval_sequences.push(seq.clone());
+        } else {
+            train_sequences.push(seq.clone());
+        }
+    }
+    eprintln!(
+        "[3b/6] Split: {} train sequences / {} held-out eval sequences",
+        train_sequences.len(),
+        eval_sequences.len()
+    );
+
     // -- Stage 4: build model -----------------------------------------------
     let device = NdArrayDevice::default();
     let model_cfg = TinyAgtConfig::new(vocab_size, 32, 64, 4, 2, 128);
@@ -142,7 +164,7 @@ fn main() {
         train_cfg.batch_size, train_cfg.n_epochs, train_cfg.lr
     );
     let t0 = std::time::Instant::now();
-    let (trained, reports) = train_next_token(model, &training_sequences, &train_cfg, &device);
+    let (trained, reports) = train_next_token(model, &train_sequences, &train_cfg, &device);
     let elapsed = t0.elapsed().as_secs_f32();
     let first_loss = reports.first().map(|r| r.loss).unwrap_or(0.0);
     let last_loss = reports.last().map(|r| r.loss).unwrap_or(0.0);
@@ -183,22 +205,35 @@ fn main() {
         100.0 * valid as f32 / total as f32
     );
 
+    // -- Stage 6b: held-out CE loss / perplexity ----------------------------
+    // Strongest generalisation signal: teacher-forced cross-entropy on
+    // held-out (root, feature) combos. If the model just memorised, this
+    // will be high. If it has learned the algebra, this will be near the
+    // training-end CE.
+    let eval_ce = held_out_ce_loss(&trained, &eval_sequences, &device);
+    eprintln!(
+        "[6b/7] Held-out teacher-forced CE: {:.3}  (training-end was {:.3})",
+        eval_ce, last_loss,
+    );
+
     // -- Stage 7: FST-constrained vs unconstrained inference comparison ----
-    eprintln!("\n[7/7] Generation comparison (constrained vs unconstrained):");
-    // Pick prefixes from sequences with ≥4 tokens (BOS + Root + ≥2 suffixes
-    // + EOS) — the harder case. Skip bare-root sequences so the model
-    // has to actually compose multi-suffix continuations.
+    eprintln!("\n[7/7] Generation comparison (constrained vs unconstrained, HELD-OUT):");
+    // Pick prefixes from HELD-OUT sequences with ≥4 tokens. These are
+    // (root, feature) combos the model never saw during training. Also
+    // capture the "gold" continuation so we can compute exact-match.
     let mut prefixes: Vec<Vec<i64>> = Vec::new();
-    for seq in training_sequences.iter() {
+    let mut gold_continuations: Vec<Vec<i64>> = Vec::new();
+    for seq in eval_sequences.iter() {
         if seq.len() >= 4 {
             prefixes.push(seq[..2].to_vec());
+            gold_continuations.push(seq[2..].to_vec());
         }
         if prefixes.len() >= 100 {
             break;
         }
     }
     eprintln!(
-        "       Using {} prefixes from sequences with ≥4 morpheme tokens",
+        "       Using {} held-out prefixes from sequences with ≥4 morpheme tokens",
         prefixes.len()
     );
 
@@ -209,6 +244,9 @@ fn main() {
     let mut con_words_valid = 0usize;
     let mut unc_words_valid = 0usize;
     let mut beam_words_valid = 0usize;
+    let mut con_exact = 0usize;
+    let mut unc_exact = 0usize;
+    let mut beam_exact = 0usize;
     let labels_of = |ids: &[i64]| -> Vec<&str> {
         ids.iter()
             .map(|&t| {
@@ -219,7 +257,26 @@ fn main() {
             })
             .collect()
     };
-    for prefix in &prefixes {
+    let exact_match = |out: &[i64], gold: &[i64]| -> bool {
+        // Compare the *generated tail* (after the prefix) against the
+        // gold continuation, up to and including EOS.
+        let prefix_len = 2;
+        if out.len() < prefix_len {
+            return false;
+        }
+        let tail = &out[prefix_len..];
+        // Truncate generated tail at first EOS.
+        let mut end = tail.len();
+        for (i, &t) in tail.iter().enumerate() {
+            if t == EOS_ID {
+                end = i + 1;
+                break;
+            }
+        }
+        let trimmed = &tail[..end];
+        trimmed == gold
+    };
+    for (prefix, gold) in prefixes.iter().zip(gold_continuations.iter()) {
         // Constrained greedy.
         let con = generate_constrained(&trained, &compact_to_label, prefix, 6, &device);
         let con_labels = labels_of(&con);
@@ -228,6 +285,9 @@ fn main() {
         constrained_total += t;
         if is_valid_word(&con_labels) {
             con_words_valid += 1;
+        }
+        if exact_match(&con, gold) {
+            con_exact += 1;
         }
 
         // Unconstrained greedy.
@@ -239,12 +299,18 @@ fn main() {
         if is_valid_word(&unc_labels) {
             unc_words_valid += 1;
         }
+        if exact_match(&unc, gold) {
+            unc_exact += 1;
+        }
 
         // Constrained beam search (beam_width=4).
         let beam = generate_constrained_beam(&trained, &compact_to_label, prefix, 6, 4, &device);
         let beam_labels = labels_of(&beam);
         if is_valid_word(&beam_labels) {
             beam_words_valid += 1;
+        }
+        if exact_match(&beam, gold) {
+            beam_exact += 1;
         }
     }
 
@@ -260,34 +326,31 @@ fn main() {
     };
     let n_prefixes = prefixes.len() as f32;
     eprintln!(
-        "       Constrained greedy:    {}/{} transitions = {:.1}%   ({}/{} words = {:.1}%)",
+        "       Constrained greedy:    {}/{} trns = {:.1}%   words = {:.1}%   exact = {:.1}%",
         constrained_valid,
         constrained_total,
         con_rate,
-        con_words_valid,
-        prefixes.len(),
         100.0 * con_words_valid as f32 / n_prefixes,
+        100.0 * con_exact as f32 / n_prefixes,
     );
     eprintln!(
-        "       Unconstrained greedy:  {}/{} transitions = {:.1}%   ({}/{} words = {:.1}%)",
+        "       Unconstrained greedy:  {}/{} trns = {:.1}%   words = {:.1}%   exact = {:.1}%",
         unconstrained_valid,
         unconstrained_total,
         unc_rate,
-        unc_words_valid,
-        prefixes.len(),
         100.0 * unc_words_valid as f32 / n_prefixes,
+        100.0 * unc_exact as f32 / n_prefixes,
     );
     eprintln!(
-        "       Constrained beam (w=4):                       ({}/{} words = {:.1}%)",
-        beam_words_valid,
-        prefixes.len(),
+        "       Constrained beam (w=4):                                 words = {:.1}%   exact = {:.1}%",
         100.0 * beam_words_valid as f32 / n_prefixes,
+        100.0 * beam_exact as f32 / n_prefixes,
     );
 
     // -- Stage 8: train a SECOND model with algebraic loss; compare -------
     eprintln!("\n[8/8] Training a second model with ALGEBRAIC LOSS for A/B:");
     let invalid_table = build_invalid_mask_table(&compact_to_label, vocab_size);
-    let state_ids_per_seq: Vec<Vec<u8>> = training_sequences
+    let state_ids_per_seq: Vec<Vec<u8>> = train_sequences
         .iter()
         .map(|s| compute_state_ids(s, &compact_to_label))
         .collect();
@@ -306,7 +369,7 @@ fn main() {
     let t0 = std::time::Instant::now();
     let (trained_alg, alg_reports) = train_next_token_with_alg_loss(
         model2,
-        &training_sequences,
+        &train_sequences,
         &state_ids_per_seq,
         &invalid_table,
         &alg_train_cfg,
@@ -331,6 +394,19 @@ fn main() {
         );
     }
 
+    // Held-out CE for the ALG model (same eval set as Stage 6b).
+    let alg_eval_ce = held_out_ce_loss(&trained_alg, &eval_sequences, &device);
+    let last_alg_ce = alg_reports.last().map(|r| r.ce).unwrap_or(0.0);
+    eprintln!(
+        "       [ALG] Held-out teacher-forced CE: {:.3}  (training-end CE was {:.3})",
+        alg_eval_ce, last_alg_ce,
+    );
+    let gen_gap = (alg_eval_ce - eval_ce) * 1000.0;
+    eprintln!(
+        "       Generalisation gap (eval_ce_alg − eval_ce_ce) × 1000 = {:+.1}  (lower = ALG generalises better)",
+        gen_gap
+    );
+
     // Same prefixes → measure constrained + unconstrained validity for model 2.
     let mut alg_con_valid = 0usize;
     let mut alg_con_total = 0usize;
@@ -339,7 +415,10 @@ fn main() {
     let mut alg_con_words = 0usize;
     let mut alg_unc_words = 0usize;
     let mut alg_beam_words = 0usize;
-    for prefix in &prefixes {
+    let mut alg_con_exact = 0usize;
+    let mut alg_unc_exact = 0usize;
+    let mut alg_beam_exact = 0usize;
+    for (prefix, gold) in prefixes.iter().zip(gold_continuations.iter()) {
         let con = generate_constrained(&trained_alg, &compact_to_label, prefix, 6, &device);
         let con_labels = labels_of(&con);
         let (v, t) = count_valid_transitions(&con_labels);
@@ -347,6 +426,9 @@ fn main() {
         alg_con_total += t;
         if is_valid_word(&con_labels) {
             alg_con_words += 1;
+        }
+        if exact_match(&con, gold) {
+            alg_con_exact += 1;
         }
 
         let unc = generate_unconstrained(&trained_alg, prefix, 6, &device);
@@ -357,12 +439,18 @@ fn main() {
         if is_valid_word(&unc_labels) {
             alg_unc_words += 1;
         }
+        if exact_match(&unc, gold) {
+            alg_unc_exact += 1;
+        }
 
         let beam =
             generate_constrained_beam(&trained_alg, &compact_to_label, prefix, 6, 4, &device);
         let beam_labels = labels_of(&beam);
         if is_valid_word(&beam_labels) {
             alg_beam_words += 1;
+        }
+        if exact_match(&beam, gold) {
+            alg_beam_exact += 1;
         }
     }
     let alg_con_rate = if alg_con_total > 0 {
@@ -376,38 +464,35 @@ fn main() {
         0.0
     };
     eprintln!(
-        "       [ALG] Constrained greedy:    {}/{} = {:.1}%   ({}/{} words = {:.1}%)",
+        "       [ALG] Constrained greedy:    {}/{} = {:.1}%   words = {:.1}%   exact = {:.1}%",
         alg_con_valid,
         alg_con_total,
         alg_con_rate,
-        alg_con_words,
-        prefixes.len(),
         100.0 * alg_con_words as f32 / n_prefixes,
+        100.0 * alg_con_exact as f32 / n_prefixes,
     );
     eprintln!(
-        "       [ALG] Unconstrained greedy:  {}/{} = {:.1}%   ({}/{} words = {:.1}%)",
+        "       [ALG] Unconstrained greedy:  {}/{} = {:.1}%   words = {:.1}%   exact = {:.1}%",
         alg_unc_valid,
         alg_unc_total,
         alg_unc_rate,
-        alg_unc_words,
-        prefixes.len(),
         100.0 * alg_unc_words as f32 / n_prefixes,
+        100.0 * alg_unc_exact as f32 / n_prefixes,
     );
     eprintln!(
-        "       [ALG] Constrained beam (w=4):                  ({}/{} words = {:.1}%)",
-        alg_beam_words,
-        prefixes.len(),
+        "       [ALG] Constrained beam (w=4):                          words = {:.1}%   exact = {:.1}%",
         100.0 * alg_beam_words as f32 / n_prefixes,
+        100.0 * alg_beam_exact as f32 / n_prefixes,
     );
     let lift_unc = alg_unc_rate - unc_rate;
     eprintln!(
         "       Algebraic-loss uplift on unconstrained-transition validity: {:+.1} pp",
         lift_unc
     );
-    let lift_unc_words = (alg_unc_words as f32 - unc_words_valid as f32) / n_prefixes * 100.0;
+    let lift_unc_exact = (alg_unc_exact as f32 - unc_exact as f32) / n_prefixes * 100.0;
     eprintln!(
-        "       Algebraic-loss uplift on unconstrained-WORD validity:        {:+.1} pp",
-        lift_unc_words
+        "       Algebraic-loss uplift on unconstrained-EXACT-match:          {:+.1} pp",
+        lift_unc_exact
     );
 
     eprintln!("\n=== HYPOTHESIS PROOF ===");
@@ -438,6 +523,58 @@ fn main() {
         "  ✓ Algebraic-loss model:     unconstrained {:.1}% ({:+.1} pp vs CE-only)",
         alg_unc_rate, lift_unc
     );
+    eprintln!(
+        "  ✓ Held-out exact-match:     CE-only {:.1}%  /  ALG {:.1}%  (constrained-beam)",
+        100.0 * beam_exact as f32 / n_prefixes,
+        100.0 * alg_beam_exact as f32 / n_prefixes,
+    );
+}
+
+/// Teacher-forced average cross-entropy over a held-out set. No
+/// gradients, no optimisation — just forward + loss.
+fn held_out_ce_loss<B2: burn::tensor::backend::AutodiffBackend>(
+    model: &TinyAgt<B2>,
+    sequences: &[Vec<i64>],
+    device: &B2::Device,
+) -> f32 {
+    use burn::prelude::*;
+    let max_seq_len = model.max_seq_len();
+    let batch_size = 32usize;
+    let mut total: f32 = 0.0;
+    let mut count: usize = 0;
+    for chunk in sequences.chunks(batch_size) {
+        let b = chunk.len();
+        let mut input_data = vec![0i64; b * max_seq_len];
+        let mut target_data = vec![0i64; b * max_seq_len];
+        for (i, seq) in chunk.iter().enumerate() {
+            let take = seq.len().min(max_seq_len);
+            if take == 0 {
+                continue;
+            }
+            for j in 0..take - 1 {
+                input_data[i * max_seq_len + j] = seq[j];
+                target_data[i * max_seq_len + j] = seq[j + 1];
+            }
+        }
+        let input: Tensor<B2, 2, Int> = Tensor::from_data(
+            burn::tensor::TensorData::new(input_data, [b, max_seq_len]),
+            device,
+        );
+        let target: Tensor<B2, 2, Int> = Tensor::from_data(
+            burn::tensor::TensorData::new(target_data, [b, max_seq_len]),
+            device,
+        );
+        let logits = model.forward(input);
+        let loss = model.loss(logits, target);
+        let v: f32 = loss.into_scalar().elem();
+        total += v;
+        count += 1;
+    }
+    if count == 0 {
+        0.0
+    } else {
+        total / count as f32
+    }
 }
 
 fn estimate_params(cfg: &TinyAgtConfig) -> usize {
