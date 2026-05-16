@@ -25,6 +25,7 @@ dependencies = [
  "adam-agg-tokenizer",
  "adam-kernel",
  "adam-kernel-fst",
+ "rayon",
  "serde",
  "serde_json",
  "thiserror 2.0.18",

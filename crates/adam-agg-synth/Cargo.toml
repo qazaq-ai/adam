@@ -12,6 +12,7 @@ adam-agg-tokenizer = { path = "../adam-agg-tokenizer" }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
+rayon = "1"
 
 [[bin]]
 name = "build_real_corpus_pairs"

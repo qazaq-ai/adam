@@ -24,10 +24,12 @@ use std::collections::HashSet;
 use std::fs;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
+use std::sync::Mutex;
 
 use adam_agg_synth::{SynthGenerator, TrainingPair};
 use adam_agg_tokenizer::{AggTokenizer, RootPos};
 use adam_kernel_fst::lexicon::LexiconV1;
+use rayon::prelude::*;
 use serde::Deserialize;
 
 /// Schema of `data/curated/*_pack.json` packs.
@@ -108,57 +110,86 @@ fn main() {
         "data/curated/clean_reference_extension_pack.json",
     ];
 
-    let mut all_pairs: Vec<TrainingPair> = Vec::new();
-    let mut seen_surfaces: HashSet<String> = HashSet::new();
+    // Parallel pack processing — every pack is read + tokenised on
+    // its own rayon worker. Each worker builds a local Vec; we merge
+    // through a Mutex-guarded dedup at the boundary. On M2 (8 cores)
+    // this saturates available CPU; with 15 packs and a per-pack
+    // workload dominated by AggTokenizer::tokenize_word, near-linear
+    // speedup is achievable. Per-pack workload is large enough that
+    // rayon overhead is negligible.
+    let pairs_lock: Mutex<Vec<TrainingPair>> = Mutex::new(Vec::new());
+    let seen_lock: Mutex<HashSet<String>> = Mutex::new(HashSet::new());
+    let progress: Mutex<()> = Mutex::new(());
 
-    let mut push_pair =
-        |p: TrainingPair, all: &mut Vec<TrainingPair>, seen: &mut HashSet<String>| {
-            if seen.insert(p.surface.clone()) {
-                all.push(p);
+    pack_paths.par_iter().for_each(|path| {
+        if !Path::new(path).exists() {
+            let _g = progress.lock().unwrap();
+            eprintln!("       skip: {} (not present)", path);
+            return;
+        }
+        let bytes = match fs::read(path) {
+            Ok(b) => b,
+            Err(e) => {
+                let _g = progress.lock().unwrap();
+                eprintln!("       skip: {} ({})", path, e);
+                return;
             }
         };
-
-    for path in &pack_paths {
-        if !Path::new(path).exists() {
-            eprintln!("       skip: {} (not present)", path);
-            continue;
-        }
-        let bytes = fs::read(path).expect("read pack");
         let pack: CuratedPack = match serde_json::from_slice(&bytes) {
             Ok(p) => p,
             Err(e) => {
+                let _g = progress.lock().unwrap();
                 eprintln!("       skip: {} ({})", path, e);
-                continue;
+                return;
             }
         };
-        let mut emitted_here = 0usize;
+        // Tokenise each sample on the same worker — keep generator
+        // state per-thread to avoid contention. We rebuild a fresh
+        // SynthGenerator per pack since pairs_from_text only borrows
+        // from the lexicon + tokenizer, both Send + Sync after build.
+        let mut local_generator = SynthGenerator::new(&lex, &tokenizer);
+        let mut local_pairs: Vec<TrainingPair> = Vec::new();
         for sample in &pack.samples {
             let sentence = sample.text();
             if sentence.is_empty() {
                 continue;
             }
-            let pairs = generator.pairs_from_text(sentence, RootPos::NounLike);
-            for p in pairs {
-                let before = all_pairs.len();
-                push_pair(p, &mut all_pairs, &mut seen_surfaces);
-                if all_pairs.len() > before {
+            let pairs = local_generator.pairs_from_text(sentence, RootPos::NounLike);
+            local_pairs.extend(pairs);
+        }
+        // Merge phase — lock once per pack, not per pair. Drops
+        // duplicates by surface.
+        let mut emitted_here = 0usize;
+        {
+            let mut seen = seen_lock.lock().unwrap();
+            let mut all = pairs_lock.lock().unwrap();
+            for p in local_pairs {
+                if all.len() >= max_pairs {
+                    break;
+                }
+                if seen.insert(p.surface.clone()) {
+                    all.push(p);
                     emitted_here += 1;
                 }
             }
-            if all_pairs.len() >= max_pairs {
-                break;
-            }
         }
+        let total = pairs_lock.lock().unwrap().len();
+        let _g = progress.lock().unwrap();
         eprintln!(
             "       pack {} → +{} unique words (total {} pairs)",
-            path,
-            emitted_here,
-            all_pairs.len()
+            path, emitted_here, total
         );
-        if all_pairs.len() >= max_pairs {
-            break;
+    });
+
+    let mut all_pairs = pairs_lock.into_inner().unwrap();
+    let mut seen_surfaces = seen_lock.into_inner().unwrap();
+    // The CSV stage below stays single-threaded — record-level state
+    // (`current_record`, `in_quoted_record`) is inherently sequential.
+    let push_pair = |p: TrainingPair, all: &mut Vec<TrainingPair>, seen: &mut HashSet<String>| {
+        if seen.insert(p.surface.clone()) {
+            all.push(p);
         }
-    }
+    };
     eprintln!(
         "[2/4] Packs ingested: {} unique surface-pair samples",
         all_pairs.len()

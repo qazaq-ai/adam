@@ -395,6 +395,64 @@ fn main() {
         100.0 * beam_exact as f32 / n_prefixes,
     );
 
+    // -- Stage 7.5: Verifier (L6) integration check -------------------------
+    // Demonstrates the v6.0 L5.5 → L6 wiring on real surfaces. We
+    // sample 100 unique surfaces from the training set, run them
+    // through the production-grade Verifier module (FST round-trip
+    // + factual-grounding gate), and report the pass/block breakdown.
+    // This is the same Verifier the production pipeline will route
+    // every neural output through; the prototype demonstrates the
+    // API surface and the audit-trail shape.
+    {
+        use adam_agg_model::verifier::{BlockReason, Verdict, Verifier};
+        let facts_path = Path::new("data/retrieval/facts.json");
+        if facts_path.exists() {
+            eprintln!("\n[7.5/8] Verifier (L6) check on 100 sampled surfaces from training:");
+            let facts_idx = Verifier::load_facts_index(facts_path).expect("facts.json load");
+            let verifier_tokenizer = AggTokenizer::build(lex.clone());
+            let verifier =
+                Verifier::new(verifier_tokenizer, facts_idx, false /* permissive */);
+            let mut seen = std::collections::HashSet::new();
+            let mut surfaces: Vec<String> = Vec::new();
+            for pair in all_pairs.iter() {
+                if surfaces.len() >= 100 {
+                    break;
+                }
+                if pair.surface.is_empty() {
+                    continue;
+                }
+                if seen.insert(pair.surface.clone()) {
+                    surfaces.push(pair.surface.clone());
+                }
+            }
+            let mut pass = 0usize;
+            let mut block_fst = 0usize;
+            let mut block_ungrounded = 0usize;
+            let mut grounded_count = 0usize;
+            for s in &surfaces {
+                let rec = verifier.check(s);
+                match rec.verdict {
+                    Verdict::Pass { grounded, .. } => {
+                        pass += 1;
+                        if grounded {
+                            grounded_count += 1;
+                        }
+                    }
+                    Verdict::Block(BlockReason::FstRoundTripFailed) => block_fst += 1,
+                    Verdict::Block(BlockReason::Ungrounded) => block_ungrounded += 1,
+                }
+            }
+            eprintln!(
+                "       {}/{} passed  ({} factually grounded);  block: {} FST-rt, {} ungrounded",
+                pass,
+                surfaces.len(),
+                grounded_count,
+                block_fst,
+                block_ungrounded
+            );
+        }
+    }
+
     // -- Stage 8: train a SECOND model with algebraic loss; compare -------
     if std::env::var("POC_SKIP_ALG").is_ok() {
         eprintln!("\n[8/8] Skipping algebraic-loss A/B (POC_SKIP_ALG set).");
