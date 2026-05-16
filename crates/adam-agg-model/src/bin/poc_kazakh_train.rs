@@ -44,12 +44,16 @@ fn main() {
     // -- Stage 2: synth training data ---------------------------------------
     let tokenizer = AggTokenizer::build(lex.clone());
     let mut generator = SynthGenerator::new(&lex, &tokenizer);
+    let inflected = generator.noun_inflections(2000); // ~28k pairs
+    let possessives = generator.noun_possessives(1000); // ~21k pairs
     let bare = generator.bare_roots();
-    let inflected = generator.noun_inflections(200);
-    let possessives = generator.noun_possessives(100);
-    let mut all_pairs = bare;
-    all_pairs.extend(inflected);
+    // Heavy-tail policy: keep ALL inflected, sub-sample bare roots so
+    // they don't dominate the training distribution (otherwise the
+    // model just memorises "after Root, emit EOS"). Skim every 4th.
+    let bare_sampled: Vec<_> = bare.into_iter().step_by(4).collect();
+    let mut all_pairs = inflected;
     all_pairs.extend(possessives);
+    all_pairs.extend(bare_sampled);
     eprintln!(
         "[2/6] Synth pipeline produced {} morpheme-tokenised pairs",
         all_pairs.len()
@@ -58,13 +62,21 @@ fn main() {
     // -- Stage 3: compact training vocab ------------------------------------
     // Phase 0: re-map the heterogeneous token ids (suffix hashes + root
     // ids from Lexicon ordering) into a dense [0..vocab_size) range.
+    // Pre-allocate service slots so they don't collide with payload
+    // tokens: 0=PAD, 1=BOS, 2=EOS, 3=SPACE. Real tokens start at id 4.
+    const PAD_ID: i64 = 0;
+    const BOS_ID: i64 = 1;
+    const EOS_ID: i64 = 2;
+    const SPACE_ID: i64 = 3;
     let mut id_to_compact: HashMap<u32, usize> = HashMap::new();
-    let mut compact_to_label: Vec<String> = vec!["<unk>".into()];
+    let mut compact_to_label: Vec<String> =
+        vec!["<unk>".into(), "BOS".into(), "EOS".into(), "<spc>".into()];
     id_to_compact.insert(u32::MAX, 0);
-    let mut next_id = 1usize;
+    let mut next_id = compact_to_label.len();
+    let _ = (PAD_ID, SPACE_ID); // reserved for completeness
     let mut training_sequences: Vec<Vec<i64>> = Vec::new();
     for pair in &all_pairs {
-        let mut seq = vec![1i64]; // BOS
+        let mut seq = vec![BOS_ID];
         for tok in &pair.tokens {
             let mapped = *id_to_compact.entry(tok.id).or_insert_with(|| {
                 let id = next_id;
@@ -84,10 +96,10 @@ fn main() {
             });
             seq.push(mapped as i64);
         }
-        seq.push(2); // EOS
+        seq.push(EOS_ID);
         training_sequences.push(seq);
     }
-    let vocab_size = next_id + 4; // headroom for service slots
+    let vocab_size = next_id;
     eprintln!(
         "[3/6] Compact training vocab: {} tokens; {} training sequences",
         vocab_size,
@@ -173,16 +185,22 @@ fn main() {
 
     // -- Stage 7: FST-constrained vs unconstrained inference comparison ----
     eprintln!("\n[7/7] Generation comparison (constrained vs unconstrained):");
-    // Pick 20 random sequence prefixes (first 2 tokens: BOS + Root).
+    // Pick prefixes from sequences with ≥4 tokens (BOS + Root + ≥2 suffixes
+    // + EOS) — the harder case. Skip bare-root sequences so the model
+    // has to actually compose multi-suffix continuations.
     let mut prefixes: Vec<Vec<i64>> = Vec::new();
-    for seq in training_sequences.iter().take(50) {
-        if seq.len() >= 2 {
+    for seq in training_sequences.iter() {
+        if seq.len() >= 4 {
             prefixes.push(seq[..2].to_vec());
         }
-        if prefixes.len() >= 20 {
+        if prefixes.len() >= 100 {
             break;
         }
     }
+    eprintln!(
+        "       Using {} prefixes from sequences with ≥4 morpheme tokens",
+        prefixes.len()
+    );
 
     let mut constrained_valid = 0usize;
     let mut constrained_total = 0usize;
