@@ -12,8 +12,8 @@
       "license": "Apache-2.0",
       "url": "https://huggingface.co/datasets/kz-transformers/multidomain-kazakh-dataset/resolve/main/kazakhBooks.csv",
       "filename": "kazakhBooks.csv",
-      "sha256": null,
-      "size_bytes": null,
+      "sha256": "f22e75a3e96583fd591eb979744be92559fd8853257cbd4790ccd7fc1ed49357",
+      "size_bytes": 3969476025,
       "expected_size_bytes": 3969476025,
       "notes": "Primary book corpus. Largest unstructured Kazakh-text source we'll ingest. Expect literary + educational + reference text."
     },
