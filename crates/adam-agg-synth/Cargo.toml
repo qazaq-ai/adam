@@ -13,5 +13,9 @@ serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 
+[[bin]]
+name = "build_real_corpus_pairs"
+path = "src/bin/build_real_corpus_pairs.rs"
+
 [lints]
 workspace = true

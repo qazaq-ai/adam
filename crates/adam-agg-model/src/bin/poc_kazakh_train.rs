@@ -41,7 +41,14 @@ fn main() {
         lex.entries_ordered.len()
     );
 
-    // -- Stage 2: synth training data ---------------------------------------
+    // -- Stage 2: training data ---------------------------------------------
+    // Synth (FST-generated) by default. If POC_REAL_PACK=path is set,
+    // *additionally* mix in the real-corpus pairs at that path; the
+    // pack must have been produced by `build_real_corpus_pairs`. We
+    // filter the real-corpus pack to keep ONLY pairs whose head token
+    // is a Root (i.e. the FST successfully decomposed the word into
+    // morphemes); Unk-headed pairs would just teach the model
+    // word-as-token mappings with no algebra to learn.
     let tokenizer = AggTokenizer::build(lex.clone());
     let mut generator = SynthGenerator::new(&lex, &tokenizer);
     let inflected = generator.noun_inflections(2000); // ~28k pairs
@@ -56,8 +63,38 @@ fn main() {
     all_pairs.extend(possessives);
     all_pairs.extend(verbs);
     all_pairs.extend(bare_sampled);
+    let synth_count = all_pairs.len();
+
+    let mut real_kept = 0usize;
+    if let Ok(real_pack_path) = std::env::var("POC_REAL_PACK") {
+        if Path::new(&real_pack_path).exists() {
+            let bytes = std::fs::read(&real_pack_path).expect("read POC_REAL_PACK");
+            let real: Vec<adam_agg_synth::TrainingPair> =
+                serde_json::from_slice(&bytes).expect("parse POC_REAL_PACK");
+            let real_total = real.len();
+            for p in real {
+                let head_is_root = matches!(
+                    p.tokens.first().map(|t| &t.kind),
+                    Some(adam_agg_synth::TokenKindSer::Root(_))
+                );
+                if head_is_root {
+                    all_pairs.push(p);
+                    real_kept += 1;
+                }
+            }
+            eprintln!(
+                "       Real-corpus pack: {}/{} pairs kept (Root-headed only)",
+                real_kept, real_total
+            );
+        } else {
+            eprintln!("       WARN: POC_REAL_PACK={} not found", real_pack_path);
+        }
+    }
+
     eprintln!(
-        "[2/6] Synth pipeline produced {} morpheme-tokenised pairs",
+        "[2/6] Training pairs: {} synth + {} real = {} total",
+        synth_count,
+        real_kept,
         all_pairs.len()
     );
 

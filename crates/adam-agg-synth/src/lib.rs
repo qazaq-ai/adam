@@ -317,6 +317,41 @@ impl<'a> SynthGenerator<'a> {
             pos: pos.into(),
         }
     }
+
+    /// Tokenise a single surface word using the underlying
+    /// [`AggTokenizer`]. Used by the real-corpus ingestion pipeline
+    /// when we don't have a paired [`RootEntry`] (the lexicon may not
+    /// contain the root). Falls back to `pos_hint` for the POS field.
+    pub fn pair_from_text_word(&self, word: &str, pos_hint: RootPos) -> TrainingPair {
+        let toks = self.tokenizer.tokenize_word(word);
+        TrainingPair {
+            surface: word.to_string(),
+            tokens: toks.iter().map(MorphTokenSer::from_token).collect(),
+            pos: pos_hint.into(),
+        }
+    }
+
+    /// Split `text` on non-alphanumeric boundaries, tokenise each word
+    /// through [`AggTokenizer`], and emit a [`TrainingPair`] per word.
+    /// Used to ingest free-form Kazakh prose (Wikipedia articles, book
+    /// chapters, news) into the same shape `bare_roots()` / inflection
+    /// generators produce — so the downstream training loop is
+    /// distribution-agnostic between synth and real data.
+    pub fn pairs_from_text(&mut self, text: &str, pos_hint: RootPos) -> Vec<TrainingPair> {
+        let mut out = Vec::new();
+        for word in text.split(|c: char| !c.is_alphabetic()) {
+            if word.is_empty() {
+                continue;
+            }
+            // Skip words shorter than 2 chars (probably noise).
+            if word.chars().count() < 2 {
+                continue;
+            }
+            out.push(self.pair_from_text_word(word, pos_hint));
+        }
+        self.emitted += out.len();
+        out
+    }
 }
 
 #[cfg(test)]

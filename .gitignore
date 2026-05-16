@@ -25,6 +25,11 @@ data/curated/adam_training_corpus_pack.json
 data/curated/adam_pretokenized_corpus_pack.json
 data/curated/adam_training_ids_pack.json
 
+# Real-corpus morpheme pairs regenerable via
+# `cargo run --release -p adam-agg-synth --bin build_real_corpus_pairs`.
+# ~23 MB; depends on data/curated/*_pack.json + huggingface_kz/kazakhBooks.csv.
+data/curated/real_corpus_pairs.json
+
 # Wikipedia shard files 02+ (v1.3.5+). Only shard 01 lives at the
 # canonical committed path `wikipedia_kz_pack.json`; the rest are
 # local-only fuel for the v2.0 retrieval engine. Regenerate with
