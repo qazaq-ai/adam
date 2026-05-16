@@ -97,12 +97,24 @@ LLM-индустрия использует нейросети, веса, ток
 |---|---|
 | Параметры модели | ≤ 10M (proof-of-concept) → ≤ 100M (если PoC удался) |
 | RSS при инференсе | ≤ 1 GB |
-| Latency p50 | ≤ 200 мс (vs main 21 мс) |
-| Hardware | M2 8GB, CPU only, no GPU |
-| Зависимости | tch/candle/burn для inference, без cloud APIs |
-| Training compute | M2 8GB CPU или максимум consumer-grade GPU (RTX 3090 локально, не cloud) |
+| Latency p50 на CPU | ≤ 200 мс (vs main 21 мс) |
+| **Inference на CPU обязан работать** | M2 8GB — основная цель |
+| Inference на GPU — допускается ускорение, не зависимость | если есть локальный GPU и реально быстрее — пользуемся |
+| Training | M2 8GB CPU **или** локальный consumer-grade GPU (RTX 3090 / M2 Ultra / 4090) |
+| **Cloud любой формы** | **ЗАПРЕЩЁН на всех этапах** (training, inference, fine-tuning) |
+| Рантайм-зависимости | candle / burn / tch для inference, без cloud APIs |
 
-**Watch-battery / air-gap не теряем.** Если эксперимент превышает эти лимиты — это **сигнал, что направление неверное**, а не аргумент за расширение лимитов.
+**Принцип — efficient use of hardware, not GPU-free.** GPU допускается там, где даёт реальный speedup:
+- **Training** (matmul-heavy → GPU быстрее CPU в 10-50×; не cloud, локально)
+- **Batch precomputes** (embedding-таблицы, root-affinity matrix, suffix priors — один раз)
+- **Inference**, если на конкретной машине есть локальный GPU **и** даёт реальный speedup **и** CPU-fallback при этом работает
+
+Чего избегаем — **GPU dependency**:
+- ❌ inference, который не работает без GPU
+- ❌ модель, которая требует Mac Studio / multi-GPU / датацентр
+- ❌ ситуация «запустить на M2 8GB CPU — невозможно»
+
+**Watch-battery / air-gap** остаётся стратегической целью. Если эксперимент **требует** GPU для inference — это сигнал, что направление неверное. Если ускоряет, но не требует — это норма.
 
 ---
 
@@ -127,13 +139,33 @@ PoC **проваливается** (rollback в main), если:
 
 ## Таймлайн
 
-- **Mai 15-26**: charter готов, ветка создана. Никакой работы — фокус на МО pitch.
-- **Mai 27 — Iyun 14** (3 недели): Phase 1 — agglutinative tokenizer + базовая инфраструктура training pipeline. **Цель**: tokenize 100k казахских слов корректно, full FST round-trip.
-- **Iyun 15 — Iyul 14** (4 недели): Phase 2 — обучить first small AGT (1-3M params) на synthetic FST corpus. **Цель**: модель производит морфологически валидный казахский на простых задачах (синтаксическое продолжение).
-- **Iyul 15 — Avgust 14** (4 недели): Phase 3 — интеграция с verifier; обучение на real diaolg-data. **Цель**: воспроизвести качество main на 30-question battery.
-- **Avgust 15**: первая полная оценка. Решение: продолжаем (готовим v6.0.0), останавливаем, или rollback.
+### Phase 0 — Deep Research Sprint (3 дня)
 
-Если в любую фазу видим явный тупик — rollback **без сожаления**.
+**Пятница — Суббота — Понедельник (15-16 + 18 мая 2026).**
+
+Полный фокус на теоретическую подготовку. **Никаких внешних дел** — МО, КРУ outreach, voice fixes, военные факты — всё отложено. Работаем в ветке `experimental/agglutinative-neural`. Никаких релизов в main за эти 3 дня.
+
+| День | Цель | Артефакт |
+|---|---|---|
+| 1 (пт) | Literature scan: small LMs / morpheme tokenization / FST-guided decoding / agglutinative NLP (TR/FI/HU/KO precedents) / neuro-symbolic hybrids | `docs/research/lit_scan.md` |
+| 2 (сб) | Математическая формализация: алгебра морфем как vector space, vowel harmony как constraint, algebraic loss как добавляемые члены | `docs/research/math_foundations.md` |
+| 3 (пн) | Спецификация морфемного токенайзера + первый Rust-прототип, который tokenize 100 казахских слов с FST round-trip | `crates/adam-agg-tokenizer/` stub + passing tests |
+
+### Phase 1 — Tokenizer + Training Pipeline (3 недели после MoD pitch)
+
+**27 мая — 14 июня.** Полная training-инфраструктура. **Цель**: 100k казахских слов корректно tokenize, full FST round-trip.
+
+### Phase 2 — First Small AGT (4 недели)
+
+**15 июня — 14 июля.** First small AGT (1-3M params) на synthetic FST corpus. **Цель**: морфологически валидный казахский на простых задачах.
+
+### Phase 3 — Verifier Integration + Real Data (4 недели)
+
+**15 июля — 14 августа.** Интеграция с deterministic verifier; обучение на real dialog-data. **Цель**: воспроизвести качество main на 30-question battery.
+
+### Decision Gate — 15 августа 2026
+
+Полная оценка: продолжаем (готовим v6.0.0 как hybrid release), останавливаем, или rollback. **Без сожаления, если данные говорят rollback.**
 
 ---
 
