@@ -1,6 +1,20 @@
 # Roadmap
 
-Version-by-version history of `adam`, grouped into two architectural eras. The final entry (v1.0.0) is the MVP cut.
+Version-by-version history of `adam`, grouped into architectural eras.
+
+> **Forward-looking note 2026-05-16.** v6.0.0 is a planned major
+> release that introduces an **algebra-anchored neural composition
+> layer** (L5.5) without breaking any v5.x deterministic guarantee.
+> The architecture is specified in
+> [`architecture_neural_v6.md`](architecture_neural_v6.md). The
+> research arc that proved the underlying hypothesis is on branch
+> `experimental/agglutinative-neural` and documented in
+> [`research/results_real_mix_2026_05_16.md`](research/results_real_mix_2026_05_16.md).
+> The full nine-item acceptance checklist for v6.0.0 GA is in
+> Section 9 of the architecture spec. v6.0 ship target: **+10–16
+> weeks from 2026-05-16** (i.e. late July → early September 2026),
+> contingent on Lexicon V2 + verifier integration + LLM-baseline
+> benchmark.
 
 ## Lifecycle view
 

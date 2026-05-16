@@ -1,13 +1,15 @@
 # Intelligence Roadmap — Path to Human-Like Dialog
 
-Status: **active**, 2026-04-26.
+Status: **active**, updated 2026-05-16.
 
 This document is the strategic plan for moving `adam` from "deterministic, traceable, but narrow" toward "deterministic, traceable, and conversationally adequate". It complements:
 - [`docs/roadmap.md`](roadmap.md) — release-by-release history.
 - [`docs/language_core_hybrid_roadmap.md`](language_core_hybrid_roadmap.md) — Language Core / Hybrid Surface Layer.
 - [`docs/foundation_scope.md`](foundation_scope.md) — current capability inventory.
+- [`docs/MANIFESTO.md`](MANIFESTO.md) — the four-inversion architectural position (algebra not statistics, CPU not cloud, verifier not RLHF, agglutinative-first).
+- [`docs/architecture_neural_v6.md`](architecture_neural_v6.md) — the v6.0.0 production architecture spec for the algebra-anchored neural composition layer.
 
-It does **not** propose abandoning the deterministic stack. Every gap below is closeable inside the existing Rust-only / graph-first architecture.
+It does **not** propose abandoning the deterministic stack. Every gap below is closeable inside the existing Rust-only / graph-first architecture; the **v6.0 neural composition layer is additive** — it improves surface realisation under the same verifier gate, never replacing the deterministic path. See [`architecture_neural_v6.md`](architecture_neural_v6.md) §2 (pipeline) and §4 (failure modes).
 
 ## What the v4.3.1 dialog test revealed
 

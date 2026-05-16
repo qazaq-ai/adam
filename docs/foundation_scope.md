@@ -1,8 +1,25 @@
 # Foundation Scope
 
+> **Forward-looking update 2026-05-16.** The "no probabilistic free
+> generation" line below describes v5.x. v6.0.0 introduces an
+> additive **algebra-anchored neural composition layer (L5.5)** —
+> see [`architecture_neural_v6.md`](architecture_neural_v6.md) for
+> the spec and [`MANIFESTO.md`](MANIFESTO.md) for the position. The
+> v6.0 path remains predictable, auditable, and CPU-resident; the
+> neural layer sits between the deterministic template (L5) and the
+> verifier (L6), and a missing model file boots-and-runs the v5.x
+> behaviour unchanged.
+
 ## Goal
 
 Deliver a **predictable, auditable Kazakh reasoning engine** built entirely in Rust and runnable on a MacBook Air M2 8 GB. Every layer's decision must be traceable. No probabilistic free generation in the recognised-intent path. **Not** an LLM clone — intentionally narrower, intentionally cheaper, intentionally provenance-first.
+
+In v6.0.0 (forthcoming, see Q3 2026 milestone) this goal extends:
+deterministic core remains load-bearing, **plus** an algebra-anchored
+neural composition layer that selects among morpho-valid surface
+variants under the same verifier gate. Hallucination remains
+architecturally impossible because the verifier still blocks any
+output that doesn't ground in `world_core` / `facts.json`.
 
 ## In scope (v1.0.0 → v4.22.5 delivered)
 

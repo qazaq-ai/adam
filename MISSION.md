@@ -6,7 +6,21 @@
 
 > **One-line thesis.** Modern AI's three structural problems —
 > opacity, cost, hallucination — are not inevitable. Agglutinative
-> languages give us a path to a deterministic alternative.
+> languages give us a path to a deterministic-and-neural-hybrid
+> alternative.
+
+> **Status update 2026-05-16.** The "deterministic alternative"
+> thesis evolved into a stronger one as of the experimental
+> `agglutinative-neural` research arc: neural training, weights,
+> tokens, and generation **can** be used inside the same architecture
+> *without* inheriting the three diseases below. Empirical proof at
+> PoC scale (M2 CPU, pure Rust, 2 M parameters, generalisation gap
+> collapsed from 0.196 to 0.031) is documented in
+> [`docs/research/results_real_mix_2026_05_16.md`](docs/research/results_real_mix_2026_05_16.md).
+> The full position is in [`docs/MANIFESTO.md`](docs/MANIFESTO.md).
+> The production architecture spec for the resulting v6.0 release is
+> in [`docs/architecture_neural_v6.md`](docs/architecture_neural_v6.md).
+> This file describes the *mission* that drives both paths.
 
 ## The three diseases of probabilistic AI
 
@@ -216,10 +230,20 @@ We need help on:
 ### AI researchers
 
 We are interested in:
-- Deterministic alternatives to neural inference
-- Formal verification of language models
-- Hybrid architectures where small ML components sit inside a
-  deterministic kernel without compromising its guarantees
+- Deterministic alternatives to neural inference (the v3.0–v5.x path,
+  load-bearing in production).
+- **Hybrid architectures where small ML components sit inside a
+  deterministic kernel without compromising its guarantees** — this
+  is no longer a hypothesis; the experimental `agglutinative-neural`
+  research arc demonstrated it at PoC scale on 2026-05-16. See
+  [`docs/MANIFESTO.md`](docs/MANIFESTO.md) for the four-inversion
+  position and [`docs/research/results_real_mix_2026_05_16.md`](docs/research/results_real_mix_2026_05_16.md)
+  for the numbers.
+- Formal verification of language models.
+- FST-constrained neural decoding for agglutinative languages
+  beyond Kazakh (Kyrgyz, Tatar, Uyghur, Yakut, Tuvan, Mongolian,
+  Turkish, Finnish, Hungarian, Estonian — see the agglutinative-
+  family list in [`COLLABORATION.md`](COLLABORATION.md)).
 
 ### Educational institutions
 

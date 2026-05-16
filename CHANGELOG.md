@@ -4,7 +4,14 @@ All notable changes are tagged in git as `vX.Y.Z`.
 
 ## Research direction
 
-We are a **research-stage company** investigating whether agglutinative-language morphology can serve as the substrate for a **deterministic alternative** to probabilistic large language models. Our goal is to address the three structural problems of modern LLMs — opacity (black-box reasoning), cost (GPU / energy / datacentre dependence), and hallucination (no architectural truth-grounding) — through a kernel built on Kazakh's mathematically-regular agglutinative structure.
+We are a **research-stage company** investigating whether agglutinative-language morphology can serve as the substrate for a fundamentally different language-AI architecture — distinct from probabilistic large language models without inheriting their three structural problems (opacity, cost, hallucination). The kernel is built on Kazakh's mathematically-regular agglutinative structure.
+
+**Updated 2026-05-16.** Originally framed as a "deterministic alternative" to LLMs. The `experimental/agglutinative-neural` research arc has demonstrated (PoC scale, CPU, pure Rust) that **neural training, weights, tokens, and generation also work inside this architecture without inheriting the LLM diseases**, provided they sit between a deterministic template scaffold and a verifier gate. The forward path is therefore `deterministic core + algebra-anchored neural composition layer + verifier`, not "deterministic only". See:
+
+- [`docs/MANIFESTO.md`](docs/MANIFESTO.md) — four-inversion position (algebra not statistics, CPU not cloud, verifier not RLHF, agglutinative-first).
+- [`docs/architecture_neural_v6.md`](docs/architecture_neural_v6.md) — production spec for the v6.0.0 release that introduces the neural layer additively.
+- [`docs/research/results_real_mix_2026_05_16.md`](docs/research/results_real_mix_2026_05_16.md) — empirical results that triggered the v6.0 plan.
+- [`RESEARCH_AGGLUTINATIVE_NEURAL.md`](RESEARCH_AGGLUTINATIVE_NEURAL.md) — research arc charter.
 
 **adam** (this repository) is the first applied demonstrator of that architecture (Qazaq IR / ARK = Agglutinative Reasoning Kernel). It is **not the goal** — the architecture is the goal; adam is what proves the architecture works. Current applied form: a Kazakh-language Rust-programming tutor.
 

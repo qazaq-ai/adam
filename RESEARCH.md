@@ -1,9 +1,21 @@
 # Research arc
 
 This document is the detailed research roadmap for **Qazaq IR** — the
-deterministic AI kernel built on agglutinative-language morphology.
-The high-level mission is in [`MISSION.md`](MISSION.md); this document
-zooms into open research questions, methodology, and milestones.
+deterministic AI kernel built on agglutinative-language morphology,
+and (as of 2026-05-16) its algebra-anchored neural extension.
+
+The high-level mission is in [`MISSION.md`](MISSION.md). The
+"why we are perpendicular to LLMs" position is in
+[`docs/MANIFESTO.md`](docs/MANIFESTO.md). The first experimental
+research arc (`experimental/agglutinative-neural`, started 2026-05-15)
+is detailed in [`RESEARCH_AGGLUTINATIVE_NEURAL.md`](RESEARCH_AGGLUTINATIVE_NEURAL.md).
+The PoC-scale empirical results are in
+[`docs/research/results_real_mix_2026_05_16.md`](docs/research/results_real_mix_2026_05_16.md).
+The production architecture spec for the resulting v6.0 release is in
+[`docs/architecture_neural_v6.md`](docs/architecture_neural_v6.md).
+
+This document zooms into open research questions, methodology, and
+milestones at the layer below those documents.
 
 ## Open research questions
 
@@ -27,11 +39,20 @@ narrower than what an LLM is trained on.
 
 ### Q2. Where is the boundary between «kernel» and «trainable component»?
 
-**Status.** Working hypothesis: **tiny ML lives, large ML doesn't**.
-adam ships a 24-byte selection-weights perceptron (6 f32) for template
-ranking, suffix-chain bigram priors (~31 k bigrams), and root-affinity
-PMI (~10 k roots). All are statistical but inspectable; none is a
-neural network in the LLM sense.
+**Status (updated 2026-05-16).** Working hypothesis confirmed at PoC
+scale and extended: **tiny ML lives inside the algebraic envelope;
+large ML doesn't.** v5.x ships a 24-byte selection-weights perceptron
+(6 f32) for template ranking, suffix-chain bigram priors (~31 k
+bigrams), and root-affinity PMI (~10 k roots). The
+`experimental/agglutinative-neural` arc demonstrated that a ~2 M-
+parameter decoder transformer (CPU, pure Rust, no GPU) trained on
+FST-validated morpheme sequences mixed with real Kazakh corpora
+generalises well — held-out CE gap of 0.031 on a 100-prefix eval
+set, exact-match rate 15 %. Critically, *all* of its outputs go
+through the same FST mask + verifier as the rest of the kernel, so
+inspectability is preserved. The v6.0 architecture spec
+([`architecture_neural_v6.md`](docs/architecture_neural_v6.md))
+formalises this as L5.5 in the pipeline.
 
 **Open sub-questions:**
 - What is the largest trainable component compatible with the
