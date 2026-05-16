@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 // Part of: adam · ARK (Agglutinative Reasoning Kernel) · github.com/qazaq-ai/adam
 //! Integration test: 100-word round-trip battery against the real
 //! committed Lexicon. Target: ≥ 80% pass rate on Phase 0; raised to

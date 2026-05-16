@@ -1,7 +1,7 @@
 # adam · ARK Manifesto
 
 **Project:** [github.com/qazaq-ai/adam](https://github.com/qazaq-ai/adam)
-**License:** MIT
+**License:** BUSL 1.1 (Business Source License — converts to Apache 2.0 after 4 years)
 **Architecture name:** ARK — Agglutinative Reasoning Kernel
 **Origin:** Kazakhstan, 2025
 **Author commit signature:** `shaman` <baimurza.daulet@gmail.com>
@@ -181,12 +181,29 @@ different meaning, it is a fork that has lost the lineage.
 
 ## 7. Stance on copying
 
-This project is MIT-licensed. You may legally fork, modify, and
-redistribute. We ask only the following, in order of importance:
+This project is licensed under the **Business Source License 1.1
+(BUSL-1.1)**. Three things follow from that choice:
 
-1. **Attribution.** Required by the MIT license. A line in your
-   README is sufficient. `Based on adam · ARK ·
-   github.com/qazaq-ai/adam (MIT)`.
+- You may use, study, modify, and redistribute the Licensed Work
+  for non-commercial purposes and for commercial purposes that do
+  not compete with the originator's hosted or embedded commercial
+  service.
+- You may **not** offer the Licensed Work or a substantially
+  derived model, tokenizer, or linguistic engine as a hosted or
+  embedded commercial service that competes with Qazna Technologies
+  LLP.
+- Each release **automatically converts to Apache 2.0** four years
+  after publication. The long-term promise to the community is
+  permissive; the short-term protection to the originator covers
+  the period during which competitive copying would be most
+  damaging.
+
+See `LICENSE` for the precise terms.
+
+In addition to license compliance we ask, in order of importance:
+
+1. **Attribution.** A line in your README is sufficient.
+   `Based on adam · ARK · github.com/qazaq-ai/adam (BUSL-1.1)`.
 
 2. **Don't break the lineage.** If you use our terms (`ARK`,
    `SemFrame`, `MorphValidator`, `agglutinative loss`), please
