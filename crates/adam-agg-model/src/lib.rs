@@ -22,6 +22,7 @@
 //! via burn feature flags; this crate's default is CPU only to keep
 //! the air-gap-deployable USP intact.
 
+pub mod generate;
 pub mod train;
 
 use burn::config::Config;

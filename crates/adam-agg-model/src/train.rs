@@ -4,13 +4,12 @@
 //! [`adam_agg_synth`], optimise next-token prediction loss, show
 //! that loss decreases. Pure Rust, CPU, no Python.
 
-use burn::module::AutodiffModule;
 use burn::optim::adaptor::OptimizerAdaptor;
 use burn::optim::{Adam, AdamConfig, GradientsParams, Optimizer};
 use burn::prelude::*;
 use burn::tensor::backend::AutodiffBackend;
 
-use crate::{TinyAgt, TinyAgtConfig};
+use crate::TinyAgt;
 
 /// Configuration for a tiny training run.
 pub struct TrainConfig {
@@ -109,6 +108,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::TinyAgtConfig;
     use burn::backend::Autodiff;
     use burn::backend::ndarray::{NdArray, NdArrayDevice};
 

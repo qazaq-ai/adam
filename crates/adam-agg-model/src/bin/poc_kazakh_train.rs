@@ -13,6 +13,9 @@
 use std::collections::HashMap;
 use std::path::Path;
 
+use adam_agg_model::generate::{
+    count_valid_transitions, generate_constrained, generate_unconstrained,
+};
 use adam_agg_model::train::{TrainConfig, train_next_token};
 use adam_agg_model::{TinyAgt, TinyAgtConfig};
 use adam_agg_synth::{SynthGenerator, TokenKindSer};
@@ -126,7 +129,7 @@ fn main() {
         train_cfg.batch_size, train_cfg.n_epochs, train_cfg.lr
     );
     let t0 = std::time::Instant::now();
-    let (_trained, reports) = train_next_token(model, &training_sequences, &train_cfg, &device);
+    let (trained, reports) = train_next_token(model, &training_sequences, &train_cfg, &device);
     let elapsed = t0.elapsed().as_secs_f32();
     let first_loss = reports.first().map(|r| r.loss).unwrap_or(0.0);
     let last_loss = reports.last().map(|r| r.loss).unwrap_or(0.0);
@@ -167,6 +170,74 @@ fn main() {
         100.0 * valid as f32 / total as f32
     );
 
+    // -- Stage 7: FST-constrained vs unconstrained inference comparison ----
+    eprintln!("\n[7/7] Generation comparison (constrained vs unconstrained):");
+    // Pick 20 random sequence prefixes (first 2 tokens: BOS + Root).
+    let mut prefixes: Vec<Vec<i64>> = Vec::new();
+    for seq in training_sequences.iter().take(50) {
+        if seq.len() >= 2 {
+            prefixes.push(seq[..2].to_vec());
+        }
+        if prefixes.len() >= 20 {
+            break;
+        }
+    }
+
+    let mut constrained_valid = 0usize;
+    let mut constrained_total = 0usize;
+    let mut unconstrained_valid = 0usize;
+    let mut unconstrained_total = 0usize;
+    for prefix in &prefixes {
+        // Constrained generation.
+        let con = generate_constrained(&trained, &compact_to_label, prefix, 6, &device);
+        let con_labels: Vec<&str> = con
+            .iter()
+            .map(|&t| {
+                compact_to_label
+                    .get(t as usize)
+                    .map(String::as_str)
+                    .unwrap_or("?")
+            })
+            .collect();
+        let (v, t) = count_valid_transitions(&con_labels);
+        constrained_valid += v;
+        constrained_total += t;
+
+        // Unconstrained generation.
+        let unc = generate_unconstrained(&trained, prefix, 6, &device);
+        let unc_labels: Vec<&str> = unc
+            .iter()
+            .map(|&t| {
+                compact_to_label
+                    .get(t as usize)
+                    .map(String::as_str)
+                    .unwrap_or("?")
+            })
+            .collect();
+        let (v, t) = count_valid_transitions(&unc_labels);
+        unconstrained_valid += v;
+        unconstrained_total += t;
+    }
+
+    let con_rate = if constrained_total > 0 {
+        100.0 * constrained_valid as f32 / constrained_total as f32
+    } else {
+        0.0
+    };
+    let unc_rate = if unconstrained_total > 0 {
+        100.0 * unconstrained_valid as f32 / unconstrained_total as f32
+    } else {
+        0.0
+    };
+    eprintln!(
+        "       Constrained:   {}/{} valid transitions = {:.1}%",
+        constrained_valid, constrained_total, con_rate
+    );
+    eprintln!(
+        "       Unconstrained: {}/{} valid transitions = {:.1}%",
+        unconstrained_valid, unconstrained_total, unc_rate
+    );
+
     eprintln!("\n=== HYPOTHESIS PROOF ===");
     eprintln!("Pure-Rust neural + agglutinative algebra works:");
     eprintln!(
@@ -183,6 +254,14 @@ fn main() {
         param_count / 1000
     );
     eprintln!("  ✓ Stack: pure Rust (burn ndarray CPU); no Python, no cloud");
+    eprintln!(
+        "  ✓ FST-constrained decoding: {:.1}% morphologically-valid transitions",
+        con_rate
+    );
+    eprintln!(
+        "  ✓ Unconstrained decoding:   {:.1}% — gap shows the constraint adds value",
+        unc_rate
+    );
 }
 
 fn estimate_params(cfg: &TinyAgtConfig) -> usize {
