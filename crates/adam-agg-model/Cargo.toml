@@ -20,6 +20,10 @@ rand = "0.9"
 name = "poc_kazakh_train"
 path = "src/bin/poc_kazakh_train.rs"
 
+[[bin]]
+name = "verifier_demo"
+path = "src/bin/verifier_demo.rs"
+
 [dev-dependencies]
 criterion = { version = "0.5", default-features = false, features = ["cargo_bench_support"] }
 
