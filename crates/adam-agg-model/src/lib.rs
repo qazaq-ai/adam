@@ -26,6 +26,7 @@
 
 pub mod generate;
 pub mod train;
+pub mod verifier;
 
 use burn::config::Config;
 use burn::module::Module;

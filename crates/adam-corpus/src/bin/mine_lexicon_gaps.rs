@@ -100,6 +100,14 @@ struct RootsFile {
 #[derive(Debug, Deserialize)]
 struct RootEntry {
     root: String,
+    /// `noun` / `verb` / `pronoun` / `particle` / `conjunction` /
+    /// `numeral` / `postposition` etc. Used to special-case the
+    /// closed-class short-root paradigm: pronouns like `ол` (2
+    /// chars) are real Kazakh roots whose inflected surfaces are
+    /// covered by the FST `pronoun_paradigm` table but would be
+    /// dropped by the global `MIN_ROOT_LEN = 3` filter.
+    #[serde(default)]
+    part_of_speech: String,
 }
 
 /// One uncovered token candidate aggregated across all source packs.
@@ -129,10 +137,8 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
-    eprintln!(
-        "mine_lexicon_gaps: loaded {} Lexicon roots (≥ {MIN_ROOT_LEN} chars)",
-        roots.len()
-    );
+    // load_roots() prints its own diagnostics including the
+    // short-closed-class count.
 
     // Pass 1: count uncovered token frequencies across all packs.
     // Pass 2: collect first-N contexts for each top-frequency candidate.
@@ -380,27 +386,62 @@ fn load_pack(path: &PathBuf) -> Result<PackFile, String> {
     serde_json::from_str(&raw).map_err(|e| e.to_string())
 }
 
+/// Closed-class POS strings whose roots are accepted regardless of
+/// length. These items have well-known irregular paradigms in
+/// `adam-kernel-fst::pronoun_paradigm` (and forthcoming
+/// closed-class extensions); the gap-miner must not classify their
+/// inflected surfaces as "uncovered" just because the bare root is
+/// two characters long.
+const CLOSED_CLASS_POS: &[&str] = &[
+    "pronoun",
+    "particle",
+    "conjunction",
+    "postposition",
+    "interjection",
+    "numeral",
+];
+
+fn is_closed_class(pos: &str) -> bool {
+    CLOSED_CLASS_POS.iter().any(|p| p.eq_ignore_ascii_case(pos))
+}
+
 fn load_roots() -> Result<HashSet<String>, String> {
     let mut set = HashSet::new();
+    let mut short_closed_class_kept = 0usize;
     for path in [CURATED_ROOTS, APERTIUM_ROOTS] {
         let raw = fs::read_to_string(path).map_err(|e| format!("{path}: {e}"))?;
         let file: RootsFile = serde_json::from_str(&raw).map_err(|e| format!("{path}: {e}"))?;
         for entry in &file.roots {
             let r = entry.root.trim().to_lowercase();
-            if r.chars().count() >= MIN_ROOT_LEN {
+            let len = r.chars().count();
+            if len >= MIN_ROOT_LEN {
+                set.insert(r);
+            } else if is_closed_class(&entry.part_of_speech) {
+                // Short closed-class roots — keep regardless of length.
+                short_closed_class_kept += 1;
                 set.insert(r);
             }
         }
     }
+    eprintln!(
+        "mine_lexicon_gaps: loaded {} Lexicon roots ({} short closed-class kept)",
+        set.len(),
+        short_closed_class_kept
+    );
     Ok(set)
 }
 
 fn has_known_prefix(word: &str, roots: &HashSet<String>) -> bool {
-    // Take prefixes of length 3..=word.len(), check if any is a known
-    // root. Short-circuits on first match.
+    // Take prefixes of length 2..=word.len(), check if any is a known
+    // root. The minimum 2 lets short closed-class roots ("ол", "не",
+    // "мен", "сен") match their oblique surfaces ("оның", "неге",
+    // "маған", "саған"). Long-root behaviour is unchanged because
+    // any 2-char prefix of a noun/verb stem rarely matches a Lexicon
+    // entry (those are length ≥ 3 by construction). Short-circuits
+    // on first match.
     let chars: Vec<char> = word.chars().collect();
     let n = chars.len();
-    for take in MIN_ROOT_LEN..=n {
+    for take in 2..=n {
         let prefix: String = chars.iter().take(take).collect();
         if roots.contains(&prefix) {
             return true;
