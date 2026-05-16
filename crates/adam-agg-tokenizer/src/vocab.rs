@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Part of: adam · ARK (Agglutinative Reasoning Kernel) · github.com/qazaq-ai/adam
 //! Vocab — id assignment for morpheme tokens.
 //!
 //! The vocab is **derived** from the [`LexiconV1`] at tokenizer

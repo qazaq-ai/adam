@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Part of: adam · ARK (Agglutinative Reasoning Kernel) · github.com/qazaq-ai/adam
 //! End-to-end proof-of-concept:
 //!
 //! 1. Load real Kazakh Lexicon V1.

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Part of: adam · ARK (Agglutinative Reasoning Kernel) · github.com/qazaq-ai/adam
 //! `adam-agg-model` — tiny pure-Rust transformer for next-morpheme
 //! prediction.
 //!

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Part of: adam · ARK (Agglutinative Reasoning Kernel) · github.com/qazaq-ai/adam
 //! `adam-agg-synth` — synthetic Kazakh training-data generator.
 //!
 //! Combines the deterministic FST ([`adam_kernel_fst`]) with our

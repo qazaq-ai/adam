@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Part of: adam · ARK (Agglutinative Reasoning Kernel) · github.com/qazaq-ai/adam
 //! `adam-agg-tokenizer` — agglutinative morpheme-level tokenizer for Kazakh.
 //!
 //! **Phase 0 prototype** of the experimental/agglutinative-neural branch.

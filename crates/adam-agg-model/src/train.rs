@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Part of: adam · ARK (Agglutinative Reasoning Kernel) · github.com/qazaq-ai/adam
 //! Training loop for the tiny agglutinative transformer.
 //!
 //! Phase 0 proof: feed it synthetic morpheme sequences from

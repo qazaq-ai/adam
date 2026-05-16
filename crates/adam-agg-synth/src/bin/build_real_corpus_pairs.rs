@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Part of: adam · ARK (Agglutinative Reasoning Kernel) · github.com/qazaq-ai/adam
 //! Read real Kazakh corpora — both pre-built sentence packs in
 //! `data/curated/*_pack.json` and raw CSVs from
 //! `data/external/huggingface_kz/` — and emit a single

@@ -3,6 +3,7 @@
 **Status:** EXPERIMENTAL · branch `experimental/agglutinative-neural` · started 2026-05-15
 **Owner:** Daulet Baimurza
 **Production branch:** `main` (deterministic kernel, unaffected by this work)
+**Why this project exists at all:** see [`docs/MANIFESTO.md`](docs/MANIFESTO.md)
 
 > **Эта ветка — исследование, не продакт.** Цель — выяснить, можно ли построить казахскоязычный AI, который **сочетает** нейросети, обучение и генерацию **с** агглютинативной алгеброй и курируемым корпусом, и при этом **сохраняет** ключевые гарантии main-ветки (предсказуемость, провенанс, watch-battery deployment, нулевые галлюцинации в фактических утверждениях).
 

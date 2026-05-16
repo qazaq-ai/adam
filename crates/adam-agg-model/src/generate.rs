@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Part of: adam · ARK (Agglutinative Reasoning Kernel) · github.com/qazaq-ai/adam
 //! FST-constrained inference: generate token sequences from a trained
 //! model while masking out morphologically invalid continuations.
 //!

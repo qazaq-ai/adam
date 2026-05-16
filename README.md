@@ -11,6 +11,10 @@
 </p>
 
 <p align="center">
+  <b>Why this project exists →</b> <a href="docs/MANIFESTO.md"><code>docs/MANIFESTO.md</code></a>
+</p>
+
+<p align="center">
   <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-5.32.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
