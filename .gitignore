@@ -3,7 +3,9 @@
 /.idea
 /.vscode
 *.log
-data/external/
+data/external/*
+!data/external/textbooks_kz/
+data/external/textbooks_kz/*.pdf
 .claude/
 
 # External reference material (Apertium-kaz source repo, etc.) — 39+ MB each.
