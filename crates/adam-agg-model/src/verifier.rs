@@ -8,6 +8,20 @@
 //! `verifier_demo` binary stays as a CLI for ad-hoc inspection; this
 //! module is what the production L5.5 → L6 wiring imports.
 //!
+//! ## Not to be confused with `adam_dialog::Verifier`
+//!
+//! There is a second, older `Verifier` type in
+//! [`adam_dialog::verifier`]. The two operate at **different layers**
+//! of the pipeline and have no overlap:
+//!
+//! | Module                          | Layer | Gates             | Input                       |
+//! |---------------------------------|-------|-------------------|-----------------------------|
+//! | `adam_dialog::Verifier` (v4.0.32) | L3-4 | (intent, action, belief) | dialog turn before render |
+//! | `adam_agg_model::Verifier` (v6.0) | L6   | FST round-trip + facts.json | surface string from L5.5 neural composer |
+//!
+//! Both are kept; v6.0 wiring uses this one *in addition* to the
+//! dialog-layer Verifier, not as a replacement.
+//!
 //! Two gates run in sequence per neural output:
 //!
 //! 1. **FST round-trip.** Detokenise the morpheme sequence; re-tokenise
