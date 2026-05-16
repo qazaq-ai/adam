@@ -32,7 +32,8 @@
 use adam_agg_tokenizer::{AggTokenizer, MorphToken, RootPos, SuffixKind};
 use adam_kernel_fst::lexicon::{LexiconV1, RootEntry};
 use adam_kernel_fst::morphotactics::{
-    Case, NounFeatures, Number, Possessive, VerbFeatures, synthesise_noun, synthesise_verb,
+    Case, NounFeatures, Number, Person, Possessive, Tense, VerbFeatures, synthesise_noun,
+    synthesise_verb,
 };
 use serde::{Deserialize, Serialize};
 
@@ -254,6 +255,49 @@ impl<'a> SynthGenerator<'a> {
                         continue;
                     }
                     out.push(self.pair_from_word(&surface, entry, RootPos::NounLike));
+                }
+            }
+            roots_used += 1;
+            if roots_used >= max_roots {
+                break;
+            }
+        }
+        self.emitted += out.len();
+        out
+    }
+
+    /// Enumerate basic verb inflections: every verb × {finite tenses}
+    /// × {3 persons} × {Sg/Pl}. Phase 0 keeps it simple — no voice,
+    /// no negation, no participles.
+    pub fn verb_inflections(&mut self, max_roots: usize) -> Vec<TrainingPair> {
+        let tenses = [
+            Tense::PastDefinite,
+            Tense::Present,
+            Tense::FutureIntentional,
+            Tense::FuturePossible,
+        ];
+        let persons = [Person::First, Person::Second, Person::Third];
+        let mut out = Vec::new();
+        let mut roots_used = 0;
+        for entry in &self.lex.entries_ordered {
+            if entry.part_of_speech != "verb" {
+                continue;
+            }
+            for &tense in &tenses {
+                for &person in &persons {
+                    for &number in &[None, Some(Number::Plural)] {
+                        let features = VerbFeatures {
+                            tense: Some(tense),
+                            person: Some(person),
+                            number,
+                            ..Default::default()
+                        };
+                        let surface = synthesise_verb(&entry.root, features);
+                        if surface.is_empty() {
+                            continue;
+                        }
+                        out.push(self.pair_from_word(&surface, entry, RootPos::Verb));
+                    }
                 }
             }
             roots_used += 1;

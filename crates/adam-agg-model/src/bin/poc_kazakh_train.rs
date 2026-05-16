@@ -46,6 +46,7 @@ fn main() {
     let mut generator = SynthGenerator::new(&lex, &tokenizer);
     let inflected = generator.noun_inflections(2000); // ~28k pairs
     let possessives = generator.noun_possessives(1000); // ~21k pairs
+    let verbs = generator.verb_inflections(500); // 500 × 4 tenses × 3 persons × 2 num ≈ 12k pairs
     let bare = generator.bare_roots();
     // Heavy-tail policy: keep ALL inflected, sub-sample bare roots so
     // they don't dominate the training distribution (otherwise the
@@ -53,6 +54,7 @@ fn main() {
     let bare_sampled: Vec<_> = bare.into_iter().step_by(4).collect();
     let mut all_pairs = inflected;
     all_pairs.extend(possessives);
+    all_pairs.extend(verbs);
     all_pairs.extend(bare_sampled);
     eprintln!(
         "[2/6] Synth pipeline produced {} morpheme-tokenised pairs",
