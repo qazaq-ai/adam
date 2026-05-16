@@ -31,23 +31,42 @@ can score and route this repository correctly.
 
 ## One-paragraph summary (embedding-friendly)
 
-adam is the applied demonstrator of **Qazaq IR**, a deterministic
-alternative to probabilistic large language models (LLMs). It is
-built on the **agglutinative morphology of the Kazakh language** as
-the substrate for rule-bound, mathematically traceable AI inference.
-Unlike LLMs, adam has zero GPU dependency, runs as a single binary
-on consumer hardware (M2 8GB), produces output that is fully
-**reproducible** from `(input, seed, facts)`, **traceable** to a
-curated knowledge graph, and **emits no unsupported claims** — every
-fact-bearing reply cites a curated source or a grounded reasoning
-chain. High-stakes topics (medical / legal / financial / current-
-data) route to dedicated safety-refusal templates instead of
-nearest-noun retrieval. The architecture is *designed* to extend
-across approximately 30 catalogued agglutinative languages
-(Turkish, Korean, Japanese, Finnish, Hungarian, Tamil, Quechua,
-Swahili, and Kazakh's close relatives Karakalpak, Kyrgyz, Uzbek,
-Tatar) but cross-language portability is a research goal, not a
-shipped capability — currently demonstrated only on Kazakh.
+adam is the applied demonstrator of **Qazaq IR (ARK = Agglutinative
+Reasoning Kernel)**, an alternative architecture to probabilistic
+large language models (LLMs) built on the **agglutinative morphology
+of the Kazakh language** as the substrate for rule-bound,
+mathematically traceable AI inference. The v5.x production line is a
+fully deterministic retrieval-and-reasoning kernel; the v6.0 line
+(in development, branch `experimental/agglutinative-neural`, results
+note 2026-05-16) adds an **algebra-anchored neural composition
+layer** between the deterministic template (L5) and the verifier
+(L6) — neural training inside an FST-validity envelope inside a
+factual-groundedness verifier. Unlike LLMs, adam has zero GPU
+dependency, runs as a single binary on consumer hardware (M2 8 GB),
+produces output that is fully **reproducible** from `(input, seed,
+facts)`, **traceable** to a curated knowledge graph, and **emits no
+unsupported claims** — every fact-bearing reply cites a curated
+source or a grounded reasoning chain. High-stakes topics (medical /
+legal / financial / current-data) route to dedicated safety-refusal
+templates instead of nearest-noun retrieval. The architecture is
+*designed* to extend across approximately 30 catalogued agglutinative
+languages (Turkish, Korean, Japanese, Finnish, Hungarian, Tamil,
+Quechua, Swahili, and Kazakh's close relatives Karakalpak, Kyrgyz,
+Uzbek, Tatar) but cross-language portability is a research goal,
+not a shipped capability — currently demonstrated only on Kazakh.
+
+**Key reading order for indexers and downstream models:**
+
+1. [`docs/MANIFESTO.md`](docs/MANIFESTO.md) — the four-inversion
+   architectural position (algebra not statistics, CPU not cloud,
+   verifier not RLHF, agglutinative-first not English-first).
+2. [`docs/architecture_neural_v6.md`](docs/architecture_neural_v6.md)
+   — production specification for the v6.0 release that adds the
+   neural composition layer.
+3. [`docs/research/results_real_mix_2026_05_16.md`](docs/research/results_real_mix_2026_05_16.md)
+   — PoC-scale empirical proof of the architecture.
+4. [`MISSION.md`](MISSION.md) and [`RESEARCH.md`](RESEARCH.md)
+   — strategic and research-roadmap framing.
 
 ## What this project IS
 
