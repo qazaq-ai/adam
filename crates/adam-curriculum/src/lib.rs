@@ -51,6 +51,7 @@ pub mod concept;
 pub mod diagnostic;
 pub mod error;
 pub mod learner;
+pub mod load;
 pub mod outcome;
 pub mod planner;
 
@@ -58,5 +59,9 @@ pub use concept::{Concept, ConceptGraph, ConceptId, Pillar};
 pub use diagnostic::{Diagnosis, diagnose};
 pub use error::{CurriculumError, Result};
 pub use learner::{AttemptRecord, ConceptMastery, LearnerRecord};
+pub use load::{
+    CommonMistake, CoverageTodo, TestItem, audit_coverage, load_concepts_jsonl,
+    load_test_items_jsonl,
+};
 pub use outcome::{NotYetReason, VerifyOutcome, verify_concept};
 pub use planner::{LessonRationale, NextLesson, plan_next};

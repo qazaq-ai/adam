@@ -317,6 +317,23 @@ mod tests {
     }
 
     #[test]
+    fn concept_serde_round_trip_documents_format() {
+        // Pin down the on-disk JSONL format authors will write by
+        // hand: ConceptId is a 1-field tuple struct so serde
+        // serialises it as a bare string, not an array.
+        let c = Concept::new("math::a", "Тест", Pillar::Mathematics, "5", "ескерту")
+            .with_prerequisites(vec![ConceptId::new("math::prereq1")]);
+        let s = serde_json::to_string(&c).unwrap();
+        assert!(
+            s.contains("\"prerequisites\":[\"math::prereq1\"]"),
+            "prereq must serialise as bare string array; got: {s}"
+        );
+        let back: Concept = serde_json::from_str(&s).unwrap();
+        assert_eq!(back.id, c.id);
+        assert_eq!(back.prerequisites.len(), 1);
+    }
+
+    #[test]
     fn threshold_out_of_range_fails() {
         let mut g = ConceptGraph::new();
         let mut c = concept("math::x", &[]);
