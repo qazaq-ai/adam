@@ -1,0 +1,17 @@
+[package]
+name = "adam-curriculum"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Curriculum graph + diagnostic engine + lesson planner + outcome verifier for «Qazaq AI Ұстаз» — the v6.0+ educational product. Implements L7-L10-edu layers on top of the deterministic kernel; «measurable mastery per concept» rubric. See docs/product/qazaq_ai_ustaz_v1.md."
+
+[dependencies]
+adam-kernel = { path = "../adam-kernel" }
+adam-kernel-fst = { path = "../adam-kernel-fst" }
+adam-agg-tokenizer = { path = "../adam-agg-tokenizer" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

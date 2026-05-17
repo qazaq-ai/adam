@@ -56,6 +56,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "adam-curriculum"
+version = "5.32.0"
+dependencies = [
+ "adam-agg-tokenizer",
+ "adam-kernel",
+ "adam-kernel-fst",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "adam-dialog"
 version = "5.32.0"
 dependencies = [

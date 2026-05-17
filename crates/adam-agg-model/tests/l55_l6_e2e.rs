@@ -35,12 +35,7 @@ fn l55_to_l6_plumbing_does_not_panic() {
     // Compact label vocab matching what poc_kazakh_train builds at
     // runtime. We need at least one valid Root + a couple of typed
     // suffixes so generate_constrained finds non-empty masks.
-    let mut labels: Vec<String> = vec![
-        "<unk>".into(),
-        "BOS".into(),
-        "EOS".into(),
-        "<spc>".into(),
-    ];
+    let mut labels: Vec<String> = vec!["<unk>".into(), "BOS".into(), "EOS".into(), "<spc>".into()];
     labels.push("R:бала".into()); // 4
     labels.push("S:Number(Plural)".into()); // 5
     labels.push("S:Case(Dative)".into()); // 6
@@ -71,8 +66,8 @@ fn detokenized_surface_round_trips_through_verifier() {
     )
     .expect("lexicon load");
     let tokenizer = AggTokenizer::build(lex);
-    let facts_idx = Verifier::load_facts_index("../../data/retrieval/facts.json")
-        .expect("facts.json load");
+    let facts_idx =
+        Verifier::load_facts_index("../../data/retrieval/facts.json").expect("facts.json load");
     let verifier = Verifier::new(tokenizer, facts_idx, false /* permissive */);
 
     // Surface that should both round-trip through FST and be
@@ -115,8 +110,8 @@ fn audit_record_shape_matches_architecture_spec() {
     )
     .expect("lexicon load");
     let tokenizer = AggTokenizer::build(lex);
-    let facts_idx = Verifier::load_facts_index("../../data/retrieval/facts.json")
-        .expect("facts.json load");
+    let facts_idx =
+        Verifier::load_facts_index("../../data/retrieval/facts.json").expect("facts.json load");
     let verifier = Verifier::new(tokenizer, facts_idx, false);
 
     let record = verifier.check("дүние");
@@ -124,7 +119,10 @@ fn audit_record_shape_matches_architecture_spec() {
     match record.verdict {
         Verdict::Pass { surface, root, .. } => {
             assert_eq!(surface, "дүние");
-            assert!(root.is_some(), "Pass record must carry the FST-extracted root");
+            assert!(
+                root.is_some(),
+                "Pass record must carry the FST-extracted root"
+            );
         }
         Verdict::Block(_) => panic!("«дүние» should pass; failure indicates facts.json regression"),
     }
