@@ -205,7 +205,7 @@ fn main() {
         batch_size: env_usize("POC_BATCH", 32),
         n_epochs: env_usize("POC_EPOCHS", 3),
         lr: env_f64("POC_LR", 3e-3),
-        seed: 42,
+        seed: env_usize("POC_SEED", 42) as u64,
     };
     eprintln!(
         "[5/6] Training: batch={}, epochs={}, lr={} ...",
@@ -470,7 +470,7 @@ fn main() {
         batch_size: env_usize("POC_BATCH", 32),
         n_epochs: env_usize("POC_EPOCHS", 3),
         lr: env_f64("POC_LR", 3e-3),
-        seed: 42,
+        seed: env_usize("POC_SEED", 42) as u64,
     };
     eprintln!(
         "       Algebraic alpha={}; same batch/epochs/lr as Stage 5 for fair compare ...",

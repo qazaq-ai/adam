@@ -406,6 +406,15 @@ fn load_roots() -> Result<HashSet<String>, String> {
     let mut set = HashSet::new();
     let mut short_kept = 0usize;
     let mut leading_dash_normalised = 0usize;
+    // Pre-seed with irregular pronoun surfaces — the FST's
+    // pronoun_paradigm catches these analytically, but mine_lexicon_
+    // gaps's prefix-match doesn't (stems alternate: ол → оғ-, бұл →
+    // бұғ-). Without this seed, "оған" / "одан" / "бұған" / etc would
+    // be flagged as uncovered despite being fully analysable.
+    let irreg_count = adam_kernel_fst::pronoun_paradigm::irregular_pronoun_surfaces().count();
+    for surface in adam_kernel_fst::pronoun_paradigm::irregular_pronoun_surfaces() {
+        set.insert(surface.to_lowercase());
+    }
     for path in [CURATED_ROOTS, APERTIUM_ROOTS] {
         let raw = fs::read_to_string(path).map_err(|e| format!("{path}: {e}"))?;
         let file: RootsFile = serde_json::from_str(&raw).map_err(|e| format!("{path}: {e}"))?;
@@ -438,10 +447,12 @@ fn load_roots() -> Result<HashSet<String>, String> {
     }
     eprintln!(
         "mine_lexicon_gaps: loaded {} Lexicon roots ({} short \
-         < {MIN_ROOT_LEN} chars kept, {} normalised `-` prefix)",
+         < {MIN_ROOT_LEN} chars kept, {} normalised `-` prefix, \
+         +{} irregular pronoun surfaces seeded)",
         set.len(),
         short_kept,
-        leading_dash_normalised
+        leading_dash_normalised,
+        irreg_count
     );
     Ok(set)
 }
