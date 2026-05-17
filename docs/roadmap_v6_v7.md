@@ -33,7 +33,7 @@ disabled and observe zero functional change.
 | 1 | Lexicon V2 — Root yield on real corpus ≥ 70 % | review queue ready (2 000 candidates) | 3–6 weeks (native-speaker bound) | linguist + shaman |
 | 2 | Verifier integration — FST + world_core + facts + audit trail | not started | 2–3 weeks | shaman |
 | 3 | Latency + energy benchmark — multi-hardware (M2 / M1 / Intel / ARM), CI-enforced | M2 bench landed; multi-hw pending | 1 week after Lexicon V2 done | shaman |
-| 4 | LLM-baseline benchmark — 5 Kazakh task categories vs Claude Haiku, GPT-4-mini, Llama-3-8B | not started | 2–3 weeks (API budget required) | shaman |
+| 4 | Characteristics comparison (`docs/bench/our_numbers_vs_published_llm.md`) — adam's measured six-axis numbers + well-attested published LLM numbers. Head-to-head bench deferred until grant funding. | landed 2026-05-17 | done | shaman |
 | 5 | Test suite expansion — workspace tests ≥ 500 including property-based + fuzzing | currently ~1442 (production) + 19 (research arc); structure ok, depth needs work | 2–3 weeks | shaman |
 | 6 | Migration plan validated against an external alpha deployment | not started | 1 week + alpha-partner window | shaman + alpha partner |
 | 7 | arXiv preprint accepted (or under review with stable DOI) | results note ready as draft | 1–2 weeks writing + ~4-12 weeks peer review | shaman |

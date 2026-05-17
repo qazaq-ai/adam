@@ -355,11 +355,18 @@ Anything missing reverts to v5.x.
 - [ ] Verifier integration: 0 hallucinations on the 100-prompt
   factual eval set; every neural output has a complete audit
   record.
-- [ ] LLM-baseline benchmark: adam v6.0 is competitive with or
-  better than the smallest production-tier API model (currently
-  Claude Haiku 4.5 or equivalent) on the published Kazakh task
-  suite — **competitiveness** defined as median ≤ baseline on
-  the published 5-task suite.
+- [ ] Characteristics comparison published. adam v6.0's measured
+  numbers on the six v6.0 axes (latency / memory / cost /
+  determinism / hallucination / audit) are published alongside
+  well-attested published LLM numbers in
+  [`docs/bench/our_numbers_vs_published_llm.md`](bench/our_numbers_vs_published_llm.md).
+  Updated 2026-05-17: this replaces the former "run head-to-head
+  API benchmark" criterion. Rationale: a paid head-to-head bench
+  is premature before our own numbers are stable and adds $90-
+  $200 + 2-3 weeks of evaluator work that grants / commercial
+  funding cover better post-GA. The full head-to-head benchmark
+  is deferred per docs/bench/our_numbers_vs_published_llm.md
+  "When a full head-to-head bench will be needed".
 - [ ] arXiv preprint accepted (or under review with a stable DOI).
 - [ ] Migration plan validated against an external alpha deployment.
 - [ ] No new dependency adds proprietary or cloud-only components.
