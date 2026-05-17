@@ -132,6 +132,34 @@ We do not claim it for:
 LLMs remain better at those. **ARK and LLMs are complements, not
 substitutes.**
 
+### 4.1 First applied product — Qazaq AI Ұстаз (education)
+
+The first commercial application of ARK is **education in
+Kazakh**, scoped to four pillars at v1.0: Kazakh morphology,
+school informatics, mathematics, and Rust programming. The
+product spec lives at
+[`docs/product/qazaq_ai_ustaz_v1.md`](product/qazaq_ai_ustaz_v1.md).
+
+Why this domain first: every ARK property maps to a concrete
+education-product requirement that current LLM-based and
+courseware competitors structurally cannot offer.
+
+| ARK property | Education-product requirement it satisfies |
+|---|---|
+| Determinism (3.1) | Same problem produces same teacher answer; supports verifiable grading |
+| CPU / offline (3.2) | School tablet without internet; one-time capex vs recurring API |
+| Verifier (3.3) | «Measurable mastery per concept» record per learner |
+| Agglutinative-first (3.4) | Kazakh morphology drills with FST-perfect grading |
+
+The product replaces neither the human teacher nor the
+specialised LLM. It replaces **overpriced courseware with
+unverifiable outcomes**. Kazakhstan currently spends up to
+500 000 KZT per learner on programmes such as TechOrda; published
+completion rates are 10-20 %. Qazaq AI Ұстаз proposes the same
+voucher path with 5-10× lower per-learner cost and
+**measurement-of-mastery** as the differentiator, not «we hope
+they learned».
+
 ## 5. Why this manifesto exists in this file
 
 Three reasons.
