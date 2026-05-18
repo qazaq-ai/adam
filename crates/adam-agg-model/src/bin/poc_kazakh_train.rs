@@ -428,6 +428,8 @@ fn main() {
             let mut pass = 0usize;
             let mut block_fst = 0usize;
             let mut block_ungrounded = 0usize;
+            let mut block_script = 0usize;
+            let mut block_unk = 0usize;
             let mut grounded_count = 0usize;
             for s in &surfaces {
                 let rec = verifier.check(s);
@@ -440,15 +442,19 @@ fn main() {
                     }
                     Verdict::Block(BlockReason::FstRoundTripFailed) => block_fst += 1,
                     Verdict::Block(BlockReason::Ungrounded) => block_ungrounded += 1,
+                    Verdict::Block(BlockReason::NonKazakhScript) => block_script += 1,
+                    Verdict::Block(BlockReason::UnkSurface) => block_unk += 1,
                 }
             }
             eprintln!(
-                "       {}/{} passed  ({} factually grounded);  block: {} FST-rt, {} ungrounded",
+                "       {}/{} passed  ({} factually grounded);  block: {} FST-rt, {} ungrounded, {} non-kazakh, {} unk",
                 pass,
                 surfaces.len(),
                 grounded_count,
                 block_fst,
-                block_ungrounded
+                block_ungrounded,
+                block_script,
+                block_unk
             );
         }
     }

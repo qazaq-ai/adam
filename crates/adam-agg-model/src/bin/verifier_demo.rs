@@ -86,6 +86,14 @@ fn main() {
                 block += 1;
                 ("yes", None, false, "Block(Ungrounded)".to_string())
             }
+            Verdict::Block(BlockReason::NonKazakhScript) => {
+                block += 1;
+                ("—", None, false, "Block(NonKazakhScript)".to_string())
+            }
+            Verdict::Block(BlockReason::UnkSurface) => {
+                block += 1;
+                ("—", None, false, "Block(UnkSurface)".to_string())
+            }
         };
         println!(
             "{:<32}  {:<24}  {:<6}  {:<14}  {:<10}  {}",

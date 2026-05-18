@@ -83,18 +83,13 @@ fn detokenized_surface_round_trips_through_verifier() {
         Verdict::Block(reason) => panic!("expected Pass on «адам», got Block({reason:?})"),
     }
 
-    // Surface that fails the FST round-trip (Latin string is not a
-    // Kazakh surface). In permissive mode it still passes — the
-    // round-trip succeeds trivially because the tokenizer returns
-    // Unk and detokenize returns the same string. This documents
-    // the current behaviour: round-trip checks morphology, not
-    // script.
+    // **v6.0 hardening:** Latin nonsense is blocked by the script
+    // gate regardless of strict / permissive. Pre-hardening this
+    // surface byte-roundtripped through Unk and silently passed in
+    // permissive mode; the new contract is that the verifier never
+    // emits a Pass on a non-Kazakh-script string.
     let record = verifier.check("blarg");
-    match record.verdict {
-        Verdict::Pass { .. } => {} // Unk passes, ungrounded but permissive.
-        Verdict::Block(BlockReason::Ungrounded) => {} // also acceptable in strict mode
-        other => panic!("unexpected verdict on Latin nonsense: {other:?}"),
-    }
+    assert_eq!(record.verdict, Verdict::Block(BlockReason::NonKazakhScript));
 }
 
 #[test]
