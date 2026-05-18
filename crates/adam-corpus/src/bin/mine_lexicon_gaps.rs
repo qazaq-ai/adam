@@ -585,10 +585,29 @@ mod tests {
     }
 
     #[test]
-    fn has_known_prefix_ignores_sub_min_length() {
-        // MIN_ROOT_LEN=3; a 2-char root shouldn't match.
+    fn has_known_prefix_accepts_short_closed_class_root() {
+        // Phase A wave 1 (2026-05-17): the prefix-match window
+        // starts at 2 chars so short closed-class roots («ол»,
+        // «не», «ба») cover their inflected surfaces («оны»,
+        // «неге», «балалар»). Length filtering moved upstream
+        // into `load_roots()` which trusts Lexicon curation —
+        // short roots only enter the set if they were curated in.
+        // See docs/research/coverage_progress_2026_05_16.md for
+        // the −33 % uncovered-surface delta this change unlocked.
         let mut roots = HashSet::new();
-        roots.insert("ба".to_string()); // normally filtered at load
-        assert!(!has_known_prefix("бала", &roots));
+        roots.insert("ба".to_string());
+        assert!(has_known_prefix("бала", &roots));
+    }
+
+    #[test]
+    fn has_known_prefix_rejects_word_shorter_than_any_root() {
+        // Defensive: a word too short to contain any prefix of
+        // length ≥ 2 should never match. The loop iterates
+        // take ∈ 2..=word.len() so a 1-char word has no
+        // candidate prefixes.
+        let mut roots = HashSet::new();
+        roots.insert("ба".to_string());
+        roots.insert("бала".to_string());
+        assert!(!has_known_prefix("б", &roots));
     }
 }
