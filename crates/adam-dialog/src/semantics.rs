@@ -1570,6 +1570,13 @@ fn detect_ask_about_system(
         || joined.contains("кім ексің")
         || joined.contains("сіз кімсіз")
         || joined.contains("сен кімсің")
+        // **v6.0** — `өзің кімсің` / `өзіңіз кімсіз` is a natural
+        // and common Kazakh "who are you" phrasing where the
+        // pronoun is replaced by the reflexive «өзі-» («yourself-»)
+        // form. Pre-v6.0 fell through to greedy retrieval and
+        // surfaced an unrelated Abai quote. Real-REPL 2026-05-18.
+        || joined.contains("өзің кімсің")
+        || joined.contains("өзіңіз кімсіз")
         || joined.contains("өзіңіз туралы")
         || joined.contains("өзің туралы")
         || joined.contains("не екен");
@@ -2033,6 +2040,13 @@ fn detect_ask_about_system(
             || joined.contains("қай тілдерде")
             || joined.contains("қандай тіл")
             || joined.contains("қай тіл"));
+    // **v6.0** — «өзің кімсің» / «өзіңіз кімсіз» as a standalone
+    // identity question. The «өзі-» reflexive form replaces the
+    // pronoun «сен / сіз» in this phrasing, so the pronoun-gated
+    // check below misses it. Real-REPL 2026-05-18 turn 5 surfaced
+    // an Abai quote instead of the canonical self-introduction.
+    let reflexive_pronoun_identity =
+        joined.contains("өзің кімсің") || joined.contains("өзіңіз кімсіз");
     if pronoun
         && (joined.contains("кімсің")
             || joined.contains("кімсіз")
@@ -2046,6 +2060,7 @@ fn detect_ask_about_system(
             || joined.contains("немен айналысасыз"))
         || self_intro_request
         || reflexive_self_question
+        || reflexive_pronoun_identity
         || asks_system_name
         || asks_speaking_language
     {

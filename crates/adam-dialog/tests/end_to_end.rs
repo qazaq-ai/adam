@@ -3880,6 +3880,32 @@ fn ask_about_system_does_not_swallow_statement_of_name() {
     );
 }
 
+/// **v6.0** — reflexive «өзің кімсің» / «өзіңіз кімсіз» must also
+/// resolve to AskAboutSystem. The «өзі-» reflexive form replaces
+/// the pronoun and is a natural Kazakh phrasing for the same
+/// "who are you" question. Real-REPL 2026-05-18 turn 5 surfaced an
+/// unrelated Abai quote because the detector's pronoun gate
+/// rejected the reflexive form.
+#[test]
+fn ask_about_system_handles_reflexive_phrasings() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    for question in ["өзің кімсің", "өзіңіз кімсіз"] {
+        let mut conv = Conversation::new();
+        let out = conv.turn(question, &lex, &repo, 0);
+        let lower = out.to_lowercase();
+        assert!(
+            lower.contains("адам"),
+            "reflexive AskAboutSystem reply must mention `адам` (got for {question:?}: {out:?})"
+        );
+        assert!(
+            out.contains("Agglutinative Reasoning Kernel") || out.contains("ARK"),
+            "reflexive AskAboutSystem reply must mention full name or abbreviation \
+             (got for {question:?}: {out:?})"
+        );
+    }
+}
+
 /// **v4.3.4** — `AskAboutSystem { aspect: General }` mentions the
 /// canonical name and the technical full name. Verifies the
 /// `system_name` and `system_full_name` slots are wired through
