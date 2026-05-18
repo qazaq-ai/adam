@@ -2186,6 +2186,7 @@ pub fn looks_like_weather_query(input: &str) -> bool {
     lower.contains("ауа райы")
         || lower.contains("ауа-райы")
         || lower.contains("ауарайы")
+        || lower.contains("ауырайы") // v6.0 — Whisper STT variant
         || (lower.contains("ауа") && (lower.contains("қандай") || lower.contains("қалай")))
         || lower.contains("жаңбыр жау")
         || lower.contains("қар жау")
@@ -2234,7 +2235,19 @@ pub fn input_is_math_expression(input: &str) -> bool {
     // **v4.42.0** — added `азайт*` (decrease / subtract) as a
     // fifth math-verb stem; pairs with the new sequel-clause
     // multi-step evaluator.
-    const MATH_VERB_STEMS: &[&str] = &["көбейт", "бөл", "қос", "есепте", "азайт"];
+    // **v6.0** — `плюс / минус / умнож / раздел` accepted as Russian-
+    // loan operator words common in spoken Kazakh and Whisper STT.
+    const MATH_VERB_STEMS: &[&str] = &[
+        "көбейт",
+        "бөл",
+        "қос",
+        "есепте",
+        "азайт",
+        "плюс",
+        "минус",
+        "умнож",
+        "раздел",
+    ];
     // `ал` (subtract / take) is too short to use as a prefix —
     // checked below as a closed set of inflected forms.
     // **v4.41.0** — closed set of `ал` (subtract / take) inflected
@@ -3712,6 +3725,25 @@ fn detect_kazakh_math_op(tokens: &[&str]) -> Option<KazakhMathOp> {
         // verb stem for subtraction. «Бесті азайт» = «subtract 5».
         if t.starts_with("азайт") {
             return Some(KazakhMathOp::Sub);
+        }
+        // **v6.0 (live REPL 2026-05-18)** — Russian-loan operator
+        // words used in spoken Kazakh: «плюс», «минус», «умножить»,
+        // «разделить» (and their accusative/dative forms). Common
+        // in casual speech and in Whisper STT output, since Whisper
+        // sometimes outputs the Russian token verbatim when the
+        // surface is mixed. Conservative: only the four core
+        // operators, no extension to multi-word phrases.
+        if t.starts_with("плюс") {
+            return Some(KazakhMathOp::Add);
+        }
+        if t.starts_with("минус") {
+            return Some(KazakhMathOp::Sub);
+        }
+        if t.starts_with("умнож") {
+            return Some(KazakhMathOp::Mul);
+        }
+        if t.starts_with("раздел") {
+            return Some(KazakhMathOp::Div);
         }
     }
     // `ал` separately because of its short length — accept only when

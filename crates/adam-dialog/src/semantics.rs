@@ -1575,8 +1575,16 @@ fn detect_ask_about_system(
         // pronoun is replaced by the reflexive «өзі-» («yourself-»)
         // form. Pre-v6.0 fell through to greedy retrieval and
         // surfaced an unrelated Abai quote. Real-REPL 2026-05-18.
+        //
+        // **v6.0 update** — Whisper STT regularly renders the
+        // velar nasal `-ң` as plain `-н` in word-final position,
+        // turning «кімсің» into «кімсін» on live voice input.
+        // Accepting both lets the detector survive the STT noise.
+        // Same for «сен кімсің / сіз кімсіз» variants below.
         || joined.contains("өзің кімсің")
         || joined.contains("өзіңіз кімсіз")
+        || joined.contains("өзің кімсін")
+        || joined.contains("сен кімсін")
         || joined.contains("өзіңіз туралы")
         || joined.contains("өзің туралы")
         || joined.contains("не екен");
@@ -2045,11 +2053,14 @@ fn detect_ask_about_system(
     // pronoun «сен / сіз» in this phrasing, so the pronoun-gated
     // check below misses it. Real-REPL 2026-05-18 turn 5 surfaced
     // an Abai quote instead of the canonical self-introduction.
-    let reflexive_pronoun_identity =
-        joined.contains("өзің кімсің") || joined.contains("өзіңіз кімсіз");
+    let reflexive_pronoun_identity = joined.contains("өзің кімсің")
+        || joined.contains("өзіңіз кімсіз")
+        || joined.contains("өзің кімсін")
+        || joined.contains("сен кімсін");
     if pronoun
         && (joined.contains("кімсің")
             || joined.contains("кімсіз")
+            || joined.contains("кімсін")  // v6.0 — Whisper -ң→-н variant
             || joined.contains("қандай моделсің")
             || joined.contains("қандай моделсіз")
             || joined.contains("қандай ботсың")
@@ -3558,8 +3569,16 @@ fn detect_statement_of_family(joined: &str) -> bool {
 }
 
 fn detect_ask_weather(joined: &str) -> bool {
-    (joined.contains("ауа райы") && joined.contains("қалай"))
-        || (joined.contains("бүгін") && joined.contains("ауа райы"))
+    // **v6.0 (live REPL 2026-05-18)** — Whisper renders «ауа райы»
+    // as the joined form «ауырайы» / «ауарайы» in spoken-Kazakh
+    // input. Accept all three surface forms so the AskWeather
+    // intent fires regardless of how the STT spelled it.
+    let weather_phrase = joined.contains("ауа райы")
+        || joined.contains("ауа-райы")
+        || joined.contains("ауарайы")
+        || joined.contains("ауырайы");
+    (weather_phrase && (joined.contains("қалай") || joined.contains("қандай")))
+        || (joined.contains("бүгін") && weather_phrase)
         || (joined.contains("сыртта") && joined.contains("қалай"))
 }
 

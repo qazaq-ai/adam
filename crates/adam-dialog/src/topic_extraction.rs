@@ -3753,10 +3753,84 @@ pub(crate) fn topic_marker_hint(input: &str, parses: &[Analysis]) -> Option<Stri
 /// form. `first_noun_root_with_confidence` reports its own band.
 /// `accusative_form_hint` reports `Low` because it strips a suffix
 /// without lexicon validation (string-level fallback for FST gaps).
+/// **v6.0 (live REPL 2026-05-18)** — Whisper STT systematically clips
+/// the final vowel of common school-subject names («Физика» → «Физик»,
+/// «Биология» → «Биолог», «История» / «Тарих» loss, …). The clipped
+/// stem is in the Lexicon as a different word (e.g. «физик» =
+/// "physicist") which then dominates the topic-extraction ranking
+/// and surfaces a tangential IsA fact. This canonicaliser maps the
+/// known clipped variants back to the school-subject canonical form.
+///
+/// Triggers ONLY when the input also contains a knowledge-question
+/// marker («не білесің» / «не білесіз» / «не айтасың» / «туралы») —
+/// outside that context, «физик» genuinely refers to a physicist and
+/// must not be rewritten.
+fn canonicalize_school_subject(input: &str) -> Option<&'static str> {
+    let lower = input.to_lowercase();
+    let has_knowledge_marker = lower.contains("не білесің")
+        || lower.contains("не білесіз")
+        || lower.contains("не айтасың")
+        || lower.contains("не айтасыз")
+        || lower.contains("туралы");
+    if !has_knowledge_marker {
+        return None;
+    }
+    // Each entry: list of clipped surface forms that should resolve
+    // to the canonical full-name school-subject topic. Order is
+    // longest-prefix first within each subject so partial overlaps
+    // don't misroute.
+    const SUBJECTS: &[(&str, &[&str])] = &[
+        ("математика", &["математикалық", "математ", "математ "]),
+        ("физика", &["физикалық", "физик "]),
+        ("биология", &["биолог "]),
+        ("химия", &["химик ", "хими "]),
+        ("география", &["географ "]),
+        ("тарих", &["истор", "истори"]),
+        ("информатика", &["информатик "]),
+        ("астрономия", &["астроном "]),
+    ];
+    // Pad input with leading + trailing space so word-boundary
+    // matching with " stem " is robust.
+    let padded = format!(" {} ", lower);
+    for (canonical, clipped_forms) in SUBJECTS {
+        // Already in canonical form → no rewrite needed; let normal
+        // extraction handle it.
+        if padded.contains(&format!(" {} ", canonical)) {
+            return None;
+        }
+        for stem in *clipped_forms {
+            // Each `stem` ends with a space inside the literal where
+            // we want strict word boundary («физик » not «физика»).
+            // Forms without trailing space match anywhere.
+            let probe = if stem.ends_with(' ') {
+                format!(" {}", stem)
+            } else {
+                format!(" {} ", stem)
+            };
+            if padded.contains(&probe) {
+                return Some(canonical);
+            }
+        }
+    }
+    None
+}
+
 pub(crate) fn best_noun_hint_with_confidence(
     input: &str,
     parses: &[Analysis],
 ) -> Option<(String, TopicConfidence)> {
+    // **v6.0 (live REPL 2026-05-18)** — Whisper STT regularly clips
+    // the trailing vowel from common school-subject names: «Физика
+    // туралы…» becomes «Физик туралы…», «Биология» becomes «Биолог»,
+    // «История» becomes «Истор». The truncated stem is a different
+    // word (e.g. «физик» = "physicist"), so the planner surfaces an
+    // unrelated definition instead of the school-subject summary.
+    // Canonicalise these stems back to their full surface forms
+    // BEFORE any of the other extraction strategies run.
+    let canonical = canonicalize_school_subject(input);
+    if let Some(subj) = canonical {
+        return Some((subj.to_string(), TopicConfidence::High));
+    }
     // **v5.23.0** — first-president normaliser. Live-feedback
     // 2026-05-12: «Ең бірше қазақстанның президенті кім болды?» and
     // «Алдымен қазақстанның президенті кім болды?» both surfaced
@@ -3848,6 +3922,16 @@ pub(crate) fn detect_first_office_query(input: &str) -> Option<String> {
     ];
     let has_first = FIRST_MARKERS.iter().any(|m| lowered.contains(m));
     if !has_first {
+        // **v6.0 (live REPL 2026-05-18)** — bare-question variant
+        // without an explicit «қазіргі» marker: «Қазақстанда кім
+        // президент?» / «Кім президент?». Live REPL surfaced the
+        // republic-structure IsA fact instead of Tokayev. When the
+        // input has BOTH «президент» and «кім» — but no first-marker
+        // — route to the «қазіргі президент» world_core topic which
+        // is grounded on the current head-of-state fact.
+        if lowered.contains("президент") && lowered.contains("кім") {
+            return Some("қазіргі президент".to_string());
+        }
         return None;
     }
     if lowered.contains("президент") {
@@ -4184,12 +4268,15 @@ mod tests {
     }
 
     #[test]
-    fn detect_first_office_query_ignores_current() {
-        // No first-marker → return None; lets the existing
-        // «қазіргі президент» / «қазақстан президенті» multiword
-        // handle current-president questions.
+    fn detect_first_office_query_returns_current_when_no_first_marker_v6() {
+        // **v6.0** — bare «X-ң президенті кім?» without a
+        // first-marker now routes to «қазіргі президент» so the
+        // current head-of-state fact wins over the republic-
+        // structure IsA fact. Live REPL 2026-05-18: «Қазақстанда
+        // кім президент?» surfaced «Қазақстан — президенттік-
+        // парламенттік аралас республика.» pre-v6.0.
         let hit = detect_first_office_query("Қазір қазақстанның президенті кім?");
-        assert!(hit.is_none());
+        assert_eq!(hit.as_deref(), Some("қазіргі президент"));
     }
 
     #[test]

@@ -2772,7 +2772,14 @@ impl Conversation {
                     );
                     self.belief
                         .record_user_fact(USER_SELF_KEY, "city", &entity.canonical, turn_id);
-                } else {
+                } else if crate::weather::kazakh_city_coords().contains_key(&city.to_lowercase()) {
+                    // **v6.0** — city is in the weather module's
+                    // closed-list of Kazakhstani settlements (29
+                    // cities including all oblast centres) but
+                    // missing from the smaller `canonical_geo_entity`
+                    // catalog. Still trustworthy — record without
+                    // city_id / geo_kind so the planner knows it's
+                    // a non-canonical slot.
                     self.session.insert("city".into(), city.clone());
                     self.session.remove("city_id");
                     self.session.remove("geo_kind");
@@ -2780,6 +2787,23 @@ impl Conversation {
                         .touch_entity(city, EntityKind::Place, city, city, None, turn_id);
                     self.belief
                         .record_user_fact(USER_SELF_KEY, "city", city, turn_id);
+                } else {
+                    // **v6.0 (live REPL 2026-05-18)** — STT garbage
+                    // guard. Whisper sometimes mangles «Қостанай
+                    // облысында тұрамын» into «қачар ауылда тұрамын»
+                    // and the unfiltered fallback then stored
+                    // «қачар» as the user's city, propagating into
+                    // every later turn («Мекеніңіз Қачар екенін
+                    // ұқтым»). Drop the slot when the surface is
+                    // neither canonical-geo nor in the weather city
+                    // list — adam will say «I didn't catch your
+                    // location» instead of pretending to remember
+                    // a hallucinated place. Genuine villages outside
+                    // the catalog can be added via `geo_catalog` or
+                    // `weather::kazakh_city_coords`.
+                    self.session.remove("city");
+                    self.session.remove("city_id");
+                    self.session.remove("geo_kind");
                 }
             }
             Intent::StatementOfOccupation {

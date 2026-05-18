@@ -408,86 +408,67 @@ mod tests {
         assert_eq!(lookup_city("алматыда"), Some((43.2389, 76.8897)));
     }
 
+    /// **v6.0** — env-mutation tests for the location-resolution
+    /// cascade. All three cases are consolidated into one test so
+    /// they run serially within a single thread; running them as
+    /// independent `#[test]` functions raced under `cargo test`'s
+    /// default parallel scheduler (one test's env-set leaked into
+    /// another test's env-read window).
     #[test]
-    fn resolve_location_prefers_env_lat_lon() {
-        // SAFETY: env mutation in tests; restore at end.
-        let prev_lat = std::env::var("ADAM_WEATHER_LAT").ok();
-        let prev_lon = std::env::var("ADAM_WEATHER_LON").ok();
-        unsafe {
-            std::env::set_var("ADAM_WEATHER_LAT", "53.21");
-            std::env::set_var("ADAM_WEATHER_LON", "63.62");
-        }
-        let session = HashMap::new();
-        let resolved = resolve_location(&session);
-        assert!(
-            matches!(resolved, Some((lat, lon, _)) if (lat - 53.21).abs() < 0.01 && (lon - 63.62).abs() < 0.01)
-        );
-        // restore
-        match prev_lat {
-            Some(v) => unsafe { std::env::set_var("ADAM_WEATHER_LAT", v) },
-            None => unsafe { std::env::remove_var("ADAM_WEATHER_LAT") },
-        }
-        match prev_lon {
-            Some(v) => unsafe { std::env::set_var("ADAM_WEATHER_LON", v) },
-            None => unsafe { std::env::remove_var("ADAM_WEATHER_LON") },
-        }
-    }
-
-    #[test]
-    fn resolve_location_falls_back_to_session_city() {
-        // Make sure no env coords are interfering.
+    fn resolve_location_cascade_env_session_none() {
+        // Snapshot existing env so we restore at the end.
         let prev_lat = std::env::var("ADAM_WEATHER_LAT").ok();
         let prev_lon = std::env::var("ADAM_WEATHER_LON").ok();
         let prev_city = std::env::var("ADAM_WEATHER_CITY").ok();
-        unsafe {
-            std::env::remove_var("ADAM_WEATHER_LAT");
-            std::env::remove_var("ADAM_WEATHER_LON");
-            std::env::remove_var("ADAM_WEATHER_CITY");
-        }
+        // Helper closures for env (de)set.
+        let set = |k: &str, v: &str| unsafe { std::env::set_var(k, v) };
+        let clear = |k: &str| unsafe { std::env::remove_var(k) };
+
+        // ── case 1: explicit LAT/LON env wins everything ───────────
+        set("ADAM_WEATHER_LAT", "53.21");
+        set("ADAM_WEATHER_LON", "63.62");
+        clear("ADAM_WEATHER_CITY");
+        let session = HashMap::new();
+        let resolved = resolve_location(&session);
+        assert!(
+            matches!(resolved, Some((lat, lon, _)) if (lat - 53.21).abs() < 0.01 && (lon - 63.62).abs() < 0.01),
+            "case 1: env LAT/LON should win (got {resolved:?})"
+        );
+        clear("ADAM_WEATHER_LAT");
+        clear("ADAM_WEATHER_LON");
+
+        // ── case 2: session-belief city is the fallback ────────────
+        clear("ADAM_WEATHER_CITY");
         let mut session = HashMap::new();
         session.insert("city".into(), "Қостанай".into());
         let resolved = resolve_location(&session);
         assert!(
-            matches!(resolved, Some((lat, lon, label)) if (lat - 53.2144).abs() < 0.01 && (lon - 63.6246).abs() < 0.01 && label.as_deref() == Some("Қостанай"))
+            matches!(&resolved, Some((lat, lon, label)) if (lat - 53.2144).abs() < 0.01 && (lon - 63.6246).abs() < 0.01 && label.as_deref() == Some("Қостанай")),
+            "case 2: session.city should resolve to Қостанай (got {resolved:?})"
         );
-        // restore
-        match prev_lat {
-            Some(v) => unsafe { std::env::set_var("ADAM_WEATHER_LAT", v) },
-            None => {}
-        }
-        match prev_lon {
-            Some(v) => unsafe { std::env::set_var("ADAM_WEATHER_LON", v) },
-            None => {}
-        }
-        match prev_city {
-            Some(v) => unsafe { std::env::set_var("ADAM_WEATHER_CITY", v) },
-            None => {}
-        }
-    }
 
-    #[test]
-    fn resolve_location_returns_none_without_signals() {
-        let prev_lat = std::env::var("ADAM_WEATHER_LAT").ok();
-        let prev_lon = std::env::var("ADAM_WEATHER_LON").ok();
-        let prev_city = std::env::var("ADAM_WEATHER_CITY").ok();
-        unsafe {
-            std::env::remove_var("ADAM_WEATHER_LAT");
-            std::env::remove_var("ADAM_WEATHER_LON");
-            std::env::remove_var("ADAM_WEATHER_CITY");
-        }
+        // ── case 3: no signals at all → None ───────────────────────
+        clear("ADAM_WEATHER_LAT");
+        clear("ADAM_WEATHER_LON");
+        clear("ADAM_WEATHER_CITY");
         let session = HashMap::new();
-        assert!(resolve_location(&session).is_none());
+        assert!(
+            resolve_location(&session).is_none(),
+            "case 3: empty signals must yield None"
+        );
+
+        // ── restore env so other tests aren't disturbed ────────────
         match prev_lat {
-            Some(v) => unsafe { std::env::set_var("ADAM_WEATHER_LAT", v) },
-            None => {}
+            Some(v) => set("ADAM_WEATHER_LAT", &v),
+            None => clear("ADAM_WEATHER_LAT"),
         }
         match prev_lon {
-            Some(v) => unsafe { std::env::set_var("ADAM_WEATHER_LON", v) },
-            None => {}
+            Some(v) => set("ADAM_WEATHER_LON", &v),
+            None => clear("ADAM_WEATHER_LON"),
         }
         match prev_city {
-            Some(v) => unsafe { std::env::set_var("ADAM_WEATHER_CITY", v) },
-            None => {}
+            Some(v) => set("ADAM_WEATHER_CITY", &v),
+            None => clear("ADAM_WEATHER_CITY"),
         }
     }
 

@@ -3615,8 +3615,21 @@ fn qaldarynyz_qalai_does_not_poison_city_memory() {
         "wellbeing-style question must not be absorbed as session.city"
     );
 
+    // **v6.0** — STT garbage guard now requires the city to be in
+    // the canonical-geo catalog OR the weather city table (29
+    // oblast centres + major towns). Hallucinated village names
+    // like «Қашар» (Whisper's mangling of «Қостанай облысында»)
+    // are no longer stored — they would propagate into every later
+    // turn as a phantom location. Genuine non-catalog villages can
+    // still be added via `geo_catalog` / `weather::kazakh_city_coords`.
     let _ = conv.turn("Мен Қашар ауылынанмын.", &lex, &repo, 0);
-    assert_eq!(conv.session.get("city"), Some(&"Қашар".to_string()));
+    assert!(
+        !conv.session.contains_key("city"),
+        "unknown village must not pollute session.city — only canonical / table-listed names are persisted"
+    );
+    // Sanity: a real city (in the weather catalog) still flows in.
+    let _ = conv.turn("Мен Қостанайда тұрамын.", &lex, &repo, 0);
+    assert_eq!(conv.session.get("city"), Some(&"Қостанай".to_string()));
 }
 
 /// v4.0.3: `Conversation::with_curated_only_reasoning(true)` — the
