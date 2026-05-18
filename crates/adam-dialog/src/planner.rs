@@ -77,7 +77,7 @@ pub fn plan_response_with_session(
     // Merge per-turn slots with persistent session entities. Per-turn
     // wins on collision.
     let mut slots = session.clone();
-    for (k, v) in extract_slots(intent) {
+    for (k, v) in extract_slots_with_session(intent, session) {
         slots.insert(k, v);
     }
     ensure_geo_kind_slot(&mut slots);
@@ -127,6 +127,17 @@ pub fn plan_response_with_session(
             _ => "submit_solution.env_error",
         };
         trace.push(format!("planner: SubmitSolution sub-key → {key}"));
+    }
+    // **v6.0** — AskWeather sub-routing. Same pattern as
+    // AskExercise / CodeRequest below: when the sentinel
+    // `__live_weather_set__` is present, the weather provider
+    // returned a fresh reading and the dedicated `.live` family
+    // (single-template) must fire. Without it the seed-mod picker
+    // rolls between the live answer and the honest-refusal variant
+    // ~50 % of turns.
+    if matches!(intent, Intent::AskWeather) && slots.contains_key("__live_weather_set__") {
+        key = "ask_weather.live";
+        trace.push(format!("planner: AskWeather sub-key → {key}"));
     }
     // **v4.96.0** — Codex round-2 audit Bug 2 fix. Pedagogical
     // sub-routing (mirror of plan_response_with_epistemic block).
@@ -1274,7 +1285,7 @@ pub fn plan_response_with_epistemic(
     };
 
     let mut slots = session.clone();
-    for (k, v) in extract_slots(intent) {
+    for (k, v) in extract_slots_with_session(intent, session) {
         slots.insert(k, v);
     }
     // Per-turn extras (e.g. conflict predicate / old_value /
@@ -1340,6 +1351,10 @@ pub fn plan_response_with_epistemic(
             _ => "submit_solution.env_error",
         };
         trace.push(format!("planner: SubmitSolution sub-key → {new_key}"));
+        new_key
+    } else if matches!(intent, Intent::AskWeather) && slots.contains_key("__live_weather_set__") {
+        let new_key = "ask_weather.live";
+        trace.push(format!("planner: AskWeather sub-key → {new_key}"));
         new_key
     } else if matches!(intent, Intent::AskExercise { .. }) {
         let new_key = if slots.contains_key("topic") && slots.contains_key("exercise_body") {
@@ -1520,7 +1535,10 @@ fn template_is_fillable(template: &str, slots: &HashMap<String, String>) -> bool
 /// v0.9.0: `{name}`, `{age}`, `{city}`, `{occupation}` — every intent
 /// that carries an optional entity contributes its slot when the
 /// entity is present.
-fn extract_slots(intent: &Intent) -> HashMap<String, String> {
+fn extract_slots_with_session(
+    intent: &Intent,
+    session: &HashMap<String, String>,
+) -> HashMap<String, String> {
     let mut slots = HashMap::new();
     // **v6.0** — live OS-clock readout for `Intent::AskTime`. The
     // slot `live_clock_answer` carries the Kazakh-formatted answer
@@ -1533,6 +1551,24 @@ fn extract_slots(intent: &Intent) -> HashMap<String, String> {
             "live_clock_answer".into(),
             crate::system_clock::render_live(*aspect),
         );
+    }
+    // **v6.0** — live Open-Meteo weather readout for
+    // `Intent::AskWeather`. Resolved via env (`ADAM_WEATHER_LAT/LON`
+    // or `ADAM_WEATHER_CITY`) or the session-belief `city` slot the
+    // user previously volunteered. On network failure or missing
+    // location, leaves the slot unset so the planner falls back to
+    // the existing «менде терезе жоқ» refusal template.
+    if matches!(intent, Intent::AskWeather)
+        && let Some(line) = crate::weather::render_live(session)
+    {
+        slots.insert("live_weather_answer".into(), line);
+        // Sentinel routes the planner to the dedicated `ask_weather.live`
+        // subfamily (single-template). Without this, the seed-mod
+        // template picker rolls between the live answer and the
+        // honest-refusal variant in `ask_weather` — half the turns
+        // would silently say «менде терезе жоқ» despite live data
+        // being available.
+        slots.insert("__live_weather_set__".into(), "1".into());
     }
     match intent {
         Intent::StatementOfName { name } => {

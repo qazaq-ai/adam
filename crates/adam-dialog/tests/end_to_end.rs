@@ -771,15 +771,45 @@ fn response_statement_of_family() {
 }
 
 #[test]
-fn response_ask_weather() {
-    assert_response_with_toml(
-        "ауа райы қалай",
-        &[
-            "менде терезе жоқ",
-            "ауа райын білмеймін",
-            "сыртта қалай екенін айтыңызшы",
-        ],
+fn response_ask_weather_falls_back_to_refusal_without_location_v6() {
+    // **v6.0** — without `ADAM_WEATHER_*` env vars AND without a
+    // session-belief city, AskWeather falls back to the refusal
+    // template. We don't pin the literal text (it now nudges the
+    // user to configure a city) — we assert the shape: must mention
+    // «терезе жоқ» OR «қалаңыз» (the refusal vocabulary). Also
+    // guarantees we DON'T accidentally render an empty
+    // `{live_weather_answer}` placeholder.
+    let prev_lat = std::env::var("ADAM_WEATHER_LAT").ok();
+    let prev_lon = std::env::var("ADAM_WEATHER_LON").ok();
+    let prev_city = std::env::var("ADAM_WEATHER_CITY").ok();
+    unsafe {
+        std::env::remove_var("ADAM_WEATHER_LAT");
+        std::env::remove_var("ADAM_WEATHER_LON");
+        std::env::remove_var("ADAM_WEATHER_CITY");
+    }
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let out = respond_with_repo("ауа райы қалай", &lex, &repo, 0);
+    assert!(
+        out.to_lowercase().contains("терезе") || out.to_lowercase().contains("қалаңыз"),
+        "AskWeather refusal must mention терезе/қалаңыз (got: {out:?})"
     );
+    assert!(
+        !out.contains("{"),
+        "refusal must not render an unfilled slot placeholder (got: {out:?})"
+    );
+    match prev_lat {
+        Some(v) => unsafe { std::env::set_var("ADAM_WEATHER_LAT", v) },
+        None => {}
+    }
+    match prev_lon {
+        Some(v) => unsafe { std::env::set_var("ADAM_WEATHER_LON", v) },
+        None => {}
+    }
+    match prev_city {
+        Some(v) => unsafe { std::env::set_var("ADAM_WEATHER_CITY", v) },
+        None => {}
+    }
 }
 
 #[test]

@@ -2176,6 +2176,21 @@ pub fn input_is_code_snippet(input: &str) -> bool {
     false
 }
 
+/// **v6.0** — true iff the input is asking specifically about
+/// **weather**, as opposed to other current-data topics (currency,
+/// news, prices) that share the `SafetyCategory::CurrentData` slot.
+/// Used by `Conversation::turn` to selectively bypass the
+/// safety-refusal when a live weather provider IS configured.
+pub fn looks_like_weather_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    lower.contains("ауа райы")
+        || lower.contains("ауа-райы")
+        || lower.contains("ауарайы")
+        || (lower.contains("ауа") && (lower.contains("қандай") || lower.contains("қалай")))
+        || lower.contains("жаңбыр жау")
+        || lower.contains("қар жау")
+}
+
 pub fn input_is_math_expression(input: &str) -> bool {
     let lower = input.to_lowercase();
     // Signal 1: arithmetic operator surrounded by digit context.

@@ -1337,17 +1337,33 @@ impl Conversation {
         let mut proof_object: Option<crate::proof_object::ProofObject> = None;
 
         if let Some(category) = crate::discourse::detect_safety_topic(input) {
-            extra_slots.insert("__safety_refusal__".into(), category.slug().into());
-            // **v5.8.5 — G2.5.** Build the typed proof for this safety
-            // refusal. The refusal IS the proof — no curated support
-            // is required because the kernel is honestly declining
-            // a high-stakes domain. SafetyDomain captures which kind.
-            let domain: crate::proof_object::SafetyDomain = category.into();
-            proof_object = Some(crate::proof_object::ProofObject::safety_refusal(
-                input.to_string(),
-                category.slug().to_string(),
-                domain,
-            ));
+            // **v6.0** — weather exception. The CurrentData category
+            // includes «ауа райы» queries because adam historically
+            // had no live data feed. With the Open-Meteo opt-in
+            // (`weather::render_live`) adam DOES have live weather
+            // when a location is resolved — env coords / env city /
+            // session-belief city. If the resolution succeeds, skip
+            // the safety refusal and let `ask_weather` family
+            // surface the actual reading. Other CurrentData topics
+            // (currency, news, prices) still hit the safety refusal
+            // because adam has no live feed for them.
+            let weather_overrides =
+                matches!(category, crate::discourse::SafetyCategory::CurrentData)
+                    && crate::discourse::looks_like_weather_query(input)
+                    && crate::weather::resolve_location(&self.session).is_some();
+            if !weather_overrides {
+                extra_slots.insert("__safety_refusal__".into(), category.slug().into());
+                // **v5.8.5 — G2.5.** Build the typed proof for this safety
+                // refusal. The refusal IS the proof — no curated support
+                // is required because the kernel is honestly declining
+                // a high-stakes domain. SafetyDomain captures which kind.
+                let domain: crate::proof_object::SafetyDomain = category.into();
+                proof_object = Some(crate::proof_object::ProofObject::safety_refusal(
+                    input.to_string(),
+                    category.slug().to_string(),
+                    domain,
+                ));
+            }
         }
         // **v5.6.6 — Codex follow-up review.** AskPreviousError recall
         // route. Pre-v5.6.6 «Ал алдыңғы қате неде болды?» fell to

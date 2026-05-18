@@ -79,6 +79,7 @@ pub mod topic_extraction;
 pub mod tts;
 pub mod uncertainty;
 pub mod verifier;
+pub mod weather;
 
 pub use action::{Action, ActionDigest, ActionPlan, ActionPlanner, OutputKind};
 pub use belief::{

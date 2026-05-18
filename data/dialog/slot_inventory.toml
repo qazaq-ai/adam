@@ -456,3 +456,10 @@ kind = "curated_fact"
 description = "Pre-rendered Kazakh-language live OS-clock answer for `Intent::AskTime`. Populated by `system_clock::render_live(aspect)` reading `std::time::SystemTime` + the `ADAM_TZ_OFFSET_HOURS` env var. The ask_time template family is a single `{live_clock_answer}` placeholder so the planner doesn't have to pick among variants."
 example = "Бүгін — 18 мамыр 2026 жыл, Дүйсенбі."
 variants = ["literal"]
+
+[[slots]]
+name = "live_weather_answer"
+kind = "curated_fact"
+description = "Pre-rendered Kazakh-language live Open-Meteo weather answer for `Intent::AskWeather`. Populated by `weather::render_live(session)` which resolves a location via env (`ADAM_WEATHER_LAT/LON` or `ADAM_WEATHER_CITY`) or the session-belief `city` slot the user previously volunteered, then shells out to `curl https://api.open-meteo.com/v1/forecast`. Empty when no location resolves or the network call fails — the planner then falls back to the honest-refusal variant of `ask_weather`."
+example = "Қостанайда қазір ішінара бұлтты — ауа температурасы 12 °C, жел 8 км/сағ, ылғалдылық 55 %."
+variants = ["literal"]

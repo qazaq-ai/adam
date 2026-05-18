@@ -1344,9 +1344,18 @@ templates = [
 [[families]]
 key = "ask_weather"
 templates = [
-    "менде терезе жоқ",
-    "ауа райын білмеймін",
-    "сыртта қалай екенін айтыңызшы",
+    "Менде терезе жоқ — қалаңызды айтсаңыз («Мен Алматыда тұрамын») немесе `ADAM_WEATHER_CITY=Қостанай` орнатсаңыз, ауа райын тексере аламын.",
+]
+
+# **v6.0** — live Open-Meteo answer subfamily. Routed by the
+# `__live_weather_set__` sentinel in `extract_slots_with_session`
+# whenever a location was resolved AND the network fetch succeeded.
+# Single template so the planner never rolls onto a refusal when
+# real data is available.
+[[families]]
+key = "ask_weather.live"
+templates = [
+    "{live_weather_answer}",
 ]
 
 [[families]]
