@@ -1108,6 +1108,20 @@ pub fn split_compound_utterance(input: &str) -> Vec<String> {
     if trimmed.contains("```") {
         return vec![trimmed.to_string()];
     }
+    // **v6.0 (live REPL 2026-05-18)** — multi-clause word-math
+    // expressions like «Елу алтыны үшке көбейтіңіз, содан кейін екіге
+    // бөліңіз» («multiply 56 by 3, then divide by 2») must reach
+    // `try_evaluate_kazakh_word_math` as ONE string. That evaluator
+    // already understands comma + «және / содан кейін / соңында» as
+    // internal clause separators and chains operations against a
+    // running accumulator. Splitting on comma here breaks the chain:
+    // clause 1 evaluates standalone (168) and clause 2 has no left
+    // operand and refuses. The user perceives this as «adam used to
+    // understand multi-step problems, now doesn't». Bail before
+    // splitting when the input is a math expression.
+    if input_is_math_expression(trimmed) {
+        return vec![trimmed.to_string()];
+    }
     let mut parts: Vec<String> = Vec::new();
     let mut buf = String::new();
     let mut in_quote = false;
@@ -3121,6 +3135,13 @@ pub fn try_evaluate_kazakh_word_math(input: &str) -> Option<i64> {
         .replace(',', " __CLAUSE_SEP__ ")
         .replace(" және ", " __CLAUSE_SEP__ ")
         .replace(" содан кейін ", " __CLAUSE_SEP__ ")
+        // **v6.0 (live REPL 2026-05-18)** — colloquial «сосын» is the
+        // spoken-language equivalent of formal «содан кейін» («then»);
+        // Kazakh speakers default to it in everyday speech. Add as a
+        // first-class clause separator so spoken-style math («бесті
+        // отызға көбейт, сосын екіге бөл») chains the same way written
+        // formal style does.
+        .replace(" сосын ", " __CLAUSE_SEP__ ")
         .replace(" соңында ", " __CLAUSE_SEP__ ");
     let clauses: Vec<&str> = normalized
         .split("__CLAUSE_SEP__")
@@ -4477,6 +4498,67 @@ mod math_tests {
         assert!(!input_is_math_expression("Қазақстанда 17 облыс бар."));
         assert!(!input_is_math_expression("Менің жасым 30"));
         assert!(!input_is_math_expression("Алты қаласы Қазақстанда"));
+    }
+
+    /// **v6.0 (live REPL 2026-05-18)** — multi-clause math expressions
+    /// must NOT be comma-split at the discourse layer. The math
+    /// evaluator handles commas internally as clause separators and
+    /// chains operations against a running accumulator; splitting
+    /// them at this layer breaks the chain (clause 1 evaluates
+    /// standalone, clause 2 has no left operand).
+    #[test]
+    fn split_compound_keeps_math_one_piece_v6() {
+        let cases = [
+            "Елу алтыны үшке көбейтіңіз, содан кейін екіге бөліңіз",
+            "Жиырма бесті бес көбейтсек, содан кейін онға бөл",
+            "Бесті отызға көбейт, сосын екіге бөл",
+            "56 * 3 / 2",
+        ];
+        for c in cases {
+            let pieces = super::split_compound_utterance(c);
+            assert_eq!(
+                pieces.len(),
+                1,
+                "math input must not be split (input={c:?}, got pieces={pieces:?})"
+            );
+        }
+    }
+
+    /// Counter-test: non-math compound inputs continue to split as
+    /// before so the per-clause dispatch path stays intact for normal
+    /// dialog turns.
+    #[test]
+    fn split_compound_still_splits_non_math_v6() {
+        let pieces = super::split_compound_utterance("Сәлем, менің атым Дәулет");
+        assert_eq!(pieces.len(), 2);
+        assert_eq!(pieces[0], "Сәлем");
+        assert_eq!(pieces[1], "менің атым Дәулет");
+    }
+
+    /// **v6.0** — colloquial «сосын» («then») recognised as a clause
+    /// separator alongside formal «содан кейін» for spoken-style math
+    /// chains.
+    #[test]
+    fn word_math_sosyn_separator_v6() {
+        // 5 × 30 = 150, then ÷ 2 = 75.
+        assert_eq!(
+            super::try_evaluate_kazakh_word_math("Бесті отызға көбейт, сосын екіге бөл"),
+            Some(75)
+        );
+    }
+
+    /// **v6.0** — the user's exact phrasing from the 2026-05-18 voice
+    /// REPL that motivated the multi-clause fix: «Елу алтыны үшке
+    /// көбейтіңіз, содан кейін екіге бөліңіз» = «56 × 3 then ÷ 2».
+    /// Should compute to 84.
+    #[test]
+    fn word_math_user_56x3_div2_v6() {
+        assert_eq!(
+            super::try_evaluate_kazakh_word_math(
+                "Елу алтыны үшке көбейтіңіз, содан кейін екіге бөліңіз"
+            ),
+            Some(84)
+        );
     }
 
     /// **v4.41.0** — word-form math evaluator tests.
