@@ -24,6 +24,7 @@
 //! via burn feature flags; this crate's default is CPU only to keep
 //! the air-gap-deployable USP intact.
 
+pub mod checkpoint;
 pub mod generate;
 pub mod train;
 pub mod verifier;

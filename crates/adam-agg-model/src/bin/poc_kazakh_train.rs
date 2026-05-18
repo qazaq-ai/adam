@@ -13,7 +13,7 @@
 //! All in pure Rust, CPU, no Python, no cloud.
 
 use std::collections::HashMap;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use adam_agg_model::generate::{
     build_invalid_mask_table, compute_state_ids, count_valid_transitions, generate_constrained,
@@ -263,6 +263,70 @@ fn main() {
         "[6b/7] Held-out teacher-forced CE: {:.3}  (training-end was {:.3})",
         eval_ce, last_loss,
     );
+
+    // -- Stage 6c: checkpoint the trained model ------------------------------
+    // **v6.0** — persist the Stage-5 model + its compact training vocab
+    // + a sidecar metadata bundle so the adam_chat process can load
+    // the trained weights without re-running this 95-minute binary.
+    //
+    // Save location is controlled by `POC_CHECKPOINT_DIR`:
+    //   - unset / empty   → `data/checkpoints/poc_kazakh/v6_<UTC-timestamp>/`
+    //                       (one directory per run, never collides)
+    //   - explicit path   → exactly that path
+    //   - `none` / `off`  → skip saving entirely (CI / smoke runs).
+    //
+    // The directory layout — `model.mpk` + three JSON sidecars — is
+    // documented in `adam_agg_model::checkpoint`.
+    {
+        use adam_agg_model::checkpoint::{
+            CheckpointMeta, save_checkpoint as do_save, timestamped_dir,
+        };
+        let env_dir = std::env::var("POC_CHECKPOINT_DIR").unwrap_or_default();
+        let skip = matches!(env_dir.as_str(), "none" | "off" | "0" | "false");
+        if !skip {
+            let dir = if env_dir.is_empty() {
+                timestamped_dir(Path::new("data/checkpoints/poc_kazakh"))
+            } else {
+                PathBuf::from(env_dir)
+            };
+            let saved_at = format!(
+                "{}",
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map(|d| d.as_secs())
+                    .unwrap_or(0)
+            );
+            let git_commit = std::process::Command::new("git")
+                .args(["rev-parse", "HEAD"])
+                .output()
+                .ok()
+                .and_then(|o| String::from_utf8(o.stdout).ok())
+                .map(|s| s.trim().to_string())
+                .unwrap_or_else(|| "unknown".into());
+            let meta = CheckpointMeta {
+                saved_at,
+                git_commit,
+                train_pairs: train_sequences.len(),
+                heldout_pairs: eval_sequences.len(),
+                final_train_ce: last_loss,
+                heldout_ce: Some(eval_ce),
+                batch_size: train_cfg.batch_size,
+                n_epochs: train_cfg.n_epochs,
+                lr: train_cfg.lr,
+                seed: train_cfg.seed,
+                algebraic_alpha: 0.0,
+            };
+            eprintln!("[6c/7] Saving checkpoint → {}", dir.display());
+            match do_save(&dir, trained.clone(), &model_cfg, &compact_to_label, &meta) {
+                Ok(()) => eprintln!(
+                    "       ✓ saved (config.json + labels.json + training.json + model.mpk)"
+                ),
+                Err(e) => eprintln!("       ⚠ checkpoint save failed: {e}"),
+            }
+        } else {
+            eprintln!("[6c/7] Checkpoint save skipped (POC_CHECKPOINT_DIR={env_dir:?})");
+        }
+    }
 
     // -- Stage 7: FST-constrained vs unconstrained inference comparison ----
     eprintln!("\n[7/7] Generation comparison (constrained vs unconstrained, HELD-OUT):");

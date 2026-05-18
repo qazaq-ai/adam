@@ -48,3 +48,8 @@ data/retrieval/morpheme_index_full.json
 data/training/*.safetensors
 data/training/*.safetensors.bak
 data/training/*.safetensors.bak2
+
+# v6.0 PoC neural checkpoints (regeneratable via `cargo run --release
+# -p adam-agg-model --bin poc_kazakh_train`). Each run writes a fresh
+# timestamped directory; sizes 3–30 MB depending on hyperparameters.
+data/checkpoints/
