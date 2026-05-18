@@ -1522,6 +1522,18 @@ fn template_is_fillable(template: &str, slots: &HashMap<String, String>) -> bool
 /// entity is present.
 fn extract_slots(intent: &Intent) -> HashMap<String, String> {
     let mut slots = HashMap::new();
+    // **v6.0** — live OS-clock readout for `Intent::AskTime`. The
+    // slot `live_clock_answer` carries the Kazakh-formatted answer
+    // for the requested aspect (time / date / weekday / month /
+    // year / datetime). The `ask_time` template family is now a
+    // single `{live_clock_answer}` placeholder; pre-v6.0 the family
+    // hard-coded a refusal regardless of variant.
+    if let Intent::AskTime { aspect } = intent {
+        slots.insert(
+            "live_clock_answer".into(),
+            crate::system_clock::render_live(*aspect),
+        );
+    }
     match intent {
         Intent::StatementOfName { name } => {
             slots.insert("name".into(), name.clone());
@@ -2013,7 +2025,7 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::StatementOfFamily => "statement_of_family",
         Intent::AskWeather => "ask_weather",
         Intent::StatementOfWeather => "statement_of_weather",
-        Intent::AskTime => "ask_time",
+        Intent::AskTime { .. } => "ask_time",
         Intent::Compliment => "compliment",
         Intent::Request => "request",
         Intent::WellWishes => "well_wishes",

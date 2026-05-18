@@ -449,3 +449,10 @@ kind = "noun_term"
 description = "Variable name being solved for in math-answer-check templates."
 example = "x"
 variants = ["literal"]
+
+[[slots]]
+name = "live_clock_answer"
+kind = "curated_fact"
+description = "Pre-rendered Kazakh-language live OS-clock answer for `Intent::AskTime`. Populated by `system_clock::render_live(aspect)` reading `std::time::SystemTime` + the `ADAM_TZ_OFFSET_HOURS` env var. The ask_time template family is a single `{live_clock_answer}` placeholder so the planner doesn't have to pick among variants."
+example = "Бүгін — 18 мамыр 2026 жыл, Дүйсенбі."
+variants = ["literal"]

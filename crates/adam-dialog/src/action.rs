@@ -413,7 +413,7 @@ impl ActionPlanner {
                 | Intent::Request
                 | Intent::AskWeather
                 | Intent::StatementOfWeather
-                | Intent::AskTime
+                | Intent::AskTime { .. }
         )
     }
 

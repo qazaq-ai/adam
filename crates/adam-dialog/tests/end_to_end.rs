@@ -795,14 +795,67 @@ fn response_statement_of_weather() {
 }
 
 #[test]
-fn response_ask_time() {
-    assert_response_with_toml(
-        "сағат неше",
-        &[
-            "уақытты білмеймін",
-            "менде сағат жоқ",
-            "уақыт — асыл қазына",
-        ],
+fn response_ask_time_reads_live_clock_v6() {
+    // **v6.0** — `Intent::AskTime` reads the OS clock and emits a
+    // literal time / date answer. Pre-v6.0 returned one of three
+    // refusal templates; that family is now `{live_clock_answer}`
+    // populated from `system_clock::render_live`. We don't pin a
+    // specific clock value (would flake on the CI clock), but we
+    // assert the SHAPE: the output mentions either «сағат» (for
+    // the time path) or a Kazakh month name (for the date path)
+    // and contains a digit somewhere.
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let out = respond_with_repo("сағат неше", &lex, &repo, 0);
+    assert!(
+        out.contains("сағат") && out.chars().any(|c| c.is_ascii_digit()),
+        "AskTime/Time must render «сағат NN:NN» (got: {out:?})"
+    );
+}
+
+#[test]
+fn response_ask_date_renders_month_name_v6() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let out = respond_with_repo("бүгін қандай күн", &lex, &repo, 0);
+    // At least one Kazakh month name + at least one digit (year or
+    // day-of-month).
+    const MONTHS: &[&str] = &[
+        "қаңтар",
+        "ақпан",
+        "наурыз",
+        "сәуір",
+        "мамыр",
+        "маусым",
+        "шілде",
+        "тамыз",
+        "қыркүйек",
+        "қазан",
+        "қараша",
+        "желтоқсан",
+    ];
+    assert!(
+        MONTHS.iter().any(|m| out.contains(m)),
+        "AskTime/Date must render Kazakh month name (got: {out:?})"
+    );
+    assert!(
+        out.chars().any(|c| c.is_ascii_digit()),
+        "AskTime/Date must include a digit for day or year (got: {out:?})"
+    );
+}
+
+#[test]
+fn response_ask_year_renders_4_digit_year_v6() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let out = respond_with_repo("қазір қай жыл", &lex, &repo, 0);
+    // Pull contiguous digit runs; at least one should be 4 digits.
+    let has_4_digit_run = out
+        .split(|c: char| !c.is_ascii_digit())
+        .any(|run| run.len() == 4);
+    assert!(
+        has_4_digit_run && out.contains("жыл"),
+        "AskTime/Year must render «NNNN жыл» (got: {out:?})"
     );
 }
 

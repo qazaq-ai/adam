@@ -125,7 +125,7 @@ impl TemplateRepository {
         by_key.insert("statement_of_family".into(), vec!["қуаныштымын".into()]);
         by_key.insert("ask_weather".into(), vec!["менде терезе жоқ".into()]);
         by_key.insert("statement_of_weather".into(), vec!["түсіндім".into()]);
-        by_key.insert("ask_time".into(), vec!["уақытты білмеймін".into()]);
+        by_key.insert("ask_time".into(), vec!["{live_clock_answer}".into()]);
         by_key.insert("compliment".into(), vec!["рахмет".into()]);
         by_key.insert("request".into(), vec!["әрине, айтыңыз".into()]);
         by_key.insert("well_wishes".into(), vec!["сізге де".into()]);

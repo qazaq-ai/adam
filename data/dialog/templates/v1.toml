@@ -1360,9 +1360,7 @@ templates = [
 [[families]]
 key = "ask_time"
 templates = [
-    "уақытты білмеймін",
-    "менде сағат жоқ",
-    "уақыт — асыл қазына",
+    "{live_clock_answer}",
 ]
 
 [[families]]

@@ -70,6 +70,7 @@ pub mod semantics;
 pub mod sentence_decomp;
 pub mod slot_inventory;
 pub mod slot_syntax;
+pub mod system_clock;
 pub mod system_identity;
 pub mod task;
 pub mod templates;

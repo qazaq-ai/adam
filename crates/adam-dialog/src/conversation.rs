@@ -392,7 +392,7 @@ impl From<&Intent> for IntentKind {
             Intent::StatementOfFamily => Self::StatementOfFamily,
             Intent::AskWeather => Self::AskWeather,
             Intent::StatementOfWeather => Self::StatementOfWeather,
-            Intent::AskTime => Self::AskTime,
+            Intent::AskTime { .. } => Self::AskTime,
             Intent::Compliment => Self::Compliment,
             Intent::Request => Self::Request,
             Intent::WellWishes => Self::WellWishes,

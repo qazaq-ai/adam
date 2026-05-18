@@ -298,8 +298,8 @@ pub fn interpret_text_with_lexicon(
     if detect_ask_weather(&joined) {
         return Intent::AskWeather;
     }
-    if detect_ask_time(&joined) {
-        return Intent::AskTime;
+    if let Some(aspect) = detect_ask_time(&joined) {
+        return Intent::AskTime { aspect };
     }
     if detect_compliment(&tokens, &joined) {
         return Intent::Compliment;
@@ -3582,11 +3582,64 @@ fn detect_statement_of_weather(tokens: &[String], joined: &str) -> bool {
     (weather_token && (joined.contains("бүгін") || joined.contains("қазір"))) || weather_phrase
 }
 
-fn detect_ask_time(joined: &str) -> bool {
-    (joined.contains("сағат") && (joined.contains("неше") || joined.contains("қанша")))
+/// **v6.0** — returns the [`TimeAspect`] the user is asking about,
+/// or `None` if the utterance isn't a time/date question. Detection
+/// is markers-first because Kazakh phonological alternation makes
+/// the same root surface in many forms; we lean on Cyrillic substring
+/// presence rather than tokenised stems.
+///
+/// Aspect priority (first match wins):
+/// 1. Year — «қай жыл», «қазір қай жыл», «қай жылдамыз»
+/// 2. Month — «қай ай», «қандай ай», «қазір қай ай»
+/// 3. Weekday — «аптаның қай күні», «бүгін қай күн» without month-
+///    -date context (calendar-date queries route to Date)
+/// 4. Date — «бүгін айдың нешесі», «бүгін қандай күн», «бүгін қай күн»
+/// 5. Time — «сағат неше / неші / қанша», «қазір уақыт / неші»
+/// 6. DateTime — composite («сағат қанша, бүгін қай күн» — both
+///    markers present)
+fn detect_ask_time(joined: &str) -> Option<crate::intent::TimeAspect> {
+    use crate::intent::TimeAspect;
+    let year_marker = (joined.contains("қай жыл") || joined.contains("қандай жыл"))
+        && !joined.contains("қай жылы")  // «қай жылы туған»: a different historical question
+        && !joined.contains("қандай жылы");
+    let month_marker = joined.contains("қай ай")
+        || joined.contains("қандай ай")
+        || (joined.contains("ай") && joined.contains("неше") && joined.contains("қазір"));
+    let weekday_marker = joined.contains("аптаның қай күні")
+        || joined.contains("аптаның қандай күні")
+        || joined.contains("апта күні");
+    let date_marker = joined.contains("айдың нешесі")
+        || joined.contains("айдың нешеуінде")
+        || (joined.contains("бүгін")
+            && (joined.contains("қандай күн")
+                || joined.contains("қай күн")
+                || joined.contains("нешесі")));
+    let time_marker = (joined.contains("сағат")
+        && (joined.contains("неше") || joined.contains("неші") || joined.contains("қанша")))
         || joined.contains("қазір уақыт")
-        || joined.contains("қандай күн")
-        || joined.contains("қай күн")
+        || joined.contains("қазір неші")
+        || joined.contains("уақыт неше")
+        || joined.contains("уақыт қанша");
+    // Composite: explicit time-marker AND explicit date-marker.
+    if time_marker && (date_marker || weekday_marker) {
+        return Some(TimeAspect::DateTime);
+    }
+    if year_marker {
+        return Some(TimeAspect::Year);
+    }
+    if month_marker {
+        return Some(TimeAspect::Month);
+    }
+    if weekday_marker {
+        return Some(TimeAspect::Weekday);
+    }
+    if date_marker {
+        return Some(TimeAspect::Date);
+    }
+    if time_marker {
+        return Some(TimeAspect::Time);
+    }
+    None
 }
 
 fn detect_compliment(tokens: &[String], joined: &str) -> bool {

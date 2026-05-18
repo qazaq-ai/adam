@@ -154,7 +154,13 @@ pub enum Intent {
 
     /// "What time is it? / What day?": сағат неше, қазір қай уақыт,
     /// бүгін қандай күн.
-    AskTime,
+    ///
+    /// **v6.0** — carries a [`TimeAspect`] so the planner can route
+    /// each subform to the right system-clock probe. Pre-v6.0
+    /// `AskTime` returned the «менде сағат жоқ» refusal for every
+    /// variant; live REPL 2026-05-18 flagged that adam should
+    /// instead read the OS clock and answer literally.
+    AskTime { aspect: TimeAspect },
 
     /// Compliment / praise: жарайсың, өте жақсы, керемет.
     Compliment,
@@ -497,6 +503,31 @@ pub enum TimeOfDay {
     Morning,
     Day,
     Evening,
+}
+
+/// **v6.0** — what time-related slice of the OS clock the user asked
+/// for. The planner reads `std::time::SystemTime`, formats it in
+/// Kazakh, and renders an inline answer (no template indirection).
+///
+/// The set of aspects is closed and small on purpose: each variant
+/// pairs one-to-one with a clock format, so adding a new phrasing
+/// is a detector change, not an architectural one.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum TimeAspect {
+    /// «Қазір сағат неші?» — hour and minute.
+    Time,
+    /// «Бүгін қандай күн?» / «Бүгін айдың нешесі?» — calendar date,
+    /// month, year, weekday all in one line.
+    Date,
+    /// «Бүгін аптаның қай күні?» — day of the week only.
+    Weekday,
+    /// «Қазір қандай ай?» / «Қай ай?» — current month name.
+    Month,
+    /// «Қазір қай жыл?» / «Қай жыл?» — current year.
+    Year,
+    /// Composite («сағат қанша, бүгін қандай күн?») — the planner
+    /// emits the full datetime line.
+    DateTime,
 }
 
 /// Person + number of a subject as recognised in an utterance.
