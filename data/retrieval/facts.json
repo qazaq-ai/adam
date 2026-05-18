@@ -1,7 +1,7 @@
 {
-  "version": "5.31.6",
-  "status": "completed",
-  "elapsed_s": 70,
+  "version": "5.32.0",
+  "status": "world_core_refresh",
+  "elapsed_s": 0,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3650,
+    "facts_total": 3672,
     "by_predicate": {
       "after": 8,
       "causes": 28,
@@ -27,9 +27,9 @@
       "has": 81,
       "has_quantity": 56,
       "in_domain": 24,
-      "is_a": 2963,
+      "is_a": 2971,
       "lives_in": 8,
-      "part_of": 260,
+      "part_of": 274,
       "related_to": 195
     },
     "by_pack": {
@@ -65,6 +65,7 @@
       "world_core/informatics_basic.jsonl": 40,
       "world_core/kazakh_cuisine.jsonl": 26,
       "world_core/kinship_extended.jsonl": 20,
+      "world_core/kz_industry.jsonl": 22,
       "world_core/kz_literature.jsonl": 120,
       "world_core/language_features.jsonl": 78,
       "world_core/life_bridges.jsonl": 5,
@@ -27064,6 +27065,446 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Келін — ұлға тиген әйел."
+    },
+    {
+      "subject": {
+        "surface": "арселормиттал теміртау",
+        "root": "арселормиттал теміртау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "металлургия комбинаты",
+        "root": "металлургия комбинаты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "АрселорМиттал Теміртау — Қарағанды облысындағы металлургия комбинаты."
+    },
+    {
+      "subject": {
+        "surface": "арселормиттал теміртау",
+        "root": "арселормиттал теміртау",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "теміртау",
+        "root": "теміртау",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "АрселорМиттал Теміртау — Қарағанды облысындағы металлургия комбинаты."
+    },
+    {
+      "subject": {
+        "surface": "арселормиттал теміртау",
+        "root": "арселормиттал теміртау",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "қарағанды облысы",
+        "root": "қарағанды облысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "АрселорМиттал Теміртау — Қарағанды облысындағы металлургия комбинаты."
+    },
+    {
+      "subject": {
+        "surface": "соколов-сарыбай гөбк",
+        "root": "соколов-сарыбай гөбк",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "кен-байыту комбинаты",
+        "root": "кен-байыту комбинаты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Соколов-Сарыбай ГӨБК — Қостанай облысының темір кеніштері."
+    },
+    {
+      "subject": {
+        "surface": "соколов-сарыбай гөбк",
+        "root": "соколов-сарыбай гөбк",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "рудный",
+        "root": "рудный",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Соколов-Сарыбай ГӨБК — Қостанай облысының темір кеніштері."
+    },
+    {
+      "subject": {
+        "surface": "соколов-сарыбай гөбк",
+        "root": "соколов-сарыбай гөбк",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "қостанай облысы",
+        "root": "қостанай облысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Соколов-Сарыбай ГӨБК — Қостанай облысының темір кеніштері."
+    },
+    {
+      "subject": {
+        "surface": "риддер кен-металлургия комбинаты",
+        "root": "риддер кен-металлургия комбинаты",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "металлургия комбинаты",
+        "root": "металлургия комбинаты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Риддер кен-металлургия комбинаты — Шығыс Қазақстандағы зауыт."
+    },
+    {
+      "subject": {
+        "surface": "риддер кен-металлургия комбинаты",
+        "root": "риддер кен-металлургия комбинаты",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "риддер",
+        "root": "риддер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Риддер кен-металлургия комбинаты — Шығыс Қазақстандағы зауыт."
+    },
+    {
+      "subject": {
+        "surface": "риддер кен-металлургия комбинаты",
+        "root": "риддер кен-металлургия комбинаты",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "шығыс қазақстан облысы",
+        "root": "шығыс қазақстан облысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Риддер кен-металлургия комбинаты — Шығыс Қазақстандағы зауыт."
+    },
+    {
+      "subject": {
+        "surface": "орал зауыты зенит",
+        "root": "орал зауыты зенит",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "машина жасау зауыты",
+        "root": "машина жасау зауыты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_039"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Орал зауыты «Зенит» — Батыс Қазақстандағы машина жасау зауыты."
+    },
+    {
+      "subject": {
+        "surface": "орал зауыты зенит",
+        "root": "орал зауыты зенит",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "орал",
+        "root": "орал",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_039"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Орал зауыты «Зенит» — Батыс Қазақстандағы машина жасау зауыты."
+    },
+    {
+      "subject": {
+        "surface": "орал зауыты зенит",
+        "root": "орал зауыты зенит",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "батыс қазақстан облысы",
+        "root": "батыс қазақстан облысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_039"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Орал зауыты «Зенит» — Батыс Қазақстандағы машина жасау зауыты."
+    },
+    {
+      "subject": {
+        "surface": "сатпаев",
+        "root": "сатпаев",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "кен орталығы",
+        "root": "кен орталығы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_041"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сатпаев қаласы — Ұлытау облысының кен-металлургия орталығы."
+    },
+    {
+      "subject": {
+        "surface": "сатпаев",
+        "root": "сатпаев",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "ұлытау облысы",
+        "root": "ұлытау облысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_041"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сатпаев қаласы — Ұлытау облысының кен-металлургия орталығы."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан темір жолы",
+        "root": "қазақстан темір жолы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "темір жол компаниясы",
+        "root": "темір жол компаниясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_052"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Астана «Қазақстан темір жолы» — ұлттық темір жол компаниясы."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан темір жолы",
+        "root": "қазақстан темір жолы",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "астана",
+        "root": "астана",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_052"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Астана «Қазақстан темір жолы» — ұлттық темір жол компаниясы."
+    },
+    {
+      "subject": {
+        "surface": "петропавл ауыр машина жасау зауыты",
+        "root": "петропавл ауыр машина жасау зауыты",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "машина жасау зауыты",
+        "root": "машина жасау зауыты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_056"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Петропавл ауыр машина жасау зауыты — Солтүстіктегі ірі кәсіпорын."
+    },
+    {
+      "subject": {
+        "surface": "петропавл ауыр машина жасау зауыты",
+        "root": "петропавл ауыр машина жасау зауыты",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "петропавл",
+        "root": "петропавл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_056"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Петропавл ауыр машина жасау зауыты — Солтүстіктегі ірі кәсіпорын."
+    },
+    {
+      "subject": {
+        "surface": "петропавл ауыр машина жасау зауыты",
+        "root": "петропавл ауыр машина жасау зауыты",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "солтүстік қазақстан облысы",
+        "root": "солтүстік қазақстан облысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_056"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Петропавл ауыр машина жасау зауыты — Солтүстіктегі ірі кәсіпорын."
+    },
+    {
+      "subject": {
+        "surface": "ақтау теңіз порты",
+        "root": "ақтау теңіз порты",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "теңіз портасы",
+        "root": "теңіз портасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_057"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ақтау теңіз порты — Маңғыстау облысындағы Каспий портасы."
+    },
+    {
+      "subject": {
+        "surface": "ақтау теңіз порты",
+        "root": "ақтау теңіз порты",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "ақтау",
+        "root": "ақтау",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_057"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ақтау теңіз порты — Маңғыстау облысындағы Каспий портасы."
+    },
+    {
+      "subject": {
+        "surface": "ақтау теңіз порты",
+        "root": "ақтау теңіз порты",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "маңғыстау облысы",
+        "root": "маңғыстау облысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_industry",
+      "source": {
+        "pack": "world_core/kz_industry.jsonl",
+        "sample_id": "ind_057"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ақтау теңіз порты — Маңғыстау облысындағы Каспий портасы."
     },
     {
       "subject": {
