@@ -25,7 +25,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/tests-1442%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-1528%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/p50%20turn%20latency-21%20ms-2EA44F?style=flat-square" alt="latency">
   <img src="https://img.shields.io/badge/RSS-~160%20MB-2EA44F?style=flat-square" alt="rss">
   <img src="https://img.shields.io/badge/GPU-0%25-2EA44F?style=flat-square" alt="gpu">
@@ -148,7 +148,7 @@ For a full evidence dump on any Kazakh root, run [`adam_inspect`](crates/adam-di
 
 | Metric | Value | Notes |
 |---|---|---|
-| Workspace tests | **1 378 passing** | + 17 ignored + adversarial_dialog_v1 (95 cases, **100%**); voice V3 normalizer + priming; Kazakh fuzzy entity matcher; **math echo specificity** (transparent refusal); CI on every release |
+| Workspace tests | **1 528 passing** | + 17 ignored + adversarial_dialog_v1 (95 cases, **100%**); voice V3 normalizer + priming; Kazakh fuzzy entity matcher; **math echo specificity** (transparent refusal); CI on every release |
 | Release cadence | **487+ versioned releases in 5 weeks** | every release CI-verified |
 | p50 turn latency | **21 ms** | vs Llama-3 8B fp16 800–1500 ms; vs GPT-4 50–200 ms |
 | Memory footprint | **~300 MB RSS** | vs LLM 16+ GB VRAM |

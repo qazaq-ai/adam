@@ -113,7 +113,7 @@ Acceptance criteria status update (see
 | 2 | Performance contracts met on M2 | ✓ measured 88× under target |
 | 3 | Lexicon V2 ≥ 70 % Root yield | partial: −33 % uncovered surfaces via Phase A waves 1-3 |
 | 4 | Characteristics comparison published | ✓ done |
-| 5 | Test suite ≥ 500 | ✓ done (1473 workspace total, 61 in research arc) |
+| 5 | Test suite ≥ 500 | ✓ done (1528 workspace total post-Codex P0/P1 closure, 61 in research arc) |
 | 6 | Migration plan validated against external alpha | playbook landed; alpha pending |
 | 7 | arXiv preprint accepted / under review | draft committed |
 | 8 | Dependency tree audited (no proprietary / cloud) | ✓ done |
