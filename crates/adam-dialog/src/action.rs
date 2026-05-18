@@ -195,6 +195,19 @@ impl ActionPlanner {
         // doesn't brick the dialog. The contradiction itself
         // remains in `belief.contradictions` for audit; only
         // priority handling changes.
+        //
+        // **v6.0 (Codex review)** — farewell escape hatch. A user
+        // who explicitly says goodbye must be allowed to exit even
+        // mid-contradiction; trapping them in a «which is true: X
+        // or Y?» clarifying loop with no way out is worse UX than
+        // leaving the contradiction unresolved. The contradiction
+        // record stays in `belief.contradictions` (audit trail), so
+        // the next session can pick it up if the user returns.
+        // Only `Intent::Farewell` bypasses; other social intents
+        // (Greeting, Thanks, AskHowAreYou, …) remain subject to
+        // contradiction priority — those don't carry the "I'm
+        // leaving" signal and bypassing them would simply let the
+        // user paper over the conflict with a "thanks".
         let active_contradiction = if let Some(ct) = current_turn {
             belief
                 .contradictions
@@ -203,7 +216,7 @@ impl ActionPlanner {
         } else {
             !belief.contradictions.is_empty()
         };
-        if active_contradiction {
+        if active_contradiction && !matches!(intent, Intent::Farewell) {
             let rationale = belief
                 .contradictions
                 .iter()
@@ -518,6 +531,59 @@ mod tests {
         assert_eq!(plan.action, Action::CheckContradiction);
         assert_eq!(plan.expected_output, OutputKind::ClarifyingQuestion);
         assert!(!plan.rationale.is_empty());
+    }
+
+    #[test]
+    fn farewell_escapes_active_contradiction() {
+        // **v6.0 (Codex review):** a user saying goodbye must exit
+        // even mid-contradiction. Pre-fix the planner emitted
+        // CheckContradiction in this case, trapping the user in a
+        // clarifying loop with no way out.
+        let mut belief = BeliefState::new();
+        belief.record_user_fact(USER_SELF_KEY, "city", "алматы", 0);
+        belief.record_user_fact(USER_SELF_KEY, "city", "астана", 1);
+        let task = TaskState::new();
+        let plan = ActionPlanner::plan(&Intent::Farewell, &belief, &task);
+        assert_eq!(
+            plan.action,
+            Action::Social,
+            "Farewell must escape contradiction priority"
+        );
+        assert_eq!(plan.expected_output, OutputKind::SocialPleasantry);
+        // Contradiction record is preserved (audit trail) — the
+        // planner just doesn't dominate the dialog with it.
+        assert_eq!(
+            belief.contradictions.len(),
+            1,
+            "contradiction must remain in audit trail"
+        );
+    }
+
+    #[test]
+    fn other_social_intents_remain_subject_to_contradiction_priority() {
+        // Counter-test: only Farewell escapes. Greeting / Thanks /
+        // AskHowAreYou should still hit the contradiction dominance
+        // rule — those don't carry the "I'm leaving" signal and
+        // would let the user paper over the conflict with a polite
+        // exchange.
+        let mut belief = BeliefState::new();
+        belief.record_user_fact(USER_SELF_KEY, "city", "алматы", 0);
+        belief.record_user_fact(USER_SELF_KEY, "city", "астана", 1);
+        let task = TaskState::new();
+        for intent in [
+            Intent::Greeting {
+                kind: GreetingKind::Casual,
+            },
+            Intent::Thanks,
+            Intent::AskHowAreYou,
+        ] {
+            let plan = ActionPlanner::plan(&intent, &belief, &task);
+            assert_eq!(
+                plan.action,
+                Action::CheckContradiction,
+                "intent {intent:?} must still hit contradiction priority"
+            );
+        }
     }
 
     #[test]
