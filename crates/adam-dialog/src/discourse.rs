@@ -3070,6 +3070,14 @@ pub fn try_explain_steps(input: &str, last_steps: &str) -> Option<String> {
 }
 
 pub fn try_evaluate_kazakh_word_math(input: &str) -> Option<i64> {
+    // **v6.0** — same geometry / measurement gate as
+    // `extract_kazakh_math_summary`. Defense in depth: a geometric
+    // question that happens to contain two case-marked numerals and
+    // a math-verb root (e.g. «Үш бұрыштың қосындысы») must not
+    // silently return a numeric answer.
+    if input_has_geometry_or_measurement_context(&input.to_lowercase()) {
+        return None;
+    }
     // **v4.42.0** — multi-clause support. Split input by commas /
     // sequencing connectives («және» — "and", «содан кейін» — "then",
     // «соңында» — "at the end") so chained operations like
@@ -3208,6 +3216,59 @@ impl From<KazakhMathOp> for KazakhMathOpName {
     }
 }
 
+/// **v6.0 (live REPL 2026-05-18)** — does the input mention a
+/// geometric figure, geometric attribute, physical-measurement unit,
+/// or geographic-distance unit? If yes, the math-summary extractor
+/// returns None so the dialog doesn't echo a misparsed numeral
+/// («Мен «3» деп ұқтым…») on a question that wasn't arithmetic at
+/// all.
+///
+/// Conservative list: only words whose presence strongly disqualifies
+/// the input from being a calculator query. NOT in the list:
+/// generic length / amount nouns («ұзындық», «көп») that legitimately
+/// appear in word-math problems ("if the length is 5, multiply by
+/// 2"). Triggers must be context-specific enough that the user
+/// genuinely is NOT asking adam to compute.
+fn input_has_geometry_or_measurement_context(lower: &str) -> bool {
+    const MARKERS: &[&str] = &[
+        // Geometric figures
+        "бұрыш",
+        "үшбұрыш",
+        "шеңбер",
+        "квадрат",
+        "тіктөртбұрыш",
+        "ромб",
+        "трапеция",
+        "пирамида",
+        "сфера",
+        "куб",
+        "цилиндр",
+        // Geometric attributes
+        "градус",
+        "радиус",
+        "диаметр",
+        "периметр",
+        "аудан",
+        "көлем",
+        "биіктік",
+        "гипотенуза",
+        // Distance / area units suggesting geography or physics,
+        // not a calculator question
+        "километр",
+        "шақырым",
+        "метр",
+        "сантиметр",
+        "миллиметр",
+        "шаршы километр",
+        "гектар",
+        // Time-context words that suggest the question is about
+        // duration / dates, not a sum
+        "ғасыр",
+        "ғасырда",
+    ];
+    MARKERS.iter().any(|m| lower.contains(m))
+}
+
 /// **v5.21.0 — math echo specificity.** Extract a [`KazakhMathSummary`]
 /// from a Kazakh-language math request even when
 /// [`try_evaluate_kazakh_word_math`] can't fully evaluate it.
@@ -3225,6 +3286,19 @@ impl From<KazakhMathOp> for KazakhMathOpName {
 /// case falls through to the existing topic-extraction path.
 pub fn extract_kazakh_math_summary(input: &str) -> Option<KazakhMathSummary> {
     let lower = input.to_lowercase();
+    // **v6.0 (live REPL 2026-05-18)** — geometry / measurement gate.
+    // Inputs like «Үш бұрыштың бұрыштарының қосындысы қанша градус?»
+    // («What's the sum of the angles of a triangle?») used to slip
+    // into the math-echo path because they pattern-match on
+    // numeral + sum-verb + «қанша». The user gets an unhelpful echo
+    // («Мен «3» деп ұқтым …») of a number they never asked about.
+    // Geometric/measurement context-words signal a non-arithmetic
+    // question; refuse to extract a math summary so the planner
+    // routes to topic-extraction or the dedicated knowledge
+    // refusal family instead.
+    if input_has_geometry_or_measurement_context(&lower) {
+        return None;
+    }
     let tokens: Vec<&str> = lower
         .split(|c: char| !c.is_alphanumeric() && c != '_')
         .filter(|t| !t.is_empty())
@@ -4688,6 +4762,48 @@ mod math_summary_tests_v5210 {
     fn no_summary_for_non_math_input_v5210() {
         // Plain dialog turn, no numbers / operators / quantity question.
         assert!(extract_kazakh_math_summary("Сәлем! Қалыңыз қалай?").is_none());
+    }
+
+    /// **v6.0 (live REPL 2026-05-18)** — geometric / measurement
+    /// questions pattern-match on numeral + sum-verb + «қанша» but
+    /// must not produce a math summary. Pre-fix the live REPL
+    /// surfaced «Мен «3» деп ұқтым…» on the triangle-angle question,
+    /// echoing back a number the user never asked about.
+    #[test]
+    fn geometry_questions_yield_no_math_summary_v6() {
+        let cases = [
+            "Үш бұрыштың бұрыштарының қосындысы қанша градус?",
+            "Шеңбердің ауданы қалай есептеледі?",
+            "Алматы мен Астана арасы қанша километр?",
+            "Кубтың көлемі қалай табылады?",
+            "Үшбұрыштың периметрі дегеніміз не?",
+        ];
+        for c in cases {
+            assert!(
+                extract_kazakh_math_summary(c).is_none(),
+                "geometry/measurement input must not produce math summary: {c:?}"
+            );
+            assert!(
+                try_evaluate_kazakh_word_math(c).is_none(),
+                "geometry/measurement input must not evaluate to a number: {c:?}"
+            );
+        }
+    }
+
+    /// Counter-test: pure arithmetic and Kazakh word-math remain
+    /// untouched by the geometry guard. False positives here would
+    /// silently break the calculator UX.
+    #[test]
+    fn arithmetic_and_word_math_unaffected_by_geometry_guard_v6() {
+        // Pure arithmetic — must keep evaluating.
+        assert!(extract_kazakh_math_summary("2 + 2 қанша?").is_some());
+        assert!(extract_kazakh_math_summary("12 + 35 қанша?").is_some());
+        // Kazakh word-math — must keep evaluating to a number.
+        assert_eq!(
+            try_evaluate_kazakh_word_math("Бесті отызға көбейтсем"),
+            Some(150)
+        );
+        assert_eq!(try_evaluate_kazakh_word_math("Бес пен үш қос"), Some(8));
     }
 
     #[test]
