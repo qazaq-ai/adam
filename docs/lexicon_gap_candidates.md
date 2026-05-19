@@ -92,26 +92,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #5 — `млрд` (freq 1040)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **voiced_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_00971`) «Қазақстан мен Иран өзара сауда-саттық айналымын 5 млрд. долларға дейін жеткізбек.»
-  2. (tatoeba_kazakh_pack.json / `tatoeba_kz_01345`) «Оның қорытындысы бойынша жалпы сомасы 110,9 млрд. теңге болатын 70 меморандумға қол қойылды, облыста 6 мыңға жуық жаңа жұмыс орны ашылады.»
-  3. (tatoeba_kazakh_pack.json / `tatoeba_kz_01346`) «Көрменің бесінші күні аясында, әкімдіктер мен инвесторлар арасында жалпы сомасы 37,6 млрд. теңге болатын 23 меморандумға қол қойылды.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #6 — `көмек` (freq 1019)
+### Candidate #5 — `көмек` (freq 1019)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -130,7 +111,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #7 — `шығады` (freq 938)
+### Candidate #6 — `шығады` (freq 938)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -149,7 +130,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #8 — `сай` (freq 905)
+### Candidate #7 — `сай` (freq 905)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -168,7 +149,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #9 — `хабарлайды` (freq 874)
+### Candidate #8 — `хабарлайды` (freq 874)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -187,7 +168,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #10 — `орай` (freq 865)
+### Candidate #9 — `орай` (freq 865)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -206,7 +187,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #11 — `орнына` (freq 816)
+### Candidate #10 — `орнына` (freq 816)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -225,7 +206,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #12 — `өтіп` (freq 799)
+### Candidate #11 — `өтіп` (freq 799)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -244,7 +225,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #13 — `жоспары` (freq 776)
+### Candidate #12 — `жоспары` (freq 776)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -263,7 +244,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #14 — `салып` (freq 770)
+### Candidate #13 — `салып` (freq 770)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -282,7 +263,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #15 — `ислам` (freq 731)
+### Candidate #14 — `ислам` (freq 731)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -301,7 +282,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #16 — `жетті` (freq 690)
+### Candidate #15 — `жетті` (freq 690)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -320,7 +301,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #17 — `директоры` (freq 686)
+### Candidate #16 — `директоры` (freq 686)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -339,7 +320,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #18 — `түсіп` (freq 674)
+### Candidate #17 — `түсіп` (freq 674)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -358,7 +339,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #19 — `оқиға` (freq 663)
+### Candidate #18 — `оқиға` (freq 663)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -377,7 +358,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #20 — `еске` (freq 662)
+### Candidate #19 — `еске` (freq 662)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -396,7 +377,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #21 — `сайлау` (freq 608)
+### Candidate #20 — `сайлау` (freq 608)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -415,7 +396,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #22 — `сирек` (freq 587)
+### Candidate #21 — `сирек` (freq 587)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -434,7 +415,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #23 — `округі` (freq 583)
+### Candidate #22 — `округі` (freq 583)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -453,7 +434,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #24 — `салдарынан` (freq 580)
+### Candidate #23 — `салдарынан` (freq 580)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -472,7 +453,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #25 — `жедел` (freq 576)
+### Candidate #24 — `жедел` (freq 576)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -491,7 +472,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #26 — `бойында` (freq 571)
+### Candidate #25 — `бойында` (freq 571)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -510,7 +491,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #27 — `жеткен` (freq 540)
+### Candidate #26 — `жеткен` (freq 540)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -529,7 +510,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #28 — `хабарлады` (freq 538)
+### Candidate #27 — `хабарлады` (freq 538)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -548,7 +529,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #29 — `жөн` (freq 537)
+### Candidate #28 — `жөн` (freq 537)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -567,7 +548,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #30 — `жақ` (freq 535)
+### Candidate #29 — `жақ` (freq 535)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -586,7 +567,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #31 — `жай` (freq 532)
+### Candidate #30 — `жай` (freq 532)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -605,7 +586,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #32 — `былай` (freq 503)
+### Candidate #31 — `былай` (freq 503)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -624,7 +605,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #33 — `салмағы` (freq 499)
+### Candidate #32 — `салмағы` (freq 499)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -643,7 +624,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #34 — `академиясының` (freq 496)
+### Candidate #33 — `академиясының` (freq 496)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -662,7 +643,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #35 — `одағының` (freq 493)
+### Candidate #34 — `одағының` (freq 493)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -681,7 +662,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #36 — `хабар` (freq 491)
+### Candidate #35 — `хабар` (freq 491)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -700,7 +681,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #37 — `аппараты` (freq 463)
+### Candidate #36 — `аппараты` (freq 463)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -719,26 +700,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #38 — `интернет` (freq 461)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **voiceless_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_00007`) «Интернет пен телефонды бір жинақта сатыл ал!»
-  2. (tatoeba_kazakh_pack.json / `tatoeba_kz_01632`) «Байқаудың мақсаты - Қазақстандағы интернет жүйесінің қарқынды дамуына, соның ішінде ақпараттық ресурстар мен сервистерді дамытуға, қоғамның ақпараттық мәдениеттілігін жоғарылатуға, желілік қауымдастық …»
-  3. (tatoeba_kazakh_pack.json / `tatoeba_kz_01632`) «Байқаудың мақсаты - Қазақстандағы интернет жүйесінің қарқынды дамуына, соның ішінде ақпараттық ресурстар мен сервистерді дамытуға, қоғамның ақпараттық мәдениеттілігін жоғарылатуға, желілік қауымдастық …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #39 — `абылай` (freq 459)
+### Candidate #37 — `абылай` (freq 459)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -757,26 +719,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #40 — `жшс` (freq 457)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **voiceless_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_01509`) «Солтүстік Қазақстан облысының «Барс-Агро» шаруа қожалығының егіс даласында бидай толтырылған бункерді босату кезінде, айналып тұрған шынжырға абайсызда ілініп қалған «Лұқбанов» ЖШС 43 жастағы механиза …»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0001988`) «» ЖШС және басқалар.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0002370`) «Резеңке және пластмасса бұйымдар шығаратын негізгі өнеркәсіптік кәсіпорындар қатарына «Қарағанды резеңке техника» ЖШС, «Саранрезеңкетехника» ААҚ, «Восход» ЖШС жатады.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #41 — `музыка` (freq 457)
+### Candidate #38 — `музыка` (freq 457)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -795,7 +738,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #42 — `экономика` (freq 452)
+### Candidate #39 — `экономика` (freq 452)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -814,7 +757,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #43 — `конкурс` (freq 439)
+### Candidate #40 — `конкурс` (freq 439)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -833,7 +776,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #44 — `оңтүстігінде` (freq 428)
+### Candidate #41 — `оңтүстігінде` (freq 428)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -852,7 +795,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #45 — `ахмет` (freq 426)
+### Candidate #42 — `ахмет` (freq 426)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -871,7 +814,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #46 — `жоспар` (freq 416)
+### Candidate #43 — `жоспар` (freq 416)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -890,7 +833,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #47 — `орнын` (freq 404)
+### Candidate #44 — `орнын` (freq 404)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -909,7 +852,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #48 — `бюджет` (freq 403)
+### Candidate #45 — `бюджет` (freq 403)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -928,7 +871,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #49 — `америка` (freq 401)
+### Candidate #46 — `америка` (freq 401)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -947,45 +890,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #50 — `электр` (freq 401)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_00894`) «17 мамыр - Дүниежүзілік электр байланысы және ақпараттық қоғам күні.»
-  2. (tatoeba_kazakh_pack.json / `tatoeba_kz_01939`) «Гидроэнергетика Қытай үшін электр қуатын өндірудің маңызды бағытына айналды, ал ауылдық үйлерде биогаз кеңінен қолданылады.»
-  3. (tatoeba_kazakh_pack.json / `tatoeba_kz_02694`) «Найзағайдың кесірінен менің үйімде тұрған барлық электр құрылғылары жанып кетті.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #51 — `комиссия` (freq 389)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_01335`) «Астаналық лаңкестікке қарсы комиссия лаңкестікке қарсы әрекет ету саласында мемлекеттік органдардың қызметін үйлестіруді жүзеге асырады.»
-  2. (tatoeba_kazakh_pack.json / `tatoeba_kz_01337`) «Бұл комиссия орталық-мемлекеттік органдардың және жергілікті басқару органдарының лаңкестіктің алдын алу жөніндегі қызметтерін үйлестіруді жүзеге асырады.»
-  3. (tatoeba_kazakh_pack.json / `tatoeba_kz_01445`) «Жоғары Еуразиялық экономикалық кеңестің 2012 жылғы 19 желтоқсандағы «Трансшекаралық нарықтарға жататын өлшемдерді бекіту туралы» шешімінің тапсырмаларын орындау мақсатында Еуразиялық экономикалық коми …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #52 — `жайында` (freq 382)
+### Candidate #47 — `жайында` (freq 382)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1004,7 +909,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #53 — `түсі` (freq 380)
+### Candidate #48 — `түсі` (freq 380)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -1023,7 +928,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #54 — `салынды` (freq 378)
+### Candidate #49 — `салынды` (freq 378)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1042,7 +947,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #55 — `докторы` (freq 376)
+### Candidate #50 — `докторы` (freq 376)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1061,7 +966,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #56 — `боп` (freq 371)
+### Candidate #51 — `боп` (freq 371)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -1080,7 +985,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #57 — `одағы` (freq 368)
+### Candidate #52 — `одағы` (freq 368)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1099,7 +1004,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #58 — `бойына` (freq 363)
+### Candidate #53 — `бойына` (freq 363)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1118,7 +1023,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #59 — `порно` (freq 362)
+### Candidate #54 — `порно` (freq 362)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1137,7 +1042,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #60 — `салды` (freq 360)
+### Candidate #55 — `салды` (freq 360)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1156,7 +1061,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #61 — `себеп` (freq 353)
+### Candidate #56 — `себеп` (freq 353)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -1175,7 +1080,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #62 — `жеңіп` (freq 352)
+### Candidate #57 — `жеңіп` (freq 352)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -1194,7 +1099,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #63 — `оңай` (freq 352)
+### Candidate #58 — `оңай` (freq 352)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -1213,7 +1118,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #64 — `кср` (freq 351)
+### Candidate #59 — `кср` (freq 351)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **liquid**
@@ -1232,7 +1137,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #65 — `технологиялар` (freq 351)
+### Candidate #60 — `технологиялар` (freq 351)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -1251,7 +1156,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #66 — `ескерту` (freq 343)
+### Candidate #61 — `ескерту` (freq 343)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -1270,7 +1175,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #67 — `виртуалды` (freq 338)
+### Candidate #62 — `виртуалды` (freq 338)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1289,7 +1194,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #68 — `категория` (freq 338)
+### Candidate #63 — `категория` (freq 338)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -1308,7 +1213,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #69 — `театр` (freq 333)
+### Candidate #64 — `театр` (freq 333)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -1327,7 +1232,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #70 — `компания` (freq 330)
+### Candidate #65 — `компания` (freq 330)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -1346,7 +1251,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #71 — `жау` (freq 314)
+### Candidate #66 — `жау` (freq 314)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1365,7 +1270,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #72 — `тергеу` (freq 310)
+### Candidate #67 — `тергеу` (freq 310)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -1384,7 +1289,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #73 — `жаулап` (freq 299)
+### Candidate #68 — `жаулап` (freq 299)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -1403,7 +1308,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #74 — `қыс` (freq 298)
+### Candidate #69 — `қыс` (freq 298)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -1422,26 +1327,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #75 — `cтратегия` (freq 292)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0000233`) «Cтратегия Казахстан 2050 - Елбасы Төлемдер және төлем жүйелері туралы заңға қол қойды»
-  2. (cc100_kk_pack.json / `cc100_kk_0000267`) «Cтратегия Казахстан 2050 - Қазақстандағы сайлауда ТМД атынан бақылаушылар құрамына танымал тұлғалар енді»
-  3. (cc100_kk_pack.json / `cc100_kk_0000271`) «Cтратегия Казахстан 2050 - Көкшетаудың 65 тұрғыны мүлікті заңдастыру комиссиясына өтініш берді»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #76 — `шыға` (freq 290)
+### Candidate #70 — `шыға` (freq 290)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1460,7 +1346,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #77 — `жауыншашын` (freq 288)
+### Candidate #71 — `жауыншашын` (freq 288)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -1479,7 +1365,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #78 — `теориясы` (freq 288)
+### Candidate #72 — `теориясы` (freq 288)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -1498,7 +1384,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #79 — `семинар` (freq 283)
+### Candidate #73 — `семинар` (freq 283)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -1517,7 +1403,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #80 — `сайланды` (freq 277)
+### Candidate #74 — `сайланды` (freq 277)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1536,7 +1422,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #81 — `ленин` (freq 276)
+### Candidate #75 — `ленин` (freq 276)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -1555,26 +1441,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #82 — `техника` (freq 276)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_01243`) «1950 жылы мамырдың 9-ында Парижде Франция сыртқы істер министрі Робер Шуман Франция, Германия және басқа еуропа елдерінің көмір және болат құятын өнеркәсіп салаларын (әскери техника өндіру негіздерін) …»
-  2. (tatoeba_kazakh_pack.json / `tatoeba_kz_01734`) «29 қазан күні күндіз ер адамнң мәйіті ҚР ТЖМ Шығыс Қазақстан облысы суда құтқару қызметінің күшімен шығарылды (6 адам мен 2 техника).»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0002370`) «Резеңке және пластмасса бұйымдар шығаратын негізгі өнеркәсіптік кәсіпорындар қатарына «Қарағанды резеңке техника» ЖШС, «Саранрезеңкетехника» ААҚ, «Восход» ЖШС жатады.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #83 — `прокуратурасы` (freq 275)
+### Candidate #76 — `прокуратурасы` (freq 275)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1593,7 +1460,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #84 — `жоспарлау` (freq 274)
+### Candidate #77 — `жоспарлау` (freq 274)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1612,7 +1479,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #85 — `орнату` (freq 271)
+### Candidate #78 — `орнату` (freq 271)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1631,7 +1498,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #86 — `аппаратының` (freq 265)
+### Candidate #79 — `аппаратының` (freq 265)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -1650,7 +1517,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #87 — `әбу` (freq 258)
+### Candidate #80 — `әбу` (freq 258)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -1669,7 +1536,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #88 — `корея` (freq 257)
+### Candidate #81 — `корея` (freq 257)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -1688,7 +1555,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #89 — `жауып` (freq 250)
+### Candidate #82 — `жауып` (freq 250)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -1707,7 +1574,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #90 — `ташкент` (freq 250)
+### Candidate #83 — `ташкент` (freq 250)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -1726,7 +1593,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #91 — `орнатылған` (freq 249)
+### Candidate #84 — `орнатылған` (freq 249)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -1745,7 +1612,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #92 — `империясының` (freq 247)
+### Candidate #85 — `империясының` (freq 247)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -1764,7 +1631,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #93 — `округ` (freq 247)
+### Candidate #86 — `округ` (freq 247)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -1783,7 +1650,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #94 — `театры` (freq 247)
+### Candidate #87 — `театры` (freq 247)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -1802,7 +1669,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #95 — `украина` (freq 247)
+### Candidate #88 — `украина` (freq 247)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1821,7 +1688,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #96 — `хабарлама` (freq 247)
+### Candidate #89 — `хабарлама` (freq 247)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1840,7 +1707,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #97 — `айға` (freq 246)
+### Candidate #90 — `айға` (freq 246)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1859,7 +1726,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #98 — `климаты` (freq 245)
+### Candidate #91 — `климаты` (freq 245)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1878,7 +1745,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #99 — `орнында` (freq 243)
+### Candidate #92 — `орнында` (freq 243)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -1897,7 +1764,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #100 — `сақ` (freq 243)
+### Candidate #93 — `сақ` (freq 243)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -1916,7 +1783,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #101 — `түс` (freq 243)
+### Candidate #94 — `түс` (freq 243)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -1935,7 +1802,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #102 — `ііі` (freq 243)
+### Candidate #95 — `ііі` (freq 243)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -1954,7 +1821,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #103 — `кмге` (freq 239)
+### Candidate #96 — `кмге` (freq 239)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -1973,7 +1840,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #104 — `бюджеттен` (freq 238)
+### Candidate #97 — `бюджеттен` (freq 238)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -1992,7 +1859,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #105 — `жоспарланған` (freq 233)
+### Candidate #98 — `жоспарланған` (freq 233)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -2011,7 +1878,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #106 — `жоспарын` (freq 232)
+### Candidate #99 — `жоспарын` (freq 232)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -2030,7 +1897,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #107 — `опера` (freq 232)
+### Candidate #100 — `опера` (freq 232)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -2049,7 +1916,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #108 — `технологиясы` (freq 232)
+### Candidate #101 — `технологиясы` (freq 232)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -2068,7 +1935,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #109 — `тмд` (freq 232)
+### Candidate #102 — `тмд` (freq 232)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiced_consonant**
@@ -2087,7 +1954,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #110 — `директорлар` (freq 231)
+### Candidate #103 — `директорлар` (freq 231)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -2106,7 +1973,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #111 — `жауабы` (freq 230)
+### Candidate #104 — `жауабы` (freq 230)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -2125,7 +1992,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #112 — `салынады` (freq 230)
+### Candidate #105 — `салынады` (freq 230)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -2144,7 +2011,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #113 — `филиалы` (freq 229)
+### Candidate #106 — `филиалы` (freq 229)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -2163,26 +2030,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #114 — `франция` (freq 228)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_00127`) «Франция Батыс Еуропада орналасады.»
-  2. (tatoeba_kazakh_pack.json / `tatoeba_kz_00723`) «Мемлекет басшысы Николя Саркозиге көп жылдар бойы Қазақстан мен Франция арасындағы қарым-қатынастардың дамуына қосқан еңбегі үшін алғысын білдірді.»
-  3. (tatoeba_kazakh_pack.json / `tatoeba_kz_01243`) «1950 жылы мамырдың 9-ында Парижде Франция сыртқы істер министрі Робер Шуман Франция, Германия және басқа еуропа елдерінің көмір және болат құятын өнеркәсіп салаларын (әскери техника өндіру негіздерін) …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #115 — `лауреаты` (freq 227)
+### Candidate #107 — `лауреаты` (freq 227)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -2201,7 +2049,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #116 — `жақты` (freq 226)
+### Candidate #108 — `жақты` (freq 226)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -2220,7 +2068,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #117 — `бой` (freq 224)
+### Candidate #109 — `бой` (freq 224)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -2239,7 +2087,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #118 — `ескере` (freq 224)
+### Candidate #110 — `ескере` (freq 224)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -2258,7 +2106,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #119 — `прокуратура` (freq 221)
+### Candidate #111 — `прокуратура` (freq 221)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -2277,7 +2125,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #120 — `нашар` (freq 220)
+### Candidate #112 — `нашар` (freq 220)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -2296,7 +2144,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #121 — `слайд` (freq 220)
+### Candidate #113 — `слайд` (freq 220)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -2315,7 +2163,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #122 — `озық` (freq 216)
+### Candidate #114 — `озық` (freq 216)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -2334,7 +2182,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #123 — `қыздың` (freq 215)
+### Candidate #115 — `қыздың` (freq 215)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -2353,7 +2201,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #124 — `әлде` (freq 215)
+### Candidate #116 — `әлде` (freq 215)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -2372,7 +2220,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #125 — `оқиғалар` (freq 214)
+### Candidate #117 — `оқиғалар` (freq 214)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -2391,7 +2239,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #126 — `сосын` (freq 214)
+### Candidate #118 — `сосын` (freq 214)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -2410,7 +2258,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #127 — `жаққа` (freq 211)
+### Candidate #119 — `жаққа` (freq 211)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -2429,7 +2277,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #128 — `бойымен` (freq 208)
+### Candidate #120 — `бойымен` (freq 208)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -2448,7 +2296,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #129 — `шебер` (freq 208)
+### Candidate #121 — `шебер` (freq 208)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -2467,7 +2315,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #130 — `чемпионы` (freq 207)
+### Candidate #122 — `чемпионы` (freq 207)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -2486,7 +2334,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #131 — `жатып` (freq 206)
+### Candidate #123 — `жатып` (freq 206)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -2505,7 +2353,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #132 — `артты` (freq 203)
+### Candidate #124 — `артты` (freq 203)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -2524,7 +2372,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #133 — `империясы` (freq 202)
+### Candidate #125 — `империясы` (freq 202)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -2543,7 +2391,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #134 — `оқиды` (freq 202)
+### Candidate #126 — `оқиды` (freq 202)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -2562,7 +2410,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #135 — `орнынан` (freq 201)
+### Candidate #127 — `орнынан` (freq 201)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -2581,7 +2429,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #136 — `жауыншашынның` (freq 197)
+### Candidate #128 — `жауыншашынның` (freq 197)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -2600,7 +2448,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #137 — `комиссияның` (freq 197)
+### Candidate #129 — `комиссияның` (freq 197)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -2619,7 +2467,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #138 — `мге` (freq 196)
+### Candidate #130 — `мге` (freq 196)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -2638,7 +2486,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #139 — `комиссиясының` (freq 195)
+### Candidate #131 — `комиссиясының` (freq 195)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -2657,7 +2505,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #140 — `конкурсқа` (freq 195)
+### Candidate #132 — `конкурсқа` (freq 195)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -2676,7 +2524,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #141 — `ораза` (freq 195)
+### Candidate #133 — `ораза` (freq 195)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -2695,7 +2543,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #142 — `француз` (freq 192)
+### Candidate #134 — `француз` (freq 192)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -2714,7 +2562,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #143 — `әлфараби` (freq 192)
+### Candidate #135 — `әлфараби` (freq 192)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -2733,7 +2581,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #144 — `компаниясы` (freq 190)
+### Candidate #136 — `компаниясы` (freq 190)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -2752,7 +2600,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #145 — `орасан` (freq 190)
+### Candidate #137 — `орасан` (freq 190)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -2771,7 +2619,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #146 — `салынып` (freq 190)
+### Candidate #138 — `салынып` (freq 190)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -2790,7 +2638,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #147 — `шектеседі` (freq 190)
+### Candidate #139 — `шектеседі` (freq 190)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -2809,7 +2657,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #148 — `сипаты` (freq 188)
+### Candidate #140 — `сипаты` (freq 188)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -2828,7 +2676,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #149 — `диплом` (freq 187)
+### Candidate #141 — `диплом` (freq 187)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -2847,7 +2695,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #150 — `мырза` (freq 187)
+### Candidate #142 — `мырза` (freq 187)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -2866,7 +2714,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #151 — `технологияларды` (freq 187)
+### Candidate #143 — `технологияларды` (freq 187)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -2885,7 +2733,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #152 — `жатты` (freq 186)
+### Candidate #144 — `жатты` (freq 186)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -2904,7 +2752,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #153 — `христиан` (freq 178)
+### Candidate #145 — `христиан` (freq 178)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -2923,7 +2771,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #154 — `академик` (freq 177)
+### Candidate #146 — `академик` (freq 177)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -2942,7 +2790,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #155 — `жəне` (freq 176)
+### Candidate #147 — `жəне` (freq 176)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -2961,7 +2809,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #156 — `мәрте` (freq 176)
+### Candidate #148 — `мәрте` (freq 176)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -2980,7 +2828,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #157 — `академиясы` (freq 175)
+### Candidate #149 — `академиясы` (freq 175)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -2999,7 +2847,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #158 — `корпусының` (freq 175)
+### Candidate #150 — `корпусының` (freq 175)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -3018,7 +2866,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #159 — `жат` (freq 172)
+### Candidate #151 — `жат` (freq 172)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -3037,7 +2885,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #160 — `шебері` (freq 172)
+### Candidate #152 — `шебері` (freq 172)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -3056,7 +2904,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #161 — `мониторинг` (freq 171)
+### Candidate #153 — `мониторинг` (freq 171)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -3075,7 +2923,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #162 — `владимир` (freq 168)
+### Candidate #154 — `владимир` (freq 168)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -3094,7 +2942,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #163 — `компанияның` (freq 168)
+### Candidate #155 — `компанияның` (freq 168)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -3113,7 +2961,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #164 — `африка` (freq 165)
+### Candidate #156 — `африка` (freq 165)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -3132,7 +2980,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #165 — `оқо` (freq 164)
+### Candidate #157 — `оқо` (freq 164)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -3151,7 +2999,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #166 — `главная` (freq 163)
+### Candidate #158 — `главная` (freq 163)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -3170,7 +3018,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #167 — `шеккен` (freq 163)
+### Candidate #159 — `шеккен` (freq 163)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -3189,7 +3037,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #168 — `испан` (freq 161)
+### Candidate #160 — `испан` (freq 161)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -3208,7 +3056,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #169 — `стратегиясы` (freq 161)
+### Candidate #161 — `стратегиясы` (freq 161)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -3227,7 +3075,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #170 — `тал` (freq 161)
+### Candidate #162 — `тал` (freq 161)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -3246,26 +3094,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #171 — `электрмагниттік` (freq 161)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **voiceless_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0111187`) «Жарық жылдамдығы, с' – кез келген электрмагниттік толқындардың (оның ішінде жарықтың да) бос кеңістіктегі (вакуумдағы) таралу жылдамдығы; іргелі физикалық тұрақтылардың бірі.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0111203`) «Жарық қысымын жарықтың электрмагниттік теориясы мен кванттық теориясы негізінде түсіндіруге болады.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0146774`) «Соңғы кезде электрмагниттік негізде жасалған әр түрлі металл іздеуші құралдар пайдаланылуда.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #172 — `арзан` (freq 160)
+### Candidate #163 — `арзан` (freq 160)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -3284,7 +3113,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #173 — `округінің` (freq 160)
+### Candidate #164 — `округінің` (freq 160)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -3303,7 +3132,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #174 — `орайда` (freq 160)
+### Candidate #165 — `орайда` (freq 160)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -3322,7 +3151,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #175 — `сирия` (freq 160)
+### Candidate #166 — `сирия` (freq 160)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **unknown**
@@ -3341,7 +3170,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #176 — `испания` (freq 159)
+### Candidate #167 — `испания` (freq 159)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -3360,7 +3189,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #177 — `салығы` (freq 157)
+### Candidate #168 — `салығы` (freq 157)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -3379,7 +3208,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #178 — `талдап` (freq 157)
+### Candidate #169 — `талдап` (freq 157)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -3398,7 +3227,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #179 — `климат` (freq 156)
+### Candidate #170 — `климат` (freq 156)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -3417,7 +3246,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #180 — `секс` (freq 156)
+### Candidate #171 — `секс` (freq 156)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -3436,7 +3265,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #181 — `соғды` (freq 154)
+### Candidate #172 — `соғды` (freq 154)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -3455,7 +3284,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #182 — `осман` (freq 153)
+### Candidate #173 — `осман` (freq 153)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -3474,7 +3303,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #183 — `хабарландыру` (freq 153)
+### Candidate #174 — `хабарландыру` (freq 153)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -3493,7 +3322,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #184 — `колледж` (freq 152)
+### Candidate #175 — `колледж` (freq 152)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -3512,7 +3341,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #185 — `сал` (freq 152)
+### Candidate #176 — `сал` (freq 152)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -3531,7 +3360,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #186 — `жеп` (freq 150)
+### Candidate #177 — `жеп` (freq 150)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -3550,7 +3379,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #187 — `кавказ` (freq 150)
+### Candidate #178 — `кавказ` (freq 150)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -3569,7 +3398,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #188 — `дулат` (freq 149)
+### Candidate #179 — `дулат` (freq 149)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -3588,7 +3417,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #189 — `бюджетке` (freq 147)
+### Candidate #180 — `бюджетке` (freq 147)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -3607,7 +3436,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #190 — `жоспарлануда` (freq 146)
+### Candidate #181 — `жоспарлануда` (freq 146)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -3626,7 +3455,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #191 — `қызды` (freq 145)
+### Candidate #182 — `қызды` (freq 145)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -3645,7 +3474,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #192 — `аустралия` (freq 144)
+### Candidate #183 — `аустралия` (freq 144)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -3664,7 +3493,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #193 — `орнының` (freq 143)
+### Candidate #184 — `орнының` (freq 143)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -3683,7 +3512,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #194 — `экономиканың` (freq 143)
+### Candidate #185 — `экономиканың` (freq 143)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -3702,7 +3531,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #195 — `теория` (freq 142)
+### Candidate #186 — `теория` (freq 142)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -3721,7 +3550,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #196 — `адрес` (freq 141)
+### Candidate #187 — `адрес` (freq 141)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -3740,7 +3569,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #197 — `жауады` (freq 140)
+### Candidate #188 — `жауады` (freq 140)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -3759,7 +3588,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #198 — `комиссиясы` (freq 140)
+### Candidate #189 — `комиссиясы` (freq 140)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -3778,7 +3607,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #199 — `түсініп` (freq 140)
+### Candidate #190 — `түсініп` (freq 140)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -3797,7 +3626,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #200 — `хабардар` (freq 140)
+### Candidate #191 — `хабардар` (freq 140)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -3816,7 +3645,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #201 — `бюджеттің` (freq 139)
+### Candidate #192 — `бюджеттің` (freq 139)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -3835,7 +3664,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #202 — `совет` (freq 139)
+### Candidate #193 — `совет` (freq 139)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -3854,7 +3683,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #203 — `хабарлауынша` (freq 139)
+### Candidate #194 — `хабарлауынша` (freq 139)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -3873,26 +3702,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #204 — `композитор` (freq 138)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_00905`) «13 жыл бұрын (1999) Кентау қаласында композитор Сейдолла Бәйтереков атындағы Халықаралық «Әлия» ән фестивалі өтті.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0000264`) «Қазақ театрлық өнерінің негізін қалаушылар халық әртістері Хадиша Бөкеева, Ғайни Хайруллина, Құрманбек Жандарбеков, ақын әрі қоғамдық қайраткер Мұхтар Шаханов, композитор Шәмші Қалдаяқов, жазушылар Фё …»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0001835`) «Жұбанова Ғазиза — Белгілі композитор, Кеңес Одағының Халық әртісі, Мемлекеттік сыйлықтың лауреаты, профессор Ғазиза Ахметқызы Жұбанова 1927 жьлдың 2 желтоқсанында заманымыздың заңғар композиторы, акад …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #205 — `ректоры` (freq 138)
+### Candidate #195 — `ректоры` (freq 138)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -3911,7 +3721,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #206 — `соғып` (freq 138)
+### Candidate #196 — `соғып` (freq 138)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -3930,7 +3740,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #207 — `жоспарланып` (freq 137)
+### Candidate #197 — `жоспарланып` (freq 137)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -3949,7 +3759,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #208 — `корей` (freq 137)
+### Candidate #198 — `корей` (freq 137)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **glide**
@@ -3968,7 +3778,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #209 — `оқитын` (freq 137)
+### Candidate #199 — `оқитын` (freq 137)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -3987,7 +3797,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #210 — `американың` (freq 136)
+### Candidate #200 — `американың` (freq 136)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -4006,7 +3816,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #211 — `инвестициялар` (freq 136)
+### Candidate #201 — `инвестициялар` (freq 136)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -4025,7 +3835,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #212 — `ғдың` (freq 135)
+### Candidate #202 — `ғдың` (freq 135)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -4044,7 +3854,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #213 — `путин` (freq 134)
+### Candidate #203 — `путин` (freq 134)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **nasal**
@@ -4063,7 +3873,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #214 — `түске` (freq 134)
+### Candidate #204 — `түске` (freq 134)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -4082,26 +3892,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #215 — `cұрақжауап` (freq 133)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **voiceless_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0001654`) «Сұрақ Жауап сайтына жауапқа және блогқа музыка қалай қоямыз? - Cұрақ-Жауап сайты»
-  2. (cc100_kk_pack.json / `cc100_kk_0001664`) «балалы ана туралы сұрақтар мен жауаптар - Cұрақ-Жауап сайты»
-  3. (cc100_kk_pack.json / `cc100_kk_0001862`) «тест туралы сұрақтар мен жауаптар - Cұрақ-Жауап сайты»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #216 — `кмм` (freq 133)
+### Candidate #205 — `кмм` (freq 133)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **nasal**
@@ -4120,7 +3911,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #217 — `область` (freq 133)
+### Candidate #206 — `область` (freq 133)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -4139,7 +3930,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #218 — `англия` (freq 132)
+### Candidate #207 — `англия` (freq 132)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -4158,7 +3949,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #219 — `академигі` (freq 131)
+### Candidate #208 — `академигі` (freq 131)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -4177,7 +3968,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #220 — `жатса` (freq 131)
+### Candidate #209 — `жатса` (freq 131)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -4196,7 +3987,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #221 — `корпорациясы` (freq 131)
+### Candidate #210 — `корпорациясы` (freq 131)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -4215,7 +4006,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #222 — `қысы` (freq 131)
+### Candidate #211 — `қысы` (freq 131)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -4234,7 +4025,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #223 — `бразилия` (freq 130)
+### Candidate #212 — `бразилия` (freq 130)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -4253,7 +4044,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #224 — `жабылған` (freq 130)
+### Candidate #213 — `жабылған` (freq 130)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -4272,7 +4063,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #225 — `ксі` (freq 129)
+### Candidate #214 — `ксі` (freq 129)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -4291,7 +4082,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #226 — `тер` (freq 129)
+### Candidate #215 — `тер` (freq 129)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -4310,26 +4101,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #227 — `технология` (freq 129)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0004285`) «Сапар барысында мемлекетаралық қатынастардың негізгі қағидалары мен бағыттары жөніндегі декларацияға, дипломатиялық қарым-қатынастар орнату жөніндегі протоколға, сауда-экономикалық қатынастар, ғылым м …»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0006883`) «35 кәсіпорындарында жаңа технология бағыттары енгізілді және өнімнің жаңа идеялары меңгерілді.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0008876`) «Өндіріске бүкіләлемдік стандартқа сәйкес метал өндіруге лайықты жаңа технология енгізілді.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #228 — `жөнінен` (freq 126)
+### Candidate #216 — `жөнінен` (freq 126)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -4348,7 +4120,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #229 — `найман` (freq 126)
+### Candidate #217 — `найман` (freq 126)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -4367,7 +4139,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #230 — `архив` (freq 125)
+### Candidate #218 — `архив` (freq 125)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -4386,7 +4158,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #231 — `аудит` (freq 125)
+### Candidate #219 — `аудит` (freq 125)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -4405,7 +4177,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #232 — `орнатылды` (freq 125)
+### Candidate #220 — `орнатылды` (freq 125)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -4424,7 +4196,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #233 — `османлы` (freq 125)
+### Candidate #221 — `османлы` (freq 125)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -4443,7 +4215,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #234 — `кандидаты` (freq 124)
+### Candidate #222 — `кандидаты` (freq 124)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -4462,7 +4234,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #235 — `моделі` (freq 124)
+### Candidate #223 — `моделі` (freq 124)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -4481,26 +4253,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #236 — `инвестиция` (freq 123)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_01205`) «40 елдің сарапшылары Ташкентте инвестиция тарту мәселесін зерделеді.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0003276`) «Осы жобалар есебінен облысқа 400млн АҚШ доллардан астам инвестиция тарту күтілуде.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0006880`) «2004 жылы қаланың өнеркәсіп орындарында өндірістің дамуына, негізінен, жаңа құрал-жабдық, жаңа технологиялар алу үшін және өнімнің жаңа түрін өндіруге 15,0 млрд теңге инвестиция салынды.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #237 — `компаниясының` (freq 123)
+### Candidate #224 — `компаниясының` (freq 123)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -4519,7 +4272,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #238 — `сайланады` (freq 123)
+### Candidate #225 — `сайланады` (freq 123)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -4538,26 +4291,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #239 — `энергетика` (freq 123)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_01917`) «Болашақта біз ғылыми-технологиялық парк құрылысын бірлесіп салу, күн, жел, ядролық және басқа да экологиялық таза энергетика көздерін дамыту, ауыл шаруашылығы саласындағы, соның ішінде мал шаруашылығы …»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0001255`) «2021 2009-ға пайызбен |- ||436864||459778 ||508824 ||110,7 ||209795 ||235844 ||112,4 ||249983 ||272980 ||109,2 |} Негізгі экономикалық бағыт: энергетика; тамақ өнеркәсібі.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0001558`) «Оқыту ауыл және орман шаруашылығы, Құрылыс және коммуналдық шаруашылық, педагогика, медицина, тау-кен ісі, қызмет көрсету саласы, өнер және мәдениет, энергетика, машина жасау технологиясы, көлікті пай …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #240 — `директорының` (freq 122)
+### Candidate #226 — `директорының` (freq 122)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -4576,7 +4310,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #241 — `музей` (freq 122)
+### Candidate #227 — `музей` (freq 122)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **glide**
@@ -4595,45 +4329,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #242 — `rust` (freq 121)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_01_0001`) «Бастау Осы тарауда `Rust` тілімен жұмыс істеуді қалай бастау керектігін көрсетеді.»
-  2. (rust_book_kk_pack.json / `rust_book_01_0003`) «Тарау үш бөлімнен тұрады: **Орнату** — `rustup` арқылы `Rust` құрал жинағын орнату. **Hello, World!** — алғашқы `Rust` бағдарламасын жазу және орындау. **Hello, Cargo!** — Cargo көмегімен жобаны жасау …»
-  3. (rust_book_kk_pack.json / `rust_book_01_0003`) «Тарау үш бөлімнен тұрады: **Орнату** — `rustup` арқылы `Rust` құрал жинағын орнату. **Hello, World!** — алғашқы `Rust` бағдарламасын жазу және орындау. **Hello, Cargo!** — Cargo көмегімен жобаны жасау …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #243 — `cargo` (freq 120)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_01_0002`) «Алдымен қажетті құралдарды орнатамыз, содан кейін бірінші бағдарламаны жазып, оны Cargo көмегімен басқаруды үйренеміз.»
-  2. (rust_book_kk_pack.json / `rust_book_01_0003`) «Тарау үш бөлімнен тұрады: **Орнату** — `rustup` арқылы `Rust` құрал жинағын орнату. **Hello, World!** — алғашқы `Rust` бағдарламасын жазу және орындау. **Hello, Cargo!** — Cargo көмегімен жобаны жасау …»
-  3. (rust_book_kk_pack.json / `rust_book_01_0003`) «Тарау үш бөлімнен тұрады: **Орнату** — `rustup` арқылы `Rust` құрал жинағын орнату. **Hello, World!** — алғашқы `Rust` бағдарламасын жазу және орындау. **Hello, Cargo!** — Cargo көмегімен жобаны жасау …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #244 — `армия` (freq 120)
+### Candidate #228 — `армия` (freq 120)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -4652,26 +4348,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #245 — `радио` (freq 120)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0000677`) «Наразылық білдірушілер президент Бәкиевтің кеңселеріне, сондай-ақ мемлекеттік радио мен телеарналарға шабуыл жасады.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0001223`) «Қазақ радиосы — Қазақ радиолары ЖШС-не қарасты, Қазақстан тұрғындарына, ТМД елдерінде және шет елдерде тұратын қазақ тыңдармандарына хабар тарататын радио желісі.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0002329`) «Облыстың барлық қалаларына, аудан орталықтарына, ірі кәсіпорындарына радио арқылы тыңдатылған бұл айтыста атақты халық ақындары Доскей Әлімбаев, Шашубай Қошқарбаев, Қайып Айнабеков, Жолдыкей Нұрмағамб …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #246 — `ахметов` (freq 119)
+### Candidate #229 — `ахметов` (freq 119)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -4690,26 +4367,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #247 — `конференция` (freq 119)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_01682`) «31 қазанда Алматыда Ғылым Ордасында «Қазақ диаспорасының жасампаз әлеуеті: тарих және қазіргі заман» атты республикалық ғылыми-тәжірибелік конференция өтеді.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0004465`) «1954 жылдан үнді әндері жөніндегі конференция (“Сангит самелян”) өткізіліп келеді.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0012988`) «Конференция планируется на одну из суббот в мае 2026 года.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #248 — `оғыз` (freq 119)
+### Candidate #230 — `оғыз` (freq 119)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -4728,7 +4386,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #249 — `оқи` (freq 119)
+### Candidate #231 — `оқи` (freq 119)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -4747,7 +4405,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #250 — `абзал` (freq 118)
+### Candidate #232 — `абзал` (freq 118)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -4766,7 +4424,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #251 — `жауға` (freq 118)
+### Candidate #233 — `жауға` (freq 118)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -4785,7 +4443,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #252 — `нарығы` (freq 118)
+### Candidate #234 — `нарығы` (freq 118)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -4804,7 +4462,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #253 — `тағды` (freq 118)
+### Candidate #235 — `тағды` (freq 118)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -4823,7 +4481,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #254 — `театрының` (freq 118)
+### Candidate #236 — `театрының` (freq 118)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -4842,7 +4500,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #255 — `компаниялар` (freq 117)
+### Candidate #237 — `компаниялар` (freq 117)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -4861,7 +4519,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #256 — `орденімен` (freq 117)
+### Candidate #238 — `орденімен` (freq 117)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -4880,7 +4538,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #257 — `оқиғасы` (freq 117)
+### Candidate #239 — `оқиғасы` (freq 117)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -4899,7 +4557,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #258 — `абсолют` (freq 116)
+### Candidate #240 — `абсолют` (freq 116)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -4918,7 +4576,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #259 — `кредит` (freq 115)
+### Candidate #241 — `кредит` (freq 115)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -4937,7 +4595,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #260 — `ктк` (freq 115)
+### Candidate #242 — `ктк` (freq 115)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -4956,7 +4614,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #261 — `натурал` (freq 114)
+### Candidate #243 — `натурал` (freq 114)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -4975,7 +4633,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #262 — `ордені` (freq 114)
+### Candidate #244 — `ордені` (freq 114)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -4994,7 +4652,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #263 — `хабарламада` (freq 113)
+### Candidate #245 — `хабарламада` (freq 113)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -5013,7 +4671,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #264 — `днқ` (freq 112)
+### Candidate #246 — `днқ` (freq 112)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -5032,26 +4690,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #265 — `архивi` (freq 111)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0035968`) «Степногорск қаласының мемлекеттiк архивi «Степногорск ақшамы» қалалық газетiнiң 2017 жылғы 19 қаңтардағы № 3 номерiнде «Архивтiк анықтамалар беру» мақаласын жариялады.»
-  2. (cc100_kk_pack.json / `cc100_kk_0035969`) «Шортанды ауданының мемлекеттiк архивi «Өрлеу» газетiнiң 2017 жылғы 21 қаңтардағы № 3 номерiнде «Мемлекеттiк қызмет» мақаласын жариялады.»
-  3. (cc100_kk_pack.json / `cc100_kk_0035971`) «Көкшетау қаласының мемлекеттiк архивi 2017 жылғы 02 ақпандағы № 9 «Степной маяк» газетiнде «У нас бесплатно» мақаласын жариялады.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #266 — `еврей` (freq 111)
+### Candidate #247 — `еврей` (freq 111)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **glide**
@@ -5070,7 +4709,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #267 — `оқиғаның` (freq 111)
+### Candidate #248 — `оқиғаның` (freq 111)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -5089,7 +4728,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #268 — `федерациясының` (freq 111)
+### Candidate #249 — `федерациясының` (freq 111)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -5108,7 +4747,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #269 — `орнатуға` (freq 109)
+### Candidate #250 — `орнатуға` (freq 109)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -5127,7 +4766,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #270 — `сайрам` (freq 109)
+### Candidate #251 — `сайрам` (freq 109)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -5146,7 +4785,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #271 — `сқа` (freq 109)
+### Candidate #252 — `сқа` (freq 109)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -5165,7 +4804,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #272 — `экономикасы` (freq 109)
+### Candidate #253 — `экономикасы` (freq 109)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -5184,7 +4823,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #273 — `лондон` (freq 108)
+### Candidate #254 — `лондон` (freq 108)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -5203,7 +4842,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #274 — `себепші` (freq 108)
+### Candidate #255 — `себепші` (freq 108)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -5222,7 +4861,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #275 — `техникасы` (freq 106)
+### Candidate #256 — `техникасы` (freq 106)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -5241,7 +4880,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #276 — `чемпионаты` (freq 106)
+### Candidate #257 — `чемпионаты` (freq 106)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -5260,7 +4899,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #277 — `орнатты` (freq 105)
+### Candidate #258 — `орнатты` (freq 105)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -5279,7 +4918,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #278 — `ардагерлер` (freq 104)
+### Candidate #259 — `ардагерлер` (freq 104)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -5298,7 +4937,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #279 — `коммуникациялар` (freq 104)
+### Candidate #260 — `коммуникациялар` (freq 104)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -5317,7 +4956,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #280 — `прокуроры` (freq 104)
+### Candidate #261 — `прокуроры` (freq 104)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -5336,7 +4975,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #281 — `сипат` (freq 104)
+### Candidate #262 — `сипат` (freq 104)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -5355,26 +4994,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #282 — `презентация` (freq 103)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0006902`) «Бүгінгі күні эмитенттер, қатысушылар, сондай-ақ, арнайы сауда алаңында Қазақстанның барлық аймақтарынан дара инвесторлар тарту мақсатында Агенттік Маңғыстау, Атырау, Ақтөбе, Қызылорда, Оңтүстік Қазақс …»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0139253`) «Баркемптерге барша жұрт қатысуға мүмкіндік бар, ол презентация, баяндама, тренинг және тақырып бойынша талқылау үлгісінде өтеді.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0139261`) «Бірінші рет баркемпке қатысып отырғандар өздері иә біреумен бірлесіп презентация жасайды.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #283 — `фильм` (freq 103)
+### Candidate #263 — `фильм` (freq 103)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **nasal**
@@ -5393,7 +5013,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #284 — `қызға` (freq 103)
+### Candidate #264 — `қызға` (freq 103)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -5412,7 +5032,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #285 — `акциясы` (freq 102)
+### Candidate #265 — `акциясы` (freq 102)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -5431,7 +5051,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #286 — `жоспарлап` (freq 102)
+### Candidate #266 — `жоспарлап` (freq 102)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -5450,7 +5070,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #287 — `компаниялардың` (freq 102)
+### Candidate #267 — `компаниялардың` (freq 102)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -5469,7 +5089,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #288 — `косово` (freq 102)
+### Candidate #268 — `косово` (freq 102)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -5488,26 +5108,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #289 — `интернетресурсы` (freq 101)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0000161`) «Солтүстiк Қазақстан облысының ресми интернет-ресурсы _ Жергілікті атқарушы органдармен көрсетілетін мемлекеттік қызметтер»
-  2. (cc100_kk_pack.json / `cc100_kk_0000321`) «Көкшетау қаласының ресми интернет-ресурсы _ Шешендік өнер сайысында – мектеп оқушылары»
-  3. (cc100_kk_pack.json / `cc100_kk_0001337`) «Солтүстік Қазақстан облысының Қызылжар ауданы әкімінің ресми интернет-ресурсы _ Қысқа тарихи анықтама»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #290 — `оқиғаға` (freq 101)
+### Candidate #269 — `оқиғаға` (freq 101)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -5526,7 +5127,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #291 — `экономикасының` (freq 101)
+### Candidate #270 — `экономикасының` (freq 101)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -5545,7 +5146,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #292 — `кандидат` (freq 100)
+### Candidate #271 — `кандидат` (freq 100)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -5564,7 +5165,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #293 — `комитет` (freq 100)
+### Candidate #272 — `комитет` (freq 100)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -5583,7 +5184,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #294 — `аппарат` (freq 99)
+### Candidate #273 — `аппарат` (freq 99)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -5602,7 +5203,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #295 — `жауын` (freq 99)
+### Candidate #274 — `жауын` (freq 99)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -5621,7 +5222,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #296 — `жоспарлары` (freq 98)
+### Candidate #275 — `жоспарлары` (freq 98)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -5640,7 +5241,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #297 — `форумы` (freq 98)
+### Candidate #276 — `форумы` (freq 98)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -5659,7 +5260,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #298 — `түсінігі` (freq 97)
+### Candidate #277 — `түсінігі` (freq 97)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -5678,7 +5279,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #299 — `грамм` (freq 96)
+### Candidate #278 — `грамм` (freq 96)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -5697,7 +5298,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #300 — `ммге` (freq 96)
+### Candidate #279 — `ммге` (freq 96)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -5716,7 +5317,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #301 — `прокуратурасының` (freq 96)
+### Candidate #280 — `прокуратурасының` (freq 96)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -5735,7 +5336,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #302 — `америкада` (freq 95)
+### Candidate #281 — `америкада` (freq 95)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -5754,7 +5355,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #303 — `сигнал` (freq 95)
+### Candidate #282 — `сигнал` (freq 95)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -5773,7 +5374,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #304 — `армения` (freq 94)
+### Candidate #283 — `армения` (freq 94)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -5792,7 +5393,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #305 — `директордың` (freq 94)
+### Candidate #284 — `директордың` (freq 94)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -5811,7 +5412,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #306 — `нарын` (freq 94)
+### Candidate #285 — `нарын` (freq 94)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -5830,7 +5431,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #307 — `нәназарбаевтың` (freq 93)
+### Candidate #286 — `нәназарбаевтың` (freq 93)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -5849,7 +5450,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #308 — `программа` (freq 93)
+### Candidate #287 — `программа` (freq 93)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -5868,7 +5469,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #309 — `прокурор` (freq 93)
+### Candidate #288 — `прокурор` (freq 93)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -5887,7 +5488,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #310 — `салынатын` (freq 93)
+### Candidate #289 — `салынатын` (freq 93)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -5906,7 +5507,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #311 — `архивтер` (freq 92)
+### Candidate #290 — `архивтер` (freq 92)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -5925,26 +5526,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #312 — `директор` (freq 92)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0007660`) «Оған қоса Уикипедияда жалақы алатын бес қызметкер (екі компьютер бағдарламашысы, бір админ, демеу қаржы жинауды ұйымдастырушы және атқарушы директор), үш техникалық қызметкер (бағдарламалық және желіл …»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0012364`) «), әр алуан қызмет баптары мен лауазым атауларын (директор, лейтенант, бастық, мырза, ханым т.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0027500`) «1966) — спорт директор Айвар Макизұлы Оңғарсынов (25.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #313 — `дсұ` (freq 92)
+### Candidate #291 — `дсұ` (freq 92)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -5963,7 +5545,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #314 — `жауды` (freq 92)
+### Candidate #292 — `жауды` (freq 92)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -5982,7 +5564,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #315 — `мырыш` (freq 92)
+### Candidate #293 — `мырыш` (freq 92)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -6001,7 +5583,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #316 — `оңтүстігіндегі` (freq 92)
+### Candidate #294 — `оңтүстігіндегі` (freq 92)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -6020,7 +5602,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #317 — `бойын` (freq 91)
+### Candidate #295 — `бойын` (freq 91)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -6039,7 +5621,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #318 — `верный` (freq 91)
+### Candidate #296 — `верный` (freq 91)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **glide**
@@ -6058,7 +5640,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #319 — `комбинаты` (freq 91)
+### Candidate #297 — `комбинаты` (freq 91)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -6077,7 +5659,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #320 — `қыры` (freq 91)
+### Candidate #298 — `қыры` (freq 91)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -6096,7 +5678,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #321 — `ажырата` (freq 90)
+### Candidate #299 — `ажырата` (freq 90)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -6115,7 +5697,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #322 — `жоспарына` (freq 90)
+### Candidate #300 — `жоспарына` (freq 90)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -6134,7 +5716,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #323 — `сонша` (freq 90)
+### Candidate #301 — `сонша` (freq 90)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -6153,7 +5735,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #324 — `чемпионатының` (freq 90)
+### Candidate #302 — `чемпионатының` (freq 90)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -6172,7 +5754,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #325 — `ардагері` (freq 89)
+### Candidate #303 — `ардагері` (freq 89)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -6191,7 +5773,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #326 — `зымыран` (freq 89)
+### Candidate #304 — `зымыран` (freq 89)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -6210,7 +5792,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #327 — `оқода` (freq 89)
+### Candidate #305 — `оқода` (freq 89)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -6229,7 +5811,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #328 — `сайлауда` (freq 89)
+### Candidate #306 — `сайлауда` (freq 89)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -6248,7 +5830,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #329 — `хабарлаған` (freq 89)
+### Candidate #307 — `хабарлаған` (freq 89)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -6267,7 +5849,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #330 — `бойжеткен` (freq 88)
+### Candidate #308 — `бойжеткен` (freq 88)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -6286,26 +5868,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #331 — `грузия` (freq 88)
-
-- Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0000439`) «Атап айтқанда, Ресей мәдениеті Византиямен қатар, көршілес жатқан Болгария, Сербия, Армения, Грузия сияқты елдердің мәдениетімен үндестік тапты.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0004795`) «Грузия ( , Сакартвело) — Еуропа құрлығының оңтүстік-шығысында, Кавказ тауларының оңтүстік бөлігінде орналасқан мемлекет.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0004812`) «1811 жылдан 1918 жылға дейін Грузия Орыс патшасына бағынышты еді.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #332 — `жайып` (freq 88)
+### Candidate #309 — `жайып` (freq 88)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -6324,7 +5887,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #333 — `көмекке` (freq 88)
+### Candidate #310 — `көмекке` (freq 88)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -6343,26 +5906,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #334 — `радиосы` (freq 88)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0001223`) «Қазақ радиосы — Қазақ радиолары ЖШС-не қарасты, Қазақстан тұрғындарына, ТМД елдерінде және шет елдерде тұратын қазақ тыңдармандарына хабар тарататын радио желісі.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0009477`) «Қызылорда облыстық радиосы, 1928 жылдың 14 қарашасында құрылған.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0015830`) «1994—1995 жылдары «Қазақстан теледидары мен радиосы» республикалық корпорациясының президенті болған.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #335 — `аккредиттеу` (freq 87)
+### Candidate #311 — `аккредиттеу` (freq 87)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -6381,7 +5925,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #336 — `градусқа` (freq 87)
+### Candidate #312 — `градусқа` (freq 87)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -6400,7 +5944,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #337 — `жайын` (freq 87)
+### Candidate #313 — `жайын` (freq 87)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -6419,7 +5963,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #338 — `ояту` (freq 87)
+### Candidate #314 — `ояту` (freq 87)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -6438,7 +5982,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #339 — `стратегиясын` (freq 87)
+### Candidate #315 — `стратегиясын` (freq 87)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -6457,7 +6001,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #340 — `филиалының` (freq 87)
+### Candidate #316 — `филиалының` (freq 87)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -6476,7 +6020,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #341 — `формасы` (freq 87)
+### Candidate #317 — `формасы` (freq 87)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -6495,7 +6039,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #342 — `ажыратылады` (freq 86)
+### Candidate #318 — `ажыратылады` (freq 86)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -6514,7 +6058,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #343 — `аргентина` (freq 86)
+### Candidate #319 — `аргентина` (freq 86)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -6533,7 +6077,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #344 — `аристотель` (freq 86)
+### Candidate #320 — `аристотель` (freq 86)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -6552,7 +6096,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #345 — `бойынан` (freq 86)
+### Candidate #321 — `бойынан` (freq 86)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -6571,7 +6115,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #346 — `бғм` (freq 86)
+### Candidate #322 — `бғм` (freq 86)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **nasal**
@@ -6590,7 +6134,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #347 — `кабинет` (freq 86)
+### Candidate #323 — `кабинет` (freq 86)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -6609,7 +6153,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #348 — `квадрат` (freq 86)
+### Candidate #324 — `квадрат` (freq 86)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -6628,7 +6172,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #349 — `процесс` (freq 86)
+### Candidate #325 — `процесс` (freq 86)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -6647,7 +6191,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #350 — `сайлауы` (freq 86)
+### Candidate #326 — `сайлауы` (freq 86)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -6666,7 +6210,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #351 — `сайлауға` (freq 86)
+### Candidate #327 — `сайлауға` (freq 86)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -6685,7 +6229,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #352 — `хоккей` (freq 86)
+### Candidate #328 — `хоккей` (freq 86)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **glide**
@@ -6704,7 +6248,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #353 — `элементтер` (freq 86)
+### Candidate #329 — `элементтер` (freq 86)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -6723,7 +6267,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #354 — `элементтердің` (freq 86)
+### Candidate #330 — `элементтердің` (freq 86)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -6742,7 +6286,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #355 — `қхр` (freq 86)
+### Candidate #331 — `қхр` (freq 86)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **liquid**
@@ -6761,26 +6305,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #356 — `iшiнде` (freq 85)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0003255`) «Ағаштардың өздерi, сондай-ақ олардың бұтақтарының құлауы адамдардың өмiрi мен денсаулығына, ғимараттар мен үй-жайлардың, коммуникациялардың зақымдалуына, жол қозғалысы (оның iшiнде жол жүру»
-  2. (cc100_kk_pack.json / `cc100_kk_0005385`) «1. Жұмыс тобы қоғамдық кеңестердi мемлекеттiк органдардың өкiлдерi және конкурстық негiзде — коммерциялық емес ұйымдардың өкiлдерi, азаматтар арасынан қалыптастырады. Қоғамдық кеңес мүшелiгiне кандида …»
-  3. (cc100_kk_pack.json / `cc100_kk_0011724`) «Құжаттар Ақмола облысы туризм басқармасы, Ақмола облысы әкiмдiгi және мемлекеттiк қызмет iстерi жөнiндегi уәкiлеттi органның ресми сайтында iшкi конкурс өткiзу туралы хабарландыру соңғы жарияланғаннан …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #357 — `армян` (freq 85)
+### Candidate #332 — `армян` (freq 85)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -6799,7 +6324,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #358 — `джордж` (freq 85)
+### Candidate #333 — `джордж` (freq 85)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -6818,7 +6343,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #359 — `нназарбаев` (freq 85)
+### Candidate #334 — `нназарбаев` (freq 85)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -6837,45 +6362,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #360 — `революция` (freq 85)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0006674`) «Қаланың кең ауқымды өсуі мен өркендеуі өнеркәсіптік революция кезінде басталған көмір және болат өнеркәсібіне байланысты болды.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0014134`) «Революция және қанды соғыс нәтижесінде Нидерланд Испандардан 1581 жылы бөлініп шықты, 1588 жылы атышулы испан флоты – “Жеңілмейтін армада” Англиядан күйрей жеңілді.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0018681`) «Еліміздегі мәдени революция кезінде әлеуметтік зор істер атқарған қоғам қайраткелері қатарында Сәкен Сейфуллин, Абдолла Асылбеков, Әбілқайыр Досов, Белаш, Зікірия Мухеев, Ораз Исаев, Жанайдар Садуақас …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #361 — `сектор` (freq 85)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0006874`) «2004 жылы қалада жалпы құны 169563,2 млн теңге өнеркәсіп өнімі өндірілген, бұл 2003 жылдың деңгейімен салыстырғанда 113,4% құрады, ал қаржылық емес сектор бойынша 168274,7 млн теңге - 113,4%.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0013291`) «1994 жылы бұл сала 71% жұмыс орнына ие болған,ЖІӨ-де 72% (49% жеке сектор және 23% қоғамдық).»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0016220`) «1985–1989 жылдары аралығында Қазақстан Компартиясы Орталық Комитетінің ұйымдастыру-партиялық және кадр жұмысы бөлімінің сектор меңгерушісі, инспекторы, меңгерушісінің орынбасары лауазымдарының иегері  …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #362 — `тяньшань` (freq 85)
+### Candidate #335 — `тяньшань` (freq 85)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -6894,7 +6381,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #363 — `хал` (freq 85)
+### Candidate #336 — `хал` (freq 85)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -6913,26 +6400,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #364 — `өткiздi` (freq 85)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0030338`) «Облыс әкiмi Бурабайда Щучъе-Бурабай курорттық аймағын одан әрi дамыту мәселелерiне арналған жиын өткiздi. Оған туристiк компаниялардың, қонақ-үй кешендерiнiң, «Көкшетау минералды су» АҚ басшылары мен  …»
-  2. (cc100_kk_pack.json / `cc100_kk_0035972`) «Атбасар қаласының мемлекеттiк архивi 2017 жылғы 09 ақпанда «Азаматтарға арналған үкiмет» мемлекеттiк корпорациясы» КЕАҚ Ақмола облысы бойынша филиалы — «Халыққа қызмет көрсету орталықтары» департамент …»
-  3. (cc100_kk_pack.json / `cc100_kk_0035973`) «2017 жылғы 09 ақпан Сандықтау ауданының мемлекеттiк архивi «Азаматтарға арналған үкiмет» мемлекеттiк корпорациясы» КЕАҚ Ақмола облысы бойынша филиалы — «Халыққа қызмет көрсету орталықтары» департамент …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #365 — `дмитрий` (freq 84)
+### Candidate #337 — `дмитрий` (freq 84)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **glide**
@@ -6951,7 +6419,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #366 — `тиіп` (freq 84)
+### Candidate #338 — `тиіп` (freq 84)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -6970,7 +6438,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #367 — `артта` (freq 83)
+### Candidate #339 — `артта` (freq 83)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -6989,7 +6457,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #368 — `димаш` (freq 83)
+### Candidate #340 — `димаш` (freq 83)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -7008,7 +6476,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #369 — `жабылып` (freq 83)
+### Candidate #341 — `жабылып` (freq 83)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -7027,7 +6495,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #370 — `жайы` (freq 83)
+### Candidate #342 — `жайы` (freq 83)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -7046,7 +6514,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #371 — `мден` (freq 83)
+### Candidate #343 — `мден` (freq 83)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -7065,7 +6533,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #372 — `театрында` (freq 83)
+### Candidate #344 — `театрында` (freq 83)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -7084,7 +6552,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #373 — `жоспарының` (freq 82)
+### Candidate #345 — `жоспарының` (freq 82)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -7103,7 +6571,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #374 — `нназарбаевтың` (freq 82)
+### Candidate #346 — `нназарбаевтың` (freq 82)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -7122,7 +6590,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #375 — `славян` (freq 82)
+### Candidate #347 — `славян` (freq 82)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -7141,7 +6609,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #376 — `талдаңдар` (freq 82)
+### Candidate #348 — `талдаңдар` (freq 82)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -7160,7 +6628,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #377 — `прокурорының` (freq 81)
+### Candidate #349 — `прокурорының` (freq 81)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -7179,7 +6647,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #378 — `рейтинг` (freq 81)
+### Candidate #350 — `рейтинг` (freq 81)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiced_consonant**
@@ -7198,7 +6666,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #379 — `техас` (freq 81)
+### Candidate #351 — `техас` (freq 81)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -7217,7 +6685,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #380 — `технологиясын` (freq 81)
+### Candidate #352 — `технологиясын` (freq 81)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -7236,7 +6704,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #381 — `украин` (freq 81)
+### Candidate #353 — `украин` (freq 81)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -7255,7 +6723,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #382 — `градус` (freq 80)
+### Candidate #354 — `градус` (freq 80)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -7274,7 +6742,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #383 — `жатқа` (freq 80)
+### Candidate #355 — `жатқа` (freq 80)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -7293,26 +6761,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #384 — `жөнiндегi` (freq 80)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0003948`) «Кәмелетке толмағандардың құқықтарын қорғау, арнайы бiлiм беру және тәрбие жұмысы жөнiндегi бөлiм»
-  2. (cc100_kk_pack.json / `cc100_kk_0004893`) «ҚР Парламенті Мәжiлiсі депутаттарының кезектен тыс сайлауы - елiмiздiң басты саяси жаңалығы. Бұл туралы ОКҚ брифингi барысында Қазақстанның iскер әйелдері қауымдастығының президентi, ҚР Президентi жан …»
-  3. (cc100_kk_pack.json / `cc100_kk_0010515`) «Осы Заң микрокредиттер беру жөнiндегi қызметтi жүзеге асыруға байланысты қоғамдық қатынастарды реттейдi, микроқаржы ұйымдарының құқықтық жағдайының, құрылуының, қызметiнiң ерекшелiктерiн белгiлейдi, с …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #385 — `зеландия` (freq 80)
+### Candidate #356 — `зеландия` (freq 80)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -7331,7 +6780,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #386 — `ленинград` (freq 80)
+### Candidate #357 — `ленинград` (freq 80)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -7350,7 +6799,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #387 — `орнады` (freq 80)
+### Candidate #358 — `орнады` (freq 80)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -7369,7 +6818,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #388 — `себептен` (freq 80)
+### Candidate #359 — `себептен` (freq 80)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -7388,26 +6837,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #389 — `филология` (freq 80)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0000269`) «Мұнда тілтанушы, мүше-корреспондент Мәулен Балақаев, геология ғылымдарының докторы Патшайым Тәжібаева, түркітанушы, академик Ісмет Кеңесбаев, филология ғылымдарының докторы Қалдыбай Бектаев, академик  …»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0008772`) «Мұхтар Әуезов – ұлы жазушы, қоғам қайраткері, ғұлама ғалым, Қазақстан Ғылым академиясының академигі (1946), филология ғылымдарының докторы, профессор (1946), Қазақ КСР-нің еңбек сіңірген ғылым қайратк …»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0014312`) «Ысқақов Ахмеди Ысқақұлы (1910—1996) — тілтанушы, филология ғылымдарының докторы (1965), профессор (1968), Қазақстан Ұлттық ғылым академиясының мүше-корреспонденті (1972), Қазақстанның еңбек сіңірген ғ …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #390 — `австралия` (freq 79)
+### Candidate #360 — `австралия` (freq 79)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -7426,7 +6856,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #391 — `аустрия` (freq 79)
+### Candidate #361 — `аустрия` (freq 79)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -7445,7 +6875,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #392 — `египет` (freq 79)
+### Candidate #362 — `египет` (freq 79)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -7464,7 +6894,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #393 — `жетпей` (freq 79)
+### Candidate #363 — `жетпей` (freq 79)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **glide**
@@ -7483,7 +6913,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #394 — `концерт` (freq 79)
+### Candidate #364 — `концерт` (freq 79)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -7502,7 +6932,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #395 — `нидерланд` (freq 79)
+### Candidate #365 — `нидерланд` (freq 79)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -7521,7 +6951,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #396 — `чемпионатында` (freq 79)
+### Candidate #366 — `чемпионатында` (freq 79)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -7540,7 +6970,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #397 — `элемент` (freq 79)
+### Candidate #367 — `элемент` (freq 79)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -7559,7 +6989,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #398 — `былтыр` (freq 78)
+### Candidate #368 — `былтыр` (freq 78)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -7578,7 +7008,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #399 — `жайылым` (freq 78)
+### Candidate #369 — `жайылым` (freq 78)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -7597,7 +7027,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #400 — `жауабын` (freq 78)
+### Candidate #370 — `жауабын` (freq 78)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -7616,7 +7046,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #401 — `оңтайлы` (freq 78)
+### Candidate #371 — `оңтайлы` (freq 78)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -7635,7 +7065,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #402 — `федерациясы` (freq 78)
+### Candidate #372 — `федерациясы` (freq 78)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -7654,26 +7084,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #403 — `rustтың` (freq 77)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **nasal**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_01_0009`) «Бұл `Rust` командаларын жүйелік `PATH` айнымалысына қосу үшін қажет. `Rust`-тың сәтті орнатылғанын тексеру үшін терминалда келесі команданы енгізіңіз: Сіз қазіргі нұсқаны, коммит идентификаторын және  …»
-  2. (rust_book_kk_pack.json / `rust_book_01_0041`) «Сондықтан келесі бөлімде Cargo туралы айтамыз — ол тура осы мақсатқа арналған құрал. 1.3. Hello, Cargo! Cargo — `Rust`-тың құрылыс жүйесі әрі бума менеджері. Cargo сіздің кодыңызды құрастырады, оның т …»
-  3. (rust_book_kk_pack.json / `rust_book_01_0044`) «Алғашқы бөлік — `[package]` — жобаның атауын, нұсқасын және `Rust`-тың қай басылымын қолданатынын сипаттайды.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #404 — `жабылды` (freq 77)
+### Candidate #373 — `жабылды` (freq 77)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -7692,7 +7103,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #405 — `израиль` (freq 77)
+### Candidate #374 — `израиль` (freq 77)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -7711,7 +7122,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #406 — `кореяның` (freq 77)
+### Candidate #375 — `кореяның` (freq 77)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -7730,7 +7141,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #407 — `тимур` (freq 77)
+### Candidate #376 — `тимур` (freq 77)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **liquid**
@@ -7749,7 +7160,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #408 — `түсін` (freq 77)
+### Candidate #377 — `түсін` (freq 77)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -7768,7 +7179,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #409 — `сипатын` (freq 76)
+### Candidate #378 — `сипатын` (freq 76)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -7787,7 +7198,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #410 — `ххі` (freq 76)
+### Candidate #379 — `ххі` (freq 76)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -7806,7 +7217,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #411 — `шектен` (freq 76)
+### Candidate #380 — `шектен` (freq 76)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -7825,7 +7236,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #412 — `академия` (freq 75)
+### Candidate #381 — `академия` (freq 75)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -7844,7 +7255,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #413 — `емтихан` (freq 75)
+### Candidate #382 — `емтихан` (freq 75)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -7863,7 +7274,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #414 — `жоспарлы` (freq 75)
+### Candidate #383 — `жоспарлы` (freq 75)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -7882,7 +7293,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #415 — `коэффициенті` (freq 75)
+### Candidate #384 — `коэффициенті` (freq 75)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -7901,7 +7312,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #416 — `теориясын` (freq 75)
+### Candidate #385 — `теориясын` (freq 75)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -7920,7 +7331,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #417 — `форум` (freq 75)
+### Candidate #386 — `форум` (freq 75)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -7939,7 +7350,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #418 — `ақның` (freq 74)
+### Candidate #387 — `ақның` (freq 74)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -7958,7 +7369,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #419 — `оңалту` (freq 74)
+### Candidate #388 — `оңалту` (freq 74)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -7977,7 +7388,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #420 — `салдары` (freq 74)
+### Candidate #389 — `салдары` (freq 74)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -7996,7 +7407,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #421 — `формула` (freq 74)
+### Candidate #390 — `формула` (freq 74)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -8015,7 +7426,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #422 — `қрның` (freq 74)
+### Candidate #391 — `қрның` (freq 74)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -8034,26 +7445,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #423 — `үкiмет` (freq 74)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **voiceless_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0004948`) «Ағымдағы жылдың 24 қаңтарында Ақмола облысының Көкшетау қаласы, Абай көшесi №96 мекен-жайы бойынша, сағат 15.00-ден 18.00-ге дейiн «Азаматтарға арналған үкiмет» мемлекеттiк корпорациясы&ra...»
-  2. (cc100_kk_pack.json / `cc100_kk_0010109`) «Уатай Ж., Каюпов Т. - Мемелекеттiк тiл мәселелерi. Жазу мен емле – Үкiмет жаршысы, 2000, № 8»
-  3. (cc100_kk_pack.json / `cc100_kk_0032427`) «Қазiргi уақытта мемлекеттiк қызметтер көрсету және орталық мемлекеттiк қызметтердi көрсету кезiнде автоматтандырылған жүйелердiң электрондық үкiмет порталы арқылы жүзеге асырылады, бұл жер қатынастары …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #424 — `жауы` (freq 73)
+### Candidate #392 — `жауы` (freq 73)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -8072,7 +7464,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #425 — `кмден` (freq 73)
+### Candidate #393 — `кмден` (freq 73)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -8091,7 +7483,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #426 — `нормаларын` (freq 73)
+### Candidate #394 — `нормаларын` (freq 73)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -8110,7 +7502,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #427 — `проблемалары` (freq 73)
+### Candidate #395 — `проблемалары` (freq 73)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -8129,7 +7521,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #428 — `радиусы` (freq 73)
+### Candidate #396 — `радиусы` (freq 73)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -8148,7 +7540,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #429 — `салмағ` (freq 73)
+### Candidate #397 — `салмағ` (freq 73)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -8167,7 +7559,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #430 — `территориясында` (freq 73)
+### Candidate #398 — `территориясында` (freq 73)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -8186,7 +7578,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #431 — `колумб` (freq 72)
+### Candidate #399 — `колумб` (freq 72)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -8205,7 +7597,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #432 — `лады` (freq 72)
+### Candidate #400 — `лады` (freq 72)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -8224,7 +7616,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #433 — `орденінің` (freq 72)
+### Candidate #401 — `орденінің` (freq 72)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -8243,7 +7635,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #434 — `смге` (freq 72)
+### Candidate #402 — `смге` (freq 72)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -8262,7 +7654,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #435 — `соғұрлым` (freq 72)
+### Candidate #403 — `соғұрлым` (freq 72)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -8281,7 +7673,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #436 — `тиген` (freq 72)
+### Candidate #404 — `тиген` (freq 72)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -8300,7 +7692,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #437 — `тренинг` (freq 72)
+### Candidate #405 — `тренинг` (freq 72)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiced_consonant**
@@ -8319,7 +7711,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #438 — `импорт` (freq 71)
+### Candidate #406 — `импорт` (freq 71)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -8338,7 +7730,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #439 — `интеллект` (freq 71)
+### Candidate #407 — `интеллект` (freq 71)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -8357,7 +7749,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #440 — `комсомол` (freq 71)
+### Candidate #408 — `комсомол` (freq 71)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -8376,7 +7768,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #441 — `орнықты` (freq 71)
+### Candidate #409 — `орнықты` (freq 71)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -8395,7 +7787,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #442 — `юнеско` (freq 71)
+### Candidate #410 — `юнеско` (freq 71)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -8414,7 +7806,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #443 — `ахуал` (freq 70)
+### Candidate #411 — `ахуал` (freq 70)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -8433,7 +7825,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #444 — `ветеринария` (freq 70)
+### Candidate #412 — `ветеринария` (freq 70)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -8452,7 +7844,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #445 — `егжейтегжейлі` (freq 70)
+### Candidate #413 — `егжейтегжейлі` (freq 70)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -8471,7 +7863,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #446 — `поздравления` (freq 70)
+### Candidate #414 — `поздравления` (freq 70)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -8490,7 +7882,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #447 — `прокуратураның` (freq 70)
+### Candidate #415 — `прокуратураның` (freq 70)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -8509,7 +7901,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #448 — `ташкентте` (freq 70)
+### Candidate #416 — `ташкентте` (freq 70)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -8528,7 +7920,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #449 — `шектелген` (freq 70)
+### Candidate #417 — `шектелген` (freq 70)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -8547,7 +7939,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #450 — `құқығ` (freq 70)
+### Candidate #418 — `құқығ` (freq 70)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -8566,7 +7958,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #451 — `норвегия` (freq 69)
+### Candidate #419 — `норвегия` (freq 69)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -8585,7 +7977,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #452 — `оқиғаларды` (freq 69)
+### Candidate #420 — `оқиғаларды` (freq 69)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -8604,7 +7996,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #453 — `оқиғаны` (freq 69)
+### Candidate #421 — `оқиғаны` (freq 69)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -8623,7 +8015,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #454 — `оңтүстігі` (freq 69)
+### Candidate #422 — `оңтүстігі` (freq 69)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -8642,7 +8034,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #455 — `пушкин` (freq 69)
+### Candidate #423 — `пушкин` (freq 69)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **nasal**
@@ -8661,7 +8053,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #456 — `академиясында` (freq 68)
+### Candidate #424 — `академиясында` (freq 68)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -8680,7 +8072,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #457 — `жатпайтын` (freq 68)
+### Candidate #425 — `жатпайтын` (freq 68)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -8699,7 +8091,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #458 — `жақтың` (freq 68)
+### Candidate #426 — `жақтың` (freq 68)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -8718,7 +8110,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #459 — `жеген` (freq 68)
+### Candidate #427 — `жеген` (freq 68)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -8737,7 +8129,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #460 — `инспекторы` (freq 68)
+### Candidate #428 — `инспекторы` (freq 68)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -8756,7 +8148,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #461 — `тағзым` (freq 68)
+### Candidate #429 — `тағзым` (freq 68)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -8775,7 +8167,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #462 — `юнесконың` (freq 68)
+### Candidate #430 — `юнесконың` (freq 68)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -8794,7 +8186,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #463 — `амбулатория` (freq 67)
+### Candidate #431 — `амбулатория` (freq 67)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -8813,7 +8205,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #464 — `жетпейді` (freq 67)
+### Candidate #432 — `жетпейді` (freq 67)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -8832,7 +8224,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #465 — `жомарт` (freq 67)
+### Candidate #433 — `жомарт` (freq 67)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -8851,7 +8243,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #466 — `ораз` (freq 67)
+### Candidate #434 — `ораз` (freq 67)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -8870,7 +8262,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #467 — `оқиғалардың` (freq 67)
+### Candidate #435 — `оқиғалардың` (freq 67)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -8889,7 +8281,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #468 — `жеделдете` (freq 66)
+### Candidate #436 — `жеделдете` (freq 66)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -8908,7 +8300,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #469 — `ксрі` (freq 66)
+### Candidate #437 — `ксрі` (freq 66)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -8927,7 +8319,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #470 — `ксрінің` (freq 66)
+### Candidate #438 — `ксрінің` (freq 66)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -8946,7 +8338,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #471 — `көмектің` (freq 66)
+### Candidate #439 — `көмектің` (freq 66)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -8965,7 +8357,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #472 — `николай` (freq 66)
+### Candidate #440 — `николай` (freq 66)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -8984,7 +8376,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #473 — `ошағы` (freq 66)
+### Candidate #441 — `ошағы` (freq 66)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -9003,7 +8395,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #474 — `рмк` (freq 66)
+### Candidate #442 — `рмк` (freq 66)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -9022,7 +8414,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #475 — `сахнаға` (freq 66)
+### Candidate #443 — `сахнаға` (freq 66)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -9041,7 +8433,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #476 — `кмдей` (freq 65)
+### Candidate #444 — `кмдей` (freq 65)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **glide**
@@ -9060,7 +8452,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #477 — `одағына` (freq 65)
+### Candidate #445 — `одағына` (freq 65)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -9079,7 +8471,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #478 — `президиумының` (freq 65)
+### Candidate #446 — `президиумының` (freq 65)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -9098,7 +8490,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #479 — `секторы` (freq 65)
+### Candidate #447 — `секторы` (freq 65)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -9117,7 +8509,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #480 — `теориясының` (freq 65)
+### Candidate #448 — `теориясының` (freq 65)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -9136,7 +8528,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #481 — `хабарды` (freq 65)
+### Candidate #449 — `хабарды` (freq 65)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -9155,7 +8547,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #482 — `хаббл` (freq 65)
+### Candidate #450 — `хаббл` (freq 65)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -9174,26 +8566,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #483 — `rustта` (freq 64)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_01_0036`) «Бұл интерпретатор тілдерінен (мысалы Python немесе JavaScript) өзгеше: онда сіз кодты жазып, `python script.py` деп тікелей орындайсыз. `Rust`-та екі қадам бөлек: алдымен құрастыру, содан кейін орында …»
-  2. (rust_book_kk_pack.json / `rust_book_01_0045`) «Екінші бөлік — `[dependencies]` — жобаның тәуелділіктерін тізбелейтін бөлік. `Rust`-та тәуелділіктер «сандық» (`crate`) деп аталады; бұл жобада әзірге тәуелділік жоқ.»
-  3. (rust_book_kk_pack.json / `rust_book_02_0014`) «Содан кейін: Бұл сөйлем `guess` атты жаңа айнымалы жариялайды. `Rust`-та айнымалылар әдетте тұрақты болады — олардың мәнін қайта тағайындау мүмкін емес.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #484 — `ажырату` (freq 64)
+### Candidate #451 — `ажырату` (freq 64)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -9212,7 +8585,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #485 — `гурьев` (freq 64)
+### Candidate #452 — `гурьев` (freq 64)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiced_consonant**
@@ -9231,7 +8604,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #486 — `ммден` (freq 64)
+### Candidate #453 — `ммден` (freq 64)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -9250,7 +8623,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #487 — `мәуезов` (freq 64)
+### Candidate #454 — `мәуезов` (freq 64)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -9269,7 +8642,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #488 — `нақ` (freq 64)
+### Candidate #455 — `нақ` (freq 64)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -9288,7 +8661,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #489 — `салығ` (freq 64)
+### Candidate #456 — `салығ` (freq 64)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -9307,7 +8680,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #490 — `скачать` (freq 64)
+### Candidate #457 — `скачать` (freq 64)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -9326,7 +8699,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #491 — `степногорск` (freq 64)
+### Candidate #458 — `степногорск` (freq 64)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -9345,7 +8718,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #492 — `театрдың` (freq 64)
+### Candidate #459 — `театрдың` (freq 64)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -9364,7 +8737,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #493 — `тжд` (freq 64)
+### Candidate #460 — `тжд` (freq 64)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiced_consonant**
@@ -9383,7 +8756,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #494 — `украинаның` (freq 64)
+### Candidate #461 — `украинаның` (freq 64)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -9402,7 +8775,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #495 — `хадис` (freq 64)
+### Candidate #462 — `хадис` (freq 64)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -9421,26 +8794,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #496 — `археология` (freq 63)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0009904`) «Сарайшық – ортағасырлық қала, Республикалық маңызы бар тарих және мәдениет ескерткіштерінің мемлекеттік тізіміне енген археология ескерткіші.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0024850`) «Есік Алтын адамы – Алматы облысының жергілікті маңызы бар тарих және мәдениет ескерткіштерінің мемлекеттік тізіміне енген археология ескерткіші.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0042059`) «Туристер бұл сарайда ерекше археология қазбаларын, әзержайбан кілемдерін, музыка аспаптары мен ежелгі құранды көре алады.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #497 — `жатпайды` (freq 63)
+### Candidate #463 — `жатпайды` (freq 63)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -9459,7 +8813,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #498 — `жетпес` (freq 63)
+### Candidate #464 — `жетпес` (freq 63)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -9478,7 +8832,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #499 — `католик` (freq 63)
+### Candidate #465 — `католик` (freq 63)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -9497,7 +8851,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #500 — `компаниялары` (freq 63)
+### Candidate #466 — `компаниялары` (freq 63)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -9516,7 +8870,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #501 — `лондонда` (freq 63)
+### Candidate #467 — `лондонда` (freq 63)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -9535,7 +8889,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #502 — `секторының` (freq 63)
+### Candidate #468 — `секторының` (freq 63)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -9554,7 +8908,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #503 — `терроризмге` (freq 63)
+### Candidate #469 — `терроризмге` (freq 63)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -9573,7 +8927,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #504 — `украиндар` (freq 63)
+### Candidate #470 — `украиндар` (freq 63)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -9592,26 +8946,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #505 — `акция` (freq 62)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0075536`) «Егер, мысалы компания өзінің менюін өзгертпей өздерінін клиенттерін олардың тағамдарының пайдалы екендігі жөнінде акция жүргізсе, онда болашақта олар халыққа сапасыз тағамдарды таратуын имиджіне ие бо …»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0077694`) «Моңғолияда білімді, әр алуанды мәдениетті, көп тілділікті әрі қарай дамыту үшін ЮНЕСКО-ның халықаралық кластерлі жобаның шеңберінде Баян-Өлгей аймағының орталық кітапханасына ҚР Ұлттық кітапханасы 200 …»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0134182`) «Акция кезінде кейбір кәсіпорындар мен мекемелер ескерткіштерді жөндеп, көгалдандыру жұмысына көмек берді.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #506 — `армиясы` (freq 62)
+### Candidate #471 — `армиясы` (freq 62)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -9630,7 +8965,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #507 — `былайша` (freq 62)
+### Candidate #472 — `былайша` (freq 62)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -9649,7 +8984,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #508 — `катонқарағай` (freq 62)
+### Candidate #473 — `катонқарағай` (freq 62)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -9668,7 +9003,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #509 — `техниканың` (freq 62)
+### Candidate #474 — `техниканың` (freq 62)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -9687,7 +9022,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #510 — `технологияны` (freq 62)
+### Candidate #475 — `технологияны` (freq 62)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -9706,7 +9041,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #511 — `хабарландырулар` (freq 62)
+### Candidate #476 — `хабарландырулар` (freq 62)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -9725,7 +9060,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #512 — `шағы` (freq 62)
+### Candidate #477 — `шағы` (freq 62)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -9744,7 +9079,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #513 — `шек` (freq 62)
+### Candidate #478 — `шек` (freq 62)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -9763,7 +9098,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #514 — `ыдырап` (freq 62)
+### Candidate #479 — `ыдырап` (freq 62)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -9782,7 +9117,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #515 — `абырой` (freq 61)
+### Candidate #480 — `абырой` (freq 61)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -9801,7 +9136,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #516 — `аймағ` (freq 61)
+### Candidate #481 — `аймағ` (freq 61)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -9820,7 +9155,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #517 — `дизайн` (freq 61)
+### Candidate #482 — `дизайн` (freq 61)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -9839,7 +9174,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #518 — `жаудың` (freq 61)
+### Candidate #483 — `жаудың` (freq 61)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -9858,7 +9193,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #519 — `жоспарлар` (freq 61)
+### Candidate #484 — `жоспарлар` (freq 61)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -9877,7 +9212,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #520 — `исламның` (freq 61)
+### Candidate #485 — `исламның` (freq 61)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -9896,7 +9231,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #521 — `монархия` (freq 61)
+### Candidate #486 — `монархия` (freq 61)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -9915,7 +9250,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #522 — `нобель` (freq 61)
+### Candidate #487 — `нобель` (freq 61)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -9934,7 +9269,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #523 — `регламенті` (freq 61)
+### Candidate #488 — `регламенті` (freq 61)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -9953,7 +9288,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #524 — `сина` (freq 61)
+### Candidate #489 — `сина` (freq 61)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -9972,7 +9307,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #525 — `сипатқа` (freq 61)
+### Candidate #490 — `сипатқа` (freq 61)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -9991,7 +9326,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #526 — `технологиялардың` (freq 61)
+### Candidate #491 — `технологиялардың` (freq 61)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -10010,7 +9345,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #527 — `түсініг` (freq 61)
+### Candidate #492 — `түсініг` (freq 61)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiced_consonant**
@@ -10029,7 +9364,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #528 — `экономиканы` (freq 61)
+### Candidate #493 — `экономиканы` (freq 61)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -10048,7 +9383,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #529 — `дунай` (freq 60)
+### Candidate #494 — `дунай` (freq 60)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -10067,7 +9402,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #530 — `ескеріп` (freq 60)
+### Candidate #495 — `ескеріп` (freq 60)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -10086,26 +9421,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #531 — `император` (freq 60)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0013512`) «Қасиетті Рим империясының басында сайлаушылар кеңесі сайлайтын император тұрды, жерлерді білдіретін орган – Рейхстаг (нем.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0014394`) «Император Ұлы Карл арабтардың әрі қарай ілгерілеуін тоқтатып, Андорраны Урхель епископының қарамағына береді.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0017736`) «Абылай сұлтанға император - ақ патша ханым­ның атынан биылғы 1759 жылдың басынан бастап жалақы төлеуі дұрыс.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #532 — `интеллектуалды` (freq 60)
+### Candidate #496 — `интеллектуалды` (freq 60)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -10124,7 +9440,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #533 — `климаттың` (freq 60)
+### Candidate #497 — `климаттың` (freq 60)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -10143,7 +9459,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #534 — `оба` (freq 60)
+### Candidate #498 — `оба` (freq 60)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -10162,7 +9478,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #535 — `оқиғаларға` (freq 60)
+### Candidate #499 — `оқиғаларға` (freq 60)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -10181,7 +9497,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #536 — `сабағ` (freq 60)
+### Candidate #500 — `сабағ` (freq 60)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -10200,7 +9516,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #537 — `символы` (freq 60)
+### Candidate #501 — `символы` (freq 60)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -10219,7 +9535,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #538 — `технологиялары` (freq 60)
+### Candidate #502 — `технологиялары` (freq 60)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -10238,26 +9554,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #539 — `трлн` (freq 60)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **nasal**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0001418`) «Газдың болжамды қоры 21-23 трлн м³, ал мұнайдікі 12 млрд тоннаға жуық делінеді.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0002830`) «т мұнай, 2 трлн.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0011259`) «Табиғи газ 3 трлн шаршы метрге тең.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #540 — `харам` (freq 60)
+### Candidate #503 — `харам` (freq 60)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -10276,7 +9573,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #541 — `шеккендер` (freq 60)
+### Candidate #504 — `шеккендер` (freq 60)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -10295,7 +9592,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #542 — `шқму` (freq 60)
+### Candidate #505 — `шқму` (freq 60)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **vowel**
@@ -10314,7 +9611,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #543 — `экономикаға` (freq 60)
+### Candidate #506 — `экономикаға` (freq 60)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -10333,7 +9630,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #544 — `абылайдың` (freq 59)
+### Candidate #507 — `абылайдың` (freq 59)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -10352,7 +9649,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #545 — `вицеминистрі` (freq 59)
+### Candidate #508 — `вицеминистрі` (freq 59)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -10371,7 +9668,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #546 — `обама` (freq 59)
+### Candidate #509 — `обама` (freq 59)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -10390,7 +9687,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #547 — `орап` (freq 59)
+### Candidate #510 — `орап` (freq 59)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -10409,7 +9706,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #548 — `төтеп` (freq 59)
+### Candidate #511 — `төтеп` (freq 59)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -10428,7 +9725,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #549 — `христиандар` (freq 59)
+### Candidate #512 — `христиандар` (freq 59)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -10447,7 +9744,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #550 — `югославия` (freq 59)
+### Candidate #513 — `югославия` (freq 59)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -10466,7 +9763,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #551 — `қиып` (freq 59)
+### Candidate #514 — `қиып` (freq 59)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -10485,7 +9782,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #552 — `армиясының` (freq 58)
+### Candidate #515 — `армиясының` (freq 58)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -10504,7 +9801,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #553 — `аңға` (freq 58)
+### Candidate #516 — `аңға` (freq 58)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -10523,7 +9820,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #554 — `вирус` (freq 58)
+### Candidate #517 — `вирус` (freq 58)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **voiceless_consonant**
@@ -10542,7 +9839,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #555 — `волейбол` (freq 58)
+### Candidate #518 — `волейбол` (freq 58)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -10561,7 +9858,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #556 — `евгений` (freq 58)
+### Candidate #519 — `евгений` (freq 58)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **glide**
@@ -10580,7 +9877,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #557 — `еврейлер` (freq 58)
+### Candidate #520 — `еврейлер` (freq 58)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -10599,7 +9896,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #558 — `жайылып` (freq 58)
+### Candidate #521 — `жайылып` (freq 58)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -10618,7 +9915,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #559 — `зейнеткер` (freq 58)
+### Candidate #522 — `зейнеткер` (freq 58)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -10637,7 +9934,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #560 — `процестерді` (freq 58)
+### Candidate #523 — `процестерді` (freq 58)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -10656,7 +9953,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #561 — `сахнада` (freq 58)
+### Candidate #524 — `сахнада` (freq 58)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -10675,7 +9972,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #562 — `себептер` (freq 58)
+### Candidate #525 — `себептер` (freq 58)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -10694,7 +9991,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #563 — `тиді` (freq 58)
+### Candidate #526 — `тиді` (freq 58)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -10713,7 +10010,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #564 — `францияның` (freq 58)
+### Candidate #527 — `францияның` (freq 58)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -10732,7 +10029,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #565 — `агенттіг` (freq 57)
+### Candidate #528 — `агенттіг` (freq 57)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -10751,7 +10048,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #566 — `жаудан` (freq 57)
+### Candidate #529 — `жаудан` (freq 57)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -10770,7 +10067,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #567 — `империя` (freq 57)
+### Candidate #530 — `империя` (freq 57)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **unknown**
@@ -10789,7 +10086,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #568 — `новости` (freq 57)
+### Candidate #531 — `новости` (freq 57)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -10808,7 +10105,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #569 — `процестер` (freq 57)
+### Candidate #532 — `процестер` (freq 57)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -10827,26 +10124,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #570 — `архивтiк` (freq 56)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **voiceless_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0031456`) «Қазiргi уақытта облыста 21 архивтiк мекеме жұмыс iстейдi (1 облыстық, 3 қалалық, 17 аудандық).»
-  2. (cc100_kk_pack.json / `cc100_kk_0031463`) «3)Халық арасында «Архивтiк анықтамалар беру» мемлекеттiк қызметiн көрсету және мемлекеттiк қызмет көрсету саласында сыбайлас жемқорлық бұзушылықтарға қарсы iс-қимыл мәселелерi бойынша ақпараттық-түсiн …»
-  3. (cc100_kk_pack.json / `cc100_kk_0035910`) «Ақмола облысы мемлекеттiк архивтерiнiң 2017 жылы бұқаралық ақпарат құралдарында жариялауға жоспарланған, архивтiк құжаттар негiзiндегi мақалаларды әзiрлеу және жариялау бойынша жұмысының МЕДИА-ЖОСПАРЫ»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #571 — `вашингтон` (freq 56)
+### Candidate #533 — `вашингтон` (freq 56)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -10865,7 +10143,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #572 — `губерниясы` (freq 56)
+### Candidate #534 — `губерниясы` (freq 56)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -10884,7 +10162,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #573 — `дина` (freq 56)
+### Candidate #535 — `дина` (freq 56)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -10903,7 +10181,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #574 — `комитеттің` (freq 56)
+### Candidate #536 — `комитеттің` (freq 56)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -10922,7 +10200,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #575 — `комментарий` (freq 56)
+### Candidate #537 — `комментарий` (freq 56)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **glide**
@@ -10941,7 +10219,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #576 — `нормалары` (freq 56)
+### Candidate #538 — `нормалары` (freq 56)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -10960,7 +10238,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #577 — `оңға` (freq 56)
+### Candidate #539 — `оңға` (freq 56)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -10979,7 +10257,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #578 — `хабарласып` (freq 56)
+### Candidate #540 — `хабарласып` (freq 56)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -10998,7 +10276,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #579 — `чемпион` (freq 56)
+### Candidate #541 — `чемпион` (freq 56)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -11017,7 +10295,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #580 — `шығанағ` (freq 56)
+### Candidate #542 — `шығанағ` (freq 56)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -11036,7 +10314,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #581 — `арр` (freq 55)
+### Candidate #543 — `арр` (freq 55)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -11055,7 +10333,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #582 — `аумағ` (freq 55)
+### Candidate #544 — `аумағ` (freq 55)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -11074,7 +10352,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #583 — `жеңген` (freq 55)
+### Candidate #545 — `жеңген` (freq 55)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -11093,7 +10371,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #584 — `зайырлы` (freq 55)
+### Candidate #546 — `зайырлы` (freq 55)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -11112,7 +10390,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #585 — `каталог` (freq 55)
+### Candidate #547 — `каталог` (freq 55)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -11131,7 +10409,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #586 — `кмсағ` (freq 55)
+### Candidate #548 — `кмсағ` (freq 55)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -11150,7 +10428,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #587 — `комиссары` (freq 55)
+### Candidate #549 — `комиссары` (freq 55)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -11169,7 +10447,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #588 — `орнатқан` (freq 55)
+### Candidate #550 — `орнатқан` (freq 55)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -11188,7 +10466,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #589 — `сайлайды` (freq 55)
+### Candidate #551 — `сайлайды` (freq 55)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -11207,7 +10485,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #590 — `салыңдар` (freq 55)
+### Candidate #552 — `салыңдар` (freq 55)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -11226,7 +10504,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #591 — `тігіп` (freq 55)
+### Candidate #553 — `тігіп` (freq 55)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -11245,26 +10523,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #592 — `string` (freq 54)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_02_0017`) «Бұл стандартты кітапхана ұсынатын `String` типінің жаңа, бос данасын қайтаратын байланысты функция. `String` — өсетін, өзгертілетін, UTF-8 кодталған жол түрі.»
-  2. (rust_book_kk_pack.json / `rust_book_02_0017`) «Бұл стандартты кітапхана ұсынатын `String` типінің жаңа, бос данасын қайтаратын байланысты функция. `String` — өсетін, өзгертілетін, UTF-8 кодталған жол түрі.»
-  3. (rust_book_kk_pack.json / `rust_book_02_0048`) «Тип сәйкестігі мәселесі Бірақ бұл код әлі құрастырылмайды. `cargo build` командасын іске қосыңыз және мынандай қатені көресіз: Қате — типтердің сәйкес келмеуі. `guess` — `String`, ал `secret_number` — …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #593 — `африкада` (freq 54)
+### Candidate #554 — `африкада` (freq 54)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -11283,7 +10542,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #594 — `африканың` (freq 54)
+### Candidate #555 — `африканың` (freq 54)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -11302,26 +10561,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #595 — `интернетке` (freq 54)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0007621`) «Мақалалардың басым көпшілігін интернетке кіре алатын әркім өңдей алады.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0007989`) «Интернетке қатынау мүмкіндігі болған кезде миллиондаған көздерден, соның ішінде білім беру мекемелерінен, мемлекеттік ұйымдардан, коммерциялық кәсіпорындардан және жекелеген пайдаланушылардан деректер …»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0007991`) «Интернет провайдері Интернетке қосылу үшін қажетті телефон нөмірін, пайдаланушы атын, құпия сөзді және басқа да мәліметтерді береді.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #596 — `категориясы` (freq 54)
+### Candidate #556 — `категориясы` (freq 54)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -11340,7 +10580,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #597 — `кредиттер` (freq 54)
+### Candidate #557 — `кредиттер` (freq 54)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -11359,7 +10599,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #598 — `музыкасы` (freq 54)
+### Candidate #558 — `музыкасы` (freq 54)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -11378,7 +10618,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #599 — `оңтайландыру` (freq 54)
+### Candidate #559 — `оңтайландыру` (freq 54)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -11397,7 +10637,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #600 — `территориясы` (freq 54)
+### Candidate #560 — `территориясы` (freq 54)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -11416,7 +10656,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #601 — `швейцария` (freq 54)
+### Candidate #561 — `швейцария` (freq 54)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -11435,7 +10675,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #602 — `құқы` (freq 54)
+### Candidate #562 — `құқы` (freq 54)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -11454,7 +10694,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #603 — `американ` (freq 53)
+### Candidate #563 — `американ` (freq 53)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -11473,7 +10713,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #604 — `артезиан` (freq 53)
+### Candidate #564 — `артезиан` (freq 53)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -11492,7 +10732,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #605 — `доцент` (freq 53)
+### Candidate #565 — `доцент` (freq 53)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -11511,7 +10751,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #606 — `жайды` (freq 53)
+### Candidate #566 — `жайды` (freq 53)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -11530,26 +10770,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #607 — `инфляция` (freq 53)
-
-- Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0013274`) «1991–1997 жылдары жұмыссыздар үлесі 10,3%, ал инфляция 1990–1995 жылдары – 2,5% құрады.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0025343`) «Теңгенің АҚШ долларына қатысты құнсыздануын біріншіден айналыстағы ақша массасының өсуімен, екіншіден мұнай өнімдеріне деген бағаның өсуінің нәтижесінде пайда болған инфляция дейгейінің 8,5 пайызға жо …»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0027428`) «Инфляция еуроға ауысқанға дейін Маастрихт критерийлеріне байланысты төмендеді және төмен болып қалды (2018 жылы 1%-дан аз).»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #608 — `исландия` (freq 53)
+### Candidate #567 — `исландия` (freq 53)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -11568,7 +10789,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #609 — `испанияның` (freq 53)
+### Candidate #568 — `испанияның` (freq 53)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -11587,7 +10808,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #610 — `кітаб` (freq 53)
+### Candidate #569 — `кітаб` (freq 53)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -11606,7 +10827,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #611 — `лимон` (freq 53)
+### Candidate #570 — `лимон` (freq 53)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -11625,7 +10846,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #612 — `оркестрі` (freq 53)
+### Candidate #571 — `оркестрі` (freq 53)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -11644,7 +10865,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #613 — `оқиғадан` (freq 53)
+### Candidate #572 — `оқиғадан` (freq 53)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -11663,7 +10884,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #614 — `оқшау` (freq 53)
+### Candidate #573 — `оқшау` (freq 53)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -11682,7 +10903,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #615 — `проблемалар` (freq 53)
+### Candidate #574 — `проблемалар` (freq 53)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -11701,7 +10922,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #616 — `сахна` (freq 53)
+### Candidate #575 — `сахна` (freq 53)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -11720,7 +10941,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #617 — `соове` (freq 53)
+### Candidate #576 — `соове` (freq 53)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -11739,7 +10960,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #618 — `стадион` (freq 53)
+### Candidate #577 — `стадион` (freq 53)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -11758,7 +10979,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #619 — `түсінді` (freq 53)
+### Candidate #578 — `түсінді` (freq 53)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -11777,7 +10998,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #620 — `экономикасын` (freq 53)
+### Candidate #579 — `экономикасын` (freq 53)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -11796,7 +11017,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #621 — `ажырамас` (freq 52)
+### Candidate #580 — `ажырамас` (freq 52)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -11815,7 +11036,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #622 — `армияның` (freq 52)
+### Candidate #581 — `армияның` (freq 52)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -11834,7 +11055,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #623 — `бжзқ` (freq 52)
+### Candidate #582 — `бжзқ` (freq 52)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -11853,7 +11074,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #624 — `вестник` (freq 52)
+### Candidate #583 — `вестник` (freq 52)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -11872,7 +11093,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #625 — `грунт` (freq 52)
+### Candidate #584 — `грунт` (freq 52)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **voiceless_consonant**
@@ -11891,7 +11112,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #626 — `крест` (freq 52)
+### Candidate #585 — `крест` (freq 52)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -11910,7 +11131,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #627 — `наразы` (freq 52)
+### Candidate #586 — `наразы` (freq 52)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -11929,7 +11150,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #628 — `ницше` (freq 52)
+### Candidate #587 — `ницше` (freq 52)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -11948,7 +11169,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #629 — `өзөзіне` (freq 52)
+### Candidate #588 — `өзөзіне` (freq 52)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -11967,7 +11188,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #630 — `анна` (freq 51)
+### Candidate #589 — `анна` (freq 51)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -11986,7 +11207,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #631 — `динара` (freq 51)
+### Candidate #590 — `динара` (freq 51)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -12005,7 +11226,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #632 — `ескертпе` (freq 51)
+### Candidate #591 — `ескертпе` (freq 51)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -12024,7 +11245,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #633 — `жайкүйі` (freq 51)
+### Candidate #592 — `жайкүйі` (freq 51)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -12043,7 +11264,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #634 — `инвесторлар` (freq 51)
+### Candidate #593 — `инвесторлар` (freq 51)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -12062,7 +11283,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #635 — `найза` (freq 51)
+### Candidate #594 — `найза` (freq 51)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -12081,7 +11302,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #636 — `осал` (freq 51)
+### Candidate #595 — `осал` (freq 51)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -12100,7 +11321,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #637 — `практикада` (freq 51)
+### Candidate #596 — `практикада` (freq 51)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -12119,7 +11340,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #638 — `реформалар` (freq 51)
+### Candidate #597 — `реформалар` (freq 51)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -12138,7 +11359,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #639 — `салынуы` (freq 51)
+### Candidate #598 — `салынуы` (freq 51)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -12157,7 +11378,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #640 — `сталин` (freq 51)
+### Candidate #599 — `сталин` (freq 51)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -12176,7 +11397,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #641 — `технологияның` (freq 51)
+### Candidate #600 — `технологияның` (freq 51)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -12195,7 +11416,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #642 — `универсиада` (freq 51)
+### Candidate #601 — `универсиада` (freq 51)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -12214,7 +11435,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #643 — `шанхай` (freq 51)
+### Candidate #602 — `шанхай` (freq 51)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -12233,7 +11454,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #644 — `қыр` (freq 51)
+### Candidate #603 — `қыр` (freq 51)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -12252,7 +11473,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #645 — `англияда` (freq 50)
+### Candidate #604 — `англияда` (freq 50)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -12271,7 +11492,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #646 — `ансамблі` (freq 50)
+### Candidate #605 — `ансамблі` (freq 50)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -12290,7 +11511,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #647 — `вирустар` (freq 50)
+### Candidate #606 — `вирустар` (freq 50)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -12309,7 +11530,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #648 — `дүр` (freq 50)
+### Candidate #607 — `дүр` (freq 50)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -12328,7 +11549,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #649 — `ескеру` (freq 50)
+### Candidate #608 — `ескеру` (freq 50)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -12347,7 +11568,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #650 — `константин` (freq 50)
+### Candidate #609 — `константин` (freq 50)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -12366,7 +11587,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #651 — `корпусы` (freq 50)
+### Candidate #610 — `корпусы` (freq 50)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -12385,26 +11606,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #652 — `мiндеттi` (freq 50)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0005377`) «4. Қоғамдық кеңестердiң ұсынымдары Қазақстан Республикасының заңнамасында көзделген шешiмдердi қабылдайтын және уәждi жауаптар беретiн мемлекеттiк органдардың қарауы үшiн мiндеттi болып табылады.»
-  2. (cc100_kk_pack.json / `cc100_kk_0010583`) «12) осы Заңда және Қазақстан Республикасының өзге де заңнамасында белгiленген өзге де талаптарды сақтауға мiндеттi.»
-  3. (cc100_kk_pack.json / `cc100_kk_0010599`) «3) осы Заңда және Қазақстан Республикасының өзге де заңнамасында және микроқаржы ұйымымен жасалған шарттарда белгіленген өзге де талаптарды орындауға мiндеттi.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #653 — `нормалар` (freq 50)
+### Candidate #611 — `нормалар` (freq 50)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -12423,7 +11625,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #654 — `образования` (freq 50)
+### Candidate #612 — `образования` (freq 50)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -12442,7 +11644,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #655 — `озды` (freq 50)
+### Candidate #613 — `озды` (freq 50)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -12461,7 +11663,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #656 — `округтер` (freq 50)
+### Candidate #614 — `округтер` (freq 50)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -12480,7 +11682,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #657 — `проблема` (freq 50)
+### Candidate #615 — `проблема` (freq 50)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -12499,7 +11701,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #658 — `халал` (freq 50)
+### Candidate #616 — `халал` (freq 50)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -12518,7 +11720,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #659 — `шөмекей` (freq 50)
+### Candidate #617 — `шөмекей` (freq 50)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **glide**
@@ -12537,7 +11739,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #660 — `әлкей` (freq 50)
+### Candidate #618 — `әлкей` (freq 50)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **glide**
@@ -12556,7 +11758,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #661 — `джеймс` (freq 49)
+### Candidate #619 — `джеймс` (freq 49)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -12575,7 +11777,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #662 — `клиент` (freq 49)
+### Candidate #620 — `клиент` (freq 49)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -12594,7 +11796,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #663 — `конкурстың` (freq 49)
+### Candidate #621 — `конкурстың` (freq 49)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -12613,7 +11815,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #664 — `конкурсы` (freq 49)
+### Candidate #622 — `конкурсы` (freq 49)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -12632,7 +11834,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #665 — `надан` (freq 49)
+### Candidate #623 — `надан` (freq 49)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -12651,7 +11853,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #666 — `референдум` (freq 49)
+### Candidate #624 — `референдум` (freq 49)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -12670,7 +11872,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #667 — `самал` (freq 49)
+### Candidate #625 — `самал` (freq 49)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -12689,7 +11891,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #668 — `техникасын` (freq 49)
+### Candidate #626 — `техникасын` (freq 49)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -12708,26 +11910,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #669 — `уәкiлеттi` (freq 49)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0003252`) «23) уәкiлеттi орган — ауданның (қаланың) жергiлiктi атқарушы органының құрылымдық бөлiмшесi;»
-  2. (cc100_kk_pack.json / `cc100_kk_0010761`) «Уәкiлеттi органның жазбаша нұсқамасына сотқа шағым жасау оның орындалуын тоқтата тұрмайды.»
-  3. (cc100_kk_pack.json / `cc100_kk_0010762`) «Уәкілетті орган жазбаша ескерту шығарылғаннан кейін бір жыл ішінде осы ескерту шығарылған бұзушылыққа ұқсас Қазақстан Республикасының заңнамасының нормалары қайтадан бұзылғанын анықтаған жағдайда, уәк …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #670 — `қмдбның` (freq 49)
+### Candidate #627 — `қмдбның` (freq 49)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -12746,7 +11929,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #671 — `губернаторы` (freq 48)
+### Candidate #628 — `губернаторы` (freq 48)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -12765,7 +11948,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #672 — `жайлаған` (freq 48)
+### Candidate #629 — `жайлаған` (freq 48)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -12784,7 +11967,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #673 — `жаттап` (freq 48)
+### Candidate #630 — `жаттап` (freq 48)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -12803,7 +11986,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #674 — `жшснің` (freq 48)
+### Candidate #631 — `жшснің` (freq 48)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -12822,7 +12005,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #675 — `императоры` (freq 48)
+### Candidate #632 — `императоры` (freq 48)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -12841,7 +12024,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #676 — `католиктер` (freq 48)
+### Candidate #633 — `католиктер` (freq 48)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -12860,7 +12043,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #677 — `конференциясы` (freq 48)
+### Candidate #634 — `конференциясы` (freq 48)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -12879,7 +12062,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #678 — `кореяда` (freq 48)
+### Candidate #635 — `кореяда` (freq 48)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -12898,7 +12081,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #679 — `көмекті` (freq 48)
+### Candidate #636 — `көмекті` (freq 48)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -12917,7 +12100,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #680 — `логика` (freq 48)
+### Candidate #637 — `логика` (freq 48)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -12936,7 +12119,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #681 — `орнаған` (freq 48)
+### Candidate #638 — `орнаған` (freq 48)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -12955,7 +12138,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #682 — `оңт` (freq 48)
+### Candidate #639 — `оңт` (freq 48)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -12974,7 +12157,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #683 — `салмағын` (freq 48)
+### Candidate #640 — `салмағын` (freq 48)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -12993,7 +12176,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #684 — `түсінген` (freq 48)
+### Candidate #641 — `түсінген` (freq 48)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -13012,7 +12195,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #685 — `хабарламаны` (freq 48)
+### Candidate #642 — `хабарламаны` (freq 48)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -13031,7 +12214,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #686 — `хабарлау` (freq 48)
+### Candidate #643 — `хабарлау` (freq 48)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -13050,7 +12233,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #687 — `ғда` (freq 48)
+### Candidate #644 — `ғда` (freq 48)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -13069,7 +12252,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #688 — `қмдб` (freq 48)
+### Candidate #645 — `қмдб` (freq 48)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiced_consonant**
@@ -13088,45 +12271,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #689 — `let` (freq 47)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_02_0041`) «Сонымен, `let secret_number = rand::thread_rng().gen_range(1..=100);` сөйлемі құпия санды құрып, оны `secret_number` атты тұрақты айнымалыға жазады.»
-  2. (rust_book_kk_pack.json / `rust_book_02_0052`) «Мысалы, бұл жерде ескі `guess` — `String`, жаңа `guess` — `u32`. `guess.trim()` — жолдың алды-артындағы бос орындар мен жол аяқталу символын алып тастайды (`read_line` соңында `\n` қалдырады). `parse( …»
-  3. (rust_book_kk_pack.json / `rust_book_02_0061`) «Кодтың `let secret_number` сөйлемінен кейінгі бөлігін `loop { ... }` блогына салыңыз: `loop` шарт жоқ цикл — бағдарлама циклден тек `break` арқылы шыға алады.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #690 — `виктор` (freq 47)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_00944`) «Петербор көшелерінің біріне Виктор Цойдың есімі берілмек.»
-  2. (tatoeba_kazakh_pack.json / `tatoeba_kz_01823`) «Павлодарда белгілі суретші Виктор Поликарповтың көрмесі ашылды.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0003561`) «Театрдың директоры-шығармашылық жетекшісі Қазақстан Республикасы еңбегі сіңген қайраткері, Қазақстан Республикасының театр қайраткерлері Одағының басқарма мүшесі, педагогикалық ғылымдар кандидаты Викт …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #691 — `жетсе` (freq 47)
+### Candidate #646 — `жетсе` (freq 47)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -13145,7 +12290,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #692 — `заглавие` (freq 47)
+### Candidate #647 — `заглавие` (freq 47)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -13164,7 +12309,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #693 — `колумбия` (freq 47)
+### Candidate #648 — `колумбия` (freq 47)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -13183,7 +12328,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #694 — `конгресс` (freq 47)
+### Candidate #649 — `конгресс` (freq 47)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -13202,7 +12347,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #695 — `рашид` (freq 47)
+### Candidate #650 — `рашид` (freq 47)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -13221,7 +12366,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #696 — `себептермен` (freq 47)
+### Candidate #651 — `себептермен` (freq 47)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -13240,7 +12385,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #697 — `сингапур` (freq 47)
+### Candidate #652 — `сингапур` (freq 47)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -13259,7 +12404,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #698 — `хабарламалар` (freq 47)
+### Candidate #653 — `хабарламалар` (freq 47)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -13278,7 +12423,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #699 — `шектеледі` (freq 47)
+### Candidate #654 — `шектеледі` (freq 47)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -13297,7 +12442,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #700 — `қырып` (freq 47)
+### Candidate #655 — `қырып` (freq 47)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -13316,26 +12461,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #701 — `match` (freq 46)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_02_0004`) «Жол барысында сіз мынаны үйренесіз: айнымалыларды жариялау, пайдаланушы енгізген мәтінді оқу, `Cargo` арқылы сыртқы сандықты қосу, `Result` енамымен қатені өңдеу, `match` өрнегі, цикл құру және цикл і …»
-  2. (rust_book_kk_pack.json / `rust_book_02_0045`) «Бұл үшін `match` өрнегі мен `std::cmp::Ordering` енамын қолданамыз.»
-  3. (rust_book_kk_pack.json / `rust_book_02_0046`) «Файлдың басына тағы бір `use` сөйлемін қосыңыз және салыстыратын `match` блогын жазыңыз: `Ordering` — стандартты кітапхана ұсынатын енам, оның үш нұсқасы бар: `Less` (кіші), `Greater` (үлкен), `Equal` …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #702 — `бюджетті` (freq 46)
+### Candidate #656 — `бюджетті` (freq 46)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -13354,7 +12480,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #703 — `гонконг` (freq 46)
+### Candidate #657 — `гонконг` (freq 46)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -13373,7 +12499,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #704 — `гумилев` (freq 46)
+### Candidate #658 — `гумилев` (freq 46)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiced_consonant**
@@ -13392,7 +12518,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #705 — `дизайны` (freq 46)
+### Candidate #659 — `дизайны` (freq 46)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -13411,7 +12537,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #706 — `жетпеген` (freq 46)
+### Candidate #660 — `жетпеген` (freq 46)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -13430,7 +12556,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #707 — `квадраты` (freq 46)
+### Candidate #661 — `квадраты` (freq 46)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -13449,7 +12575,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #708 — `композиторы` (freq 46)
+### Candidate #662 — `композиторы` (freq 46)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -13468,7 +12594,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #709 — `мырзахметов` (freq 46)
+### Candidate #663 — `мырзахметов` (freq 46)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -13487,7 +12613,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #710 — `объектілерін` (freq 46)
+### Candidate #664 — `объектілерін` (freq 46)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -13506,7 +12632,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #711 — `орнатылады` (freq 46)
+### Candidate #665 — `орнатылады` (freq 46)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -13525,7 +12651,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #712 — `оқиғалары` (freq 46)
+### Candidate #666 — `оқиғалары` (freq 46)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -13544,7 +12670,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #713 — `оңғар` (freq 46)
+### Candidate #667 — `оңғар` (freq 46)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -13563,7 +12689,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #714 — `препараттар` (freq 46)
+### Candidate #668 — `препараттар` (freq 46)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -13582,7 +12708,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #715 — `рекорд` (freq 46)
+### Candidate #669 — `рекорд` (freq 46)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -13601,7 +12727,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #716 — `салығын` (freq 46)
+### Candidate #670 — `салығын` (freq 46)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -13620,7 +12746,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #717 — `смден` (freq 46)
+### Candidate #671 — `смден` (freq 46)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -13639,7 +12765,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #718 — `успен` (freq 46)
+### Candidate #672 — `успен` (freq 46)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -13658,7 +12784,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #719 — `чемпионатына` (freq 46)
+### Candidate #673 — `чемпионатына` (freq 46)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -13677,7 +12803,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #720 — `шаған` (freq 46)
+### Candidate #674 — `шаған` (freq 46)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -13696,7 +12822,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #721 — `эстония` (freq 46)
+### Candidate #675 — `эстония` (freq 46)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -13715,7 +12841,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #722 — `гвинея` (freq 45)
+### Candidate #676 — `гвинея` (freq 45)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **unknown**
@@ -13734,7 +12860,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #723 — `дипломат` (freq 45)
+### Candidate #677 — `дипломат` (freq 45)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -13753,7 +12879,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #724 — `дифракциялық` (freq 45)
+### Candidate #678 — `дифракциялық` (freq 45)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -13772,7 +12898,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #725 — `жауған` (freq 45)
+### Candidate #679 — `жауған` (freq 45)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -13791,7 +12917,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #726 — `зырян` (freq 45)
+### Candidate #680 — `зырян` (freq 45)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -13810,7 +12936,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #727 — `корпус` (freq 45)
+### Candidate #681 — `корпус` (freq 45)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -13829,7 +12955,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #728 — `кристалды` (freq 45)
+### Candidate #682 — `кристалды` (freq 45)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -13848,7 +12974,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #729 — `лизинг` (freq 45)
+### Candidate #683 — `лизинг` (freq 45)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **voiced_consonant**
@@ -13867,7 +12993,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #730 — `модулі` (freq 45)
+### Candidate #684 — `модулі` (freq 45)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -13886,7 +13012,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #731 — `мониторингі` (freq 45)
+### Candidate #685 — `мониторингі` (freq 45)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -13905,7 +13031,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #732 — `монополияға` (freq 45)
+### Candidate #686 — `монополияға` (freq 45)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -13924,7 +13050,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #733 — `музыкант` (freq 45)
+### Candidate #687 — `музыкант` (freq 45)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -13943,7 +13069,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #734 — `міт` (freq 45)
+### Candidate #688 — `міт` (freq 45)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -13962,7 +13088,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #735 — `нәназарбаев` (freq 45)
+### Candidate #689 — `нәназарбаев` (freq 45)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -13981,7 +13107,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #736 — `объективті` (freq 45)
+### Candidate #690 — `объективті` (freq 45)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -14000,7 +13126,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #737 — `орт` (freq 45)
+### Candidate #691 — `орт` (freq 45)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -14019,7 +13145,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #738 — `процестердің` (freq 45)
+### Candidate #692 — `процестердің` (freq 45)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -14038,7 +13164,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #739 — `психолог` (freq 45)
+### Candidate #693 — `психолог` (freq 45)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -14057,7 +13183,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #740 — `рының` (freq 45)
+### Candidate #694 — `рының` (freq 45)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -14076,7 +13202,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #741 — `стратегия` (freq 45)
+### Candidate #695 — `стратегия` (freq 45)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -14095,7 +13221,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #742 — `абыройлы` (freq 44)
+### Candidate #696 — `абыройлы` (freq 44)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -14114,7 +13240,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #743 — `австрия` (freq 44)
+### Candidate #697 — `австрия` (freq 44)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -14133,7 +13259,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #744 — `академияның` (freq 44)
+### Candidate #698 — `академияның` (freq 44)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -14152,7 +13278,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #745 — `диктант` (freq 44)
+### Candidate #699 — `диктант` (freq 44)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -14171,7 +13297,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #746 — `еее` (freq 44)
+### Candidate #700 — `еее` (freq 44)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -14190,7 +13316,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #747 — `жайлау` (freq 44)
+### Candidate #701 — `жайлау` (freq 44)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -14209,7 +13335,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #748 — `жоспарды` (freq 44)
+### Candidate #702 — `жоспарды` (freq 44)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -14228,7 +13354,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #749 — `исламға` (freq 44)
+### Candidate #703 — `исламға` (freq 44)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -14247,7 +13373,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #750 — `когерентті` (freq 44)
+### Candidate #704 — `когерентті` (freq 44)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -14266,7 +13392,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #751 — `конго` (freq 44)
+### Candidate #705 — `конго` (freq 44)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -14285,7 +13411,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #752 — `области` (freq 44)
+### Candidate #706 — `области` (freq 44)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -14304,7 +13430,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #753 — `проблемаларды` (freq 44)
+### Candidate #707 — `проблемаларды` (freq 44)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -14323,7 +13449,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #754 — `семинарлар` (freq 44)
+### Candidate #708 — `семинарлар` (freq 44)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -14342,7 +13468,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #755 — `сипатына` (freq 44)
+### Candidate #709 — `сипатына` (freq 44)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -14361,7 +13487,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #756 — `тетігі` (freq 44)
+### Candidate #710 — `тетігі` (freq 44)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -14380,7 +13506,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #757 — `қыстың` (freq 44)
+### Candidate #711 — `қыстың` (freq 44)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -14399,7 +13525,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #758 — `қысып` (freq 44)
+### Candidate #712 — `қысып` (freq 44)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -14418,7 +13544,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #759 — `аббас` (freq 43)
+### Candidate #713 — `аббас` (freq 43)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -14437,7 +13563,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #760 — `ажыратуға` (freq 43)
+### Candidate #714 — `ажыратуға` (freq 43)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -14456,7 +13582,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #761 — `аппаратында` (freq 43)
+### Candidate #715 — `аппаратында` (freq 43)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -14475,7 +13601,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #762 — `ескерсек` (freq 43)
+### Candidate #716 — `ескерсек` (freq 43)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -14494,7 +13620,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #763 — `жеткенде` (freq 43)
+### Candidate #717 — `жеткенде` (freq 43)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -14513,26 +13639,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #764 — `интернетте` (freq 43)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_00424`) «Ол бос уақытында интернетте отыруды жақсы көреді.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0010276`) «Көбірек білу үшін осы ұғымдар туралы Интернетте (Уикипедияда) оқып, танысуға болады.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0035574`) «1997 жылы Интернетте 10 млн компьютер болды, 1 миллионнан астам домендік аттар тіркелді.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #765 — `исламды` (freq 43)
+### Candidate #718 — `исламды` (freq 43)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -14551,7 +13658,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #766 — `катар` (freq 43)
+### Candidate #719 — `катар` (freq 43)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -14570,7 +13677,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #767 — `лицей` (freq 43)
+### Candidate #720 — `лицей` (freq 43)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **glide**
@@ -14589,7 +13696,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #768 — `монополияларды` (freq 43)
+### Candidate #721 — `монополияларды` (freq 43)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -14608,7 +13715,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #769 — `округіне` (freq 43)
+### Candidate #722 — `округіне` (freq 43)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -14627,7 +13734,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #770 — `орамдар` (freq 43)
+### Candidate #723 — `орамдар` (freq 43)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -14646,7 +13753,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #771 — `продюсер` (freq 43)
+### Candidate #724 — `продюсер` (freq 43)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -14665,7 +13772,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #772 — `роберт` (freq 43)
+### Candidate #725 — `роберт` (freq 43)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -14684,7 +13791,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #773 — `саба` (freq 43)
+### Candidate #726 — `саба` (freq 43)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -14703,7 +13810,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #774 — `смдей` (freq 43)
+### Candidate #727 — `смдей` (freq 43)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **glide**
@@ -14722,7 +13829,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #775 — `таз` (freq 43)
+### Candidate #728 — `таз` (freq 43)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -14741,7 +13848,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #776 — `хабарланды` (freq 43)
+### Candidate #729 — `хабарланды` (freq 43)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -14760,7 +13867,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #777 — `холдингі` (freq 43)
+### Candidate #730 — `холдингі` (freq 43)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -14779,7 +13886,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #778 — `целиноград` (freq 43)
+### Candidate #731 — `целиноград` (freq 43)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -14798,7 +13905,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #779 — `шжқ` (freq 43)
+### Candidate #732 — `шжқ` (freq 43)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -14817,7 +13924,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #780 — `әтәжібаев` (freq 43)
+### Candidate #733 — `әтәжібаев` (freq 43)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -14836,7 +13943,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #781 — `акциясын` (freq 42)
+### Candidate #734 — `акциясын` (freq 42)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -14855,7 +13962,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #782 — `есмахан` (freq 42)
+### Candidate #735 — `есмахан` (freq 42)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -14874,7 +13981,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #783 — `жайлап` (freq 42)
+### Candidate #736 — `жайлап` (freq 42)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -14893,7 +14000,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #784 — `жайлауға` (freq 42)
+### Candidate #737 — `жайлауға` (freq 42)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -14912,7 +14019,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #785 — `жоспарларын` (freq 42)
+### Candidate #738 — `жоспарларын` (freq 42)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -14931,7 +14038,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #786 — `зеленов` (freq 42)
+### Candidate #739 — `зеленов` (freq 42)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -14950,7 +14057,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #787 — `контур` (freq 42)
+### Candidate #740 — `контур` (freq 42)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -14969,7 +14076,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #788 — `лениннің` (freq 42)
+### Candidate #741 — `лениннің` (freq 42)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -14988,7 +14095,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #789 — `монографияның` (freq 42)
+### Candidate #742 — `монографияның` (freq 42)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -15007,7 +14114,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #790 — `одағында` (freq 42)
+### Candidate #743 — `одағында` (freq 42)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -15026,7 +14133,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #791 — `октаваның` (freq 42)
+### Candidate #744 — `октаваның` (freq 42)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -15045,7 +14152,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #792 — `оңтүстігін` (freq 42)
+### Candidate #745 — `оңтүстігін` (freq 42)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -15064,7 +14171,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #793 — `практикасы` (freq 42)
+### Candidate #746 — `практикасы` (freq 42)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -15083,7 +14190,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #794 — `прокурордың` (freq 42)
+### Candidate #747 — `прокурордың` (freq 42)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -15102,7 +14209,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #795 — `слайдтар` (freq 42)
+### Candidate #748 — `слайдтар` (freq 42)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -15121,7 +14228,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #796 — `сыпайы` (freq 42)
+### Candidate #749 — `сыпайы` (freq 42)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -15140,7 +14247,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #797 — `хтің` (freq 42)
+### Candidate #750 — `хтің` (freq 42)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -15159,7 +14266,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #798 — `қмж` (freq 42)
+### Candidate #751 — `қмж` (freq 42)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiced_consonant**
@@ -15178,7 +14285,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #799 — `әлеумет` (freq 42)
+### Candidate #752 — `әлеумет` (freq 42)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -15197,26 +14304,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #800 — `әлеуметтiк` (freq 42)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **voiceless_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0006152`) «"Нұр Отан" партиясының әлеуметтiк саладағы қызметi / О. Тазабеков // Қоғам және дәуiр. - 2009. - № 2. - 41-45 б.»
-  2. (cc100_kk_pack.json / `cc100_kk_0006153`) «партия -- Нұр Отан -- әлеуметтiк сала -- бағдарламалар»
-  3. (cc100_kk_pack.json / `cc100_kk_0020200`) «Қазақстан Республикасы Денсаулық сақтау және әлеуметтiк даму министрiнiң 2015 жылғы 29 желтоқсандағы № 1065 бұйрығы. Қазақстан Республикасының Әдiлет министрлiгiнде 2015 жылы 31 желтоқсанда № 12773 бо …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #801 — `айғағы` (freq 41)
+### Candidate #753 — `айғағы` (freq 41)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -15235,7 +14323,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #802 — `венгрия` (freq 41)
+### Candidate #754 — `венгрия` (freq 41)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **unknown**
@@ -15254,7 +14342,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #803 — `гималай` (freq 41)
+### Candidate #755 — `гималай` (freq 41)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -15273,26 +14361,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #804 — `диссертация` (freq 41)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0009390`) «Университет оқытушыларынан 2 докторлық, 8 кандидаттық, 14 магистрлік диссертация жұмыстары қорғалды.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0015385`) «Ломоносов атындағы ММУ-де машықтанушы-оқытушы болып қызмет атқарған, сонда аспирантураны бітіріп, диссертация қорғаған.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0039984`) «1999 жылы «Жақып Ақбаев және Алаш қайраткерлері саяси-құқықтық көзқарастарының эволюциясы (ХІХ ғасырдың аяғы – ХХ ғасырдың басы)» тақырыбында заң ғылымы бойынша докторлық диссертация қорғады.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #805 — `жет` (freq 41)
+### Candidate #756 — `жет` (freq 41)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -15311,7 +14380,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #806 — `жоспардың` (freq 41)
+### Candidate #757 — `жоспардың` (freq 41)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -15330,7 +14399,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #807 — `кмқк` (freq 41)
+### Candidate #758 — `кмқк` (freq 41)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -15349,7 +14418,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #808 — `кристалл` (freq 41)
+### Candidate #759 — `кристалл` (freq 41)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -15368,7 +14437,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #809 — `ломоносов` (freq 41)
+### Candidate #760 — `ломоносов` (freq 41)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -15387,7 +14456,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #810 — `округтері` (freq 41)
+### Candidate #761 — `округтері` (freq 41)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -15406,7 +14475,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #811 — `реформа` (freq 41)
+### Candidate #762 — `реформа` (freq 41)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -15425,7 +14494,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #812 — `сәу` (freq 41)
+### Candidate #763 — `сәу` (freq 41)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -15444,7 +14513,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #813 — `төгіп` (freq 41)
+### Candidate #764 — `төгіп` (freq 41)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -15463,7 +14532,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #814 — `фабрикасы` (freq 41)
+### Candidate #765 — `фабрикасы` (freq 41)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -15482,7 +14551,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #815 — `формалары` (freq 41)
+### Candidate #766 — `формалары` (freq 41)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -15501,7 +14570,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #816 — `хабарланған` (freq 41)
+### Candidate #767 — `хабарланған` (freq 41)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -15520,7 +14589,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #817 — `хабарлап` (freq 41)
+### Candidate #768 — `хабарлап` (freq 41)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -15539,7 +14608,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #818 — `цемент` (freq 41)
+### Candidate #769 — `цемент` (freq 41)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -15558,7 +14627,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #819 — `экран` (freq 41)
+### Candidate #770 — `экран` (freq 41)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -15577,7 +14646,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #820 — `әлектронды` (freq 41)
+### Candidate #771 — `әлектронды` (freq 41)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -15596,7 +14665,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #821 — `абаттандыру` (freq 40)
+### Candidate #772 — `абаттандыру` (freq 40)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -15615,7 +14684,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #822 — `айман` (freq 40)
+### Candidate #773 — `айман` (freq 40)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -15634,7 +14703,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #823 — `аппараттың` (freq 40)
+### Candidate #774 — `аппараттың` (freq 40)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -15653,45 +14722,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #824 — `вектор` (freq 40)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0036831`) «Әңгіме вектор 2022 жайлы болса, қолдаймын.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0055892`) «Кеңістіктегі ерікті нүкте үшін радиус векторы басынан бастап сол нүктеге дейінгі вектор болып табылады.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0056334`) «Осы қосымша құрылымға байланысты кеңістік элементі «нүкте», «вектор», «оқиға» т.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #825 — `доктор` (freq 40)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_02249`) «"Док" дегеніміз "доктор" сөзінің қысқармасы.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0015866`) «Даниал Кенжетайұлы Ахметов — Қазақстан Республикасы Қорғаныс министрі, саяси қайраткер, экономика ғылымы доктор (2003).»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0025130`) «Депутаттар арасында 1 академик, 7 доктор және әртүрлі мамандықтары бар 20 ғылым кандидаты болды.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #826 — `жабылады` (freq 40)
+### Candidate #775 — `жабылады` (freq 40)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -15710,7 +14741,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #827 — `жайылған` (freq 40)
+### Candidate #776 — `жайылған` (freq 40)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -15729,7 +14760,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #828 — `жиып` (freq 40)
+### Candidate #777 — `жиып` (freq 40)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -15748,7 +14779,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #829 — `жөні` (freq 40)
+### Candidate #778 — `жөні` (freq 40)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -15767,7 +14798,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #830 — `ирландия` (freq 40)
+### Candidate #779 — `ирландия` (freq 40)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -15786,7 +14817,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #831 — `кремний` (freq 40)
+### Candidate #780 — `кремний` (freq 40)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **glide**
@@ -15805,7 +14836,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #832 — `ордендерімен` (freq 40)
+### Candidate #781 — `ордендерімен` (freq 40)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -15824,7 +14855,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #833 — `программалар` (freq 40)
+### Candidate #782 — `программалар` (freq 40)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -15843,7 +14874,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #834 — `салыңыз` (freq 40)
+### Candidate #783 — `салыңыз` (freq 40)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -15862,7 +14893,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #835 — `себепкер` (freq 40)
+### Candidate #784 — `себепкер` (freq 40)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -15881,7 +14912,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #836 — `тему` (freq 40)
+### Candidate #785 — `тему` (freq 40)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -15900,7 +14931,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #837 — `қобда` (freq 40)
+### Candidate #786 — `қобда` (freq 40)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -15919,7 +14950,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #838 — `аристов` (freq 39)
+### Candidate #787 — `аристов` (freq 39)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -15938,7 +14969,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #839 — `ахмад` (freq 39)
+### Candidate #788 — `ахмад` (freq 39)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -15957,7 +14988,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #840 — `бұрып` (freq 39)
+### Candidate #789 — `бұрып` (freq 39)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -15976,7 +15007,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #841 — `ведомство` (freq 39)
+### Candidate #790 — `ведомство` (freq 39)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -15995,7 +15026,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #842 — `другие` (freq 39)
+### Candidate #791 — `другие` (freq 39)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -16014,7 +15045,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #843 — `жеткенше` (freq 39)
+### Candidate #792 — `жеткенше` (freq 39)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -16033,7 +15064,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #844 — `клиенттерге` (freq 39)
+### Candidate #793 — `клиенттерге` (freq 39)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -16052,26 +15083,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #845 — `корпорация` (freq 39)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0056597`) «Қазіргі таңда корпорация жаңа өнімдер шығарумен айналысуда, олар: сервер бағдарламаларының жинағы, ойындар, бағдарлама құру құралдары т.»
-  2. (cc100_kk_pack.json / `cc100_kk_0007419`) «Дәл осындай семинар-сабақтар аймақтағы жоғары және орта-мамандандырылған оқу орындарында, мектептерде және басқа да еңбек ұжымдарында өтіп жатыр. Ұйымдастырушылардың айтуынша, мемлекеттік корпорация а …»
-  3. (cc100_kk_pack.json / `cc100_kk_0017532`) «Сайт корпорация қызметі туралы, біздің іскер серіктестеріміз, жобаларымыз бен әлеуметтік бағыттарымыз туралы әділ және нақты ақпарат ұсынады»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #846 — `лайфстайл` (freq 39)
+### Candidate #794 — `лайфстайл` (freq 39)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -16090,7 +15102,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #847 — `музыканың` (freq 39)
+### Candidate #795 — `музыканың` (freq 39)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -16109,7 +15121,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #848 — `мүм` (freq 39)
+### Candidate #796 — `мүм` (freq 39)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -16128,7 +15140,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #849 — `орнатып` (freq 39)
+### Candidate #797 — `орнатып` (freq 39)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -16147,7 +15159,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #850 — `сайлаудың` (freq 39)
+### Candidate #798 — `сайлаудың` (freq 39)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -16166,7 +15178,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #851 — `салысымен` (freq 39)
+### Candidate #799 — `салысымен` (freq 39)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -16185,7 +15197,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #852 — `талдай` (freq 39)
+### Candidate #800 — `талдай` (freq 39)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -16204,7 +15216,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #853 — `технологиясының` (freq 39)
+### Candidate #801 — `технологиясының` (freq 39)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -16223,7 +15235,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #854 — `хардкор` (freq 39)
+### Candidate #802 — `хардкор` (freq 39)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -16242,26 +15254,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #855 — `швеция` (freq 39)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_02279`) «Швейцария - Швеция емес.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0008484`) «2016 – Қазақстандағы Швеция Тӛтенше және Ӛкілетті елшісі Христиан Камиллдың сапары.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0013168`) «Норвегия сыртқы саудада Германия, Швеция, Ұлыбритания, Дания, Нидерланд, Еуропа одағы елдерімен және АҚШ мемлекеттерімен тығыз байланыс орнатқан.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #856 — `шеберлер` (freq 39)
+### Candidate #803 — `шеберлер` (freq 39)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -16280,7 +15273,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #857 — `шектесіп` (freq 39)
+### Candidate #804 — `шектесіп` (freq 39)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -16299,7 +15292,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #858 — `ырғағы` (freq 39)
+### Candidate #805 — `ырғағы` (freq 39)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -16318,7 +15311,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #859 — `әлеум` (freq 39)
+### Candidate #806 — `әлеум` (freq 39)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -16337,7 +15330,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #860 — `аграрлы` (freq 38)
+### Candidate #807 — `аграрлы` (freq 38)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -16356,7 +15349,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #861 — `айжан` (freq 38)
+### Candidate #808 — `айжан` (freq 38)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -16375,7 +15368,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #862 — `аккаунт` (freq 38)
+### Candidate #809 — `аккаунт` (freq 38)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -16394,7 +15387,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #863 — `армяндар` (freq 38)
+### Candidate #810 — `армяндар` (freq 38)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -16413,7 +15406,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #864 — `аудио` (freq 38)
+### Candidate #811 — `аудио` (freq 38)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -16432,7 +15425,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #865 — `ахуалды` (freq 38)
+### Candidate #812 — `ахуалды` (freq 38)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -16451,7 +15444,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #866 — `дизайнер` (freq 38)
+### Candidate #813 — `дизайнер` (freq 38)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -16470,7 +15463,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #867 — `емі` (freq 38)
+### Candidate #814 — `емі` (freq 38)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -16489,7 +15482,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #868 — `жақып` (freq 38)
+### Candidate #815 — `жақып` (freq 38)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -16508,7 +15501,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #869 — `ипотека` (freq 38)
+### Candidate #816 — `ипотека` (freq 38)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -16527,7 +15520,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #870 — `кгға` (freq 38)
+### Candidate #817 — `кгға` (freq 38)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -16546,7 +15539,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #871 — `конкурсты` (freq 38)
+### Candidate #818 — `конкурсты` (freq 38)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -16565,7 +15558,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #872 — `музыкасының` (freq 38)
+### Candidate #819 — `музыкасының` (freq 38)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -16584,7 +15577,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #873 — `ницшенің` (freq 38)
+### Candidate #820 — `ницшенің` (freq 38)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -16603,7 +15596,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #874 — `озып` (freq 38)
+### Candidate #821 — `озып` (freq 38)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -16622,7 +15615,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #875 — `оспан` (freq 38)
+### Candidate #822 — `оспан` (freq 38)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -16641,7 +15634,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #876 — `проректоры` (freq 38)
+### Candidate #823 — `проректоры` (freq 38)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -16660,7 +15653,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #877 — `салса` (freq 38)
+### Candidate #824 — `салса` (freq 38)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -16679,7 +15672,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #878 — `светлана` (freq 38)
+### Candidate #825 — `светлана` (freq 38)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -16698,7 +15691,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #879 — `талдайды` (freq 38)
+### Candidate #826 — `талдайды` (freq 38)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -16717,7 +15710,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #880 — `территориясының` (freq 38)
+### Candidate #827 — `территориясының` (freq 38)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -16736,7 +15729,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #881 — `технологияларын` (freq 38)
+### Candidate #828 — `технологияларын` (freq 38)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -16755,26 +15748,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #882 — `транспорт` (freq 38)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **voiceless_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0001802`) «2020 |- |763 589 |777 471 |786 349 |795 817 |808 932 |822 522 |834 813 |845 679 |857 711 |869 637 |881 651 |} Географиялық жағынан қолайлы орналасқан Ақтөбе облысында транспорт байланысы желісі жақсы  …»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0006977`) «Бүгінгі күні саны 1,000,000,000-тан асатын бұл көлік әлемнің кейбір аумақтарында серуендеуге, не спортта қолданылса, көп региондарда негізгі транспорт түрі болып табылады.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0011279`) «Тауарлардың негізгі топтары бойынша көлем деңгейі өсті, олар: мәшине, құрал, транспорт, құбырлар және аппараттар.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #883 — `украинада` (freq 38)
+### Candidate #829 — `украинада` (freq 38)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -16793,7 +15767,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #884 — `элементтің` (freq 38)
+### Candidate #830 — `элементтің` (freq 38)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -16812,7 +15786,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #885 — `өзөзін` (freq 38)
+### Candidate #831 — `өзөзін` (freq 38)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -16831,7 +15805,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #886 — `ардагер` (freq 37)
+### Candidate #832 — `ардагер` (freq 37)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -16850,7 +15824,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #887 — `вавилон` (freq 37)
+### Candidate #833 — `вавилон` (freq 37)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -16869,7 +15843,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #888 — `дидар` (freq 37)
+### Candidate #834 — `дидар` (freq 37)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -16888,7 +15862,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #889 — `жайылма` (freq 37)
+### Candidate #835 — `жайылма` (freq 37)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -16907,7 +15881,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #890 — `зейнетке` (freq 37)
+### Candidate #836 — `зейнетке` (freq 37)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -16926,7 +15900,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #891 — `инфографика` (freq 37)
+### Candidate #837 — `инфографика` (freq 37)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -16945,7 +15919,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #892 — `йемен` (freq 37)
+### Candidate #838 — `йемен` (freq 37)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -16964,7 +15938,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #893 — `кандидаттар` (freq 37)
+### Candidate #839 — `кандидаттар` (freq 37)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -16983,7 +15957,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #894 — `канело` (freq 37)
+### Candidate #840 — `канело` (freq 37)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -17002,7 +15976,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #895 — `клиенттер` (freq 37)
+### Candidate #841 — `клиенттер` (freq 37)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -17021,7 +15995,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #896 — `конкурстар` (freq 37)
+### Candidate #842 — `конкурстар` (freq 37)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -17040,7 +16014,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #897 — `координаталық` (freq 37)
+### Candidate #843 — `координаталық` (freq 37)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -17059,7 +16033,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #898 — `нашарлап` (freq 37)
+### Candidate #844 — `нашарлап` (freq 37)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -17078,7 +16052,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #899 — `норма` (freq 37)
+### Candidate #845 — `норма` (freq 37)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -17097,7 +16071,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #900 — `ньюйорк` (freq 37)
+### Candidate #846 — `ньюйорк` (freq 37)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -17116,7 +16090,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #901 — `орамадағы` (freq 37)
+### Candidate #847 — `орамадағы` (freq 37)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -17135,7 +16109,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #902 — `оркестр` (freq 37)
+### Candidate #848 — `оркестр` (freq 37)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -17154,7 +16128,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #903 — `орна` (freq 37)
+### Candidate #849 — `орна` (freq 37)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -17173,7 +16147,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #904 — `ошақты` (freq 37)
+### Candidate #850 — `ошақты` (freq 37)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -17192,7 +16166,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #905 — `пионер` (freq 37)
+### Candidate #851 — `пионер` (freq 37)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -17211,7 +16185,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #906 — `проблемасы` (freq 37)
+### Candidate #852 — `проблемасы` (freq 37)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -17230,7 +16204,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #907 — `резонанс` (freq 37)
+### Candidate #853 — `резонанс` (freq 37)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -17249,7 +16223,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #908 — `сап` (freq 37)
+### Candidate #854 — `сап` (freq 37)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -17268,7 +16242,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #909 — `сғс` (freq 37)
+### Candidate #855 — `сғс` (freq 37)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -17287,7 +16261,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #910 — `ташкентке` (freq 37)
+### Candidate #856 — `ташкентке` (freq 37)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -17306,7 +16280,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #911 — `тех` (freq 37)
+### Candidate #857 — `тех` (freq 37)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -17325,7 +16299,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #912 — `техниканы` (freq 37)
+### Candidate #858 — `техниканы` (freq 37)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -17344,7 +16318,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #913 — `тиым` (freq 37)
+### Candidate #859 — `тиым` (freq 37)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -17363,7 +16337,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #914 — `түсінігін` (freq 37)
+### Candidate #860 — `түсінігін` (freq 37)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -17382,7 +16356,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #915 — `халел` (freq 37)
+### Candidate #861 — `халел` (freq 37)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -17401,7 +16375,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #916 — `чемпиондар` (freq 37)
+### Candidate #862 — `чемпиондар` (freq 37)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -17420,7 +16394,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #917 — `черчилль` (freq 37)
+### Candidate #863 — `черчилль` (freq 37)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiced_consonant**
@@ -17439,7 +16413,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #918 — `әлауқатын` (freq 37)
+### Candidate #864 — `әлауқатын` (freq 37)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -17458,45 +16432,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #919 — `өткiзу` (freq 37)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0011724`) «Құжаттар Ақмола облысы туризм басқармасы, Ақмола облысы әкiмдiгi және мемлекеттiк қызмет iстерi жөнiндегi уәкiлеттi органның ресми сайтында iшкi конкурс өткiзу туралы хабарландыру соңғы жарияланғаннан …»
-  2. (cc100_kk_pack.json / `cc100_kk_0012545`) «конкурс өткiзу барысы туралы жалпы баға беруге;»
-  3. (cc100_kk_pack.json / `cc100_kk_0020271`) «Құжаттар Көкшетау қаласы әкiмiнiң және уәкiлеттi органның сайтында iшкi конкурс өткiзу туралы хабарландыру соңғы жарияланғаннан кейiнгi келесi жұмыс күнiнен бастап 3 жұмыс күнi iшiнде тапсырылуға қаже …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #920 — `iске` (freq 36)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0001651`) «Жобаны iске асыру арқылы жылына 7 млн тонна өнiм өңдеуге қол жеткiзедi. Бастапқы кезеңде мұнда ” Доре қорытпасымен” жылына 4 тонна алтын және 2 тонна күмiс өндiрiлетiн болады.»
-  2. (cc100_kk_pack.json / `cc100_kk_0001652`) «Ақмола облысының индустрияландыру картасына құны 782,5 млрд теңге болатын барлығы 90 жоба енгiзiлген. Олардың iске қосылуы 12,3 мың тұрақты жұмыс орнын ашады.»
-  3. (cc100_kk_pack.json / `cc100_kk_0016974`) «2017 жылғы 1 желтоқсанына дейiнгi жағдай бойынша 223,6 млрд. теңге сомасына 76 жоба iске қосылды, 7,7 мың тұрақты жұмыс орындары ашылды:»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #921 — `август` (freq 36)
+### Candidate #865 — `август` (freq 36)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -17515,7 +16451,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #922 — `ажыратып` (freq 36)
+### Candidate #866 — `ажыратып` (freq 36)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -17534,7 +16470,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #923 — `академиясын` (freq 36)
+### Candidate #867 — `академиясын` (freq 36)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -17553,7 +16489,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #924 — `ахметова` (freq 36)
+### Candidate #868 — `ахметова` (freq 36)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -17572,7 +16508,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #925 — `жұбы` (freq 36)
+### Candidate #869 — `жұбы` (freq 36)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -17591,7 +16527,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #926 — `империясына` (freq 36)
+### Candidate #870 — `империясына` (freq 36)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -17610,45 +16546,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #927 — `инвестор` (freq 36)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0036730`) «шілденің 26 (+06) ::Демеуші табу оңай емес, себебі инвестор болсын спонсор болсын ақшаны жайдан жай бермейді, олар қайтарымы тез және қомақты пайда тапқысы келеді ондай пайданы көре алмаса демеуші бол …»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0054844`) «Сонымен бірге, концессионердің пайда болуымен елімізде газдың тұтынылуы күрт төмендеді, өйткені инвестор өздерінің ішкі резервтерінен газ жеткізілімімен емес, оны тасымалдаумен ғана айналысты.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0056055`) «Институттық инвестор () — заңды тұлға, пайда табу үшін құнды қағаздарға, жылжымайтын мүлікке (жылжымайтын мүлікке хұқысымен қоса) салатын пұлы (пайы, жарна ретінде) бар адам.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #928 — `интернеті` (freq 36)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0117588`) «Бұл жүйені жетілдіру мақсатымен 1999 “Қазақтелеком” өз абоненттеріне “Қазақстан Интернеті” атты жаңа қызмет ұсынды.»
-  2. (cc100_kk_pack.json / `cc100_kk_0056505`) «“Тұжырым” бағдарламасында “Қазақ Интернеті” туралы бейне сұхбат – "IT-тірлік"»
-  3. (kazakh_textbooks_pack.json / `kz_textbook_informatics_11_emn_p0004_s01`) «Қолдарыңдағы оқулық «Жасанды интеллект», «ӚО жобалау», «Аппараттық жасақтама», «Заттар интернеті», «ІТ бізгішр», «Цифрлық сауаттылық» бөлімдерінен тұрады»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #929 — `кавказда` (freq 36)
+### Candidate #871 — `кавказда` (freq 36)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -17667,7 +16565,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #930 — `камера` (freq 36)
+### Candidate #872 — `камера` (freq 36)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -17686,7 +16584,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #931 — `конференциялар` (freq 36)
+### Candidate #873 — `конференциялар` (freq 36)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -17705,7 +16603,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #932 — `лаборатория` (freq 36)
+### Candidate #874 — `лаборатория` (freq 36)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -17724,7 +16622,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #933 — `люксембург` (freq 36)
+### Candidate #875 — `люксембург` (freq 36)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiced_consonant**
@@ -17743,7 +16641,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #934 — `нар` (freq 36)
+### Candidate #876 — `нар` (freq 36)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -17762,7 +16660,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #935 — `пиреней` (freq 36)
+### Candidate #877 — `пиреней` (freq 36)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **glide**
@@ -17781,7 +16679,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #936 — `программалау` (freq 36)
+### Candidate #878 — `программалау` (freq 36)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -17800,26 +16698,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #937 — `просмотров` (freq 36)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **voiced_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0000529`) «Категория: Экономика, Қаржы, Банктік іс, Бухгалтерлік іс, Салық _ Просмотров: 879 _ Теги: Жарғылық, капитал _ Рейтинг: 0.0/0»
-  2. (cc100_kk_pack.json / `cc100_kk_0004669`) «Категория: Өнеркәсіп, Өндіріс, Мұнай _ Просмотров: 842 _ Теги: өңдеу, Геологиялық _ Рейтинг: 0.0/0»
-  3. (cc100_kk_pack.json / `cc100_kk_0007589`) «Просмотров: 4610 _ Теги: Қуандық, Ғашықтар, Шын, Рахым _ Рейтинг: 5.0/1»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #938 — `салына` (freq 36)
+### Candidate #879 — `салына` (freq 36)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -17838,7 +16717,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #939 — `сидней` (freq 36)
+### Candidate #880 — `сидней` (freq 36)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **glide**
@@ -17857,7 +16736,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #940 — `синтаксисі` (freq 36)
+### Candidate #881 — `синтаксисі` (freq 36)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -17876,7 +16755,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #941 — `тернер` (freq 36)
+### Candidate #882 — `тернер` (freq 36)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -17895,7 +16774,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #942 — `түгі` (freq 36)
+### Candidate #883 — `түгі` (freq 36)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -17914,7 +16793,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #943 — `форматта` (freq 36)
+### Candidate #884 — `форматта` (freq 36)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -17933,7 +16812,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #944 — `халифа` (freq 36)
+### Candidate #885 — `халифа` (freq 36)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -17952,7 +16831,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #945 — `іот` (freq 36)
+### Candidate #886 — `іот` (freq 36)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -17971,7 +16850,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #946 — `ұос` (freq 36)
+### Candidate #887 — `ұос` (freq 36)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -17990,45 +16869,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #947 — `panic` (freq 35)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_08_0058`) «Егер сіз байт шегінде емес жерде қиып алсаңыз — panic.»
-  2. (rust_book_kk_pack.json / `rust_book_08_0059`) «Мысалы `&hello[0..1]` — panic, өйткені бір байт «З» таңбасының жартысы ғана.»
-  3. (rust_book_kk_pack.json / `rust_book_08_0083`) «Келесі тарауда `Rust`-тың қателерді өңдеу жүйесін қарастырамыз — `panic!` пен `Result<T, E>` түрінің практикалық қолданыстарын, `?` операторын, қашан панелге барып, қашан қатені шақырушыға қайтарып жі …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #948 — `авиация` (freq 35)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0006334`) «1968 жылы Мұсабаев Рига азаматтық авиация инженерлері институтына оқуға түсіп, қысқы демалыстарда Можгаға барып тұрды.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0006339`) «Диплом алғаннан кейін бір жыл Боралдай азаматтық авиация отрядында радио жабдықтар инженері болып жұмыс істеді.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0006341`) «Кейін Қазақ азаматтық авиация басқармасында нұсқаушы, аға нұсқаушы болып еңбек етті.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #949 — `вирустардың` (freq 35)
+### Candidate #888 — `вирустардың` (freq 35)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -18047,7 +16888,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #950 — `губерниясының` (freq 35)
+### Candidate #889 — `губерниясының` (freq 35)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -18066,7 +16907,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #951 — `емінеркін` (freq 35)
+### Candidate #890 — `емінеркін` (freq 35)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -18085,7 +16926,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #952 — `жабылу` (freq 35)
+### Candidate #891 — `жабылу` (freq 35)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -18104,7 +16945,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #953 — `жайылымы` (freq 35)
+### Candidate #892 — `жайылымы` (freq 35)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -18123,7 +16964,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #954 — `жеделхатын` (freq 35)
+### Candidate #893 — `жеделхатын` (freq 35)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -18142,7 +16983,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #955 — `ибрагим` (freq 35)
+### Candidate #894 — `ибрагим` (freq 35)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -18161,7 +17002,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #956 — `испанияда` (freq 35)
+### Candidate #895 — `испанияда` (freq 35)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -18180,7 +17021,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #957 — `категории` (freq 35)
+### Candidate #896 — `категории` (freq 35)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -18199,7 +17040,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #958 — `компартиясы` (freq 35)
+### Candidate #897 — `компартиясы` (freq 35)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -18218,7 +17059,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #959 — `композиторлар` (freq 35)
+### Candidate #898 — `композиторлар` (freq 35)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -18237,7 +17078,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #960 — `лагері` (freq 35)
+### Candidate #899 — `лагері` (freq 35)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -18256,7 +17097,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #961 — `номиналды` (freq 35)
+### Candidate #900 — `номиналды` (freq 35)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -18275,7 +17116,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #962 — `объектілерінің` (freq 35)
+### Candidate #901 — `объектілерінің` (freq 35)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -18294,7 +17135,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #963 — `одағын` (freq 35)
+### Candidate #902 — `одағын` (freq 35)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -18313,7 +17154,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #964 — `путиннің` (freq 35)
+### Candidate #903 — `путиннің` (freq 35)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -18332,7 +17173,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #965 — `рауан` (freq 35)
+### Candidate #904 — `рауан` (freq 35)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -18351,7 +17192,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #966 — `рекордтар` (freq 35)
+### Candidate #905 — `рекордтар` (freq 35)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -18370,7 +17211,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #967 — `сайлауында` (freq 35)
+### Candidate #906 — `сайлауында` (freq 35)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -18389,7 +17230,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #968 — `францияда` (freq 35)
+### Candidate #907 — `францияда` (freq 35)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -18408,7 +17249,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #969 — `хабарлаймыз` (freq 35)
+### Candidate #908 — `хабарлаймыз` (freq 35)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -18427,7 +17268,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #970 — `хабаршысы` (freq 35)
+### Candidate #909 — `хабаршысы` (freq 35)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -18446,7 +17287,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #971 — `хасан` (freq 35)
+### Candidate #910 — `хасан` (freq 35)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -18465,7 +17306,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #972 — `ысты` (freq 35)
+### Candidate #911 — `ысты` (freq 35)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -18484,7 +17325,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #973 — `экранда` (freq 35)
+### Candidate #912 — `экранда` (freq 35)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -18503,7 +17344,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #974 — `элементі` (freq 35)
+### Candidate #913 — `элементі` (freq 35)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -18522,7 +17363,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #975 — `ааа` (freq 34)
+### Candidate #914 — `ааа` (freq 34)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -18541,7 +17382,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #976 — `арт` (freq 34)
+### Candidate #915 — `арт` (freq 34)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -18560,7 +17401,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #977 — `ахуалы` (freq 34)
+### Candidate #916 — `ахуалы` (freq 34)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -18579,7 +17420,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #978 — `вицепрезиденті` (freq 34)
+### Candidate #917 — `вицепрезиденті` (freq 34)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -18598,7 +17439,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #979 — `дипломатия` (freq 34)
+### Candidate #918 — `дипломатия` (freq 34)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -18617,7 +17458,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #980 — `екатерина` (freq 34)
+### Candidate #919 — `екатерина` (freq 34)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -18636,7 +17477,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #981 — `жайкүйін` (freq 34)
+### Candidate #920 — `жайкүйін` (freq 34)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -18655,7 +17496,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #982 — `жамал` (freq 34)
+### Candidate #921 — `жамал` (freq 34)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -18674,7 +17515,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #983 — `идеал` (freq 34)
+### Candidate #922 — `идеал` (freq 34)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -18693,7 +17534,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #984 — `интеграл` (freq 34)
+### Candidate #923 — `интеграл` (freq 34)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -18712,7 +17553,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #985 — `история` (freq 34)
+### Candidate #924 — `история` (freq 34)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -18731,7 +17572,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #986 — `конференцияға` (freq 34)
+### Candidate #925 — `конференцияға` (freq 34)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -18750,7 +17591,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #987 — `наймандар` (freq 34)
+### Candidate #926 — `наймандар` (freq 34)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -18769,7 +17610,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #988 — `озады` (freq 34)
+### Candidate #927 — `озады` (freq 34)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -18788,7 +17629,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #989 — `октябрь` (freq 34)
+### Candidate #928 — `октябрь` (freq 34)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -18807,7 +17648,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #990 — `оппозициялық` (freq 34)
+### Candidate #929 — `оппозициялық` (freq 34)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -18826,7 +17667,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #991 — `орнымен` (freq 34)
+### Candidate #930 — `орнымен` (freq 34)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -18845,7 +17686,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #992 — `проблемаларын` (freq 34)
+### Candidate #931 — `проблемаларын` (freq 34)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -18864,7 +17705,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #993 — `рейтингі` (freq 34)
+### Candidate #932 — `рейтингі` (freq 34)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -18883,7 +17724,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #994 — `рнқ` (freq 34)
+### Candidate #933 — `рнқ` (freq 34)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -18902,7 +17743,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #995 — `сахнасында` (freq 34)
+### Candidate #934 — `сахнасында` (freq 34)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -18921,7 +17762,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #996 — `словакия` (freq 34)
+### Candidate #935 — `словакия` (freq 34)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -18940,7 +17781,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #997 — `сценарий` (freq 34)
+### Candidate #936 — `сценарий` (freq 34)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **glide**
@@ -18959,7 +17800,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #998 — `талды` (freq 34)
+### Candidate #937 — `талды` (freq 34)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -18978,7 +17819,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #999 — `тердің` (freq 34)
+### Candidate #938 — `тердің` (freq 34)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -18997,7 +17838,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1000 — `техникада` (freq 34)
+### Candidate #939 — `техникада` (freq 34)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -19016,7 +17857,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1001 — `фосфор` (freq 34)
+### Candidate #940 — `фосфор` (freq 34)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -19035,7 +17876,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1002 — `хабарламасында` (freq 34)
+### Candidate #941 — `хабарламасында` (freq 34)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -19054,7 +17895,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1003 — `шәкен` (freq 34)
+### Candidate #942 — `шәкен` (freq 34)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -19073,7 +17914,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1004 — `элементар` (freq 34)
+### Candidate #943 — `элементар` (freq 34)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -19092,7 +17933,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1005 — `энциклопедиясы` (freq 34)
+### Candidate #944 — `энциклопедиясы` (freq 34)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -19111,7 +17952,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1006 — `қызбен` (freq 34)
+### Candidate #945 — `қызбен` (freq 34)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -19130,26 +17971,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1007 — `result` (freq 33)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_02_0004`) «Жол барысында сіз мынаны үйренесіз: айнымалыларды жариялау, пайдаланушы енгізген мәтінді оқу, `Cargo` арқылы сыртқы сандықты қосу, `Result` енамымен қатені өңдеу, `match` өрнегі, цикл құру және цикл і …»
-  2. (rust_book_kk_pack.json / `rust_book_02_0020`) «Сілтеме иелікті ауыстырмастан мәнге қол жеткізуге мүмкіндік береді; өзгермелі сілтеме мәнді өзгертуге рұқсат етеді. `read_line` тек жолды жинақтап қана қоймайды, ол сонымен бірге `Result` типін қайтар …»
-  3. (rust_book_kk_pack.json / `rust_book_02_0020`) «Сілтеме иелікті ауыстырмастан мәнге қол жеткізуге мүмкіндік береді; өзгермелі сілтеме мәнді өзгертуге рұқсат етеді. `read_line` тек жолды жинақтап қана қоймайды, ол сонымен бірге `Result` типін қайтар …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1008 — `бойда` (freq 33)
+### Candidate #946 — `бойда` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -19168,7 +17990,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1009 — `вагон` (freq 33)
+### Candidate #947 — `вагон` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -19187,7 +18009,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1010 — `ватикан` (freq 33)
+### Candidate #948 — `ватикан` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -19206,7 +18028,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1011 — `венн` (freq 33)
+### Candidate #949 — `венн` (freq 33)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -19225,7 +18047,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1012 — `галилей` (freq 33)
+### Candidate #950 — `галилей` (freq 33)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **glide**
@@ -19244,7 +18066,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1013 — `грамотасымен` (freq 33)
+### Candidate #951 — `грамотасымен` (freq 33)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -19263,7 +18085,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1014 — `дсұға` (freq 33)
+### Candidate #952 — `дсұға` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -19282,7 +18104,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1015 — `ескертті` (freq 33)
+### Candidate #953 — `ескертті` (freq 33)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -19301,7 +18123,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1016 — `жао` (freq 33)
+### Candidate #954 — `жао` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -19320,7 +18142,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1017 — `законодательство` (freq 33)
+### Candidate #955 — `законодательство` (freq 33)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -19339,26 +18161,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1018 — `инфекция` (freq 33)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0063256`) «Қуық түбі безінің созылмалы қабынуы : қуық түбінің бактерия, микоплазма сияқты қоздырғыштармен инфекциялануы немесе инфекция емес себептердің тітіркендіруі арқылы қабынуы болып табылады.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0087769`) «Инфекция қоздырушысының бастауы қалалық індет кезінде иесіз иттер мен мысықтар, ал табиғи індет кезінде жабайы ет қоректі жануарлар.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0088930`) «Бронхит — бұл өкпеге ауа баратын тыныс жолдарындағы немесе түтікшелердегі инфекция.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1019 — `кахастан` (freq 33)
+### Candidate #956 — `кахастан` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -19377,7 +18180,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1020 — `квт` (freq 33)
+### Candidate #957 — `квт` (freq 33)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -19396,7 +18199,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1021 — `кмс` (freq 33)
+### Candidate #958 — `кмс` (freq 33)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -19415,7 +18218,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1022 — `компоненттер` (freq 33)
+### Candidate #959 — `компоненттер` (freq 33)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -19434,7 +18237,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1023 — `конкурсына` (freq 33)
+### Candidate #960 — `конкурсына` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -19453,7 +18256,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1024 — `кәне` (freq 33)
+### Candidate #961 — `кәне` (freq 33)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -19472,7 +18275,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1025 — `лебяжі` (freq 33)
+### Candidate #962 — `лебяжі` (freq 33)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -19491,7 +18294,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1026 — `лизингі` (freq 33)
+### Candidate #963 — `лизингі` (freq 33)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -19510,7 +18313,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1027 — `лимфа` (freq 33)
+### Candidate #964 — `лимфа` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -19529,7 +18332,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1028 — `оар` (freq 33)
+### Candidate #965 — `оар` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -19548,7 +18351,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1029 — `одағай` (freq 33)
+### Candidate #966 — `одағай` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -19567,7 +18370,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1030 — `орден` (freq 33)
+### Candidate #967 — `орден` (freq 33)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -19586,7 +18389,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1031 — `оңтүстігіне` (freq 33)
+### Candidate #968 — `оңтүстігіне` (freq 33)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -19605,7 +18408,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1032 — `пирамида` (freq 33)
+### Candidate #969 — `пирамида` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -19624,7 +18427,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1033 — `платон` (freq 33)
+### Candidate #970 — `платон` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -19643,7 +18446,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1034 — `ресупблики` (freq 33)
+### Candidate #971 — `ресупблики` (freq 33)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -19662,7 +18465,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1035 — `ринат` (freq 33)
+### Candidate #972 — `ринат` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -19681,7 +18484,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1036 — `ркфср` (freq 33)
+### Candidate #973 — `ркфср` (freq 33)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **liquid**
@@ -19700,7 +18503,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1037 — `сайланып` (freq 33)
+### Candidate #974 — `сайланып` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -19719,7 +18522,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1038 — `салысты` (freq 33)
+### Candidate #975 — `салысты` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -19738,64 +18541,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1039 — `тиiс` (freq 33)
-
-- Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
-- Final sound (auto): **voiceless_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0005398`) «3) психикалық ауруға, алкоголизмге, нашақорлыққа немесе уытқұмарлыққа байланысты денсаулық сақтау ұйымдарында есепте тұрмауға тиiс.»
-  2. (cc100_kk_pack.json / `cc100_kk_0010634`) «1. Микроқаржы ұйымының атауында мiндеттi түрде "микроқаржы ұйымы" деген сөздер болуға тиiс. Атауында "MҚҰ" деген аббревиатураны пайдалана отырып, микроқаржы ұйымының атауын қысқартып жазуға жол беріле …»
-  3. (cc100_kk_pack.json / `cc100_kk_0013121`) «Клиенттiң банк шоттары бойынша ақша қозғалысы туралы үзiндi көшірмеде болуға тиiс мәлiметтер уәкілетті органның нормативтiк құқықтық актiсiнде айқындалады.»;»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1040 — `тиiстi` (freq 33)
-
-- Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0005396`) «1. Қазақстан Республикасының он сегiз жасқа толған, сондай-ақ Қоғамдық кеңес жергiлiктi деңгейде қалыптастырылған жағдайда — тиiстi әкiмшiлiк-аумақтық бiрлiк шегiнде тұратын азаматы Қоғамдық кеңес мүш …»
-  2. (cc100_kk_pack.json / `cc100_kk_0013065`) ««1) Қазақстан Республикасының кәсіпкерлік саласындағы заңнамасына сәйкес жеке кәсiпкерлiк субъектiлерiнiң бiрлестiктерiне жұмыскерлердің жыл iшiндегi орташа тiзiмдiк санын негiзге ала отырып, бiр жұмы …»
-  3. (cc100_kk_pack.json / `cc100_kk_0013191`) «1. Мемлекеттiк орган басшысының немесе өзге де жоғары тұрған лауазымды адамның осы лауазымды адам шығарған актiлермен байланысты емес тапсырмаларының орындалуына ішкі бақылау осы мемлекеттiк органның  …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1041 — `трансферттер` (freq 33)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0011740`) «4. 2016 жылға арналған аудандық бюджеттің шығыстар құрамында республикалық бюджеттен нысаналы трансферттер мен бюджеттік кредиттер 4 қосымшаға сәйкес қарастырылғаны ескерілсін.»
-  2. (cc100_kk_pack.json / `cc100_kk_0011742`) «5. 2016 жылға арналған аудандық бюджеттің шығыстар құрамында облыстық бюджеттен нысаналы трансферттер 5 қосымшаға сәйкес қарастырылғаны ескерілсін.»
-  3. (cc100_kk_pack.json / `cc100_kk_0035310`) «Шағын және орта кәсіпкерлік субъектілеріне сервистік қолдау көрсетілетін болады және қызметтерді қаржыландыру республикалық бюджеттен нысаналы трансферттер есебінен жүзеге асырылатын болады.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1042 — `шектеліп` (freq 33)
+### Candidate #976 — `шектеліп` (freq 33)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -19814,7 +18560,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1043 — `экономикасына` (freq 33)
+### Candidate #977 — `экономикасына` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -19833,7 +18579,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1044 — `ғларда` (freq 33)
+### Candidate #978 — `ғларда` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -19852,7 +18598,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1045 — `қырсырын` (freq 33)
+### Candidate #979 — `қырсырын` (freq 33)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -19871,7 +18617,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1046 — `абаев` (freq 32)
+### Candidate #980 — `абаев` (freq 32)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -19890,7 +18636,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1047 — `абыройын` (freq 32)
+### Candidate #981 — `абыройын` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -19909,7 +18655,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1048 — `айрылған` (freq 32)
+### Candidate #982 — `айрылған` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -19928,7 +18674,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1049 — `анкара` (freq 32)
+### Candidate #983 — `анкара` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -19947,7 +18693,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1050 — `археологтар` (freq 32)
+### Candidate #984 — `археологтар` (freq 32)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -19966,7 +18712,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1051 — `бойының` (freq 32)
+### Candidate #985 — `бойының` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -19985,7 +18731,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1052 — `бомба` (freq 32)
+### Candidate #986 — `бомба` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -20004,7 +18750,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1053 — `бруней` (freq 32)
+### Candidate #987 — `бруней` (freq 32)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **glide**
@@ -20023,7 +18769,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1054 — `гагарин` (freq 32)
+### Candidate #988 — `гагарин` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -20042,7 +18788,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1055 — `грузин` (freq 32)
+### Candidate #989 — `грузин` (freq 32)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **nasal**
@@ -20061,7 +18807,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1056 — `дзюдо` (freq 32)
+### Candidate #990 — `дзюдо` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -20080,7 +18826,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1057 — `ескертеді` (freq 32)
+### Candidate #991 — `ескертеді` (freq 32)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -20099,7 +18845,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1058 — `жоспарда` (freq 32)
+### Candidate #992 — `жоспарда` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -20118,7 +18864,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1059 — `жоспарға` (freq 32)
+### Candidate #993 — `жоспарға` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -20137,7 +18883,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1060 — `испанияға` (freq 32)
+### Candidate #994 — `испанияға` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -20156,7 +18902,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1061 — `кандидатурасын` (freq 32)
+### Candidate #995 — `кандидатурасын` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -20175,26 +18921,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1062 — `коммуникация` (freq 32)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0025354`) «|Негізгі бейнесі: Қазақстан картасының контуры, алдыңғы жағында ҚР Көлік және коммуникация министрлігінің үйі және Астанада Есіл өзені арқылы көпірде орнатылған қанатты барыстың біреуі, артқы жағында  …»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0040917`) «2005–2006 жылдары Қазақстан Республикасы Көлік және коммуникация министрі болып қызмет атқарған.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0047624`) «Транспорт мұнарасы — Көлік және коммуникация министрлігінің ғимараты, қаланың ең биік ғимараттарының бірі.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1063 — `координаталар` (freq 32)
+### Candidate #996 — `координаталар` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -20213,7 +18940,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1064 — `кристалдар` (freq 32)
+### Candidate #997 — `кристалдар` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -20232,7 +18959,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1065 — `лашын` (freq 32)
+### Candidate #998 — `лашын` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -20251,26 +18978,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1066 — `лицензия` (freq 32)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0088518`) «Нәтижесінде ол табысты мейрамхананың иелеріне жолығып, көп ұзамай ұқсас мейрамханаларды сатып алу немесе сату құқығына лицензия алды.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0088547`) «1999 жылы Алматыда лицензия бойынша Баскин Роббинс халықаралық балмұздақ желісінің бірінші нүктесі ашылды.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0090526`) «Енді, мемле­кет, жоғарыда көрсетілгендей, зиян­ды қалдықтар шығуының норма­тивін жасаумен шұғылданбайды, тек зиянды заттар шығуының ең жоғары көлемін хаттама негізінде белгілейді, сол көлемде ластауға …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1067 — `мдей` (freq 32)
+### Candidate #999 — `мдей` (freq 32)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **glide**
@@ -20289,7 +18997,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1068 — `мкқк` (freq 32)
+### Candidate #1000 — `мкқк` (freq 32)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -20308,7 +19016,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1069 — `мусин` (freq 32)
+### Candidate #1001 — `мусин` (freq 32)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **nasal**
@@ -20327,7 +19035,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1070 — `обл` (freq 32)
+### Candidate #1002 — `обл` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -20346,7 +19054,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1071 — `объектісі` (freq 32)
+### Candidate #1003 — `объектісі` (freq 32)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -20365,7 +19073,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1072 — `ожсб` (freq 32)
+### Candidate #1004 — `ожсб` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -20384,7 +19092,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1073 — `орнатады` (freq 32)
+### Candidate #1005 — `орнатады` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -20403,7 +19111,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1074 — `оқшауланған` (freq 32)
+### Candidate #1006 — `оқшауланған` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -20422,7 +19130,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1075 — `салдарын` (freq 32)
+### Candidate #1007 — `салдарын` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -20441,7 +19149,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1076 — `сталинград` (freq 32)
+### Candidate #1008 — `сталинград` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -20460,7 +19168,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1077 — `театрда` (freq 32)
+### Candidate #1009 — `театрда` (freq 32)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -20479,7 +19187,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1078 — `театрына` (freq 32)
+### Candidate #1010 — `театрына` (freq 32)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -20498,7 +19206,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1079 — `триллион` (freq 32)
+### Candidate #1011 — `триллион` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -20517,7 +19225,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1080 — `уошингтон` (freq 32)
+### Candidate #1012 — `уошингтон` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -20536,7 +19244,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1081 — `халде` (freq 32)
+### Candidate #1013 — `халде` (freq 32)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -20555,7 +19263,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1082 — `ыдырайды` (freq 32)
+### Candidate #1014 — `ыдырайды` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -20574,26 +19282,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1083 — `экономист` (freq 32)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **voiceless_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0009688`) «), мамандығы бойынша мұғалім, экономист, 2019 жылдан бастап Атырау облыстық мемлекеттік кірістер департаменті басшысының орынбасары.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0015831`) «Зағипа Яхияқызы Балиева (3 қазан 1958, Кеген ауданы, Алматы облысы) — қазақстандық мемлекеттік қайраткер, экономист, Әділет министрі (2005—2009),Орталық сайлау комиссиясының төрағасы (1996—2005).»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0016264`) «1991 жылы Алматы Халық шаруашылағы институтын оқып бітірген, мамандығы — экономист.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1084 — `қкнің` (freq 32)
+### Candidate #1015 — `қкнің` (freq 32)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -20612,7 +19301,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1085 — `қрда` (freq 32)
+### Candidate #1016 — `қрда` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -20631,7 +19320,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1086 — `ұкп` (freq 32)
+### Candidate #1017 — `ұкп` (freq 32)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -20650,7 +19339,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1087 — `абылайхан` (freq 31)
+### Candidate #1018 — `абылайхан` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -20669,7 +19358,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1088 — `аддин` (freq 31)
+### Candidate #1019 — `аддин` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -20688,7 +19377,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1089 — `айдос` (freq 31)
+### Candidate #1020 — `айдос` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -20707,7 +19396,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1090 — `айманов` (freq 31)
+### Candidate #1021 — `айманов` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -20726,7 +19415,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1091 — `англияның` (freq 31)
+### Candidate #1022 — `англияның` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -20745,7 +19434,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1092 — `аполлон` (freq 31)
+### Candidate #1023 — `аполлон` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -20764,7 +19453,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1093 — `аустралияның` (freq 31)
+### Candidate #1024 — `аустралияның` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -20783,7 +19472,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1094 — `ганди` (freq 31)
+### Candidate #1025 — `ганди` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -20802,7 +19491,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1095 — `гренландия` (freq 31)
+### Candidate #1026 — `гренландия` (freq 31)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -20821,7 +19510,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1096 — `диуани` (freq 31)
+### Candidate #1027 — `диуани` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -20840,7 +19529,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1097 — `жайдарман` (freq 31)
+### Candidate #1028 — `жайдарман` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -20859,7 +19548,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1098 — `жатын` (freq 31)
+### Candidate #1029 — `жатын` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -20878,7 +19567,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1099 — `жоспарында` (freq 31)
+### Candidate #1030 — `жоспарында` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -20897,26 +19586,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1100 — `интернетті` (freq 31)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0028530`) «Интернетті пайдаланудың қатаң ережелері енгізілді.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0035570`) «Бүкіләлемдік тор Интернетті өзгертіп, оның қазіргі заманғы бет-бейнесінің қалыптасуына әсер етті деп айтуға болады.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0044731`) «Интернетті әлемде 15,778 миллион адам немесе ел халқының 93,1 пайызы пайдаланады - әлемдегі 34-ші көрсеткіш.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1101 — `комбинатының` (freq 31)
+### Candidate #1031 — `комбинатының` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -20935,7 +19605,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1102 — `компоненттері` (freq 31)
+### Candidate #1032 — `компоненттері` (freq 31)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -20954,7 +19624,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1103 — `кооператив` (freq 31)
+### Candidate #1033 — `кооператив` (freq 31)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -20973,7 +19643,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1104 — `нормаларды` (freq 31)
+### Candidate #1034 — `нормаларды` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -20992,7 +19662,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1105 — `объектілерді` (freq 31)
+### Candidate #1035 — `объектілерді` (freq 31)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -21011,7 +19681,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1106 — `окнің` (freq 31)
+### Candidate #1036 — `окнің` (freq 31)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -21030,7 +19700,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1107 — `округтік` (freq 31)
+### Candidate #1037 — `округтік` (freq 31)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -21049,7 +19719,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1108 — `официальный` (freq 31)
+### Candidate #1038 — `официальный` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -21068,7 +19738,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1109 — `препарат` (freq 31)
+### Candidate #1039 — `препарат` (freq 31)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -21087,7 +19757,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1110 — `прогресс` (freq 31)
+### Candidate #1040 — `прогресс` (freq 31)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -21106,7 +19776,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1111 — `процестің` (freq 31)
+### Candidate #1041 — `процестің` (freq 31)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -21125,7 +19795,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1112 — `робот` (freq 31)
+### Candidate #1042 — `робот` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -21144,7 +19814,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1113 — `себептерге` (freq 31)
+### Candidate #1043 — `себептерге` (freq 31)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -21163,7 +19833,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1114 — `сигналды` (freq 31)
+### Candidate #1044 — `сигналды` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -21182,7 +19852,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1115 — `сюжет` (freq 31)
+### Candidate #1045 — `сюжет` (freq 31)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -21201,7 +19871,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1116 — `түсінде` (freq 31)
+### Candidate #1046 — `түсінде` (freq 31)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -21220,7 +19890,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1117 — `түсіндім` (freq 31)
+### Candidate #1047 — `түсіндім` (freq 31)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -21239,7 +19909,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1118 — `управление` (freq 31)
+### Candidate #1048 — `управление` (freq 31)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -21258,7 +19928,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1119 — `формуланы` (freq 31)
+### Candidate #1049 — `формуланы` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -21277,7 +19947,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1120 — `шағып` (freq 31)
+### Candidate #1050 — `шағып` (freq 31)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -21296,7 +19966,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1121 — `ажыратады` (freq 30)
+### Candidate #1051 — `ажыратады` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -21315,7 +19985,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1122 — `америкаға` (freq 30)
+### Candidate #1052 — `америкаға` (freq 30)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -21334,7 +20004,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1123 — `аристотельдің` (freq 30)
+### Candidate #1053 — `аристотельдің` (freq 30)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -21353,7 +20023,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1124 — `ауд` (freq 30)
+### Candidate #1054 — `ауд` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -21372,7 +20042,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1125 — `венгр` (freq 30)
+### Candidate #1055 — `венгр` (freq 30)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -21391,7 +20061,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1126 — `виктория` (freq 30)
+### Candidate #1056 — `виктория` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -21410,7 +20080,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1127 — `глубокое` (freq 30)
+### Candidate #1057 — `глубокое` (freq 30)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -21429,7 +20099,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1128 — `жабысып` (freq 30)
+### Candidate #1058 — `жабысып` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -21448,7 +20118,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1129 — `жаттау` (freq 30)
+### Candidate #1059 — `жаттау` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -21467,7 +20137,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1130 — `инвесторларды` (freq 30)
+### Candidate #1060 — `инвесторларды` (freq 30)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -21486,7 +20156,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1131 — `инсулин` (freq 30)
+### Candidate #1061 — `инсулин` (freq 30)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **nasal**
@@ -21505,26 +20175,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1132 — `интернеттен` (freq 30)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **nasal**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_03514`) «Бұл кітапты интернеттен жүктеп алдым.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0008053`) «Мысалы, бір терезеде электрондық пошта бағдарламасын ашуға, ал екінші терезеде Интернеттен қажетті деректерді іздеуге болады.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0035583`) «Заң кенселері бұрын қажетті информациялар үшін сағатына $8600 төлесе, қазір олар оны Интернет-тен өте аз бағаға ала алады.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1133 — `конкурсының` (freq 30)
+### Candidate #1062 — `конкурсының` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -21543,7 +20194,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1134 — `король` (freq 30)
+### Candidate #1063 — `король` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -21562,7 +20213,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1135 — `москва` (freq 30)
+### Candidate #1064 — `москва` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -21581,7 +20232,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1136 — `музыканы` (freq 30)
+### Candidate #1065 — `музыканы` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -21600,7 +20251,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1137 — `обалар` (freq 30)
+### Candidate #1066 — `обалар` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -21619,7 +20270,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1138 — `орағытып` (freq 30)
+### Candidate #1067 — `орағытып` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -21638,7 +20289,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1139 — `прага` (freq 30)
+### Candidate #1068 — `прага` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -21657,7 +20308,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1140 — `пропорционал` (freq 30)
+### Candidate #1069 — `пропорционал` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -21676,7 +20327,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1141 — `рационал` (freq 30)
+### Candidate #1070 — `рационал` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -21695,7 +20346,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1142 — `рекордын` (freq 30)
+### Candidate #1071 — `рекордын` (freq 30)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -21714,7 +20365,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1143 — `салыс` (freq 30)
+### Candidate #1072 — `салыс` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -21733,7 +20384,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1144 — `сирияда` (freq 30)
+### Candidate #1073 — `сирияда` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -21752,7 +20403,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1145 — `сметалық` (freq 30)
+### Candidate #1074 — `сметалық` (freq 30)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -21771,7 +20422,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1146 — `статусын` (freq 30)
+### Candidate #1075 — `статусын` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -21790,7 +20441,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1147 — `таиланд` (freq 30)
+### Candidate #1076 — `таиланд` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -21809,7 +20460,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1148 — `тибет` (freq 30)
+### Candidate #1077 — `тибет` (freq 30)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -21828,7 +20479,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1149 — `философ` (freq 30)
+### Candidate #1078 — `философ` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -21847,7 +20498,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1150 — `фирма` (freq 30)
+### Candidate #1079 — `фирма` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -21866,7 +20517,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1151 — `формуласы` (freq 30)
+### Candidate #1080 — `формуласы` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -21885,7 +20536,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1152 — `хабарлар` (freq 30)
+### Candidate #1081 — `хабарлар` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -21904,7 +20555,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1153 — `хирург` (freq 30)
+### Candidate #1082 — `хирург` (freq 30)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **voiced_consonant**
@@ -21923,7 +20574,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1154 — `шыбын` (freq 30)
+### Candidate #1083 — `шыбын` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -21942,7 +20593,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1155 — `шырағым` (freq 30)
+### Candidate #1084 — `шырағым` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -21961,7 +20612,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1156 — `шқмуда` (freq 30)
+### Candidate #1085 — `шқмуда` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -21980,7 +20631,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1157 — `ыалтынсарин` (freq 30)
+### Candidate #1086 — `ыалтынсарин` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -21999,7 +20650,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1158 — `экранға` (freq 30)
+### Candidate #1087 — `экранға` (freq 30)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -22018,7 +20669,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1159 — `әлауқатының` (freq 30)
+### Candidate #1088 — `әлауқатының` (freq 30)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -22037,7 +20688,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1160 — `адвокат` (freq 29)
+### Candidate #1089 — `адвокат` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -22056,7 +20707,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1161 — `америкасы` (freq 29)
+### Candidate #1090 — `америкасы` (freq 29)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -22075,7 +20726,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1162 — `аның` (freq 29)
+### Candidate #1091 — `аның` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -22094,7 +20745,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1163 — `ақпа` (freq 29)
+### Candidate #1092 — `ақпа` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -22113,7 +20764,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1164 — `аңның` (freq 29)
+### Candidate #1093 — `аңның` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -22132,7 +20783,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1165 — `григорий` (freq 29)
+### Candidate #1094 — `григорий` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -22151,26 +20802,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1166 — `дивизия` (freq 29)
-
-- Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_01244`) «Бүкіл соғысты басынан өткерген қазақстандық 12 дивизия құрметті атақтар алды.»
-  2. (tatoeba_kazakh_pack.json / `tatoeba_kz_01246`) «Бес дивизия гвардиялық аталды, олардың ішінде Кеңес Одағының Батыры И.В.Панфилов атындағы атақты 8-гвардиялық дивизия бар.»
-  3. (tatoeba_kazakh_pack.json / `tatoeba_kz_01246`) «Бес дивизия гвардиялық аталды, олардың ішінде Кеңес Одағының Батыры И.В.Панфилов атындағы атақты 8-гвардиялық дивизия бар.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1167 — `дипломмен` (freq 29)
+### Candidate #1095 — `дипломмен` (freq 29)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -22189,7 +20821,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1168 — `егіп` (freq 29)
+### Candidate #1096 — `егіп` (freq 29)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -22208,7 +20840,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1169 — `жеткені` (freq 29)
+### Candidate #1097 — `жеткені` (freq 29)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -22227,7 +20859,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1170 — `жсн` (freq 29)
+### Candidate #1098 — `жсн` (freq 29)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **nasal**
@@ -22246,7 +20878,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1171 — `жсқ` (freq 29)
+### Candidate #1099 — `жсқ` (freq 29)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -22265,7 +20897,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1172 — `империяның` (freq 29)
+### Candidate #1100 — `империяның` (freq 29)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -22284,7 +20916,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1173 — `инвестицияларды` (freq 29)
+### Candidate #1101 — `инвестицияларды` (freq 29)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -22303,7 +20935,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1174 — `кандидаттардың` (freq 29)
+### Candidate #1102 — `кандидаттардың` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -22322,7 +20954,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1175 — `клинтон` (freq 29)
+### Candidate #1103 — `клинтон` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -22341,7 +20973,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1176 — `когнитивтік` (freq 29)
+### Candidate #1104 — `когнитивтік` (freq 29)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -22360,7 +20992,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1177 — `колледжде` (freq 29)
+### Candidate #1105 — `колледжде` (freq 29)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -22379,7 +21011,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1178 — `колледждер` (freq 29)
+### Candidate #1106 — `колледждер` (freq 29)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -22398,7 +21030,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1179 — `колхоз` (freq 29)
+### Candidate #1107 — `колхоз` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -22417,7 +21049,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1180 — `коммунаның` (freq 29)
+### Candidate #1108 — `коммунаның` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -22436,7 +21068,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1181 — `концерті` (freq 29)
+### Candidate #1109 — `концерті` (freq 29)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -22455,7 +21087,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1182 — `лай` (freq 29)
+### Candidate #1110 — `лай` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -22474,7 +21106,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1183 — `мжә` (freq 29)
+### Candidate #1111 — `мжә` (freq 29)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -22493,7 +21125,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1184 — `мкк` (freq 29)
+### Candidate #1112 — `мкк` (freq 29)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -22512,7 +21144,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1185 — `монарх` (freq 29)
+### Candidate #1113 — `монарх` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -22531,7 +21163,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1186 — `мәмс` (freq 29)
+### Candidate #1114 — `мәмс` (freq 29)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -22550,7 +21182,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1187 — `наполеон` (freq 29)
+### Candidate #1115 — `наполеон` (freq 29)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -22569,7 +21201,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1188 — `озат` (freq 29)
+### Candidate #1116 — `озат` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -22588,7 +21220,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1189 — `округінде` (freq 29)
+### Candidate #1117 — `округінде` (freq 29)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -22607,7 +21239,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1190 — `ошақ` (freq 29)
+### Candidate #1118 — `ошақ` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -22626,7 +21258,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1191 — `оғыздар` (freq 29)
+### Candidate #1119 — `оғыздар` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -22645,7 +21277,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1192 — `оғыздардың` (freq 29)
+### Candidate #1120 — `оғыздардың` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -22664,7 +21296,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1193 — `про` (freq 29)
+### Candidate #1121 — `про` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -22683,26 +21315,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1194 — `проректор` (freq 29)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0027626`) «), проректор (1983 ж.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0045224`) «Ол 1990 жылдың басында Ленинградқа «белсенді резервтердің» мүшесі ретінде оралды, онда ол докторлық диссертациясын дайындап жүргенде проректор Юрий Молчановқа есеп беріп, Ленинград мемлекеттік универс …»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0051594`) «Өзі проректор болып істейтін, халқымыздың алғашқы жоғары оқу орны Қазақ педагогика институтының негізінде Қазақ мемлекеттік университетін ұйымдастыру жөніндегі комиссияның төрағасы, оның бірінші проре …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1195 — `рмқк` (freq 29)
+### Candidate #1122 — `рмқк` (freq 29)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -22721,7 +21334,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1196 — `сабан` (freq 29)
+### Candidate #1123 — `сабан` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -22740,7 +21353,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1197 — `сайлаушылардың` (freq 29)
+### Candidate #1124 — `сайлаушылардың` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -22759,7 +21372,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1198 — `салығының` (freq 29)
+### Candidate #1125 — `салығының` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -22778,7 +21391,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1199 — `самалы` (freq 29)
+### Candidate #1126 — `самалы` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -22797,7 +21410,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1200 — `самат` (freq 29)
+### Candidate #1127 — `самат` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -22816,7 +21429,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1201 — `самбо` (freq 29)
+### Candidate #1128 — `самбо` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -22835,7 +21448,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1202 — `секторын` (freq 29)
+### Candidate #1129 — `секторын` (freq 29)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -22854,7 +21467,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1203 — `сократ` (freq 29)
+### Candidate #1130 — `сократ` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -22873,7 +21486,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1204 — `трысқұлов` (freq 29)
+### Candidate #1131 — `трысқұлов` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -22892,7 +21505,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1205 — `төте` (freq 29)
+### Candidate #1132 — `төте` (freq 29)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -22911,26 +21524,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1206 — `федерация` (freq 29)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0032136`) «1948 жылы құрылған Малайлық Федерация 1956 жылы автономияға және 1957 жылы Ұлыбритания Достастығының құрамында тәуелсіздікке ие болды.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0038706`) «КСРО — 15 республикалардан құрылған ірі федерация болған, адамзат заманауи тарихындағы ең ықпалды мемлекеттерінің бірі еді.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0051830`) «Ол осы спорт түрінен Республикалық федерация құрып соның президенті болады.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1207 — `фильмдер` (freq 29)
+### Candidate #1133 — `фильмдер` (freq 29)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -22949,7 +21543,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1208 — `фильмнің` (freq 29)
+### Candidate #1134 — `фильмнің` (freq 29)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -22968,7 +21562,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1209 — `хадисте` (freq 29)
+### Candidate #1135 — `хадисте` (freq 29)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -22987,26 +21581,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1210 — `этика` (freq 29)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0000842`) «Бастауыш мектепте балаларға базалық білім беріледі, Мұндай жазбаша ретінде, оқу, оқу тілдері, арифметика, Отан сабақтары, жұмыс, этика және дене тәрбиесі.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0035934`) «Қоғамдағы ірі өзгерістерге, белгілі оқиғаларға байланысты жаңа тақырыптардың тууы, ақындардың өзіне баға берудегі өзгешеліктер, жаңа жағдай туғызған ақындық этика нормалары, шаруашылық мәселелерін тақ …»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0050007`) «Баласағұнның «Құтадғу Білігінде» өмір мәні пайымдалып, жалпыадамзаттық рухани байлықтар – мұрат, дін, этика, өнер және даналықтың мәні сараланған.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1211 — `яссауи` (freq 29)
+### Candidate #1136 — `яссауи` (freq 29)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -23025,45 +21600,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1212 — `mut` (freq 28)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_02_0015`) «Бірақ бізге пайдаланушының жауабын осы айнымалыға жазу керек, сондықтан `mut` кілтсөзін қосамыз. `mut` өзгермелі дегенді білдіреді, яғни мәнін кейін ауыстыруға болады.»
-  2. (rust_book_kk_pack.json / `rust_book_02_0015`) «Бірақ бізге пайдаланушының жауабын осы айнымалыға жазу керек, сондықтан `mut` кілтсөзін қосамыз. `mut` өзгермелі дегенді білдіреді, яғни мәнін кейін ауыстыруға болады.»
-  3. (rust_book_kk_pack.json / `rust_book_02_0019`) «Назар аударыңыз: біз `guess` айнымалысына өзгермелі сілтеме береміз — `&mut guess`. `&` белгісі — сілтеме, ал `mut` — өзгермелі.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1213 — `self` (freq 28)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_05_0052`) «Әдіс синтаксисі **Әдіс** — функцияға ұқсас, бірақ ол бір типтің контекстінде анықталады және оның бірінші параметрі әрқашан `self` (мәннің өзі) болады. `self` параметрі арқылы әдіс типтің данасына қол …»
-  2. (rust_book_kk_pack.json / `rust_book_05_0052`) «Әдіс синтаксисі **Әдіс** — функцияға ұқсас, бірақ ол бір типтің контекстінде анықталады және оның бірінші параметрі әрқашан `self` (мәннің өзі) болады. `self` параметрі арқылы әдіс типтің данасына қол …»
-  3. (rust_book_kk_pack.json / `rust_book_05_0054`) «Тіктөртбұрыштың ауданын есептеуге `area` функциясын `Rectangle`-ге әдіске айналдырайық: Бірінші параметр — `&self`.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1214 — `апреля` (freq 28)
+### Candidate #1137 — `апреля` (freq 28)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -23082,7 +21619,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1215 — `аустриямажарстан` (freq 28)
+### Candidate #1138 — `аустриямажарстан` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -23101,7 +21638,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1216 — `ахметжан` (freq 28)
+### Candidate #1139 — `ахметжан` (freq 28)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -23120,7 +21657,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1217 — `визуалды` (freq 28)
+### Candidate #1140 — `визуалды` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -23139,7 +21676,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1218 — `віосксһаіп` (freq 28)
+### Candidate #1141 — `віосксһаіп` (freq 28)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -23158,7 +21695,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1219 — `гвардия` (freq 28)
+### Candidate #1142 — `гвардия` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -23177,7 +21714,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1220 — `глоссарий` (freq 28)
+### Candidate #1143 — `глоссарий` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -23196,7 +21733,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1221 — `докторлары` (freq 28)
+### Candidate #1144 — `докторлары` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -23215,7 +21752,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1222 — `дөп` (freq 28)
+### Candidate #1145 — `дөп` (freq 28)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -23234,7 +21771,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1223 — `ескертулер` (freq 28)
+### Candidate #1146 — `ескертулер` (freq 28)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -23253,7 +21790,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1224 — `ескертіп` (freq 28)
+### Candidate #1147 — `ескертіп` (freq 28)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -23272,7 +21809,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1225 — `жамбас` (freq 28)
+### Candidate #1148 — `жамбас` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -23291,7 +21828,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1226 — `жаққан` (freq 28)
+### Candidate #1149 — `жаққан` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -23310,7 +21847,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1227 — `жоспарлаған` (freq 28)
+### Candidate #1150 — `жоспарлаған` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -23329,7 +21866,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1228 — `зейнеткерлер` (freq 28)
+### Candidate #1151 — `зейнеткерлер` (freq 28)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -23348,7 +21885,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1229 — `зеландияның` (freq 28)
+### Candidate #1152 — `зеландияның` (freq 28)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -23367,7 +21904,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1230 — `ибрагимов` (freq 28)
+### Candidate #1153 — `ибрагимов` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -23386,7 +21923,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1231 — `инклюзивті` (freq 28)
+### Candidate #1154 — `инклюзивті` (freq 28)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -23405,7 +21942,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1232 — `интеллектіні` (freq 28)
+### Candidate #1155 — `интеллектіні` (freq 28)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -23424,7 +21961,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1233 — `кадмий` (freq 28)
+### Candidate #1156 — `кадмий` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -23443,7 +21980,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1234 — `комиссияларының` (freq 28)
+### Candidate #1157 — `комиссияларының` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -23462,7 +21999,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1235 — `коммунистер` (freq 28)
+### Candidate #1158 — `коммунистер` (freq 28)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -23481,7 +22018,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1236 — `ксрнің` (freq 28)
+### Candidate #1159 — `ксрнің` (freq 28)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -23500,7 +22037,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1237 — `кхдр` (freq 28)
+### Candidate #1160 — `кхдр` (freq 28)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **liquid**
@@ -23519,7 +22056,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1238 — `лазер` (freq 28)
+### Candidate #1161 — `лазер` (freq 28)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -23538,7 +22075,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1239 — `ливан` (freq 28)
+### Candidate #1162 — `ливан` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -23557,7 +22094,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1240 — `лығы` (freq 28)
+### Candidate #1163 — `лығы` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -23576,7 +22113,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1241 — `монументі` (freq 28)
+### Candidate #1164 — `монументі` (freq 28)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -23595,26 +22132,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1242 — `номинация` (freq 28)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0042309`) «Гайана ЮНЕСКО-ға Дүниежүзілік мұра ретінде Кайетур ұлттық паркін, оның ішінде Кайетур сарқырамасымен бірге, алғашқы номинация ретінде ұсынды.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0070560`) «Маусымның аяғында ұпайлардың қайта есебі жүріп екі номинация бойынша жеңімпаздар анықталады.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0113472`) «Іріктеу қорытындысы бойынша 10 жүлдегер бағалы сыйлықтармен, ал қос номинация бойынша 2 жеңімпаз 5 млн.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1243 — `образ` (freq 28)
+### Candidate #1165 — `образ` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -23633,7 +22151,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1244 — `орам` (freq 28)
+### Candidate #1166 — `орам` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -23652,7 +22170,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1245 — `орнындағы` (freq 28)
+### Candidate #1167 — `орнындағы` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -23671,7 +22189,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1246 — `оспанов` (freq 28)
+### Candidate #1168 — `оспанов` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -23690,7 +22208,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1247 — `пластина` (freq 28)
+### Candidate #1169 — `пластина` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -23709,7 +22227,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1248 — `прокуратурада` (freq 28)
+### Candidate #1170 — `прокуратурада` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -23728,7 +22246,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1249 — `прокурорлық` (freq 28)
+### Candidate #1171 — `прокурорлық` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -23747,7 +22265,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1250 — `процессор` (freq 28)
+### Candidate #1172 — `процессор` (freq 28)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -23766,26 +22284,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1251 — `пруссия` (freq 28)
-
-- Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0013518`) «1848 жылғы революциядан кейін ықпалы күшейіп келе жатқан Пруссия мен Аустрия империясы арасында қақтығыс басталды.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0013519`) «Бұл 1866 жылғы соғысқа әкелді, онда Пруссия жеңіп, бірқатар неміс княздіктерін аннексиялады.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0013520`) «, заң шығарушы органдар ретінде және Пруссия королі мемлекет басшысы ретінде пайда болған Мемлекеттік Президент (нем.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1252 — `раундта` (freq 28)
+### Candidate #1173 — `раундта` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -23804,7 +22303,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1253 — `резонанстық` (freq 28)
+### Candidate #1174 — `резонанстық` (freq 28)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -23823,7 +22322,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1254 — `репортаж` (freq 28)
+### Candidate #1175 — `репортаж` (freq 28)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -23842,7 +22341,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1255 — `рождество` (freq 28)
+### Candidate #1176 — `рождество` (freq 28)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -23861,7 +22360,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1256 — `рып` (freq 28)
+### Candidate #1177 — `рып` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -23880,7 +22379,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1257 — `сайлауды` (freq 28)
+### Candidate #1178 — `сайлауды` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -23899,7 +22398,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1258 — `сайлауын` (freq 28)
+### Candidate #1179 — `сайлауын` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -23918,7 +22417,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1259 — `самара` (freq 28)
+### Candidate #1180 — `самара` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -23937,7 +22436,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1260 — `сапқа` (freq 28)
+### Candidate #1181 — `сапқа` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -23956,7 +22455,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1261 — `сирияның` (freq 28)
+### Candidate #1182 — `сирияның` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -23975,7 +22474,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1262 — `спартакиада` (freq 28)
+### Candidate #1183 — `спартакиада` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -23994,7 +22493,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1263 — `стадионы` (freq 28)
+### Candidate #1184 — `стадионы` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -24013,7 +22512,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1264 — `теориясына` (freq 28)
+### Candidate #1185 — `теориясына` (freq 28)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -24032,7 +22531,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1265 — `терапия` (freq 28)
+### Candidate #1186 — `терапия` (freq 28)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -24051,7 +22550,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1266 — `федералды` (freq 28)
+### Candidate #1187 — `федералды` (freq 28)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -24070,7 +22569,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1267 — `форма` (freq 28)
+### Candidate #1188 — `форма` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -24089,7 +22588,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1268 — `форматтағы` (freq 28)
+### Candidate #1189 — `форматтағы` (freq 28)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -24108,7 +22607,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1269 — `ххх` (freq 28)
+### Candidate #1190 — `ххх` (freq 28)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -24127,7 +22626,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1270 — `шаяхметов` (freq 28)
+### Candidate #1191 — `шаяхметов` (freq 28)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -24146,7 +22645,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1271 — `қтж` (freq 28)
+### Candidate #1192 — `қтж` (freq 28)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiced_consonant**
@@ -24165,7 +22664,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1272 — `ажыратыңдар` (freq 27)
+### Candidate #1193 — `ажыратыңдар` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -24184,7 +22683,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1273 — `айрылып` (freq 27)
+### Candidate #1194 — `айрылып` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -24203,7 +22702,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1274 — `акциялар` (freq 27)
+### Candidate #1195 — `акциялар` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -24222,7 +22721,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1275 — `аэроғарыш` (freq 27)
+### Candidate #1196 — `аэроғарыш` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -24241,7 +22740,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1276 — `вопросы` (freq 27)
+### Candidate #1197 — `вопросы` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -24260,7 +22759,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1277 — `восток` (freq 27)
+### Candidate #1198 — `восток` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -24279,7 +22778,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1278 — `динамикасы` (freq 27)
+### Candidate #1199 — `динамикасы` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -24298,7 +22797,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1279 — `жайылады` (freq 27)
+### Candidate #1200 — `жайылады` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -24317,7 +22816,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1280 — `зайыбы` (freq 27)
+### Candidate #1201 — `зайыбы` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -24336,7 +22835,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1281 — `зиярат` (freq 27)
+### Candidate #1202 — `зиярат` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -24355,45 +22854,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1282 — `инспектор` (freq 27)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0049284`) «1915 — 1917 жылы Орталық ұсақ несие басқармасының Семей қаласындағы бөлімшесінде есепші, Мемлекеттік банктің Семей бөлімшесінде инспектор болып қызмет атқарған.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0049301`) «ЖОО бітірген соң Семейде уақ-қарыз серіктігінде инспектор болып қызмет атқарады.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0050985`) «; Темір уездік оқу бөлімінде – инспектор, 12.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1283 — `коммунизм` (freq 27)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **nasal**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0001211`) «1957 жылғы 1 наурыз — Ұйғыр тіліндегі «Коммунизм туги» газетінің бірінші нөмірінің шығуы.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0030903`) «1967 жылы қаңтарда ТАНУ басшылығы Танзанияда коммунизм салу бағдарламасын жариялады.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0030905`) «Ауылдық жерлерде Танзаниялық коммунизм ұжымы тұжырымдамасына сәйкес колхоздар құрыла бастады.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1284 — `композиторларының` (freq 27)
+### Candidate #1203 — `композиторларының` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -24412,7 +22873,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1285 — `конференциясында` (freq 27)
+### Candidate #1204 — `конференциясында` (freq 27)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -24431,26 +22892,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1286 — `монография` (freq 27)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0018812`) «Оның «Өсу жолдарымыз» (1960), «Жарқын жұлдыздар» (1964), «Халық мұрасы» (1974‚ «Қазақ қауымы»‚ 1995) атты монография, зерттеулері қазақ халқының мәдениеті, тілі, өнері, материалдық тұрмысы‚ т.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0025257`) «Соттағы көп жылғы тәжірибесі негіз болған ауқымды және жемісті жұмысының нәтижесінде Қазақстандағы сот жүйесі мен сот билігінің құрылуы және қалыптасуына байланысты алты монография, 50-ден астам ғылым …»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0064833`) «150-ден астам ғылыми еңбектің, оның ішінде 15 монография, оқулықтар мен оқу құралдарының авторы.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1287 — `мрт` (freq 27)
+### Candidate #1205 — `мрт` (freq 27)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -24469,7 +22911,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1288 — `нашарлайды` (freq 27)
+### Candidate #1206 — `нашарлайды` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -24488,7 +22930,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1289 — `нашарлауы` (freq 27)
+### Candidate #1207 — `нашарлауы` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -24507,7 +22949,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1290 — `орнатылып` (freq 27)
+### Candidate #1208 — `орнатылып` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -24526,7 +22968,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1291 — `ошақтары` (freq 27)
+### Candidate #1209 — `ошақтары` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -24545,26 +22987,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1292 — `радиосының` (freq 27)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **nasal**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0005728`) «Сондай-ақ Моңғол Ұлттық Радиосының аймақтық бөлімшесінің қазақ тіліндегі бір сағаттық бағдарламасы таратылады.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0026313`) «Бағдат радиосының жанында Шығыс муз.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0031777`) «Шыңжаң халық радиосының қазақ бөлімі, Шыңжаң телеарнасы қазақ тілінде үш арнамен күн сайын хабар таратады.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1293 — `реформасы` (freq 27)
+### Candidate #1210 — `реформасы` (freq 27)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -24583,7 +23006,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1294 — `салым` (freq 27)
+### Candidate #1211 — `салым` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -24602,7 +23025,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1295 — `семинаркеңес` (freq 27)
+### Candidate #1212 — `семинаркеңес` (freq 27)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -24621,7 +23044,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1296 — `словения` (freq 27)
+### Candidate #1213 — `словения` (freq 27)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -24640,7 +23063,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1297 — `ставкасын` (freq 27)
+### Candidate #1214 — `ставкасын` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -24659,7 +23082,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1298 — `стивен` (freq 27)
+### Candidate #1215 — `стивен` (freq 27)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -24678,7 +23101,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1299 — `стратегиясының` (freq 27)
+### Candidate #1216 — `стратегиясының` (freq 27)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -24697,7 +23120,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1300 — `территория` (freq 27)
+### Candidate #1217 — `территория` (freq 27)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -24716,7 +23139,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1301 — `техаста` (freq 27)
+### Candidate #1218 — `техаста` (freq 27)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -24735,7 +23158,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1302 — `техникасының` (freq 27)
+### Candidate #1219 — `техникасының` (freq 27)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -24754,7 +23177,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1303 — `тжк` (freq 27)
+### Candidate #1220 — `тжк` (freq 27)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -24773,26 +23196,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1304 — `трактор` (freq 27)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0004634`) «Машина жасау және металл өңдеу кәсіпорындары тоқыма станоктарын, ауыл шаруашылық машиналарын, тоңазытқыш, электртехникалық қондырғылар, трактор бөлшектерін, т.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0012434`) «Соғыстан кейін қираған шаруашылықты қалпына келтіру жұмыстары жүргізіледі, өнеркәсіптің жаңа салалары (автомобиль, кеме, трактор жасау, т.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0030031`) «1958 жылы Қарағандының “Шахтер”, ал келесі жылдары Шымкенттің “Еңбек”, Өскеменнің “Восток”, Жамбылдың “Металлист”, Павлодардың “Трактор”, Ақтөбенің “Актюбинец”, Целиноградтың “Целинник”, Жезқазғанның  …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1305 — `түспек` (freq 27)
+### Candidate #1221 — `түспек` (freq 27)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -24811,7 +23215,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1306 — `түспен` (freq 27)
+### Candidate #1222 — `түспен` (freq 27)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -24830,7 +23234,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1307 — `формуласын` (freq 27)
+### Candidate #1223 — `формуласын` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -24849,7 +23253,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1308 — `хабары` (freq 27)
+### Candidate #1224 — `хабары` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -24868,7 +23272,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1309 — `хазар` (freq 27)
+### Candidate #1225 — `хазар` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -24887,7 +23291,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1310 — `хауа` (freq 27)
+### Candidate #1226 — `хауа` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -24906,7 +23310,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1311 — `хок` (freq 27)
+### Candidate #1227 — `хок` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -24925,7 +23329,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1312 — `шеккендерге` (freq 27)
+### Candidate #1228 — `шеккендерге` (freq 27)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -24944,7 +23348,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1313 — `экипаж` (freq 27)
+### Candidate #1229 — `экипаж` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -24963,7 +23367,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1314 — `ясы` (freq 27)
+### Candidate #1230 — `ясы` (freq 27)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -24982,7 +23386,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1315 — `ііб` (freq 27)
+### Candidate #1231 — `ііб` (freq 27)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiced_consonant**
@@ -25001,7 +23405,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1316 — `ққс` (freq 27)
+### Candidate #1232 — `ққс` (freq 27)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -25020,7 +23424,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1317 — `әлауқат` (freq 27)
+### Candidate #1233 — `әлауқат` (freq 27)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -25039,26 +23443,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1318 — `unsafe` (freq 26)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_14_0022`) «Кездейсоқ ескертулерге арналған бөлімдер Құжаттама түсініктемелеріне арнайы бөлімдер қосу қабылданған: **`# Examples`** — мысалдар. **`# Panics`** — қандай жағдайда `panic!`-қа барады. **`# Errors`**  …»
-  2. (rust_book_kk_pack.json / `rust_book_16_0053`) «Қолмен бекіту — `unsafe`.»
-  3. (rust_book_kk_pack.json / `rust_book_16_0055`) «Бірақ сіздің кодыңыз белгілі бір инвариантты кепілдеп, көрсеткішті ағындар арасында қауіпсіз қолдана алса — `unsafe impl Send` жазып жасай аласыз.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1319 — `абыройы` (freq 26)
+### Candidate #1234 — `абыройы` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -25077,7 +23462,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1320 — `армстронг` (freq 26)
+### Candidate #1235 — `армстронг` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -25096,7 +23481,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1321 — `архитектурасы` (freq 26)
+### Candidate #1236 — `архитектурасы` (freq 26)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -25115,7 +23500,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1322 — `аустралияда` (freq 26)
+### Candidate #1237 — `аустралияда` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -25134,7 +23519,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1323 — `бразилияда` (freq 26)
+### Candidate #1238 — `бразилияда` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -25153,7 +23538,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1324 — `бюджетте` (freq 26)
+### Candidate #1239 — `бюджетте` (freq 26)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -25172,7 +23557,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1325 — `векторы` (freq 26)
+### Candidate #1240 — `векторы` (freq 26)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -25191,26 +23576,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1326 — `губернатор` (freq 26)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0005752`) «Аймақты (округті) губернатор басқарады, оны мұнда «әкім» емес, «уәли» деп атайды, ал қала мэрлерін «қала бастығы» деп атайды, есесіне аудан әкімдерін көбінесе «аудан әкімі» деп атайды.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0008747`) «Тарихи-өлкетану мұражайының ғимараты (бұрынғы губернатор үйі) - 1856 ж.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0011025`) «Буш Техас Губернаторы болып қызмет еткенде, Техаста Демократ Лейтенант Губернатор Боб Баллок болды.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1327 — `дзюдодан` (freq 26)
+### Candidate #1241 — `дзюдодан` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -25229,7 +23595,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1328 — `дойбы` (freq 26)
+### Candidate #1242 — `дойбы` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -25248,7 +23614,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1329 — `дубай` (freq 26)
+### Candidate #1243 — `дубай` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -25267,7 +23633,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1330 — `ескелді` (freq 26)
+### Candidate #1244 — `ескелді` (freq 26)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -25286,7 +23652,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1331 — `кандидаттарды` (freq 26)
+### Candidate #1245 — `кандидаттарды` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -25305,7 +23671,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1332 — `компанияларға` (freq 26)
+### Candidate #1246 — `компанияларға` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -25324,7 +23690,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1333 — `компанияға` (freq 26)
+### Candidate #1247 — `компанияға` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -25343,7 +23709,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1334 — `консерваториясының` (freq 26)
+### Candidate #1248 — `консерваториясының` (freq 26)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -25362,7 +23728,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1335 — `кореяға` (freq 26)
+### Candidate #1249 — `кореяға` (freq 26)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -25381,7 +23747,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1336 — `косовоның` (freq 26)
+### Candidate #1250 — `косовоның` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -25400,7 +23766,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1337 — `костюм` (freq 26)
+### Candidate #1251 — `костюм` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -25419,7 +23785,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1338 — `локомотив` (freq 26)
+### Candidate #1252 — `локомотив` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -25438,7 +23804,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1339 — `мвт` (freq 26)
+### Candidate #1253 — `мвт` (freq 26)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -25457,7 +23823,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1340 — `музейде` (freq 26)
+### Candidate #1254 — `музейде` (freq 26)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -25476,7 +23842,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1341 — `мырзаның` (freq 26)
+### Candidate #1255 — `мырзаның` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -25495,7 +23861,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1342 — `нокаутпен` (freq 26)
+### Candidate #1256 — `нокаутпен` (freq 26)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -25514,7 +23880,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1343 — `норвегияның` (freq 26)
+### Candidate #1257 — `норвегияның` (freq 26)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -25533,7 +23899,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1344 — `объектілері` (freq 26)
+### Candidate #1258 — `объектілері` (freq 26)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -25552,7 +23918,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1345 — `оқиғасына` (freq 26)
+### Candidate #1259 — `оқиғасына` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -25571,7 +23937,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1346 — `проблеманы` (freq 26)
+### Candidate #1260 — `проблеманы` (freq 26)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -25590,7 +23956,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1347 — `пқбаи` (freq 26)
+### Candidate #1261 — `пқбаи` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -25609,7 +23975,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1348 — `роналду` (freq 26)
+### Candidate #1262 — `роналду` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -25628,7 +23994,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1349 — `салмағының` (freq 26)
+### Candidate #1263 — `салмағының` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -25647,7 +24013,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1350 — `сектордың` (freq 26)
+### Candidate #1264 — `сектордың` (freq 26)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -25666,7 +24032,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1351 — `смартфон` (freq 26)
+### Candidate #1265 — `смартфон` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -25685,7 +24051,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1352 — `ссейфуллин` (freq 26)
+### Candidate #1266 — `ссейфуллин` (freq 26)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -25704,7 +24070,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1353 — `стадионында` (freq 26)
+### Candidate #1267 — `стадионында` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -25723,7 +24089,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1354 — `ташкенттегі` (freq 26)
+### Candidate #1268 — `ташкенттегі` (freq 26)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -25742,7 +24108,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1355 — `холмс` (freq 26)
+### Candidate #1269 — `холмс` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -25761,7 +24127,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1356 — `шоғы` (freq 26)
+### Candidate #1270 — `шоғы` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -25780,7 +24146,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1357 — `этнос` (freq 26)
+### Candidate #1271 — `этнос` (freq 26)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -25799,7 +24165,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1358 — `қрз` (freq 26)
+### Candidate #1272 — `қрз` (freq 26)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiced_consonant**
@@ -25818,45 +24184,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1359 — `impl` (freq 25)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_05_0053`) «Әдістерді анықтау Структтың әдістерін `impl` блогында жариялаймыз.»
-  2. (rust_book_kk_pack.json / `rust_book_05_0060`) «Байланысты функциялар `impl` блогында `self` параметрсіз функцияны да жариялауға болады.»
-  3. (rust_book_kk_pack.json / `rust_book_05_0062`) «Әдетте конструктор ретінде қолданылады: `Self` — `impl` блогының түрі (мұнда `Rectangle`).»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1360 — `use` (freq 25)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_02_0011`) «Бірінші жолда `use std::io;` сөйлемі тұр.»
-  2. (rust_book_kk_pack.json / `rust_book_02_0013`) «Стандартты кітапхана көптеген пайдалы заттарды ұсынады, бірақ олардың бәрі автоматты түрде қолжетімді емес: `io` сияқты бөлектерді қолданғанда оларды нақты `use` арқылы шақыру керек. `main` функциясын …»
-  3. (rust_book_kk_pack.json / `rust_book_02_0039`) «Кездейсоқ санды жасау Енді кодқа кездейсоқ сан генерациясын қосайық. `src/main.rs` файлының басына жаңа `use` сөйлемін, ал кодтың ішіне сан жасайтын бөлік қосыңыз: `use rand::Rng;` сөйлемі `Rng` трейт …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1361 — `аймауытов` (freq 25)
+### Candidate #1273 — `аймауытов` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -25875,7 +24203,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1362 — `академиясына` (freq 25)
+### Candidate #1274 — `академиясына` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -25894,7 +24222,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1363 — `аккредиттелген` (freq 25)
+### Candidate #1275 — `аккредиттелген` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -25913,7 +24241,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1364 — `анонс` (freq 25)
+### Candidate #1276 — `анонс` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -25932,7 +24260,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1365 — `аргумент` (freq 25)
+### Candidate #1277 — `аргумент` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -25951,7 +24279,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1366 — `архитектура` (freq 25)
+### Candidate #1278 — `архитектура` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -25970,7 +24298,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1367 — `валентина` (freq 25)
+### Candidate #1279 — `валентина` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -25989,7 +24317,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1368 — `гаухар` (freq 25)
+### Candidate #1280 — `гаухар` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -26008,7 +24336,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1369 — `горький` (freq 25)
+### Candidate #1281 — `горький` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -26027,7 +24355,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1370 — `дивизионда` (freq 25)
+### Candidate #1282 — `дивизионда` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -26046,7 +24374,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1371 — `динамо` (freq 25)
+### Candidate #1283 — `динамо` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -26065,7 +24393,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1372 — `дирижер` (freq 25)
+### Candidate #1284 — `дирижер` (freq 25)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -26084,7 +24412,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1373 — `дисплей` (freq 25)
+### Candidate #1285 — `дисплей` (freq 25)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **glide**
@@ -26103,7 +24431,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1374 — `еұу` (freq 25)
+### Candidate #1286 — `еұу` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -26122,7 +24450,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1375 — `жамылып` (freq 25)
+### Candidate #1287 — `жамылып` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -26141,7 +24469,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1376 — `житс` (freq 25)
+### Candidate #1288 — `житс` (freq 25)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **voiceless_consonant**
@@ -26160,7 +24488,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1377 — `жоспардан` (freq 25)
+### Candidate #1289 — `жоспардан` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -26179,7 +24507,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1378 — `империясын` (freq 25)
+### Candidate #1290 — `империясын` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -26198,7 +24526,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1379 — `инвестициялардың` (freq 25)
+### Candidate #1291 — `инвестициялардың` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -26217,7 +24545,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1380 — `инвесторларға` (freq 25)
+### Candidate #1292 — `инвесторларға` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -26236,7 +24564,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1381 — `инспекциясы` (freq 25)
+### Candidate #1293 — `инспекциясы` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -26255,7 +24583,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1382 — `иоганн` (freq 25)
+### Candidate #1294 — `иоганн` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -26274,7 +24602,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1383 — `кадет` (freq 25)
+### Candidate #1295 — `кадет` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -26293,7 +24621,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1384 — `клиентке` (freq 25)
+### Candidate #1296 — `клиентке` (freq 25)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -26312,7 +24640,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1385 — `компанияларының` (freq 25)
+### Candidate #1297 — `компанияларының` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -26331,7 +24659,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1386 — `кувейт` (freq 25)
+### Candidate #1298 — `кувейт` (freq 25)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -26350,7 +24678,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1387 — `курчатов` (freq 25)
+### Candidate #1299 — `курчатов` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -26369,7 +24697,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1388 — `кітабді` (freq 25)
+### Candidate #1300 — `кітабді` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -26388,45 +24716,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1389 — `монитор` (freq 25)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0040709`) «Жүйелік блоктың артқы жағында негізгі (монитор, пернетақта, тышқан) және қосымша құрылғыларды (принтер, модем, сканер, микрофон) қосатын порттар мен енгізу құрылғылары орналасқан.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0040710`) «Сыртқы пішіні бойынша дисплей кәдімгі түрлі түсті теледидарға ұқсайды, сондықтан оны жиі телевизиялық техникадағыдай монитор деп те атайды.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0071270`) «Монитор (немесе дисплей) - мәтіндік жəне сызбалық ақпаратты бейнелеуге, көрсетуге, пайдаланушы мен компьютер арасындағы ақпараттық байланысты қамтамассыз етуге арналған құрылғы.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1390 — `мүмкiн` (freq 25)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **nasal**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0005385`) «1. Жұмыс тобы қоғамдық кеңестердi мемлекеттiк органдардың өкiлдерi және конкурстық негiзде — коммерциялық емес ұйымдардың өкiлдерi, азаматтар арасынан қалыптастырады. Қоғамдық кеңес мүшелiгiне кандида …»
-  2. (cc100_kk_pack.json / `cc100_kk_0013411`) «5) тармақшадағы «iшiнде берiлуi мүмкiн.» деген сөздер «ішінде;» деген сөзбен ауыстырылып, мынадай мазмұндағы 6), 7), 8), 9), 10) және 11) тармақшалармен толықтырылсын:»
-  3. (cc100_kk_pack.json / `cc100_kk_0021854`) «болуы мүмкiн және болуы тиiс.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1391 — `номері` (freq 25)
+### Candidate #1301 — `номері` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -26445,7 +24735,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1392 — `округтің` (freq 25)
+### Candidate #1302 — `округтің` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -26464,7 +24754,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1393 — `опералық` (freq 25)
+### Candidate #1303 — `опералық` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -26483,7 +24773,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1394 — `оңаша` (freq 25)
+### Candidate #1304 — `оңаша` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -26502,7 +24792,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1395 — `пму` (freq 25)
+### Candidate #1305 — `пму` (freq 25)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **vowel**
@@ -26521,7 +24811,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1396 — `протестанттар` (freq 25)
+### Candidate #1306 — `протестанттар` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -26540,7 +24830,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1397 — `салдырған` (freq 25)
+### Candidate #1307 — `салдырған` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -26559,7 +24849,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1398 — `семинардың` (freq 25)
+### Candidate #1308 — `семинардың` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -26578,7 +24868,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1399 — `сигналдар` (freq 25)
+### Candidate #1309 — `сигналдар` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -26597,7 +24887,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1400 — `синтаксис` (freq 25)
+### Candidate #1310 — `синтаксис` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -26616,7 +24906,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1401 — `театрға` (freq 25)
+### Candidate #1311 — `театрға` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -26635,7 +24925,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1402 — `терді` (freq 25)
+### Candidate #1312 — `терді` (freq 25)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -26654,7 +24944,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1403 — `теру` (freq 25)
+### Candidate #1313 — `теру` (freq 25)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -26673,7 +24963,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1404 — `титан` (freq 25)
+### Candidate #1314 — `титан` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -26692,7 +24982,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1405 — `уругвай` (freq 25)
+### Candidate #1315 — `уругвай` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -26711,7 +25001,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1406 — `филиппин` (freq 25)
+### Candidate #1316 — `филиппин` (freq 25)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **nasal**
@@ -26730,7 +25020,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1407 — `француздар` (freq 25)
+### Candidate #1317 — `француздар` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -26749,7 +25039,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1408 — `шриланка` (freq 25)
+### Candidate #1318 — `шриланка` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -26768,7 +25058,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1409 — `элементтерді` (freq 25)
+### Candidate #1319 — `элементтерді` (freq 25)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -26787,7 +25077,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1410 — `қиған` (freq 25)
+### Candidate #1320 — `қиған` (freq 25)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -26806,7 +25096,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1411 — `ұәқ` (freq 25)
+### Candidate #1321 — `ұәқ` (freq 25)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -26825,26 +25115,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1412 — `send` (freq 24)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_15_0054`) «Бірақ `MockMessenger` тестілеу барысында хабарламаларды есептеуі керек. `RefCell` арқылы `send` ішінде ішкі векторды өзгерте аламыз. `Rc<T>` пен `RefCell<T>` бірге Кейде бізге **бірнеше иеленуші** бар …»
-  2. (rust_book_kk_pack.json / `rust_book_16_0007`) «Ағындар арасында **хабарлама арқылы алмасу** (`mpsc::channel`). **Ортақ күйді** қорғау (`Mutex<T>` пен `Arc<T>`). `Send` пен `Sync` трейттері — қатарлас орындаудың типтік негізі. 16.1.»
-  3. (rust_book_kk_pack.json / `rust_book_16_0019`) «Қосалқы ағында: `tx.send(val)` — `val`-ды каналға жібереді. `send` иелікті алады — содан соң `val`-ды басқа жерде қолдану мүмкін емес.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1413 — `абыроймен` (freq 24)
+### Candidate #1322 — `абыроймен` (freq 24)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -26863,7 +25134,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1414 — `акимат` (freq 24)
+### Candidate #1323 — `акимат` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -26882,7 +25153,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1415 — `аппаратына` (freq 24)
+### Candidate #1324 — `аппаратына` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -26901,7 +25172,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1416 — `аудиторияға` (freq 24)
+### Candidate #1325 — `аудиторияға` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -26920,7 +25191,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1417 — `аөсшк` (freq 24)
+### Candidate #1326 — `аөсшк` (freq 24)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -26939,7 +25210,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1418 — `бкбп` (freq 24)
+### Candidate #1327 — `бкбп` (freq 24)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -26958,7 +25229,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1419 — `валентин` (freq 24)
+### Candidate #1328 — `валентин` (freq 24)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -26977,7 +25248,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1420 — `вьетнам` (freq 24)
+### Candidate #1329 — `вьетнам` (freq 24)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -26996,7 +25267,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1421 — `гидрогеологиялық` (freq 24)
+### Candidate #1330 — `гидрогеологиялық` (freq 24)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -27015,7 +25286,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1422 — `гликозидтері` (freq 24)
+### Candidate #1331 — `гликозидтері` (freq 24)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -27034,26 +25305,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1423 — `дiни` (freq 24)
-
-- Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0018198`) «Заңмен тыйым салынған 15 түрлі дiни ағымдар және олардың сипаттамалары»
-  2. (cc100_kk_pack.json / `cc100_kk_0025743`) «болады. Анығырақ айтар болсақ, түрік дәуірінен бастау алады. Бұл ұғым көпшiлiк түсiнiгiнде дiни»
-  3. (cc100_kk_pack.json / `cc100_kk_0033947`) «3. Республиканың конституциялық құрылысын күштеп өзгертуге, тұтастығын бұзуға, мемлекет қауiпсiздiгiне нұқсан келтiруге, соғысқа, әлеуметтiк, нәсiлдiк, ұлттық, дiни, тектiк-топтық және рулық астамшылы …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1424 — `жайылымдар` (freq 24)
+### Candidate #1332 — `жайылымдар` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -27072,7 +25324,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1425 — `жаңғағы` (freq 24)
+### Candidate #1333 — `жаңғағы` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -27091,7 +25343,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1426 — `жоббм` (freq 24)
+### Candidate #1334 — `жоббм` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -27110,26 +25362,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1427 — `интернетресурсында` (freq 24)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0008766`) «Салық кодексінің 1-бап, 30) тармағына сәйкесинтернет-дүкен – тауарларды өз интернет-ресурсында өткізуге арналған, Интернетте орналастырылған ақпараттық жүйе;»
-  2. (cc100_kk_pack.json / `cc100_kk_0010650`) «5. Есептік тіркеуден өткен микроқаржы ұйымдарының тізілімі уәкілетті органның интернет-ресурсында орналастырылады.»
-  3. (cc100_kk_pack.json / `cc100_kk_0014141`) «Осы келісімнің Зеленов ауданы әкімі аппаратының интернет-ресурсында (мемлекеттік орган атауы)»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1428 — `клетка` (freq 24)
+### Candidate #1335 — `клетка` (freq 24)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -27148,7 +25381,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1429 — `климатты` (freq 24)
+### Candidate #1336 — `климатты` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -27167,7 +25400,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1430 — `комиссиялар` (freq 24)
+### Candidate #1337 — `комиссиялар` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -27186,7 +25419,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1431 — `компонент` (freq 24)
+### Candidate #1338 — `компонент` (freq 24)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -27205,7 +25438,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1432 — `кондитер` (freq 24)
+### Candidate #1339 — `кондитер` (freq 24)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -27224,7 +25457,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1433 — `конус` (freq 24)
+### Candidate #1340 — `конус` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -27243,7 +25476,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1434 — `корейлер` (freq 24)
+### Candidate #1341 — `корейлер` (freq 24)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -27262,7 +25495,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1435 — `корреспондент` (freq 24)
+### Candidate #1342 — `корреспондент` (freq 24)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -27281,7 +25514,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1436 — `лесбиянки` (freq 24)
+### Candidate #1343 — `лесбиянки` (freq 24)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -27300,7 +25533,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1437 — `либерия` (freq 24)
+### Candidate #1344 — `либерия` (freq 24)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **unknown**
@@ -27319,7 +25552,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1438 — `ливия` (freq 24)
+### Candidate #1345 — `ливия` (freq 24)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **unknown**
@@ -27338,7 +25571,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1439 — `монолог` (freq 24)
+### Candidate #1346 — `монолог` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -27357,7 +25590,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1440 — `округке` (freq 24)
+### Candidate #1347 — `округке` (freq 24)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -27376,7 +25609,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1441 — `орнатуды` (freq 24)
+### Candidate #1348 — `орнатуды` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -27395,7 +25628,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1442 — `оңайға` (freq 24)
+### Candidate #1349 — `оңайға` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -27414,7 +25647,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1443 — `оңды` (freq 24)
+### Candidate #1350 — `оңды` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -27433,7 +25666,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1444 — `процесті` (freq 24)
+### Candidate #1351 — `процесті` (freq 24)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -27452,7 +25685,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1445 — `пушкиннің` (freq 24)
+### Candidate #1352 — `пушкиннің` (freq 24)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -27471,7 +25704,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1446 — `радиус` (freq 24)
+### Candidate #1353 — `радиус` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -27490,45 +25723,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1447 — `реактор` (freq 24)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0046384`) «1945 — АҚШ-та алғашқы ядролық реактор пайда болды.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0131767`) «70 жылдардың аяғында ядролық реактор құрастырушылары “ҮМЗ” де жоғары сапалы ядролық жылу өндіру мүмкіндігі бар екендігін айтты.»
-  3. (kazakh_textbooks_pack.json / `kz_textbook_physics_11_emn_p0257_s05`) «Ядролық реактор (о) Бұл қызық»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1448 — `ректор` (freq 24)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_01783`) «Бірінші ректор С. Ж. Асфендияров Верный гимназиясы директорының үйінде (қазіргі Түркия Елшілігі) тұрды.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0056014`) «Гумилев атындағы ЕҰУ базасында ректор М.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0073037`) «1993 жылы тұңғыш мемлекеттік емес университетке (қазіргі “Көкше” академиясы, ректор Ж.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1449 — `рыңдар` (freq 24)
+### Candidate #1354 — `рыңдар` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -27547,7 +25742,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1450 — `сайланатын` (freq 24)
+### Candidate #1355 — `сайланатын` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -27566,7 +25761,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1451 — `сайып` (freq 24)
+### Candidate #1356 — `сайып` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -27585,7 +25780,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1452 — `салынбаған` (freq 24)
+### Candidate #1357 — `салынбаған` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -27604,7 +25799,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1453 — `секторларында` (freq 24)
+### Candidate #1358 — `секторларында` (freq 24)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -27623,7 +25818,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1454 — `секторында` (freq 24)
+### Candidate #1359 — `секторында` (freq 24)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -27642,7 +25837,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1455 — `сипатты` (freq 24)
+### Candidate #1360 — `сипатты` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -27661,7 +25856,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1456 — `сон` (freq 24)
+### Candidate #1361 — `сон` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -27680,7 +25875,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1457 — `статусы` (freq 24)
+### Candidate #1362 — `статусы` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -27699,7 +25894,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1458 — `студия` (freq 24)
+### Candidate #1363 — `студия` (freq 24)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **unknown**
@@ -27718,7 +25913,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1459 — `сыпатай` (freq 24)
+### Candidate #1364 — `сыпатай` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -27737,26 +25932,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1460 — `тiлi` (freq 24)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0003269`) «Қ. Сатбаев және жiктiк жалғауларды қайталау / С. Жанатқызы // Қазақ тiлi мен әдебиетi орыс мектебiнде=Каз.яз.и лит.в рус. школе. - 2010. - № 2. - 64-74 б.»
-  2. (cc100_kk_pack.json / `cc100_kk_0006177`) «Туған тiлiм - дарыған ана сүтiмен : (Аналармен кездесу) / Г. Жаппарова // Қазақ тiлi мен әдебиетi орыс мектебiнде. - 2002. - № 4. - 57-61 б.»
-  3. (cc100_kk_pack.json / `cc100_kk_0006192`) «"Шетел тiлiн бiлу-болашақтың кiлтi" : (ғалым, ұстаз, қоғам қайраткерi Әдiл Құрманжанұлы Ахметовпен кездесу кешi) / Г. Қ. Рысбаева // Мектептегi шет тiлi= Иностранный язык в школе. - 2008. - № 2. - 28- …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1461 — `талда` (freq 24)
+### Candidate #1365 — `талда` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -27775,7 +25951,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1462 — `талибан` (freq 24)
+### Candidate #1366 — `талибан` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -27794,7 +25970,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1463 — `теорияның` (freq 24)
+### Candidate #1367 — `теорияның` (freq 24)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -27813,7 +25989,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1464 — `триас` (freq 24)
+### Candidate #1368 — `триас` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -27832,7 +26008,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1465 — `төңірегі` (freq 24)
+### Candidate #1369 — `төңірегі` (freq 24)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -27851,7 +26027,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1466 — `физигі` (freq 24)
+### Candidate #1370 — `физигі` (freq 24)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -27870,7 +26046,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1467 — `формасын` (freq 24)
+### Candidate #1371 — `формасын` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -27889,7 +26065,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1468 — `хакас` (freq 24)
+### Candidate #1372 — `хакас` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -27908,7 +26084,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1469 — `ыдырай` (freq 24)
+### Candidate #1373 — `ыдырай` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -27927,7 +26103,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1470 — `эльмира` (freq 24)
+### Candidate #1374 — `эльмира` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -27946,7 +26122,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1471 — `эстрада` (freq 24)
+### Candidate #1375 — `эстрада` (freq 24)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -27965,7 +26141,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1472 — `үеұ` (freq 24)
+### Candidate #1376 — `үеұ` (freq 24)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -27984,7 +26160,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1473 — `әддин` (freq 24)
+### Candidate #1377 — `әддин` (freq 24)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -28003,7 +26179,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1474 — `айбек` (freq 23)
+### Candidate #1378 — `айбек` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -28022,26 +26198,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1475 — `аккумулятор` (freq 23)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0001659`) «Экспортқа шығарылған өнімдерге тері шикізаттары, жүн, аккумулятор, түсті металдар жатады.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0043302`) «машина || Аккумулятор|| Талдықорған |- | Радиотехника|| Телевизор || Алматы |} Химия өнеркәсібінің кәсіпорындары Қазақстанның біршама аймақтарында орналасқан.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0066510`) «Гиробус аккумулятор автобусовтарға және троллейбустарға балама ретінде ойлап табылған еді.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1476 — `америкадан` (freq 23)
+### Candidate #1379 — `америкадан` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -28060,7 +26217,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1477 — `ангола` (freq 23)
+### Candidate #1380 — `ангола` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -28079,7 +26236,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1478 — `аппараттары` (freq 23)
+### Candidate #1381 — `аппараттары` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -28098,7 +26255,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1479 — `археолог` (freq 23)
+### Candidate #1382 — `археолог` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -28117,26 +26274,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1480 — `бюджеттiк` (freq 23)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **voiceless_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0004981`) «Ақмола облысында «Нұрлы жол» аясында 3,8 млрд теңгенің 14 жобасы жүзеге асырылуда. Бұл туралы облыс басшысының төрағалағымен өткен әкiмдiк отырысында облыстық экономика және бюджеттiк жоспарлау басқар …»
-  2. (cc100_kk_pack.json / `cc100_kk_0006154`) «Бюджеттiк бағдарламалар : қазақстан Республикасы Денсаулық сақтау министрлiгiнiң бюджеттiк бағдарламасы // ҚР ПҮАЖ-ы=САПП РК. - 2009. - № 29. - 66-138 б.»
-  3. (cc100_kk_pack.json / `cc100_kk_0006154`) «Бюджеттiк бағдарламалар : қазақстан Республикасы Денсаулық сақтау министрлiгiнiң бюджеттiк бағдарламасы // ҚР ПҮАЖ-ы=САПП РК. - 2009. - № 29. - 66-138 б.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1481 — `бөжей` (freq 23)
+### Candidate #1383 — `бөжей` (freq 23)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **glide**
@@ -28155,7 +26293,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1482 — `вицеминистр` (freq 23)
+### Candidate #1384 — `вицеминистр` (freq 23)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -28174,7 +26312,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1483 — `волейболдан` (freq 23)
+### Candidate #1385 — `волейболдан` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -28193,7 +26331,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1484 — `галина` (freq 23)
+### Candidate #1386 — `галина` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -28212,7 +26350,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1485 — `гандидің` (freq 23)
+### Candidate #1387 — `гандидің` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -28231,7 +26369,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1486 — `гигиена` (freq 23)
+### Candidate #1388 — `гигиена` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -28250,7 +26388,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1487 — `гигиенасы` (freq 23)
+### Candidate #1389 — `гигиенасы` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -28269,7 +26407,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1488 — `гомер` (freq 23)
+### Candidate #1390 — `гомер` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -28288,7 +26426,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1489 — `гсм` (freq 23)
+### Candidate #1391 — `гсм` (freq 23)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **nasal**
@@ -28307,7 +26445,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1490 — `египетте` (freq 23)
+### Candidate #1392 — `египетте` (freq 23)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -28326,7 +26464,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1491 — `жайлауы` (freq 23)
+### Candidate #1393 — `жайлауы` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -28345,7 +26483,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1492 — `жоспарланды` (freq 23)
+### Candidate #1394 — `жоспарланды` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -28364,7 +26502,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1493 — `зейнеткерлерге` (freq 23)
+### Candidate #1395 — `зейнеткерлерге` (freq 23)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -28383,7 +26521,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1494 — `изоляторына` (freq 23)
+### Candidate #1396 — `изоляторына` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -28402,7 +26540,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1495 — `империясында` (freq 23)
+### Candidate #1397 — `империясында` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -28421,26 +26559,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1496 — `интербелсенді` (freq 23)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0004093`) «Интербелсенді симулятормен жұмыс істеп, оқушы келесі сұрақтарға жауап беру керек:»
-  2. (cc100_kk_pack.json / `cc100_kk_0026863`) «Оқулық, интербелсенді тақта, семантикалық карта, плакат, стикер, маркер т.б.»
-  3. (cc100_kk_pack.json / `cc100_kk_0055118`) «Керекті құрал - жабдықтар: Интербелсенді тақта, қима қағаздар, А- 3 қағазы, карточкалар»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1497 — `йынша` (freq 23)
+### Candidate #1398 — `йынша` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -28459,7 +26578,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1498 — `комиссарлар` (freq 23)
+### Candidate #1399 — `комиссарлар` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -28478,7 +26597,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1499 — `консервативті` (freq 23)
+### Candidate #1400 — `консервативті` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -28497,7 +26616,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1500 — `консерваториясы` (freq 23)
+### Candidate #1401 — `консерваториясы` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -28516,7 +26635,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1501 — `континенталды` (freq 23)
+### Candidate #1402 — `континенталды` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -28535,7 +26654,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1502 — `контурда` (freq 23)
+### Candidate #1403 — `контурда` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -28554,7 +26673,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1503 — `лнгумилев` (freq 23)
+### Candidate #1404 — `лнгумилев` (freq 23)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiced_consonant**
@@ -28573,7 +26692,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1504 — `мораль` (freq 23)
+### Candidate #1405 — `мораль` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -28592,7 +26711,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1505 — `музыкасын` (freq 23)
+### Candidate #1406 — `музыкасын` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -28611,7 +26730,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1506 — `мырзалиев` (freq 23)
+### Candidate #1407 — `мырзалиев` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -28630,7 +26749,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1507 — `нартай` (freq 23)
+### Candidate #1408 — `нартай` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -28649,7 +26768,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1508 — `нигерия` (freq 23)
+### Candidate #1409 — `нигерия` (freq 23)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **unknown**
@@ -28668,7 +26787,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1509 — `норвег` (freq 23)
+### Candidate #1410 — `норвег` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -28687,26 +26806,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1510 — `нормативтiк` (freq 23)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **voiceless_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0005376`) «3. Қоғамдық кеңес өз қызметiнде Қазақстан Республикасының Конституциясын, оған сәйкес заңдарды, Қазақстан Республикасы Президентiнiң, Қазақстан Республикасы Үкiметiнiң актiлерiн, өзге де нормативтiк қ …»
-  2. (cc100_kk_pack.json / `cc100_kk_0013121`) «Клиенттiң банк шоттары бойынша ақша қозғалысы туралы үзiндi көшірмеде болуға тиiс мәлiметтер уәкілетті органның нормативтiк құқықтық актiсiнде айқындалады.»;»
-  3. (cc100_kk_pack.json / `cc100_kk_0013166`) ««4. Жеке-дара қолданылатын құқықтық актiлердi қабылдау рәсiмдерi, олардың ресiмделуiн, орындалуын және орындалуына ішкі бақылауды ұйымдастыру осы Заңда және өзге де нормативтiк құқықтық актiлерде айқы …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1511 — `ньюйоркте` (freq 23)
+### Candidate #1411 — `ньюйоркте` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -28725,7 +26825,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1512 — `операсы` (freq 23)
+### Candidate #1412 — `операсы` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -28744,26 +26844,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1513 — `осакаров` (freq 23)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **voiced_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0002347`) «Осынау іс жері егін өсіруге қолайлы Нұра және Осакаров аудандарында кең өріс алды.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0002545`) «Оған Бұқар жырау, Абай, Нұра, Осакаров ауданының Солтүстік-Шығыс, Қарқаралы ауданының Солтүстік-Шығыс кіреді.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0002548`) «Қоңыржай-жылы өте қуаң ауданға Осакаров ауданының басым бөлігі, Жаңаарқа ауданының Солтүстік, Қарқаралы ауданының Оңтүстік-Шығысы жатады.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1514 — `оянып` (freq 23)
+### Candidate #1413 — `оянып` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -28782,7 +26863,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1515 — `повесі` (freq 23)
+### Candidate #1414 — `повесі` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -28801,7 +26882,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1516 — `презентациялар` (freq 23)
+### Candidate #1415 — `презентациялар` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -28820,7 +26901,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1517 — `прогрессивті` (freq 23)
+### Candidate #1416 — `прогрессивті` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -28839,26 +26920,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1518 — `публицист` (freq 23)
-
-- Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
-- Final sound (auto): **voiceless_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0008783`) «Әлихан Нұрмұхамедұлы Бөкейхан — қазақтың мемлекеттік, саяси және қоғам қайраткері, ұлт-азаттық және Алаш партиясының жетекшісі, Алашорда автономиялы үкіметінің төрағасы, публицист, ғалым, аудармашы.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0019301`) «Жүсіпбек Аймауытов (1889–1931) — қазақтың көрнекті жазушысы, драматург, публицист, қазақ әдебиетін қалыптастырушылардың бірі.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0048997`) «Алаш партиясының жетекшісі, Алашорда автономиялы үкіметінің төрағасы, публицист, ғалым, аудармашы.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1519 — `ракета` (freq 23)
+### Candidate #1417 — `ракета` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -28877,7 +26939,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1520 — `рын` (freq 23)
+### Candidate #1418 — `рын` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -28896,7 +26958,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1521 — `саванна` (freq 23)
+### Candidate #1419 — `саванна` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -28915,7 +26977,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1522 — `сайлап` (freq 23)
+### Candidate #1420 — `сайлап` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -28934,7 +26996,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1523 — `сайлауына` (freq 23)
+### Candidate #1421 — `сайлауына` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -28953,7 +27015,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1524 — `сирияға` (freq 23)
+### Candidate #1422 — `сирияға` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -28972,7 +27034,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1525 — `соборы` (freq 23)
+### Candidate #1423 — `соборы` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -28991,7 +27053,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1526 — `спикері` (freq 23)
+### Candidate #1424 — `спикері` (freq 23)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -29010,7 +27072,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1527 — `ста` (freq 23)
+### Candidate #1425 — `ста` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -29029,7 +27091,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1528 — `талдамалық` (freq 23)
+### Candidate #1426 — `талдамалық` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -29048,7 +27110,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1529 — `талпыныс` (freq 23)
+### Candidate #1427 — `талпыныс` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -29067,7 +27129,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1530 — `техногендік` (freq 23)
+### Candidate #1428 — `техногендік` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -29086,26 +27148,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1531 — `трансформатор` (freq 23)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0089655`) «Егер трансформатор жоғары кернеулі желіге ауыстырылып қосылса, онда оны кернеуі 220 В желіге қосуға болмайды.»
-  2. (cc100_kk_pack.json / `cc100_kk_0047460`) «Балғынбек достарымен ойнап жүріп трансформатор тұрған қауіпті аймаққа кіріп тоққа түскен. Содан екі қолынан айырылған жеткіншек екі жылдан бері қиналып келеді. Оның жанына медет тек ата-анасы мен қары …»
-  3. (cc100_kk_pack.json / `cc100_kk_0106286`) «7-ші қысқы Азия ойындарына арналған 2 * 40 МВА трансформатор 110/10 кВ «Білім ордасы» нысаны.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1532 — `тренингтер` (freq 23)
+### Candidate #1429 — `тренингтер` (freq 23)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -29124,7 +27167,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1533 — `формада` (freq 23)
+### Candidate #1430 — `формада` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -29143,7 +27186,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1534 — `функционалды` (freq 23)
+### Candidate #1431 — `функционалды` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -29162,7 +27205,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1535 — `хаа` (freq 23)
+### Candidate #1432 — `хаа` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -29181,7 +27224,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1536 — `хадистер` (freq 23)
+### Candidate #1433 — `хадистер` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -29200,7 +27243,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1537 — `хас` (freq 23)
+### Candidate #1434 — `хас` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -29219,7 +27262,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1538 — `цилиндр` (freq 23)
+### Candidate #1435 — `цилиндр` (freq 23)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **liquid**
@@ -29238,7 +27281,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1539 — `черногория` (freq 23)
+### Candidate #1436 — `черногория` (freq 23)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -29257,26 +27300,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1540 — `этнография` (freq 23)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_01564`) «Мәселен, өсіп-өну генетикасы, дәстүрлі шежіре, этнография, тарихи география және т.б. түйісінде.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0009363`) «Мұражайда университеттің өнері мен мәдениетінен сыр шертетін 1 көрме залы, 2 этнография залы, 1 техника залы, ун-т тарихын баяндайтын 6 экспозиц.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0009493`) «мұражайда «Өлке кеңес үкіметі кезінде», «Сыр бойындағы астана», «Қызылорда облысы екінші дүниежүзілік соғыс жылдарында», «Тәуелсіз Қазақстан», «Этнография», «Мәдениет және өнер» залдары ашылды.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1541 — `эқкның` (freq 23)
+### Candidate #1437 — `эқкның` (freq 23)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -29295,45 +27319,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1542 — `өзiнөзi` (freq 23)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0005381`) «2) жергiлiктi атқарушы органдар мен жергiлiктi өзiн-өзi басқару органдарының азаматтық қоғаммен өзара iс-қимыл жасауын дамыту;»
-  2. (cc100_kk_pack.json / `cc100_kk_0005382`) «3) қоғамдық бақылауды ұйымдастыру мен жергiлiктi атқарушы органдар мен жергiлiктi өзiн-өзi басқару органдары қызметiнiң ашықтығын қамтамасыз ету болып табылады.»
-  3. (cc100_kk_pack.json / `cc100_kk_0005385`) «1. Жұмыс тобы қоғамдық кеңестердi мемлекеттiк органдардың өкiлдерi және конкурстық негiзде — коммерциялық емес ұйымдардың өкiлдерi, азаматтар арасынан қалыптастырады. Қоғамдық кеңес мүшелiгiне кандида …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1543 — `main` (freq 22)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_01_0019`) «Егер файл атауында бірнеше сөз болса, оларды астыңғы сызық арқылы бөлу қабылданған: мысалы, `hello_world.rs` (бірақ `helloworld.rs` емес). `main.rs` файлын ашып, ішіне мына кодты жазыңыз: Файлды сақта …»
-  2. (rust_book_kk_pack.json / `rust_book_01_0022`) «Бірінші жолда: Бұл жол `main` атты функцияны жариялайды. `main` функциясы — кез келген орындалатын `Rust` бағдарламасында ең бірінші іске қосылатын код.»
-  3. (rust_book_kk_pack.json / `rust_book_01_0022`) «Бірінші жолда: Бұл жол `main` атты функцияны жариялайды. `main` функциясы — кез келген орындалатын `Rust` бағдарламасында ең бірінші іске қосылатын код.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1544 — `ада` (freq 22)
+### Candidate #1438 — `ада` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -29352,7 +27338,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1545 — `ажырасу` (freq 22)
+### Candidate #1439 — `ажырасу` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -29371,7 +27357,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1546 — `аида` (freq 22)
+### Candidate #1440 — `аида` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -29390,7 +27376,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1547 — `акцияларының` (freq 22)
+### Candidate #1441 — `акцияларының` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -29409,7 +27395,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1548 — `артем` (freq 22)
+### Candidate #1442 — `артем` (freq 22)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -29428,7 +27414,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1549 — `ахмед` (freq 22)
+### Candidate #1443 — `ахмед` (freq 22)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -29447,7 +27433,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1550 — `бренд` (freq 22)
+### Candidate #1444 — `бренд` (freq 22)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiced_consonant**
@@ -29466,7 +27452,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1551 — `винчи` (freq 22)
+### Candidate #1445 — `винчи` (freq 22)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **vowel**
@@ -29485,7 +27471,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1552 — `гасы` (freq 22)
+### Candidate #1446 — `гасы` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -29504,7 +27490,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1553 — `дивизиясы` (freq 22)
+### Candidate #1447 — `дивизиясы` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -29523,7 +27509,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1554 — `днепр` (freq 22)
+### Candidate #1448 — `днепр` (freq 22)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -29542,7 +27528,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1555 — `дулатов` (freq 22)
+### Candidate #1449 — `дулатов` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -29561,7 +27547,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1556 — `еккен` (freq 22)
+### Candidate #1450 — `еккен` (freq 22)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -29580,7 +27566,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1557 — `емшек` (freq 22)
+### Candidate #1451 — `емшек` (freq 22)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -29599,7 +27585,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1558 — `жауыншашынды` (freq 22)
+### Candidate #1452 — `жауыншашынды` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -29618,7 +27604,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1559 — `жиған` (freq 22)
+### Candidate #1453 — `жиған` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -29637,7 +27623,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1560 — `жүгі` (freq 22)
+### Candidate #1454 — `жүгі` (freq 22)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -29656,64 +27642,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1561 — `идеология` (freq 22)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0005949`) «Рас, қоғамның репрессиялық қаталдығы туыдрған жағымсыз саясат пен желбуаз идеология Динаның бұла дарынын қақпайлап бақты.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0039025`) «Түркілердің сол уақыттағы стратегиялық мұраты қорғаныс болды да, ол саясат пен идеология астарында өзін Қытайға қарсы қоюшылық жатқан еді.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0039871`) «1988 жылдан - Ақтөбе облыстық партия комитетінің идеология бөлімінің меңгерушісі.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1562 — `интернеттегі` (freq 22)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0007616`) «2001 жылы пайда бола салысымен Уикипедия интернеттегі ең үлкен мәлімет беретін сайттарының біріне айналды.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0012893`) «Уикипедиядағы мақалаларда Интернеттегі сыртқы дерек көздеріне сілтемелер орналасқан.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0074928`) «Интернеттегі жаңалықтар теледидар және радиодан да жедел ақпарат жариялайтын болды.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1563 — `интерфейсі` (freq 22)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0021020`) «Аппараттық және программалық құралдармен адамның өзара қарым-қатынасының әдістері мен құралдарын қолданушы интерфейсі деп атайды.»
-  2. (cc100_kk_pack.json / `cc100_kk_0021024`) «• есептеу жүйелерінің интерфейсі (аппараттық және программалық жасақтаманы басқару тәсілдері мен әдістері);»
-  3. (kazakh_textbooks_pack.json / `kz_textbook_informatics_11_emn_p0128_s00`) «Дизайнер режимі Дизайнер режимі - қосымшаның интерфейсі жасалатын режим (сыртқы түрі)»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1564 — `инфекциялық` (freq 22)
+### Candidate #1455 — `инфекциялық` (freq 22)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -29732,7 +27661,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1565 — `комиссиясына` (freq 22)
+### Candidate #1456 — `комиссиясына` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -29751,7 +27680,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1566 — `лена` (freq 22)
+### Candidate #1457 — `лена` (freq 22)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -29770,7 +27699,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1567 — `липидтер` (freq 22)
+### Candidate #1458 — `липидтер` (freq 22)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -29789,7 +27718,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1568 — `лисаков` (freq 22)
+### Candidate #1459 — `лисаков` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -29808,7 +27737,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1569 — `музыкаға` (freq 22)
+### Candidate #1460 — `музыкаға` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -29827,7 +27756,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1570 — `мұстафин` (freq 22)
+### Candidate #1461 — `мұстафин` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -29846,7 +27775,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1571 — `мәртөк` (freq 22)
+### Candidate #1462 — `мәртөк` (freq 22)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -29865,7 +27794,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1572 — `надежда` (freq 22)
+### Candidate #1463 — `надежда` (freq 22)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -29884,7 +27813,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1573 — `нки` (freq 22)
+### Candidate #1464 — `нки` (freq 22)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **vowel**
@@ -29903,7 +27832,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1574 — `номинациясы` (freq 22)
+### Candidate #1465 — `номинациясы` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -29922,7 +27851,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1575 — `нормаларына` (freq 22)
+### Candidate #1466 — `нормаларына` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -29941,7 +27870,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1576 — `нормаларға` (freq 22)
+### Candidate #1467 — `нормаларға` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -29960,7 +27889,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1577 — `нормаға` (freq 22)
+### Candidate #1468 — `нормаға` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -29979,7 +27908,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1578 — `нші` (freq 22)
+### Candidate #1469 — `нші` (freq 22)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -29998,7 +27927,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1579 — `облигациялық` (freq 22)
+### Candidate #1470 — `облигациялық` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -30017,7 +27946,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1580 — `объект` (freq 22)
+### Candidate #1471 — `объект` (freq 22)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -30036,7 +27965,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1581 — `объектілер` (freq 22)
+### Candidate #1472 — `объектілер` (freq 22)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -30055,7 +27984,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1582 — `оқимын` (freq 22)
+### Candidate #1473 — `оқимын` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -30074,7 +28003,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1583 — `оқиғаларын` (freq 22)
+### Candidate #1474 — `оқиғаларын` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -30093,7 +28022,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1584 — `оңбас` (freq 22)
+### Candidate #1475 — `оңбас` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -30112,7 +28041,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1585 — `плакат` (freq 22)
+### Candidate #1476 — `плакат` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -30131,7 +28060,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1586 — `плакаттар` (freq 22)
+### Candidate #1477 — `плакаттар` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -30150,7 +28079,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1587 — `практикум` (freq 22)
+### Candidate #1478 — `практикум` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -30169,26 +28098,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1588 — `радиобайланыс` (freq 22)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **voiceless_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0052071`) «Попов) дамытуға мүмкіндік беріп, радиобайланыс кең өріс ала бастады.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0056277`) «Мұнан басқа жаңа қызмет түрі түрлі ойындар, радиобайланыс, анықтамалық ақпараттар, қала, облыс, елдер, дүниежүзінің картасы, ұшақтар мен пойыздардың жүру кестесі, валюталар бағамы, ауа-райы мәліметі с …»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0083562`) «Қысқа толқынды радиобайланыс үшін үлкен маңызы бар.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1589 — `реакторлар` (freq 22)
+### Candidate #1479 — `реакторлар` (freq 22)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -30207,7 +28117,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1590 — `революцияға` (freq 22)
+### Candidate #1480 — `революцияға` (freq 22)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -30226,7 +28136,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1591 — `регламенттерін` (freq 22)
+### Candidate #1481 — `регламенттерін` (freq 22)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -30245,7 +28155,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1592 — `рефлекс` (freq 22)
+### Candidate #1482 — `рефлекс` (freq 22)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -30264,7 +28174,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1593 — `рефлекстер` (freq 22)
+### Candidate #1483 — `рефлекстер` (freq 22)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -30283,7 +28193,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1594 — `самырсын` (freq 22)
+### Candidate #1484 — `самырсын` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -30302,26 +28212,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1595 — `секреция` (freq 22)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0056142`) «Етеккірдің келу уақытының ауытқушылығы ішкі секреция бездері қызметінің бұзылуына байланысты.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0087890`) «Қазбадан табылған белемниттердің қармақша иілген 5 жұп аяқтары, суда жүзуге бейімделген үлкен көзі, сіңір жақтары, қорғаныш қызметін атқаратын ерекше секреция бездері, жұмсақ денесінің ішінде 3 бөлікт …»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0090733`) «Гормондар - ішкі секреция бездерінен бөлінетін ұлпалар мен мүшелерге әсер ететін биологиялық белсенді заттар.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1596 — `секторды` (freq 22)
+### Candidate #1485 — `секторды` (freq 22)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -30340,7 +28231,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1597 — `скандинавия` (freq 22)
+### Candidate #1486 — `скандинавия` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -30359,7 +28250,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1598 — `смс` (freq 22)
+### Candidate #1487 — `смс` (freq 22)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -30378,7 +28269,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1599 — `спикер` (freq 22)
+### Candidate #1488 — `спикер` (freq 22)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -30397,7 +28288,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1600 — `стакан` (freq 22)
+### Candidate #1489 — `стакан` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -30416,7 +28307,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1601 — `сталиннің` (freq 22)
+### Candidate #1490 — `сталиннің` (freq 22)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -30435,7 +28326,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1602 — `театрлар` (freq 22)
+### Candidate #1491 — `театрлар` (freq 22)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -30454,7 +28345,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1603 — `теорема` (freq 22)
+### Candidate #1492 — `теорема` (freq 22)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -30473,7 +28364,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1604 — `территориясын` (freq 22)
+### Candidate #1493 — `территориясын` (freq 22)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -30492,7 +28383,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1605 — `тимор` (freq 22)
+### Candidate #1494 — `тимор` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -30511,7 +28402,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1606 — `тмдның` (freq 22)
+### Candidate #1495 — `тмдның` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -30530,7 +28421,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1607 — `түспеген` (freq 22)
+### Candidate #1496 — `түспеген` (freq 22)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -30549,7 +28440,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1608 — `тұяғы` (freq 22)
+### Candidate #1497 — `тұяғы` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -30568,7 +28459,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1609 — `фараби` (freq 22)
+### Candidate #1498 — `фараби` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -30587,7 +28478,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1610 — `филиалдары` (freq 22)
+### Candidate #1499 — `филиалдары` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -30606,7 +28497,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1611 — `францияға` (freq 22)
+### Candidate #1500 — `францияға` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -30625,7 +28516,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1612 — `хабарламасы` (freq 22)
+### Candidate #1501 — `хабарламасы` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -30644,7 +28535,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1613 — `хирургия` (freq 22)
+### Candidate #1502 — `хирургия` (freq 22)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **unknown**
@@ -30663,7 +28554,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1614 — `чемпионат` (freq 22)
+### Candidate #1503 — `чемпионат` (freq 22)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -30682,7 +28573,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1615 — `шемонаиха` (freq 22)
+### Candidate #1504 — `шемонаиха` (freq 22)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -30701,7 +28592,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1616 — `шыр` (freq 22)
+### Candidate #1505 — `шыр` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -30720,7 +28611,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1617 — `шәуілдір` (freq 22)
+### Candidate #1506 — `шәуілдір` (freq 22)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **liquid**
@@ -30739,7 +28630,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1618 — `января` (freq 22)
+### Candidate #1507 — `января` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -30758,7 +28649,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1619 — `ғып` (freq 22)
+### Candidate #1508 — `ғып` (freq 22)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -30777,26 +28668,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1620 — `әрi` (freq 22)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0000414`) «1) отандық өндiрушi(бұдан әрi – тыңайтқыштарды өндіруші) – Қазақстан Республикасында тыңайтқыштарды (органикалық тыңайтқыштарды қоспағанда) өндiрудi жүзеге асыратын және «Рұқсаттар және хабарламалар т …»
-  2. (cc100_kk_pack.json / `cc100_kk_0007502`) «Бұдан әрi оқып отыру»
-  3. (cc100_kk_pack.json / `cc100_kk_0030338`) «Облыс әкiмi Бурабайда Щучъе-Бурабай курорттық аймағын одан әрi дамыту мәселелерiне арналған жиын өткiздi. Оған туристiк компаниялардың, қонақ-үй кешендерiнiң, «Көкшетау минералды су» АҚ басшылары мен  …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1621 — `өттік` (freq 22)
+### Candidate #1509 — `өттік` (freq 22)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -30815,26 +28687,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1622 — `test` (freq 21)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_11_0004`) «Жаңа жобада дайын дайындаулар бар: `cargo test` командасымен әр жаңартудан кейін сынақтар жүгіртіледі; жаңа функцияға арналған сынақты жазу — бір атрибут пен бір функция.»
-  2. (rust_book_kk_pack.json / `rust_book_11_0005`) «Бұл тарауда үш бөлік бар: **Сынақты қалай жазу** — `#[test]` атрибуты, `assert!`-дер тобы, panic-күтілуі, тестілерде `Result` қолдану. **Сынақтардың жұмысын қалай басқаруға болады** — параллельді / дә …»
-  3. (rust_book_kk_pack.json / `rust_book_11_0006`) «Сынақты қалай жазу `Rust`-та сынақ — әдеттегі функция, бірақ оның үстінде `#[test]` атрибуты тұрады. `cargo test` командасы атрибутпен белгіленген барлық функцияларды табады, оларды бөлек жүгіртеді жә …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1623 — `августа` (freq 21)
+### Candidate #1510 — `августа` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -30853,7 +28706,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1624 — `агенттігді` (freq 21)
+### Candidate #1511 — `агенттігді` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -30872,7 +28725,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1625 — `ажырасып` (freq 21)
+### Candidate #1512 — `ажырасып` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -30891,7 +28744,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1626 — `амстердам` (freq 21)
+### Candidate #1513 — `амстердам` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -30910,7 +28763,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1627 — `архиві` (freq 21)
+### Candidate #1514 — `архиві` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -30929,7 +28782,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1628 — `аумағды` (freq 21)
+### Candidate #1515 — `аумағды` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -30948,7 +28801,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1629 — `бойды` (freq 21)
+### Candidate #1516 — `бойды` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -30967,7 +28820,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1630 — `бойжеткеннің` (freq 21)
+### Candidate #1517 — `бойжеткеннің` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -30986,7 +28839,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1631 — `вирустық` (freq 21)
+### Candidate #1518 — `вирустық` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -31005,7 +28858,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1632 — `гаити` (freq 21)
+### Candidate #1519 — `гаити` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -31024,7 +28877,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1633 — `градустан` (freq 21)
+### Candidate #1520 — `градустан` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -31043,7 +28896,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1634 — `гумус` (freq 21)
+### Candidate #1521 — `гумус` (freq 21)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **voiceless_consonant**
@@ -31062,7 +28915,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1635 — `гюйгенс` (freq 21)
+### Candidate #1522 — `гюйгенс` (freq 21)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -31081,7 +28934,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1636 — `димаштың` (freq 21)
+### Candidate #1523 — `димаштың` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -31100,7 +28953,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1637 — `директорлары` (freq 21)
+### Candidate #1524 — `директорлары` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -31119,7 +28972,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1638 — `докторантура` (freq 21)
+### Candidate #1525 — `докторантура` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -31138,7 +28991,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1639 — `документы` (freq 21)
+### Candidate #1526 — `документы` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -31157,7 +29010,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1640 — `дығы` (freq 21)
+### Candidate #1527 — `дығы` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -31176,7 +29029,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1641 — `женева` (freq 21)
+### Candidate #1528 — `женева` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -31195,7 +29048,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1642 — `жом` (freq 21)
+### Candidate #1529 — `жом` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -31214,7 +29067,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1643 — `жоспарлауда` (freq 21)
+### Candidate #1530 — `жоспарлауда` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -31233,7 +29086,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1644 — `жоғ` (freq 21)
+### Candidate #1531 — `жоғ` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -31252,7 +29105,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1645 — `жігін` (freq 21)
+### Candidate #1532 — `жігін` (freq 21)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -31271,7 +29124,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1646 — `зейнет` (freq 21)
+### Candidate #1533 — `зейнет` (freq 21)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -31290,7 +29143,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1647 — `зираты` (freq 21)
+### Candidate #1534 — `зираты` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -31309,64 +29162,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1648 — `интер` (freq 21)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **liquid**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0112144`) «2006-жылдың 10 тамызынан бері Златан «Интер» сапында өнер көрсетіп келді.»
-  2. (cc100_kk_pack.json / `cc100_kk_0002510`) «- Мадридтік «Атлетико» Чемпиондар Лишасының ширек финалына 17 жыл бұрын шыққан екен. Ал ол кезде қазіргі бас бапкер Диего Симеоне «Интер» ойыншысы болатын.»
-  3. (cc100_kk_pack.json / `cc100_kk_0018303`) «Футзалдан клубтар арасындағы ең мәртебелі турнир биыл Сарагостада өтетін болды. «Барселона», «Интер»,...»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1649 — `интернетінің` (freq 21)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **nasal**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (kazakh_textbooks_pack.json / `kz_textbook_informatics_11_emn_p0004_s05`) ««Заттар интернеті» бөлімі «заттар интернетінің» жұмыс қағи- даларын сипаттау, оның перспективалары туралы айту, конструкторда ыңғайлы мобильдік қосымшасының интерфейсін құру, ақылды үй датчиктерінен а …»
-  2. (kazakh_textbooks_pack.json / `kz_textbook_informatics_11_emn_p0108_s06`) «Х “ заттар интернетінің жұмыс қағидалары; “ заттар интернетінің қолданылу салалары»
-  3. (kazakh_textbooks_pack.json / `kz_textbook_informatics_11_emn_p0108_s06`) «Х “ заттар интернетінің жұмыс қағидалары; “ заттар интернетінің қолданылу салалары»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1650 — `интерфейс` (freq 21)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **voiceless_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0010305`) «Қатынас жасау тәсілі – пайдаланушымен сұхбатты ұйымдастыруға арналған бағдарламалық ортаның сыртқы көрінісі тілдесу (интерфейс) деп те аталады.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0071343`) «Екі көршілес деңгейлер арасындағы әрекеттесуді және олардың арасындағы берілетін мәліметтердің пішімін сипаттау үшін интерфейс (мысалы, Х.»
-  3. (cc100_kk_pack.json / `cc100_kk_0009277`) ««Интерфейс келісім бойнша жасалған», - дегенде, «Немен келісілген», деп сұраймыз. Бұл сұраққа жауап беру үшін өлшемділік ұғымын түсіну керек.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1651 — `исекешев` (freq 21)
+### Candidate #1535 — `исекешев` (freq 21)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiced_consonant**
@@ -31385,7 +29181,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1652 — `кавказдың` (freq 21)
+### Candidate #1536 — `кавказдың` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -31404,7 +29200,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1653 — `кавказға` (freq 21)
+### Candidate #1537 — `кавказға` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -31423,7 +29219,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1654 — `камерун` (freq 21)
+### Candidate #1538 — `камерун` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -31442,7 +29238,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1655 — `кашмир` (freq 21)
+### Candidate #1539 — `кашмир` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -31461,7 +29257,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1656 — `квота` (freq 21)
+### Candidate #1540 — `квота` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -31480,7 +29276,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1657 — `кгдай` (freq 21)
+### Candidate #1541 — `кгдай` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -31499,7 +29295,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1658 — `климатқа` (freq 21)
+### Candidate #1542 — `климатқа` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -31518,7 +29314,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1659 — `колорадо` (freq 21)
+### Candidate #1543 — `колорадо` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -31537,7 +29333,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1660 — `ком` (freq 21)
+### Candidate #1544 — `ком` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -31556,7 +29352,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1661 — `комбинатында` (freq 21)
+### Candidate #1545 — `комбинатында` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -31575,7 +29371,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1662 — `компоненттерінің` (freq 21)
+### Candidate #1546 — `компоненттерінің` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -31594,7 +29390,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1663 — `консулдығы` (freq 21)
+### Candidate #1547 — `консулдығы` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -31613,7 +29409,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1664 — `конфуций` (freq 21)
+### Candidate #1548 — `конфуций` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -31632,7 +29428,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1665 — `лот` (freq 21)
+### Candidate #1549 — `лот` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -31651,7 +29447,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1666 — `млрдтеңге` (freq 21)
+### Candidate #1550 — `млрдтеңге` (freq 21)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -31670,7 +29466,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1667 — `ммнің` (freq 21)
+### Candidate #1551 — `ммнің` (freq 21)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -31689,7 +29485,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1668 — `никель` (freq 21)
+### Candidate #1552 — `никель` (freq 21)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiced_consonant**
@@ -31708,7 +29504,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1669 — `нын` (freq 21)
+### Candidate #1553 — `нын` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -31727,7 +29523,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1670 — `озон` (freq 21)
+### Candidate #1554 — `озон` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -31746,7 +29542,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1671 — `округтердің` (freq 21)
+### Candidate #1555 — `округтердің` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -31765,7 +29561,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1672 — `опасыздық` (freq 21)
+### Candidate #1556 — `опасыздық` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -31784,7 +29580,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1673 — `опоңай` (freq 21)
+### Candidate #1557 — `опоңай` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -31803,7 +29599,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1674 — `оркестрінің` (freq 21)
+### Candidate #1558 — `оркестрінің` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -31822,7 +29618,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1675 — `оскар` (freq 21)
+### Candidate #1559 — `оскар` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -31841,7 +29637,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1676 — `оянады` (freq 21)
+### Candidate #1560 — `оянады` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -31860,7 +29656,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1677 — `оқиғалардан` (freq 21)
+### Candidate #1561 — `оқиғалардан` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -31879,7 +29675,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1678 — `приозерск` (freq 21)
+### Candidate #1562 — `приозерск` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -31898,7 +29694,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1679 — `провинциясында` (freq 21)
+### Candidate #1563 — `провинциясында` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -31917,7 +29713,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1680 — `провинциясының` (freq 21)
+### Candidate #1564 — `провинциясының` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -31936,26 +29732,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1681 — `радиация` (freq 21)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0078453`) «Антарктида жазында, яғни желтоқсан мен қаңтар айларында, Орталық Антарктидада орташа айлық радиация жиынтығы Жер шарындағы ең жоғары көрсеткішке (30 ккал/см2) жетеді.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0087481`) «Радиация әсер еткенде клеткалардың шапшаң бөлінуі, құрылымы мен құрамының өзгеруі мүмкін.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0087718`) «Оны буын, құяң, бүйрек ауруларына және радиация сәулелеріне қарсы ем ретінде пайдаланады.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1682 — `рады` (freq 21)
+### Candidate #1565 — `рады` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -31974,7 +29751,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1683 — `рефлекстің` (freq 21)
+### Candidate #1566 — `рефлекстің` (freq 21)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -31993,7 +29770,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1684 — `реформалау` (freq 21)
+### Candidate #1567 — `реформалау` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -32012,7 +29789,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1685 — `сад` (freq 21)
+### Candidate #1568 — `сад` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -32031,7 +29808,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1686 — `салма` (freq 21)
+### Candidate #1569 — `салма` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -32050,7 +29827,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1687 — `салмай` (freq 21)
+### Candidate #1570 — `салмай` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -32069,7 +29846,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1688 — `салмағына` (freq 21)
+### Candidate #1571 — `салмағына` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -32088,7 +29865,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1689 — `салымшылар` (freq 21)
+### Candidate #1572 — `салымшылар` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -32107,7 +29884,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1690 — `сек` (freq 21)
+### Candidate #1573 — `сек` (freq 21)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -32126,7 +29903,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1691 — `семинары` (freq 21)
+### Candidate #1574 — `семинары` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -32145,7 +29922,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1692 — `сигналдың` (freq 21)
+### Candidate #1575 — `сигналдың` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -32164,7 +29941,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1693 — `символ` (freq 21)
+### Candidate #1576 — `символ` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -32183,7 +29960,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1694 — `сов` (freq 21)
+### Candidate #1577 — `сов` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -32202,7 +29979,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1695 — `стадионда` (freq 21)
+### Candidate #1578 — `стадионда` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -32221,7 +29998,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1696 — `стамбул` (freq 21)
+### Candidate #1579 — `стамбул` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -32240,7 +30017,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1697 — `сто` (freq 21)
+### Candidate #1580 — `сто` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -32259,7 +30036,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1698 — `стоматологиялық` (freq 21)
+### Candidate #1581 — `стоматологиялық` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -32278,7 +30055,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1699 — `стратегияны` (freq 21)
+### Candidate #1582 — `стратегияны` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -32297,7 +30074,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1700 — `стресс` (freq 21)
+### Candidate #1583 — `стресс` (freq 21)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -32316,26 +30093,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1701 — `трансформатордың` (freq 21)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **nasal**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0089652`) «Трансформатордың барлық орамалары бір-бірімен индуктивті түрде, ортақ магнит өрісімен байланысқан.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0089653`) «Бірінші реттік орамаларның шықпаларын (Трансформатордың кірісі) айнымалы Кернеу көзіне, ал Екінші реттік орамаларның шықпаларын жүктемеге қосады.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0089664`) «Оның бойынан жүретін айнымалы ток трансформатордың өзекшесінде айнымалы магнит ағынын тудырады.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1702 — `төрге` (freq 21)
+### Candidate #1584 — `төрге` (freq 21)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -32354,7 +30112,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1703 — `фестиваль` (freq 21)
+### Candidate #1585 — `фестиваль` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -32373,7 +30131,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1704 — `фильмді` (freq 21)
+### Candidate #1586 — `фильмді` (freq 21)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -32392,7 +30150,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1705 — `формасына` (freq 21)
+### Candidate #1587 — `формасына` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -32411,7 +30169,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1706 — `форматы` (freq 21)
+### Candidate #1588 — `форматы` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -32430,7 +30188,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1707 — `форумында` (freq 21)
+### Candidate #1589 — `форумында` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -32449,7 +30207,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1708 — `форумға` (freq 21)
+### Candidate #1590 — `форумға` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -32468,7 +30226,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1709 — `хабарлы` (freq 21)
+### Candidate #1591 — `хабарлы` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -32487,7 +30245,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1710 — `хасенов` (freq 21)
+### Candidate #1592 — `хасенов` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -32506,7 +30264,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1711 — `хикая` (freq 21)
+### Candidate #1593 — `хикая` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -32525,7 +30283,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1712 — `хикмет` (freq 21)
+### Candidate #1594 — `хикмет` (freq 21)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -32544,7 +30302,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1713 — `чемпионатын` (freq 21)
+### Candidate #1595 — `чемпионатын` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -32563,7 +30321,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1714 — `шавкат` (freq 21)
+### Candidate #1596 — `шавкат` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -32582,7 +30340,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1715 — `шоғын` (freq 21)
+### Candidate #1597 — `шоғын` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -32601,7 +30359,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1716 — `энциклопедия` (freq 21)
+### Candidate #1598 — `энциклопедия` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -32620,7 +30378,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1717 — `ява` (freq 21)
+### Candidate #1599 — `ява` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -32639,7 +30397,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1718 — `қмг` (freq 21)
+### Candidate #1600 — `қмг` (freq 21)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiced_consonant**
@@ -32658,7 +30416,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1719 — `қыздан` (freq 21)
+### Candidate #1601 — `қыздан` (freq 21)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -32677,7 +30435,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1720 — `қызкеліншектер` (freq 21)
+### Candidate #1602 — `қызкеліншектер` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -32696,7 +30454,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1721 — `әбілғазы` (freq 21)
+### Candidate #1603 — `әбілғазы` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -32715,7 +30473,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1722 — `әрқилы` (freq 21)
+### Candidate #1604 — `әрқилы` (freq 21)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -32734,45 +30492,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1723 — `drop` (freq 20)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_04_0042`) «Бұл механизмді `drop` функциясы жасайды; ол ішкі әрі үнсіз шақырылады, бірақ оны мысалдың соңында ашық түрде көрсетсек: Бұл — иеліктің ең қарапайым көрінісі.»
-  2. (rust_book_kk_pack.json / `rust_book_08_0034`) «Вектор аяқталғанда Вектор өз аумағынан шыққанда — `drop` шақырылады, оның барлық элементтері де өшіріледі. `Rust` бұл туралы алаңдамауыңызды кепіл етеді: бір вектор жоғалғанда, оның элементтері де жой …»
-  3. (rust_book_kk_pack.json / `rust_book_09_0011`) «Жөндеу барысында бұл — өте пайдалы. `panic!` пен `abort` Әдепкі бойынша `panic!` болғанда `Rust` стекті **кері айналдырады** — функция-функциядан сатып шығып, әр айнымалыны `drop` арқылы тазартады.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1724 — `hash` (freq 20)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_05_0049`) «Стандартты кітапхана ұсынатын `Debug`, `Clone`, `Copy`, `PartialEq`, `Eq`, `Hash`, `Default` сияқты трейттерді бір қатармен типке бекітуге мүмкіндік береді. 10-тарау мен Қосымшадан толығырақ ала аласы …»
-  2. (rust_book_kk_pack.json / `rust_book_08_0005`) «Бұл тарауда үш жалпы қолданылатын ұжыммен танысамыз: **Vector (`Vec<T>`)** — өсетін, сан бойынша индекстелетін бір типтегі мәндердің тізбегі. **String (`String`)** — UTF-8 кодталған өсетін мәтін. **Ha …»
-  3. (rust_book_kk_pack.json / `rust_book_08_0062`) «Кілт-мән жұптарын Hash Map арқылы сақтау `HashMap<K, V>` — кілт пен мәнді жұптап сақтайтын ұжым.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1725 — `абу` (freq 20)
+### Candidate #1605 — `абу` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -32791,7 +30511,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1726 — `абудаби` (freq 20)
+### Candidate #1606 — `абудаби` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -32810,7 +30530,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1727 — `админ` (freq 20)
+### Candidate #1607 — `админ` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -32829,7 +30549,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1728 — `амбулаториялық` (freq 20)
+### Candidate #1608 — `амбулаториялық` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -32848,7 +30568,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1729 — `аппаратын` (freq 20)
+### Candidate #1609 — `аппаратын` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -32867,7 +30587,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1730 — `аудитория` (freq 20)
+### Candidate #1610 — `аудитория` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -32886,7 +30606,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1731 — `брутто` (freq 20)
+### Candidate #1611 — `брутто` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -32905,7 +30625,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1732 — `біп` (freq 20)
+### Candidate #1612 — `біп` (freq 20)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -32924,7 +30644,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1733 — `вконтакте` (freq 20)
+### Candidate #1613 — `вконтакте` (freq 20)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -32943,7 +30663,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1734 — `вундт` (freq 20)
+### Candidate #1614 — `вундт` (freq 20)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **voiceless_consonant**
@@ -32962,7 +30682,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1735 — `глобус` (freq 20)
+### Candidate #1615 — `глобус` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -32981,7 +30701,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1736 — `григориан` (freq 20)
+### Candidate #1616 — `григориан` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -33000,7 +30720,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1737 — `добы` (freq 20)
+### Candidate #1617 — `добы` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -33019,7 +30739,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1738 — `жабын` (freq 20)
+### Candidate #1618 — `жабын` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -33038,7 +30758,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1739 — `жаулары` (freq 20)
+### Candidate #1619 — `жаулары` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -33057,7 +30777,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1740 — `жеделдету` (freq 20)
+### Candidate #1620 — `жеделдету` (freq 20)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -33076,7 +30796,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1741 — `жең` (freq 20)
+### Candidate #1621 — `жең` (freq 20)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -33095,7 +30815,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1742 — `жоспарымен` (freq 20)
+### Candidate #1622 — `жоспарымен` (freq 20)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -33114,7 +30834,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1743 — `жшсгі` (freq 20)
+### Candidate #1623 — `жшсгі` (freq 20)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -33133,26 +30853,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1744 — `инновация` (freq 20)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0103066`) «Инновация жетелеген өндірістік даму қоғамдық байлық дамуының бірден-бір себебі екені тайға басылған таңбадай айқын.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0103075`) «Инновация мұнда жаңа ой, жаңа зат, ол бір жаңалық жасау барысы, ол бір өндіру мен қызмет көрсету салаларының сапасының жаңа деңгейге көтерілуі, санының артуы.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0147416`) «9 қыркүйегіне дейін Нұр-Мүбарак Египет ислам мәдениеті университетінің проректоры; 2018-2024 жылдар аралығында Нұр-Мүбарак университеті жанындағы Әбу Ханифа ғылыми зерттеу орталығының директоры, Дінта …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1745 — `исламда` (freq 20)
+### Candidate #1624 — `исламда` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -33171,7 +30872,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1746 — `испандар` (freq 20)
+### Candidate #1625 — `испандар` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -33190,7 +30891,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1747 — `испаниядан` (freq 20)
+### Candidate #1626 — `испаниядан` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -33209,7 +30910,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1748 — `колледждің` (freq 20)
+### Candidate #1627 — `колледждің` (freq 20)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -33228,7 +30929,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1749 — `компаниясына` (freq 20)
+### Candidate #1628 — `компаниясына` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -33247,7 +30948,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1750 — `композитордың` (freq 20)
+### Candidate #1629 — `композитордың` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -33266,7 +30967,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1751 — `комсомолы` (freq 20)
+### Candidate #1630 — `комсомолы` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -33285,7 +30986,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1752 — `контурдағы` (freq 20)
+### Candidate #1631 — `контурдағы` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -33304,7 +31005,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1753 — `кіндігі` (freq 20)
+### Candidate #1632 — `кіндігі` (freq 20)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -33323,7 +31024,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1754 — `көміп` (freq 20)
+### Candidate #1633 — `көміп` (freq 20)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -33342,7 +31043,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1755 — `людмила` (freq 20)
+### Candidate #1634 — `людмила` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -33361,7 +31062,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1756 — `мкф` (freq 20)
+### Candidate #1635 — `мкф` (freq 20)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -33380,7 +31081,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1757 — `нариман` (freq 20)
+### Candidate #1636 — `нариман` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -33399,7 +31100,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1758 — `наталья` (freq 20)
+### Candidate #1637 — `наталья` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -33418,7 +31119,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1759 — `нормасы` (freq 20)
+### Candidate #1638 — `нормасы` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -33437,7 +31138,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1760 — `облигациялар` (freq 20)
+### Candidate #1639 — `облигациялар` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -33456,7 +31157,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1761 — `образын` (freq 20)
+### Candidate #1640 — `образын` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -33475,7 +31176,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1762 — `ожсбға` (freq 20)
+### Candidate #1641 — `ожсбға` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -33494,7 +31195,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1763 — `округтерінің` (freq 20)
+### Candidate #1642 — `округтерінің` (freq 20)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -33513,7 +31214,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1764 — `оптоталшықты` (freq 20)
+### Candidate #1643 — `оптоталшықты` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -33532,7 +31233,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1765 — `оразаны` (freq 20)
+### Candidate #1644 — `оразаны` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -33551,7 +31252,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1766 — `оразаның` (freq 20)
+### Candidate #1645 — `оразаның` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -33570,7 +31271,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1767 — `офицерлер` (freq 20)
+### Candidate #1646 — `офицерлер` (freq 20)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -33589,7 +31290,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1768 — `ошағының` (freq 20)
+### Candidate #1647 — `ошағының` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -33608,7 +31309,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1769 — `оәк` (freq 20)
+### Candidate #1648 — `оәк` (freq 20)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -33627,7 +31328,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1770 — `платформа` (freq 20)
+### Candidate #1649 — `платформа` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -33646,26 +31347,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1771 — `резервiне` (freq 20)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0014225`) «4) «А» корпусының кадр резервiне алу туралы шешiм қабылдау сәтiнде беймәлiм болған немесе орын алмаған, Қазақстан Республикасының заңнамасына сәйкес азаматтардың мемлекеттiк қызметте болуын шектейтiн  …»
-  2. (cc100_kk_pack.json / `cc100_kk_0014233`) «1) конкурстық iрiктеуге қатысқан және мемлекеттік органның конкурстық комиссиясы кадр резервiне алу үшін ұсыным берген;»
-  3. (cc100_kk_pack.json / `cc100_kk_0014238`) «8-1. «А» корпусының кадр резервiне алынған азаматтар «Б» корпусының кадр резервiне «Б» корпусының мемлекеттік әкімшілік лауазымының тиісті санатына қойылатын үлгiлік бiлiктiлiк талаптарына сай болған  …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1772 — `рінің` (freq 20)
+### Candidate #1650 — `рінің` (freq 20)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -33684,7 +31366,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1773 — `салм` (freq 20)
+### Candidate #1651 — `салм` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -33703,7 +31385,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1774 — `себеппен` (freq 20)
+### Candidate #1652 — `себеппен` (freq 20)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -33722,7 +31404,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1775 — `секторына` (freq 20)
+### Candidate #1653 — `секторына` (freq 20)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -33741,7 +31423,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1776 — `семинарға` (freq 20)
+### Candidate #1654 — `семинарға` (freq 20)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -33760,7 +31442,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1777 — `симметриялы` (freq 20)
+### Candidate #1655 — `симметриялы` (freq 20)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -33779,7 +31461,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1778 — `софия` (freq 20)
+### Candidate #1656 — `софия` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -33798,7 +31480,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1779 — `спектаклі` (freq 20)
+### Candidate #1657 — `спектаклі` (freq 20)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -33817,7 +31499,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1780 — `студияда` (freq 20)
+### Candidate #1658 — `студияда` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -33836,7 +31518,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1781 — `сыңдар` (freq 20)
+### Candidate #1659 — `сыңдар` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -33855,26 +31537,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1782 — `тiркеу` (freq 20)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0003754`) «Газет Қазақстан Республикасының Мәдениет және ақпарат министрлiгiнде тiркелiп, тiркеу туралы №13246-Г куәлiгi берiлген.»
-  2. (cc100_kk_pack.json / `cc100_kk_0008396`) «2) салыстыру үшін түпнұсқасы ұсынылмаған жағдайда, құрылтай құжаттарының және бiрлестiктi заңды тұлға ретiнде мемлекеттiк тiркеу (қайта тіркеу) туралы куәлiктiң немесе анықтаманың нотариалды куәландыр …»
-  3. (cc100_kk_pack.json / `cc100_kk_0010630`) «1. Микроқаржы ұйымының құрылтайшылары құрылатын микроқаржы ұйымын мемлекеттiк тiркеу (қайта тіркеу) кезінде оның жарғылық капиталының ең төменгi мөлшерiн толық төлеуге мiндеттi.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1783 — `ташкенттің` (freq 20)
+### Candidate #1660 — `ташкенттің` (freq 20)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -33893,7 +31556,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1784 — `тед` (freq 20)
+### Candidate #1661 — `тед` (freq 20)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiced_consonant**
@@ -33912,7 +31575,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1785 — `тергептексеру` (freq 20)
+### Candidate #1662 — `тергептексеру` (freq 20)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -33931,26 +31594,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1786 — `терроризм` (freq 20)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **nasal**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0110072`) «Оларға Ядролық қарусыздану мен таратпау, терроризм мен экстремизмге қарсы күрес, бейбітшілік пен бейбітшілікті орнатуға жәрдемдесу, сондай-ақ Орталық Азия өңіріндегі қауіпсіздік пен даму мәселелері кі …»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0112371`) «Антитеррорлық сипаттағы маңызды құжаттар –(терроризм, сепаратизм және экстремизмге қарсы күресуде ШЫҰ-ға мүше мемлекеттердің ынтымақтастық тұжырымдамасы, ШЫҰ ӨТҚҚ жанындағы ШЫҰ-ға мүше мемлекеттердің  …»
-  3. (cc100_kk_pack.json / `cc100_kk_0007325`) «Курстардың тақырыбы бүкіл ел үшін стратегиялық және өзекті ұлттық қауіпсіздік, терроризм мен экстремизге, сыбайлас жемқорлыққа қарсы іс-қимыл, қылмыстарды ашудағы заманауи ақпараттық технологияларды п …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1787 — `тетігін` (freq 20)
+### Candidate #1663 — `тетігін` (freq 20)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -33969,7 +31613,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1788 — `тсс` (freq 20)
+### Candidate #1664 — `тсс` (freq 20)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -33988,7 +31632,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1789 — `украинадан` (freq 20)
+### Candidate #1665 — `украинадан` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -34007,7 +31651,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1790 — `украинаға` (freq 20)
+### Candidate #1666 — `украинаға` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -34026,7 +31670,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1791 — `фрейд` (freq 20)
+### Candidate #1667 — `фрейд` (freq 20)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiced_consonant**
@@ -34045,7 +31689,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1792 — `хабарланады` (freq 20)
+### Candidate #1668 — `хабарланады` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -34064,7 +31708,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1793 — `хабарланғандай` (freq 20)
+### Candidate #1669 — `хабарланғандай` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -34083,7 +31727,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1794 — `шектелмейді` (freq 20)
+### Candidate #1670 — `шектелмейді` (freq 20)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -34102,7 +31746,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1795 — `школа` (freq 20)
+### Candidate #1671 — `школа` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -34121,7 +31765,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1796 — `югославияның` (freq 20)
+### Candidate #1672 — `югославияның` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -34140,7 +31784,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1797 — `қкп` (freq 20)
+### Candidate #1673 — `қкп` (freq 20)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -34159,7 +31803,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1798 — `қысты` (freq 20)
+### Candidate #1674 — `қысты` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -34178,7 +31822,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1799 — `құқығды` (freq 20)
+### Candidate #1675 — `құқығды` (freq 20)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -34197,7 +31841,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1800 — `әсурет` (freq 20)
+### Candidate #1676 — `әсурет` (freq 20)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -34216,64 +31860,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1801 — `өзiнiң` (freq 20)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **nasal**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0003019`) «Сөзiмнiң соңында айтарым: соншама екiжүздi, арам, өзiнiң қара басының ғана қамын ойлайтын, асыл жандардың өлiгiн таптап мақсатына жететiн адам партия қатарында қалай жүре алады!».»
-  2. (cc100_kk_pack.json / `cc100_kk_0010686`) «1. Микроқаржы ұйымы өзiнiң қаржы-шаруашылық қызметiн бақылауды жүзеге асыруы үшiн iшкi бақылау қызметiн құруы мүмкін.»
-  3. (cc100_kk_pack.json / `cc100_kk_0013085`) ««3. Нарық субъектiлерiнiң Қазақстан Республикасының Кәсіпкерлік кодексінде тыйым салынған өзiнiң үстем немесе монополиялық жағдайын терiс пайдалануы, егер бұл әрекеттерде қылмыстық жазаланатын iс-әрек …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1802 — `for` (freq 19)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_03_0084`) «Циклдар `Rust` үш цикл құрылымын ұсынады: `loop`, `while`, `for`. `loop` — шарт жоқ цикл `loop` денесін шарт қойылғанша қайталай береді.»
-  2. (rust_book_kk_pack.json / `rust_book_03_0091`) «Бар санды нөлге дейін кеміту немесе шарт орындалғанша күту — `while`-тың әдеттегі қолданысы. `for` цикл Жиым немесе диапазон бойынша жүруге `for` цикл ыңғайлы.»
-  3. (rust_book_kk_pack.json / `rust_book_03_0091`) «Бар санды нөлге дейін кеміту немесе шарт орындалғанша күту — `while`-тың әдеттегі қолданысы. `for` цикл Жиым немесе диапазон бойынша жүруге `for` цикл ыңғайлы.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1803 — `pub` (freq 19)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_07_0028`) «Қажетті элементті ашық қылу үшін `pub` кілтсөзін қосамыз: Енді `hosting` модулі сыртқа ашық, `add_to_waitlist` функциясы да ашық.»
-  2. (rust_book_kk_pack.json / `rust_book_07_0029`) «Бірақ маңызды нәрсе: `pub` бір қабат қана ашады.»
-  3. (rust_book_kk_pack.json / `rust_book_07_0030`) «Модулді `pub` ету — ішіндегі бәрін автоматты түрде ашпайды.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1804 — `абылайды` (freq 19)
+### Candidate #1677 — `абылайды` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -34292,7 +31879,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1805 — `абылайға` (freq 19)
+### Candidate #1678 — `абылайға` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -34311,7 +31898,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1806 — `американы` (freq 19)
+### Candidate #1679 — `американы` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -34330,7 +31917,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1807 — `аммиак` (freq 19)
+### Candidate #1680 — `аммиак` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -34349,7 +31936,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1808 — `англияға` (freq 19)
+### Candidate #1681 — `англияға` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -34368,7 +31955,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1809 — `аполло` (freq 19)
+### Candidate #1682 — `аполло` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -34387,7 +31974,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1810 — `ақмарал` (freq 19)
+### Candidate #1683 — `ақмарал` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -34406,7 +31993,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1811 — `брюнетка` (freq 19)
+### Candidate #1684 — `брюнетка` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -34425,7 +32012,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1812 — `бюджеттеріне` (freq 19)
+### Candidate #1685 — `бюджеттеріне` (freq 19)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -34444,7 +32031,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1813 — `бұрды` (freq 19)
+### Candidate #1686 — `бұрды` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -34463,7 +32050,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1814 — `валерий` (freq 19)
+### Candidate #1687 — `валерий` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **glide**
@@ -34482,7 +32069,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1815 — `венесуэла` (freq 19)
+### Candidate #1688 — `венесуэла` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -34501,7 +32088,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1816 — `галереясы` (freq 19)
+### Candidate #1689 — `галереясы` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -34520,7 +32107,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1817 — `гиппократ` (freq 19)
+### Candidate #1690 — `гиппократ` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -34539,7 +32126,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1818 — `динар` (freq 19)
+### Candidate #1691 — `динар` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -34558,7 +32145,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1819 — `дулаттың` (freq 19)
+### Candidate #1692 — `дулаттың` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -34577,7 +32164,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1820 — `ебелек` (freq 19)
+### Candidate #1693 — `ебелек` (freq 19)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -34596,7 +32183,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1821 — `евклид` (freq 19)
+### Candidate #1694 — `евклид` (freq 19)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiced_consonant**
@@ -34615,7 +32202,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1822 — `евклидтің` (freq 19)
+### Candidate #1695 — `евклидтің` (freq 19)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -34634,7 +32221,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1823 — `еврейлердің` (freq 19)
+### Candidate #1696 — `еврейлердің` (freq 19)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -34653,26 +32240,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1824 — `екi` (freq 19)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0005384`) «3. Жұмыс тобының құрамында азаматтық қоғамнан өкiлдiк ету жұмыс тобы мүшелерiнiң жалпы санының кемiнде үштен екi бөлiгiн құрайды және коммерциялық емес ұйымдардың, азаматтардың ұсыныстары негiзiнде қа …»
-  2. (cc100_kk_pack.json / `cc100_kk_0009411`) «Логикалық қосу. Егер логикалық өлшемдердiң (А және В) тым болмағанда бiреу шындық болса онданәтиже шын мәнді бередi. Егер екi өлшемнiң де (А және В) мәндерi жалған болса, онда операция нәтижесi де жал …»
-  3. (cc100_kk_pack.json / `cc100_kk_0009412`) «Логикалық көбейту. Егер екi өлшем де шындық болса ғана шындық нәтиже бередi. Егер өлшемдердiң тым болмағанда бiреуi жалған болса, онда операцияның нәтижесi де жалған болады.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1825 — `ескерген` (freq 19)
+### Candidate #1697 — `ескерген` (freq 19)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -34691,7 +32259,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1826 — `жоспарлауға` (freq 19)
+### Candidate #1698 — `жоспарлауға` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -34710,7 +32278,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1827 — `жшсдегі` (freq 19)
+### Candidate #1699 — `жшсдегі` (freq 19)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -34729,7 +32297,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1828 — `жығып` (freq 19)
+### Candidate #1700 — `жығып` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -34748,26 +32316,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1829 — `жөнiнде` (freq 19)
-
-- Vowel harmony (auto): **front**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0003280`) «Басты __ Мемлекеттік қызметтер __ «Ақмола облысының табиғи ресурстар және табиғатты пайдалануды реттеу басқармасы» мемлекеттiк мекемесiнiң 2016 жылы мемлекеттiк қызметтердi көрсету мәселелерi жөнiнде  …»
-  2. (cc100_kk_pack.json / `cc100_kk_0003281`) ««Ақмола облысының табиғи ресурстар және табиғатты пайдалануды реттеу басқармасы» мемлекеттiк мекемесiнiң мемлекеттiк қызметтердi көрсету мәселелерi жөнiнде қызметi туралы есептеме бойынша өткiзiлген ж …»
-  3. (cc100_kk_pack.json / `cc100_kk_0033970`) «17-бап. Қазақстан Республикасы Президентiнiң республикалық референдум тағайындау туралы бастамашылық жөнiнде шешiм қабылдау»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1830 — `зайыбының` (freq 19)
+### Candidate #1701 — `зайыбының` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -34786,7 +32335,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1831 — `зейнолла` (freq 19)
+### Candidate #1702 — `зейнолла` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -34805,7 +32354,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1832 — `интегралы` (freq 19)
+### Candidate #1703 — `интегралы` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -34824,26 +32373,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1833 — `интерференциясы` (freq 19)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0111194`) «Жарық интерференциясы – жарық толқындарының қабаттасуы нәтижесінде бірін-бірі күшейтуі немесе әлсіретуі.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0111196`) «Жарық интерференциясы кезінде қабаттасқан жарық шоғының қарқындылығы бастапқы шоқтың қарқындылығына тең болмайды.»
-  3. (kazakh_textbooks_pack.json / `kz_textbook_physics_11_emn_p0077_s03`) «Гюйгенс принципі Күтілетін нәтиже: ІТолқындардың интерференциясы Осы параграфты игергенде: Қандай да бір ортада бірнеше толқын көзі меха- “ судың бетінде екі көзден |»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1834 — `исмаил` (freq 19)
+### Candidate #1704 — `исмаил` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -34862,7 +32392,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1835 — `каб` (freq 19)
+### Candidate #1705 — `каб` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -34881,7 +32411,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1836 — `кабель` (freq 19)
+### Candidate #1706 — `кабель` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -34900,7 +32430,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1837 — `клиенттің` (freq 19)
+### Candidate #1707 — `клиенттің` (freq 19)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -34919,7 +32449,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1838 — `кмк` (freq 19)
+### Candidate #1708 — `кмк` (freq 19)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -34938,7 +32468,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1839 — `комбинат` (freq 19)
+### Candidate #1709 — `комбинат` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -34957,7 +32487,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1840 — `комиссариаты` (freq 19)
+### Candidate #1710 — `комиссариаты` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -34976,26 +32506,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1841 — `коммунист` (freq 19)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **voiceless_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0018631`) «1920 жылы Бүкілодақтық Коммунист (большевиктер) партиясына мүшелікке өтіп, 1921-1922 жылдары Петропавл қалалық партия комитетінде істейді.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0027820`) «1945–1992 жылдардағы коммунист билігінде Албания ресми дінін атеизм қылған тұңғыш мемлекет болғанымен, қазіргі күні дін сақталған.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0030768`) «2,5 мың коммунист тұтқындалды.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1842 — `компанияны` (freq 19)
+### Candidate #1711 — `компанияны` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -35014,26 +32525,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1843 — `компиляция` (freq 19)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0010290`) «Бағдарлама осы түрінде пайдасыз, қолдану үшін оны «жинау» керек, бұл үрдіс компиляция деп аталады.»
-  2. (rust_book_kk_pack.json / `rust_book_03_0015`) «Тұрақтының мәні — компиляция кезінде есептелетін өрнек болуы керек.»
-  3. (rust_book_kk_pack.json / `rust_book_03_0026`) «Мәлімет түрлері `Rust` — статикалық тип жүйесі бар тіл: әрбір мәннің түрі компиляция кезінде белгілі.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1844 — `композиторлық` (freq 19)
+### Candidate #1712 — `композиторлық` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -35052,7 +32544,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1845 — `компресс` (freq 19)
+### Candidate #1713 — `компресс` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -35071,7 +32563,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1846 — `кон` (freq 19)
+### Candidate #1714 — `кон` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -35090,7 +32582,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1847 — `конспект` (freq 19)
+### Candidate #1715 — `конспект` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -35109,26 +32601,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1848 — `консультация` (freq 19)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0134384`) «Қазақстан Республикасының Президенті Қазақстан Республикасы сыртқы саясат ведомствосының басшысын парламентпен консультация өткізбей, өз еркімен лауазымға тағайындайды және лауазымнан босатады.»
-  2. (cc100_kk_pack.json / `cc100_kk_0014156`) «Құжаттарды МҰҚИЯТ зерделеңіз (әкімдіктің қаулысы, мемлекеттік акт және т.б.), қажет болған жағдайда білікті заңгерлерден консультация алу үшін қосымша уақыт сұраңыз.»
-  3. (cc100_kk_pack.json / `cc100_kk_0035279`) «басқа ұйымдар қаржылық қызмет бойынша қосымша есептерді құру бойынша консультация беру;»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1849 — `конференцияда` (freq 19)
+### Candidate #1716 — `конференцияда` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -35147,7 +32620,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1850 — `конференцияның` (freq 19)
+### Candidate #1717 — `конференцияның` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -35166,7 +32639,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1851 — `концерттер` (freq 19)
+### Candidate #1718 — `концерттер` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **liquid**
@@ -35185,7 +32658,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1852 — `координаталары` (freq 19)
+### Candidate #1719 — `координаталары` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -35204,7 +32677,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1853 — `кристалдардың` (freq 19)
+### Candidate #1720 — `кристалдардың` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -35223,7 +32696,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1854 — `лексикаграмматикалық` (freq 19)
+### Candidate #1721 — `лексикаграмматикалық` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -35242,7 +32715,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1855 — `лкжо` (freq 19)
+### Candidate #1722 — `лкжо` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -35261,7 +32734,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1856 — `мму` (freq 19)
+### Candidate #1723 — `мму` (freq 19)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **vowel**
@@ -35280,7 +32753,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1857 — `мониторингілеу` (freq 19)
+### Candidate #1724 — `мониторингілеу` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -35299,7 +32772,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1858 — `монша` (freq 19)
+### Candidate #1725 — `монша` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -35318,7 +32791,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1859 — `музыканттар` (freq 19)
+### Candidate #1726 — `музыканттар` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -35337,7 +32810,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1860 — `мындасыз` (freq 19)
+### Candidate #1727 — `мындасыз` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -35356,7 +32829,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1861 — `мюнхен` (freq 19)
+### Candidate #1728 — `мюнхен` (freq 19)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -35375,7 +32848,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1862 — `наиб` (freq 19)
+### Candidate #1729 — `наиб` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -35394,7 +32867,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1863 — `нде` (freq 19)
+### Candidate #1730 — `нде` (freq 19)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -35413,7 +32886,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1864 — `нокаутқа` (freq 19)
+### Candidate #1731 — `нокаутқа` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -35432,7 +32905,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1865 — `нормадан` (freq 19)
+### Candidate #1732 — `нормадан` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -35451,7 +32924,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1866 — `нормаларының` (freq 19)
+### Candidate #1733 — `нормаларының` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -35470,7 +32943,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1867 — `образы` (freq 19)
+### Candidate #1734 — `образы` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -35489,7 +32962,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1868 — `объектісінің` (freq 19)
+### Candidate #1735 — `объектісінің` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -35508,7 +32981,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1869 — `обь` (freq 19)
+### Candidate #1736 — `обь` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -35527,7 +33000,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1870 — `озған` (freq 19)
+### Candidate #1737 — `озған` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -35546,7 +33019,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1871 — `орама` (freq 19)
+### Candidate #1738 — `орама` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -35565,7 +33038,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1872 — `орната` (freq 19)
+### Candidate #1739 — `орната` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -35584,7 +33057,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1873 — `орныққан` (freq 19)
+### Candidate #1740 — `орныққан` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -35603,7 +33076,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1874 — `ортқазақстан` (freq 19)
+### Candidate #1741 — `ортқазақстан` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -35622,7 +33095,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1875 — `оқдәрі` (freq 19)
+### Candidate #1742 — `оқдәрі` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -35641,7 +33114,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1876 — `оқжетпес` (freq 19)
+### Candidate #1743 — `оқжетпес` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -35660,7 +33133,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1877 — `оққа` (freq 19)
+### Candidate #1744 — `оққа` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -35679,7 +33152,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1878 — `пленарлық` (freq 19)
+### Candidate #1745 — `пленарлық` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -35698,7 +33171,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1879 — `потанин` (freq 19)
+### Candidate #1746 — `потанин` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -35717,26 +33190,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1880 — `практика` (freq 19)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **vowel**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0048820`) ««Жаттау мектебі» мен «үркіту мектебінен» бас тарту мектептің, соның ішінде шетелде жинақталған педагогика теориясы мен практика жиналған жағымды тәжірибеге сүйеніп іске асырылады деген.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0053474`) «Сондықтан практика Теорияның ақиқаттылығын дәлелдеумен қатар, оны дамытып, жетілдірудің негізі.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0063702`) «Әсіресе, Ол бұрынғы заманғы этика өлшемдеріне қазіргі заман адамдарының барынша сай келуге тырысушылдығына назар аударып, моралдық өлшемдер мен моралдық практика ортасындағы кеше мен бүгінді сай етуде …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1881 — `программаны` (freq 19)
+### Candidate #1747 — `программаны` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -35755,7 +33209,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1882 — `прокуратурасымен` (freq 19)
+### Candidate #1748 — `прокуратурасымен` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -35774,7 +33228,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1883 — `прокурорлар` (freq 19)
+### Candidate #1749 — `прокурорлар` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -35793,7 +33247,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1884 — `психологтар` (freq 19)
+### Candidate #1750 — `психологтар` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -35812,7 +33266,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1885 — `публицистикалық` (freq 19)
+### Candidate #1751 — `публицистикалық` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -35831,7 +33285,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1886 — `революцияның` (freq 19)
+### Candidate #1752 — `революцияның` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -35850,7 +33304,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1887 — `регион` (freq 19)
+### Candidate #1753 — `регион` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -35869,7 +33323,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1888 — `репертуарында` (freq 19)
+### Candidate #1754 — `репертуарында` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -35888,7 +33342,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1889 — `референдумға` (freq 19)
+### Candidate #1755 — `референдумға` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -35907,7 +33361,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1890 — `реформаны` (freq 19)
+### Candidate #1756 — `реформаны` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -35926,7 +33380,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1891 — `рәбия` (freq 19)
+### Candidate #1757 — `рәбия` (freq 19)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **unknown**
@@ -35945,7 +33399,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1892 — `сайлады` (freq 19)
+### Candidate #1758 — `сайлады` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -35964,7 +33418,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1893 — `салем` (freq 19)
+### Candidate #1759 — `салем` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -35983,7 +33437,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1894 — `самар` (freq 19)
+### Candidate #1760 — `самар` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -36002,7 +33456,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1895 — `себеді` (freq 19)
+### Candidate #1761 — `себеді` (freq 19)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -36021,7 +33475,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1896 — `семинарда` (freq 19)
+### Candidate #1762 — `семинарда` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -36040,7 +33494,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1897 — `силур` (freq 19)
+### Candidate #1763 — `силур` (freq 19)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **liquid**
@@ -36059,7 +33513,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1898 — `сыңайлы` (freq 19)
+### Candidate #1764 — `сыңайлы` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -36078,7 +33532,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1899 — `талып` (freq 19)
+### Candidate #1765 — `талып` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -36097,7 +33551,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1900 — `территориясына` (freq 19)
+### Candidate #1766 — `территориясына` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -36116,7 +33570,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1901 — `транзисторлы` (freq 19)
+### Candidate #1767 — `транзисторлы` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -36135,26 +33589,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1902 — `транскрипт` (freq 19)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **voiceless_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0008521`) «Презентация на тему: " Аты- жөні: Туған жылы: Туылған жері: Азаматтығы: Отбасылық жағдайы: Мекен жайы: Білімі (бітірген оқу орны, мамандығы, квалификациясы) Педагогикалық өтілі:" — Транскрипт:»
-  2. (cc100_kk_pack.json / `cc100_kk_0023194`) «Транскрипт (қол қойылған және мөрмен рсталған);»
-  3. (cc100_kk_pack.json / `cc100_kk_0028177`) «Презентация на тему: " 7 сынып қазақ әдебиеті Қобыланды батыр жырындағы кейіпкерлер әлемі." — Транскрипт:»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1903 — `тығып` (freq 19)
+### Candidate #1768 — `тығып` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -36173,7 +33608,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1904 — `утің` (freq 19)
+### Candidate #1769 — `утің` (freq 19)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -36192,7 +33627,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1905 — `фатима` (freq 19)
+### Candidate #1770 — `фатима` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -36211,7 +33646,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1906 — `филиалында` (freq 19)
+### Candidate #1771 — `филиалында` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -36230,7 +33665,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1907 — `фирмалық` (freq 19)
+### Candidate #1772 — `фирмалық` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -36249,7 +33684,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1908 — `форумның` (freq 19)
+### Candidate #1773 — `форумның` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -36268,7 +33703,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1909 — `хабарсыз` (freq 19)
+### Candidate #1774 — `хабарсыз` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -36287,26 +33722,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1910 — `хакасия` (freq 19)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0006008`) «000||Ресей (Хакасия) |- |Алтай тілі||75.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0025634`) «2015 жылдың соңында Ресей мәдениет министрі Владимир Мединский Алтай, Башқұртстан, Саха (Якутия), Татарстан, Тыва және Хакасия Республикаларының басшыларына Халықаралық түркі мәдениеті ұйымымен байлан …»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0025640`) «Алтай Республикасы Қазақстан, Қытай, Моңғолия жерімен, сондай-ақ Ресей Федерациясының Тыва, Хакасия республикаларымен, Кемерово облысымен, Алтай өлкесімен шектеседі.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1911 — `халайық` (freq 19)
+### Candidate #1775 — `халайық` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -36325,7 +33741,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1912 — `химигі` (freq 19)
+### Candidate #1776 — `химигі` (freq 19)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -36344,7 +33760,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1913 — `хоккейден` (freq 19)
+### Candidate #1777 — `хоккейден` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -36363,7 +33779,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1914 — `холдинг` (freq 19)
+### Candidate #1778 — `холдинг` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -36382,7 +33798,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1915 — `шәй` (freq 19)
+### Candidate #1779 — `шәй` (freq 19)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **glide**
@@ -36401,7 +33817,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1916 — `экономикада` (freq 19)
+### Candidate #1780 — `экономикада` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -36420,7 +33836,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1917 — `ғлар` (freq 19)
+### Candidate #1781 — `ғлар` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -36439,7 +33855,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1918 — `қкхп` (freq 19)
+### Candidate #1782 — `қкхп` (freq 19)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -36458,7 +33874,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1919 — `қызады` (freq 19)
+### Candidate #1783 — `қызады` (freq 19)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -36477,7 +33893,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1920 — `әбдірашев` (freq 19)
+### Candidate #1784 — `әбдірашев` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiced_consonant**
@@ -36496,7 +33912,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1921 — `әлжан` (freq 19)
+### Candidate #1785 — `әлжан` (freq 19)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -36515,102 +33931,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1922 — `iсi` (freq 18)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0004163`) «82-бап ҚР кеден iсi туралы Алдын ала шешімнің қолданылуын тоқтату, оны өзгерту немесе кері қайтару 2010 жылғы 30 маусымдағы № 296-IV Қазақстан Республикасындағы кеден iсi туралы бап 82 Комментарий - З …»
-  2. (cc100_kk_pack.json / `cc100_kk_0004163`) «82-бап ҚР кеден iсi туралы Алдын ала шешімнің қолданылуын тоқтату, оны өзгерту немесе кері қайтару 2010 жылғы 30 маусымдағы № 296-IV Қазақстан Республикасындағы кеден iсi туралы бап 82 Комментарий - З …»
-  3. (cc100_kk_pack.json / `cc100_kk_0004164`) «120-бап ҚР кеден iсi туралы Төлеушілер, кедендік алымдарды төлеу мерзімдері мен тәртібі 2010 жылғы 30 маусымдағы № 296-IV Қазақстан Республикасындағы кеден iсi туралы бап 120 Комментарий - Законодател …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1923 — `iшкi` (freq 18)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0010685`) «18-бап. Iшкi бақылау қызметi»
-  2. (cc100_kk_pack.json / `cc100_kk_0010686`) «1. Микроқаржы ұйымы өзiнiң қаржы-шаруашылық қызметiн бақылауды жүзеге асыруы үшiн iшкi бақылау қызметiн құруы мүмкін.»
-  3. (cc100_kk_pack.json / `cc100_kk_0010687`) «2. Iшкi бақылау қызметiнiң жұмыс тәртiбi Қазақстан Республикасының заңнамасында, сондай-ақ микроқаржы ұйымының iшкi қызметiн реттейтiн қағидаларда, ережеде және өзге де құжаттарда айқындалады.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1924 — `run` (freq 18)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_01_0049`) «Орындалатын файлды іске қосу үшін: Бірақ әдетте жоғарыдағы екі қадамды бір команда арқылы орындау ыңғайлы: `cargo run` командасы алдымен жобаны құрастырады (өзгеріс болса), содан кейін орындайды.»
-  2. (rust_book_kk_pack.json / `rust_book_02_0057`) «Енді `cargo run` командасын тағы іске қосыңыз — салыстыру жұмыс істейді: 2.5.»
-  3. (rust_book_kk_pack.json / `rust_book_02_0070`) «Енді бағдарлама толық болды: > **Ескерту.** Жөндеу мақсатында тұрған `println!("Құпия сан: ...")` > жолын кодтан өшіріңіз — ойыншы құпия санды көрмеуі керек. `cargo run` арқылы ойынды бірнеше рет ойна …»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1925 — `str` (freq 18)
-
-- Vowel harmony (auto): **unknown (no vowels)**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (rust_book_kk_pack.json / `rust_book_04_0029`) «Блок бітісімен `s`-тің аумағы аяқталады. `String` түрі Бұрын біз `&str` (жол литералы) типімен таныстық.»
-  2. (rust_book_kk_pack.json / `rust_book_04_0085`) «Ол `&str` түрінде болады және үймедегі `String`-тің бір бөлігіне сілтейді.»
-  3. (rust_book_kk_pack.json / `rust_book_04_0087`) «Жол тілімдері параметр ретінде Функция параметр түрін `&String`-тен `&str`-ге өзгертсек, ол `String` және жол литералы екеуімен де жұмыс істей алады: `&str` — `&String`-тен жалпырақ тип.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1926 — `абхазия` (freq 18)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0004797`) «Құрамына Абхазия (1931) және Аджария (1921) республикалары енеді.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0004817`) «1992 жылдан 1993 жылға дейін Грузия Абхазия сепаратизміне жол бермейтін болды да, аймаққа әскерін жіберді.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0004822`) «2008 жылы Ресей Абхазия мен Оңтүстік Осетия тәуелсіздіктерін мойындады, бұл екі аймақты халықаралық қауымдастық әлі де мемлекет деп танымайды.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1927 — `австралияның` (freq 18)
+### Candidate #1786 — `австралияның` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -36629,7 +33950,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1928 — `ажырап` (freq 18)
+### Candidate #1787 — `ажырап` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -36648,7 +33969,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1929 — `аив` (freq 18)
+### Candidate #1788 — `аив` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -36667,7 +33988,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1930 — `айбын` (freq 18)
+### Candidate #1789 — `айбын` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -36686,7 +34007,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1931 — `айрылды` (freq 18)
+### Candidate #1790 — `айрылды` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -36705,7 +34026,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1932 — `анемия` (freq 18)
+### Candidate #1791 — `анемия` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -36724,7 +34045,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1933 — `апельсин` (freq 18)
+### Candidate #1792 — `апельсин` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -36743,7 +34064,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1934 — `аргентинаның` (freq 18)
+### Candidate #1793 — `аргентинаның` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -36762,7 +34083,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1935 — `аргументті` (freq 18)
+### Candidate #1794 — `аргументті` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -36781,7 +34102,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1936 — `армысыздар` (freq 18)
+### Candidate #1795 — `армысыздар` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -36800,7 +34121,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1937 — `бмск` (freq 18)
+### Candidate #1796 — `бмск` (freq 18)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -36819,7 +34140,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1938 — `бразилияның` (freq 18)
+### Candidate #1797 — `бразилияның` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -36838,7 +34159,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1939 — `ведомстволары` (freq 18)
+### Candidate #1798 — `ведомстволары` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -36857,7 +34178,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1940 — `вирустың` (freq 18)
+### Candidate #1799 — `вирустың` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -36876,26 +34197,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1941 — `востров` (freq 18)
-
-- Vowel harmony (auto): **back**
-- Final sound (auto): **voiced_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0044514`) «Таңбасына (бақанға ұқсас) қарап кейбір ғалымдар (Востров) бұлардың түп-төркіні найман болуы мүмкін деген мардымсыз болжам айтқан.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0071150`) «, 1896; Востров В.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0124580`) «Востров пікірінің жаны бар.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1942 — `гватемала` (freq 18)
+### Candidate #1800 — `гватемала` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -36914,7 +34216,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1943 — `гккп` (freq 18)
+### Candidate #1801 — `гккп` (freq 18)
 
 - Vowel harmony (auto): **unknown (no vowels)**
 - Final sound (auto): **voiceless_consonant**
@@ -36933,7 +34235,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1944 — `гондурас` (freq 18)
+### Candidate #1802 — `гондурас` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -36952,7 +34254,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1945 — `дирижері` (freq 18)
+### Candidate #1803 — `дирижері` (freq 18)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -36971,7 +34273,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1946 — `дифракциясы` (freq 18)
+### Candidate #1804 — `дифракциясы` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -36990,26 +34292,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1947 — `евразия` (freq 18)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **unknown**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (wikipedia_kz_pack.json / `wiki_kz_0039924`) «Евразия нарық институтын бітірген.»
-  2. (wikipedia_kz_pack.json / `wiki_kz_0056020`) ««Евразия» гуманитарлық ғылыми зерттеулер орталығы 2.»
-  3. (wikipedia_kz_pack.json / `wiki_kz_0069740`) «Тұтас Евразия бойынша саны біршама жоғары, бірақ Қазақстанда белгісіз.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1948 — `еспе` (freq 18)
+### Candidate #1805 — `еспе` (freq 18)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -37028,7 +34311,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1949 — `жайлар` (freq 18)
+### Candidate #1806 — `жайлар` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -37047,7 +34330,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1950 — `жайнап` (freq 18)
+### Candidate #1807 — `жайнап` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -37066,7 +34349,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1951 — `жауатын` (freq 18)
+### Candidate #1808 — `жауатын` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -37085,7 +34368,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1952 — `жауыншашынсыз` (freq 18)
+### Candidate #1809 — `жауыншашынсыз` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -37104,7 +34387,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1953 — `жесе` (freq 18)
+### Candidate #1810 — `жесе` (freq 18)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -37123,7 +34406,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1954 — `жиырылу` (freq 18)
+### Candidate #1811 — `жиырылу` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -37142,7 +34425,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1955 — `жоспарлаудың` (freq 18)
+### Candidate #1812 — `жоспарлаудың` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -37161,7 +34444,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1956 — `жшсның` (freq 18)
+### Candidate #1813 — `жшсның` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -37180,7 +34463,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1957 — `имидж` (freq 18)
+### Candidate #1814 — `имидж` (freq 18)
 
 - Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
 - Final sound (auto): **voiced_consonant**
@@ -37199,7 +34482,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1958 — `инспекциясының` (freq 18)
+### Candidate #1815 — `инспекциясының` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -37218,7 +34501,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1959 — `кабинетте` (freq 18)
+### Candidate #1816 — `кабинетте` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -37237,7 +34520,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1960 — `кайнозой` (freq 18)
+### Candidate #1817 — `кайнозой` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **glide**
@@ -37256,7 +34539,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1961 — `каскелен` (freq 18)
+### Candidate #1818 — `каскелен` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -37275,7 +34558,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1962 — `кастинг` (freq 18)
+### Candidate #1819 — `кастинг` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiced_consonant**
@@ -37294,7 +34577,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1963 — `комиссиялардың` (freq 18)
+### Candidate #1820 — `комиссиялардың` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -37313,7 +34596,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1964 — `коммерцияландыру` (freq 18)
+### Candidate #1821 — `коммерцияландыру` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -37332,7 +34615,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1965 — `коммуналды` (freq 18)
+### Candidate #1822 — `коммуналды` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -37351,7 +34634,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1966 — `компанияларды` (freq 18)
+### Candidate #1823 — `компанияларды` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **vowel**
@@ -37370,7 +34653,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1967 — `консультациялар` (freq 18)
+### Candidate #1824 — `консультациялар` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -37389,7 +34672,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1968 — `конференциясының` (freq 18)
+### Candidate #1825 — `конференциясының` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -37408,7 +34691,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1969 — `корпоративті` (freq 18)
+### Candidate #1826 — `корпоративті` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -37427,7 +34710,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1970 — `корпускулалық` (freq 18)
+### Candidate #1827 — `корпускулалық` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -37446,7 +34729,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1971 — `красноярск` (freq 18)
+### Candidate #1828 — `красноярск` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -37465,7 +34748,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1972 — `кредиттерді` (freq 18)
+### Candidate #1829 — `кредиттерді` (freq 18)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **vowel**
@@ -37484,7 +34767,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1973 — `лауреаттары` (freq 18)
+### Candidate #1830 — `лауреаттары` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -37503,7 +34786,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1974 — `лексика` (freq 18)
+### Candidate #1831 — `лексика` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -37522,7 +34805,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1975 — `логотипі` (freq 18)
+### Candidate #1832 — `логотипі` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -37541,7 +34824,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1976 — `лік` (freq 18)
+### Candidate #1833 — `лік` (freq 18)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -37560,7 +34843,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1977 — `модем` (freq 18)
+### Candidate #1834 — `модем` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -37579,7 +34862,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1978 — `момын` (freq 18)
+### Candidate #1835 — `момын` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -37598,7 +34881,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1979 — `мсек` (freq 18)
+### Candidate #1836 — `мсек` (freq 18)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -37617,26 +34900,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1980 — `мүсiрепов` (freq 18)
-
-- Vowel harmony (auto): **mixed**
-- Final sound (auto): **voiced_consonant**
-- POS (default): **noun** — confirm or correct
-- Contexts:
-  1. (cc100_kk_pack.json / `cc100_kk_0122258`) «Мекен-жайы: 150402, Солтүстiк Қазақстан облысы Ғабит Мүсiрепов атындағы аудан, Андреевка ауылы, Советская көшесi, 53.»
-  2. (cc100_kk_pack.json / `cc100_kk_0122259`) «Мекен-жайы: 150405, Солтүстiк Қазақстан облысы Ғабит Мүсiрепов атындағы аудан, Бiрлiк ауылы, Киров көшесi, 5.»
-  3. (cc100_kk_pack.json / `cc100_kk_0122260`) «Мекен-жайы: 150407, Солтүстiк Қазақстан облысы Ғабит Мүсiрепов атындағы аудан, Возвышенка ауылы, Мир көшесi, 1.»
-
-- [ ] Approved
-- Root form: __
-- POS: __
-- Harmony override: __
-- Final-sound override: __
-- Comment:
-
----
-
-### Candidate #1981 — `мәуліт` (freq 18)
+### Candidate #1837 — `мәуліт` (freq 18)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -37655,7 +34919,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1982 — `мөлтек` (freq 18)
+### Candidate #1838 — `мөлтек` (freq 18)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **voiceless_consonant**
@@ -37674,7 +34938,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1983 — `нидерланды` (freq 18)
+### Candidate #1839 — `нидерланды` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -37693,7 +34957,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1984 — `обал` (freq 18)
+### Candidate #1840 — `обал` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -37712,7 +34976,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1985 — `областная` (freq 18)
+### Candidate #1841 — `областная` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **unknown**
@@ -37731,7 +34995,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1986 — `образдар` (freq 18)
+### Candidate #1842 — `образдар` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **liquid**
@@ -37750,7 +35014,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1987 — `округіндегі` (freq 18)
+### Candidate #1843 — `округіндегі` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -37769,7 +35033,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1988 — `опырылып` (freq 18)
+### Candidate #1844 — `опырылып` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -37788,7 +35052,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1989 — `оранған` (freq 18)
+### Candidate #1845 — `оранған` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -37807,7 +35071,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1990 — `оргазм` (freq 18)
+### Candidate #1846 — `оргазм` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -37826,7 +35090,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1991 — `ордовик` (freq 18)
+### Candidate #1847 — `ордовик` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **voiceless_consonant**
@@ -37845,7 +35109,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1992 — `осінен` (freq 18)
+### Candidate #1848 — `осінен` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -37864,7 +35128,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1993 — `офицері` (freq 18)
+### Candidate #1849 — `офицері` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -37883,7 +35147,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1994 — `ошақтарының` (freq 18)
+### Candidate #1850 — `ошақтарының` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -37902,7 +35166,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1995 — `оюөрнек` (freq 18)
+### Candidate #1851 — `оюөрнек` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **voiceless_consonant**
@@ -37921,7 +35185,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1996 — `оян` (freq 18)
+### Candidate #1852 — `оян` (freq 18)
 
 - Vowel harmony (auto): **back**
 - Final sound (auto): **nasal**
@@ -37940,7 +35204,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1997 — `оңтүстігінен` (freq 18)
+### Candidate #1853 — `оңтүстігінен` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **nasal**
@@ -37959,7 +35223,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1998 — `пневмония` (freq 18)
+### Candidate #1854 — `пневмония` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **unknown**
@@ -37978,7 +35242,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #1999 — `проблемаларына` (freq 18)
+### Candidate #1855 — `проблемаларына` (freq 18)
 
 - Vowel harmony (auto): **mixed**
 - Final sound (auto): **vowel**
@@ -37997,7 +35261,7 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
 
 ---
 
-### Candidate #2000 — `путинмен` (freq 18)
+### Candidate #1856 — `путинмен` (freq 18)
 
 - Vowel harmony (auto): **front**
 - Final sound (auto): **nasal**
@@ -38006,6 +35270,2742 @@ Approved roots get added via a Lexicon PR against `data/tokenizer/segmentation_r
   1. (wikipedia_kz_pack.json / `wiki_kz_0065324`) «Медведев бұған дейін президент Путинмен бірге өзінің кандидатурасын талқылады.»
   2. (cc100_kk_pack.json / `cc100_kk_0010237`) «Нұрсұлтан Назарбаев Ресей Федерациясының Президенті Владимир Путинмен телефон арқылы сөйлесті деп хабарлады Ақорданың баспасөз қызметі. Әңгімелесу барысында мемлекеттер басшылары екіжақты ынтымақтасты …»
   3. (cc100_kk_pack.json / `cc100_kk_0023735`) «Бүгін Қазақстан Республикасының Президенті Нұрсұлтан Назарбаев Қазақстанға ресми сапармен келген Ресей Федерациясының Президенті Владимир Путинмен кездесті.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1857 — `рейтингте` (freq 18)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0056018`) «Әлемнің 20 мыңнан астам ЖОО арасында өт­етін рейтингте бұған дейін, дәлірек айтсақ, 2011 жылдың шілде айының қорытындысы бойынша білім ордасының ресми сайты 4082-ші орынға ие болған еді.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0088628`) «2009 жылы мамырдың 4-де өзінен рейтингте жоғары тұрған Кореяны Азия Бес Ұлты шеңберінде 30-27 есебімен жеңіп 29-шы орынға бірақ көтеріледі.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0102889`) «Ел өткен жылмен салыстырғанда 2020 жылғы рейтингте өз позициясын 3 тармаққа, 28-ден 25-ке дейін жақсартты.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1858 — `риа` (freq 18)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0065377`) «Справка] // РИА Новости, 14 сентября 2009 г.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0065382`) «Выступление в Давосе] РИА «Новости» 29 января 2009.»
+  3. (cc100_kk_pack.json / `cc100_kk_0005485`) «"РИА Новости" агенттігіне Ресей әділет министрлігі берген мәліметке қарағанда, екі белсендінің әрқайсысына 26 мың еуро (ЕО валютасы) көлемінде өтемақы төленген.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1859 — `сайдың` (freq 18)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0003807`) «Сайдың ені бірнеше километрге жетеді, тереңдігі-10-20 м.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0006424`) «Сайдың ішіндегі саялы жерде жайғасып отырған соң талдан бір шыбық кесіп алады, оған жылқының қылын керіп байлайды да, дыбыс шығармақ болып көреді.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0038674`) «Бұрын бабасы Шапырашты ұрыс салып, соның атымен аталатын сайдың бір саласы да күні бүгінге дейін Қарасай есімімен аталады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1860 — `сайран` (freq 18)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0063577`) «Шабыт күйіне мас болу адамның рухани әлемі соған дейін этика және дін пердесімен қымталған ішкі маскүнемдік әлеміне еніп, сонда сайран салу, сондағыны тіке сезіну, соны ақтару, жарыққа шығару болмақ.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0063815`) «Шарап құдайына берілетін тасаттықта адамдар түрлі этикалық шектемелерді бұзып, нәпсі-қалауды еркін жіберіп, барлық өмір бұғауларын шешіп, табиғилыққа қайтатын, еркінше сайран салатын болған.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0066749`) «Сол жолы Қажымұқан үш айға жуық ел аралап, тойдумандарда болып, халқының арасында сайран салып жүрген.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1861 — `салығды` (freq 18)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (synthetic_sentences_pack.json / `synth_08083`) «ету тағыны толықтырды және жарл салығды күшейтеді.»
+  2. (synthetic_sentences_pack.json / `synth_09335`) «есек көлігге нақты салығды құйылды.»
+  3. (synthetic_sentences_pack.json / `synth_16159`) «діни шоқайды ұйықтады әйтпесе етек салығды қатынайды.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1862 — `сексуалды` (freq 18)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0052259`) «Сексуалды сүйісу кезінде дәл парашютпен секіргенде немесе мылтық атқандағы сияқты сіздің миыңызда химиялық реакцияны тудырады.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0116055`) «Осы ескертуді есінде сақтаған Фрейд бірнеше жыл өткен соң осы болжамдар мен бақылауларға сүйене отырып, адам мінез құлқындағы басты қозғаушы күш ретінде оның сексуалды өмірінің рөлі туралы идеяны алға …»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0116056`) «Фрейд адам өміріне дәл осы сексуалды бастамалардың тікелей және жанама әсер ететіндігін адам өміріндегі барлық проблемаларға әкелер жол деп ұқты.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1863 — `семинартренинг` (freq 18)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **voiced_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0015347`) «Сонымен қатар, орталық ішкі және сыртқы серіктестердің көмегімен дәстүрлі және онлайн бағдарламаларды жүзеге асыру, семинар-тренинг сарапшылары мен ішкі мүдделі тараптардың тұрақты кері байланысын қам …»
+  2. (cc100_kk_pack.json / `cc100_kk_0025102`) «Университетте жастарды кәсіпкерлікке баулуға бағытталған семинар-тренинг өтті»
+  3. (cc100_kk_pack.json / `cc100_kk_0027114`) ««Жайық Пресс» журналистеріне арналған семинар-тренинг өтті»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1864 — `синонимі` (freq 18)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0010876`) «суреттеуінде автор “қазақ” терминінің синонимі ретінде арабтың “су’лұқ” сөзін алса керек.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0025045`) «1993 жылғы 16 қарашада Алматы қаласы депутаттарының Алатау аудандық кеңесі барлық деңгейдегі депутаттарға үндеу жазып, онда кеңестерді «бұрынғы режимнің синонимі» деп атады: Барлық деңгейдегі кеңестер …»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0038300`) «Қырғыз және қазақ тілдерінде «Ата-Жұрт» сөзі «атамекен» - синонимі «Отан», сөзбе-сөз айтқанында: «Әке үйі» дегенді білдіреді.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1865 — `синоптиктер` (freq 18)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **liquid**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_01642`) «Синоптиктер түстен кейін желдің жылдамдығы бірте-бірте төмендейді деп хабарлауда.»
+  2. (cc100_kk_pack.json / `cc100_kk_0006997`) «Синоптиктер “Мәскеу дауылының” Қазақстанға келе жатқаны туралы мәліметті жоққа шығарды»
+  3. (cc100_kk_pack.json / `cc100_kk_0020334`) «Еске сала кетсек, синоптиктер бүгін еліміздің басым бөлігінде қатты аяз болатынын хабарлаған.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1866 — `спираль` (freq 18)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **voiced_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0024877`) «Есік жауынгерінің мойнында спираль тәрізді, екі ұшы бедерлі жолбарыс басымен бітетін алтын гривна (мойынға тағатын сәнді бұйым) болған.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0056486`) «ғалымдар рентгендік талдау арқылы ДНҚ молекуласы құрылымының спираль бойынша оң жақ оралымын (В – ДНҚ), ал 1979 ж.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0056517`) «Интеркалирлеуші ​​қосылыс негіздердің арасына түсуі үшін бір-бірінен жылжып, қос спираль құрылымын ажыратып, бұзуы керек.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1867 — `спора` (freq 18)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0079086`) «Липтобиолиттерге өсімдіктің биохимиялықұ ыдырауға шыдамды бөліктерінен (шайыр, спора, қабық, тағы басқа) құралған қатты Каустобиолиттер жатады.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0080948`) «Спора арқылы немесе тамырының кесіндісімен көбейеді, үш жолақты спорасы шілде – тамыз айларында жетіледі.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0081315`) «А-дың арасында спора түзетін бактериялар, яғни анаэробты бактериялар да кездеседі.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1868 — `стат` (freq 18)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (cc100_kk_pack.json / `cc100_kk_0019110`) «Заглавие : Ақмола облысы. 2009 жылғы Қазақстан Республикасы халқының Ұлттық санағының қорытындылары. 3-том : стат. жинақ»
+  2. (cc100_kk_pack.json / `cc100_kk_0019111`) «Заглавие : Ақтөбе облысы. 2009 жылғы Қазақстан Республикасы халқының Ұлттық санағының қорытындылары. 3-том : стат. жинақ»
+  3. (cc100_kk_pack.json / `cc100_kk_0019112`) «Заглавие : Алматы облысы. 2009 жылғы Қазақстан Республикасы халқының Ұлттық санағының қорытындылары. 3-том : стат. жинақ»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1869 — `статус` (freq 18)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0009786`) «2001 жылы 22-қыркүйек айында №685 ҚР үкіметінің қаулысымен «аудандық маңызы бар Құлсары қаласы» деген статус алды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0038775`) «Оның жалпы аймағы 22,402,200 шаршы километр, бұл статус оның ізбасар мемлекеті Ресейге мұра болып берілді.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0046721`) «1996 жылы театрдың 50 жылдық мерейтойына орай, оған «Академиялық» деген статус берілді.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1870 — `стратегиялары` (freq 18)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (cc100_kk_pack.json / `cc100_kk_0000655`) «Әдіс –тәсілдер: Ішіне-сыртына, негізгі идеяны суреттеу стратегиялары.»
+  2. (cc100_kk_pack.json / `cc100_kk_0003764`) «Әдіс-тәсілдер: «Бір айналым сөйлесу» стратегиялары. сөздік жұмыс, спикерлерге арналған сигналды таяқшалар, бетке түсірілген ассоциялар, әңгімелерден үзінді,мақал-мәтелдер, белгілер,оқулық, дәптер»
+  3. (cc100_kk_pack.json / `cc100_kk_0014060`) «Баға белгілеу стратегиялары мен әдістері»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1871 — `сюжеті` (freq 18)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0039615`) «Ал ақын поэмаларының сюжеті еліміздің ақын-жазушыларының, композиторларының шығармашылығынан кең орын алғанын айтсақ артық болмас.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0088402`) «Поэмада аңыз сюжеті сақталғанмен, ақын оны өмір шындығына жақындатып, реалистік негізде баяндайды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0098170`) «Екінші кітаптың сюжеті мен композициясы бас кейіпкер характерінің осы ерекшеліктерінен туындайды.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1872 — `ташкенттен` (freq 18)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_00571`) «Әйтеке би Ташкенттен 75 шақырым жердегі Қауыншы жөне Шыназ ауылдарының маңында жерленген.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0005674`) «1723—1725 — Ойраттардан түбегейлі жеңіліс, Түркістан, Сауран, Ташкенттен, бүкіл оңтүстіктен айрылу, Ақтабан шұбырынды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0009307`) «Оны Ташкенттен келген Сырдария облыстық партия комитетінің хатшысы Әбілқайыр Досов ашты.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1873 — `ташкентті` (freq 18)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0005648`) «1627 — Есім хан Ташкентті алды, Тұрсын ханның басын шапты, қатаған руы жазаға тартылып, қырылғаннан қалғаны басқа рулар ішіне таратылды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0005694`) «1766—1768 — Абылай хан Қоқан хандығына қарсы соғыс ашты, Ташкентті бағындырды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0010491`) «Өз әкесі Мұхаммед Хұсайын Моғолстанның Жүніс ханының күйеу баласы, Ташкентті билеген.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1874 — `теориялар` (freq 18)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **liquid**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0051944`) «Фундаменталды ғылымдар нәрселердің қалай жұмыс істейтінін (жаратылыстану ғылымдары) ашу мен сипаттауда, сонымен қатар адамдар қалай ойлап, қалай әрекет ететінін (гуманитарлық ғылымдар) сипаттауға маңы …»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0063635`) «Бұл кітап түрлі философиялық сірескен теориялар мен күрделі ұғымдарға құрылған кітап емес, парасаттың қарапайым да жаттық үлгісін паш еткен қызықты толғаныс кітабы.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0083280`) «Оның пайда болуы жөнінде эолдық, аллювийлік, топырақтық сияқты тағы басқа теориялар бар.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1875 — `теориясында` (freq 18)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0035651`) «Өзінің Туғызушы Грамматика теориясында Хомский тіл үйрену тек шарттастық арқылы орын алынбайтығын дәлелдеді.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0044136`) «Юнгтің «аналитикалық психологиясында», Выготскийдің «мәдени-тарихи теориясында», Дж.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0051889`) «Аксиомалық тәсілдер геометрияда, арифметикада, ықтималдықтар теориясында тағы басқа салаларда кеңінен қолданылады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1876 — `терроризмді` (freq 18)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_00957`) «Елбасы заңсыз жолмен алынған кірістерді заңдастыруға және терроризмді қаржыландыруға қарсы іс-қимыл мәселелері бойынша заңнаманы жетілдіруге бағытталған заңға қол қойды.»
+  2. (cc100_kk_pack.json / `cc100_kk_0003963`) «Діни экстремизм мен терроризмді алдын алу шараларын алдағы уақытта ұйымдастыруда жауаптылық аясын шектеуге қатысты мәселелер;»
+  3. (cc100_kk_pack.json / `cc100_kk_0006432`) «Астананың 3 тұрғыны терроризмді насихаттады деген күдікпен ұсталды»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1877 — `техникамен` (freq 18)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0002020`) «Әуежай жаңа техникамен жабдықталып, жаңадан ұшу- қону алаңдары үлкейтіліп, аэровокзал кешені салынды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0008706`) «Ет комбинатымен бір мезгілде ірі ұн комбинаты, жаңа техникамен жаңа тері зауыты салынып, ал 1938 жылы арнайы зертханасымен қой терісі зауытының құрылысы басталды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0008707`) «Сол кездегі ең жаңа техникамен жабдықталған судорем зауытының құрылысы да дами бастады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1878 — `тіп` (freq 18)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (kazakh_textbooks_pack.json / `kz_textbook_kz_lang_11_ogn_p0123_s15`) «Сөй- тіп, бір әйелдің дауынан екі ел бірліктен ажырап, зор бүлін- шілікке ұшырайды»
+  2. (kazakh_textbooks_pack.json / `kz_textbook_kz_lang_11_ogn_p0190_s04`) «Өмірдегіні өз күйінде көрсету, көрсе- тіп қана қоймай, оны басқа біреу байқай бермейтін қырынан сезіндіру - М»
+  3. (kazakh_textbooks_pack.json / `kz_textbook_algebra_7_p0144_s11`) «1) 0,25х: 2) 49а% 8) 4тіп 4) 0,04а% 5»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1879 — `түсінігді` (freq 18)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (synthetic_sentences_pack.json / `synth_04604`) «көк шаршқа таза түсінігді тәртті.»
+  2. (synthetic_sentences_pack.json / `synth_26521`) «мүгедек жас түсінігді тигізді.»
+  3. (synthetic_sentences_pack.json / `synth_26765`) «шикізат түсінігді кеңейді немесе әлі болайды.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1880 — `украинадағы` (freq 18)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0000522`) «2004 жылғы қорытынды бойынша осы тауарлардың Беларусь, Қазақстан, Қырғызстан, Молдова мен Украинадағы үлесі 24 %-дан 60 %-ға дейін ауытқыған.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0005055`) «Украина Конституциясының 75-бабына сәйкес, Парламент — Верховна Рада, Украинадағы жалғыз заң шығарушы билік органы.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0045320`) «Путинге әлемнің түкпір-түкпіріндегі ұйымдардың құрметті докторлық және басқа да марапат-дәрежелері берілді, бірақ олардың кейбіреулері Украинадағы соғыс себебінен алып тасталды.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1881 — `уытты` (freq 18)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0019574`) «Институт қабырғасында оқып жүрген кезде-ақ ол туған халқының, мұңын мұңдап, жоғын жоқтап баспасөзде уытты мақалалар жариялайды және әр түрлі жиындарда сөз сөйлейді.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0042932`) «Жас кезінде айтыскер ақын ретінде елге танылған ол 1919 жылдан бастап “Кедей күні”, “Сары Мешелге”, “Қарау байға”, “Жөргем салға”, “Халел мен Мәлік молдаға” секілді өлеңдерімен сол кездегі мешеулікті  …»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0060025`) «Сонымен қатар ол екеуі бірге Ксениялар деп аталатын қысқа, бірақ өте уытты сатирикалық өлеңдер жинағын құрастырды.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1882 — `факультет` (freq 18)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0015337`) «Факультет түлектері алыс–жақын шетелдерде тәжірибеден өтіп, Қытай, Ұлыбритания, АҚШ мемлекеттерінің беделді университеттерінде ғылыми зерттеулермен айналысуда.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0015339`) «Факультет - бәсекелестікке қабілетті халықаралық үлгідегі жоғары деңгейде білім беру арқылы студенттерін өз қатарластарынан ажыралып тұруына себепші.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0015345`) «Инженерлік факультет - университеттің бағдарлама әзірлеу бойынша озық зертханасы бар, сапалы білім беру орталығы.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1883 — `форумда` (freq 18)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0069464`) «Қатысушылардың пікірінше, форумда соғысқа тыйым салу және жаһандық бейбітшілікті нығайту үшін маңызды белсенді және тұрақты күрес қажет .»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0104156`) «Бұл олимпиялық ойындар сияқты әлемдегі ең үлкен форумда әлі халықаралық тәжірибесі аз жас мемлекеттің үлкен табысы болатын.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0111765`) «Осы форумда Сайрам ауданы көрме-жәрмеңкені жоғары дәрежеде ұйымдастырғаны үшін облыс және «ҚазАгроМаркетинг» АҚ басшылығы тарапынан жоғары бағаға ие болды.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1884 — `фрунзе` (freq 18)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0001119`) «1970 жылғы 25 желтоқсан — Алматы — Фрунзе (Бішкек) — Ташкент автомагистралі құрылысының аяқталуы.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0007293`) «Артекте батырлар тақтасына Рубен Ибаррури, Тимур Фрунзе сияқты батырлармен қатар Әлия Молдағұлованың да суреті енгізілген.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0016353`) «1976-1983 жылдары Фрунзе аудандық, Алматы қалалық және облыстық комсомол комитеттерінің хатшысы, республика комсомолы Орталық Комитетінде бөлім меңгерушісі болып істеді.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1885 — `халге` (freq 18)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0005350`) «Ақынды қатты алаңдатқан жағдайлар қазақтардың жаппай кедейленіп, қайыршылық халге түсе бастауы, патша үкіметі шенеуніктерінің шектен шыққан озбырлығы, жергілікті болыстардың парақорлығы мен қанағатсыз …»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0005359`) «Сол жылы оның сан мыңдаған жерлестері қайыршылық халге душар болған еді.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0008333`) «Ол жай ғана рухтың тәннен айырылып, басқа бір халге ауысуы.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1886 — `хдп` (freq 18)
+
+- Vowel harmony (auto): **unknown (no vowels)**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0015803`) ««Нұр Отан» ХДП (2007 жылдан).»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0015809`) «2007 жылдан бері - ҚР Парламенті Мәжілісі 4-шақырылымының «Нұр Отан» ХДП тізімі бойынша депутаты, Қаржы және бюджет комитетінің төрайымы.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0041244`) «2012 жылғы қыркүйек — 2013 қаңтар аралығында — «Нұр Отан» ХДП төрағасының бірінші орынбасары.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1887 — `чемпионатта` (freq 18)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0068501`) «Платини 1984 жылғы Еуропа чемпионатында 9 гол соғып, турнирлер тарихындағы мергендер көшін бастады (бұл рекордты 2016 жылы португалиялық Криштиану Роналду қайталады, бірақ төрт чемпионатта).»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0068515`) ««Бір ғана актердің театры» аталып кеткен чемпионатта Марадонаның құрамасына тигізген пайдасы ұшан-теңіз.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0068531`) «Арада төрт жыл өткен соң Италия жеріндегі чемпионатта Марадона оншалық жарқырай қоймады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1888 — `чемпионаттың` (freq 18)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0066733`) «Чемпионаттың жарты жолында баяғы әуен қайталанып, «жарыс ережесін бұзды» деп тағы да жарыстан шығарып тастайды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0070621`) «Сонымен қатар, бірнеше жылдың ішінде алғаш рет лауазым үшін күресте екі командадан төрт пилот Чемпионаттың соңғы ширегіне дейін қатысатын болды, ал олардың үшеуі – соңғы жарыстың соңғы айналымына шейі …»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0114779`) «Чемпионаттың уыста тұрғандай болған алтын жүлдесі сусып түсіп, өзгенің бағын ашты.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1889 — `чемпиондары` (freq 18)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0025541`) «Шаңғышылар Кристина Смигун мен Андрус Веерпалу 1990-2000 жылдардағы өз спорт түрлерінің көшбасшылары, Олимпиада чемпиондары болды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0060790`) «Жанбек Нығметұлы Сауранбаев (5 мамыр, 1940 жыл- 24 ақпан 2016) - волейболдан әлем кубогының иегері, Еуропа және КСРО чемпионы, Еуропа чемпиондары кубогының екі мәрте иегері.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0066661`) «Дүние жүзінің чемпиондары Иван Поддубный, Иван Шемякин, Алекс Аберг, Иван Заикин, Георг Лурих, Георг Гаккеншмидт, Поль Понс, Вейланд Шульц сынды жампоздармен қатар жүру, боз кілемдегі айқастарда осы б …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1890 — `шебердің` (freq 18)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0006516`) «Мұндай домбыра жасаушы шебердің бірі — Саубай Ахметов екен.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0062354`) «Әрбір шебердің сиқырлы әдет-ғұрыптарға ұқсас өз құпиялары болды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0102079`) «Көркемдеу тәсілдерін іздеу, оларды құбылтып отыру - асқан зор талант иесінің, қас шебердің, үлкен ақынның арқалайтын жүктерінің бірі.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1891 — `шығанағды` (freq 18)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (synthetic_sentences_pack.json / `synth_00190`) «тез процесін шығанағды көбейді.»
+  2. (synthetic_sentences_pack.json / `synth_06365`) «тағамда климаттық шығанағды әңгімелесті.»
+  3. (synthetic_sentences_pack.json / `synth_08721`) «сәуір шығанағды бұлды әйтпесе осылай кіріспейді.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1892 — `қызғалдағы` (freq 18)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0001737`) «Грейг қызғалдағы Қорық символы ретінде таңдалған.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0025309`) «Монетаның сырт жағында (реверсінде) орталық белігінде ұлттық валюта нышандары суретінін аясында үш монетадан — «Шабандоз», «Регель қызғалдағы» және «Ғарыш» монеталарынан коллаж бейнеленген.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0025320`) «Мұражайға келушілер арасында Қазақстандық теңге сарайы шығарған — «Қызыл бөрі», «Регель қызғалдағы», «Шабандоз» алтын және күміс монеталар үлкен қызығушылық тудырады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1893 — `әлхорезми` (freq 18)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0061356`) «Кітаптың өзінде Дереккөздер көрсетілмегендіктен, әл-Хорезми қандай кітаптарды қолданылғаны белгісіз.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0073456`) «Әл-Хорезми () (толық есімі - Әбу Абдулла (немесе Әбу Жафар) Мұхаммед ибн Мұса әл-Хорезми) - Орта ғасырлық Ұлы ғалым - математик, астроном (жұлдызшы), тарихшы, географ.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0073456`) «Әл-Хорезми () (толық есімі - Әбу Абдулла (немесе Әбу Жафар) Мұхаммед ибн Мұса әл-Хорезми) - Орта ғасырлық Ұлы ғалым - математик, астроном (жұлдызшы), тарихшы, географ.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1894 — `акцияларын` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0015531`) «Есімовтің басқаруымен «Қазатомөнеркәсіп» АҚ өз акцияларын халықаралық қор биржасында сәтті орналастырған алғашқы ұлттық компания болды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0042389`) «31 % дауыс алған Селу Далейн Диаллоны қолдаған халықтар мен тайпалар наразылық акцияларын ұйымдастыруға тырысқанымен, бұл әрекеттер сәтсіз болды.»
+  3. (cc100_kk_pack.json / `cc100_kk_0016875`) «Э. Кимге акцияларын сатпаған «Трамвайный парк» АҚ-ның басқа акционері Ю. Им 2005 жылғы қазанда қайтыс болған, ал оның мұрагері Н. Им бір жарым жыл бойынша жоғарыда аталған қылмыстық іс бойынша қамауда …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1895 — `аппаратты` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0029907`) «Келісім-шарттта сонымен қатар ұшуда ғарыштық аппаратты басқару және бақылау, сондай-ақ ұлттық кадрларды оқыту және даярлау үшін жер инфрақұрылымы көзделген.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0060341`) «2006 жылғы наурыздың 4-інде аппараттың антенналары Жерге қарай бағытталып тұратын соңғы ретті пайдаланып, аппаратты шақыратын арнайы сигнал жіберілді.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0077110`) «Сутегін сынауыққа жинап алып қана тазалығын тексереміз, жанған шырпыны аппараттың газ бөлінетін түтігіне [5] өсте жақындатуға болмайды, себебі тұтанған газ жанып аппаратты жарып кетуі мүмкін.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1896 — `аудиториясы` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0091686`) «Сайт аудиториясы ай сайын 5 пайызға өсуде.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0133626`) «Қазіргі уақытта 6 дәріс залы, 30 оқу аудиториясы, 36 оқу-әдістемелік кабинеті, педагогикалық шеберлік кабинеті бар 2 оқу корпусы, жедел-криминалистикалық полигоны, 2 жақсы жабдықталған жатақханасы, 60 …»
+  3. (cc100_kk_pack.json / `cc100_kk_0016757`) «Мемлекеттік пен әлеуметтік тапсырыстардың шеңберінде және дәстүрлі діни құндылықтарды насихаттау мақсатында 2014-2016 жылдар аралығында Қарағанды, Теміртау, Балқаш, Шахтинск, Қаражал, Ақтоғай қалалары …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1897 — `аху` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (kazakh_textbooks_pack.json / `kz_textbook_algebra_7_p0024_s29`) «і(ш) 2) (-ла) з) (105) 5) (тау 6) (-8а) ту (-2аху) Есептеңдер»
+  2. (kazakh_textbooks_pack.json / `kz_textbook_algebra_7_p0050_s36`) «және -2ах%у" - ұқсас мүшелер, ал Захіу және Заху" мүшелері ұқсас емес»
+  3. (kazakh_textbooks_pack.json / `kz_textbook_algebra_7_p0056_s36`) «- --8а4х1у" %10а%х3у3-2а% ху), 2-мысал»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1898 — `ахуалдың` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0090597`) «Мамандар мұны нәзік жандыларда гормоналды ахуалдың жиі өзгеретінімен түсіндіреді.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0109795`) «Экологиялық ахуалдың жалпы деңгейде нашарлауы ірі қалаларда ауадағы таза оттегі мөлшері кейде 10-12%-дан артпауына алып келді.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0124203`) «Христиан дінінің қазіргі моңғолдар арасында біршама танымалдылыққа ие болуы елдегі діни ахуалдың өзгергенін көрсетеді.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1899 — `ақтың` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0006152`) «Оған қойдың басы мен сүр ет салып пісірілуі – қыс тағамымен (етпен) қоштасуды, құрамына ақтың қосылуы – жаз тағамымен (сүт, ақ) қауышуды білдіреді.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0057983`) «Сабаның үлкен-кіші болуы оның ішіне құйылатын ақтың мөлшеріне байланысты болады.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0093742`) «Ол – “СНПС-Ақтөбемұнайгаз” АҚ-тың үшінші Жаңажол газ өңдеу зауытының құрылысы.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1900 — `ведомстволарының` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (cc100_kk_pack.json / `cc100_kk_0006376`) «ТМД сыртқы істер ведомстволарының басшылары Достастық шеңберіндегі қазіргі жағдай мен ықпалдастықтың перспективаларын талқылап, халықаралық күн тәртібінің өзекті мәселелері бойынша пікір алмасты және  …»
+  2. (cc100_kk_pack.json / `cc100_kk_0010429`) «2) 12-баптың 20) тармақшасындағы «тұратын Қазақстан Республикасы азаматтарына Қазақстан Республикасының заңдарында» деген сөздер «істейтін, сондай-ақ Қазақстан Республикасы Ұлттық Банкінің және оның в …»
+  3. (cc100_kk_pack.json / `cc100_kk_0017130`) «Түрікменбасшысы құқық қорғау ведомстволарының жетекшілеріне тұтқындарды тез арада босатуды тапсырған. Ал жергілікті билік босап келген адамдарға жұмыс табуға көмектеседі.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1901 — `вексель` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **voiced_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0117700`) «Вексель () — міндеттеме шоты) — белгілі бір соманы алдын ала келісілген мерзімде және белгіленген жерде төлейтіндігі туралы борышқордың қарыздық міндеттемесі.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0117702`) «Аудармалы вексель келесі бетіндегі индоссамент (басқа біреуге аударып жазу) көмегімен айналыста жүре береді.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0117703`) «Қаржылық (банктік) вексель — белгілі бір ақша сомасын қарызға беруден туындайтын қарыздық міндеттеме.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1902 — `вектордың` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0055893`) «Радиус векторының ұзындығы немесе модулі нүктенің координаттық нүктеден болатын қашықтығы, вектордың көрсеткісі кеңістіктегі осы нүктеге бағытты көрсетеді.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0057251`) «Вектордың ұзындығын басқаша модульі немесе абсолюттік шамасы деп те атайды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0057257`) «Өзі жатқан түзу бойымен вектор бас нүктесін көшіргенмен қай нүктеге қатысты есептесе де күш моменті өзгермейді; керісінше, басын басқа түзуге көшірсе тіпті вектордың бығыты мен ұзындығын сақтағанның ө …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1903 — `владислав` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **voiced_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0031155`) «1320 жылы Куяв князі Владислав Локетек (1305-1333) Үлкен Польшаны өз иелігіне қосып, Краковта поляк королі болып тағайындалды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0031182`) «1617 жылы Мәскеудің Ұлы Герцогі атағын алып жүрген Владислав Ресейге басып кіріп, «заңды» тақты иемденуге тырысып, Мәскеуге жетті, бірақ оны ала алмады.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0031184`) «Владислав Мәскеудің Ұлы князі атағын сақтап қалды.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1904 — `вячеслав` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **voiced_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0045326`) «Келісімге 1939 жылдың 23 тамызында Германия жағынан сыртқы істер министрі Йоахим фон Риббентроп пен кеңестік жағынан сыртқы істер халық комиссары Вячеслав Молотов қол қойды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0047643`) «Оның қала аумағындағы су жиналу алқабы 7400 шаршы км, бұған Вячеслав бөгені ауқымындағы 5310 шаршы км су жиналу алқабы қосылады.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0069774`) «|| Шығыс Қазақстан облысы ||77 кг |- ||Вячеслав Ершов || 1980 ж.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1905 — `гоголь` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **voiced_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0045807`) «Алматы орта мектебінің 10 жылдық сыныбын және Алматы Гоголь атындағы сурет училищесін 1969 жылы аяқтағаннан соң, Суриков атындағы Мәскеу мемлекеттік көркемсурет институтына оқуға түсті.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0062733`) «Орыстың Гоголь, Чехов, Толстой және Достоевский секілді ұлы ақын-жазушыларының шығармаларының әсерімен осы сияқты қос сөздердің арасындағы мағыналар байланысы дәстүрге айналды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0076915`) ««Жібек жолы» (Гоголь — Панфилов көшелері); «Алмалы» (Қарасай-батыр — Панфилов), «Абай» (Фурманов — Абай); «Байқоңыр» (Абай — Байтұрсынұлы), «Әуезов атындағы драма театры» (Абай — Мұқанов), «Алатау» (А …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1906 — `гомердің` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0076618`) «Дастанның жазбаша үлгілерінің бірі жарты миллионға жуық жолдан тұрады да, көлемі жағынан Гомердің Одиссеясы мен Илиадасын қосқандағы көлемнен жиырма есе, ал Махабхарата көлемінен екі есе асып түседі.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0094557`) «Гомердің өлеңдерімен және Платон философиясымен, дін ілімімен, пиитика және риторика, парсы және араб әдебиетімен таныс болған Руставели өзін әдеби іске арнап, грузин сөздерінің сұлулығы мен мақтанышы …»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0096538`) «Жас Пифагор күні бойы Гермодаманттың жанында жүріп, Гомердің жақсы әуендерді тыңдап өскен.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1907 — `дивизиясының` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0008729`) «8-ші атқыштар дивизиясының жолы да даңқты болды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0009068`) «312-ші атқыштар дивизиясының 11 мың адамының 9,5 мыңы соғыс майданында қаза тапты.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0016021`) «— дивизия командирінің орынбасары, Түркістан әскери округінің әуе шабуылына қарсы қорғаныс дивизиясының командирі.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1908 — `динамикасын` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0036025`) «Бұл нышан ақша бірлігі тұрақтылығының идеясын, жоғары әлеуетін, Қазақстан Республикасы ұлттық экономикасының даму және өсу динамикасын бейнелейтін болады.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0046856`) «Жазық рычагты механизмдер кинематикасы мен кинетостатикасын, серпімді буынды механизмдердің динамикасын зерттеуге арналған еңбектері шет елдерде де кеңінен танымал.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0054142`) «Астрономия ғарыш кеңістігіндегі жекелеген денелерді немесе денелер жүйелерін, олардың құрылысын, пайда болуын және динамикасын, сондай-ақ, оларда болып жатқан құбылыстарды зерттейді.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1909 — `добавить` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **voiced_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (cc100_kk_pack.json / `cc100_kk_0022597`) «Добавить комментарий к 15-бап Қазақстан Республикасындағы баланың құқықтары туралы 2002 жылғы 8 тамыздағы N 345»
+  2. (cc100_kk_pack.json / `cc100_kk_0029756`) «Алашұлы тобы - Бізде бәрі қазақша [2016]. (добавить в избранное) 03:13.»
+  3. (cc100_kk_pack.json / `cc100_kk_0032845`) «Добавить комментарий к 1-бап Бал ара шаруашылығы туралы 2002 жылғы 12 наурыздағы N 303»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1910 — `дойбыдан` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0138607`) «Дүниежүзілік олимпиада 1986 жылдан (халықаралық дойбыдан), дүниежүзілік чемпионат 1984 жылдан (халықаралық дойбыдан, ал орыс дойбысынан 1985 жылдан) өткізіліп келеді.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0138607`) «Дүниежүзілік олимпиада 1986 жылдан (халықаралық дойбыдан), дүниежүзілік чемпионат 1984 жылдан (халықаралық дойбыдан, ал орыс дойбысынан 1985 жылдан) өткізіліп келеді.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0138608`) «Қазақстанда дойбыдан ресми жарыстар 1935 жылдан бері өтіп келеді.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1911 — `дрезден` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0038210`) «“Қорқыт Ата кітабының” Дрезден кітапханасында (Германия) сақталған толық нұсқасының фотокөшірмесі, орыс және қазақ тілдеріндегі аудармаларының таңдаулы үлгілері берілген.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0045824`) «1990 жылы Дрезден қаласындағы (Германия) Жоғарғы өнер мектебінде тәжірибе жинақтаудан өтті.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0060049`) «Шиллер 1783 жылы Штутгарттан қашып, Лейпциг пен Дрезден арқылы 1787 жылы Ваймарға жетті.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1912 — `дсм` (freq 17)
+
+- Vowel harmony (auto): **unknown (no vowels)**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (cc100_kk_pack.json / `cc100_kk_0005004`) «ҚР ДСМ "Денсаулық сақтауды дамыту республикалық орталығы" ШЖҚ РМК»
+  2. (cc100_kk_pack.json / `cc100_kk_0008681`) «Құжаттар (базалармен келісім шарт, ҚР ДСМ бұйрықтары, кафедраның құжаттары, есебі, базалардың бас дәрігері)»
+  3. (cc100_kk_pack.json / `cc100_kk_0013900`) «БҒМ, Еңбекмині, Қаржымині, ҚТКШІА, ДСМ, Астана, Алматы қалаларының, облыстардың әкімдері»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1913 — `дунайдың` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0005572`) «Альпінің биік таулы аудандарындағы Рейн, Рона, По өзендерінің сол салаларының, Дунайдың оң салаларының жоғарғы ағыстары қар, жаңбыр суымен қоса, мұздықтардан да толығады.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0022313`) «Әрі қарай ғұндардың әскери әрекеттері Дунайдың шығыс жағына, яғни Ратиария жаққа қарай (қазіргі Арчар болгар селосы) және оңтүстіктегі Морава өзенінен Наисс (қазіргі Сербияның Ниш қаласы) жаққа қарай  …»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0022314`) «Присктің айтуы бойынша 442 жылға таяу шайқастар тоқтап, ғұндар қазіргі Сербияның аумағындағы Дунайдың оңтүстігіне қарай «бес күндік жол» алатын кең алқапты басып алады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1914 — `египеттің` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0026874`) «Енді коптар Египеттің 68-миллиондық тұрғындарының ішіндегі шамамен 5-7 млн.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0026880`) «Ежелгі Египеттің мәдениетін, тілін және тарихын зерттейтін ғылым бар, оның ресми атауы - Египетология.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0031052`) «Судан Ұлыбритания мен Египеттің бірігіп басқаратын аймағы деп жарияланды (кондоминиум), сөйтіп, Ағылшын-Египет Суданы деген атты иеленді.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1915 — `емін` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0036393`) «Ешбір дəрісіз, құралсыз тек адалдығымен шипагер болғандықтан, əйелдердің бұл емін «ақ жол емі» деп атаған.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0089096`) «көріністері мен емін толық сипаттап жазған.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0101863`) «Пиелонефритпен ауыратын балалардың комплексті терапиясына санаторий- курорт емін енгізу керек.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1916 — `жайына` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0012597`) «Олар бір жылды он екі айға, айды үш ондыққа (отыз күнге) бөлген; жыл мезгілдерін Күннің Үркерге қарағандағы жайына қарай да белгілеген.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0012600`) «Қазақтар дүниенің төрт тарабын күн көзінің күндізгі жайына қарай “күншығыс”, “күнбатыс”, “оңтүстік”, “солтүстік” деп атады.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0069496`) «Енді «бастаймыз» деген кезде Қытай киностудиясының басшылығы ауысты да келісім жайына қалды.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1917 — `жеделіздестіру` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0133610`) «Қазақстан Республикасы Ішкі істер министрлігінің Бәрімбек Бейсенов атындағы Қарағанды академиясы — жоғары оқу орны болып табылады, онда күндізгі және сырттай оқыту факультеттерінде жедел-іздестіру қыз …»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0142739`) «ҚР ІІМ Алматы заң институтының жедел-іздестіру қызметі кафедрасының (1998) және ҚР ІІМ академиясының ғылым орталық бастығы (2001) және осы академия бастығының ғылыми жұмыстар жөніндегі орынбасары (200 …»
+  3. (cc100_kk_pack.json / `cc100_kk_0009080`) «Қалалық Полиция департаментінің мәліметінше, үйіне ұры түскен қала тұрғыны ішкі істер бөліміне арызданған. Жедел-іздестіру іс-шаралары нәтижесінде күдікті ұсталып, уақытша ұстау оқшаулағышыа қамалды.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1918 — `жетпеді` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0006477`) «Исраилдің өзі де бірнеше күй шығарған, бірақ өкініштісі, ол күйлер бізге жетпеді.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0057434`) «16-шы ғасырда және 17-ші ғасырдың басында Қырым татарлары оңтүстік Ресей, Украина және тіпті Польшаны жиі-жиі шауып отырды, бірақ Ресейді жеңуге немесе Мәскеуді басып алуға күштері жетпеді.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0059458`) «Бірақ бұл сиракуздықтардың арасында болғандықтан, олар қалаға шабуыл жасауға батылы жетпеді».»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1919 — `жко` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (cc100_kk_pack.json / `cc100_kk_0012449`) «Бұл ЖКО санын екі есеге қысқартады және қала орталығындағы көлік кептелісі…»
+  2. (cc100_kk_pack.json / `cc100_kk_0012450`) «Бұл ЖКО санын екі есеге қысқартады және қала орталығындағы көлік кептелісін азайтады. Алматылықтар бұрынғыға қарағанда межелі жерге 17%-ға тезірек жетеді. Өзгерістер біртіндеп енгізіледі. Қазірдің өзі …»
+  3. (cc100_kk_pack.json / `cc100_kk_0017065`) «2013 жылдың қазан айында 937 ЖКО орын алған жерге тиісті топ аттандырылған. 2,5 мың адам алғашқы медициналық көмсек алса, 900 адам ауруханаға жатқызылған.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1920 — `жұрнағы` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0011596`) «Ондай үстеу тудыратын жұрнақтар мыналар: -ша, -ше жұрнағы.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0011612`) «-қары (-кері) жұрнағы санаулы біраз сөздерге жалғанып үстеу жасайды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0012079`) «Лексикалық мағынасына алғашқы етістік негіз (жетекші) болады да, оған қосылатын көсемшенің жұрнағы (-а, -е, -й, -ып, -іп) мен соңғы көмекші етістік селбесіп жетекші етістіктің мағынасын саралайтындай  …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1921 — `зеландияда` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0013353`) «Интенсивті түрде көкеніс және бақша өндірісі оңтүстік шығыс Зеландияда дамуда.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0031950`) «Вета сияқты омыртқасыздар Жаңа Зеландияда да кездеседі, олардың көпшілігі елдің қоршаған орта жағдайына бірегей бейімделулерін көрсетеді.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0031990`) «Жаңа Зеландияда минералды ресурстардың көп мөлшері болмаса да, ол көмір, мұнай, алюминий және табиғи газ өндіреді.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1922 — `ильич` (freq 17)
+
+- Vowel harmony (auto): **neutral (only и/у/ю — needs context)**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0038724`) «құрылымды одан әрі жетілдіру үшін, билік басындағы коммунистер (большевиктер) партиясының жетекшісі Владимир Ильич Лениннің жоспары бойынша, кеңестік республикалардың одағын құру керек болды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0048565`) «Крупская «Правда» газетінде былай деп жазды: «Владимир Ильич Плехановты қатты жақсы көрді.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0048582`) «Бастапқыда Владимир Ильич те, Надежда Константиновна да некесін шіркеу арқылы рәсімдемек болған жоқ, бірақ өте қысқа уақыттан кейін полиция бастығының бұйрығы келді: не үйленіңіз, не Надежда Константи …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1923 — `инвесторлардың` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_00929`) «Қазақстанда жұмыс істейтін инвесторлардың 85 пайызы оны ТМД-дағы ең тартымды ел деп есептейді.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0000234`) «Шетелдік инвесторлардың көмегімен бірге жалпы сомасы 2,3 млрд АҚШ долларын құрайтын 17 жоба жүзеге асқан.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0003432`) «Сонымен қатар, экономикалық деңгейдің осы көрсеткіштеріне өңірдің өзге де тартымды сипаттарын: дамыған банк саласын, шағын және орта бизнестің серпінді дамуын, біліктілігі жоғары мамандардың болуын, қ …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1924 — `исландияда` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0005508`) «Сөнбеген жанартаулар Исландияда және Жерорта теңізінің аумағында орналасқан.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0005591`) «Тау тундрасы Исландияда, Скандинавияда, Полюстік Оралда таралған.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0013033`) «Елдің төрт шекарасын да мұхит қоршап тұрғанымен қоса, Исландияда өзендер мен көлдердің ірі жүйесі бар.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1925 — `иіп` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0021691`) «бүкіл орыс патшасы Борис Федоровичтің үкім жарлығымен оңды-солды қаршыларды, қүрметті бектерді отырғызып, көше-көше, орам-орам мылтық андаздармен маңғазданып және саясатпен қол қусырып, бас иіп, игі ж …»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0022663`) «с) шариғатына бас иіп қана қоймай, оған мейлінше өріс бердім.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0038325`) «Күлдіреуіш– түнікті көтеріп тұратын, ағаштан иіп жасалған бөлшек.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1926 — `квадраттарының` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0096564`) «Пифагор теоремасы қысқаша былай тұжырымдалады: тік бұрышты үшбұрыштың гипотенузасының квадраты катеттері квадраттарының қосындысына тең.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0096608`) «Дәлелдеу керек: Гипотенузаның квадраты катеттерінің квадраттарының қосындысына тең.»
+  3. (cc100_kk_pack.json / `cc100_kk_0053014`) «Мұғалім: Бәрекелді, енді осы теоремаға кері теореманы практикалық жолмен дәлелденімізді еске түсірейік. Сонымен, үшбұрыштың бір қабырғасының квадраты қалған екі қабырғасының квадраттарының қосындысына …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1927 — `кварц` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_01644`) «Табиғи түрпілік материалдар – алмас, корунд, зімпара, анартас, кварц, көбіктас; жасандылары – электрокорунд, карборунд, синтетикалық алмас және т.б.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0002823`) «Құрылысқа қажетті ұсақ қиыршықтастар, әйнек және шыны бұйымдарын жасайтын кварц құмы, қыш, гипс, алебастр, цемент балшығы, құрылыс тастары, әктас, тақтатас (Майлыбас), қоңыр көмір (Құланды) кен байлық …»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0036438`) «Мономинералды дегеніміз — тек бір ғана химиялық қосылыстан (мысалы, кварц, пирит), ал полиминералды дегеніміз — бірнеше химиялық қосылыстан (минералдардың басым көпшілігі) тұратын минерал.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1928 — `клиенттердің` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_01087`) «Жоғары сапалы қызмет көрсете отырып, клиенттердің барлық қажеттіліктерін барынша қанағаттандыруға тырысамыз.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0105198`) «Оларға қатысу үлкен және орта бизнеске әлеуетті клиенттердің үлкен тобын қамтуға мүмкіндік береді.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0115411`) «Компанияның мамандандырылған персоналы қаржы нарығында қаражат орналастыру мүмкіншіліктері туралы жеткілікті ақпарат береді және клиенттердің тілектері мен қажеттіліктерін ескере отырып, дара инвестиц …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1929 — `кобальт` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0003885`) «Мұнда мырыш, қорғасын, мыс, күміс, алтын, кадмий, сүрме, күшәла, темір, күкірт, висмут, индий, галий, селен, теллур, сынап, қалайы, тантал, ниобий, молибден, вольфрам, титан, никель, кобальт, көмір, ж …»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0004750`) «Сапасы жоғары темір кендері, алюминий шикізаты, хром, молибден, кобальт, алтын, күкірт колчеданы және әртүрлі құрылыс материалдары, полиметалл кендері мен емдік минерал су көздері бар.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0025582`) «Темір, титан-магний, мыс, мырыш, никель, шойын, болат, хром, (әлемдегі ең ірі кен) орны, қорғасын, гранит, мәрмәр, кобальт өндіру жақсы дамыған.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1930 — `комедиялық` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0014227`) «Орта ғасырларда діни театр (литургиялық драма, мистерия) және комедиялық халық театры өркен жайды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0018485`) «Көрермен қауымның ой-талғамынан шыққан «Біздің сүйікті дәрігер» (1958) мен «Тақиялы періште» (1969) фильмдері ұлттық кино өнерінде комедиялық жанрды дамытудағы соны ізденістерімен ерекшеленді.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0096490`) «”, 1917–1918) лирикалық және комедиялық бояуды шебер шендестіре отырып, “кішкене адамның” есте қалар жиынтық бейнесін жасады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1931 — `коменский` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **glide**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (cc100_kk_pack.json / `cc100_kk_0119363`) «Қайта өрлеу дәуірінде қалыптасқан адам туралы көзқарастарға сүйене отырып, Коменский адамды табиғаттың бір бөлігі деп есептеді және табиғатта бәрі де, адамды қоса есептегенде, табиғаттың бәріне бірдей …»
+  2. (cc100_kk_pack.json / `cc100_kk_0119364`) «Коменский "жалпыға бірдей табиғи әдісті” жасау тұжырымдады, ол негізінен "заттардың табиғатынан” туындайды және оның айтуынша, "адам табиғатына” негізделеді деген болатынды. Сондықтан да, ол өзінің пе …»
+  3. (cc100_kk_pack.json / `cc100_kk_0119365`) «Ол адамды табиғаттың бір бөлігі ретінде қарады. Табиғатқа сәйкес деп, Коменский бойынша, балалардың жас ерекшеліктерін ескере отырып құрылған оқыту үрдісі болып табылады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1932 — `компанияда` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_03447`) «Қай компанияда жұмыс істейсің?»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0052940`) «Компанияда Қазақстан азаматтары болып табылатын 1100-ден астам бортсеріктер жұмыс істейді.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0062138`) «Ол кезде компанияда бақылау және атқарушы кеңестер болды және оның бас директорынан іс жүзінде тәуелсіз болды, оның үстіне бақылау кеңесі негізінен Попппен және оның корпоративтік саясатымен қарама-қа …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1933 — `компаниясын` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0004245`) «Ұлыбритания билеуші топтарының арасында Үндістанды отарлық езгіге түсіруге ұмтылушылық жолындағы күрес Ост-Үндістан компаниясын ағылшын парламентінің бақылауына алатын заң қабылдаумен аяқталды (1773).»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0015474`) «Өңірлерден бөлек Президент Әкімшілігін, Ауыл шаруашылығы министрлігін, «Астана ЭКСПО-2017» Ұлттық компаниясын, «Самұрық-Қазына» Ұлттық әл-ауқат қорын басқарған.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0016211`) «2015 жылғы маусымнан тамызға дейін әкім қызметімен қатар «Астана ЭКСПО-2017» ұлттық компаниясын басқарды.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1934 — `компоненті` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_01531`) «Әлемдік білім беру кеңістігіне ықпалдасудың тағы бір маңызды компоненті академиялық ұтқырлықты дамыту деп санаймыз.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0000713`) «Ол Сырдария өзенінің негізгі компоненті болып табылады, Арал теңізі бассейніне жатады.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0043968`) «Есептеуіш техника — есептеу және мәліметтерді өңдеу процессінің маңызды компоненті болып табылады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1935 — `кореядағы` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0026589`) «АҚШ пен Ұлыбританияның қолдауына сүйенген Жапония жеңіске жетіп, Ресей Кореядағы жапон үстемдігін мойындады және Қиыр Шығыстағы Порт-Артур, Дальний порттарынан, Оңтүстік Сахалин аралдарынан бас тартуғ …»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0028937`) «2006 жылғы сарап бойынша Кореядағы қытайлар саны 20 700 адамды құрады.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0028998`) «Оңтүстік Кореядағы жан басына шаққандағы АҚТ бойынша жалпы ішкі өнім 100 АҚШ долларынан (1963 жылы) 35 000 АҚШ долларына дейін жетті (2014 жылы).»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1936 — `кредиттері` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0040878`) «Бұл шаралар проблемалық кредиттері бар және ақша тапшылығына ұшыраған банктерге қолдау көрсету үшін қабылданды.»
+  2. (cc100_kk_pack.json / `cc100_kk_0035075`) «Сыйақы ставкасын субсидиялау 7%-ын мемлекет өтейтін 14%-дан аспайтын сыйақы ставкасы бар банктердің кредиттері бойынша ғана жүзеге асырылуы мүмкін. Бұл ретте банк:»
+  3. (cc100_kk_pack.json / `cc100_kk_0035077`) «Даму Банкінің кредиттері бойынша сыйақы ставкасын субсидиялау»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1937 — `лаборант` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0015834`) «Еңбек қызметін АПТУ-да лаборант болып бастаған 1981—82 жж.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0140597`) «Қазақ аул шаруашылық экономикасын ұйымдастыру ғылыми-зертеулер институтында лаборант, аға лаборант, ғылыми қызметкер, аспирант, аға ғылыми қызметкер (1974–1991), Алматы зоотех.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0140597`) «Қазақ аул шаруашылық экономикасын ұйымдастыру ғылыми-зертеулер институтында лаборант, аға лаборант, ғылыми қызметкер, аспирант, аға ғылыми қызметкер (1974–1991), Алматы зоотех.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1938 — `лап` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0011609`) «Көсемшенің құрамды -лап, -леп (-дап, -деп, -тап, -теп) формалары қосылған сөздің бәрі бірдей, әрине, үстеу бола бермейді.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0011611`) «Бұл жұрнақ - бастапқы -ша және -лап деген қосымшалардан құралған.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0012329`) «Жап, жып, лап, лып, сап, сып, тап, топ, тып, шап т.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1939 — `леннон` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0036941`) «1962 жылдан бастап Битлз құрамына Джон Леннон (гитара, ән), Пол Маккартни (бас-гитара, ән), Джордж Харрисон (соло-гитара, ән) және Ринго Старр (соқпалы аспап, ән) кірген.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0036953`) «Леннон мен Маккартни әнді Бадди Холли мен Эдди Кокран сияқты бірге жаза бастайды, сонымен қатар олар өздерінің әндеріне екіжақты ауторлық беру туралы шешім қабылдайды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0036954`) «1959 жылдың аяғында топқа Стюарт Сатклифф атты жаңа бастап жүрген суретші кіреді, Леннон оны өзінің арт-колледжінен танитын.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1940 — `логикасы` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0060644`) «Аристотель логикасы болмыс туралы іліммен және ақиқат теориясымен тығыз байланысты.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0113789`) «Осы ауқымды бәсекелестіктің өзіндік саяси логикасы туындады - кім бізбен бірге болмаса, ол бізге қарсы.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0119445`) «Керісінше, оның шығармалары – алуан салалы, өміршең, адамның бойына жігер, қуат құярлық оптимизмге де толы, оқушысын өз ырқына бірден көндіріп, ілестіріп кетерлік логикасы мықты туындылар.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1941 — `локк` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0095813`) «1652 жылы мектепті үздік бітірген Локк Оксфорд университетіне түсіп, 1656 жылы бакалавр дәрежесіне, ал 1658 жылы — магистр дәрежесіне еге болады.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0095815`) «1672 - 1679 жылдары Локк Англияның мемлекеттік мекемелерінде түрлі лауазымды қызметтерін атқарады.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0095816`) «1675 жылдан 1679 жылдың ортасына дейін денсаулығының жағдайына байланысты Локк Францияда ем қабылдайды.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1942 — `монако` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0028451`) «Монако (), ресми атауы — Монако кінәздігі () — Оңтүстік Еуропада, Жерорта теңізінің жағалауына орналасқан шағын мемлекет.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0028451`) «Монако (), ресми атауы — Монако кінәздігі () — Оңтүстік Еуропада, Жерорта теңізінің жағалауына орналасқан шағын мемлекет.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0028456`) «Монако 1993 жылдан БҰҰ-ға мүше.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1943 — `мониторингін` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (cc100_kk_pack.json / `cc100_kk_0010021`) «6.Бағдарламаға қатысушылармен әлеуметтік келісімшарт жасау, қатысушылар қабылдаған міндеттемелердің мониторингін жүргізу және т.б.»
+  2. (cc100_kk_pack.json / `cc100_kk_0014228`) «5-1. Мемлекеттік қызмет істері жөніндегі уәкілетті орган «А» корпусының кадр резервінен резервшілерді шығару үшін жартыжылдық негізде мәліметтердің мониторингін, оның ішінде құқықтық статистика және а …»
+  3. (cc100_kk_pack.json / `cc100_kk_0035184`) «7. Бағдарлама шеңберінде қазақстандық өндірушілерді қолдаудың жоғарыда көрсетілген шарттарының сақталу мониторингін Қаржы агенті жүзеге асыратын болады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1944 — `монографиясы` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0018806`) «Оның 1944-45 жылдары жазылып‚ 1961 жылы жарық көрген «Абай Құнанбаев» монографиясы автордың Абай туралы пікірлерінің және қазақ әдебиетінің өткені мен бүгіні жайлы көзқарастарының өсіп-жетілу кезеңдер …»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0018988`) «1942 жылы Алматыға көшіп келгеннен кейін, Сәтбаевтың екі маңызды монографиясы жарық көрді.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0018989`) «Олардың біріншісі - «Қазақстан мен Кеңес Одағының мыс құмдары» монографиясы, ол Жезқазған қаласындағы жұмыс істеу кезінде жинақталған материалдарға негізделген.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1945 — `музейдің` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0018747`) «Сәбит Маяковскийді ең алғаш рет 1924 жылы тарих музейдің клубында әдебиеттік диспутта көреді.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0019469`) «Музейдің алдында ескерткіш орнатылған.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0045995`) «Қазіргі таңдағы музейдің қоры өзінің көркемдік деңгейінің жоғарылығымен көптеген әлемдік жинақтардан еш қалыспайды.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1946 — `мында` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_02369`) «Мында кел!»
+  2. (tatoeba_kazakh_pack.json / `tatoeba_kz_03999`) «Том ертең мында болмайды. Осыны саған кепіл ете аламын»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0012556`) «Мында сілтейтін беттер — Уикипедия ішінен ағымдағы бетке сілтейтін барлық беттер тізімі беріледі.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1947 — `мырзалар` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **liquid**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_00215`) «Ханымдар мен мырзалар!»
+  2. (tatoeba_kazakh_pack.json / `tatoeba_kz_00216`) «Қайырлы таң, ханымдар мен мырзалар!»
+  3. (tatoeba_kazakh_pack.json / `tatoeba_kz_00217`) «Ханымдар мен мырзалар, отырыңыздар.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1948 — `мқозыбаев` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **voiced_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (cc100_kk_pack.json / `cc100_kk_0001097`) «М.Қозыбаев атындағы СҚМУ-да ректордың грантына негізгі пәндер бойынша бірінші облыстық педагогикалық олимпиаданың II кезеңі өтті. Олимпиадаға Солтүстік Қазақстан облысының жалпы білім беру мектептерін …»
+  2. (cc100_kk_pack.json / `cc100_kk_0001340`) «1998 жылғы желтоқсан айында Бескөл құс фабрикасы асыл тұқымды шаруашылық мәртебесiн алды. Солтүстiк ӨҒЗИ-мен және М.Қозыбаев ат. Солтүстiк Қазақстан мемлекеттiк университетiмен ғылыми-өндiрiстiк байла …»
+  3. (cc100_kk_pack.json / `cc100_kk_0008745`) «М.Қозыбаев атындағы СҚМУ ректоры Солтүстiк Қазақстан облысы әкiмiнiң орынбасары Солтүстiк Қазақстан облысы әкiмдігiнiң Бiлiм басқармасының басшысы»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1949 — `новобогат` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0044832`) «Сол жылы Новобогат ауданы Сағыз станциясынан облыстық ақыл-есінде ауытқушылығы бар балалар мектебі Махамбет ауданына көшіп, орналасты.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0075395`) «1920 жылдың 5-6 қаңтар күндері Сарайшық, Новобогат селоларында, сол қаңтар айында Редут, Сорочинко, Кандаур, №8, №13 сияқты ауылдарда селолық кеңестер құрылды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0075411`) «1939 жылы Новобогат ауданының құрылуына байланысты Бақсай ауданынан Бегайдар, Жамбыл, Жамбай, Кетешағыл, Манаш, Новобогат ауылдық Кеңестері бөлініп шықты.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1950 — `ноября` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **unknown**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0012943`) «Ниже приведен список запланированных встреч: Азиатско-Тихоокеанский регион: 4 ноября 2022 года в 09:00-10.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0012945`) «Северная и Южная Америка/Западная Европа: 12 ноября 2022 года в 15:00-16.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0141659`) «Телеканал «Атырау» (8 ноября 2017).»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1951 — `нәти` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (kazakh_textbooks_pack.json / `kz_textbook_kz_lang_11_ogn_p0256_s00`) «Еңбек нарығы Сұраныс пен ұсыныс механизмі арқылы белгілі бір жұ- мысбастылық көлемі мен еңбекақы деңгейі анықтала- тын, экономикалық агенттер арасындағы бәсеке нәти- жесінде қалыптасқан экономикалық о …»
+  2. (kazakh_textbooks_pack.json / `kz_textbook_kz_lang_11_ogn_p0264_s03`) «Мысалы, жаңа тех- нологиялар мен жаңа тауарлардың пайда болуының нәти- жесінде жұмыс күшінің кәсіби-біліктілік құрылымында өзгерістердің орын алуы»
+  3. (kazakh_textbooks_pack.json / `kz_textbook_algebra_7_p0122_s07`) «Статистика - белгілі бір ортақ белгі-қасиеттермен сипатталатын сан- дық мәліметтерді (деректі) жинақтау, өңдеу, талдау және оның нәти- желерін түсіндірумен айналысатын ғылым саласы»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1952 — `обсөж` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **voiced_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (cc100_kk_pack.json / `cc100_kk_0024885`) «Лекция: 15 Лаборатория: 30 СӨЖ: 45 обсөЖ: 45 1- рб: 30 балл 2- рб: 30 балл Емтихан: 40 балл ∑ : 100 балл Оқытушы: Жасұзақова м жетісай 2009 ж. «Компьютерлік графика»»
+  2. (cc100_kk_pack.json / `cc100_kk_0024887`) «Мектеп педагогикасы” пәні бойынша обсөж тапсырмалар мәтіні»
+  3. (cc100_kk_pack.json / `cc100_kk_0024888`) «Адам анатомиясы” пәні бойынша 050113 “Биология”мамандығының студенттерінің білімін бақылауға арналған обсөЖ тапсырмалар мәтіні»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1953 — `озар` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **liquid**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (common_voice_kk_pack.json / `cv_kk_00346`) «Айырылған азар, қосылған озар.»
+  2. (common_voice_kk_pack.json / `cv_kk_00650`) «Асық ойнаған озар, доп ойнаған тозар.»
+  3. (common_voice_kk_pack.json / `cv_kk_01840`) «Бірлігі жоқ ел тозар, бірлігі күшті ел озар.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1954 — `операның` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0005472`) «Абай (жарнама кітапша) — осы аттас операның қойылымына арналған орыс тіліндегі жарнама кітапша.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0013909`) «Монтеверди (1567 – 1643) – операның тұңғыш классигі, әрі 17 ғасырдағы Венеция опера мектебінің негізін салушы.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0047438`) «Сахнада қырыққа жуық музыкалық образ жасап, ұлттық операның өркендеуіне үлкен үлес қосқан.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1955 — `операсын` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0018341`) «Қожамяровпен бірлесіп жазған «Алтын таулар» операсын (1961) «Ата толғауы» оркестр үшін жазылған шығармаларын (1962) «Халық қуанышы» (1963) «Қайрат» (1964) «Жеңіс солдаты» (1975) сияқты увертюраларын а …»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0018588`) «Брусиловскиймен бірлесіп «Аманкелді» операсын жазған.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0018603`) «Өмірінің соңғы жылдарында композитор лирикалық-драмалық «Қозы Көрпеш – Баян сұлу» операсын бастайды, бірақ композитор кенеттен дүние салып, бұл шығарма аяқталмай қалады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1956 — `оригинал` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **liquid**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0096885`) «Топ әлі күнге дейін абсолютті оригинал дыбысқа ие және алғашқы аккордтардан-ақ танымал болып келеді.»
+  2. (cc100_kk_pack.json / `cc100_kk_0020421`) «Оригинал Бал тәтті, балдан да бала тәтті.»
+  3. (cc100_kk_pack.json / `cc100_kk_0046656`) «оригинал мақалада ондай қате жоқ. Мына жігіттің жеке авторлық қатесі-ау дим)»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1957 — `оркестрдің` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0006604`) «Құрылысы мен даусының түпкі ерекшеліктері сақталып қайта жасалған домбыра оркестрдің құрамында домбыра-тенор қызметін атқара бастады.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0025278`) «Таңатаров сияқты әншілер оркестрдің беделін биіктетуде.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0058986`) «Ария ( — ән) – опера, оперетта, оратория немесе кантатаның ішіндегі жеке дауыстағы әнші оркестрдің сүйемелдеуімен орындайтын дербес шығарма.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1958 — `орск` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0017784`) «Абылай ханның батыл әрі ғажап қимылынан кейін Орск бағытының қолбас­шысы, полковник Родестен генерал-майор Фонвейнмарнға 1760 жылы 22 қыркүйекте (№315) мынадай баянат келіпті: «.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0041367`) «Хан ставкасында, Ресейдің Орск, Элиста қалаларында ат көрмелері өткізіліп, ат жарыстары ұйымдастырылып тұрады.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0055312`) «1735 жылы 15 тамызда Иван Кириллов бастаған экспедициясы Жайықтың сол жақ жағалауына құяр сағасына қала (қазіргі Орск) сала бастады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1959 — `орфографиялық` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0011404`) «1940 жылы орыс графикасы негізінде қалыптасқан қазақ әліпбиі мен орфографиялық емлесіне әр кезде (1957 жыл, 1970 жыл) әртүрлі өзгерістер енгізілді.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0037553`) «Орфографиялық ережелер бойынша бұрынғы және қазіргі ағылшын тіліндегі дыбыстардың өзгерістері жазуда қатаң сақталады.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0060261`) «1880 жылы Дуден анықтамалығында алғаш рет грамматикалық және орфографиялық ережелер бекітілді.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1960 — `оятады` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (tatoeba_kazakh_pack.json / `tatoeba_kz_00997`) «Терезаның анасы шоколадқа құмары болды, ал Помпадур ханым шоколад қана құмарлықты оятады деп сенген.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0002263`) «Бұл көптеген туристердің қызығушылығын оятады.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0022098`) «Осы ұйқыдан оны даланың улы жыланы шағып оятады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1961 — `оқиғаларының` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0011931`) «Түркияда 1986 жылы Алматыдағы желтоқсан оқиғаларының толқыны ретінде түрік қазақтарының «Вакиф» мәдени-ағарту қоғамы құрылды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0070296`) «Басынан кешірген оқиғаларының бірнешеуінде ол өзінің ісін жеңілдету үшін немесе айналадағы адамдарды әшкерелеу үшін жараланған немесе қатты науқастанып қалған адамды айнытпай салады мысалы Өлейін деп  …»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0070915`) «Ақпан төңкерісі оқиғаларының белсенді қатысушысы, Ресей әскерінің Жоғарғы бас қолбасшысы (1917).»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1962 — `оқиғалы` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0010768`) «Әсіресе, лирикалық-әлеуметтік тақырыпқа арналған оқиғалы желіде туған, формасы күрделі музыкалар орындаушылығы жағынан мықты шеберлікті қажет етті.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0028162`) «Верннің ғылыми, шытырман оқиғалы романдары көпке танылды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0039596`) «өлеңдер, «Қалқаман-Мамыр», «Еңлік-Кебек», «Нартайлақ-Айсұлу» сияқты оқиғалы дастандар, «Әділ-Мәрия» романы жөне басқа да прозалық туындылар, аудармалар, тарихқа, философияға қатысты еңбектер, сазды ән …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1963 — `платформаның` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0013547`) «Ойпаттың батыс бөлігін батпақты ойпаттар - батпақтар алып жатыр, олардың пайда болуы платформаның төмендеуімен байланысты.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0025403`) «110 м (солт-нде) – 600 м (оңтүстік-батысында) тереңдікте жатқан платформаның кристалданған іргетасы күшті шоғырланған архейлік және протерезойлық гнейстерден, мигматиттерден, кристаллды тақтатастардан …»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0029174`) «Платформаның докембрийлік төменгі қабаты кварцит, мәрмәр және гранитоидтан түзілген, оларды палеозойлық құм тас пен тақта тас және мезозойлық жыныс қабаттары жауып жатыр.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1964 — `поқ` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (cc100_kk_pack.json / `cc100_kk_0000101`) «Жукова Алла Валентиновна _ ҚарМТУ-дың ПОҚ жеке парақшалары»
+  2. (cc100_kk_pack.json / `cc100_kk_0012426`) «Іс-шараға ҚР Мемлекеттік қызмет істері және сыбайлас жемқорлыққа қарсы іс қимыл агенттігінің Шымкент қаласы бойынша департаментінің бас маманы Ж.Әлжанова, Нұр Отан партиясының өкілі С.Мәжінбеков, унив …»
+  3. (cc100_kk_pack.json / `cc100_kk_0035668`) «3.3.15 сурет. ЖОО - ның ПОҚ біліктілігін арттыру , қайтадан даярлау және»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1965 — `препараттарды` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0052382`) «Сондай-ақ басқадай тыйым салынған препараттарды қолданғандарын білдірмеу үшін кеңінен пайдаланылады.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0057789`) «Оның үстіне екі өзен бойындағы шаруашылықтарда тыңайтқыштар мен химиялық препараттарды қолдану 10-15 есеге өскен.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0082856`) «Қалампырдың бұл түрінен жасалған препараттарды медицинада қолданады: олар адам денесіндегі жұмсақ ет талшықтарының қабілеттілігін арттырады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1966 — `программаларды` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0010326`) «Оларға мысал ретінде антивирустік (вирустерге қарсы) программаларды, мәліметтерді архивтеу (кысу) программаларын, компыотердің: жұмыс істеу қабілетін (диагностика) тексеретін программаларды (тест ирог …»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0010326`) «Оларға мысал ретінде антивирустік (вирустерге қарсы) программаларды, мәліметтерді архивтеу (кысу) программаларын, компыотердің: жұмыс істеу қабілетін (диагностика) тексеретін программаларды (тест ирог …»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0071367`) «Қызметтік пернелер есептеу жүйесінің түрлі міндеттерін немесе жеке программаларды басқаруға арналған.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1967 — `прокуратурасында` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0037726`) «Павлодар облысының прокуратурасында заңгер болып істеген.»
+  2. (cc100_kk_pack.json / `cc100_kk_0015813`) «Прокуратура органдарындағы қызметін 2002 жылы Шығыс Қазақстан облысы, Шемонаиха ауданының прокуратурасында бастады, 2004 жылдан бастап Шығыс Қазақстан прокуратурасының облыс аппаратында қызмет атқарды …»
+  3. (cc100_kk_pack.json / `cc100_kk_0046854`) «Еңбек жолын 1996 жылдың қыркүйек айында Ақтау қалалық прокуратурасында тағылымдамашы, одан әрі прокурор көмекшісі болып бастады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1968 — `протокол` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **liquid**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0035608`) «Бұл жағдайдағы протокол түсінігі - желімен жұмыс жасаған кездегі компьютерлер арасындағы мәліметтер алмасу «тілін» білдіреді.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0045330`) «Келісімге жасалған қосымша құпия протокол бойынша екі ел Орталық Еуропаны өз мүдде аймақтарына бөлісіп алды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0045356`) «Түрлі мәселелер туралы талқылаулардан кейін тамыздың 17-нде елші Шуленбург сыртқы істер министрі Молотовқа өздерінің шабуыл жасаспау туралы келісімге қол қоюға дайын екендіктерін және мүдделер аймақта …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1969 — `революциясы` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0014151`) «1931 жылы 14 сәуірде елде республика орнап, алтыншы испан революциясы (1931 – 39) басталды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0026100`) «Бір айдан соң, 30 қарашада, Сәуір революциясы кезінде алынып тасталған президент статусы жаңа Лойя джирга конституциясы бойынша, қайта қалпына келтіріліп, Мұхаммед Наджибулла президент болды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0027105`) «Бірақ грек революциясы кезінде де үлкен әдебиет, музыка және кескіндеме туындылары жасалды.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1970 — `резерв` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **voiced_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0003479`) «2006 жылы 50 адамдық Олимпиадалық резерв дайындау орталығы құрылды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0036683`) «Сайланған төрешіні резервтегілердің бірімен (резерв тізімінде алғашқы болып тұрғанымен) мына жағдайларда алмастыруға жол беріледі: ;1.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0040852`) «Мысалы, 20 миллиард — доллар бағамы мен инфляция төмен болғандықтан, 77 миллиард — резерв қолданылмаған.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1971 — `резиденциясы` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0000207`) «1810–1864 жылдары Шымкент Қоқан хандығының билігіне өтіп, хан өкілінің резиденциясы болды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0009545`) «Қимақ қағанаты кезінде, қазіргі қала аумағында қағанат билеушісінің жазғы резиденциясы болған ортағасырлық Имакия қаласы орналасқан.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0009644`) «Погодин атындағы орыс драма театры Солтүстік Қазақстан облыстық тарихи-өлкетану мұражайы Облыстық бейнелеу өнері мұражайы «Абылай ханның резиденциясы» мұражай кешені Манаш Қозыбаев атындағы СҚМУ тарих …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1972 — `рмм` (freq 17)
+
+- Vowel harmony (auto): **unknown (no vowels)**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (cc100_kk_pack.json / `cc100_kk_0013705`) ««Көкшетау техникалық институты» РММ»
+  2. (cc100_kk_pack.json / `cc100_kk_0016034`) «2011 – 2016 жылдары «20015 әскери бөлімшесі» РММ материалдық-техникалық қамсыздандырудың басты басқармасының басшысы, «ҚазМұнайГаз – Сервис» ЖШС бас директорының орынбасары, ҚР аймақтық даму бірінші в …»
+  3. (cc100_kk_pack.json / `cc100_kk_0024941`) «© "Қазақстан Республикасының Ұлттық академиялық кітапханасы" РММ»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1973 — `рылған` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (kazakh_textbooks_pack.json / `kz_textbook_kz_lang_11_emn_p0138_s16`) «Сегіз жасында АҚШ-қа НАСА-да жұмыс істеуге шақы- рылған»
+  2. (kazakh_textbooks_pack.json / `kz_textbook_kz_lang_11_ogn_p0016_s08`) «Жалпы, дер кезінде айтылған сөз - тарихи ерлік, тынды- рылған шаруа - тарихи әрекет»
+  3. (kazakh_textbooks_pack.json / `kz_textbook_kz_lang_11_ogn_p0246_s20`) «Тарпыған аяғын кессем - түйеңіз шолтақ болады, өркешін кессем - молтақ болады, қозысынан айы- рылған адам осы түйенің қырыққан жүніне ортақ болады»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1974 — `сайлауалды` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0065325`) «Дмитрий Медведевтің сайлауалды штабын Президент Әкімшілігінің басшысы Сергей Собянин басқарды, ол онда жұмыс істеген кезде демалыста болған.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0101802`) «Партияның «Қазақстандық жол-2009» сайлауалды тұғырнамасы қабылданды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0101809`) «Партияның сайлауалды бағдарламасы қабылданды, Парламент Мәжілісінің депутаттығына кандидаттардың партиялық тізімі бекітіліп, партияның Саяси кеңесі құрамына өзгеріс енгізілді.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1975 — `салдың` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0041013`) «Қазақтың халық музыкасында Біржан салдың “Жанботасы”, “Ләйлім шырағы”, Ақан серінің “Құлагері”, Иса Байзақовтың сұлу сазды төкпе желдірмелері – импровизациялық туындылар.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0083968`) «Біржан салдың қыстағы болған.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0085910`) «Шөже, Салғара, Толыбай, Орынбай, Нүркей, Сегізсері, Арыстан тәрізді өнер иелері – Біржан салдың ұстаздары.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1976 — `салынуына` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0002651`) «Бұлардың барлығы көмір кен орындарының қарқынды игерілуіне, шахталар, қара және түсті металлургия, химия, машина жасау кәсіпорындарының салынуына байланысты пайда болды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0009214`) «Оңтүстік Сібір темір жолы магистралінің Челябинск – Троицк – Қостанай тармағының салынуына байланысты Қостанай Ресейде өнеркәсіптік дамуы бойынша біршама ілгері тұрған Орталық Ресей аудандарымен тікел …»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0009249`) «1901–1906 жылдары Орынбор–Ташкент теміржолының салынуына байланысты қала халқы қарқынды өсті.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1977 — `сексуалдық` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0116460`) «Құлыбаева директор болып отырған “Нұрсұлтан Назарбаев Білім беру қорына” кіретін элиталық мектепте бірінші сынып оқушысының анасы баласына сексуалдық зорлық-зомбылық жасалғанын айтып, мектепті айыптад …»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0116466`) «Қылмыстық іс ҚР ҚК 121-бабы бойынша (сексуалдық сипаттағы зорлық-зомбылық әрекеттері) қозғалды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0118402`) «Жалаңаштанған емшектің көрінісі екі жыныстың да сексуалдық құштарлығын оятады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1978 — `секторға` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0000569`) «ҚХР-да «түрлі-түсті революцияның» алдын алу мақсатында 2006 жылы аграрлық секторға шамамен 340 млрд юань жұмсау көзделіп отыр (2005 жылғыдан 14 пайызға көп).»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0004302`) «Салық жүйесіне өзгерістер енгізу, банк-қаржылық секторға бақылауды күшейту, мемлекеттік бюджет зәрулігін қысқарту, экономикадағы өнеркәсіп саласын реттеу мен нарықтық қатынастарға бейімдеу, сауда-тари …»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0028000`) «Францияда әртараптандырылған экономика бар, онда қызмет көрсету секторы басым (2017 жылы ЖІӨ-нің 78,8% - ын құрады), ал өнеркәсіп секторы ЖІӨ-нің 19,5% -ын құрады, ал қалған 1,7% -ы бастапқы секторға  …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1979 — `сигналын` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0047708`) «халықаралық құтқару туралы сигналын жіберген оператор.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0052449`) «Біршама сирек болса да, бүкіл асинхронды процессорлар жаһандық сағат сигналын пайдаланбай жасалған.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0065913`) «Дыбыс жиілігіндегі электр сигналын кедергісі бірнеше мың омды құрайтын құлаққап арқылы тыңдауға болады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1980 — `синапстар` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **liquid**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (kazakh_textbooks_pack.json / `kz_textbook_informatics_11_emn_p0007_s13`) «Кіріс ақпараттар Хх, Синапстар Нейрон ұяшығы Хх, Шығыс ақпараттар х, Ү 1-сызба»
+  2. (kazakh_textbooks_pack.json / `kz_textbook_informatics_11_emn_p0008_s00`) «Нейрон ұяшығы Синапстар 1-сурет»
+  3. (kazakh_textbooks_pack.json / `kz_textbook_informatics_11_emn_p0008_s01`) «Биологиялық нейрон Синапстар дегеніміз не»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1981 — `синоним` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0007098`) «Ал «Шәмші аға» деген сөз «Ән аға» деген сөзбен тұтасып, синоним болып кеткелі қашан.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0010522`) «Бұл сөзді қазақ тіліне синоним ретінде қолдануға болады.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0012100`) «Сондай-ақ, сыртқы түр-тұрпат ұқсастықтарына немесе мағына-мазмұнын алшақтықтарына қарай оларды омоним естістіктер, синоним етістіктер, антоним етістіктер деген тәрізді топтарға да жіктеуге болады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1982 — `сипатында` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0000011`) «Тағы қараңыз: Арнайы:Бұғатталғандар Қазіргі бұғатталғандар Бұғаттау және бұғаттауынан босату журналы Тіркелу журналы Басқаларды бұғаттау Егер қатысушының беттері бұзақылық сипатында болса оларды жаппа …»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0016929`) «2006 жылдың 11 қаңтарында «Менің Қазақстаным» әні елдің мемлекеттік әнұраны сипатында алғаш рет астаналық «Ақорда» резиденциясының шаңырағы астында, Нұрсұлтан Назарбаевтың Қазақстан Президенті лауазым …»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0017174`) «Үш айға жуық уақытқа созылып, әскери бүлік сипатында болған көтеріліс осылай аяқталды.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1983 — `совхоз` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **voiced_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0008900`) «, қараша – Жаңа Согра поселкесінде бақша өнімдерін өндіретін арнаулы КОКП ХХІІІ сьезі атындағы совхоз құрылды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0106120`) «Әншінің жанына жара салған жалған сөз Расында Роза Бағланованың сұлулығына еліткен бір Хрущев емес, олардың қатарында шетелдің мемлекет басшылары, маршалдар, генералдар, хатшылар, колхоз председательд …»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0119796`) «) – комбайнер, 50-жылдық КСРО совхоз атындағы бригадирі, Социалистік Еңбек ері (1973 жыл).»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1984 — `соншама` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0011608`) «Мысалы: осыншама, соншама, соншалық, мұнша, мұншалық т.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0064343`) «Сондықтан Қызыл Әскердің фин әскерін соншама ұзақ уақыт жеңе алмауы оның әлсіздігі және соғысқа дайындығының төмен деңгейін көрсетеді деп қарастырыла бастады.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0086946`) «Биосферада тіршілік пайда болғаннан бері қалыптасқан соншама бай түр иелерінің бәріне ортақ заң ережелері тым қатал еді.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1985 — `софокл` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **liquid**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0096810`) «Софокл шығармалары Грекиядағы құл иеленушілік құрылымның дамып, гүлденген кезеңін, қоғамдық-саяси оқиғаларға толы өзгерістерді, ел демократиясының жай-күйін бейнеледі.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0096811`) «Софокл туындылары адам мәселесін алғашқы орынға қоя отырып, өмір шындығын қарама-қайшылықтар негізінде көркем жеткізуімен ерекшеленді.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0096813`) «Грек ойшылы Гомердің шығармаларын үлгі тұта отырып, мифологиялық оқиғаларды шығармаларына арқау еткен Софокл “Трахинянкілер” трагедиясында соғыс майданында әрдайым мерейі үстем болған Гераклдың (Герку …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1986 — `сюжетті` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0088395`) «Ескендір поэмасы — Абайдың гуманистік көзқарасын тереңірек танытатын елеулі сюжетті туындысы.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0102009`) «Дулат өзінің “елге қорған ер туса” деген идеясын халыққа жеткізу үшін, қазақ-қалмақ соғысы тұсындағы сюжетті алып, “Еспембет” поэмасын жазған.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0105549`) «Ол лиро-эпостық сипаттағы шағын сюжетті өлең, барлық әдебиетте кең тараған.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1987 — `сөж` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **voiced_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (cc100_kk_pack.json / `cc100_kk_0024870`) ««Мәдениеттану» пәнінен СӨЖ сабақтарының»
+  2. (cc100_kk_pack.json / `cc100_kk_0024874`) «Лекция: 15 сағ. Семинар : 15 сағ обс¤Ж: 30 саѓ. СӨЖ: 30 сағ. Барлық сағат: 90 Кредит: 2»
+  3. (cc100_kk_pack.json / `cc100_kk_0024885`) «Лекция: 15 Лаборатория: 30 СӨЖ: 45 обсөЖ: 45 1- рб: 30 балл 2- рб: 30 балл Емтихан: 40 балл ∑ : 100 балл Оқытушы: Жасұзақова м жетісай 2009 ж. «Компьютерлік графика»»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1988 — `талмай` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **glide**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0076880`) «Сондықтан да ол Абай өлеңдері тақырыбына қайта-қайта оралып, ақынның әр сезіне үңіле қарау қажеттігін талмай көтеріп келеді.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0102498`) «Өз компанияңды талмай үйренуші жетілген және қорытынды жасалған ұйымға айналдыр.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0115701`) «Ұзақ жыл талмай баптап, жауапты сын алдында ащы терін алып, бәйгеге қосқан шәкірті шығыршықта не бел темірде шырқ үйіріліп, өнер көрсетіп жатады.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1989 — `тергеуге` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0049364`) «1929-1930 жылдары бір топ қазақ зиялылары абақтыға алынып, тергеуге түскенде, Ә.»
+  2. (cc100_kk_pack.json / `cc100_kk_0002490`) «Естеріңізге сала кетейік, 2018 жылы 24 ақпанда Ұлттық бюро экс-әкім Рысқалиевті тергеуге шақырды.»
+  3. (cc100_kk_pack.json / `cc100_kk_0008344`) «Білім мекмелерінің оқушылар қауымдастығының өкілдерімен қатысқан іс-шарада үш тілде келеңсіз жағдай кезіндегі іс-әрекеттер алгоритмі ұсынылып, әдістемелік нұсқаулықтар берілді. Сонымен қатар балалар Қ …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1990 — `техникумын` (freq 17)
+
+- Vowel harmony (auto): **mixed**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0007053`) «-- Сарыағаштағы Қапланбек малдәрігерлік техникумын бітірген (1950).»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0015822`) «— Өскемен индустриалды техникумын (техник — жылу-технигі).»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0018112`) «Нижний Тагил Тау металлургия техникумын (1947), Урал политехникалық институтын (1955) бітірген.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1991 — `түсік` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0088676`) «Мұндай сырқатпен ауырған әйелдерде түсік тастау және босанған кезде қатты қансырау қаупі зор.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0089441`) «Осындай себептерге байланысты әйел өзінің жүкті боп қалғанын сезініп үлгергенше, түсік тастайды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0089442`) «Бала көтере алмай жүрген және түсік тастауға бейім әйелдер дұрыс тамақтанып, иодталған түзды күнделікті аста көбірек пайдаланғаны жөн, ал мүлдем қан аздық жағдайында (анемия), темір қоспалы дәрілер іш …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1992 — `төрде` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0018439`) «Нұрғисаның көзіне төрде ілулі тұрған қозы қарын қызыл домбыра алдымен шалынады.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0020576`) «Сонда Қазыбек: - Біздің қазақтың әдетінде жасына қарай отырып, жағына қарай сөз сөйлей береді, өзімнен үлкен ағаларым төрде отырса, маған төбеде отырғанмен бірдей, - деп жалт бұрылып орнына қайта бары …»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0020808`) «Сонда Қазыбек: - Біздің қазақтың әдетінде жасына қарай отырып, жағына қарай сөз сөйлей береді, өзімнен үлкен ағаларым төрде отырса, маған төбеде отыр- ғанмен бірдей, - деп жалт бұрылып орнына қайта ба …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1993 — `фаунасы` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0029611`) «Кембрий тау жыныстары мен фаунасы Жер шарының барлық құрлықтарында ашылып сипатталған.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0029718`) «Динант екі қабатқа бөлініп, мол корал-брахиопод фаунасы бар теңіздік әктаспен сипатталады.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0033040`) «Ол 1961 жылы еліміздің орталығында бойында ерекше фаунасы бар саванналар мен шөлдердің табиғи кешендерін қорғайтын жерде құрылған.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1994 — `фигуралар` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **liquid**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0001686`) «Онда үш түрлі фигуралар: діни орналасқан, йогтармен тең төрт қолды Будда суреттелген.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0043890`) «Құлақ, ауыз, мұрын секілді фигуралар бірігіп адамды құрайды деп айтып жүрміз.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0059372`) «Архимедтің көптеген математикалық еңбектерінің ішінен қисық сызықтардың ұзындықтарын, әр түрлі фигуралар мен денелердің көлемін және беттердің ауданын есептеу ерекше орын алды.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1995 — `форматында` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0011290`) «Достастыққа көпжақты өзара әрекеттестіктің түрлі салаларына мемлекеттердің іріктеліп қатысуы тән, яғни, мүдделік білдіретін тараптар форматында жүзеге асады.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0110087`) «Қазақстан 2015 жылғы 11-12 ақпанда Минскіде Ресей, Украина, Франция және Германия басшыларының қатысуымен «Норман форматында» келіссөздер ұйымдастырып, бейбітшілік орнатуға жол ашуға шақырды.»
+  3. (cc100_kk_pack.json / `cc100_kk_0012776`) «"Мойынқұм таңы"! Міне сізге керек десеңіз! Айтпақшы, газетіміз А3 форматында шығатын болыпты ғой, құтты болсын! Бұрын ішінде аукцион мен "жарамсыз деп табылсын"-дардан басқа түк те жоқ газет ерлепті.  …»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1996 — `хамза` (freq 17)
+
+- Vowel harmony (auto): **back**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0000992`) «Хамза Хакимзада Ниязи (1889–1929), Садриддин Айни (1878–1954), Абдулла Қадыри (1894–1940) шығармалары демократикалық-ағартушылық ағымның бастауы болып саналады.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0005910`) «Әкесі Хамза мен ағасы Әшімтай ғажайып музыканттар болды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0005911`) «Күйшілік өнерге баулыған әкесі Хамза және Сатан, Хамит, Әшірбек сияқты әнші-күйшілер болды.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1997 — `хусейн` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0010456`) «Өсерұлы «Жеті жарғы» Алматы «Жеті жарғы» 1995 жыл Тегерандағы Қажы Хусейн Малек кітапханасынан табылған қолжазбалардың бірі «Тарих-и Сафавие» (Сефевидтер әулетінің тарихы) деп аталады.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0010479`) «Қазақ тарихына қатысты қолжазбалардың бірі Тегерандағы Қажы Хусейн Малек атындағы ұлттық кітапханадан табылды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0022742`) «Мамаш хан, толық аты Мұхаммед Хусейн — (1521—1523) билік құрған Қазақ хандығының билеушісі.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1998 — `шiлде` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **vowel**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (cc100_kk_pack.json / `cc100_kk_0012989`) «2010 жылдың шiлде айынан бастап осы лауазымда жұмыс iстейдi.»
+  2. (cc100_kk_pack.json / `cc100_kk_0019565`) «сыйақы төлеу күні – 2016 жылғы 21 шiлде;»
+  3. (cc100_kk_pack.json / `cc100_kk_0019567`) «аталған сыйақыны төлеу үшін бағалы қағаздарды ұстаушылар тізілімін тіркеу күні – 2016 жылғы 20 шiлде.»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #1999 — `шекпен` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **nasal**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0010643`) «Кілем, алаша, шекпен, киіз үйге керекті басқұр, бау-шулар, сырмақ және басқаларды дайындаған.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0010654`) «Әрбір ауыл көшпелі мектеп, жалдамалы молда (кейінірек мұғалім) ұстаған, кілем, алаша, шекпен т.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0024900`) «Ұштары жолбарыстың басы түріндегі алтын алқа (гривна) және былғары шекпен (графикалық жаңғыртпа).»
+
+- [ ] Approved
+- Root form: __
+- POS: __
+- Harmony override: __
+- Final-sound override: __
+- Comment:
+
+---
+
+### Candidate #2000 — `шектес` (freq 17)
+
+- Vowel harmony (auto): **front**
+- Final sound (auto): **voiceless_consonant**
+- POS (default): **noun** — confirm or correct
+- Contexts:
+  1. (wikipedia_kz_pack.json / `wiki_kz_0003764`) «Бұған климаттың шапшаң континентігі, ылғалдық жетіспеуі және шектес жатқан аумақтың жалпы жазықтығы ауаның меридиан және ендік бағыттарымен еркін алмауына жағдай жасайды.»
+  2. (wikipedia_kz_pack.json / `wiki_kz_0023012`) «Лоулаң, Ұсын, Құтзе және оларға шектес 36 үлес (кінәздік) сүннулерге қаратылды.»
+  3. (wikipedia_kz_pack.json / `wiki_kz_0023583`) «Григорьев басқаша көзқарасын айтады, оған карағанда парадрайа сақтар деп Оңтүстік Ресей және онымен шектес аймақтар аумағын мекендеген еуропалық скифтерді түсіну кажет болады.»
 
 - [ ] Approved
 - Root form: __

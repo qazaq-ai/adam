@@ -28,6 +28,92 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.0.0-rc2] — 2026-05-18 — Lexicon V2 triage pipeline · auto-exclude filter
+
+> Second v6.0 release candidate. Focus: closing v6.0 GA blocker #3
+> (Lexicon V2) by reducing the gap-candidate noise floor through a
+> conservative heuristic triage, without requiring a native-speaker
+> review pass.
+
+### New: `triage_lexicon_v2` binary
+
+`cargo run -p adam-corpus --bin triage_lexicon_v2` parses
+`docs/lexicon_gap_candidates.md` (top-2000 uncovered surfaces) and
+classifies each into one of three buckets:
+
+  - **auto-approve.csv** (509 rows, per-iteration) — pure-Cyrillic,
+    short, ≥ 50 freq surfaces that look like regular Kazakh content
+    words. Listed for downstream root-extraction review BEFORE
+    Lexicon addition — many entries are inflected forms (3sg past
+    «өтті», 3sg possessive «жоспары») whose canonical root needs a
+    separate extraction pass.
+  - **auto_exclude.csv** (154 cumulative across iterations) —
+    confirmed noise: Latin-mixed surfaces, digits, Russian-loan
+    suffixes (`-ция / -логия / -изм`), Russian-loan prefixes
+    (`интер / авто / теле / электр / компью`), abbreviations
+    («млрд / жшс»), already-canonical proper nouns from
+    `world_core/geography_kz`.
+  - **needs_review.csv** (1490 rows, per-iteration) — everything
+    else. Includes 3sg-possessive compound nouns where the bare
+    root + POS judgement requires native-speaker work.
+
+Conservative bias: when a heuristic is ambiguous, the candidate
+defaults to needs-review rather than auto-approve. Codex's
+2026-05-18 peer-review pass produced 491/687/822; rc2's heuristics
+produce 509/154/1490 — narrower auto-exclude on purpose (rather
+under-classify than mis-exclude a real Kazakh root). The
+remaining difference can be closed by extending the heuristic
+list as more loanword patterns surface.
+
+### `mine_lexicon_gaps` auto-exclude filter
+
+The gap miner now reads `data/lexicon_v2/auto_exclude.csv` at
+startup and drops listed surfaces from the candidate pool before
+ranking. Effect on the rc2 baseline:
+
+  Distinct uncovered surfaces before rc2:  69 808
+  After applying auto_exclude (154 rows):  69 655 (−153)
+
+The filter is cumulative — successive triage iterations append
+new excludes to the CSV without losing earlier ones. Convergence
+observed: iteration 2 added 9 fresh excludes (143→153), iteration
+3 added 1 (153→154), iteration 4 expected to be a fixed point
+given current heuristics.
+
+### What's still open
+
+  - **auto-approve has NOT been applied to the Lexicon.** Each
+    surface requires a root-extraction pass (e.g. `өтті` → root
+    `өт`, `жоспары` → root `жоспар`) before it can be added.
+    Deferred to rc3.
+  - The needs-review pile (1 490 rows) is what a native-speaker
+    linguist (or a follow-up Codex peer-review pass) would
+    process. Currently blocking GA criterion #3.
+  - The auto-exclude heuristics could be widened. The 144 vs
+    Codex's 687 gap is opportunity for rc3 — patterns like
+    `-сы / -сі / -сында / -сінде` possessive-locative suffixes,
+    Russian-loan compound forms, and OCR-merge artefacts could
+    join the auto-exclude bucket with care.
+
+### Workspace
+
+  No new tests added — pipeline is data-engineering, not unit-
+  testable in the conventional sense. The CSVs themselves are
+  the deliverables. `cargo test --workspace --all-targets
+  --release` still green at 1 556 tests.
+
+### Bug fixes
+
+  - `verify_release_version.sh` accepts `x.y.z-rcN` (was strict
+    `x.y.z` only; rc1 push failed CI on this).
+  - `check_metrics_currency.sh` accepts the shields.io double-
+    dash encoding `version-X.Y.Z--rcN` in README badges + plain
+    `vX.Y.Z-rcN` in performance.md header (rc1 push failed CI on
+    this).
+  - `adam_chat` non-`neural`-feature build drops a dead
+    `neural_state` Option<()> binding that emitted a
+    `warning: unused variable` flagged by the IDE.
+
 ## [6.0.0-rc1] — 2026-05-18 — Kazakh agglutinative neural composer preview · runnable, verifier-bounded
 
 > **Release candidate, not GA.** v6.0.0-rc1 ships the v6.0

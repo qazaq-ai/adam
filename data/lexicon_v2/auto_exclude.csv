@@ -1,0 +1,155 @@
+n,surface,freq,harmony,final_class,reason
+243,cargo,120,unknown (no vowels),unknown,contains-latin
+75,cтратегия,292,mixed,unknown,contains-latin
+215,cұрақжауап,133,back,voiceless_consonant,contains-latin
+1723,drop,20,unknown (no vowels),unknown,contains-latin
+1802,for,19,unknown (no vowels),unknown,contains-latin
+1724,hash,20,unknown (no vowels),unknown,contains-latin
+1359,impl,25,unknown (no vowels),unknown,contains-latin
+1922,iсi,18,unknown (no vowels),unknown,contains-latin
+920,iске,36,front,vowel,contains-latin
+1894,iсқимыл,17,back,liquid,contains-latin
+356,iшiнде,85,front,vowel,contains-latin
+1923,iшкi,18,unknown (no vowels),unknown,contains-latin
+689,let,47,unknown (no vowels),unknown,contains-latin
+1543,main,22,unknown (no vowels),unknown,contains-latin
+701,match,46,unknown (no vowels),unknown,contains-latin
+1212,mut,28,unknown (no vowels),unknown,contains-latin
+1895,none,17,unknown (no vowels),unknown,contains-latin
+947,panic,35,unknown (no vowels),unknown,contains-latin
+1803,pub,19,unknown (no vowels),unknown,contains-latin
+1007,result,33,unknown (no vowels),unknown,contains-latin
+1924,run,18,unknown (no vowels),unknown,contains-latin
+242,rust,121,unknown (no vowels),unknown,contains-latin
+483,rustта,64,back,vowel,contains-latin
+403,rustтың,77,back,nasal,contains-latin
+1213,self,28,unknown (no vowels),unknown,contains-latin
+1412,send,24,unknown (no vowels),unknown,contains-latin
+1925,str,18,unknown (no vowels),unknown,contains-latin
+592,string,54,unknown (no vowels),unknown,contains-latin
+1622,test,21,unknown (no vowels),unknown,contains-latin
+1318,unsafe,26,unknown (no vowels),unknown,contains-latin
+1360,use,25,unknown (no vowels),unknown,contains-latin
+1926,абхазия,18,back,unknown,russian-loan-suffix
+948,авиация,35,back,unknown,russian-loan-suffix
+1475,аккумулятор,23,back,liquid,russian-loan-suffix
+505,акция,62,back,unknown,russian-loan-suffix
+496,археология,63,mixed,unknown,russian-loan-suffix
+265,архивi,111,back,unknown,contains-latin
+570,архивтiк,56,back,voiceless_consonant,contains-latin
+1480,бюджеттiк,23,front,voiceless_consonant,contains-latin
+824,вектор,40,mixed,liquid,russian-loan-suffix
+690,виктор,47,back,liquid,russian-loan-suffix
+1941,востров,18,back,voiced_consonant,russian-loan-suffix
+331,грузия,88,neutral (only и/у/ю — needs context),unknown,russian-loan-suffix
+1326,губернатор,26,mixed,liquid,russian-loan-suffix
+1423,дiни,24,neutral (only и/у/ю — needs context),vowel,contains-latin
+1166,дивизия,29,neutral (only и/у/ю — needs context),unknown,russian-loan-suffix
+312,директор,92,mixed,liquid,russian-loan-suffix
+804,диссертация,41,mixed,unknown,russian-loan-suffix
+1911,дифракция,17,back,unknown,russian-loan-suffix
+825,доктор,40,back,liquid,russian-loan-suffix
+1947,евразия,18,mixed,unknown,russian-loan-suffix
+1824,екi,19,front,unknown,contains-latin
+40,жшс,457,unknown (no vowels),voiceless_consonant,abbreviation
+1829,жөнiнде,19,front,vowel,contains-latin
+384,жөнiндегi,80,front,unknown,contains-latin
+1561,идеология,22,mixed,unknown,russian-loan-suffix
+531,император,60,mixed,liquid,russian-loan-suffix
+236,инвестиция,123,front,unknown,russian-loan-suffix
+927,инвестор,36,mixed,liquid,russian-loan-suffix
+1744,инновация,20,back,unknown,russian-loan-suffix
+1282,инспектор,27,mixed,liquid,russian-loan-suffix
+1648,интер,21,front,liquid,russian-loan-prefix
+1496,интербелсенді,23,front,vowel,russian-loan-prefix
+38,интернет,461,front,voiceless_consonant,russian-loan-prefix
+595,интернетке,54,front,vowel,russian-loan-prefix
+289,интернетресурсы,101,mixed,vowel,russian-loan-prefix
+1427,интернетресурсында,24,mixed,vowel,russian-loan-prefix
+764,интернетте,43,front,vowel,russian-loan-prefix
+1562,интернеттегі,22,front,vowel,russian-loan-prefix
+1132,интернеттен,30,front,nasal,russian-loan-prefix
+1100,интернетті,31,front,vowel,russian-loan-prefix
+928,интернеті,36,front,vowel,russian-loan-prefix
+1649,интернетінің,21,front,nasal,russian-loan-prefix
+1650,интерфейс,21,front,voiceless_consonant,russian-loan-prefix
+1563,интерфейсі,22,front,vowel,russian-loan-prefix
+1833,интерференциясы,19,mixed,vowel,russian-loan-prefix
+1018,инфекция,33,front,unknown,russian-loan-suffix
+607,инфляция,53,neutral (only и/у/ю — needs context),unknown,russian-loan-suffix
+1932,клиника,17,back,vowel,russian-loan-suffix
+51,комиссия,389,back,unknown,russian-loan-suffix
+1283,коммунизм,27,back,nasal,russian-loan-suffix
+1062,коммуникация,32,back,unknown,russian-loan-suffix
+1841,коммунист,19,back,voiceless_consonant,russian-loan-suffix
+1843,компиляция,19,back,unknown,russian-loan-suffix
+204,композитор,138,back,liquid,russian-loan-suffix
+1939,конвенция,17,mixed,unknown,russian-loan-suffix
+1848,консультация,19,back,unknown,russian-loan-suffix
+1940,конфедерация,17,mixed,unknown,russian-loan-suffix
+247,конференция,119,mixed,unknown,russian-loan-suffix
+845,корпорация,39,back,unknown,russian-loan-suffix
+1945,лекция,17,front,unknown,russian-loan-suffix
+1066,лицензия,32,front,unknown,russian-loan-suffix
+652,мiндеттi,50,front,unknown,contains-latin
+5,млрд,1040,unknown (no vowels),voiced_consonant,abbreviation
+1389,монитор,25,back,liquid,russian-loan-suffix
+1286,монография,27,back,unknown,russian-loan-suffix
+1390,мүмкiн,25,front,nasal,contains-latin
+1980,мүсiрепов,18,mixed,voiced_consonant,contains-latin
+1242,номинация,28,back,unknown,russian-loan-suffix
+1510,нормативтiк,23,back,voiceless_consonant,contains-latin
+1963,оппозиция,17,back,unknown,russian-loan-suffix
+1513,осакаров,23,back,voiced_consonant,russian-loan-suffix
+1880,практика,19,back,vowel,russian-loan-suffix
+282,презентация,103,mixed,unknown,russian-loan-suffix
+1194,проректор,29,mixed,liquid,russian-loan-suffix
+937,просмотров,36,back,voiced_consonant,russian-loan-suffix
+1251,пруссия,28,neutral (only и/у/ю — needs context),unknown,russian-loan-suffix
+1518,публицист,23,neutral (only и/у/ю — needs context),voiceless_consonant,russian-loan-suffix
+1681,радиация,21,back,unknown,russian-loan-suffix
+245,радио,120,back,vowel,russian-loan-prefix
+1588,радиобайланыс,22,back,voiceless_consonant,russian-loan-prefix
+334,радиосы,88,back,vowel,russian-loan-prefix
+1292,радиосының,27,back,nasal,russian-loan-prefix
+1447,реактор,24,mixed,liquid,russian-loan-suffix
+360,революция,85,mixed,unknown,russian-loan-suffix
+1771,резервiне,20,front,vowel,contains-latin
+1448,ректор,24,mixed,liquid,russian-loan-suffix
+1595,секреция,22,front,unknown,russian-loan-suffix
+361,сектор,85,mixed,liquid,russian-loan-suffix
+1995,сәуiр,17,front,liquid,contains-latin
+1460,тiлi,24,unknown (no vowels),unknown,contains-latin
+1782,тiркеу,20,front,vowel,contains-latin
+1786,терроризм,20,mixed,nasal,russian-loan-suffix
+82,техника,276,mixed,vowel,russian-loan-suffix
+227,технология,129,mixed,unknown,russian-loan-suffix
+1039,тиiс,33,neutral (only и/у/ю — needs context),voiceless_consonant,contains-latin
+1040,тиiстi,33,neutral (only и/у/ю — needs context),unknown,contains-latin
+1304,трактор,27,back,liquid,russian-loan-suffix
+1902,транскрипт,19,back,voiceless_consonant,russian-loan-prefix
+882,транспорт,38,back,voiceless_consonant,russian-loan-prefix
+1041,трансферттер,33,mixed,liquid,russian-loan-prefix
+1531,трансформатор,23,back,liquid,russian-loan-suffix
+1701,трансформатордың,21,back,nasal,russian-loan-prefix
+539,трлн,60,unknown (no vowels),nasal,abbreviation
+669,уәкiлеттi,49,front,unknown,contains-latin
+1206,федерация,29,mixed,unknown,russian-loan-suffix
+389,филология,80,back,unknown,russian-loan-suffix
+114,франция,228,back,unknown,russian-loan-suffix
+1910,хакасия,19,back,unknown,russian-loan-suffix
+1998,шiлде,17,front,vowel,contains-latin
+855,швеция,39,front,unknown,russian-loan-suffix
+1083,экономист,32,back,voiceless_consonant,russian-loan-suffix
+50,электр,401,front,liquid,russian-loan-prefix
+171,электрмагниттік,161,mixed,voiceless_consonant,russian-loan-prefix
+239,энергетика,123,mixed,vowel,russian-loan-suffix
+1210,этика,29,back,vowel,russian-loan-suffix
+1540,этнография,23,back,unknown,russian-loan-suffix
+423,үкiмет,74,front,voiceless_consonant,contains-latin
+800,әлеуметтiк,42,front,voiceless_consonant,contains-latin
+1620,әрi,22,front,unknown,contains-latin
+1801,өзiнiң,20,front,nasal,contains-latin
+1542,өзiнөзi,23,front,unknown,contains-latin
+364,өткiздi,85,front,unknown,contains-latin
+919,өткiзу,37,front,vowel,contains-latin

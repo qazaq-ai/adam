@@ -132,6 +132,20 @@ fn main() -> ExitCode {
     // load_roots() prints its own diagnostics including the
     // short-closed-class count.
 
+    // **v6.0.0-rc2** — apply the Lexicon-V2 auto-exclude filter
+    // built by `triage_lexicon_v2`. Surfaces in
+    // `data/lexicon_v2/auto_exclude.csv` are confirmed loanwords /
+    // OCR artefacts / abbreviations / already-covered proper nouns
+    // and should never resurface in the gap pool. Missing CSV →
+    // empty set → pre-rc2 behaviour preserved.
+    let excludes = load_lexicon_v2_excludes();
+    if !excludes.is_empty() {
+        eprintln!(
+            "mine_lexicon_gaps: Lexicon-V2 auto-exclude filter active ({} surfaces skipped from gap pool)",
+            excludes.len()
+        );
+    }
+
     // Pass 1: count uncovered token frequencies across all packs.
     // Pass 2: collect first-N contexts for each top-frequency candidate.
     // Doing it in two passes lets us keep the contexts Vec capped at
@@ -164,6 +178,10 @@ fn main() -> ExitCode {
                     }
                     local_tokens += 1;
                     if has_known_prefix(&cleaned, &roots) {
+                        continue;
+                    }
+                    // v6.0.0-rc2 — drop confirmed-noise surfaces.
+                    if excludes.contains(&cleaned) {
                         continue;
                     }
                     *local_freq.entry(cleaned).or_insert(0) += 1;
@@ -395,6 +413,33 @@ fn normalise(word: &str) -> String {
         .filter(|c| c.is_alphabetic())
         .collect::<String>()
         .to_lowercase()
+}
+
+/// **v6.0.0-rc2** — load the Lexicon-V2 auto-exclude CSV produced
+/// by `triage_lexicon_v2`. Surfaces listed there are confirmed
+/// loanwords / OCR artefacts / abbreviations / already-covered
+/// proper nouns; the gap miner skips them so the candidate pool
+/// keeps shrinking instead of resurfacing the same noise.
+///
+/// Returns an empty set when the CSV is missing — keeps pre-rc2
+/// behaviour identical for callers who haven't run the triage yet.
+fn load_lexicon_v2_excludes() -> HashSet<String> {
+    let path = Path::new("data/lexicon_v2/auto_exclude.csv");
+    let mut set = HashSet::new();
+    let Ok(text) = std::fs::read_to_string(path) else {
+        return set;
+    };
+    for (i, line) in text.lines().enumerate() {
+        if i == 0 {
+            continue; // header
+        }
+        // CSV format: n,surface,freq,harmony,final_class,reason
+        let parts: Vec<&str> = line.split(',').collect();
+        if parts.len() >= 2 {
+            set.insert(parts[1].trim().to_lowercase());
+        }
+    }
+    set
 }
 
 fn load_pack(path: &PathBuf) -> Result<PackFile, String> {
