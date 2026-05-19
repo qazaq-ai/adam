@@ -104,7 +104,7 @@ output that doesn't ground in `world_core` / `facts.json`.
 - **79.48 % morpheme coverage** of the committed pool (v1.5.5 audit baseline).
 
 ### Quality gates
-- **Full regression test suite — 1 556 workspace tests passing as of v6.0.0-rc1, 0 failing, 2 ignored**. (Cumulative growth from 822 at v4.22.5 → 969 at v4.52.5 → 1 528 (mid-arc) → **1 556 at v6.0.0-rc1** with full L5.5/L6 wire-up, weather + clock + industry modules.)
+- **Full regression test suite — 1 557 workspace tests passing as of v6.0.0-rc4, 0 failing, 2 ignored**. (Cumulative growth from 822 at v4.22.5 → 969 at v4.52.5 → 1 528 (mid-arc) → 1 556 at v6.0.0-rc1 with full L5.5/L6 wire-up → **1 557 at v6.0.0-rc4** adding `factual_eval_100` gate.)
 - `scripts/validate_foundation.sh` — foundation CI (lex / FST / corpus / world_core / reasoner end-to-end).
 - `scripts/verify_release_version.sh` — manifest-consistency gate (every committed JSON pinned to current crate version).
 - `scripts/run_slow_roundtrip.sh` (v4.1.6+) — runs the four `#[ignore]`d FST synthesis-analysis roundtrip tests on demand.

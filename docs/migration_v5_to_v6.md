@@ -1,7 +1,8 @@
-# Migration playbook — v5.x → v6.0.0-rc1
+# Migration playbook — v5.x → v6.0.0-rcN
 
-**Status:** authoritative for the **v6.0.0-rc1 preview** release.
-Updated 2026-05-18 to reflect the actually-shipped feature surface.
+**Status:** authoritative for the **v6.0.0-rc1 … rc4 preview** line.
+Updated 2026-05-19 (rc4 ships world_core expansion + validator CI
+gate + factual_eval_100 baseline; rc1 migration surface unchanged).
 The full GA migration (Settings::NeuralSettings struct + automatic
 L5.5 integration into the dialog loop + pre-built `.bin` artifacts)
 remains a v6.0.5+ task — see §7.

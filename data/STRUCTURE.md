@@ -69,9 +69,11 @@ bash scripts/fetch_huggingface_kazakh.sh
 
 ### `data/external/wikibooks_kk/` (~4 MB raw, 6.7 MB pack) — kk.wikibooks.org
 
-Required for the v6.0.0-rc3 `wikibooks_kk_pack.json` rebuild. The
-committed pack and `world_core/abai_works.jsonl` carry the
-distilled facts; raw page dump is regenerable.
+Required for `wikibooks_kk_pack.json` rebuild. The committed pack
+and three derived `world_core/*.jsonl` packs (`abai_works.jsonl`,
+`kz_constitution.jsonl`, `programming_java.jsonl` — last two added
+at v6.0.0-rc4) carry the distilled facts; raw page dump is
+regenerable.
 
 ```bash
 bash scripts/fetch_kk_wikibooks.sh

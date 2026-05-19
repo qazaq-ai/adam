@@ -14,8 +14,11 @@ Each `page_*.json` carries:
 ## Downstream processing
 
 `cargo run --release -p adam-corpus --bin process_kk_wikibooks`
-parses these into `data/curated/wikibooks_kk_pack.json` for the
-v6.0.0-rc3 corpus expansion.
+parses these into `data/curated/wikibooks_kk_pack.json` (v6.0.0-rc3
+corpus expansion). At v6.0.0-rc4 the same dump is also distilled
+into three `data/world_core/*.jsonl` knowledge packs:
+`abai_works.jsonl` (45 entries), `kz_constitution.jsonl` (32),
+`programming_java.jsonl` (30).
 
 ## Coverage
 
