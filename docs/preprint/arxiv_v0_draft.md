@@ -3,8 +3,8 @@
 **Authors:** Daulet Baimurza · Qazna Technologies LLP · `baimurza.daulet@gmail.com`
 **Affiliation:** Qazna Technologies LLP, Almaty, Kazakhstan
 **Source repository:** [github.com/qazaq-ai/adam](https://github.com/qazaq-ai/adam) (BUSL-1.1, converts to Apache 2.0 after four years)
-**Draft date:** 2026-05-16
-**Status:** **DRAFT v0** — to be polished for arXiv submission. Suggestions and reviewer comments welcome via repository Issues.
+**Draft date:** 2026-05-16 · revised 2026-05-18 (Codex peer-review pass)
+**Status:** **DRAFT v0.2** — substantive critique pass applied. Ready for arXiv `cs.CL` submission pending LaTeX conversion + reference formatting. Workshop / conference targets and submission plan in `docs/preprint/preprint_submission_plan.md` (forthcoming).
 
 ---
 
@@ -15,23 +15,34 @@ agglutinative languages that combines a deterministic finite-state
 transducer (FST) for morphology, a typed-morpheme tokenizer, and a
 small CPU-resident neural transformer trained inside an FST-validity
 envelope. The composition's outputs are gated by a verifier that
-checks each generated word against (a) FST round-trip validity and
-(b) factual grounding in a curated knowledge graph. We empirically
-demonstrate at proof-of-concept scale on Kazakh that this
-architecture (i) trains end-to-end in pure Rust on commodity CPU
-hardware (M2 8 GB, no GPU, 39 minutes), (ii) generalises from
-real-corpus pairs with a held-out cross-entropy gap of 0.031 (down
-from 0.196 with FST-synthetic-only training, a 6.3× reduction),
-(iii) produces inference at 1.71 ms per six-token greedy generation
-(88× under the 150 ms latency target for production deployment),
-and (iv) blocks morphologically-invalid and factually-ungrounded
-outputs by construction. We argue that this design is not a smaller
-LLM but a perpendicular architecture: it inverts each of the four
-load-bearing properties of contemporary LLMs (statistical / cloud /
-RLHF-aligned / English-first → algebraic / CPU / architecturally-
-verified / agglutinative-first) and is therefore the appropriate
-substrate for regulated, low-resource, and offline-deployment
-contexts where current LLMs are not viable.
+checks each generated word against (a) FST round-trip validity,
+(b) Kazakh script validity, (c) lexicon coverage (no `Unk`-headed
+output), and (d) factual grounding in a curated knowledge graph
+(3 672 facts at the time of writing). We empirically demonstrate
+at proof-of-concept scale on Kazakh that this architecture
+(i) trains end-to-end in pure Rust on commodity CPU hardware
+(M2 8 GB, no GPU, 31 minutes Stage-5 training + 64 minutes Stage-8
+algebraic-loss A/B), (ii) generalises from real-corpus pairs with
+a held-out cross-entropy gap of 0.048 (down from 0.196 with
+FST-synthetic-only training, a 4.1× reduction), (iii) produces
+morpheme-level generation at 1.71 ms per six-token greedy decoding
+on M2 CPU — a single-word composer latency, not a sentence-answer
+latency, and not directly comparable to full LLM inference, and
+(iv) **blocks unsupported factual claims within the covered
+knowledge graph by construction**, rather than relying on training-
+time alignment to discourage them. We argue that this design is
+not a smaller LLM but a perpendicular architecture: it inverts
+each of the four load-bearing properties of contemporary LLMs
+(statistical / cloud / RLHF-aligned / English-first → algebraic /
+CPU / architecturally-verified / agglutinative-first) and is
+therefore the appropriate substrate for regulated, low-resource,
+and offline-deployment contexts where current LLMs are not viable.
+**Scope disclaimer.** The numbers reported here are at PoC scale
+(≈ 1.17 M parameters, single training run with seed 42, 100-prefix
+held-out exact-match eval). Production claims will require bootstrap
+confidence intervals, multi-seed runs, and baseline comparison
+against Apertium-Kazakh and a char-level neural model; these
+ablations are listed in §5.3 (Limitations).
 
 ---
 
@@ -130,7 +141,13 @@ discrete-rule verifier in the *training* loop. Our verifier is
 placed at *inference* and the *architecture* — every emitted word
 passes through it at runtime, not just selected training examples.
 This is the difference between RLHF-style "discouraged from
-hallucinating" and "structurally cannot hallucinate."
+hallucinating during training" and **"blocks unsupported factual
+claims within the covered knowledge graph at inference time"**.
+We are careful with the framing: the verifier provides a hard
+architectural gate **only over the subset of knowledge the
+knowledge graph covers**; for queries outside its coverage the
+honest path is refusal, not generation. The architectural
+contribution is closing the gate, not eliminating the gap.
 
 ---
 
@@ -153,9 +170,17 @@ paper are:
 - **L5.5 Neural composer.** TinyAgt — a decoder-only transformer
   with causal attention, pre-norm, GELU FFN, and tied output
   projection, parametrised to fit in 1–10 M params.
-- **L6 Verifier.** Two gates: FST round-trip check, factual-
-  grounding check against `data/retrieval/facts.json` (3 650
-  facts at the time of writing).
+- **L6 Verifier.** Four gates checked in order: (1) Kazakh-script
+  gate (input must contain only Cyrillic in the Kazakh alphabet
+  range plus internal hyphen / apostrophe), (2) Unk gate (the
+  tokenizer must not fall back to `MorphToken::Unk` — the surface
+  must be a known Kazakh word), (3) FST round-trip check
+  (`tokenize(s) == tokens && detokenize(tokens) == s`), and
+  (4) factual-grounding check against `data/retrieval/facts.json`
+  (3 672 facts at the time of writing). Strict-by-default; the
+  permissive mode that previously let ungrounded surfaces through
+  with a flag was retained for telemetry but not for production
+  paths.
 
 ### 3.2 Algebraic loss
 
@@ -228,7 +253,17 @@ Three configurations:
 |-----------------|---------------:|---------:|------------:|-------:|-----------------------------------:|
 | synth-nouns     |       53 104 |    0.297 |       0.493 | 0.196 |                              0 %  |
 | synth-mixed     |       65 104 |    0.355 |       0.486 | 0.131 |                              0 %  |
-| **synth + real**|      109 298 |    0.384 |       0.415 | **0.031** |                          15 %  |
+| **synth + real (sprint 1)** | 109 298 | 0.384 | 0.415 | **0.031** |                       15 %  |
+| **synth + real (sprint 2)** | 115 729 | 0.368 | 0.416 | **0.048** |                       17 %  |
+
+Sprint 2 (committed 2026-05-17) adds 6 431 additional Root-headed
+real-corpus pairs from a wider data-mix audit (290 194 candidate
+pairs, of which 50 625 Root-headed kept; +37 % over sprint 1). The
+generalisation gap widened slightly (0.031 → 0.048) while exact-
+match improved (+2 pp); we interpret this as mild overfitting at
+sprint 2's scale rather than a regression: the model learns the
+seen distribution more sharply without losing held-out accuracy.
+**Single seed (POC_SEED=42); no bootstrap CI**, see §5.3.
 
 ### 4.4 Generation latency (M2 CPU, single core)
 
@@ -240,20 +275,37 @@ Criterion bench `crates/adam-agg-model/benches/neural_inference.rs`:
 | FST-constrained greedy generation of 6 new tokens        | 1.71 ms |
 | FST-constrained beam (width 4) generation of 6 new tokens | 4.20 ms |
 
-The production performance contract for the v6.0 release is p50 ≤
-150 ms per neural-enabled turn; the measured greedy value is 88×
-under target.
+Important framing: 1.71 ms is the **morpheme-level composition
+time for a six-token continuation**, not a full sentence-answer
+latency. It is directly comparable to single-word inflection
+latency in Apertium-Kazakh or a char-level neural baseline, not
+to GPT-class full-answer latency. The v6.0 production contract
+sets p50 ≤ 150 ms per neural-enabled turn including all
+deterministic-kernel pre-/post-processing; the measured
+composition step alone consumes < 2 % of that budget on M2 CPU,
+leaving substantial headroom for the surrounding template /
+retrieval / verifier work. We do **not** claim the 150 ms total-
+turn target has been measured end-to-end; that is part of the
+v6.0 GA performance acceptance criterion.
 
 ### 4.5 Verifier prototype
 
-A prototype L5.5 → L6 verifier (`verifier_demo` binary) tests both
-gates (FST round-trip + factual grounding against
-`data/retrieval/facts.json`, 3 650 facts indexed at 3 559 unique
-roots/surfaces) on a control set of grounded inflections, ungrounded
-real Kazakh, loanwords, and nonsense. The gate correctly admits
-all grounded inflections, admits ungrounded-but-FST-valid forms
-(which is the loose-grounding mode), and rejects nonsense surfaces.
-Strict-grounding mode is the v6.0 production default.
+A prototype L5.5 → L6 verifier (`verifier_demo` binary) tests all
+four gates (Kazakh-script, Unk, FST round-trip, factual grounding
+against `data/retrieval/facts.json`, 3 672 facts indexed at 3 559
+unique roots/surfaces) on a control set of grounded inflections,
+ungrounded real Kazakh, loanwords, and nonsense. The gate
+correctly admits all grounded inflections, admits ungrounded-but-
+FST-valid forms (which is the loose-grounding mode), and rejects
+nonsense surfaces. Strict-grounding mode is the v6.0 production
+default. **Caveat (Codex review 2026-05-18):** the prototype is
+exercised on a fixed test fixture; the verifier has *not* yet
+been measured against the live neural composer's free generations
+under production traffic. That measurement is part of v6.0 GA
+acceptance criterion #4 and remains TBD. The architectural claim
+of §2.4 — «blocks unsupported factual claims within covered KG» —
+is supported by the present fixture-based tests but not yet by
+end-to-end production telemetry.
 
 ---
 
@@ -269,11 +321,14 @@ memorisation sense. A model that merely memorised would have a gap
 that explodes on held-out (root, feature) combinations; ours
 contracts.
 
-The 88× latency margin against the production contract converts
-the watch-battery deployment claim from rhetorical to empirical.
-At 1.71 ms / six-token generation on M2 CPU, the energy cost is on
-the order of millijoules per generation, well within the budget
-of a smartwatch or hearing aid.
+The measured 1.71 ms / six-token composition time on M2 CPU
+suggests — but does **not yet prove** — that the composition-step
+energy cost is in the low-millijoule range per generation. A
+dedicated energy benchmark (powermetrics / `pmset` on macOS,
+or RAPL on Linux) is needed to convert this latency observation
+into a defensible energy claim. We have removed earlier "watch-
+battery deployment" rhetoric from this draft pending that bench;
+see §5.3.
 
 ### 5.2 What this does not demonstrate
 
@@ -294,17 +349,43 @@ the production targets are within reach given the existing trends.
 
 ### 5.3 Limitations
 
-- **Coverage.** The 21 % Root yield on real corpus is a Lexicon-
+- **Statistical reporting.** All numbers in §4 are from a **single
+  training seed** (`POC_SEED=42`); no bootstrap confidence
+  intervals, no multi-seed mean ± std. The 17 % exact-match number
+  on the 100-prefix eval set is a small sample with binomial
+  half-CI ≈ ±7.5 pp at 95 %. We treat the PoC numbers as
+  directional evidence, not as a calibrated benchmark.
+- **No baseline comparison.** We do not benchmark against
+  Apertium-Kazakh's morphology system, a Hugging Face Kazakh
+  morphological tagger, or a char-level neural baseline trained
+  on the same pairs. Three such baselines are pre-registered for
+  the v6.0 GA empirical pass.
+- **No ablations.** We do not vary lexicon size, algebraic-loss
+  weight (α), or model width × depth. Five ablations are
+  pre-registered: 3 seeds × {0.0, 0.25, 0.5, 1.0} α grid × {64×2,
+  128×4} model sizes × {synth-only, synth+real} data mixes ×
+  {constrained, unconstrained} decoding. Total ≈ 24 training
+  runs, each ≈ 30 minutes on M2 CPU.
+- **No human eval.** The exact-match metric does not measure
+  semantic correctness; a held-out 100-prompt human-evaluation
+  set scored by Kazakh native speakers is part of the GA
+  acceptance criterion.
+- **Verifier-on-real-traffic gap.** The four-gate verifier has
+  been measured only on fixture inputs; production-traffic
+  measurement is GA-criterion-4 work, see §4.5.
+- **Coverage.** The current Root yield on real corpus is a Lexicon-
   bound limitation, not an architectural one; Lexicon V2 mining
   has identified 2 000 high-frequency candidate surfaces from a
-  pool of 103 694 uncovered tokens in the committed corpus.
-  Lexicographer-grade curation is the bottleneck.
+  pool of ~70 000 uncovered tokens (down from 103 694 pre-Phase-A
+  cleanup). Lexicographer-grade curation is the bottleneck.
 - **Single language.** All numbers are on Kazakh. Cross-Turkic
   transfer is in the v6.1–v6.2 roadmap but not measured here.
 - **Generation length.** The PoC measures generation of 6 new
   tokens (sufficient for a single inflected Kazakh word).
-  Sentence-level generation is straightforward extension but not
+  Sentence-level generation is a v6.x research-arc extension, not
   measured in this preprint.
+- **No energy bench.** The energy claim has been removed from
+  this draft pending a `powermetrics`-grade measurement.
 
 ### 5.4 Why we publish openly
 

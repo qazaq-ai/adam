@@ -72,11 +72,14 @@ dependencies = [
 name = "adam-dialog"
 version = "5.32.0"
 dependencies = [
+ "adam-agg-model",
+ "adam-agg-tokenizer",
  "adam-kernel",
  "adam-kernel-fst",
  "adam-reasoning",
  "adam-retrieval",
  "adam-voice",
+ "burn",
  "criterion",
  "serde",
  "serde_json",

@@ -70,6 +70,11 @@ use adam_kernel_fst::suffix_priors::SuffixPriors;
 use adam_reasoning::{Fact as ReasFact, reasoner::DerivedFact};
 use adam_retrieval::MorphemeIndex;
 
+// **v6.0.0-rc1** — L5.5 neural composer preview module. Lives in
+// the library under `--features neural`; absent without it.
+#[cfg(feature = "neural")]
+use adam_dialog::neural_preview;
+
 const RETRIEVAL_INDEX_PATH: &str = "data/retrieval/morpheme_index.json";
 const FACTS_PATH: &str = "data/retrieval/facts.json";
 const DERIVED_FACTS_PATH: &str = "data/retrieval/derived_facts.json";
@@ -158,6 +163,23 @@ fn main() -> ExitCode {
         .find(|w| w[0] == "--whisper-confidence-threshold")
         .and_then(|w| w[1].parse().ok())
         .unwrap_or(0.5);
+
+    // **v6.0.0-rc1** — opt-in L5.5 neural composer. `--neural-model
+    // <path>` points at a checkpoint directory produced by
+    // `poc_kazakh_train` (config.json + labels.json + training.json +
+    // model.mpk). When set AND the `neural` cargo feature is on, the
+    // REPL accepts a `/neural <root>` slash command that runs
+    // constrained generation, verifies the output through L6, and
+    // prints both the raw surface and the verdict. Without the flag,
+    // adam runs as the deterministic v5.x kernel — no behaviour
+    // change.
+    //
+    // Migration plan: `docs/migration_v5_to_v6.md` §4 ("Wiring L5.5
+    // into the dialog loop").
+    let neural_model_arg = args
+        .windows(2)
+        .find(|w| w[0] == "--neural-model")
+        .map(|w| w[1].clone());
 
     // **v5.6.0** — parallel cold-start load. Heavy I/O resources
     // (retrieval index ~18 MB, derived facts ~22 MB, root affinity
@@ -383,6 +405,30 @@ fn main() -> ExitCode {
     let tts_handle: Option<&dyn adam_dialog::tts::TtsBackend> =
         if tts_enabled { Some(&*tts_box) } else { None };
 
+    // **v6.0.0-rc1** — initialise the L5.5 preview if the user asked
+    // for it AND the `neural` cargo feature is on. Returns `None`
+    // silently when the feature is off OR the checkpoint is
+    // missing — deterministic kernel keeps working unchanged.
+    #[cfg(feature = "neural")]
+    let neural_state = neural_model_arg.as_deref().and_then(|p| {
+        neural_preview::init(
+            std::path::Path::new(p),
+            "data/tokenizer/segmentation_roots.json",
+            "data/lexicon_v1/apertium_imported_roots.json",
+            FACTS_PATH,
+        )
+    });
+    #[cfg(not(feature = "neural"))]
+    let neural_state: Option<()> = if neural_model_arg.is_some() {
+        eprintln!(
+            "adam-chat --neural-model: requires the `neural` cargo feature. \
+             Rebuild with `cargo build --release -p adam-dialog --bin adam_chat --features neural`."
+        );
+        None
+    } else {
+        None
+    };
+
     if let Some(pos) = args.iter().position(|a| a == "--once") {
         if let Some(input) = args.get(pos + 1) {
             let (_refused, out) = run_turn(&mut conv, input, &lex, &repo, trace, turn_seed(0));
@@ -453,6 +499,40 @@ fn main() -> ExitCode {
     for line in stdin.lock().lines() {
         let Ok(line) = line else { break };
         if let Some(assembled) = absorb_line(&line, &mut block_buf) {
+            // **v6.0.0-rc1** — `/neural <prompt>` opt-in slash command.
+            // Runs the L5.5 preview composer when a checkpoint was
+            // loaded; otherwise prints a hint. Done BEFORE the regular
+            // dialog dispatch so the slash command never leaks into the
+            // kernel turn pipeline. Audit trail printed verbatim so
+            // alpha partners see exactly what the neural layer
+            // produced + what the L6 verifier did with it.
+            if let Some(prompt) = assembled.strip_prefix("/neural ") {
+                #[cfg(feature = "neural")]
+                {
+                    match neural_state.as_ref() {
+                        Some(state) => {
+                            let audit = neural_preview::compose(state, prompt);
+                            println!("{audit}");
+                        }
+                        None => {
+                            println!(
+                                "/neural: no checkpoint loaded. Launch with \
+                                 `--neural-model <path-to-checkpoint-dir>`."
+                            );
+                        }
+                    }
+                }
+                #[cfg(not(feature = "neural"))]
+                {
+                    let _ = prompt;
+                    println!(
+                        "/neural: this binary was built without the `neural` feature. \
+                         Rebuild with `--features neural`."
+                    );
+                }
+                stdout.lock().flush().ok();
+                continue;
+            }
             // **v5.24.5 — Voice arc V4 (push-to-talk barge-in).** The
             // user just submitted a new turn. If TTS from the previous
             // turn is still playing, kill it immediately so it

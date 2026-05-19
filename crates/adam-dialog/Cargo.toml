@@ -11,6 +11,9 @@ adam-kernel-fst = { path = "../adam-kernel-fst" }
 adam-retrieval = { path = "../adam-retrieval" }
 adam-reasoning = { path = "../adam-reasoning" }
 adam-voice = { path = "../adam-voice", optional = true }
+adam-agg-model = { path = "../adam-agg-model", optional = true }
+adam-agg-tokenizer = { path = "../adam-agg-tokenizer", optional = true }
+burn = { version = "0.17", default-features = false, features = ["std", "ndarray"], optional = true }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
@@ -23,6 +26,15 @@ default = []
 # whisper.cpp shell-out; without the feature, the binary builds
 # unchanged and the flag prints a build-help line.
 voice = ["dep:adam-voice"]
+# **v6.0.0-rc1.** Opt-in neural composer transducer. When enabled,
+# `adam_chat --neural-model <path>` loads a trained L5.5 TinyAgt
+# checkpoint and exposes a `/neural <root>` slash command in the
+# REPL that runs FST-constrained generation through the L6
+# verifier and prints both the raw morpheme sequence and the
+# verifier verdict. Default-off so the deterministic kernel stays
+# the production path — neural is opt-in preview surface for
+# alpha partners.
+neural = ["dep:adam-agg-model", "dep:adam-agg-tokenizer", "dep:burn"]
 
 [dev-dependencies]
 criterion = { version = "0.5", default-features = false, features = ["cargo_bench_support"] }
