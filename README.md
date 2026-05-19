@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.0.0--rc3-FBC02D?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.0.0--rc4-FBC02D?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -25,12 +25,12 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/tests-1556%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-1557%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/p50%20turn%20latency-21%20ms-2EA44F?style=flat-square" alt="latency">
   <img src="https://img.shields.io/badge/RSS-~160%20MB-2EA44F?style=flat-square" alt="rss">
   <img src="https://img.shields.io/badge/GPU-0%25-2EA44F?style=flat-square" alt="gpu">
-  <img src="https://img.shields.io/badge/derived%20facts-37%20062-9CCC65?style=flat-square" alt="derived facts">
-  <img src="https://img.shields.io/badge/world%20core-3328%20curated%20/%203676%20facts%20%2F%2063%20domains-9CCC65?style=flat-square" alt="world core">
+  <img src="https://img.shields.io/badge/derived%20facts-37%20704-9CCC65?style=flat-square" alt="derived facts">
+  <img src="https://img.shields.io/badge/world%20core-3415%20curated%20/%204031%20facts%20%2F%2065%20domains-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/lexicon-25.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/intents-41-2EA44F?style=flat-square" alt="intents">
 </p>

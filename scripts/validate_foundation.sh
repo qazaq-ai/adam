@@ -144,6 +144,15 @@ cmp -s "$tmp_acceptance_report" data/curated/source_acceptance_report.json
 ./scripts/run_foundation_overview.sh
 ./scripts/run_foundation_overview_delta.sh
 
+# **v6.0.0-rc4** — world_core integrity gate. Cross-checks every
+# `data/world_core/*.jsonl` entry deserialises (predicates must come
+# from the closed 11-variant Predicate enum), ids are globally
+# unique, and `kk` text passes the Kazakh-only purity audit. Closes
+# the v3.9.0 roadmap promise that put this in CI. Any unknown
+# predicate (e.g. `produces`, `author`, `birth_year`) or stray
+# Latin character outside backticks fails the gate.
+cargo run --release -p adam-reasoning --bin validate_world_core
+
 # **v4.55.0** — metrics-currency CI gate. Cross-checks numeric
 # claims in README.md / data/README.md / data/world_core/README.md
 # / docs/performance.md against actual values from intent.rs +

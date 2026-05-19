@@ -103,12 +103,20 @@ Validator checks:
   hits into distinct sections of its per-root report, so the user can
   tell at a glance where each fact came from.
 
-## Current scale (v6.0.0-rc1)
+## Current scale (v6.0.0-rc4)
 
-**Live totals: 3328 entries / 3676 facts across 63 domains**, all `approved`
-by `shaman`. v6.0.0-rc1 adds `kz_industry.jsonl` (64 enterprises across 17
-oblasts: АрселорМиттал Теміртау, ССГПО, ҚазМұнайГаз, ПКОП, Жамбыл фосфор
-зауыты, …). Re-run `bash scripts/validate_foundation.sh` to refresh.
+**Live totals: 3415 entries / 4031 facts across 65 domains**, all `approved`
+by `shaman`. v6.0.0-rc4 adds `kz_constitution.jsonl` (32 entries on the 1995
+Constitution: 9 разделов, president 7-year mandate, parliament Senate+Mäjilis,
+languages, symbols) + `programming_java.jsonl` (30 entries on the kk.wikibooks
+Java tutorial: JDK/JRE/JVM, литералдар, айнымалылар, методтер) + 25 individual
+`Қара сөздер` summaries appended to `abai_works.jsonl`. rc4 also fixes 73 entries
+in `abai_works` + `kz_industry` that used unknown predicates (`author`,
+`birth_year`, `produces`, …) — every fact now uses one of the 11 closed-set
+predicates. `validate_world_core` is now a hard `validate_foundation.sh` CI gate
+(unknown predicates fail the build). v6.0.0-rc1 added `kz_industry.jsonl`
+(64 enterprises across 17 oblasts). Re-run `bash scripts/validate_foundation.sh`
+to refresh.
 Per-domain counts in the listing below are a **historical v4.11.7 snapshot**
 preserved for change-tracking; verify current counts via
 `find data/world_core -name '*.jsonl' | xargs cat | jq -s 'length'`.

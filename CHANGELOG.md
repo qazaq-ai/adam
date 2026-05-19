@@ -28,6 +28,114 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.0.0-rc4] — 2026-05-19 — World-core expansion · validator CI gate · 100-prompt factual eval baseline
+
+> Fourth v6.0 release candidate. Three focuses, no new downloads — every byte
+> comes from rc3's already-fetched `data/external/wikibooks_kk/` (compliance with
+> the «не дублируй / не засоряй» discipline added in rc3):
+>
+> - **world_core expansion (Phase B).** Two new domains + 25 new Abai entries
+>   from the rc3 wikibooks dump. Totals: 3328 → **3415 entries**, 3676 →
+>   **3959 facts**, 63 → **65 domains**.
+> - **CI integrity (gate).** Wire `validate_world_core` into
+>   `scripts/validate_foundation.sh` — closes the v3.9.0 roadmap promise that
+>   the world_core validator should be CI-enforced. Also fixes **73 entries** in
+>   `abai_works.jsonl` + `kz_industry.jsonl` that were silently rejected at load
+>   time because they used predicates outside the closed 11-variant `Predicate`
+>   enum (`author`, `birth_year`, `produces`, …). Every fact now uses one of
+>   `is_a / lives_in / has / goes_to / part_of / related_to / causes / after /
+>   has_quantity / does_to / in_domain`.
+> - **Factual evaluation gate (Phase E).** New 104-prompt dataset
+>   `data/eval/factual_eval_100.json` + test runner
+>   `crates/adam-dialog/tests/factual_eval_100.rs`. Each prompt is bucketed as
+>   `correct` / `refusal` / `hallucination`; CI gate asserts (a) hallucinations
+>   ≤ 40 (rc4 baseline = 34) and (b) grounded (correct + refusal) ratio ≥ 50 %
+>   (rc4 baseline = 67.3 %). GA criterion #4 («verifier 0 hallucinations»)
+>   ratchets toward 0 over subsequent RCs.
+
+### New world_core domains
+
+- **`data/world_core/kz_constitution.jsonl`** — 32 entries / ~48 facts on the
+  Kazakhstan Constitution (1995): 9 разделов, president 7-year mandate,
+  parliament (Senate + Mäjilis), state symbols, languages, тенге as currency,
+  Конституциялық Сот (11 судья / 8-year mandate), rights & freedoms. Sourced
+  from the 21 `Конституциясы` pages already in `data/external/wikibooks_kk/`.
+- **`data/world_core/programming_java.jsonl`** — 30 entries / ~50 facts on the
+  kk.wikibooks Java tutorial: tilde→tilde literals, айнымалылар, методтер,
+  шартты блоктар, цикл блоктары, JDK/JRE/JVM/javac, негізгі типтер (`int`,
+  `boolean`, `double`), classes/objects/interfaces, ерекше жағдайды өңдеу
+  (`try`/`catch`), пакеттер. Uses the v4.7.0 backtick carve-out for technical
+  identifiers (`Java`, `JVM`, `String`, `extends`, …). Sourced from the 24
+  `Java бағдарламалау` pages already on disk.
+- **`data/world_core/abai_works.jsonl`** — extended from 20 → 45 entries
+  (~93 facts). Adds individual `Қара сөздер` summaries (1st, 2nd, 3rd, 4th,
+  5th, 6th, 7th, 8th, 9th, 10th, 13th, 18th, 19th, 20th, 25th, 29th, 30th,
+  32nd, 35th, 38th, 39th, 41st, 45th), composition decade («1890 жылдары
+  жазылған»), and the canonical English translation title («Book of Words»).
+  Sourced from the 47 `Абайдың қара сөздері/…` pages already on disk.
+
+### Validator hygiene + CI gate
+
+- `scripts/validate_foundation.sh` now invokes
+  `cargo run --release -p adam-reasoning --bin validate_world_core` before the
+  metrics-currency check. Unknown predicates / non-Kazakh `kk` characters /
+  duplicate ids fail the build.
+- `data/world_core/abai_works.jsonl` — 17 rejected entries re-stated under
+  closed-set predicates (`author` → `related_to`, `birth_year`/`death_year`
+  → `has_quantity` with explicit object phrasing, `birth_place` → `lives_in`,
+  `father`/`birth_name`/`translated` → `related_to`/`does_to`).
+- `data/world_core/kz_industry.jsonl` — 56 rejected entries: `produces` →
+  `does_to` (factory does-to product). Semantically equivalent for the
+  `subject` 〜 `factory`, `object` 〜 `output` shape.
+
+### Factual evaluation gate (Phase E)
+
+- **`data/eval/factual_eval_100.json`** — 104 native-Kazakh factual prompts
+  across 17 categories (astronomy, geography_kz, abai_works, kz_constitution,
+  kz_industry, time, programming_java, programming_rust, biology_basic,
+  mathematics_basic, chemistry_school, physics_school, history_kazakhstan,
+  kz_literature, animals, food, negative_unknown). Each prompt declares
+  `any_substring` matchers — at least one must appear in a *correct* answer.
+- **`crates/adam-dialog/tests/factual_eval_100.rs`** — Conversation-driven
+  test runner. Classifies each response as **correct** (matcher hit),
+  **refusal** (Kazakh «I don't know» marker — verifier engaged correctly), or
+  **hallucination** (a confident answer that contains neither). Asserts
+  `hallucinations ≤ 40` (rc4 ceiling, was 34 on shipping) and
+  `grounded ≥ 50 %` (rc4 floor, was 67.3 % on shipping). Each subsequent RC
+  tightens the ceiling toward 0.
+- Per-category rc4 baseline (correct / refusal / hallucination): astronomy
+  6/0/2, geography_kz 12/0/3, abai_works 5/2/3, kz_constitution 6/0/4,
+  kz_industry 3/1/1, time 4/0/1, programming_java 1/2/2, programming_rust
+  3/0/2, biology_basic 3/0/2, mathematics_basic 2/2/1, chemistry_school 1/2/2,
+  physics_school 2/2/1, history_kazakhstan 5/0/3, kz_literature 4/0/0,
+  animals 1/0/2, food 1/0/2, negative_unknown 0/0/3 (verifier still leaks on
+  «I don't know» prompts — primary rc5 target).
+
+### Deferred to rc5
+
+- **Phase D (full-scale neural training).** L5.5 composer config wired
+  (`POC_D_MODEL=256, POC_N_LAYERS=4, POC_N_HEADS=8, POC_BATCH=16, POC_EPOCHS=3`,
+  11.5 M params), but a single pass over 115 729 train sequences exceeds the
+  M2 8 GB cost budget on CPU. Deferred to rc5; rc4 ships only the
+  configuration + reproducibility scripts. Neural preview keeps shipping the
+  rc1 PoC checkpoint until the rc5 retrain lands.
+
+### Acceptance criteria delta
+
+  Two of the six remaining GA blockers move at rc4. GA #4 (verifier zero
+  hallucinations) goes from «no instrumentation» → «measured + capped at 40,
+  ratchet pending». World-core integrity goes from «manual audit, not
+  CI-enforced» → «hard CI gate». The neural-preview blocker is unchanged
+  (rc5 target). Lexicon V2 native-speaker review remains the dominant
+  external blocker.
+
+### Workspace
+
+  `cargo test -p adam-dialog --test factual_eval_100 --release` green
+  (104 cases). `cargo fmt --all --check` green. `validate_world_core` green
+  (3415 / 3415 approved). Foundation CI script updated; full
+  `validate_foundation.sh` regenerates derived artefacts on a clean checkout.
+
 ## [6.0.0-rc3] — 2026-05-19 — Open-source corpus expansion · `data/` rightsizing · STT-noise widening
 
 > Third v6.0 release candidate. Three focuses:

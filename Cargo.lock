@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "adam-agg-model"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 dependencies = [
  "adam-agg-synth",
  "adam-agg-tokenizer",
@@ -21,7 +21,7 @@ dependencies = [
 
 [[package]]
 name = "adam-agg-synth"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 dependencies = [
  "adam-agg-tokenizer",
  "adam-kernel",
@@ -34,7 +34,7 @@ dependencies = [
 
 [[package]]
 name = "adam-agg-tokenizer"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 dependencies = [
  "adam-kernel",
  "adam-kernel-fst",
@@ -46,7 +46,7 @@ dependencies = [
 
 [[package]]
 name = "adam-corpus"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 dependencies = [
  "adam-kernel",
  "adam-kernel-fst",
@@ -58,7 +58,7 @@ dependencies = [
 
 [[package]]
 name = "adam-curriculum"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 dependencies = [
  "adam-agg-tokenizer",
  "adam-kernel",
@@ -70,7 +70,7 @@ dependencies = [
 
 [[package]]
 name = "adam-dialog"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 dependencies = [
  "adam-agg-model",
  "adam-agg-tokenizer",
@@ -89,7 +89,7 @@ dependencies = [
 
 [[package]]
 name = "adam-eval"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 dependencies = [
  "adam-corpus",
  "adam-tokenizer",
@@ -100,7 +100,7 @@ dependencies = [
 
 [[package]]
 name = "adam-kernel"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 dependencies = [
  "serde",
  "serde_json",
@@ -109,7 +109,7 @@ dependencies = [
 
 [[package]]
 name = "adam-kernel-fst"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 dependencies = [
  "adam-kernel",
  "serde",
@@ -119,7 +119,7 @@ dependencies = [
 
 [[package]]
 name = "adam-reasoning"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 dependencies = [
  "adam-kernel-fst",
  "ctrlc",
@@ -132,7 +132,7 @@ dependencies = [
 
 [[package]]
 name = "adam-retrieval"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 dependencies = [
  "adam-kernel-fst",
  "serde",
@@ -142,7 +142,7 @@ dependencies = [
 
 [[package]]
 name = "adam-scaling"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 dependencies = [
  "adam-kernel-fst",
  "adam-reasoning",
@@ -154,7 +154,7 @@ dependencies = [
 
 [[package]]
 name = "adam-tokenizer"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 dependencies = [
  "adam-kernel",
  "serde",
@@ -164,7 +164,7 @@ dependencies = [
 
 [[package]]
 name = "adam-train"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 dependencies = [
  "adam-corpus",
  "adam-eval",
@@ -178,7 +178,7 @@ dependencies = [
 
 [[package]]
 name = "adam-voice"
-version = "6.0.0-rc3"
+version = "6.0.0-rc4"
 dependencies = [
  "aec3",
  "cpal",
