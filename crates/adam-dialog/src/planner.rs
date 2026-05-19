@@ -1834,6 +1834,20 @@ mod tests {
     }
 
     #[test]
+    fn locative_property_guard_catches_locative_qualified_qandai() {
+        // «X-дегі/дағы Y қандай?» — sub-property of a parent entity.
+        assert!(is_locative_property_query("юпитердегі ауа қандай"));
+        assert!(is_locative_property_query("шамалардағы мәңгі мұз қандай"));
+        assert!(is_locative_property_query(
+            "антарктидадағы температура қандай"
+        ));
+        // Locative present but no «қандай» — wh-/who-questions about
+        // sub-entities should still pass through to grounded retrieval.
+        assert!(!is_locative_property_query("қазақстандағы президент кім"));
+        assert!(!is_locative_property_query("қазақстандағы өзендер"));
+    }
+
+    #[test]
     fn factual_guard_lets_through_open_questions() {
         // Open / conversational queries — example fallback is fine.
         assert!(!is_specific_factual_query("қазақстан туралы айт"));
@@ -2478,17 +2492,20 @@ pub fn intent_key(intent: &Intent) -> &'static str {
                     let factual_joined = raw_tokens.join(" ").to_lowercase();
                     let factual = is_specific_factual_query(&factual_joined);
                     let example_ok = !factual;
-                    // Numeric-grounded guard explored 2026-05-19 but
-                    // turned net-negative (downgraded legitimate
-                    // grounded_fact answers for const_005/006/010 to
-                    // reasoning-chain templates, losing −4 correct
-                    // for −2 hallucinations). Reverted to plain
-                    // `grounded_fact.is_some()` here. The category-C
-                    // (adjacent-fact) hallucination is documented as
-                    // open in `docs/factual_eval_hallucination_*` —
-                    // proper fix needs predicate-aware fact selection
-                    // upstream of the router, not a post-hoc digit
-                    // heuristic.
+                    // Numeric-grounded guard + locative-grounded
+                    // guard both explored 2026-05-19 and reverted:
+                    // - numeric: dropped 5 legit grounded answers
+                    //   in const_005/006/010 for 2 hallucinations.
+                    // - locative: dropped 4 legit
+                    //   `Қазақстандағы өзендер/көлдер/шөлдер/таулар`
+                    //   PartOf-derived answers for 1 hallucination.
+                    // Both Category-C / Category-D hallucinations
+                    // documented as open in
+                    // `docs/factual_eval_hallucination_*` — proper
+                    // fix needs predicate-aware fact selection
+                    // upstream of the router, not a post-hoc
+                    // heuristic on the answer string or the query
+                    // shape.
                     if example.is_some()
                         && unknown_prefers_quoted_example(raw_tokens)
                         && *example_adapted
@@ -2581,5 +2598,35 @@ fn is_specific_factual_query(joined: &str) -> bool {
     if definitional_y.iter().any(|p| joined.contains(p)) {
         return true;
     }
+    // **Locative-qualified property** «X-дегі/дағы/ндегі/ндағы Y
+    // қандай?». The user asks about a *sub-property* of an entity
+    // (Юпитердегі ауа = atmosphere on Jupiter, Антарктидадағы
+    // температура = temperature in Antarctica). adam routinely
+    // has the parent-entity fact («Юпитер — газ ғаламшары») but
+    // not the locative sub-property, so the corpus-sample fallback
+    // produces an off-topic proverb mentioning the parent. Narrow
+    // co-occurrence with «қандай» keeps wh-/who- queries like
+    // «Қазақстандағы президент кім?» out of this branch.
+    if is_locative_property_query(joined) {
+        return true;
+    }
     false
+}
+
+/// Detect the **locative-qualified property** shape «X-дегі/дағы Y
+/// қандай?» — used by `is_specific_factual_query` AND independently
+/// by the General-mode router to suppress `unknown.with_grounded_fact`
+/// for this shape (the curated graph normally has a fact about the
+/// PARENT entity X, not its sub-property Y, so surfacing the parent
+/// fact is a confident off-topic answer). Narrowest-possible
+/// suppression to avoid disturbing the `const_005/006/010` numeric
+/// grounded answers that survived the prior numeric-guard rollback.
+fn is_locative_property_query(joined: &str) -> bool {
+    let has_locative = joined.contains("дегі")
+        || joined.contains("дағы")
+        || joined.contains("ндағы")
+        || joined.contains("ндегі")
+        || joined.contains("лардағы")
+        || joined.contains("лердегі");
+    has_locative && joined.contains("қандай")
 }

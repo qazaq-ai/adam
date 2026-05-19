@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-19
 **Eval set:** `data/eval/factual_eval_100.json` (104 prompts, 17 categories)
-**Day's ratchet:** 34 (rc4 morning) → 18 → **13** (rc4 evening)
+**Day's ratchet:** 34 (rc4 morning) → 18 → 13 → **12** (rc4 evening)
 
 This document classifies the **remaining 13 hallucinations** in
 `factual_eval_100` after the rc4-evening hardening, so rc5 can pick

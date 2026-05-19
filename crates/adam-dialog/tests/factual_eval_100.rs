@@ -276,13 +276,20 @@ fn factual_eval_100() {
     // v6.0.0-rc4 (evening hardening 2026-05-19, commit 7e91aec):
     // baseline 18 via matcher widening + clock-intent guards +
     // proverb-fallback suppression on specific-factual queries.
-    // v6.0.0-rc4 (evening hardening 2026-05-19, this commit):
+    // v6.0.0-rc4 (evening hardening 2026-05-19, commit a0ebb54):
     // baseline 13 via definitional-pattern extension («Y қандай Y»
     // / «X не нәрсе») in the same `is_specific_factual_query`
-    // predicate. Ceiling tightened 25 → 20 — leaves a 7-case
-    // headroom before CI red. GA #4 lifts when the ceiling reaches
-    // 0 and stays there across two consecutive RCs.
-    const HALLUCINATION_CEILING: usize = 20;
+    // predicate.
+    // v6.0.0-rc4 (evening hardening 2026-05-19, this commit):
+    // baseline 12 via locative-property pattern «X-дегі/дағы Y
+    // қандай?» — suppresses corpus-sample fallback for sub-property
+    // queries (neg_002 closed). Companion grounded-fact suppression
+    // explored AND rolled back (broke 4 legitimate
+    // `Қазақстандағы өзендер/көлдер/шөлдер/таулар` PartOf-derived
+    // answers). Ceiling tightened 20 → 18 — leaves a 6-case
+    // headroom. GA #4 lifts when the ceiling reaches 0 across two
+    // consecutive RCs.
+    const HALLUCINATION_CEILING: usize = 18;
     assert!(
         totals[2] <= HALLUCINATION_CEILING,
         "factual_eval_100: {} hallucination(s) — above the v6.0.0-rc4 ceiling of {} (GA #4 target: 0). Tighten verifier or correct the regression.",
