@@ -118,8 +118,17 @@ workspace_version="$(
     ' Cargo.toml
 )"
 
+# **v6.0.0-rc1** — accept shields.io double-dash encoding for the
+# SemVer 2.0 pre-release suffix `-rcN`. shields.io URL-encodes a
+# single dash as `--` inside badge text, so `version-6.0.0-rc1` is
+# served as `version-6.0.0--rc1` in the badge URL. We extract the
+# full `MAJOR.MINOR.PATCH[--rcN]` group and collapse `--` back to
+# `-` before comparing to the workspace version.
 readme_version_claim="$(
-    grep -oE 'version-[0-9]+\.[0-9]+\.[0-9]+' README.md | head -1 | sed 's/version-//'
+    grep -oE 'version-[0-9]+\.[0-9]+\.[0-9]+(--rc[0-9]+)?' README.md \
+        | head -1 \
+        | sed 's/version-//' \
+        | sed 's/--rc/-rc/'
 )"
 
 if [[ "$workspace_version" != "$readme_version_claim" ]]; then
@@ -128,7 +137,10 @@ fi
 ok "workspace version: $workspace_version (README badge matches)"
 
 perf_version_claim="$(
-    head -1 docs/performance.md | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | sed 's/v//'
+    head -1 docs/performance.md \
+        | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?' \
+        | head -1 \
+        | sed 's/^v//'
 )"
 
 if [[ "$workspace_version" != "$perf_version_claim" ]]; then
