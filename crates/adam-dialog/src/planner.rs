@@ -1787,6 +1787,60 @@ mod tests {
     use super::*;
     use crate::intent::Intent;
 
+    // **v6.0.0-rc4** — guard regression tests for the
+    // `factual_eval_100` 34 → 13 hallucination ratchet. Each block
+    // pins one specific prompt shape from the eval set so that
+    // future refactors of the guard cannot silently re-open the
+    // proverb-fallback / definitional regressions.
+
+    #[test]
+    fn factual_guard_catches_temporal_specific() {
+        assert!(is_specific_factual_query(
+            "қазақстан конституциясы қашан қабылданған"
+        ));
+        assert!(is_specific_factual_query("абай қай жылы туылған"));
+        assert!(is_specific_factual_query("java тілі қашан шықты"));
+    }
+
+    #[test]
+    fn factual_guard_catches_counted_quantity() {
+        assert!(is_specific_factual_query(
+            "абайдың қара сөздері неше шығармадан тұрады"
+        ));
+        assert!(is_specific_factual_query("парламент неше палатадан тұрады"));
+        // «қазір» suppresses — that's the live-clock case, not factual.
+        assert!(!is_specific_factual_query("қазір сағат неше"));
+    }
+
+    #[test]
+    fn factual_guard_catches_named_attributes() {
+        assert!(is_specific_factual_query(
+            "қазақстанның ақша бірлігі қандай"
+        ));
+        assert!(is_specific_factual_query("су химиялық формуласы қандай"));
+        assert!(is_specific_factual_query("абайдың шын аты қандай"));
+        assert!(is_specific_factual_query(
+            "қазақстанда биліктің бастауы кім"
+        ));
+    }
+
+    #[test]
+    fn factual_guard_catches_definitional_x_qandai_y() {
+        assert!(is_specific_factual_query("ай не нәрсе"));
+        assert!(is_specific_factual_query("жаз қандай мезгіл"));
+        assert!(is_specific_factual_query("жарық қандай құбылыс"));
+        assert!(is_specific_factual_query("қан қандай сұйықтық"));
+        assert!(is_specific_factual_query("бурабай қандай орын"));
+    }
+
+    #[test]
+    fn factual_guard_lets_through_open_questions() {
+        // Open / conversational queries — example fallback is fine.
+        assert!(!is_specific_factual_query("қазақстан туралы айт"));
+        assert!(!is_specific_factual_query("мысал келтір"));
+        assert!(!is_specific_factual_query("сәлем"));
+    }
+
     #[test]
     fn template_without_placeholder_is_always_fillable() {
         assert!(template_is_fillable("сәлем", &HashMap::new()));
@@ -2424,6 +2478,17 @@ pub fn intent_key(intent: &Intent) -> &'static str {
                     let factual_joined = raw_tokens.join(" ").to_lowercase();
                     let factual = is_specific_factual_query(&factual_joined);
                     let example_ok = !factual;
+                    // Numeric-grounded guard explored 2026-05-19 but
+                    // turned net-negative (downgraded legitimate
+                    // grounded_fact answers for const_005/006/010 to
+                    // reasoning-chain templates, losing −4 correct
+                    // for −2 hallucinations). Reverted to plain
+                    // `grounded_fact.is_some()` here. The category-C
+                    // (adjacent-fact) hallucination is documented as
+                    // open in `docs/factual_eval_hallucination_*` —
+                    // proper fix needs predicate-aware fact selection
+                    // upstream of the router, not a post-hoc digit
+                    // heuristic.
                     if example.is_some()
                         && unknown_prefers_quoted_example(raw_tokens)
                         && *example_adapted
@@ -2490,6 +2555,30 @@ fn is_specific_factual_query(joined: &str) -> bool {
         || joined.contains("елордасы")
         || joined.contains("халық саны")
     {
+        return true;
+    }
+    // **Definitional shape «X қандай Y / X не Y»** where Y is a
+    // generic-class noun. The corpus-sample fallback on this shape
+    // surfaces an off-topic proverb mentioning Y (e.g. astro_003
+    // «Ай не нәрсе?» → quote about money, time_004 «Жаз қандай
+    // мезгіл?» → quote about prisoners). Treat as factual so the
+    // router prefers `unknown.with_noun` (honest hedge) over the
+    // proverb fallback.
+    let definitional_y = [
+        "қандай нәрсе",
+        "қандай зат",
+        "қандай орын",
+        "қандай мезгіл",
+        "қандай құбылыс",
+        "қандай сұйықтық",
+        "қандай газ",
+        "қандай ай",
+        "қандай аспан денесі",
+        "қандай мемлекет",
+        "не нәрсе",
+        "не зат",
+    ];
+    if definitional_y.iter().any(|p| joined.contains(p)) {
         return true;
     }
     false
