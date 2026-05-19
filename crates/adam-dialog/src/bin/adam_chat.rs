@@ -419,15 +419,12 @@ fn main() -> ExitCode {
         )
     });
     #[cfg(not(feature = "neural"))]
-    let neural_state: Option<()> = if neural_model_arg.is_some() {
+    if neural_model_arg.is_some() {
         eprintln!(
             "adam-chat --neural-model: requires the `neural` cargo feature. \
              Rebuild with `cargo build --release -p adam-dialog --bin adam_chat --features neural`."
         );
-        None
-    } else {
-        None
-    };
+    }
 
     if let Some(pos) = args.iter().position(|a| a == "--once") {
         if let Some(input) = args.get(pos + 1) {
