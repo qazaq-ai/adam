@@ -11,8 +11,15 @@ if [[ -z "$expected_version" ]]; then
   exit 1
 fi
 
-if [[ ! "$expected_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "release version must match x.y.z" >&2
+# **v6.0.0-rc1** — accept SemVer 2.0 pre-release suffix `-rcN`
+# alongside the strict `x.y.z` form. The v6.0.0 release uses an
+# rc track (`v6.0.0-rc1`, `-rc2`, …) for preview releases that
+# ship to alpha partners before GA. GA itself remains strict
+# `x.y.z`. Other pre-release dialects (alpha / beta / dev) are
+# intentionally NOT allowed yet — extend the regex if a future
+# release line needs them.
+if [[ ! "$expected_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?$ ]]; then
+  echo "release version must match x.y.z or x.y.z-rcN" >&2
   exit 1
 fi
 
