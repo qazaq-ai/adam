@@ -79,6 +79,12 @@ const SOURCE_PACKS: &[&str] = &[
     "kazakh_textbooks_pack.json",
     // v4.7.1 — Rust Book Kazakh translation pack.
     "rust_book_kk_pack.json",
+    // **v6.0.0-rc3** — Kazakh Wikibooks corpus (CC-BY-SA-3.0).
+    // 17 k curriculum-focused sentences: Abai literature, Kazakh
+    // Constitution, Java tutorial in Kazakh, language textbooks.
+    // Complements wikipedia_kz_pack (encyclopaedic breadth) with
+    // structured-content depth. See `data/external/wikibooks_kk/`.
+    "wikibooks_kk_pack.json",
 ];
 
 #[derive(Debug, Deserialize)]

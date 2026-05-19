@@ -1,4 +1,4 @@
-# Performance — adam v6.0.0-rc2 (deterministic path; neural preview is opt-in)
+# Performance — adam v6.0.0-rc3 (deterministic path; neural preview is opt-in)
 
 > **v6.0.0-rc1 note (2026-05-18).** The numbers below cover the
 > **deterministic kernel path** which is the default in v6.0.0-rc1

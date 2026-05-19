@@ -11,6 +11,9 @@ n,surface,freq,harmony,final_class,reason
 1894,iсқимыл,17,back,liquid,contains-latin
 356,iшiнде,85,front,vowel,contains-latin
 1923,iшкi,18,unknown (no vowels),unknown,contains-latin
+74,java,285,unknown (no vowels),unknown,contains-latin
+1655,jdk,20,unknown (no vowels),unknown,contains-latin
+1656,jre,20,unknown (no vowels),unknown,contains-latin
 689,let,47,unknown (no vowels),unknown,contains-latin
 1543,main,22,unknown (no vowels),unknown,contains-latin
 701,match,46,unknown (no vowels),unknown,contains-latin
@@ -30,6 +33,7 @@ n,surface,freq,harmony,final_class,reason
 1622,test,21,unknown (no vowels),unknown,contains-latin
 1318,unsafe,26,unknown (no vowels),unknown,contains-latin
 1360,use,25,unknown (no vowels),unknown,contains-latin
+1376,windows,24,unknown (no vowels),unknown,contains-latin
 1926,абхазия,18,back,unknown,russian-loan-suffix
 948,авиация,35,back,unknown,russian-loan-suffix
 1475,аккумулятор,23,back,liquid,russian-loan-suffix
@@ -119,6 +123,7 @@ n,surface,freq,harmony,final_class,reason
 1595,секреция,22,front,unknown,russian-loan-suffix
 361,сектор,85,mixed,liquid,russian-loan-suffix
 1995,сәуiр,17,front,liquid,contains-latin
+1541,тiкелей,22,front,glide,contains-latin
 1460,тiлi,24,unknown (no vowels),unknown,contains-latin
 1782,тiркеу,20,front,vowel,contains-latin
 1786,терроризм,20,mixed,nasal,russian-loan-suffix
@@ -151,5 +156,7 @@ n,surface,freq,harmony,final_class,reason
 1620,әрi,22,front,unknown,contains-latin
 1801,өзiнiң,20,front,nasal,contains-latin
 1542,өзiнөзi,23,front,unknown,contains-latin
+1429,өкiлеттiгiн,24,front,nasal,contains-latin
+1960,өтiнiштерiн,18,front,nasal,contains-latin
 364,өткiздi,85,front,unknown,contains-latin
 919,өткiзу,37,front,vowel,contains-latin

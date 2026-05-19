@@ -1,5 +1,5 @@
 {
-  "version": "5.32.0",
+  "version": "6.0.0-rc2",
   "status": "world_core_refresh",
   "elapsed_s": 0,
   "packs_completed": 9,
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3672,
+    "facts_total": 3676,
     "by_predicate": {
       "after": 8,
       "causes": 28,
@@ -27,7 +27,7 @@
       "has": 81,
       "has_quantity": 56,
       "in_domain": 24,
-      "is_a": 2971,
+      "is_a": 2975,
       "lives_in": 8,
       "part_of": 274,
       "related_to": 195
@@ -41,6 +41,7 @@
       "kazakh_textbooks_pack.json": 14,
       "tatoeba_kazakh_pack.json": 3,
       "wikipedia_kz_pack.json": 17,
+      "world_core/abai_works.jsonl": 4,
       "world_core/adam_self.jsonl": 54,
       "world_core/animals.jsonl": 44,
       "world_core/astronomy.jsonl": 60,
@@ -1685,6 +1686,86 @@
       },
       "confidence": "Grammar",
       "raw_text": "Дүние үмітке сүйенеді Бірде Жанқұтты шешен Құнанбайдың үйінде отырғанда, Абай келіп сәлем береді"
+    },
+    {
+      "subject": {
+        "surface": "абай",
+        "root": "абай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ақын",
+        "root": "ақын",
+        "pos": "noun"
+      },
+      "pattern": "world_core/abai_works",
+      "source": {
+        "pack": "world_core/abai_works.jsonl",
+        "sample_id": "abai_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Абай Құнанбаев — қазақтың ұлы ақыны."
+    },
+    {
+      "subject": {
+        "surface": "абай",
+        "root": "абай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ойшыл",
+        "root": "ойшыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/abai_works",
+      "source": {
+        "pack": "world_core/abai_works.jsonl",
+        "sample_id": "abai_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Абай Құнанбаев — қазақтың ұлы ақыны."
+    },
+    {
+      "subject": {
+        "surface": "қара сөздер",
+        "root": "қара сөздер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "проза",
+        "root": "проза",
+        "pos": "noun"
+      },
+      "pattern": "world_core/abai_works",
+      "source": {
+        "pack": "world_core/abai_works.jsonl",
+        "sample_id": "abai_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "«Қара сөздер» қазақ прозасының алғашқы үлгісі болып саналады."
+    },
+    {
+      "subject": {
+        "surface": "абай",
+        "root": "абай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әдебиет негізін салушы",
+        "root": "әдебиет негізін салушы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/abai_works",
+      "source": {
+        "pack": "world_core/abai_works.jsonl",
+        "sample_id": "abai_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Абай — қазақ жазба әдебиетінің негізін салушы."
     },
     {
       "subject": {

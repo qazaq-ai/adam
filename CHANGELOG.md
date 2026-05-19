@@ -28,6 +28,58 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.0.0-rc3] — 2026-05-19 — Open-source corpus expansion · `data/` rightsizing · STT-noise widening
+
+> Third v6.0 release candidate. Three focuses:
+> - **Corpus.** Add the first new source pack since v5.x — `wikibooks_kk_pack.json` (17 148 sentences, CC-BY-SA-3.0). Closes the «mostly Wikipedia / CC100» monoculture with curriculum-focused content: Abai literature, Kazakhstan Constitution, Java tutorial in Kazakh.
+> - **Data discipline.** Audit `data/` from 5.7 GB → 575 MB by deleting regeneratable build cache (`kazakhBooks.csv` 3.7 GB, `curated/shards/` 1.4 GB); document every subdir's role + regeneration in `data/STRUCTURE.md`.
+> - **STT recovery (live REPL 2026-05-19).** Two more Whisper-Kazakh vowel-confusion variants: «нешісі» (е↔і in «нешесі») and «аұрайы» (у↔ұ in «ауа райы»).
+
+### New data
+
+- **`data/external/wikibooks_kk/`** — full kk.wikibooks.org dump (434 pages, ≈ 4 MB raw). CC-BY-SA-3.0; gitignored as regenerable.
+- **`data/curated/wikibooks_kk_pack.json`** — 17 148 cleaned sentences (≈ 6.7 MB, committed). Complements `wikipedia_kz_pack.json` (encyclopaedic) with structured curriculum content. Registered in `mine_lexicon_gaps` `SOURCE_PACKS`.
+- **`data/world_core/abai_works.jsonl`** — 20 entries (≈ 4 net-new facts) on Abai's life + canonical works: «Қара сөздер», «Сегіз аяқ», «Ескендір», «Жазғытұры», birth/death years, family. Sourced from kk.wikibooks Abai pages.
+- **`data/external/huggingface_kz/aman_instructions/kaz_instructions.json`** — 52 201 Q&A pairs (MIT licence). Downloaded for future v6.x tutor training; not yet wired into the pipeline.
+
+### New scripts / binaries
+
+- **`scripts/fetch_kk_wikibooks.sh`** — Mediawiki-API fetcher. Rust-only-policy compliant (uses `jq` + `curl --data-urlencode`, no foreign language runtime).
+- **`crates/adam-corpus/src/bin/process_kk_wikibooks.rs`** — sentence-splitter + Kazakh-script filter + dedup → corpus pack.
+
+### Lexicon V2 update
+
+The wikibooks corpus added 3 128 new uncovered surfaces to the gap pool (69 655 → 72 783). Re-triage:
+
+- auto-approve: 530 rows (per-iteration; +21 vs rc2)
+- auto-exclude: 161 cumulative (+7 vs rc2)
+- needs-review: 1 463 (per-iteration; −20 vs rc2; gap pool stabilising)
+
+### Data discipline
+
+- `data/STRUCTURE.md` (new) — every subdir's role, source-vs-derived distinction, regeneration commands. Reference doc for future operators.
+- Deleted regenerable build cache: `data/external/huggingface_kz/kazakhBooks.csv` (3.7 GB), `data/curated/shards/` (1.4 GB). Both products downstream (`real_corpus_pairs.json`, `morpheme_index.json`) remain on disk.
+- `.gitignore` extended: `data/external/wikibooks_kk/page_*.json` and `_manifest.json` (raw dump is regeneratable; only `README.md` committed).
+
+### STT-noise widening
+
+- `detect_ask_time` accepts «айдың нешісі» and «нешісі» (Whisper е↔і confusion).
+- `detect_ask_weather` + `looks_like_weather_query` accept «аұрайы» and «ауырай» (Whisper у↔ұ confusion + clipped tail).
+
+### Other
+
+- `world_core/abai_works.jsonl` introduces 7 new compound-subject phrases; `MULTIWORD_ENTITIES` extended accordingly to keep `world_core_multiword_coverage` invariant green.
+
+### Workspace
+
+  No new tests added beyond shape extensions in existing fixtures. `cargo test --workspace --all-targets --release` green; default + `--features neural` builds both pass.
+
+### Acceptance criteria delta
+
+  Same 6/9 closed as rc2. No external blockers moved (Lexicon V2 needs-review still wants a native-speaker pass; arXiv preprint still draft; alpha-partner kit still ready but not deployed). rc3 is foundational work on corpus + discipline that unblocks the **next** push toward those blockers, not direct closure.
+
+---
+
 ## [6.0.0-rc2] — 2026-05-18 — Lexicon V2 triage pipeline · auto-exclude filter
 
 > Second v6.0 release candidate. Focus: closing v6.0 GA blocker #3

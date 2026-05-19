@@ -105,7 +105,7 @@ Validator checks:
 
 ## Current scale (v6.0.0-rc1)
 
-**Live totals: 3308 entries / 3672 facts across 62 domains**, all `approved`
+**Live totals: 3328 entries / 3676 facts across 63 domains**, all `approved`
 by `shaman`. v6.0.0-rc1 adds `kz_industry.jsonl` (64 enterprises across 17
 oblasts: АрселорМиттал Теміртау, ССГПО, ҚазМұнайГаз, ПКОП, Жамбыл фосфор
 зауыты, …). Re-run `bash scripts/validate_foundation.sh` to refresh.

@@ -6,11 +6,17 @@
 data/external/*
 !data/external/textbooks_kz/
 !data/external/huggingface_kz/
+!data/external/wikibooks_kk/
 data/external/textbooks_kz/*.pdf
 data/external/huggingface_kz/*.csv
 data/external/huggingface_kz/*.parquet
 data/external/huggingface_kz/*.tsv
 data/external/huggingface_kz/*.json
+# v6.0.0-rc3 — wikibooks_kk page dump is regenerable via
+# `bash scripts/fetch_kk_wikibooks.sh`. Only the README and
+# `_manifest.json` are committed; per-page JSONs are local-only.
+data/external/wikibooks_kk/page_*.json
+data/external/wikibooks_kk/_manifest.json
 .claude/
 
 # External reference material (Apertium-kaz source repo, etc.) — 39+ MB each.
