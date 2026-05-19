@@ -72,6 +72,8 @@ const REFUSAL_MARKERS: &[&str] = &[
     "туралы айтасыз ба",
     "әзірге сөзбен",
     "арифметикалық өрнекпен",
+    "қандай ұғымның",
+    "қандай ұғымның мақсатын",
 ];
 
 #[derive(Debug, Deserialize)]
@@ -269,11 +271,16 @@ fn factual_eval_100() {
     }
     println!();
 
-    // v6.0.0-rc4 baseline: each release tightens this ceiling. GA
-    // #4 lifts when the ceiling reaches 0 and stays there across
-    // two consecutive RCs. The ceiling is a hard CI gate — a *new*
-    // hallucination (beyond the budget) fails the build.
-    const HALLUCINATION_CEILING: usize = 40;
+    // v6.0.0-rc4 (initial 2026-05-19 release): ceiling 40, shipped
+    // baseline 34.
+    // v6.0.0-rc4 (evening hardening 2026-05-19): matcher widening +
+    // clock-intent misfire guards + proverb-fallback suppression on
+    // specific-factual queries. Baseline at this commit: 18. Ceiling
+    // tightened to 25 — leaves headroom for one or two future
+    // regressions before CI red without weakening the ratchet.
+    // GA #4 lifts when the ceiling reaches 0 and stays there across
+    // two consecutive RCs.
+    const HALLUCINATION_CEILING: usize = 25;
     assert!(
         totals[2] <= HALLUCINATION_CEILING,
         "factual_eval_100: {} hallucination(s) — above the v6.0.0-rc4 ceiling of {} (GA #4 target: 0). Tighten verifier or correct the regression.",

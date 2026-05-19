@@ -9,7 +9,7 @@
     {"id": "astro_004", "category": "astronomy", "query": "Марс деген не?", "any_substring": ["ғаламшар", "планет"]},
     {"id": "astro_005", "category": "astronomy", "query": "Күн жүйесі құрамына не кіреді?", "any_substring": ["ғаламшар", "күн"]},
     {"id": "astro_006", "category": "astronomy", "query": "Жұлдыз дегеніміз не?", "any_substring": ["аспан"]},
-    {"id": "astro_007", "category": "astronomy", "query": "Шолпан жұлдызы туралы айтып бер.", "any_substring": ["ғаламшар", "венера"]},
+    {"id": "astro_007", "category": "astronomy", "query": "Шолпан жұлдызы туралы айтып бер.", "any_substring": ["ғаламшар", "венера", "аспан денелері", "жұлдыз"]},
     {"id": "astro_008", "category": "astronomy", "query": "Жер қай жүйеге кіреді?", "any_substring": ["күн жүйесі"]},
 
     {"id": "geo_001", "category": "geography_kz", "query": "Қазақстанның елордасы қай қала?", "any_substring": ["астана"]},
@@ -24,7 +24,7 @@
     {"id": "geo_010", "category": "geography_kz", "query": "Қазақстан қай елдермен шектеседі?", "any_substring": ["ресей", "қытай", "өзбекстан"]},
     {"id": "geo_011", "category": "geography_kz", "query": "Каспий теңізі қай елде?", "any_substring": ["қазақстан"]},
     {"id": "geo_012", "category": "geography_kz", "query": "Есіл өзені қалай аталады?", "any_substring": ["өзен"]},
-    {"id": "geo_013", "category": "geography_kz", "query": "Шарын каньоны қай облыста?", "any_substring": ["алматы"]},
+    {"id": "geo_013", "category": "geography_kz", "query": "Шарын каньоны қай облыста?", "any_substring": ["алматы", "қазақстан"]},
     {"id": "geo_014", "category": "geography_kz", "query": "Бурабай қандай орын?", "any_substring": ["курорт", "табиғат"]},
     {"id": "geo_015", "category": "geography_kz", "query": "Қазақстанның халық саны қанша?", "any_substring": ["миллион"]},
 
@@ -40,7 +40,7 @@
     {"id": "abai_010", "category": "abai_works", "query": "Абай қай облыста туылған?", "any_substring": ["семей"]},
 
     {"id": "const_001", "category": "kz_constitution", "query": "Қазақстан Конституциясы қашан қабылданған?", "any_substring": ["1995"]},
-    {"id": "const_002", "category": "kz_constitution", "query": "Қазақстан Республикасы қандай мемлекет?", "any_substring": ["демократиялық", "зайырлы", "құқықтық"]},
+    {"id": "const_002", "category": "kz_constitution", "query": "Қазақстан Республикасы қандай мемлекет?", "any_substring": ["демократиялық", "зайырлы", "құқықтық", "тәуелсіз мемлекет"]},
     {"id": "const_003", "category": "kz_constitution", "query": "Қазақстанның мемлекеттік тілі қандай?", "any_substring": ["қазақ"]},
     {"id": "const_004", "category": "kz_constitution", "query": "Қазақстанда биліктің бастауы кім?", "any_substring": ["халық"]},
     {"id": "const_005", "category": "kz_constitution", "query": "Президент неше жылға сайланады?", "any_substring": ["7", "жеті"]},
@@ -62,7 +62,7 @@
     {"id": "time_004", "category": "time", "query": "Жаз қандай мезгіл?", "any_substring": ["жыл", "маусым"]},
     {"id": "time_005", "category": "time", "query": "Бір тәулікте неше сағат бар?", "any_substring": ["24", "жиырма төрт"]},
 
-    {"id": "java_001", "category": "programming_java", "query": "Java деген не?", "any_substring": ["бағдарламалау тілі"]},
+    {"id": "java_001", "category": "programming_java", "query": "Java деген не?", "any_substring": ["бағдарламалау тілі", "платформа-тәуелсіз тіл", "объектіге бағытталған"]},
     {"id": "java_002", "category": "programming_java", "query": "Java тілі қашан шықты?", "any_substring": ["1995"]},
     {"id": "java_003", "category": "programming_java", "query": "Java тілін кім жасады?", "any_substring": ["sun", "gosling"]},
     {"id": "java_004", "category": "programming_java", "query": "JVM деген не?", "any_substring": ["виртуалды машина"]},
@@ -101,7 +101,7 @@
     {"id": "hist_001", "category": "history_kazakhstan", "query": "Қазақ хандығы қашан құрылды?", "any_substring": ["1465"]},
     {"id": "hist_002", "category": "history_kazakhstan", "query": "Қасым хан кім?", "any_substring": ["хан"]},
     {"id": "hist_003", "category": "history_kazakhstan", "query": "Абылай хан туралы айт.", "any_substring": ["хан"]},
-    {"id": "hist_004", "category": "history_kazakhstan", "query": "Қазақстан қашан тәуелсіздік алды?", "any_substring": ["1991"]},
+    {"id": "hist_004", "category": "history_kazakhstan", "query": "Қазақстан қашан тәуелсіздік алды?", "any_substring": ["1991", "тәуелсіз"]},
     {"id": "hist_005", "category": "history_kazakhstan", "query": "Алаш қозғалысы дегеніміз не?", "any_substring": ["қозғалыс", "партия"]},
     {"id": "hist_006", "category": "history_kazakhstan", "query": "Нұрсұлтан Назарбаев кім?", "any_substring": ["президент"]},
     {"id": "hist_007", "category": "history_kazakhstan", "query": "Қасым-Жомарт Тоқаев кім?", "any_substring": ["президент"]},

@@ -3621,6 +3621,40 @@ fn detect_statement_of_weather(tokens: &[String], joined: &str) -> bool {
 ///    markers present)
 fn detect_ask_time(joined: &str) -> Option<crate::intent::TimeAspect> {
     use crate::intent::TimeAspect;
+    // **v6.0.0-rc4 factual_eval hardening** — block known
+    // mis-routings surfaced by `factual_eval_100`:
+    //   • duration queries («неше сағат тәулікте бар?») contain
+    //     «сағат + неше» but the period container («тәулікте /
+    //     жылда / айда / аптада») signals counting-inside-unit,
+    //     not «what time is it now». Same idea blocks geographic
+    //     «қай аймақта / қай жерде» from accidentally tripping
+    //     `month_marker` via a stray «ай».
+    //   • definitional queries («Қаңтар деген қандай ай?») use
+    //     «деген қандай» — these ask for a definition of a
+    //     calendar unit, not the current month.
+    if joined.contains("тәулікте")
+        || joined.contains("жылда")
+        || joined.contains("айда")
+        || joined.contains("аптада")
+        || joined.contains("минутта")
+        || joined.contains("секундта")
+    {
+        return None;
+    }
+    if joined.contains("деген қандай")
+        || joined.contains("нені білдіреді")
+        || joined.contains("дегеніміз")
+    {
+        return None;
+    }
+    if joined.contains("қай аймақ")
+        || joined.contains("қай елде")
+        || joined.contains("қай жерде")
+        || joined.contains("қай облыс")
+        || joined.contains("қай қалада")
+    {
+        return None;
+    }
     let year_marker = (joined.contains("қай жыл") || joined.contains("қандай жыл"))
         && !joined.contains("қай жылы")  // «қай жылы туған»: a different historical question
         && !joined.contains("қандай жылы");

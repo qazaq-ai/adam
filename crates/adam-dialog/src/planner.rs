@@ -2405,6 +2405,25 @@ pub fn intent_key(intent: &Intent) -> &'static str {
                     }
                 }
                 UnknownAnswerMode::General => {
+                    // **v6.0.0-rc4 factual_eval hardening** — when the
+                    // turn is a *specific factual query* (asks for a
+                    // year, a single named referent, a formula, an
+                    // explicit «бастауы кім / қашан / неше / қандай
+                    // зат» …), suppress the corpus-sample fallback
+                    // (`unknown.with_evidence`) because it produces
+                    // «{noun} туралы мынаны айта аламын: «<random
+                    // proverb mentioning noun>»» which reads as a
+                    // confident answer but is content-wise off-topic
+                    // (rc4 `factual_eval_100` had ~10 such cases).
+                    // Other Unknown routes (citation requests, generic
+                    // «X не нәрсе?» without a specific aspect, anything
+                    // landing in Example mode) still receive corpus
+                    // quotes as before — regression-tested by the
+                    // `compose_mode_*` / `unknown_with_retrieval_*` /
+                    // `adapted_evidence_*` end-to-end suites.
+                    let factual_joined = raw_tokens.join(" ").to_lowercase();
+                    let factual = is_specific_factual_query(&factual_joined);
+                    let example_ok = !factual;
                     if example.is_some()
                         && unknown_prefers_quoted_example(raw_tokens)
                         && *example_adapted
@@ -2414,9 +2433,9 @@ pub fn intent_key(intent: &Intent) -> &'static str {
                         "unknown.with_evidence"
                     } else if grounded_fact.is_some() {
                         "unknown.with_grounded_fact"
-                    } else if example.is_some() && *example_adapted {
+                    } else if example_ok && example.is_some() && *example_adapted {
                         "unknown.with_adapted_evidence"
-                    } else if example.is_some() {
+                    } else if example_ok && example.is_some() {
                         "unknown.with_evidence"
                     } else if reasoning_chain.is_some() {
                         "unknown.with_derived_chain"
@@ -2429,4 +2448,49 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             }
         }
     }
+}
+
+/// **v6.0.0-rc4 factual_eval_100 guard.** Detect specific factual
+/// queries that ask for a single grounded answer (year, formula,
+/// named source / author / currency, counted quantity). When a
+/// query of this shape lacks a curated fact, surfacing a corpus-
+/// sample (`unknown.with_evidence`) yields the «{noun} туралы
+/// мынаны айта аламын: «<random proverb>»» hallucination pattern
+/// that GA #4 prohibits. The General-mode Unknown router uses
+/// this predicate to suppress the example fallback for such
+/// queries, falling back instead to noun-echo / bare unknown
+/// (which the `factual_eval_100` runner counts as Refusal — i.e.
+/// grounded).
+fn is_specific_factual_query(joined: &str) -> bool {
+    // Temporal-specific
+    if joined.contains("қашан") || joined.contains("қай жылы") || joined.contains("нешеуінде")
+    {
+        return true;
+    }
+    // Counted quantity («неше X-DAT тұрады», «неше шумақтан»,
+    // «неше сағат бар»). The duration guard in detect_ask_time
+    // already steers obvious time-period reads away; the remaining
+    // «неше» queries are factual numeric.
+    if (joined.contains("неше") || joined.contains("қанша")) && !joined.contains("қазір")
+    {
+        return true;
+    }
+    // Authorship / structural-source asking phrases.
+    if joined.contains("бастауы")
+        || joined.contains("авторы")
+        || joined.contains("иесі")
+        || joined.contains("шын аты")
+        || joined.contains("әкесі")
+    {
+        return true;
+    }
+    // Named-attribute factual nouns.
+    if joined.contains("ақша бірлігі")
+        || joined.contains("формуласы")
+        || joined.contains("елордасы")
+        || joined.contains("халық саны")
+    {
+        return true;
+    }
+    false
 }
