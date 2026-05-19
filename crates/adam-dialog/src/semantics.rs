@@ -3570,13 +3570,16 @@ fn detect_statement_of_family(joined: &str) -> bool {
 
 fn detect_ask_weather(joined: &str) -> bool {
     // **v6.0 (live REPL 2026-05-18)** — Whisper renders «ауа райы»
-    // as the joined form «ауырайы» / «ауарайы» in spoken-Kazakh
-    // input. Accept all three surface forms so the AskWeather
-    // intent fires regardless of how the STT spelled it.
+    // as the joined form «ауырайы» / «ауарайы» / «аұрайы» (Kazakh
+    // у↔ұ vowel confusion in voice transcription).
+    // v6.0.0-rc3 — added «аұрайы» / «ауырай» variants surfaced on
+    // the 2026-05-19 voice probe.
     let weather_phrase = joined.contains("ауа райы")
         || joined.contains("ауа-райы")
         || joined.contains("ауарайы")
-        || joined.contains("ауырайы");
+        || joined.contains("ауырайы")
+        || joined.contains("аұрайы")
+        || joined.contains("ауырай");
     (weather_phrase && (joined.contains("қалай") || joined.contains("қандай")))
         || (joined.contains("бүгін") && weather_phrase)
         || (joined.contains("сыртта") && joined.contains("қалай"))
@@ -3627,12 +3630,17 @@ fn detect_ask_time(joined: &str) -> Option<crate::intent::TimeAspect> {
     let weekday_marker = joined.contains("аптаның қай күні")
         || joined.contains("аптаның қандай күні")
         || joined.contains("апта күні");
+    // **v6.0.0-rc3 (live voice 2026-05-19)** — Whisper systematically
+    // confuses Kazakh `е/і` in the «нешесі ↔ нешісі» pair. Both
+    // forms now route the same way.
     let date_marker = joined.contains("айдың нешесі")
+        || joined.contains("айдың нешісі")
         || joined.contains("айдың нешеуінде")
         || (joined.contains("бүгін")
             && (joined.contains("қандай күн")
                 || joined.contains("қай күн")
-                || joined.contains("нешесі")));
+                || joined.contains("нешесі")
+                || joined.contains("нешісі")));
     let time_marker = (joined.contains("сағат")
         && (joined.contains("неше") || joined.contains("неші") || joined.contains("қанша")))
         || joined.contains("қазір уақыт")

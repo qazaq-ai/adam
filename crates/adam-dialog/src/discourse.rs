@@ -2186,7 +2186,9 @@ pub fn looks_like_weather_query(input: &str) -> bool {
     lower.contains("ауа райы")
         || lower.contains("ауа-райы")
         || lower.contains("ауарайы")
-        || lower.contains("ауырайы") // v6.0 — Whisper STT variant
+        || lower.contains("ауырайы")
+        || lower.contains("аұрайы") // v6.0.0-rc3 — Whisper у↔ұ variant
+        || lower.contains("ауырай")  // some clipped forms drop final ы
         || (lower.contains("ауа") && (lower.contains("қандай") || lower.contains("қалай")))
         || lower.contains("жаңбыр жау")
         || lower.contains("қар жау")
