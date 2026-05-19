@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-5.32.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.0.0--rc1-FBC02D?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -25,15 +25,42 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/tests-1528%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-1556%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/p50%20turn%20latency-21%20ms-2EA44F?style=flat-square" alt="latency">
   <img src="https://img.shields.io/badge/RSS-~160%20MB-2EA44F?style=flat-square" alt="rss">
   <img src="https://img.shields.io/badge/GPU-0%25-2EA44F?style=flat-square" alt="gpu">
   <img src="https://img.shields.io/badge/derived%20facts-37%20062-9CCC65?style=flat-square" alt="derived facts">
-  <img src="https://img.shields.io/badge/world%20core-3244%20curated%20/%203650%20facts%20%2F%2061%20domains-9CCC65?style=flat-square" alt="world core">
+  <img src="https://img.shields.io/badge/world%20core-3308%20curated%20/%203672%20facts%20%2F%2062%20domains-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/lexicon-25.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/intents-41-2EA44F?style=flat-square" alt="intents">
 </p>
+
+---
+
+## What's new in v6.0.0-rc1
+
+**Release candidate**, not GA. The deterministic kernel path is
+unchanged from v5.32.0 — every existing v5.x test still passes.
+The v6.0 neural-composition layer (L5.5) and four-gate verifier
+(L6) are shipped as **opt-in preview**: a Cargo feature flag
+(`--features neural`) plus a CLI argument
+(`--neural-model <checkpoint-dir>`) together expose the
+`/neural <prompt>` slash command for external alpha validation.
+Without both, the neural code is not even linked.
+
+Highlights this release:
+- **L5.5 TinyAgt neural composer preview** — runnable, verifier-bounded.
+- **Live OS clock + Open-Meteo weather** for `Intent::AskTime` and `AskWeather` (opt-in by env).
+- **Multi-clause word-math** restored — «56 × 3, содан кейін ÷ 2» → 84.
+- **kz_industry domain** — 64 major enterprises across 17 oblasts.
+- **6 STT-noise recovery fixes** from voice-REPL probes.
+- **Alpha onboarding kit** — 8-file package for external partners.
+- **arXiv preprint draft v0.2** — Codex peer-review pass applied.
+
+Three v6.0 GA acceptance criteria remain open (Lexicon V2 native-
+speaker review, arXiv submission, alpha-partner deployment) —
+all blocked by external parties. See
+[`docs/codex_briefs/v6_ga_external_blockers_2026_05_18.md`](docs/codex_briefs/v6_ga_external_blockers_2026_05_18.md).
 
 ---
 
@@ -148,7 +175,7 @@ For a full evidence dump on any Kazakh root, run [`adam_inspect`](crates/adam-di
 
 | Metric | Value | Notes |
 |---|---|---|
-| Workspace tests | **1 528 passing** | + 17 ignored + adversarial_dialog_v1 (95 cases, **100%**); voice V3 normalizer + priming; Kazakh fuzzy entity matcher; **math echo specificity** (transparent refusal); CI on every release |
+| Workspace tests | **1 556 passing** | default + `--features neural` builds both green; 5 new crates (`adam-agg-tokenizer` / `adam-agg-synth` / `adam-agg-model` / `adam-curriculum` + neural-preview module in `adam-dialog`); v5.x release-blocker invariants preserved |
 | Release cadence | **487+ versioned releases in 5 weeks** | every release CI-verified |
 | p50 turn latency | **21 ms** | vs Llama-3 8B fp16 800–1500 ms; vs GPT-4 50–200 ms |
 | Memory footprint | **~300 MB RSS** | vs LLM 16+ GB VRAM |

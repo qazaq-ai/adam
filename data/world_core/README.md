@@ -103,10 +103,12 @@ Validator checks:
   hits into distinct sections of its per-root report, so the user can
   tell at a glance where each fact came from.
 
-## Current scale (v5.32.0)
+## Current scale (v6.0.0-rc1)
 
-**Live totals: 3244 entries / 3650 facts across 61 domains**, all `approved` (3 571 from world_core jsonl + 79 text-extracted)
-by `shaman`. Re-run `bash scripts/validate_foundation.sh` to refresh.
+**Live totals: 3308 entries / 3672 facts across 62 domains**, all `approved`
+by `shaman`. v6.0.0-rc1 adds `kz_industry.jsonl` (64 enterprises across 17
+oblasts: АрселорМиттал Теміртау, ССГПО, ҚазМұнайГаз, ПКОП, Жамбыл фосфор
+зауыты, …). Re-run `bash scripts/validate_foundation.sh` to refresh.
 Per-domain counts in the listing below are a **historical v4.11.7 snapshot**
 preserved for change-tracking; verify current counts via
 `find data/world_core -name '*.jsonl' | xargs cat | jq -s 'length'`.

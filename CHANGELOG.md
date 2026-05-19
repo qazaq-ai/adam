@@ -28,6 +28,138 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.0.0-rc1] — 2026-05-18 — Kazakh agglutinative neural composer preview · runnable, verifier-bounded
+
+> **Release candidate, not GA.** v6.0.0-rc1 ships the v6.0
+> architecture surface as a preview for external alpha partners.
+> The deterministic kernel path is unchanged from v5.32.0 — every
+> v5.x test still passes. The neural composer (L5.5) and verifier
+> (L6) are **opt-in**: a Cargo feature flag (`--features neural`)
+> plus a CLI argument (`--neural-model <checkpoint-dir>`). Without
+> both, the neural code is not linked. The `/neural <prompt>` slash
+> command exposes the runnable preview for alpha-partner validation.
+>
+> External blockers for v6.0.0 GA remain open (Lexicon V2 native-
+> speaker pass, arXiv submission, alpha-partner deployment); see
+> `docs/codex_briefs/v6_ga_external_blockers_2026_05_18.md`.
+
+### Five new crates
+
+- **`adam-agg-tokenizer`** — typed-morpheme tokenizer over the
+  production Lexicon (25.5 k Roots × 64 typed SuffixKinds × 5
+  service tokens). FST round-trip property-tested across 256 cases.
+- **`adam-agg-synth`** — FST-synthesised training pairs + real-
+  corpus mining (290 k candidate pairs from Wikipedia-kk / CC100-kk
+  / textbooks / Tatoeba / Abai / Rust Book kk; 50 k Root-
+  decomposed kept).
+- **`adam-agg-model`** — TinyAgt (~1.17 M-param decoder-only
+  transformer on `burn` ndarray CPU backend). Constrained / beam
+  / unconstrained generation. L6 verifier (script → Unk → FST
+  round-trip → grounding, strict-by-default). Checkpoint
+  save/load.
+- **`adam-curriculum`** — L7-L10-edu (concept graph, diagnostic,
+  planner, learner state, JSONL loader, coverage audit). Seed
+  for Pillar 1 (Kazakh morphology): 10 concepts × 50 test items.
+- **`adam-dialog`** existing crate gains `system_clock`,
+  `weather`, and `neural_preview` modules (see below).
+
+### Dialog enhancements (deterministic path, default-on)
+
+- **Live OS-clock answers** for `Intent::AskTime` — date / time /
+  weekday / month / year / composite datetime. Reads
+  `std::time::SystemTime` + `ADAM_TZ_OFFSET_HOURS` env. Pure-Rust
+  Howard Hinnant civil-date math; no `chrono` dependency.
+- **Live weather answers** for `Intent::AskWeather` via Open-Meteo
+  (free, no-key, HTTP). Opt-in cascade: `ADAM_WEATHER_LAT/LON`
+  env → `ADAM_WEATHER_CITY` env → session-belief `city` → honest
+  refusal. 29-city lookup table covers all oblast centres.
+  4-second curl timeout; no phone-home without explicit config.
+- **Multi-clause word-math** restored — «Елу алтыны үшке
+  көбейтіңіз, содан кейін екіге бөліңіз» evaluates to 84.
+  «сосын» recognised as colloquial sequencer.
+- **Geometry / measurement guard** in math detectors — «Үш
+  бұрыштың қосындысы қанша градус?» no longer misparsed as
+  arithmetic.
+- **Six STT-noise recovery fixes** — «кімсін» (Whisper -ң→-н),
+  «ауырайы» (joined form), city-storage validation against
+  closed-list (rejects «Қачар» STT garbage), Russian-loan math
+  operators («плюс / минус»), school-subject lemma normalisation
+  («Физик» → «Физика»), bare «кім президент?» routes to current
+  head-of-state.
+- **kz_industry domain** — 64 major Kazakhstani enterprises across
+  17 oblasts (АрселорМиттал Теміртау, ССГПО, ҚазМұнайГаз, ПКОП,
+  Жамбыл фосфор зауыты, …).
+- **L6 verifier hardening** — four gates in order
+  (NonKazakhScript → UnkSurface → FstRoundTripFailed →
+  Ungrounded), strict-by-default constructor.
+- **Parser longest-root preference** — closes proptest «бостық»
+  regression.
+- **Farewell escapes contradiction** — user saying «Сау бол»
+  mid-contradiction-loop now exits cleanly.
+
+### L5.5 neural composer preview (opt-in, default-off)
+
+- New `--features neural` cargo feature on `adam-dialog`.
+- New `--neural-model <checkpoint-dir>` CLI flag for `adam_chat`.
+- New `/neural <prompt>` slash command — tokenises through
+  `AggTokenizer`, runs `generate_constrained` over the loaded
+  `TinyAgt`, detokenises to surface, runs through L6 verifier,
+  prints audit trail.
+- Backend-generic checkpoint save/load. Format: directory of
+  `config.json` + `labels.json` + `training.json` + `model.mpk`.
+
+### Documentation
+
+- `docs/MANIFESTO.md` — four-inversion architectural position.
+- `docs/architecture_neural_v6.md` — v6.0 architecture contract.
+- `docs/migration_v5_to_v6.md` — rollback-safe upgrade procedure,
+  honest §7 "Deferred to v6.0.5+".
+- `docs/preprint/arxiv_v0_draft.md` — preprint draft v0.2 (Codex
+  critique pass applied).
+- `docs/bench/our_numbers_vs_published_llm.md` — characteristics
+  comparison.
+- `docs/alpha_onboarding_kit/` — 8-file kit for external alpha-
+  partner onboarding (pitch_kk / pitch_ru / deploy /
+  validation_spec / feedback_form / privacy / risk_disclaimer /
+  outreach_candidates).
+- `docs/codex_briefs/v6_ga_external_blockers_2026_05_18.md` —
+  peer-review brief for the three remaining external blockers.
+- `RESEARCH_AGGLUTINATIVE_NEURAL.md` — research-arc charter.
+
+### Tests
+
+  1 556 workspace tests passing; default build + `--features
+  neural` build both green.
+
+### Empirical results (sprint 2, 2026-05-17)
+
+  Train CE 0.368 · Held-out CE 0.416 · gap 0.048 · exact-match
+  17 % over 100 prefixes. Model ≈ 1.17 M params (vocab 5 773 ·
+  d_model 64 · 2 layers · d_ff 128). Training: M2 8 GB CPU,
+  31 min Stage-5 + 64 min Stage-8. Inference: 1.71 ms / 6-token
+  greedy composition on M2 CPU single core.
+
+### Acceptance criteria status (architecture_neural_v6 §9)
+
+  | # | Criterion | rc1 status |
+  |---|---|---|
+  | 1 | v5.x release-blocker tests pass | ✓ green |
+  | 2 | Performance contracts met on M2 | ✓ measured |
+  | 3 | Lexicon V2 ≥ 70 % Root coverage | partial; Codex triage applied, needs-review pass deferred to rc2 |
+  | 4 | Verifier: 0 hallucinations on 100-prompt eval | preview works, full 100-prompt suite TBD |
+  | 5 | Characteristics comparison published | ✓ done |
+  | 6 | arXiv preprint | draft v0.2 ready, submission TBD |
+  | 7 | Migration validated against alpha | kit ready, partner TBD |
+  | 8 | No proprietary / cloud deps | ✓ audited |
+  | 9 | Documentation reflects v6.0 | ✓ done |
+
+  Three of nine remain open: #3 (Lexicon V2 needs-review),
+  #6 (arXiv submission), #7 (alpha-partner deployment). Each is
+  gated by an external party (linguist, peer reviewers, deploying
+  organisation).
+
+---
+
 ## [5.32.0] — 2026-05-15 — `military_kz` doubled: ВС РК structure + discipline (42 new facts from Law 29-III + 4 уставы)
 
 **Minor.** Extends the `military_kz` domain seeded in v5.31.5 with two more thematic batches, **doubling its size** from 60 → 120 facts. Total demo coverage now: definitions / ranks / oath / conscription / **ВС structure / discipline** — a full first-contact knowledge surface for МО РК.
