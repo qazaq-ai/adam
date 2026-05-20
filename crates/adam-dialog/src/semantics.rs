@@ -3777,8 +3777,17 @@ fn detect_ask_time(joined: &str) -> Option<crate::intent::TimeAspect> {
                 || joined.contains("қай күн")
                 || joined.contains("нешесі")
                 || joined.contains("нешісі")));
-    let time_marker = (joined.contains("сағат")
-        && (joined.contains("неше") || joined.contains("неші") || joined.contains("қанша")))
+    // **v6.0.0-rc5 voice REPL round 4** — Whisper-turbo transcribes
+    // «сағат» as «сақат» (final voiceless drift) and «неше» as
+    // «нишы» / «ниши» on slurred articulation. Accept both surfaces
+    // here so the live-clock branch fires on diction-impaired
+    // speakers / non-broadcast voice input.
+    let time_marker = ((joined.contains("сағат") || joined.contains("сақат"))
+        && (joined.contains("неше")
+            || joined.contains("неші")
+            || joined.contains("нишы")
+            || joined.contains("ниши")
+            || joined.contains("қанша")))
         || joined.contains("қазір уақыт")
         || joined.contains("қазір неші")
         || joined.contains("уақыт неше")

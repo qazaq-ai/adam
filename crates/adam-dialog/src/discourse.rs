@@ -4202,6 +4202,53 @@ const PREAMBLES: &[&str] = &[
 /// next non-whitespace character.
 const PREAMBLE_SEPARATORS: &[char] = &[',', '—', '–', '-', ':', ';'];
 
+/// **v6.0.0-rc5 voice REPL round 4** — Whisper-turbo splits long
+/// Kazakh compounds at non-existent word boundaries. Live REPL
+/// surfaced «Мен қостан айда тұрамын» (true: «Мен Қостанайда
+/// тұрамын») — the city locative «Қостанайда» got split into
+/// «қостан айда», so the noun_hint extractor picked the spurious
+/// «қос» (pair) instead of the city. Same drift hits Astana
+/// («астан ада»), Almaty («алмат ыда»), and several others.
+/// This pre-processor rejoins the canonical compound BEFORE
+/// FST parsing sees the input.
+///
+/// Closed-list (top cities + key compounds). For each pair
+/// (`left`, `right`), the input is scanned for the bigram «left
+/// right» (case-insensitive, exact spaces) and replaced with the
+/// concatenation `leftright`. Conservative — single-byte-boundary
+/// matches only, never alters interior word characters.
+pub fn rejoin_whisper_splits(input: &str) -> String {
+    const PAIRS: &[(&str, &str)] = &[
+        ("қостан", "айда"),  // Қостанайда
+        ("қостан", "айдан"), // Қостанайдан
+        ("астан", "ада"),    // Астанада
+        ("астан", "адан"),   // Астанадан
+        ("алмат", "ыда"),    // Алматыда
+        ("алмат", "ыдан"),   // Алматыдан
+        ("шымкент", "те"),   // Шымкентте (already one token, harmless)
+        ("қарағанд", "ыда"), // Қарағандыда
+        ("ақтөб", "еде"),    // Ақтөбеде
+        ("тарас", "айық"),   // танысайық — Whisper split that broke round-3
+        ("таныс", "айық"),   // танысайық (canonical first half)
+    ];
+    let mut out = input.to_string();
+    let lower = out.to_lowercase();
+    for (left, right) in PAIRS {
+        let needle = format!("{left} {right}");
+        if let Some(pos) = lower.find(&needle) {
+            // Splice replacement into the original-case buffer at the
+            // same byte offset. Whisper produces lowercase / mixed-
+            // case both — the resulting locative usually starts a
+            // sentence and gets re-cased downstream by NLG.
+            let replacement = format!("{left}{right}");
+            out.replace_range(pos..pos + needle.len(), &replacement);
+            // Restart on the rejoined string for cascading fixes.
+            return rejoin_whisper_splits(&out);
+        }
+    }
+    out
+}
+
 /// **v4.6.20** — strip a leading discourse preamble from the
 /// input, returning the residual. If the input does not start with
 /// a known preamble (or has no clause separator after it), returns

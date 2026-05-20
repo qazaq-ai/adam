@@ -400,7 +400,20 @@ impl Tool {
                     // turns («Раст?» asking about Rust), so add the
                     // single-syllable Cyrillic spelling here too.
                     ("раст", "rust"),
+                    // **v6.0.0-rc5 voice REPL round 4** — Whisper-turbo
+                    // collapses «Раст бағдарламалы тілі» to «Рас» (lost
+                    // final «-т») when the speaker chains the language
+                    // name with the following noun. «Рас» is also the
+                    // Kazakh word for «truth», so the synonym fires
+                    // only inside SearchGraph subject lookup (where the
+                    // context is already a programming-language query)
+                    // — the bare word «рас» elsewhere stays a normal
+                    // adjective.
+                    ("рас", "rust"),
                     ("питон", "python"),
+                    // Whisper-turbo «Pythоn» / «Пайтон» — voice-input
+                    // surface for python.
+                    ("пайтон", "python"),
                     ("джава", "java"),
                 ];
                 let mut matches: Vec<&ReasFact> = ctx

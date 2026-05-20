@@ -607,7 +607,16 @@ impl Conversation {
         // (parses, noun_hint, retrieval) see only the meaningful
         // residual; surface-level checks (Russian/math detection)
         // still operate on the raw input above.
-        let stripped = crate::discourse::strip_addressee(crate::discourse::strip_preamble(input));
+        // **v6.0.0-rc5 voice REPL round 4** — Whisper-turbo splits
+        // long Kazakh compounds at non-existent word boundaries
+        // («Қостанайда» → «қостан айда», «танысайық» → «таныс
+        // айық»), making downstream noun_hint extraction pick the
+        // first fragment as the topic. Rejoin known splits BEFORE
+        // preamble / addressee stripping so all later layers see
+        // the canonical surface.
+        let rejoined = crate::discourse::rejoin_whisper_splits(input);
+        let stripped =
+            crate::discourse::strip_addressee(crate::discourse::strip_preamble(&rejoined));
         // **v4.15.5 + v4.16.5** — priors-aware parse path. When a
         // trained `SuffixPriors` artifact is attached, each
         // token's candidate analyses are re-ranked by `P(chain)`
