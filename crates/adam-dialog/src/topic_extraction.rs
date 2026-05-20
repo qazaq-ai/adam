@@ -3113,6 +3113,21 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "үкімет бөлімі",
     "үшінші қара сөз",
     "әдістер контрактысы",
+    // **v6.0.0-rc4 morning 2026-05-20** — chemistry formulas +
+    // Caspian/Mangystau geography + Jupiter atmosphere additions
+    // for `factual_eval_100` data gaps.
+    "CO2 формуласы",
+    "H2 формуласы",
+    "H2O формуласы",
+    "N2 формуласы",
+    "NaCl формуласы",
+    "O2 формуласы",
+    "ас тұз",
+    "батыс қазақстан",
+    "каспий теңізі",
+    "көмірқышқыл газ",
+    "сутегі-гелий атмосферасы",
+    "юпитердегі ауа",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns

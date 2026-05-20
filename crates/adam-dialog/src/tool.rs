@@ -523,10 +523,17 @@ impl Tool {
                 // trigger, HasQuantity facts compete for the top slot,
                 // and the digit-bearing object (1845 / 1904 / 1995)
                 // wins on quantity_object_match_rank below.
+                //
+                // **2026-05-20 morning** — formula-asking analogue
+                // («формуласы қандай»). Same shape: chem_001
+                // surfaces the IsA generic «Су — өмір негізі» when
+                // the HasQuantity branch «су → H2O формуласы»
+                // would be on-topic.
                 let has_quantity_intent = query_lower.contains("қанша")
                     || query_lower.contains("неше")
                     || query_lower.contains("қай жылы")
-                    || query_lower.contains("қашан");
+                    || query_lower.contains("қашан")
+                    || query_lower.contains("формуласы");
                 // **v4.17.5** — synonym table for list-intent
                 // disambiguation. Hoisted out of the sort closure
                 // so debug code can also reference it. **v4.38.0**

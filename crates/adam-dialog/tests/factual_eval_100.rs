@@ -282,14 +282,16 @@ fn factual_eval_100() {
     // predicate.
     // v6.0.0-rc4 (evening hardening 2026-05-19, commit 31ba9ae):
     // baseline 12 via locative-property pattern.
-    // v6.0.0-rc4 (morning 2026-05-20, this commit): baseline 9 via
-    // year-asking trigger («қай жылы / қашан») on
-    // has_quantity_intent + digit-bonus in quantity_object_match_rank
-    // — closes abai_004/005, java_002. The remaining 9 are split
-    // between Category-B noun_hint mis-extraction (5) and other
-    // aspect-mismatches (4). Ceiling tightened 18 → 15. Headroom 6.
-    // GA #4 lifts when ceiling reaches 0 across two consecutive RCs.
-    const HALLUCINATION_CEILING: usize = 15;
+    // v6.0.0-rc4 (morning 2026-05-20, commit 2f51fcd): baseline 9
+    // via year-asking trigger («қай жылы / қашан»).
+    // v6.0.0-rc4 (morning 2026-05-20, this commit): baseline 8 via
+    // formula-asking trigger («формуласы») extension of
+    // has_quantity_intent + chem_001 closes (su has_quantity «H2O
+    // формуласы»). The remaining 8 split: 5 Category-B noun_hint
+    // mis-extraction + 3 other aspect-mismatches — all rc5 work.
+    // Ceiling tightened 15 → 12. Headroom 4. GA #4 lifts when
+    // ceiling reaches 0 across two consecutive RCs.
+    const HALLUCINATION_CEILING: usize = 12;
     assert!(
         totals[2] <= HALLUCINATION_CEILING,
         "factual_eval_100: {} hallucination(s) — above the v6.0.0-rc4 ceiling of {} (GA #4 target: 0). Tighten verifier or correct the regression.",
