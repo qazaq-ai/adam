@@ -2319,12 +2319,22 @@ pub fn input_is_math_expression(input: &str) -> bool {
         "үш",
         "төрт",
         "бес",
+        // **v6.0.0-rc5 voice REPL 2026-05-20** — Whisper-turbo
+        // transcribes «бес» as «без» on the «Он без кубейт» turn
+        // and «жиырма» as «жерма» / «жерме» on the «Жерма кубейт
+        // екіге» turn. Adding the STT variants here so the
+        // numeral-detector still fires (downstream resolver maps
+        // both spellings to the same integer in parse_kk_numeral_
+        // value).
+        "без",
         "алты",
         "жеті",
         "сегіз",
         "тоғыз",
         "он",
         "жиырма",
+        "жерма",
+        "жерме",
         "отыз",
         "қырық",
         "елу",
@@ -2471,12 +2481,15 @@ pub fn is_kazakh_word_problem(input: &str) -> bool {
         "үш",
         "төрт",
         "бес",
+        "без", // STT variant of «бес» (rc5)
         "алты",
         "жеті",
         "сегіз",
         "тоғыз",
         "он",
         "жиырма",
+        "жерма",
+        "жерме", // STT variants of «жиырма» (rc5)
         "отыз",
         "қырық",
         "елу",
@@ -3558,7 +3571,7 @@ fn kazakh_units_value_local(token: &str) -> Option<u32> {
         "екі" => Some(2),
         "үш" => Some(3),
         "төрт" => Some(4),
-        "бес" => Some(5),
+        "бес" | "без" => Some(5), // «без» — Whisper-turbo STT variant of «бес»
         "алты" => Some(6),
         "жеті" => Some(7),
         "сегіз" => Some(8),
@@ -3570,7 +3583,7 @@ fn kazakh_units_value_local(token: &str) -> Option<u32> {
 fn kazakh_tens_value_local(token: &str) -> Option<u32> {
     match token {
         "он" => Some(10),
-        "жиырма" => Some(20),
+        "жиырма" | "жерма" | "жерме" => Some(20), // STT variants
         "отыз" => Some(30),
         "қырық" => Some(40),
         "елу" => Some(50),
@@ -4120,13 +4133,13 @@ fn bare_kazakh_number(stem: &str) -> Option<i64> {
         "екі" => Some(2),
         "үш" => Some(3),
         "төрт" => Some(4),
-        "бес" => Some(5),
+        "бес" | "без" => Some(5),
         "алты" => Some(6),
         "жеті" => Some(7),
         "сегіз" => Some(8),
         "тоғыз" => Some(9),
         "он" => Some(10),
-        "жиырма" => Some(20),
+        "жиырма" | "жерма" | "жерме" => Some(20),
         "отыз" => Some(30),
         "қырық" => Some(40),
         "елу" => Some(50),

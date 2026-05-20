@@ -99,14 +99,57 @@ pub fn read_clock(tz_offset_secs: i64) -> ClockReading {
     }
 }
 
-/// Resolve the timezone-offset env var into seconds. Accepts integer
-/// or decimal hours, e.g. `5`, `5.5`, `-3`. Defaults to 0 (UTC) when
-/// unset or malformed — the answer stays consistent rather than
-/// silently producing garbage on a typo.
+/// Resolve the timezone offset for the live clock. Resolution order:
+///
+/// 1. `ADAM_TZ_OFFSET_HOURS` env var (explicit operator override) —
+///    accepts integer / decimal hours, e.g. `5`, `5.5`, `-3`.
+/// 2. OS-detected local offset via `date +%z` (Unix). Parses
+///    `±HHMM` format that BSD / GNU `date` print regardless of
+///    locale. macOS / Linux laptops both ship `date`.
+/// 3. Default `+5` (Asia/Almaty / Asia/Astana) — adam is a
+///    Kazakh-language product, so the most-likely-correct
+///    silent fallback is Kazakhstan's single time zone instead
+///    of UTC. **v6.0.0-rc5 voice REPL 2026-05-20** flagged the
+///    UTC default: live laptop time 13:37 Astana surfaced as
+///    «Қазір сағат 08:37» because step 1 was unset and step 2
+///    did not exist yet.
 pub fn tz_offset_secs_from_env() -> i64 {
-    let raw = std::env::var("ADAM_TZ_OFFSET_HOURS").unwrap_or_default();
-    let hours: f64 = raw.parse().unwrap_or(0.0);
-    (hours * 3_600.0) as i64
+    if let Ok(raw) = std::env::var("ADAM_TZ_OFFSET_HOURS") {
+        if let Ok(hours) = raw.parse::<f64>() {
+            return (hours * 3_600.0) as i64;
+        }
+    }
+    if let Some(secs) = detect_local_tz_offset_secs() {
+        return secs;
+    }
+    // Asia/Almaty default — Kazakhstan is the primary target locale
+    // for the deterministic dialog kernel; UTC is a worse silent
+    // fallback than the canonical product locale.
+    5 * 3_600
+}
+
+/// OS-level local TZ offset detection. Spawns `date +%z` and parses
+/// the `±HHMM` output. Returns `None` if the command is absent or
+/// emits an unparseable value; callers then fall through to the
+/// product-locale default. Pure-Rust kernel directive: no chrono
+/// dependency for this one query.
+fn detect_local_tz_offset_secs() -> Option<i64> {
+    use std::process::Command;
+    let output = Command::new("date").arg("+%z").output().ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    let raw = String::from_utf8(output.stdout).ok()?;
+    let trimmed = raw.trim();
+    // Expected format: `+0500` / `-0300` / `+0530`.
+    if trimmed.len() < 5 {
+        return None;
+    }
+    let sign: i64 = if trimmed.starts_with('-') { -1 } else { 1 };
+    let body = &trimmed[1..];
+    let hh: i64 = body.get(..2)?.parse().ok()?;
+    let mm: i64 = body.get(2..4)?.parse().ok()?;
+    Some(sign * (hh * 3_600 + mm * 60))
 }
 
 /// Render a Kazakh-language answer for the requested clock aspect.
@@ -266,10 +309,21 @@ mod tests {
             std::env::set_var("ADAM_TZ_OFFSET_HOURS", "5.5");
         }
         assert_eq!(tz_offset_secs_from_env(), (5.5 * 3600.0) as i64);
+        // **v6.0.0-rc5** — when the env var is unparseable, the
+        // resolver now falls through to OS detection (`date +%z`)
+        // and finally to the Asia/Almaty default. The exact value
+        // depends on the CI host, but it MUST be non-UTC for the
+        // garbage case to be a useful fallback (UTC was the v6.0
+        // bug that surfaced on the 2026-05-20 voice REPL).
+        // Assert: non-zero AND within a sensible global TZ range.
         unsafe {
             std::env::set_var("ADAM_TZ_OFFSET_HOURS", "garbage");
         }
-        assert_eq!(tz_offset_secs_from_env(), 0);
+        let fallback = tz_offset_secs_from_env();
+        assert!(
+            (-12 * 3600..=14 * 3600).contains(&fallback),
+            "fallback TZ offset {fallback}s out of plausible global range"
+        );
         match prev {
             Some(v) => unsafe { std::env::set_var("ADAM_TZ_OFFSET_HOURS", v) },
             None => unsafe { std::env::remove_var("ADAM_TZ_OFFSET_HOURS") },

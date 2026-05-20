@@ -395,6 +395,11 @@ impl Tool {
                     // the Latin spelling. Conservative — only the
                     // top-3 most likely typed in Cyrillic.
                     ("руст", "rust"),
+                    // **v6.0.0-rc5 voice REPL 2026-05-20** — Whisper-
+                    // turbo drops the «у» from «руст» on bare-utterance
+                    // turns («Раст?» asking about Rust), so add the
+                    // single-syllable Cyrillic spelling here too.
+                    ("раст", "rust"),
                     ("питон", "python"),
                     ("джава", "java"),
                 ];
