@@ -562,6 +562,15 @@ fn detect_greeting(tokens: &[String], joined: &str) -> Option<Intent> {
         || joined.contains("сәлямет")
         || joined.contains("саламет")
         || joined.contains("салеметсіз")
+        // **v6.0.0-rc5 voice REPL round 3** — Whisper-turbo drops
+        // intermediate syllables on the polite greeting: «сәлеметспе»
+        // (lost «-сіз»), «сәлеметсіб» (lost «бе»), and bare «сәлемет»
+        // / «сәлемат». Live REPL round 3 fell to «Айтқаныңыз маған
+        // әлі түсініксіз» on the «Сәлеметспе» opener.
+        || joined.contains("сәлеметспе")
+        || joined.contains("сәлеметсіб")
+        || joined.contains("сәлемат")
+        || joined.starts_with("сәлемет")
     {
         return Some(Intent::Greeting {
             kind: GreetingKind::Polite,
@@ -591,6 +600,30 @@ fn detect_greeting(tokens: &[String], joined: &str) -> Option<Intent> {
     // strict sense, but it opens an introduction exchange and
     // belongs in the Greeting bucket so the planner volunteers
     // adam's name and asks for the user's.
+    // **v6.0.0-rc5 voice REPL round 3** — fuzzy-graph fallback.
+    // When the exact greeting forms above didn't fire, do an
+    // edit-distance-2 pass over the first token against a closed
+    // set of canonical greetings. This catches Whisper-dialect
+    // drift (speakers with speech-pathology / non-broadcast diction
+    // produce slurred or partial surfaces that pure substring
+    // matchers miss).
+    if let Some(first) = tokens.first() {
+        const CANON_GREETINGS: &[(&str, GreetingKind)] = &[
+            ("сәлем", GreetingKind::Casual),
+            ("салем", GreetingKind::Casual),
+            ("сәлеметсіз", GreetingKind::Polite),
+            ("сәлеметсің", GreetingKind::Polite),
+            ("салеметсіз", GreetingKind::Polite),
+            ("ассалам", GreetingKind::Polite),
+            ("ассалаумағалейкум", GreetingKind::Polite),
+        ];
+        for (canon, kind) in CANON_GREETINGS {
+            if first.chars().count() >= 4 && edit_distance_lte_2(first, canon) {
+                return Some(Intent::Greeting { kind: *kind });
+            }
+        }
+    }
+
     if tokens
         .iter()
         .any(|t| t == "танысайық" || t == "танысалық" || t == "танысыңыз")
@@ -669,6 +702,45 @@ fn detect_apology(tokens: &[String], joined: &str) -> bool {
 /// the correction's content. Future bundles may add proper
 /// correction-content extraction (filed in
 /// `project_retrieval_not_neural_v2.md` Stage A roadmap).
+/// **v6.0.0-rc5 voice REPL round 3** — fuzzy-graph fallback shared
+/// by the greeting / identity / disagreement detectors. Returns
+/// `true` when `surface` is within Levenshtein distance 2 of
+/// `canonical`. Stops early if the absolute length gap is already
+/// > 2 (a hard upper bound on edit distance). The bound 2 lets us
+/// rescue most Whisper-noise variants («сәлеметспе» ≈ «сәлеметсіз»
+/// distance 2, «сең кімсің» ≈ «сен кімсің» distance 1, «олаемис»
+/// ≈ «олаемес» distance 1) without over-firing on genuinely
+/// different words. Memory-fixed O(|canonical|) via the
+/// two-row dynamic-programming variant.
+fn edit_distance_lte_2(surface: &str, canonical: &str) -> bool {
+    let a: Vec<char> = surface.chars().collect();
+    let b: Vec<char> = canonical.chars().collect();
+    let (la, lb) = (a.len(), b.len());
+    if la.abs_diff(lb) > 2 {
+        return false;
+    }
+    let mut prev: Vec<usize> = (0..=lb).collect();
+    let mut curr: Vec<usize> = vec![0; lb + 1];
+    for i in 1..=la {
+        curr[0] = i;
+        let mut row_min = curr[0];
+        for j in 1..=lb {
+            let cost = if a[i - 1] == b[j - 1] { 0 } else { 1 };
+            curr[j] = (prev[j] + 1).min(curr[j - 1] + 1).min(prev[j - 1] + cost);
+            if curr[j] < row_min {
+                row_min = curr[j];
+            }
+        }
+        if row_min > 2 {
+            // Whole row dominated by ≥3 edits — distance can only
+            // grow from here. Short-circuit.
+            return false;
+        }
+        std::mem::swap(&mut prev, &mut curr);
+    }
+    prev[lb] <= 2
+}
+
 fn detect_user_disagreement(joined: &str) -> bool {
     joined.contains("қателесесің")
         || joined.contains("қателесесіз")
@@ -680,6 +752,25 @@ fn detect_user_disagreement(joined: &str) -> bool {
         || joined.contains("бұл қате")
         || joined.contains("сіз қате")
         || joined.contains("сен қате")
+        // **v6.0.0-rc5 voice REPL round 3** — Whisper-turbo
+        // collapses «олай емес» into «олаемис» / «олаемес» when
+        // the speaker chains it onto «Жоқ» without a pause:
+        // «Жоқ, олай емес» → «Жок олаемис». The disagreement
+        // intent now catches the fused surface (and the бұлай
+        // counterpart). Pre-fix the turn fell to corpus-sample
+        // proverb fallback on «жоқ» as the noun_hint.
+        || joined.contains("олаемис")
+        || joined.contains("олаемес")
+        || joined.contains("бұлаемис")
+        || joined.contains("бұлаемес")
+        // Fuzzy: «жок олаемис» / «жок олаемес» — Whisper drops the
+        // final «-қ» on «жоқ» AND fuses «олай емес» into a single
+        // token, so the bare-substring guards above can miss the
+        // fused-and-bare-«жок» combo. The edit-distance fallback
+        // catches «жок» → «жоқ» distance 1 while keeping the
+        // semantic anchor «емес»-like surface on the right.
+        || joined.split_whitespace().any(|t| edit_distance_lte_2(t, "жоқ"))
+            && (joined.contains("емис") || joined.contains("емес"))
 }
 
 fn detect_ask_how_are_you(joined: &str) -> bool {
@@ -2056,7 +2147,18 @@ fn detect_ask_about_system(
     let reflexive_pronoun_identity = joined.contains("өзің кімсің")
         || joined.contains("өзіңіз кімсіз")
         || joined.contains("өзің кімсін")
-        || joined.contains("сен кімсін");
+        || joined.contains("сен кімсін")
+        // **v6.0.0-rc5 voice REPL round 3** — Whisper-turbo
+        // dropped articulation on «сен» turns. Live REPL surfaced
+        // «Сіздің кімсің?» (acc-form leak: сізді+ң) and «Сең
+        // кімсің?» (collapsed -н ending). Both ARE asking the
+        // identity question — accept them so the canonical
+        // self-introduction fires instead of the fall-through
+        // «Сұрағыңызды нақтырақ тұжырымдасаңыз — ...».
+        || joined.contains("сіздің кімсің")
+        || joined.contains("сең кімсің")
+        || joined.contains("сең кімсіз")
+        || joined.contains("сең кімсін");
     if pronoun
         && (joined.contains("кімсің")
             || joined.contains("кімсіз")
