@@ -838,6 +838,18 @@ impl Tool {
                             }
                         }
                     };
+                    // Name-asking rerank explored 2026-05-20 and
+                    // rolled back: «шын аты қандай» query (abai_006)
+                    // expects the RelatedTo edge «абай → ибраһим»,
+                    // but upstream SearchGraph dispatch already
+                    // applies a predicate filter that drops
+                    // RelatedTo for «what is X?» shape queries,
+                    // so the rerank tier received an empty
+                    // RelatedTo cohort and only changed the
+                    // already-hallucinating IsA answer into a
+                    // reasoning-chain hallucination of equivalent
+                    // wrongness. Proper fix needs predicate-filter
+                    // bypass at the dispatch level, scoped to rc5.
                     // **v4.17.5** — when has_list_intent fires,
                     // list_intent_rank takes precedence over the
                     // v4.4.11 overlap reranker. Reason: spurious
