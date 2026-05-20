@@ -655,6 +655,118 @@ mod propositions_request_tests_v5110 {
 }
 
 #[cfg(test)]
+mod kazakh_phonetic_tests_v6rc5 {
+    use super::kazakh_phonetic_code;
+
+    #[test]
+    fn collapses_whisper_consonant_drift() {
+        // «сағат» (clock) and «сақат» (Whisper STT noise from voice
+        // REPL round 4) both encode to the same phonetic code via
+        // the velar-class collapse (қ ↔ ғ ↔ к → K).
+        assert_eq!(kazakh_phonetic_code("сағат"), kazakh_phonetic_code("сақат"));
+        // «бес» (5) and «без» (Whisper round-2 STT noise) — both
+        // sibilant-final.
+        assert_eq!(kazakh_phonetic_code("бес"), kazakh_phonetic_code("без"));
+        // «көбейт» (multiply) and «кубейт» (Whisper STT noise) —
+        // velar-vowel-labial-vowel-glide-dental on both.
+        assert_eq!(
+            kazakh_phonetic_code("көбейт"),
+            kazakh_phonetic_code("кубейт")
+        );
+        // «жиырма» (20) and «жерма» (Whisper STT noise) — sibilant +
+        // vowel + liquid + nasal + vowel.
+        assert_eq!(
+            kazakh_phonetic_code("жиырма"),
+            kazakh_phonetic_code("жерма")
+        );
+    }
+
+    #[test]
+    fn collapses_whisper_nasal_drift() {
+        // «кімсің» (who are you) and «кімсін» (Whisper -ң→-н
+        // round 2 STT noise) — both velar-vowel-nasal-sibilant-
+        // vowel-nasal.
+        assert_eq!(
+            kazakh_phonetic_code("кімсің"),
+            kazakh_phonetic_code("кімсін")
+        );
+    }
+
+    #[test]
+    fn collapses_kazakh_vowel_drift() {
+        // The first three classes (V, L, V) are shared between the
+        // bare «олай» and the Whisper-collapsed disagreement form
+        // «олаемис» / «олаемес». They diverge on the final segment
+        // (Y glide vs N + S) so the codes are NOT equal, but both
+        // begin with «VLV» — useful for prefix-match retrieval.
+        let canonical = kazakh_phonetic_code("олай");
+        let noisy = kazakh_phonetic_code("олаемис");
+        let common = "VLV";
+        assert!(
+            canonical.starts_with(common),
+            "{canonical} should start with {common}"
+        );
+        assert!(
+            noisy.starts_with(common),
+            "{noisy} should start with {common}"
+        );
+    }
+
+    #[test]
+    fn distinguishes_semantically_different_words() {
+        // Sanity: the encoder must NOT collapse genuinely different
+        // words. «адам» (human) and «алма» (apple) differ on
+        // consonant class (T vs L mid-word) — codes should differ.
+        assert_ne!(kazakh_phonetic_code("адам"), kazakh_phonetic_code("алма"));
+        // «сен» (you) vs «мен» (I) — first consonant class S vs P.
+        assert_ne!(kazakh_phonetic_code("сен"), kazakh_phonetic_code("мен"));
+    }
+
+    #[test]
+    fn passes_through_latin_lowercased() {
+        // Programming-language identifiers should stay distinguishable
+        // from Cyrillic neighbours.
+        assert_eq!(kazakh_phonetic_code("rust"), "RUST");
+        assert_eq!(kazakh_phonetic_code("Java"), "JAVA");
+    }
+
+    #[test]
+    fn empty_for_punctuation_only() {
+        assert_eq!(kazakh_phonetic_code("?!"), "");
+        assert_eq!(kazakh_phonetic_code(""), "");
+    }
+
+    #[test]
+    fn phonetic_index_round_trip_via_whisper_noise() {
+        use super::{build_phonetic_index, phonetic_lookup};
+        // Mini fixture lexicon: a handful of canonical roots.
+        let canonical = ["сағат", "көбейт", "жиырма", "кімсің", "адам"];
+        let index = build_phonetic_index(canonical);
+        // The same canonical roots round-trip via their own code.
+        for root in canonical {
+            let code = super::kazakh_phonetic_code(root);
+            assert_eq!(phonetic_lookup(&code, &index).as_deref(), Some(root));
+        }
+        // Whisper-noise variants resolve to the canonical via
+        // shared phonetic class.
+        let noise_pairs = [
+            ("сақат", "сағат"),
+            ("кубейт", "көбейт"),
+            ("жерма", "жиырма"),
+            ("кімсін", "кімсің"),
+        ];
+        for (noisy, canon) in noise_pairs {
+            let code = super::kazakh_phonetic_code(noisy);
+            assert_eq!(
+                phonetic_lookup(&code, &index).as_deref(),
+                Some(canon),
+                "noisy={noisy} canon={canon}"
+            );
+        }
+    }
+}
+
+#[cfg(test)]
 mod unprovable_assertion_tests_v5110 {
     use super::is_unprovable_assertion_request;
 
@@ -4338,6 +4450,118 @@ const PREAMBLES: &[&str] = &[
 /// punctuation char is consumed too so the residual starts at the
 /// next non-whitespace character.
 const PREAMBLE_SEPARATORS: &[char] = &[',', '—', '–', '-', ':', ';'];
+
+/// **v6.0.0-rc5 MOD voice REPL 2026-05-20** — Kazakh phonetic
+/// reverse-index. Maps phonetic codes to canonical lexicon roots.
+/// One root may have multiple Whisper-noise surfaces all encoding
+/// to the same code; the index returns the canonical root. Build
+/// once at first call with `phonetic_lookup` against a snapshot
+/// of the lexicon's `entries_ordered`. Costs ~17k iterations on
+/// boot — same order as the existing FST init.
+///
+/// **Returns** the canonical root surface when the phonetic code
+/// has a unique mapping; `None` when ambiguous or unseen. The
+/// caller then substitutes the original token before FST parse.
+pub fn phonetic_lookup(
+    phonetic_code: &str,
+    lexicon_index: &std::collections::HashMap<String, Vec<String>>,
+) -> Option<String> {
+    if phonetic_code.is_empty() {
+        return None;
+    }
+    let candidates = lexicon_index.get(phonetic_code)?;
+    if candidates.len() == 1 {
+        return Some(candidates[0].clone());
+    }
+    // Ambiguous code with multiple roots — let downstream FST
+    // pick from the alternates. Returning `None` is safer than
+    // committing to an arbitrary winner.
+    None
+}
+
+/// Build the phonetic reverse-index from a slice of lexicon roots.
+/// Pure function so callers can cache the result (e.g. via
+/// `std::sync::OnceLock` on lexicon load).
+pub fn build_phonetic_index<I, S>(roots: I) -> std::collections::HashMap<String, Vec<String>>
+where
+    I: IntoIterator<Item = S>,
+    S: AsRef<str>,
+{
+    let mut index: std::collections::HashMap<String, Vec<String>> =
+        std::collections::HashMap::new();
+    for root in roots {
+        let r = root.as_ref();
+        let code = kazakh_phonetic_code(r);
+        if code.is_empty() {
+            continue;
+        }
+        index.entry(code).or_default().push(r.to_string());
+    }
+    // Sort + dedup each cohort for deterministic lookup.
+    for cohort in index.values_mut() {
+        cohort.sort();
+        cohort.dedup();
+    }
+    index
+}
+
+/// **v6.0.0-rc5 MOD voice REPL 2026-05-20** — Kazakh phonetic
+/// encoder for the «math-graph of nearest-meaning words» the user
+/// keeps asking for. Collapses surface tokens to a canonical
+/// phonetic code so Whisper-noise variants («сағат» / «сақат»,
+/// «бес» / «без», «көбейт» / «кубейт», «жиырма» / «жерма» / «жерме»)
+/// all hash to the same code and can be looked up against the
+/// lexicon via a single shared index.
+///
+/// Encoding rules (Kazakh sound-class collapse):
+/// - Vowels {а, ә, ы, е, і, и, э, о, ұ, у, ө, ү, я, ю, ё} → V
+///   (any vowel; collapses front/back/rounded/unrounded distinctions
+///   because Whisper systematically conflates them);
+/// - Velars {қ, к, г, ғ, х, һ} → K;
+/// - Nasals {м, н, ң} → N;
+/// - Sibilants {с, з, ш, ж, ч, щ, ц} → S;
+/// - Liquids {л, р} → L;
+/// - Labials {п, б, ф, в} → P;
+/// - Dentals {т, д} → T;
+/// - Glides {й, у-as-glide} → Y.
+/// - Latin letters are passed through lowercase (so «rust» / «java»
+///   stay distinguishable from Cyrillic forms);
+/// - Non-alphabetic chars are dropped.
+///
+/// Consecutive same-class characters compress to one (Soundex-style):
+/// «сағат» → s-V-K-V-T → "SVKVT" — but VV repeats collapse, so
+/// "SVKVT" → "SVKVT" (no collapse here). «сақат» → s-V-K-V-T →
+/// "SVKVT". Match.
+///
+/// Returns the phonetic code as an uppercase string. Empty input
+/// produces an empty string.
+pub fn kazakh_phonetic_code(word: &str) -> String {
+    let lower = word.to_lowercase();
+    let mut code = String::new();
+    let mut last_class: Option<char> = None;
+    for c in lower.chars() {
+        let class = match c {
+            'а' | 'ә' | 'ы' | 'е' | 'і' | 'и' | 'э' | 'о' | 'ұ' | 'у' | 'ө' | 'ү' | 'я' | 'ю'
+            | 'ё' => Some('V'),
+            'қ' | 'к' | 'г' | 'ғ' | 'х' | 'һ' => Some('K'),
+            'м' | 'н' | 'ң' => Some('N'),
+            'с' | 'з' | 'ш' | 'ж' | 'ч' | 'щ' | 'ц' => Some('S'),
+            'л' | 'р' => Some('L'),
+            'п' | 'б' | 'ф' | 'в' => Some('P'),
+            'т' | 'д' => Some('T'),
+            'й' => Some('Y'),
+            'a'..='z' => Some(c.to_ascii_uppercase()),
+            _ => None,
+        };
+        if let Some(cl) = class {
+            if last_class != Some(cl) {
+                code.push(cl);
+                last_class = Some(cl);
+            }
+        }
+    }
+    code
+}
 
 /// **v6.0.0-rc5 voice REPL round 4** — Whisper-turbo splits long
 /// Kazakh compounds at non-existent word boundaries. Live REPL

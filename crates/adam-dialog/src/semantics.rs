@@ -712,7 +712,7 @@ fn detect_apology(tokens: &[String], joined: &str) -> bool {
 /// ≈ «олаемес» distance 1) without over-firing on genuinely
 /// different words. Memory-fixed O(|canonical|) via the
 /// two-row dynamic-programming variant.
-fn edit_distance_lte_2(surface: &str, canonical: &str) -> bool {
+pub(crate) fn edit_distance_lte_2(surface: &str, canonical: &str) -> bool {
     let a: Vec<char> = surface.chars().collect();
     let b: Vec<char> = canonical.chars().collect();
     let (la, lb) = (a.len(), b.len());

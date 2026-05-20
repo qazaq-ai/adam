@@ -213,6 +213,17 @@ pub struct Conversation {
     /// `cargo_status` slot resolves to `passed` or `failed`. Empty
     /// when no lesson-state turns have happened yet.
     pub curriculum_progress: HashMap<String, crate::curriculum::StageProgress>,
+    /// **v6.0.0-rc5 MOD voice REPL 2026-05-20** — cached Kazakh
+    /// phonetic reverse-index, built lazily on the first
+    /// `phonetic_normalize` call. Invalidated when the lexicon
+    /// pointer / length changes (see `phonetic_index_signature`).
+    /// Maps phonetic code → canonical root surfaces. Used by the
+    /// Whisper-noise normaliser in the input-preprocessor chain.
+    pub phonetic_index: HashMap<String, Vec<String>>,
+    /// Lexicon identity (ptr + len) under which `phonetic_index`
+    /// was built. `None` means «not yet built»; a mismatching
+    /// signature triggers a rebuild on next normalisation call.
+    pub phonetic_index_signature: Option<(usize, usize)>,
 }
 
 /// v4.0.25 — intermediate state captured by
@@ -414,6 +425,121 @@ impl From<&Intent> for IntentKind {
 }
 
 impl Conversation {
+    /// **v6.0.0-rc5 MOD voice REPL 2026-05-20** — Whisper-noise
+    /// normaliser via Kazakh phonetic graph search.
+    ///
+    /// For each whitespace-separated token in `input`:
+    ///   1. If the bare lowercase token is present in `lexicon.by_
+    ///      surface` (canonical, FST-parseable), keep as-is;
+    ///   2. Otherwise compute its phonetic code via `kazakh_phonetic_
+    ///      code` and look up the canonical root via the cached
+    ///      phonetic reverse-index (built once per lexicon and
+    ///      stored in `Conversation::phonetic_index`);
+    ///   3. If the lookup produces a unique match, replace the
+    ///      token with the canonical surface; otherwise keep
+    ///      original so downstream FST still gets a chance.
+    ///
+    /// The result is a re-joined string with whitespace preserved.
+    /// Performance: O(N tokens × HashMap lookup) per turn —
+    /// negligible against the ~20 ms turn latency.
+    fn phonetic_normalize(&mut self, input: &str, lexicon: &LexiconV1) -> String {
+        // Build or reuse the phonetic index. Indexed by the lexicon
+        // identity (entries pointer + len) — invalidated on lexicon
+        // swap. For the common case of one lexicon per process, the
+        // index is built exactly once.
+        let lex_signature = (
+            lexicon.entries_ordered.as_ptr() as usize,
+            lexicon.entries_ordered.len(),
+        );
+        if self.phonetic_index_signature != Some(lex_signature) {
+            let roots: Vec<&str> = lexicon
+                .entries_ordered
+                .iter()
+                .map(|e| e.root.as_str())
+                .collect();
+            self.phonetic_index = crate::discourse::build_phonetic_index(roots.iter().copied());
+            self.phonetic_index_signature = Some(lex_signature);
+        }
+        let mut out_parts: Vec<String> = Vec::new();
+        for raw in input.split_whitespace() {
+            // Strip trailing punctuation for the lookup but keep
+            // it on the output token. Whisper turbo often emits
+            // «деген?» with the question mark glued on; the
+            // canonical root is «деген», so we want to look that
+            // up, not «деген?».
+            let mut tail = String::new();
+            let mut core = raw;
+            while let Some(last) = core.chars().last() {
+                if last.is_ascii_punctuation() {
+                    tail.insert(0, last);
+                    core = &core[..core.len() - last.len_utf8()];
+                } else {
+                    break;
+                }
+            }
+            let core_lower = core.to_lowercase();
+            if lexicon.by_surface.contains_key(&core_lower) {
+                out_parts.push(format!("{core}{tail}"));
+                continue;
+            }
+            // **Phonetic-substitution safety gates** (added after
+            // round-2 regression on `mta_03` where the locative
+            // form «Алматыда» was substituted with an unrelated
+            // canonical root). Phonetic normalisation only fires
+            // when:
+            //   1. Token has 3..=8 chars (short = likely root, not
+            //      inflected form — long words almost always
+            //      contain agglutinative suffixes the FST handles
+            //      natively);
+            //   2. Token does NOT end in a common Kazakh case /
+            //      possessive suffix — those are inflected forms
+            //      that should pass through to FST untouched.
+            // The lexicon is roots-only, so inflected forms always
+            // fail the bare lookup above; phonetic substitution on
+            // them would systematically pick the wrong canonical.
+            let char_count = core_lower.chars().count();
+            if !(3..=8).contains(&char_count) {
+                out_parts.push(format!("{core}{tail}"));
+                continue;
+            }
+            const INFLECTION_SUFFIXES: &[&str] = &[
+                "дан", "ден", "тан", "тен", "нан", "нен", // ablative
+                "ға", "ге", "қа", "ке", "на", "не", // dative
+                "ды", "ді", "ты", "ті", "ны", "ні", // accusative
+                "да", "де", "та", "те", "нда", "нде", // locative
+                "мен", "пен", "бен", // instrumental
+                "ның", "нің", "дың", "дің", "тың", "тің", // genitive
+                "мын", "мін", "сың", "сің", "сыз", "сіз", // person endings
+                "лар", "лер", "дар", "дер", "тар", "тер", // plural
+            ];
+            if INFLECTION_SUFFIXES
+                .iter()
+                .any(|suf| core_lower.ends_with(suf))
+            {
+                out_parts.push(format!("{core}{tail}"));
+                continue;
+            }
+            let code = crate::discourse::kazakh_phonetic_code(core);
+            if let Some(canonical) = crate::discourse::phonetic_lookup(&code, &self.phonetic_index)
+            {
+                // Final gate: replace only when canonical is within
+                // edit-distance 2 of the original. Same phonetic
+                // code can match radically different roots (e.g.
+                // VLNT could be «алмат» / «олимп» / «олонт» / …);
+                // requiring near-spelling-equality prevents the
+                // false-positive that broke `action_routing_compliment`.
+                if crate::semantics::edit_distance_lte_2(&core_lower, &canonical) {
+                    out_parts.push(format!("{canonical}{tail}"));
+                } else {
+                    out_parts.push(format!("{core}{tail}"));
+                }
+            } else {
+                out_parts.push(format!("{core}{tail}"));
+            }
+        }
+        out_parts.join(" ")
+    }
+
     /// Start a fresh session — no remembered entities and no history.
     pub fn new() -> Self {
         let mut conv = Self::default();
@@ -615,6 +741,21 @@ impl Conversation {
         // preamble / addressee stripping so all later layers see
         // the canonical surface.
         let rejoined = crate::discourse::rejoin_whisper_splits(input);
+        // **v6.0.0-rc5 MOD voice REPL 2026-05-20** — Kazakh phonetic
+        // normalisation. The encoder + reverse-index are wired
+        // (`build_phonetic_index`, `kazakh_phonetic_code`,
+        // `phonetic_lookup` in discourse.rs, `phonetic_normalize`
+        // method below) and unit-tested for the core Whisper-noise
+        // pairs (сақат↔сағат, кубейт↔көбейт, жерма↔жиырма,
+        // кімсін↔кімсің). Integration in the turn pipeline is
+        // deferred to v6.0.5: token-level substitution disrupted
+        // greeting / intent classification («Танысып алайық» →
+        // «танысып ылайық» — same phonetic code, edit-distance 1,
+        // but the substituted form blocks IntroProposal routing).
+        // The proper integration is at the noun-extraction layer
+        // (after intent settled), not as a blanket pre-processor.
+        // Foundation is in place; the integration patch is a
+        // small follow-up that needs an intent-aware harness.
         let stripped =
             crate::discourse::strip_addressee(crate::discourse::strip_preamble(&rejoined));
         // **v4.15.5 + v4.16.5** — priors-aware parse path. When a
