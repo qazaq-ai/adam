@@ -1188,7 +1188,30 @@ fn query_content_tokens(input: &str, subject: &str) -> Vec<String> {
             if trimmed.is_empty() {
                 return None;
             }
-            if trimmed.chars().count() < 4 {
+            // **v6.0.0-rc4 morning 2026-05-20 part 3** — relaxed
+            // threshold 4 → 3 chars with a stop-word blacklist.
+            // The 4-char minimum dropped 3-char Kazakh content
+            // tokens like «шын» / «аты» / «көл» that ARE
+            // semantically content-bearing. Surfaced by
+            // `factual_eval_100::abai_006` «Абайдың шын аты
+            // қандай?» where tokens reduced to ["абайдың", "қандай"]
+            // and the abai-RelatedTo-Ибраһим fact lost to the
+            // abai-RelatedTo-қазақ-әдебиеті fact (no «шын аты»
+            // signal in the ranker). 3-char content tokens fire
+            // EXCEPT for generic stop-words like «бар / жоқ /
+            // ма / ба / қай / не» that would spuriously match
+            // many facts and disrupt list-query sorting
+            // (repl_replay's kazakhstan_lakes / mountains /
+            // deserts cases regressed when «бар» landed in the
+            // token set unfiltered).
+            if trimmed.chars().count() < 3 {
+                return None;
+            }
+            const STOP_TOKENS: &[&str] = &[
+                "бар", "жоқ", "ма", "ба", "қай", "не", "сен", "сіз", "мен", "біз", "ол", "бұл",
+                "осы", "сол", "де",
+            ];
+            if STOP_TOKENS.iter().any(|s| trimmed == *s) {
                 return None;
             }
             if trimmed == subject_lower {

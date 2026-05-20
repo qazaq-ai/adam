@@ -2965,6 +2965,24 @@ fn graph_predicate_hint(intent: &Intent) -> Option<String> {
     {
         return Some("has_quantity".into());
     }
+    // **v6.0.0-rc4 morning 2026-05-20 part 3** — name-asking shape.
+    // «шын аты / нағыз аты / бастапқы аты / туған аты» targets the
+    // RelatedTo edge from the entity to its birth name (e.g.
+    // `abai → ибраһим` in world_core). Without this hint, the
+    // first SearchGraph dispatch ran with predicate=None and the
+    // ranker cascade put IsA (rank 0 in user_facing_fact_priority)
+    // above RelatedTo (rank 6), so the curated «Абай — әдебиет
+    // негізін салушы» IsA fact won over «Абайдың шын аты — Ибраһим»
+    // — confident off-topic answer flagged as hallucination by
+    // `factual_eval_100::abai_006`.
+    let joined = raw_tokens.join(" ").to_lowercase();
+    if joined.contains("шын аты")
+        || joined.contains("нағыз аты")
+        || joined.contains("бастапқы аты")
+        || joined.contains("туған аты")
+    {
+        return Some("related_to".into());
+    }
     None
 }
 

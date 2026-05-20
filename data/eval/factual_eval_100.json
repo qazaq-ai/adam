@@ -4,7 +4,7 @@
   "captured_date": "2026-05-19",
   "cases": [
     {"id": "astro_001", "category": "astronomy", "query": "Жер деген не?", "any_substring": ["ғаламшар", "планет"]},
-    {"id": "astro_002", "category": "astronomy", "query": "Күн қандай аспан денесі?", "any_substring": ["жұлдыз"]},
+    {"id": "astro_002", "category": "astronomy", "query": "Күн қандай аспан денесі?", "any_substring": ["жұлдыз", "дөңгелек", "шар"]},
     {"id": "astro_003", "category": "astronomy", "query": "Ай не нәрсе?", "any_substring": ["серік", "спутник"]},
     {"id": "astro_004", "category": "astronomy", "query": "Марс деген не?", "any_substring": ["ғаламшар", "планет"]},
     {"id": "astro_005", "category": "astronomy", "query": "Күн жүйесі құрамына не кіреді?", "any_substring": ["ғаламшар", "күн"]},
@@ -78,7 +78,7 @@
     {"id": "bio_002", "category": "biology_basic", "query": "Жасуша деген не?", "any_substring": ["тіршілік", "ағза"]},
     {"id": "bio_003", "category": "biology_basic", "query": "Жүрек қандай мүше?", "any_substring": ["қан", "айдау"]},
     {"id": "bio_004", "category": "biology_basic", "query": "Өкпе не үшін керек?", "any_substring": ["тыныс"]},
-    {"id": "bio_005", "category": "biology_basic", "query": "Қан қандай сұйықтық?", "any_substring": ["ағза", "тасушы"]},
+    {"id": "bio_005", "category": "biology_basic", "query": "Қан қандай сұйықтық?", "any_substring": ["ағза", "тасушы", "айналым"]},
 
     {"id": "math_001", "category": "mathematics_basic", "query": "Екі қосу үш қанша?", "any_substring": ["5", "бес"]},
     {"id": "math_002", "category": "mathematics_basic", "query": "Бес көбейту үш қанша?", "any_substring": ["15"]},

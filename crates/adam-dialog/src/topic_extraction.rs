@@ -3129,6 +3129,11 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "сутегі-гелий атмосферасы",
     "юпитердегі ауа",
     "ішкі теңіз",
+    // **v6.0.0-rc4 morning 2026-05-20 part 3** — compound subjects
+    // surfaced by `factual_eval_100` const_001 / ind_004 / phys_005.
+    "қазақстан конституциясы",
+    "су химиялық формуласы",
+    "ссгпо",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
@@ -3241,6 +3246,18 @@ pub(crate) fn multiword_entity_hint(input: &str) -> Option<String> {
         }
         for window in tokens.windows(2) {
             if window[0] == parts[0] && window[1].starts_with(stem_2.as_str()) {
+                // Y-side suppression (second pass mirror of first
+                // pass) — if the matched compound begins AFTER the
+                // «қандай / не нәрсе / не зат» marker, it is the
+                // category, not the subject. Approximate position
+                // by searching `parts[0]` in lowered string.
+                if let Some(qp) = qandai_pos {
+                    if let Some(mp) = lowered.find(parts[0]) {
+                        if mp > qp {
+                            continue;
+                        }
+                    }
+                }
                 return Some((*entity).to_string());
             }
         }
@@ -3281,6 +3298,14 @@ pub(crate) fn multiword_entity_hint(input: &str) -> Option<String> {
                     && window[0].starts_with(parts[0])
                     && window[0].ends_with(suf)
                 {
+                    // Y-side suppression (third pass mirror).
+                    if let Some(qp) = qandai_pos {
+                        if let Some(mp) = lowered.find(window[0]) {
+                            if mp > qp {
+                                continue;
+                            }
+                        }
+                    }
                     return Some((*entity).to_string());
                 }
             }
@@ -4031,8 +4056,42 @@ pub(crate) fn best_noun_hint_with_confidence(
     if let Some(la) = locative_attributive_hint(input) {
         return Some((la, TopicConfidence::High));
     }
-    if let Some(pair) = first_noun_root_with_confidence(parses) {
-        return Some(pair);
+    if let Some((root, conf)) = first_noun_root_with_confidence(parses) {
+        // **v6.0.0-rc4 morning 2026-05-20 part 3** — Y-suppress at
+        // first-noun fallback. When `first_noun_root` lands on the
+        // category noun AFTER the «қандай» marker (e.g.
+        // `factual_eval_100::phys_005` «Жарық қандай құбылыс?»
+        // → FST first-noun = «құбылыс»), look for an earlier noun
+        // in the parse stream that sits BEFORE the marker and
+        // prefer it. Falls through to the original pick if no
+        // earlier noun is available.
+        let lower = input.to_lowercase();
+        let qandai_pos = lower
+            .find(" қандай ")
+            .or_else(|| lower.find(" не нәрсе"))
+            .or_else(|| lower.find(" не зат"));
+        if let Some(qp) = qandai_pos {
+            if let Some(rp) = lower.find(root.as_str()) {
+                if rp > qp {
+                    // Look earlier in parses for a noun whose root
+                    // surfaces BEFORE the marker.
+                    for p in parses.iter() {
+                        if let Analysis::Noun { root: r, .. } = p {
+                            let cand = r.root.to_lowercase();
+                            if NOT_A_TOPIC.contains(&cand.as_str()) {
+                                continue;
+                            }
+                            if let Some(cp) = lower.find(cand.as_str()) {
+                                if cp < qp {
+                                    return Some((cand, TopicConfidence::High));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return Some((root, conf));
     }
     accusative_form_hint(input).map(|s| (s, TopicConfidence::Low))
 }
@@ -4237,6 +4296,19 @@ pub(crate) fn genitive_topic_hint_for_list(input: &str, parses: &[Analysis]) -> 
                 Some(adam_kernel_fst::morphotactics::Case::Genitive)
             ) && !NOT_A_TOPIC.contains(&root.root.as_str()) =>
         {
+            // **v6.0.0-rc4 morning 2026-05-20 part 3** — when the
+            // input contains a registered compound «X-ның Y-сы»
+            // whose first word matches this genitive root, prefer
+            // the compound (more informative subject for the
+            // SearchGraph). Closes `factual_eval_100::abai_003`
+            // where the genitive subject «абай» was returned
+            // before the compound «абайдың қара сөздері» could
+            // win in the multiword cascade.
+            if let Some(mw) = multiword_entity_hint(input) {
+                if mw.starts_with(&root.root) || mw.contains(root.root.as_str()) {
+                    return Some(mw);
+                }
+            }
             Some(root.root.clone())
         }
         _ => None,
