@@ -442,6 +442,7 @@ impl Conversation {
     /// The result is a re-joined string with whitespace preserved.
     /// Performance: O(N tokens × HashMap lookup) per turn —
     /// negligible against the ~20 ms turn latency.
+    #[allow(dead_code)]
     fn phonetic_normalize(&mut self, input: &str, lexicon: &LexiconV1) -> String {
         // Build or reuse the phonetic index. Indexed by the lexicon
         // identity (entries pointer + len) — invalidated on lexicon
@@ -741,6 +742,30 @@ impl Conversation {
         // preamble / addressee stripping so all later layers see
         // the canonical surface.
         let rejoined = crate::discourse::rejoin_whisper_splits(input);
+        // **v6.0.0-rc5 voice REPL round 7** — detect "how did you
+        // figure out my gender from voice?" so we can override the
+        // final output with an honest pitch-detection explanation
+        // (the normal pipeline would otherwise surface a stray
+        // «дауыс — сөйлеу құралы» definition). Override happens at
+        // function tail to keep the full TurnTrace populated.
+        let gender_explain_override: Option<String> =
+            if crate::discourse::detect_ask_gender_detection_explain(&rejoined) {
+                let hint = self.session.get("voice_gender_hint").cloned();
+                let detail = match hint.as_deref() {
+                    Some("male") => "Сіздің даусыңыз 140 Гц-тен төмен жиілікте — еркектің дауысы.",
+                    Some("female") => {
+                        "Сіздің даусыңыз 180 Гц-тен жоғары жиілікте — әйелдің дауысы."
+                    }
+                    _ => "Сіздің даусыңыздың жиілігін дөп басу мүмкін болмады.",
+                };
+                Some(format!(
+                    "Сіздің даусыңыздың негізгі жиілігін (F0) талдадым. \
+                    Еркектің дауысы әдетте 85–180 Гц аралығында, ал әйелдің дауысы — 165–255 Гц. \
+                    Менің бағалауымша {detail} Бұл деректер сақталмайды — тек ағымдағы сөйлесу барысында пайдаланылады."
+                ))
+            } else {
+                None
+            };
         // **v6.0.0-rc5 MOD voice REPL 2026-05-20** — gender-vocative
         // fallback. If the speaker has not introduced themselves by
         // name (no `name` slot in session) but the voice pipeline
@@ -2433,7 +2458,13 @@ impl Conversation {
             proof_object,
             verification_outcome,
         };
-        (output, trace)
+        // **v6.0.0-rc5 voice REPL round 7** — final-stage override
+        // for the gender-detection explanation. Computed at the top
+        // of the turn (from `rejoined`), applied here so the trace
+        // remains authoritative for any consumer that inspects what
+        // the pipeline would have said.
+        let final_output = gender_explain_override.unwrap_or(output);
+        (final_output, trace)
     }
 
     /// v2.7: for `Intent::Unknown { noun_hint: Some(n), .. }`, scan

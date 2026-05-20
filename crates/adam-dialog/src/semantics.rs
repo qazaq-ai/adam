@@ -2367,11 +2367,49 @@ fn detect_statement_of_name(
             "кім" | "кiм" | "не" | "қандай" | "қайсысы" | "ким"
         )
     };
+    // **v6.0.0-rc5 voice REPL round 7** — personal-pronoun guard.
+    // Whisper-turbo noise on «менің атымды есініңізде ме?» / similar
+    // memory-probe forms can produce «менің атым сенің …» fragments
+    // — the bare token «сенің» is the 2sg-genitive pronoun, not a
+    // personal name. Adding it (and the other six standard Kazakh
+    // personal pronouns) to the rejection set so the
+    // pattern-1 «атым X» match doesn't store «Сенің» as a name
+    // and trigger a false-positive name-conflict dialog.
+    let is_personal_pronoun = |t: &str| {
+        let lower = t.to_lowercase();
+        matches!(
+            lower.as_str(),
+            "мен"
+                | "сен"
+                | "сіз"
+                | "ол"
+                | "біз"
+                | "сендер"
+                | "сіздер"
+                | "олар"
+                | "менің"
+                | "сенің"
+                | "сіздің"
+                | "оның"
+                | "біздің"
+                | "сендердің"
+                | "сіздердің"
+                | "олардың"
+                | "мені"
+                | "сені"
+                | "сізді"
+                | "оны"
+                | "бізді"
+                | "сендерді"
+                | "сіздерді"
+                | "оларды"
+        )
+    };
 
     // Pattern 1: "атым X".
     if let Some(i) = tokens.iter().position(|t| t == "атым") {
         if let Some(name) = raw_tokens.get(i + 1) {
-            if is_interrogative_pronoun(name) {
+            if is_interrogative_pronoun(name) || is_personal_pronoun(name) {
                 return None;
             }
             return Some(normalize_proper_noun(name));
@@ -2380,7 +2418,7 @@ fn detect_statement_of_name(
     // Pattern 3: "есімім X".
     if let Some(i) = tokens.iter().position(|t| t == "есімім") {
         if let Some(name) = raw_tokens.get(i + 1) {
-            if is_interrogative_pronoun(name) {
+            if is_interrogative_pronoun(name) || is_personal_pronoun(name) {
                 return None;
             }
             return Some(normalize_proper_noun(name));
@@ -2394,7 +2432,7 @@ fn detect_statement_of_name(
         ) {
             if end > start + 1 {
                 if let Some(name) = raw_tokens.get(start + 1) {
-                    if is_interrogative_pronoun(name) {
+                    if is_interrogative_pronoun(name) || is_personal_pronoun(name) {
                         return None;
                     }
                     return Some(normalize_proper_noun(name));

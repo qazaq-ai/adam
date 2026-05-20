@@ -4462,6 +4462,81 @@ const PREAMBLE_SEPARATORS: &[char] = &[',', '—', '–', '-', ':', ';'];
 /// **Returns** the canonical root surface when the phonetic code
 /// has a unique mapping; `None` when ambiguous or unseen. The
 /// caller then substitutes the original token before FST parse.
+/// **v6.0.0-rc5 voice REPL round 7** — detect "how did you figure
+/// out my gender from my voice?" turns. The user wants transparency
+/// about adam's pitch-based gender classification. Caller routes a
+/// matched turn to an explicit explanation template instead of the
+/// usual world_core retrieval (which surfaces a stray "voice is a
+/// communication tool" definition).
+///
+/// Fires when the input pairs a meta-cognitive verb («қалай білдің
+/// / қалай түсіндің / қайдан білдің») with a gender / voice
+/// subject («еркек / әйел / даусым / дауысым / гендер / жыныс»).
+pub fn detect_ask_gender_detection_explain(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    let has_how_question = lower.contains("қалай білдің")
+        || lower.contains("қалай білдіңіз")
+        || lower.contains("қалай түсіндің")
+        || lower.contains("қалай түсіндіңіз")
+        || lower.contains("қалайша білдің")
+        || lower.contains("қайдан білдің")
+        || lower.contains("қайдан түсіндің");
+    if !has_how_question {
+        return false;
+    }
+    let has_gender_voice_subject = lower.contains("еркек")
+        || lower.contains("әйел")
+        || lower.contains("ер адам")
+        || lower.contains("ер кісі")
+        || lower.contains("даусым")
+        || lower.contains("дауысым")
+        || lower.contains("дауысын")
+        || lower.contains("гендер")
+        || lower.contains("жыныс");
+    has_gender_voice_subject
+}
+
+#[cfg(test)]
+mod tests_gender_detection_explain_v6_rc5 {
+    use super::detect_ask_gender_detection_explain;
+
+    #[test]
+    fn fires_on_male_voice_query_v6_rc5() {
+        assert!(detect_ask_gender_detection_explain(
+            "Қалай білдің мен еркек екенімді?"
+        ));
+    }
+
+    #[test]
+    fn fires_on_female_voice_query_v6_rc5() {
+        assert!(detect_ask_gender_detection_explain(
+            "Қалай түсіндің мен әйел екенімді?"
+        ));
+    }
+
+    #[test]
+    fn fires_on_voice_subject_v6_rc5() {
+        assert!(detect_ask_gender_detection_explain(
+            "Сен менің даусым бойынша қалай білдің?"
+        ));
+    }
+
+    #[test]
+    fn fires_on_kaidan_v6_rc5() {
+        assert!(detect_ask_gender_detection_explain(
+            "Қайдан білдің менің жынысымды?"
+        ));
+    }
+
+    #[test]
+    fn does_not_fire_on_general_question_v6_rc5() {
+        assert!(!detect_ask_gender_detection_explain(
+            "Сен қалай білдің мектепте оқып жүргенімді?"
+        ));
+        assert!(!detect_ask_gender_detection_explain("Сәлем, қалайсың?"));
+    }
+}
+
 pub fn phonetic_lookup(
     phonetic_code: &str,
     lexicon_index: &std::collections::HashMap<String, Vec<String>>,

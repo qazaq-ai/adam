@@ -636,10 +636,20 @@ key = "math_answer"
 # results > 999_999_999 the renderer returns None and the
 # planner inserts an empty string; templates fall through to a
 # plain digit form via the alternates that don't use the slot.
+# **v6.0.0-rc5 voice REPL round 7** — TTS double-pronunciation
+# fix. Previously templates were «нәтижесі: 40 (қырық)»; the
+# macOS `say` voice reads BOTH the digit «40» (as «сорок» under
+# the Kazakh voice, or rendered numerically) and the Kazakh word
+# form «қырық», producing a parrot-like repetition. User feedback
+# (round-7 transcript) — drop the word-form trailer; the digit
+# alone is concise and unambiguous in both text and TTS surfaces.
+# `{math_words}` slot stays surfaced by the planner so future
+# templates (e.g. an explicit «word answer» request) can still
+# use it; default templates here no longer do.
 templates = [
-    "нәтижесі: {math_value}{math_words}",
-    "жауабы — {math_value}{math_words}",
-    "есептедім: {math_value}{math_words}",
+    "нәтижесі: {math_value}",
+    "жауабы — {math_value}",
+    "есептедім: {math_value}",
 ]
 
 # **v4.75.5** — Check-answer template families. User submits their
