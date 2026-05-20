@@ -281,6 +281,16 @@ fn main() -> ExitCode {
     if let Some(idx) = index {
         conv = conv.with_morpheme_index(idx);
     }
+    // **v6.0.5** — gate Kazakh phonetic-substitution to STT mode.
+    // Voice input is noisy (Whisper mishears «көбейт» as «Кубейт»,
+    // «жиырма» as «Жерма») and benefits from in-pipeline phonetic
+    // normalisation. Typed input is intentional and should pass
+    // through verbatim. The session slot drives `phonetic_normalize`
+    // in `Conversation::turn_with_trace`.
+    if voice_input {
+        conv.session
+            .insert("voice_input_mode".into(), "true".to_string());
+    }
     if compose {
         conv = conv.with_compose_mode(ComposeMode::InSampleCitySwap);
         eprintln!(
@@ -970,14 +980,33 @@ fn run_voice_repl(
                 adam_voice::pitch::PitchGender::Male => "male",
                 adam_voice::pitch::PitchGender::Female => "female",
             };
-            eprintln!("[voice] pitch-gender hint = {label}");
-            // Conversation reads this slot in the next turn build.
-            // `voice_gender_hint` is intentionally distinct from
-            // `user_gender` (set by name-based detection) so the
-            // name-based path keeps priority when both signals
-            // are present.
-            conv.session
-                .insert("voice_gender_hint".into(), label.to_string());
+            // **v6.0.5** — session-persistent voice profile. Per-
+            // turn F0 estimation is noisy (room acoustics, segment
+            // length, octave-error). Once the same gender label
+            // wins on two non-overlapping segments we lock it for
+            // the session — subsequent turns no longer overwrite
+            // it, which prevents the round-8 "male / female / male"
+            // flapping when a single speaker's voice straddles the
+            // 155–175 Hz dead-band.
+            let counter_key = format!("voice_gender_count_{label}");
+            let prior_count: u32 = conv
+                .session
+                .get(&counter_key)
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(0);
+            let new_count = prior_count + 1;
+            conv.session.insert(counter_key, new_count.to_string());
+            let locked = conv.session.get("voice_gender_locked").cloned().is_some();
+            if !locked {
+                eprintln!("[voice] pitch-gender hint = {label}");
+                conv.session
+                    .insert("voice_gender_hint".into(), label.to_string());
+                if new_count >= 2 {
+                    eprintln!("[voice] pitch-gender locked = {label} (2+ consistent estimates)");
+                    conv.session
+                        .insert("voice_gender_locked".into(), label.to_string());
+                }
+            }
         }
         let tmp_dir = std::env::temp_dir();
         let wav_path = tmp_dir.join(format!("adam_voice_turn_{}.wav", *turn + 1));

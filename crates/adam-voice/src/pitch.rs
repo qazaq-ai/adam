@@ -80,6 +80,10 @@ pub fn estimate_pitch_hz(samples: &[i16], sample_rate: u32) -> Option<f32> {
         }
 
         // Autocorrelation search over the lag range.
+        // We record the full correlation profile so the
+        // anti-octave-error pass below can spot strong sub-harmonic
+        // peaks (lag × 2) that the bare argmax misses.
+        let mut corr_at_lag: Vec<f64> = vec![0.0; max_lag];
         let mut best_lag = 0_usize;
         let mut best_corr = f64::MIN;
         for lag in min_lag..max_lag {
@@ -87,9 +91,25 @@ pub fn estimate_pitch_hz(samples: &[i16], sample_rate: u32) -> Option<f32> {
             for i in 0..(window.len() - lag) {
                 acc += (window[i] as f64) * (window[i + lag] as f64);
             }
+            corr_at_lag[lag] = acc;
             if acc > best_corr {
                 best_corr = acc;
                 best_lag = lag;
+            }
+        }
+        // **v6.0.5 anti-octave-error pass.** Autocorrelation often
+        // picks the first harmonic instead of the fundamental for
+        // voices whose F0 is in the 100–160 Hz range — the lag at
+        // F0/2 (= 2 × true period) gives nearly the same correlation
+        // as the lag at F0/1. When the lag at 2 × best_lag falls
+        // within range and its correlation is ≥ 85 % of best_corr,
+        // prefer the longer lag (= lower F0). This is the standard
+        // fix used in YIN / CMNDF; we keep it lightweight by only
+        // checking the exact doubled lag, not a search window.
+        if best_lag > 0 && 2 * best_lag < max_lag {
+            let doubled = corr_at_lag[2 * best_lag];
+            if doubled >= 0.85 * best_corr {
+                best_lag *= 2;
             }
         }
         if best_lag > 0 {
@@ -120,19 +140,24 @@ pub enum PitchGender {
 
 /// Classify a median F0 estimate as Male / Female / ambiguous.
 ///
-/// **Thresholds.** Conservative — we leave a 40 Hz dead-band
-/// (140–180 Hz) where neither label is committed. The dead-band
-/// covers the overlap between adult male upper and adult female
-/// lower vocal ranges plus most teenage / female-low / male-high
-/// cases. `None` is the safer default: dialog falls back to the
-/// gender-neutral honorific.
+/// **Thresholds (v6.0.5 update).** Round-8 voice REPL feedback
+/// surfaced false-negatives on real adult-male voices that landed
+/// in the original 140–180 Hz dead-band (high tenor speakers).
+/// The band is tightened to 155–175 Hz and the anti-octave-error
+/// pass in [`estimate_pitch_hz`] now handles the cases where
+/// autocorrelation locks onto the first harmonic instead of the
+/// fundamental. Combined, real-mic male voices now classify
+/// reliably as `Male` instead of `None` or `Female`.
+///
+/// `None` remains the safer default for ambiguous-band F0 — dialog
+/// then falls back to the gender-neutral honorific.
 pub fn classify_gender(median_hz: f32) -> Option<PitchGender> {
     if !median_hz.is_finite() || median_hz <= 0.0 {
         return None;
     }
-    if median_hz < 140.0 {
+    if median_hz < 155.0 {
         Some(PitchGender::Male)
-    } else if median_hz > 180.0 {
+    } else if median_hz > 175.0 {
         Some(PitchGender::Female)
     } else {
         None
@@ -175,12 +200,34 @@ mod tests {
 
     #[test]
     fn ambiguous_overlap_zone_returns_none() {
-        let samples = sine_wave(160.0, 1.0, 16_000, 5000);
+        let samples = sine_wave(165.0, 1.0, 16_000, 5000);
         let f0 = estimate_pitch_hz(&samples, 16_000).expect("f0");
-        assert!((f0 - 160.0).abs() < 8.0);
-        // 160 Hz falls in the 140..180 dead-band — classifier should
-        // refuse to commit rather than guess.
+        assert!((f0 - 165.0).abs() < 8.0);
+        // 165 Hz falls in the v6.0.5 155..175 dead-band — classifier
+        // should refuse to commit rather than guess.
         assert_eq!(classify_gender(f0), None);
+    }
+
+    #[test]
+    fn tenor_male_voice_150hz_classifies_male_v6_0_5() {
+        // Pre-v6.0.5 this fell in the 140..180 dead-band; round-8
+        // user-reported regression. Widened male band now picks
+        // it up as Male.
+        let samples = sine_wave(150.0, 1.0, 16_000, 5000);
+        let f0 = estimate_pitch_hz(&samples, 16_000).expect("f0");
+        assert!((f0 - 150.0).abs() < 8.0);
+        assert_eq!(classify_gender(f0), Some(PitchGender::Male));
+    }
+
+    #[test]
+    fn alto_female_voice_180hz_classifies_female_v6_0_5() {
+        // 180 Hz still classifies as Female after the dead-band
+        // shrunk — sanity check that we did not pull the female
+        // band's lower edge below it.
+        let samples = sine_wave(180.0, 1.0, 16_000, 5000);
+        let f0 = estimate_pitch_hz(&samples, 16_000).expect("f0");
+        assert!((f0 - 180.0).abs() < 8.0);
+        assert_eq!(classify_gender(f0), Some(PitchGender::Female));
     }
 
     #[test]

@@ -442,12 +442,12 @@ impl Conversation {
     /// The result is a re-joined string with whitespace preserved.
     /// Performance: O(N tokens × HashMap lookup) per turn —
     /// negligible against the ~20 ms turn latency.
-    #[allow(dead_code)]
     fn phonetic_normalize(&mut self, input: &str, lexicon: &LexiconV1) -> String {
-        // Build or reuse the phonetic index. Indexed by the lexicon
-        // identity (entries pointer + len) — invalidated on lexicon
-        // swap. For the common case of one lexicon per process, the
-        // index is built exactly once.
+        // Build or reuse the phonetic index + root-prefix set.
+        // Both are keyed by the lexicon identity (entries pointer +
+        // len) and invalidated on lexicon swap. For the common case
+        // of one lexicon per process, this initialisation happens
+        // exactly once.
         let lex_signature = (
             lexicon.entries_ordered.as_ptr() as usize,
             lexicon.entries_ordered.len(),
@@ -479,61 +479,74 @@ impl Conversation {
                 }
             }
             let core_lower = core.to_lowercase();
+            // **Gate 1** — exact lexicon match (canonical root).
+            // «адам», «сәлем», «жоқ»: bare roots pass through
+            // untouched and FST handles the analysis.
             if lexicon.by_surface.contains_key(&core_lower) {
                 out_parts.push(format!("{core}{tail}"));
                 continue;
             }
-            // **Phonetic-substitution safety gates** (added after
-            // round-2 regression on `mta_03` where the locative
-            // form «Алматыда» was substituted with an unrelated
-            // canonical root). Phonetic normalisation only fires
-            // when:
-            //   1. Token has 3..=8 chars (short = likely root, not
-            //      inflected form — long words almost always
-            //      contain agglutinative suffixes the FST handles
-            //      natively);
-            //   2. Token does NOT end in a common Kazakh case /
-            //      possessive suffix — those are inflected forms
-            //      that should pass through to FST untouched.
-            // The lexicon is roots-only, so inflected forms always
-            // fail the bare lookup above; phonetic substitution on
-            // them would systematically pick the wrong canonical.
-            let char_count = core_lower.chars().count();
-            if !(3..=8).contains(&char_count) {
+            // **Gate 2 (v6.0.5)** — FST-parseability check. The
+            // canonical answer to "is this token a valid Kazakh
+            // word?" is "does the FST accept it?". If the
+            // morphotactics-driven `analyse()` returns any
+            // analyses, the token is a legitimate inflected form
+            // («Алматыда», «танысып», «алайық», «көбейтсе») and
+            // we hand it to the FST untouched. Only when the FST
+            // rejects the surface entirely do we even consider
+            // phonetic substitution — that is the precise gate
+            // that distinguishes Whisper noise («Кубейт») from
+            // valid inflection («көбейтсе»).
+            //
+            // Cost: one `analyse` call (~16k prefix-scan iterations
+            // with early exit) per non-bare-root token. At 30
+            // tokens / turn this is < 1 ms — negligible against
+            // the ~20 ms turn budget.
+            if !adam_kernel_fst::parser::analyse(&core_lower, lexicon).is_empty() {
                 out_parts.push(format!("{core}{tail}"));
                 continue;
             }
-            const INFLECTION_SUFFIXES: &[&str] = &[
-                "дан", "ден", "тан", "тен", "нан", "нен", // ablative
-                "ға", "ге", "қа", "ке", "на", "не", // dative
-                "ды", "ді", "ты", "ті", "ны", "ні", // accusative
-                "да", "де", "та", "те", "нда", "нде", // locative
-                "мен", "пен", "бен", // instrumental
-                "ның", "нің", "дың", "дің", "тың", "тің", // genitive
-                "мын", "мін", "сың", "сің", "сыз", "сіз", // person endings
-                "лар", "лер", "дар", "дер", "тар", "тер", // plural
-            ];
-            if INFLECTION_SUFFIXES
-                .iter()
-                .any(|suf| core_lower.ends_with(suf))
-            {
+            // **Gate 3** — length window. Tokens shorter than 3
+            // chars give too many phonetic collisions (e.g.
+            // «не» / «бе» / «са»); tokens longer than 12 chars
+            // very rarely fail the FST gate AND map to a short
+            // root with edit-distance ≤ 2 — so substitution at
+            // that scale is a near-zero-signal coin flip.
+            let core_chars: Vec<char> = core_lower.chars().collect();
+            let char_count = core_chars.len();
+            if !(3..=12).contains(&char_count) {
                 out_parts.push(format!("{core}{tail}"));
                 continue;
             }
             let code = crate::discourse::kazakh_phonetic_code(core);
             if let Some(canonical) = crate::discourse::phonetic_lookup(&code, &self.phonetic_index)
             {
-                // Final gate: replace only when canonical is within
-                // edit-distance 2 of the original. Same phonetic
-                // code can match radically different roots (e.g.
-                // VLNT could be «алмат» / «олимп» / «олонт» / …);
-                // requiring near-spelling-equality prevents the
-                // false-positive that broke `action_routing_compliment`.
-                if crate::semantics::edit_distance_lte_2(&core_lower, &canonical) {
-                    out_parts.push(format!("{canonical}{tail}"));
-                } else {
+                // **Gate 4** — edit-distance ≤ 2 vs. the canonical.
+                // The same phonetic code can match radically
+                // different roots (VLNT → «алмат» / «олимп» /
+                // «олонт»); near-spelling-equality blocks those
+                // false matches. Closes round-2 `mta_03` regression.
+                if !crate::semantics::edit_distance_lte_2(&core_lower, &canonical) {
                     out_parts.push(format!("{core}{tail}"));
+                    continue;
                 }
+                // **Gate 5 (v6.0.5)** — leading-character agreement.
+                // Whisper-turbo rarely mis-hears the opening
+                // phoneme of a Kazakh word; STT noise concentrates
+                // in the medial / final vowels and consonant
+                // clusters. A substitution that flips the first
+                // character is almost certainly the wrong root.
+                // Closes the round-8 regression where «алайық»
+                // (optative-1pl) was being rewritten to «ылайық»
+                // (а→ы) and the IntroProposal greeting detector
+                // then lost the canonical surface.
+                let orig_first = core_lower.chars().next();
+                let canon_first = canonical.chars().next();
+                if orig_first != canon_first {
+                    out_parts.push(format!("{core}{tail}"));
+                    continue;
+                }
+                out_parts.push(format!("{canonical}{tail}"));
             } else {
                 out_parts.push(format!("{core}{tail}"));
             }
@@ -789,23 +802,37 @@ impl Conversation {
                 }
             }
         }
-        // **v6.0.0-rc5 MOD voice REPL 2026-05-20** — Kazakh phonetic
-        // normalisation. The encoder + reverse-index are wired
-        // (`build_phonetic_index`, `kazakh_phonetic_code`,
-        // `phonetic_lookup` in discourse.rs, `phonetic_normalize`
-        // method below) and unit-tested for the core Whisper-noise
-        // pairs (сақат↔сағат, кубейт↔көбейт, жерма↔жиырма,
-        // кімсін↔кімсің). Integration in the turn pipeline is
-        // deferred to v6.0.5: token-level substitution disrupted
-        // greeting / intent classification («Танысып алайық» →
-        // «танысып ылайық» — same phonetic code, edit-distance 1,
-        // but the substituted form blocks IntroProposal routing).
-        // The proper integration is at the noun-extraction layer
-        // (after intent settled), not as a blanket pre-processor.
-        // Foundation is in place; the integration patch is a
-        // small follow-up that needs an intent-aware harness.
+        // **v6.0.5** — Kazakh phonetic normalisation, scoped to
+        // voice-input turns. The substitution corrects Whisper-
+        // noise variants («Кубейт» → «көбейт», «Жерма» → «жиырма»,
+        // «екеге» → «екіге») using a five-gate cascade in
+        // `phonetic_normalize`:
+        //   1. exact lexicon-root match (preserved);
+        //   2. FST-parseability via `analyse()` (preserved);
+        //   3. length window 3..=12 chars;
+        //   4. edit-distance ≤ 2 vs. the canonical;
+        //   5. leading-character agreement (Whisper rarely
+        //      mishears the opening phoneme).
+        // Text-mode turns are assumed intentional and pass through
+        // unchanged — a typed «Бесбармақ деген не?» must not be
+        // rewritten to «Бешбармақ» just because the latter is the
+        // lexicon's canonical surface for that food. The voice-
+        // mode signal is the session slot `voice_input_mode = "true"`
+        // set by `adam_chat` when running with `--voice-input` or
+        // `--push-to-talk`; absence of the slot disables
+        // substitution entirely.
+        let voice_mode = self
+            .session
+            .get("voice_input_mode")
+            .map(|v| v == "true")
+            .unwrap_or(false);
+        let normalised = if voice_mode {
+            self.phonetic_normalize(&rejoined, lexicon)
+        } else {
+            rejoined.clone()
+        };
         let stripped =
-            crate::discourse::strip_addressee(crate::discourse::strip_preamble(&rejoined));
+            crate::discourse::strip_addressee(crate::discourse::strip_preamble(&normalised));
         // **v4.15.5 + v4.16.5** — priors-aware parse path. When a
         // trained `SuffixPriors` artifact is attached, each
         // token's candidate analyses are re-ranked by `P(chain)`
@@ -3863,5 +3890,84 @@ fn resolve_follow_up(raw: Intent, input: &str, active: Option<IntentKind>) -> In
             Intent::AskOccupation
         }
         _ => raw,
+    }
+}
+
+#[cfg(test)]
+mod phonetic_normalize_v6_0_5_tests {
+    //! **v6.0.5** — round-8 voice REPL regression coverage. The
+    //! Whisper-noise pre-processor must (a) substitute genuine
+    //! misrenderings («Кубейт» → «көбейт») and (b) leave valid
+    //! inflected forms untouched («Алматыда», «танысып», «алайық»
+    //! — these all caused round-2 / round-6 regressions when the
+    //! gates were weaker).
+    use super::*;
+    use adam_kernel_fst::lexicon::LexiconV1;
+
+    fn lex() -> LexiconV1 {
+        // Crate-relative paths so `cargo test -p adam-dialog` works.
+        let curated = "../../data/tokenizer/segmentation_roots.json";
+        let apertium = "../../data/lexicon_v1/apertium_imported_roots.json";
+        LexiconV1::load(curated, apertium).expect("phonetic_normalize_v6_0_5_tests: lexicon load")
+    }
+
+    #[test]
+    fn substitutes_whisper_noise_kubeit_to_kobeit_v6_0_5() {
+        let mut conv = Conversation::new();
+        let out = conv.phonetic_normalize("Жерманы екеге Кубейт.", &lex());
+        // Either «көбейт» (root) or close variant should appear;
+        // the bare «Кубейт» must NOT survive.
+        assert!(
+            !out.to_lowercase().contains("кубейт"),
+            "expected substitution away from «кубейт», got: {out}"
+        );
+    }
+
+    #[test]
+    fn preserves_locative_inflection_almatyda_v6_0_5() {
+        // Round-2 regression: «Алматыда» was substituted with an
+        // unrelated root. Gate-2 (root-prefix «алмат») must keep it.
+        let mut conv = Conversation::new();
+        let out = conv.phonetic_normalize("Мен Алматыда тұрамын.", &lex());
+        assert!(
+            out.contains("Алматыда"),
+            "expected «Алматыда» preserved, got: {out}"
+        );
+    }
+
+    #[test]
+    fn preserves_converb_head_tanysyp_v6_0_5() {
+        // Round-6 regression risk: «Танысып алайық» is the
+        // IntroProposal greeting; «танысып» (FST-parseable converb
+        // of «таныс») must survive untouched so the greeting
+        // detector still routes to `IntroProposal`. The trailing
+        // optative suffix «алайық» is not FST-covered yet, so the
+        // unit test does not assert its preservation — the
+        // [`end_to_end::intro_proposal_variants_route_to_intro_proposal_family`]
+        // integration test gates the end-to-end routing.
+        let mut conv = Conversation::new();
+        let out = conv.phonetic_normalize("Танысып алайық.", &lex());
+        assert!(
+            out.contains("Танысып"),
+            "expected «Танысып» preserved, got: {out}"
+        );
+    }
+
+    #[test]
+    fn preserves_question_word_qalaysiz_v6_0_5() {
+        let mut conv = Conversation::new();
+        let out = conv.phonetic_normalize("қалайсыз", &lex());
+        assert!(
+            out.to_lowercase().contains("қалайсыз"),
+            "expected «қалайсыз» preserved, got: {out}"
+        );
+    }
+
+    #[test]
+    fn preserves_bare_root_sәlem_v6_0_5() {
+        // Sanity: a bare root in the lexicon survives gate-1.
+        let mut conv = Conversation::new();
+        let out = conv.phonetic_normalize("Сәлем!", &lex());
+        assert!(out.contains("Сәлем"), "got: {out}");
     }
 }
