@@ -1,7 +1,7 @@
 {
   "version": "6.0.0-rc4",
   "status": "completed",
-  "elapsed_s": 66,
+  "elapsed_s": 64,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,19 +18,19 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 70,
-    "facts_total": 4031,
+    "facts_total": 4044,
     "by_predicate": {
       "after": 8,
       "causes": 29,
       "does_to": 65,
       "goes_to": 21,
-      "has": 81,
-      "has_quantity": 68,
+      "has": 82,
+      "has_quantity": 74,
       "in_domain": 24,
-      "is_a": 3108,
+      "is_a": 3109,
       "lives_in": 7,
-      "part_of": 397,
-      "related_to": 223
+      "part_of": 401,
+      "related_to": 224
     },
     "by_pack": {
       "abai_wikisource_pack.json": 3,
@@ -44,11 +44,11 @@
       "world_core/abai_works.jsonl": 82,
       "world_core/adam_self.jsonl": 54,
       "world_core/animals.jsonl": 44,
-      "world_core/astronomy.jsonl": 60,
+      "world_core/astronomy.jsonl": 62,
       "world_core/biology_basic.jsonl": 53,
       "world_core/biology_school.jsonl": 128,
       "world_core/body_parts.jsonl": 57,
-      "world_core/chemistry_school.jsonl": 132,
+      "world_core/chemistry_school.jsonl": 138,
       "world_core/clothing.jsonl": 35,
       "world_core/colors.jsonl": 38,
       "world_core/computer_science_basics.jsonl": 30,
@@ -59,7 +59,7 @@
       "world_core/economics_basic.jsonl": 22,
       "world_core/emotions.jsonl": 44,
       "world_core/food.jsonl": 50,
-      "world_core/geography_kz.jsonl": 178,
+      "world_core/geography_kz.jsonl": 183,
       "world_core/government_kazakhstan.jsonl": 32,
       "world_core/history_kazakhstan.jsonl": 125,
       "world_core/house_parts.jsonl": 20,
@@ -6348,6 +6348,46 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Жер — Күн жүйесіндегі үшінші ғаламшар; Меркурий мен Шолпаннан кейін тұрады. Күннен қашықтығы ~150 миллион км. Жалғыз тіршілік бар екендігі дәлелденген ғаламшар."
+    },
+    {
+      "subject": {
+        "surface": "юпитердегі ауа",
+        "root": "юпитердегі ауа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сутегі-гелий атмосферасы",
+        "root": "сутегі-гелий атмосферасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_050"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Юпитердегі атмосфера басым сутегі мен гелийден тұрады; су буы, метан, аммиак та аз мөлшерде кездеседі."
+    },
+    {
+      "subject": {
+        "surface": "юпитер",
+        "root": "юпитер",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "сутегі-гелий атмосферасы",
+        "root": "сутегі-гелий атмосферасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_050"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Юпитердегі атмосфера басым сутегі мен гелийден тұрады; су буы, метан, аммиак та аз мөлшерде кездеседі."
     },
     {
       "subject": {
@@ -13748,6 +13788,126 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Уран — радиоактивті ауыр химиялық элемент (U, № 92, актиноидтар тобы). Ядролық отын ретінде атом электрстанцияларында қолданылады. Қазақстан — әлемде уран қорын мен өндіруі бойынша ірі мемлекеттердің бірі."
+    },
+    {
+      "subject": {
+        "surface": "су",
+        "root": "су",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "H2O формуласы",
+        "root": "H2O формуласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_131"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Судың химиялық формуласы — H2O (екі сутегі атомы мен бір оттегі атомы)."
+    },
+    {
+      "subject": {
+        "surface": "көмірқышқыл газ",
+        "root": "көмірқышқыл газ",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "CO2 формуласы",
+        "root": "CO2 формуласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_132"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Көмірқышқыл газының химиялық формуласы — CO2."
+    },
+    {
+      "subject": {
+        "surface": "ас тұз",
+        "root": "ас тұз",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "NaCl формуласы",
+        "root": "NaCl формуласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_133"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ас тұзының химиялық формуласы — NaCl."
+    },
+    {
+      "subject": {
+        "surface": "оттегі",
+        "root": "оттегі",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "O2 формуласы",
+        "root": "O2 формуласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_134"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Оттегінің химиялық формуласы — O2 (екіатомды молекула)."
+    },
+    {
+      "subject": {
+        "surface": "сутегі",
+        "root": "сутегі",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "H2 формуласы",
+        "root": "H2 формуласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_135"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сутегінің химиялық формуласы — H2 (екіатомды молекула)."
+    },
+    {
+      "subject": {
+        "surface": "азот",
+        "root": "азот",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "N2 формуласы",
+        "root": "N2 формуласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_136"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Азоттың химиялық формуласы — N2 (екіатомды молекула)."
     },
     {
       "subject": {
@@ -23308,6 +23468,106 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Қазақстан — Орталық Азиядағы аумағы бойынша 9-шы үлкен тәуелсіз мемлекет; астанасы — Астана, ірі қаласы — Алматы."
+    },
+    {
+      "subject": {
+        "surface": "каспий",
+        "root": "каспий",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/geography_kz",
+      "source": {
+        "pack": "world_core/geography_kz.jsonl",
+        "sample_id": "geo_kz_116"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Каспий теңізі Қазақстан, Ресей, Иран, Әзірбайжан және Түрікменстан жағалауларын жуып тұр."
+    },
+    {
+      "subject": {
+        "surface": "каспий",
+        "root": "каспий",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "ресей",
+        "root": "ресей",
+        "pos": "noun"
+      },
+      "pattern": "world_core/geography_kz",
+      "source": {
+        "pack": "world_core/geography_kz.jsonl",
+        "sample_id": "geo_kz_116"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Каспий теңізі Қазақстан, Ресей, Иран, Әзірбайжан және Түрікменстан жағалауларын жуып тұр."
+    },
+    {
+      "subject": {
+        "surface": "каспий",
+        "root": "каспий",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "иран",
+        "root": "иран",
+        "pos": "noun"
+      },
+      "pattern": "world_core/geography_kz",
+      "source": {
+        "pack": "world_core/geography_kz.jsonl",
+        "sample_id": "geo_kz_116"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Каспий теңізі Қазақстан, Ресей, Иран, Әзірбайжан және Түрікменстан жағалауларын жуып тұр."
+    },
+    {
+      "subject": {
+        "surface": "маңғыстау облысы",
+        "root": "маңғыстау облысы",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "батыс қазақстан",
+        "root": "батыс қазақстан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/geography_kz",
+      "source": {
+        "pack": "world_core/geography_kz.jsonl",
+        "sample_id": "geo_kz_117"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Маңғыстау облысы Қазақстанның батыс өңірінде, Каспий теңізінің шығыс жағалауында орналасқан."
+    },
+    {
+      "subject": {
+        "surface": "маңғыстау облысы",
+        "root": "маңғыстау облысы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "каспий теңізі",
+        "root": "каспий теңізі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/geography_kz",
+      "source": {
+        "pack": "world_core/geography_kz.jsonl",
+        "sample_id": "geo_kz_117"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Маңғыстау облысы Қазақстанның батыс өңірінде, Каспий теңізінің шығыс жағалауында орналасқан."
     },
     {
       "subject": {
