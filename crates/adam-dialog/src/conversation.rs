@@ -741,6 +741,29 @@ impl Conversation {
         // preamble / addressee stripping so all later layers see
         // the canonical surface.
         let rejoined = crate::discourse::rejoin_whisper_splits(input);
+        // **v6.0.0-rc5 MOD voice REPL 2026-05-20** — gender-vocative
+        // fallback. If the speaker has not introduced themselves by
+        // name (no `name` slot in session) but the voice pipeline
+        // captured a confident pitch-based gender hint
+        // (`voice_gender_hint = "male" | "female"`), synthesise a
+        // generic Kazakh honorific into `name_respect` so any
+        // template that interpolates `{name_respect}` gets a
+        // culturally-appropriate vocative («Ағай» for male,
+        // «Апай» for female). Cleared once the user introduces
+        // themselves — name-based detection overwrites the slot
+        // with the personal honorific («Дәке» / «Айгерімжан»).
+        if !self.session.contains_key("name") {
+            if let Some(hint) = self.session.get("voice_gender_hint") {
+                let vocative = match hint.as_str() {
+                    "male" => Some("Ағай"),
+                    "female" => Some("Апай"),
+                    _ => None,
+                };
+                if let Some(v) = vocative {
+                    self.session.insert("name_respect".into(), v.to_string());
+                }
+            }
+        }
         // **v6.0.0-rc5 MOD voice REPL 2026-05-20** — Kazakh phonetic
         // normalisation. The encoder + reverse-index are wired
         // (`build_phonetic_index`, `kazakh_phonetic_code`,

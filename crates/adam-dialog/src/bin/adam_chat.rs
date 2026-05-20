@@ -955,6 +955,30 @@ fn run_voice_repl(
             samples.len() as f64 / adam_voice::mic::WHISPER_SAMPLE_RATE as f64
         );
         io::stderr().lock().flush().ok();
+        // **v6.0.0-rc5 MOD voice REPL 2026-05-20** — pitch-based
+        // gender hint. Compute F0 on the captured audio before
+        // Whisper. The hint is opportunistic: dialog still prefers
+        // name-based gender (set when the user introduces themselves
+        // by name) — voice pitch only fills the slot when the
+        // speaker hasn't named themselves yet, so anonymous Q&A
+        // can still address them as «ағай» / «апай».
+        let voice_gender_hint =
+            adam_voice::pitch::estimate_pitch_hz(&samples, adam_voice::mic::WHISPER_SAMPLE_RATE)
+                .and_then(adam_voice::pitch::classify_gender);
+        if let Some(g) = voice_gender_hint {
+            let label = match g {
+                adam_voice::pitch::PitchGender::Male => "male",
+                adam_voice::pitch::PitchGender::Female => "female",
+            };
+            eprintln!("[voice] pitch-gender hint = {label}");
+            // Conversation reads this slot in the next turn build.
+            // `voice_gender_hint` is intentionally distinct from
+            // `user_gender` (set by name-based detection) so the
+            // name-based path keeps priority when both signals
+            // are present.
+            conv.session
+                .insert("voice_gender_hint".into(), label.to_string());
+        }
         let tmp_dir = std::env::temp_dir();
         let wav_path = tmp_dir.join(format!("adam_voice_turn_{}.wav", *turn + 1));
         if let Err(e) = write_wav(&samples, &wav_path) {
