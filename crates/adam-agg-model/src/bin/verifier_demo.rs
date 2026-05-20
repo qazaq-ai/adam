@@ -65,8 +65,8 @@ fn main() {
 
     println!();
     println!(
-        "{:<32}  {:<24}  {:<6}  {:<14}  {:<10}  {}",
-        "label", "input", "fst✓", "root", "grounded", "verdict"
+        "{:<32}  {:<24}  {:<6}  {:<14}  {:<10}  verdict",
+        "label", "input", "fst✓", "root", "grounded"
     );
     println!("{}", "-".repeat(110));
     let mut pass = 0usize;

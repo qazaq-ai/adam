@@ -798,17 +798,14 @@ fn response_ask_weather_falls_back_to_refusal_without_location_v6() {
         !out.contains("{"),
         "refusal must not render an unfilled slot placeholder (got: {out:?})"
     );
-    match prev_lat {
-        Some(v) => unsafe { std::env::set_var("ADAM_WEATHER_LAT", v) },
-        None => {}
+    if let Some(v) = prev_lat {
+        unsafe { std::env::set_var("ADAM_WEATHER_LAT", v) }
     }
-    match prev_lon {
-        Some(v) => unsafe { std::env::set_var("ADAM_WEATHER_LON", v) },
-        None => {}
+    if let Some(v) = prev_lon {
+        unsafe { std::env::set_var("ADAM_WEATHER_LON", v) }
     }
-    match prev_city {
-        Some(v) => unsafe { std::env::set_var("ADAM_WEATHER_CITY", v) },
-        None => {}
+    if let Some(v) = prev_city {
+        unsafe { std::env::set_var("ADAM_WEATHER_CITY", v) }
     }
 }
 

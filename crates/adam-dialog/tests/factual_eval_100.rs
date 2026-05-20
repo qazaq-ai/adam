@@ -1,4 +1,4 @@
-//! **v6.0.0-rc4 — factual evaluation gate (100+ prompts).**
+//! **v6.0.0-rc5 — factual evaluation gate (100+ prompts).**
 //!
 //! Closes the v6.0.0 GA criterion #4 ("verifier 0 hallucinations").
 //!
@@ -243,7 +243,7 @@ fn factual_eval_100() {
         }
     }
 
-    println!("\n=== factual_eval_100 (v6.0.0-rc4) ===");
+    println!("\n=== factual_eval_100 (v6.0.0-rc5) ===");
     println!(
         "Overall: {} cases  →  correct={}  refusal={}  hallucination={}",
         total, totals[0], totals[1], totals[2]
@@ -316,7 +316,7 @@ fn factual_eval_100() {
     const HALLUCINATION_CEILING: usize = 3;
     assert!(
         totals[2] <= HALLUCINATION_CEILING,
-        "factual_eval_100: {} hallucination(s) — above the v6.0.0-rc4 ceiling of {} (GA #4 target: 0). Tighten verifier or correct the regression.",
+        "factual_eval_100: {} hallucination(s) — above the v6.0.0-rc5 ceiling of {} (GA #4 target: 0). Tighten verifier or correct the regression.",
         totals[2],
         HALLUCINATION_CEILING,
     );

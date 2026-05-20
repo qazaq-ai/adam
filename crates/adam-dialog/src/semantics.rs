@@ -3580,8 +3580,8 @@ fn detect_ask_weather(joined: &str) -> bool {
         || joined.contains("ауырайы")
         || joined.contains("аұрайы")
         || joined.contains("ауырай");
-    (weather_phrase && (joined.contains("қалай") || joined.contains("қандай")))
-        || (joined.contains("бүгін") && weather_phrase)
+    weather_phrase
+        && (joined.contains("қалай") || joined.contains("қандай") || joined.contains("бүгін"))
         || (joined.contains("сыртта") && joined.contains("қалай"))
 }
 

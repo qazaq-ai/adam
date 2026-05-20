@@ -1211,7 +1211,7 @@ fn query_content_tokens(input: &str, subject: &str) -> Vec<String> {
                 "бар", "жоқ", "ма", "ба", "қай", "не", "сен", "сіз", "мен", "біз", "ол", "бұл",
                 "осы", "сол", "де",
             ];
-            if STOP_TOKENS.iter().any(|s| trimmed == *s) {
+            if STOP_TOKENS.contains(&trimmed) {
                 return None;
             }
             if trimmed == subject_lower {

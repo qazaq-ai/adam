@@ -166,11 +166,8 @@ fn parse_candidates(text: &str) -> Vec<Candidate> {
         let mut final_class = String::new();
         // Peek at the next line — break (without consuming) when it
         // starts the next candidate or hits an H2 boundary.
-        loop {
-            let peeked = match lines.peek() {
-                Some(l) => *l,
-                None => break,
-            };
+        while let Some(l) = lines.peek() {
+            let peeked = *l;
             if peeked.starts_with("### Candidate #") {
                 break;
             }

@@ -1108,6 +1108,23 @@ pub fn split_compound_utterance(input: &str) -> Vec<String> {
     if trimmed.contains("```") {
         return vec![trimmed.to_string()];
     }
+    // Political evaluative questions often use contrastive comma
+    // shapes: «Президент жақсы ма, жаман ба?». Splitting turns the
+    // second half («жаман ба?») into an unrelated emotional/social
+    // turn after the correct political refusal. Keep the whole
+    // request together so the political-safety detector sees the
+    // complete question.
+    if is_political_recommendation(trimmed) {
+        return vec![trimmed.to_string()];
+    }
+    // User-self recall questions may have a discourse preface:
+    // «Есімде ме, мен қай қалада тұрамын?». Splitting makes the
+    // preface look like a standalone name topic and produces a
+    // tangential answer before the actual recall. Keep the complete
+    // question as one turn.
+    if is_user_self_location_query(trimmed) {
+        return vec![trimmed.to_string()];
+    }
     // **v6.0 (live REPL 2026-05-18)** — multi-clause word-math
     // expressions like «Елу алтыны үшке көбейтіңіз, содан кейін екіге
     // бөліңіз» («multiply 56 by 3, then divide by 2») must reach
@@ -1221,6 +1238,22 @@ mod compound_utterance_tests_v5150 {
                 "қалыңыз қалай".to_string(),
                 "танысайық".to_string(),
             ]
+        );
+    }
+
+    #[test]
+    fn political_evaluative_question_stays_one_piece_v6_rc5() {
+        assert_eq!(
+            split_compound_utterance("Президент жақсы ма, жаман ба?"),
+            vec!["Президент жақсы ма, жаман ба?".to_string()]
+        );
+    }
+
+    #[test]
+    fn user_self_location_preface_stays_one_piece_v6_rc5() {
+        assert_eq!(
+            split_compound_utterance("Есімде ме, мен қай қалада тұрамын?"),
+            vec!["Есімде ме, мен қай қалада тұрамын?".to_string()]
         );
     }
 

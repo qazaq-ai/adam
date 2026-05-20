@@ -2,6 +2,11 @@
 
 **Status:** SPECIFICATION (not yet implemented in `main`). Target
 release: v6.0.0. Branch of record: `experimental/agglutinative-neural`.
+**Implementation note for v6.0.0-rc5:** the neural stack is present as
+an opt-in preview surface (`--features neural`, `--neural-model`, and
+the `/neural` slash command). Automatic L5.5 composition inside the
+normal dialog turn loop remains deferred to v6.0.5+; the deterministic
+v5.x path stays the default runtime path.
 **Audience:** every developer, partner, and downstream system that
 needs to know how the v6.0 neural layer fits into the deterministic
 kernel without breaking the v3.0–v5.x guarantees.
