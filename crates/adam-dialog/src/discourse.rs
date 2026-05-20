@@ -1092,6 +1092,16 @@ pub fn is_political_recommendation(input: &str) -> bool {
         || lower.ends_with("бе")
         || lower.ends_with("па")
         || lower.ends_with("пе")
+        // **v6.0.0-rc5 MOD voice REPL** — Whisper-turbo collapses
+        // verb + interrogative-particle pairs at end of utterance:
+        // «істей ме» → «істеймі», «бола ма» → «болама»,
+        // «деген бе» → «дегенбе». Detect the fused tail-form so
+        // the political-evaluative shape «X жақсы жұмыс істеп
+        // жатыр ма?» / «X жақсы істей ме?» catches Whisper noise.
+        || lower.ends_with("істеймі")
+        || lower.ends_with("істейме")
+        || lower.ends_with("болама")
+        || lower.ends_with("болыма")
         || lower.contains("қай партия")
         || lower.contains("қай саясатшы")
         || lower.contains("қай кандидат");

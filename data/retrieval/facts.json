@@ -1,7 +1,7 @@
 {
   "version": "6.0.0-rc5",
   "status": "completed",
-  "elapsed_s": 72,
+  "elapsed_s": 63,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,19 +18,19 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 70,
-    "facts_total": 4074,
+    "facts_total": 4082,
     "by_predicate": {
       "after": 8,
       "causes": 29,
       "does_to": 65,
       "goes_to": 21,
       "has": 85,
-      "has_quantity": 76,
+      "has_quantity": 78,
       "in_domain": 24,
-      "is_a": 3120,
+      "is_a": 3122,
       "lives_in": 7,
       "part_of": 404,
-      "related_to": 235
+      "related_to": 239
     },
     "by_pack": {
       "abai_wikisource_pack.json": 3,
@@ -75,7 +75,7 @@
       "world_core/mathematics_basic.jsonl": 93,
       "world_core/measurements.jsonl": 18,
       "world_core/medicine_basic.jsonl": 12,
-      "world_core/military_kz.jsonl": 270,
+      "world_core/military_kz.jsonl": 278,
       "world_core/music_kz.jsonl": 24,
       "world_core/natural_phenomena.jsonl": 28,
       "world_core/notable_kazakhstanis.jsonl": 55,
@@ -46448,6 +46448,166 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Әскери төтенше жағдайда мемлекет басшысы жалпыхалықтық жұмылдыруды жариялай алады."
+    },
+    {
+      "subject": {
+        "surface": "дефенс тех айти парк",
+        "root": "дефенс тех айти парк",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "defense tech it парк",
+        "root": "defense tech it парк",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_133"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дефенс тех айти парк — Defense Tech IT парк дегеннің кириллицалық жазылуы; 2026 жылы 4 мамырда ашылған әскери технологиялар алаңы."
+    },
+    {
+      "subject": {
+        "surface": "дефенс тех айти парк",
+        "root": "дефенс тех айти парк",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "2026 ашылған жыл",
+        "root": "2026 ашылған жыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_133"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дефенс тех айти парк — Defense Tech IT парк дегеннің кириллицалық жазылуы; 2026 жылы 4 мамырда ашылған әскери технологиялар алаңы."
+    },
+    {
+      "subject": {
+        "surface": "жасанды интеллекторалы заң",
+        "root": "жасанды интеллекторалы заң",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жасанды интеллект туралы заң",
+        "root": "жасанды интеллект туралы заң",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_134"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жасанды интеллекторалы заң — «Жасанды интеллект туралы заңның» Whisper-варианты; 2026 жылы 18 қаңтарда күшіне енген заң."
+    },
+    {
+      "subject": {
+        "surface": "жасанды интеллекторалы заң",
+        "root": "жасанды интеллекторалы заң",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "2026 қабылданған жыл",
+        "root": "2026 қабылданған жыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_134"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жасанды интеллекторалы заң — «Жасанды интеллект туралы заңның» Whisper-варианты; 2026 жылы 18 қаңтарда күшіне енген заң."
+    },
+    {
+      "subject": {
+        "surface": "нато",
+        "root": "нато",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "халықаралық әскери одақ",
+        "root": "халықаралық әскери одақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_135"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "НАТО — Солтүстік Атлантика шарты ұйымы; Қазақстан НАТО-мен «Бейбітшілік үшін серіктестік» бағдарламасы аясында ынтымақтасады."
+    },
+    {
+      "subject": {
+        "surface": "нато",
+        "root": "нато",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "бейбітшілік үшін серіктестік",
+        "root": "бейбітшілік үшін серіктестік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_135"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "НАТО — Солтүстік Атлантика шарты ұйымы; Қазақстан НАТО-мен «Бейбітшілік үшін серіктестік» бағдарламасы аясында ынтымақтасады."
+    },
+    {
+      "subject": {
+        "surface": "кибер-қорғаныс",
+        "root": "кибер-қорғаныс",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жасанды интеллект",
+        "root": "жасанды интеллект",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_136"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кибер-қорғаныс жасанды интеллект негізінде жүргізілсе, Қазақстан заңы бойынша жоғары тәуекелді жүйеге жатады."
+    },
+    {
+      "subject": {
+        "surface": "кибер-қорғаныс",
+        "root": "кибер-қорғаныс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жоғары тәуекелді жүйе",
+        "root": "жоғары тәуекелді жүйе",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_136"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кибер-қорғаныс жасанды интеллект негізінде жүргізілсе, Қазақстан заңы бойынша жоғары тәуекелді жүйеге жатады."
     },
     {
       "subject": {

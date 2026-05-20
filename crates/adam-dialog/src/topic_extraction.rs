@@ -3176,6 +3176,12 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "әскери технологиялар алаңы",
     "әуе күштері",
     "әуе шабуылына қарсы қорғаныс",
+    // **v6.0.0-rc5 MOD voice REPL 2026-05-20** — Whisper-turbo
+    // transliterates Latin defense terms into Cyrillic and merges
+    // adjacent words. Adding the captured surfaces so the compound
+    // topic detector finds them on live voice input.
+    "дефенс тех айти парк",
+    "жасанды интеллекторалы заң",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
