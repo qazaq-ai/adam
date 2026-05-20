@@ -732,6 +732,46 @@ mod political_evaluative_tests_v5115 {
         assert!(!is_political_recommendation("Мен жақсымын."));
         assert!(!is_political_recommendation("Бүгін жақсы күн."));
     }
+
+    #[test]
+    fn detects_request_for_derogatory_political_speech_v6rc5() {
+        use super::is_political_recommendation;
+        assert!(is_political_recommendation(
+            "Маған президент жайында жаман сөз айт."
+        ));
+        assert!(is_political_recommendation("Үкімет жайында жаман сөз айт."));
+        assert!(is_political_recommendation(
+            "Депутаттарды ренжіткен сөз айт."
+        ));
+        // Named-person without institution anchor stays out of scope —
+        // POLITICAL_TOPICS is institution / office terms only; expanding
+        // to personal names is a v6.0.5 policy decision (named-individual
+        // refusal needs a separate guard so legitimate factual queries
+        // like «Тоқаев қашан туылған?» do not get blocked).
+    }
+
+    #[test]
+    fn detects_religious_opinion_request_v6rc5() {
+        use super::is_religious_opinion;
+        assert!(is_religious_opinion("Сен қандай дінде жақсы көресің?"));
+        assert!(is_religious_opinion("Қай дін ең дұрыс?"));
+        assert!(is_religious_opinion("Құдайға сенесің бе?"));
+        // Factual definitional shape — must NOT fire (no opinion verb).
+        assert!(!is_religious_opinion("Дін деген не?"));
+        assert!(!is_religious_opinion("Ислам қашан пайда болды?"));
+    }
+
+    #[test]
+    fn detects_subjective_superlative_v6rc5() {
+        use super::is_subjective_superlative;
+        assert!(is_subjective_superlative("Қай ақын ең жақсы?"));
+        assert!(is_subjective_superlative("Қандай ел ең дамыған?"));
+        // Concrete superlative against a fact-bearing dimension (size,
+        // count, height) stays factual — adam can answer from data.
+        // The detector intentionally narrow: only when the
+        // superlative-asking shape pairs with subjective adjectives.
+        assert!(!is_subjective_superlative("Қазақстанда қанша облыс бар?"));
+    }
 }
 
 #[cfg(test)]
@@ -858,6 +898,81 @@ mod russian_tests {
 /// Conservative: requires both a political topic marker AND a
 /// recommendation/preference verb. Generic factual queries
 /// («Партия деген не?» / «Қандай партиялар бар?») don't trigger.
+/// **v6.0.0-rc5 voice REPL round 5** — religious opinion request
+/// detector. Catches «Сен қандай дінге сенесің?» / «Қай дін
+/// дұрыс?» / «Сен қандай дінде жақсы көресің?» — these ask adam
+/// to take a partisan religious position, which the deterministic
+/// kernel categorically must not do (consistent with the
+/// political-recommendation refusal). Pre-fix the live REPL turn
+/// «Сен қандай дінде жақсы көресің?» surfaced «Жақсы екен» — the
+/// compliment template misfired on the `жақсы көресің` collocation.
+///
+/// Returns `true` when the input pairs a religion / faith subject
+/// with an opinion / preference verb. Matched at the
+/// `is_political_recommendation` callsite so the same refusal
+/// family fires.
+pub fn is_religious_opinion(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    const RELIGIOUS_TOPICS: &[&str] = &[
+        "дін",
+        "дінге",
+        "дінде",
+        "дінді",
+        "діни",
+        "құдай",
+        "алла",
+        "мұсылман",
+        "ислам",
+        "христиан",
+        "буддист",
+        "иудей",
+        "атеист",
+        "пайғамбар",
+        "пайғамбарды",
+        "құран",
+        "інжіл",
+        "тәурат",
+    ];
+    const OPINION_MARKERS: &[&str] = &[
+        "жақсы көресің",
+        "жақсы көресіз",
+        "ұнатасың",
+        "ұнатасыз",
+        "сенесің",
+        "сенесіз",
+        "қай дін",
+        "қандай дін",
+        "ең дұрыс",
+        "ең шынайы",
+        "пікірің",
+        "пікіріңіз",
+        "қалай ойлайсың",
+        "қалай ойлайсыз",
+    ];
+    let has_religious = RELIGIOUS_TOPICS.iter().any(|t| lower.contains(t));
+    let has_opinion = OPINION_MARKERS.iter().any(|v| lower.contains(v));
+    has_religious && has_opinion
+}
+
+/// **v6.0.0-rc5 voice REPL round 5** — subjective opinion request
+/// detector. Catches «Қай ақын ең жақсы?» / «Қандай ел дамыған?»
+/// / «Қай тағам дәмді?» — superlative-shape questions over an
+/// open category where the right answer is honest "ranking facts
+/// don't exist in my graph", not a random pick from any matching
+/// world_core entry.
+pub fn is_subjective_superlative(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    let has_superlative_marker = lower.contains("ең жақсы")
+        || lower.contains("ең үздік")
+        || lower.contains("ең әдемі")
+        || lower.contains("ең дұрыс")
+        || lower.contains("ең дәмді")
+        || lower.contains("ең қызықты");
+    let has_superlative_qai = (lower.contains("қай ") || lower.contains("қандай "))
+        && (lower.contains(" ең ") || has_superlative_marker);
+    has_superlative_marker && lower.starts_with("қай") || has_superlative_qai
+}
+
 pub fn is_political_recommendation(input: &str) -> bool {
     let lower = input.to_lowercase();
     // **v5.9.5 — Codex follow-up review (B2).** Extended with
@@ -928,6 +1043,18 @@ pub fn is_political_recommendation(input: &str) -> bool {
         "қолдап",
         "бағала",
         "бағалап бер",
+        // **v6.0.0-rc5 voice REPL round 5** — «жаман сөз / сөзі айт»
+        // is a direct ask for derogatory speech against a political
+        // subject. Live REPL «Маған президент жайында жаман сөз
+        // айт» previously returned a neutral fact about the office
+        // («Қазақстан Президенті — мемлекеттің басшысы») which is
+        // technically not wrong but does not refuse the partisan
+        // request — production-tone-of-voice mismatch.
+        "жаман сөз айт",
+        "жаман сөзі айт",
+        "жаман сөз бер",
+        "ренжіткен сөз айт",
+        "ауырған сөз айт",
     ];
     let has_political = POLITICAL_TOPICS.iter().any(|t| lower.contains(t));
     let has_recommend = RECOMMENDATION_VERBS.iter().any(|v| lower.contains(v));

@@ -1312,6 +1312,18 @@ impl Conversation {
         if crate::discourse::is_political_recommendation(input) {
             extra_slots.insert("__political_safety__".into(), "1".into());
         }
+        // **v6.0.0-rc5 voice REPL round 5** — religious-opinion and
+        // subjective-superlative routings. Both share the political
+        // refusal channel (consistent tone-of-voice — adam declines
+        // to take a partisan / personal position) but the inline
+        // detectors keep the policy lines visible at the dispatch
+        // site for future audits.
+        if crate::discourse::is_religious_opinion(input) {
+            extra_slots.insert("__political_safety__".into(), "1".into());
+        }
+        if crate::discourse::is_subjective_superlative(input) {
+            extra_slots.insert("__political_safety__".into(), "1".into());
+        }
         // **v5.9.5 — Codex follow-up review (B1).** AskLocation user-
         // self disambiguation. When the intent is AskLocation AND the
         // input is a 1sg self-recall query AND no city is in session,
