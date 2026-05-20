@@ -29,8 +29,8 @@
   <img src="https://img.shields.io/badge/p50%20turn%20latency-21%20ms-2EA44F?style=flat-square" alt="latency">
   <img src="https://img.shields.io/badge/RSS-~160%20MB-2EA44F?style=flat-square" alt="rss">
   <img src="https://img.shields.io/badge/GPU-0%25-2EA44F?style=flat-square" alt="gpu">
-  <img src="https://img.shields.io/badge/derived%20facts-37%20716-9CCC65?style=flat-square" alt="derived facts">
-  <img src="https://img.shields.io/badge/world%20core-3427%20curated%20/%204050%20facts%20%2F%2065%20domains-9CCC65?style=flat-square" alt="world core">
+  <img src="https://img.shields.io/badge/derived%20facts-37%20982-9CCC65?style=flat-square" alt="derived facts">
+  <img src="https://img.shields.io/badge/world%20core-3439%20curated%20/%204074%20facts%20%2F%2065%20domains-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/lexicon-25.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/intents-41-2EA44F?style=flat-square" alt="intents">
   <img src="https://img.shields.io/badge/factual_eval_100-0%20hallucinations%20%2F%20100%25%20grounded-2EA44F?style=flat-square" alt="factual eval">

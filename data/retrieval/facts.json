@@ -1,7 +1,7 @@
 {
   "version": "6.0.0-rc5",
   "status": "completed",
-  "elapsed_s": 68,
+  "elapsed_s": 72,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,19 +18,19 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 70,
-    "facts_total": 4050,
+    "facts_total": 4074,
     "by_predicate": {
       "after": 8,
       "causes": 29,
       "does_to": 65,
       "goes_to": 21,
-      "has": 82,
-      "has_quantity": 74,
+      "has": 85,
+      "has_quantity": 76,
       "in_domain": 24,
-      "is_a": 3111,
+      "is_a": 3120,
       "lives_in": 7,
-      "part_of": 402,
-      "related_to": 227
+      "part_of": 404,
+      "related_to": 235
     },
     "by_pack": {
       "abai_wikisource_pack.json": 3,
@@ -75,7 +75,7 @@
       "world_core/mathematics_basic.jsonl": 93,
       "world_core/measurements.jsonl": 18,
       "world_core/medicine_basic.jsonl": 12,
-      "world_core/military_kz.jsonl": 246,
+      "world_core/military_kz.jsonl": 270,
       "world_core/music_kz.jsonl": 24,
       "world_core/natural_phenomena.jsonl": 28,
       "world_core/notable_kazakhstanis.jsonl": 55,
@@ -45968,6 +45968,486 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Демалыс — әскери қызметшіге заңдар мен жарғыларға сәйкес берілетін уақыт."
+    },
+    {
+      "subject": {
+        "surface": "defense tech it парк",
+        "root": "defense tech it парк",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери технологиялар алаңы",
+        "root": "әскери технологиялар алаңы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_121"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Defense Tech IT парк — Қазақстан Республикасы Қорғаныс министрлігінің әскери технологиялар саласындағы инновацияларды дамыту үшін ашылған арнайы технологиялық алаңы."
+    },
+    {
+      "subject": {
+        "surface": "defense tech it парк",
+        "root": "defense tech it парк",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қорғаныс министрлігі",
+        "root": "қорғаныс министрлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_121"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Defense Tech IT парк — Қазақстан Республикасы Қорғаныс министрлігінің әскери технологиялар саласындағы инновацияларды дамыту үшін ашылған арнайы технологиялық алаңы."
+    },
+    {
+      "subject": {
+        "surface": "defense tech it парк",
+        "root": "defense tech it парк",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "2026 ашылған жыл",
+        "root": "2026 ашылған жыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_122"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Defense Tech IT парк 2026 жылдың 4 мамырында ашылды."
+    },
+    {
+      "subject": {
+        "surface": "жасанды интеллект туралы заң",
+        "root": "жасанды интеллект туралы заң",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекеттік заң",
+        "root": "мемлекеттік заң",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_123"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанның жасанды интеллект туралы заңы 2026 жылы 18 қаңтарда күшіне енді."
+    },
+    {
+      "subject": {
+        "surface": "жасанды интеллект туралы заң",
+        "root": "жасанды интеллект туралы заң",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "2026 қабылданған жыл",
+        "root": "2026 қабылданған жыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_123"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанның жасанды интеллект туралы заңы 2026 жылы 18 қаңтарда күшіне енді."
+    },
+    {
+      "subject": {
+        "surface": "қорғаныс жасанды интеллекті",
+        "root": "қорғаныс жасанды интеллекті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жоғары тәуекелді жүйе",
+        "root": "жоғары тәуекелді жүйе",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_124"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қорғаныс саласындағы жасанды интеллект жүйелері Қазақстан заңы бойынша жоғары тәуекелді болып жіктеледі."
+    },
+    {
+      "subject": {
+        "surface": "қорғаныс жасанды интеллекті",
+        "root": "қорғаныс жасанды интеллекті",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жасанды интеллект туралы заң",
+        "root": "жасанды интеллект туралы заң",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_124"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қорғаныс саласындағы жасанды интеллект жүйелері Қазақстан заңы бойынша жоғары тәуекелді болып жіктеледі."
+    },
+    {
+      "subject": {
+        "surface": "кибер-қорғаныс",
+        "root": "кибер-қорғаныс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қорғаныс саласы",
+        "root": "қорғаныс саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_125"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кибер-қорғаныс — мемлекеттік және әскери ақпараттық жүйелерді кибершабуылдардан қорғауға бағытталған шаралар жиынтығы."
+    },
+    {
+      "subject": {
+        "surface": "кибер-қорғаныс",
+        "root": "кибер-қорғаныс",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ақпараттық қауіпсіздік",
+        "root": "ақпараттық қауіпсіздік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_125"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кибер-қорғаныс — мемлекеттік және әскери ақпараттық жүйелерді кибершабуылдардан қорғауға бағытталған шаралар жиынтығы."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "ұжымдық қауіпсіздік шарты ұйымы",
+        "root": "ұжымдық қауіпсіздік шарты ұйымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_126"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан Ұжымдық қауіпсіздік туралы шарт ұйымына (ҰҚШҰ) мүше мемлекет."
+    },
+    {
+      "subject": {
+        "surface": "ұжымдық қауіпсіздік шарты ұйымы",
+        "root": "ұжымдық қауіпсіздік шарты ұйымы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "халықаралық әскери одақ",
+        "root": "халықаралық әскери одақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_126"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан Ұжымдық қауіпсіздік туралы шарт ұйымына (ҰҚШҰ) мүше мемлекет."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "шанхай ынтымақтастық ұйымы",
+        "root": "шанхай ынтымақтастық ұйымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_127"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан Шанхай ынтымақтастық ұйымына (ШЫҰ) мүше мемлекет."
+    },
+    {
+      "subject": {
+        "surface": "шанхай ынтымақтастық ұйымы",
+        "root": "шанхай ынтымақтастық ұйымы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "халықаралық ұйым",
+        "root": "халықаралық ұйым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_127"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан Шанхай ынтымақтастық ұйымына (ШЫҰ) мүше мемлекет."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "бейбітшілік үшін серіктестік",
+        "root": "бейбітшілік үшін серіктестік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_128"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан НАТО-мен «Бейбітшілік үшін серіктестік» бағдарламасы аясында ынтымақтасады."
+    },
+    {
+      "subject": {
+        "surface": "бейбітшілік үшін серіктестік",
+        "root": "бейбітшілік үшін серіктестік",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "нато",
+        "root": "нато",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_128"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан НАТО-мен «Бейбітшілік үшін серіктестік» бағдарламасы аясында ынтымақтасады."
+    },
+    {
+      "subject": {
+        "surface": "әскери доктрина",
+        "root": "әскери доктрина",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "стратегиялық құжат",
+        "root": "стратегиялық құжат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_129"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан Республикасының Әскери доктринасы елдің әскери қауіпсіздігі мен қорғанысының негізгі мақсаттарын анықтайды."
+    },
+    {
+      "subject": {
+        "surface": "әскери доктрина",
+        "root": "әскери доктрина",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери қауіпсіздік",
+        "root": "әскери қауіпсіздік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_129"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан Республикасының Әскери доктринасы елдің әскери қауіпсіздігі мен қорғанысының негізгі мақсаттарын анықтайды."
+    },
+    {
+      "subject": {
+        "surface": "беспилотты ұшу аппараты",
+        "root": "беспилотты ұшу аппараты",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әскери техника",
+        "root": "әскери техника",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_130"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Беспилотты ұшу аппараттары (БПЛА) заманауи әскери операцияларда барлау және соққы беру үшін қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "беспилотты ұшу аппараты",
+        "root": "беспилотты ұшу аппараты",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "әскери барлау",
+        "root": "әскери барлау",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_130"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Беспилотты ұшу аппараттары (БПЛА) заманауи әскери операцияларда барлау және соққы беру үшін қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "жер әскерлері",
+        "root": "жер әскерлері",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_131"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан Республикасының Қарулы Күштері Жер әскерлерін, Әуе күштерін, Әуе шабуылына қарсы қорғаныс күштерін және Бөлімдер мен әскери құралымдарды қамтиды."
+    },
+    {
+      "subject": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "әуе күштері",
+        "root": "әуе күштері",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_131"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан Республикасының Қарулы Күштері Жер әскерлерін, Әуе күштерін, Әуе шабуылына қарсы қорғаныс күштерін және Бөлімдер мен әскери құралымдарды қамтиды."
+    },
+    {
+      "subject": {
+        "surface": "қарулы күштер",
+        "root": "қарулы күштер",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "әуе шабуылына қарсы қорғаныс",
+        "root": "әуе шабуылына қарсы қорғаныс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_131"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан Республикасының Қарулы Күштері Жер әскерлерін, Әуе күштерін, Әуе шабуылына қарсы қорғаныс күштерін және Бөлімдер мен әскери құралымдарды қамтиды."
+    },
+    {
+      "subject": {
+        "surface": "жалпыхалықтық жұмылдыру",
+        "root": "жалпыхалықтық жұмылдыру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекеттік шара",
+        "root": "мемлекеттік шара",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_132"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери төтенше жағдайда мемлекет басшысы жалпыхалықтық жұмылдыруды жариялай алады."
+    },
+    {
+      "subject": {
+        "surface": "жалпыхалықтық жұмылдыру",
+        "root": "жалпыхалықтық жұмылдыру",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "төтенше жағдай",
+        "root": "төтенше жағдай",
+        "pos": "noun"
+      },
+      "pattern": "world_core/military_kz",
+      "source": {
+        "pack": "world_core/military_kz.jsonl",
+        "sample_id": "mil_kz_132"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әскери төтенше жағдайда мемлекет басшысы жалпыхалықтық жұмылдыруды жариялай алады."
     },
     {
       "subject": {
