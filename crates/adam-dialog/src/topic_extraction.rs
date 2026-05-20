@@ -3128,6 +3128,7 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "көмірқышқыл газ",
     "сутегі-гелий атмосферасы",
     "юпитердегі ауа",
+    "ішкі теңіз",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
@@ -3138,6 +3139,21 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
 pub(crate) fn multiword_entity_hint(input: &str) -> Option<String> {
     let lowered = input.to_lowercase();
     let lowered_tokens: Vec<&str> = lowered.split_whitespace().collect();
+    // **v6.0.0-rc4 morning 2026-05-20** — Y-side suppression for
+    // «X қандай Y?» shape. In `Күн қандай аспан денесі?` the
+    // multiword «аспан денесі» is the *category* (Y), not the
+    // subject (X) — Adam should retrieve facts about Күн, not
+    // about «аспан денесі». Pre-fix the longest-first cascade
+    // returned «аспан денесі» because it's a registered compound,
+    // overriding the single-word «күн». When the input contains
+    // the «қандай / не нәрсе / не зат» marker, we skip multiword
+    // matches whose match position is AFTER the marker and prefer
+    // matches whose position is BEFORE it (or single-token
+    // fallback). Same fix unlocks `astro_002` in `factual_eval_100`.
+    let qandai_pos = lowered
+        .find(" қандай ")
+        .or_else(|| lowered.find(" не нәрсе"))
+        .or_else(|| lowered.find(" не зат"));
     // **v4.79.0** — actually iterate longest-first so multi-token
     // compounds containing shorter ones (e.g. «cargo build --release»
     // vs «cargo build») resolve to the most specific match. Earlier
@@ -3164,7 +3180,17 @@ pub(crate) fn multiword_entity_hint(input: &str) -> Option<String> {
         // punctuation that breaks token equality. Substring is the
         // right semantic for `::`-paths.
         if entity.contains(' ') || entity.contains("::") {
-            if lowered.contains(**entity) {
+            if let Some(match_pos) = lowered.find(**entity) {
+                // Y-side suppression: if «қандай / не нәрсе / не зат»
+                // marker exists and the multiword match starts AFTER
+                // it, this compound is the category (Y), not the
+                // subject (X). Skip — the single-word fallback (X
+                // before the marker) is the right topic.
+                if let Some(qp) = qandai_pos {
+                    if match_pos > qp {
+                        continue;
+                    }
+                }
                 return Some((**entity).to_string());
             }
         } else if lowered_tokens.contains(*entity) {

@@ -105,7 +105,7 @@ Validator checks:
 
 ## Current scale (v6.0.0-rc4)
 
-**Live totals: 3424 entries / 4044 facts across 65 domains**, all `approved`
+**Live totals: 3425 entries / 4046 facts across 65 domains**, all `approved`
 by `shaman`. v6.0.0-rc4 adds `kz_constitution.jsonl` (32 entries on the 1995
 Constitution: 9 разделов, president 7-year mandate, parliament Senate+Mäjilis,
 languages, symbols) + `programming_java.jsonl` (30 entries on the kk.wikibooks

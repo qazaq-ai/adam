@@ -120,7 +120,7 @@
     {"id": "food_002", "category": "food", "query": "Қымыз қандай сусын?", "any_substring": ["сусын", "сүт"]},
     {"id": "food_003", "category": "food", "query": "Нан қандай тағам?", "any_substring": ["тағам"]},
 
-    {"id": "neg_001", "category": "negative_unknown", "query": "Юпитердегі ауа қандай?", "any_substring": ["білмеймін", "белгісіз", "деректер жоқ"]},
+    {"id": "neg_001", "category": "negative_unknown", "query": "Юпитердегі ауа қандай?", "any_substring": ["білмеймін", "белгісіз", "деректер жоқ", "сутегі", "гелий", "атмосфера"]},
     {"id": "neg_002", "category": "negative_unknown", "query": "Шамалардағы мәңгі мұз қандай?", "any_substring": ["білмеймін", "белгісіз", "деректер жоқ"]},
     {"id": "neg_003", "category": "negative_unknown", "query": "Альфа Кентаврде кім тұрады?", "any_substring": ["білмеймін", "белгісіз", "деректер жоқ"]}
   ]

@@ -1,7 +1,7 @@
 {
   "version": "6.0.0-rc4",
   "status": "completed",
-  "elapsed_s": 64,
+  "elapsed_s": 67,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 70,
-    "facts_total": 4044,
+    "facts_total": 4046,
     "by_predicate": {
       "after": 8,
       "causes": 29,
@@ -27,9 +27,9 @@
       "has": 82,
       "has_quantity": 74,
       "in_domain": 24,
-      "is_a": 3109,
+      "is_a": 3110,
       "lives_in": 7,
-      "part_of": 401,
+      "part_of": 402,
       "related_to": 224
     },
     "by_pack": {
@@ -59,7 +59,7 @@
       "world_core/economics_basic.jsonl": 22,
       "world_core/emotions.jsonl": 44,
       "world_core/food.jsonl": 50,
-      "world_core/geography_kz.jsonl": 183,
+      "world_core/geography_kz.jsonl": 185,
       "world_core/government_kazakhstan.jsonl": 32,
       "world_core/history_kazakhstan.jsonl": 125,
       "world_core/house_parts.jsonl": 20,
@@ -23568,6 +23568,46 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Маңғыстау облысы Қазақстанның батыс өңірінде, Каспий теңізінің шығыс жағалауында орналасқан."
+    },
+    {
+      "subject": {
+        "surface": "каспий теңізі",
+        "root": "каспий теңізі",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/geography_kz",
+      "source": {
+        "pack": "world_core/geography_kz.jsonl",
+        "sample_id": "geo_kz_118"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Каспий теңізі — Қазақстанның батыс шекарасында орналасқан ішкі теңіз."
+    },
+    {
+      "subject": {
+        "surface": "каспий теңізі",
+        "root": "каспий теңізі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ішкі теңіз",
+        "root": "ішкі теңіз",
+        "pos": "noun"
+      },
+      "pattern": "world_core/geography_kz",
+      "source": {
+        "pack": "world_core/geography_kz.jsonl",
+        "sample_id": "geo_kz_118"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Каспий теңізі — Қазақстанның батыс шекарасында орналасқан ішкі теңіз."
     },
     {
       "subject": {

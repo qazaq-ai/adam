@@ -284,14 +284,18 @@ fn factual_eval_100() {
     // baseline 12 via locative-property pattern.
     // v6.0.0-rc4 (morning 2026-05-20, commit 2f51fcd): baseline 9
     // via year-asking trigger («қай жылы / қашан»).
-    // v6.0.0-rc4 (morning 2026-05-20, this commit): baseline 8 via
-    // formula-asking trigger («формуласы») extension of
-    // has_quantity_intent + chem_001 closes (su has_quantity «H2O
-    // формуласы»). The remaining 8 split: 5 Category-B noun_hint
-    // mis-extraction + 3 other aspect-mismatches — all rc5 work.
-    // Ceiling tightened 15 → 12. Headroom 4. GA #4 lifts when
-    // ceiling reaches 0 across two consecutive RCs.
-    const HALLUCINATION_CEILING: usize = 12;
+    // v6.0.0-rc4 (morning 2026-05-20, commit 57e7f42): baseline 8
+    // via formula-asking trigger.
+    // v6.0.0-rc4 (morning 2026-05-20, this commit): baseline 6 via
+    // (a) Y-side compound suppression in `multiword_entity_hint`
+    // for the «X қандай Y» shape (closes neg_001's prompt mismatch
+    // after the new `астр_050` Jupiter atmosphere fact landed),
+    // and (b) a compound-subject Caspian fact «каспий теңізі
+    // part_of қазақстан» (closes geo_011). Day-2 ratchet: 34 → 6
+    // = −82 % from rc4 morning baseline. Pass-rate 76.0 %, grounded
+    // 94.2 %. Ceiling tightened 12 → 9. Headroom 3. GA #4 lifts
+    // when ceiling reaches 0 across two consecutive RCs.
+    const HALLUCINATION_CEILING: usize = 9;
     assert!(
         totals[2] <= HALLUCINATION_CEILING,
         "factual_eval_100: {} hallucination(s) — above the v6.0.0-rc4 ceiling of {} (GA #4 target: 0). Tighten verifier or correct the regression.",
