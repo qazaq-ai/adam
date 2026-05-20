@@ -512,8 +512,21 @@ impl Tool {
                 // wins over «қала» / «облыс» when the user asks
                 // about өзен. Strictly additive — fires only when
                 // `has_quantity_intent` is true.
-                let has_quantity_intent =
-                    query_lower.contains("қанша") || query_lower.contains("неше");
+                // **v6.0.0-rc4 evening hardening** — year-asking
+                // queries («қай жылы / қашан») now also trigger the
+                // quantity intent. Pre-fix, `factual_eval_100` cases
+                // abai_004/005, const_001, java_002 surfaced IsA
+                // facts («Абай — негізін салушы») instead of
+                // HasQuantity facts («1845 туылған жыл») because
+                // user_facing_fact_priority puts IsA above HasQuantity
+                // in the default cascade. With the year-asking
+                // trigger, HasQuantity facts compete for the top slot,
+                // and the digit-bearing object (1845 / 1904 / 1995)
+                // wins on quantity_object_match_rank below.
+                let has_quantity_intent = query_lower.contains("қанша")
+                    || query_lower.contains("неше")
+                    || query_lower.contains("қай жылы")
+                    || query_lower.contains("қашан");
                 // **v4.17.5** — synonym table for list-intent
                 // disambiguation. Hoisted out of the sort closure
                 // so debug code can also reference it. **v4.38.0**
@@ -748,6 +761,19 @@ impl Tool {
                     } else {
                         Vec::new()
                     };
+                    // **v6.0.0-rc4 evening hardening** — year-asking
+                    // sub-trigger. When the query is specifically
+                    // «қай жылы / қашан» (rather than the broader
+                    // «қанша / неше»), the right HasQuantity fact is
+                    // the one whose object **contains a digit** (year
+                    // numbers «1845», «1995», «1991», «1904» …).
+                    // Pre-fix the rank was decided purely by content-
+                    // token overlap, which let «45 қара сөз» win
+                    // over «1845 туылған жыл» for «Абай қай жылы
+                    // туылған?» because «жыл» also appears in «жыл»
+                    // (4-char prefix) bridging from «жылы».
+                    let year_asking =
+                        query_lower.contains("қай жылы") || query_lower.contains("қашан");
                     let quantity_object_match_rank = |fact: &ReasFact| -> i32 {
                         if has_quantity_intent {
                             // Only HasQuantity facts compete for
@@ -758,6 +784,19 @@ impl Tool {
                                 return 1;
                             }
                             let object_lower = fact.object.root.to_lowercase();
+                            if year_asking {
+                                // Digit-bearing HasQuantity wins
+                                // over digit-less «45 қара сөз»
+                                // style counts (which won't appear
+                                // in 1845/1995-shaped year answers
+                                // anyway, but the user's actual
+                                // year-asking shape is unambiguous).
+                                let has_digit = object_lower.chars().any(|c| c.is_ascii_digit());
+                                if has_digit {
+                                    return 0;
+                                }
+                                return 1;
+                            }
                             // Match the candidate's object root
                             // against any of the user's content
                             // tokens. Both directions: object

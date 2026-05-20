@@ -280,16 +280,16 @@ fn factual_eval_100() {
     // baseline 13 via definitional-pattern extension («Y қандай Y»
     // / «X не нәрсе») in the same `is_specific_factual_query`
     // predicate.
-    // v6.0.0-rc4 (evening hardening 2026-05-19, this commit):
-    // baseline 12 via locative-property pattern «X-дегі/дағы Y
-    // қандай?» — suppresses corpus-sample fallback for sub-property
-    // queries (neg_002 closed). Companion grounded-fact suppression
-    // explored AND rolled back (broke 4 legitimate
-    // `Қазақстандағы өзендер/көлдер/шөлдер/таулар` PartOf-derived
-    // answers). Ceiling tightened 20 → 18 — leaves a 6-case
-    // headroom. GA #4 lifts when the ceiling reaches 0 across two
-    // consecutive RCs.
-    const HALLUCINATION_CEILING: usize = 18;
+    // v6.0.0-rc4 (evening hardening 2026-05-19, commit 31ba9ae):
+    // baseline 12 via locative-property pattern.
+    // v6.0.0-rc4 (morning 2026-05-20, this commit): baseline 9 via
+    // year-asking trigger («қай жылы / қашан») on
+    // has_quantity_intent + digit-bonus in quantity_object_match_rank
+    // — closes abai_004/005, java_002. The remaining 9 are split
+    // between Category-B noun_hint mis-extraction (5) and other
+    // aspect-mismatches (4). Ceiling tightened 18 → 15. Headroom 6.
+    // GA #4 lifts when ceiling reaches 0 across two consecutive RCs.
+    const HALLUCINATION_CEILING: usize = 15;
     assert!(
         totals[2] <= HALLUCINATION_CEILING,
         "factual_eval_100: {} hallucination(s) — above the v6.0.0-rc4 ceiling of {} (GA #4 target: 0). Tighten verifier or correct the regression.",
