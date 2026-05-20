@@ -1,7 +1,7 @@
 {
-  "version": "6.0.0-rc4",
+  "version": "6.0.0-rc5",
   "status": "completed",
-  "elapsed_s": 67,
+  "elapsed_s": 68,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 70,
-    "facts_total": 4046,
+    "facts_total": 4050,
     "by_predicate": {
       "after": 8,
       "causes": 29,
@@ -27,10 +27,10 @@
       "has": 82,
       "has_quantity": 74,
       "in_domain": 24,
-      "is_a": 3110,
+      "is_a": 3111,
       "lives_in": 7,
       "part_of": 402,
-      "related_to": 224
+      "related_to": 227
     },
     "by_pack": {
       "abai_wikisource_pack.json": 3,
@@ -66,7 +66,7 @@
       "world_core/informatics_basic.jsonl": 40,
       "world_core/kazakh_cuisine.jsonl": 26,
       "world_core/kinship_extended.jsonl": 20,
-      "world_core/kz_constitution.jsonl": 49,
+      "world_core/kz_constitution.jsonl": 53,
       "world_core/kz_industry.jsonl": 208,
       "world_core/kz_literature.jsonl": 120,
       "world_core/language_features.jsonl": 78,
@@ -29848,6 +29848,86 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Қазақстан Республикасының ақша бірлігі — теңге."
+    },
+    {
+      "subject": {
+        "surface": "теңге",
+        "root": "теңге",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұлттық валюта",
+        "root": "ұлттық валюта",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_constitution",
+      "source": {
+        "pack": "world_core/kz_constitution.jsonl",
+        "sample_id": "const_033"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанның ұлттық валютасы — теңге."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "теңге",
+        "root": "теңге",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_constitution",
+      "source": {
+        "pack": "world_core/kz_constitution.jsonl",
+        "sample_id": "const_033"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанның ұлттық валютасы — теңге."
+    },
+    {
+      "subject": {
+        "surface": "ұлттық валюта",
+        "root": "ұлттық валюта",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "теңге",
+        "root": "теңге",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_constitution",
+      "source": {
+        "pack": "world_core/kz_constitution.jsonl",
+        "sample_id": "const_034"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ұлттық валюта — теңге."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан ұлттық валютасы",
+        "root": "қазақстан ұлттық валютасы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "теңге",
+        "root": "теңге",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_constitution",
+      "source": {
+        "pack": "world_core/kz_constitution.jsonl",
+        "sample_id": "const_034"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ұлттық валюта — теңге."
     },
     {
       "subject": {

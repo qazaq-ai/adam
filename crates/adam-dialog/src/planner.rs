@@ -2571,6 +2571,9 @@ fn is_specific_factual_query(joined: &str) -> bool {
         || joined.contains("формуласы")
         || joined.contains("елордасы")
         || joined.contains("халық саны")
+        || joined.contains("ұлттық валюта")
+        || joined.contains("ұлттық тіл")
+        || joined.contains("ұлттық рәміз")
     {
         return true;
     }

@@ -3134,6 +3134,13 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "қазақстан конституциясы",
     "су химиялық формуласы",
     "ссгпо",
+    // **v6.0.0-rc5 finalisation 2026-05-20** — novel-smoke
+    // findings: currency / employment-vs-physics word-sense
+    // disambiguation.
+    "ұлттық валюта",
+    "жұмыс күні",
+    "жұмыс іздегенде",
+    "қазақстан ұлттық валютасы",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
