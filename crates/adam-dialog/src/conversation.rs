@@ -2846,14 +2846,31 @@ impl Conversation {
                 if let Some(person) = crate::language_core::canonical_person_entity(name) {
                     self.session.insert("name".into(), person.canonical.clone());
                     self.session.insert("name_id".into(), person.id.clone());
-                    // **v4.18.0** — also store the respectful
-                    // address form. Adam uses `{name_respect}` in
-                    // most templates so every post-introduction
-                    // turn addresses the user as «Дәке / Мәке /
-                    // Сәке» per Kazakh tradition. Vowel-initial
-                    // names fall back to the literal name.
-                    let respect_opt =
-                        crate::language_core::kazakh_respectful_address(&person.canonical);
+                    // **v6.0.0-rc5 MOD voice REPL 2026-05-20** —
+                    // gender-aware respectful form. Female names
+                    // get «-жан» / role-aware «апай»; male / unknown
+                    // names keep the legacy «-әке» honorific. Also
+                    // stash the detected gender so downstream
+                    // templates (and future role-aware addressing)
+                    // can read it.
+                    let gender = crate::language_core::kazakh_name_gender(&person.canonical);
+                    let role = self.session.get("occupation").map(|s| s.as_str());
+                    let respect_opt = crate::language_core::kazakh_respectful_address_gendered(
+                        &person.canonical,
+                        gender,
+                        role,
+                    );
+                    if let Some(g) = gender {
+                        self.session.insert(
+                            "user_gender".into(),
+                            match g {
+                                crate::language_core::KazakhNameGender::Male => "male".to_string(),
+                                crate::language_core::KazakhNameGender::Female => {
+                                    "female".to_string()
+                                }
+                            },
+                        );
+                    }
                     let respect = respect_opt
                         .clone()
                         .unwrap_or_else(|| person.canonical.clone());
@@ -2882,10 +2899,25 @@ impl Conversation {
                 } else {
                     self.session.insert("name".into(), name.clone());
                     self.session.remove("name_id");
-                    // **v4.18.0** — same respectful form for non-
-                    // canonical-registry names (covers any
-                    // person-name shape the FST recovered).
-                    let respect_opt = crate::language_core::kazakh_respectful_address(name);
+                    // **v6.0.0-rc5 MOD voice REPL 2026-05-20** —
+                    // gender-aware respectful form for non-canonical-
+                    // registry names too.
+                    let gender = crate::language_core::kazakh_name_gender(name);
+                    let role = self.session.get("occupation").map(|s| s.as_str());
+                    let respect_opt = crate::language_core::kazakh_respectful_address_gendered(
+                        name, gender, role,
+                    );
+                    if let Some(g) = gender {
+                        self.session.insert(
+                            "user_gender".into(),
+                            match g {
+                                crate::language_core::KazakhNameGender::Male => "male".to_string(),
+                                crate::language_core::KazakhNameGender::Female => {
+                                    "female".to_string()
+                                }
+                            },
+                        );
+                    }
                     let respect = respect_opt.clone().unwrap_or_else(|| name.clone());
                     self.session.insert("name_respect".into(), respect);
                     if let Some(distinct) = respect_opt {

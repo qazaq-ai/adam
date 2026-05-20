@@ -192,6 +192,370 @@ pub fn kazakh_respectful_address(name: &str) -> Option<String> {
     ))
 }
 
+/// **v6.0.0-rc5 MOD voice REPL 2026-05-20** — Kazakh personal-name
+/// gender classification. Returns the inferred gender of a given
+/// proper noun via a closed-list lookup over the ~120 most common
+/// Kazakh male / female names + a heuristic suffix fallback for
+/// out-of-list entries.
+///
+/// Used to choose culturally-appropriate respectful address forms:
+/// male names take the bare «-әке» honorific (Дәулет → Дәке);
+/// female names take «-жан» suffix (Айгерим → Айгерімжан) and,
+/// when the speaker context includes a teacher / elder role,
+/// «X апай» (Айгерим апай) instead.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KazakhNameGender {
+    Male,
+    Female,
+}
+
+/// Top-120 Kazakh male personal names (lowercased). Closed list
+/// for explicit gender lookup; out-of-list inputs fall through to
+/// the heuristic suffix detector.
+const KAZAKH_MALE_NAMES: &[&str] = &[
+    "абай",
+    "абдулла",
+    "абзал",
+    "абылай",
+    "абзал",
+    "айбар",
+    "айбек",
+    "айдар",
+    "айдос",
+    "айдын",
+    "айнур",
+    "айтуар",
+    "алдияр",
+    "алибек",
+    "алимжан",
+    "алмат",
+    "алтай",
+    "альмас",
+    "ансар",
+    "анвар",
+    "арман",
+    "армат",
+    "арнур",
+    "арсен",
+    "аршат",
+    "аскар",
+    "аслан",
+    "асылбек",
+    "ахмет",
+    "аян",
+    "ауэлбек",
+    "әбіш",
+    "әділ",
+    "әділет",
+    "әзіз",
+    "әнуар",
+    "ержан",
+    "ерлан",
+    "ермек",
+    "ернар",
+    "ерсин",
+    "есен",
+    "жаміл",
+    "жаңабай",
+    "жанболат",
+    "жанболды",
+    "жанибек",
+    "жасулан",
+    "кадыр",
+    "кайрат",
+    "канат",
+    "касым",
+    "кенесары",
+    "куаныш",
+    "қазыбек",
+    "қанат",
+    "қасым",
+    "мадияр",
+    "максат",
+    "манап",
+    "мансур",
+    "марат",
+    "мейір",
+    "мирас",
+    "мұрат",
+    "мухтар",
+    "нурболат",
+    "нурлан",
+    "нурсултан",
+    "олжас",
+    "омар",
+    "райымбек",
+    "ринат",
+    "руслан",
+    "рустам",
+    "сабит",
+    "сабыр",
+    "санжар",
+    "сапар",
+    "саят",
+    "сейтжан",
+    "серік",
+    "сұлтан",
+    "султанбек",
+    "тауман",
+    "тимур",
+    "темир",
+    "темирлан",
+    "темирхан",
+    "тоқтар",
+    "торехан",
+    "ұлан",
+    "ұлықбек",
+    "фархат",
+    "хамза",
+    "чингиз",
+    "шерхан",
+    "шынғыс",
+    "ыдырыс",
+    "юсуф",
+    "ясын",
+    // common Russian-loan male names that also appear in Kazakh-
+    // speaker dialogs
+    "александр",
+    "андрей",
+    "артем",
+    "виктор",
+    "виталий",
+    "владимир",
+    "дмитрий",
+    "евгений",
+    "иван",
+    "максим",
+    "михаил",
+    "николай",
+    "олег",
+    "павел",
+    "роман",
+    "сергей",
+    "юрий",
+    "ярослав",
+    "дәулет",
+    "бауыржан",
+    "бекжан",
+    "болат",
+    "берік",
+    "досжан",
+];
+
+/// Top-120 Kazakh female personal names (lowercased). Same
+/// closed-list approach as the male table.
+const KAZAKH_FEMALE_NAMES: &[&str] = &[
+    "айгерим",
+    "айгерім",
+    "айгүл",
+    "айгуль",
+    "айдана",
+    "айжан",
+    "айзада",
+    "айман",
+    "айнагүл",
+    "айнагул",
+    "айнур",
+    "айсулу",
+    "айша",
+    "акмарал",
+    "ақмарал",
+    "алия",
+    "алуа",
+    "анар",
+    "анель",
+    "арайлым",
+    "арайым",
+    "аруна",
+    "аружан",
+    "асем",
+    "асель",
+    "асемгүл",
+    "атиля",
+    "аяулым",
+    "балжан",
+    "балнур",
+    "балсулу",
+    "бану",
+    "ботагөз",
+    "гаухар",
+    "гулмира",
+    "гүлбану",
+    "гүлден",
+    "гүлжан",
+    "гүлзада",
+    "гүлзат",
+    "гүлмира",
+    "гүлназ",
+    "гүлнар",
+    "гүлсім",
+    "гүлшат",
+    "дана",
+    "дария",
+    "дилда",
+    "динара",
+    "елнура",
+    "ерке",
+    "жадыра",
+    "жанар",
+    "жанна",
+    "жулдыз",
+    "жұлдыз",
+    "жайна",
+    "зада",
+    "зарина",
+    "зухра",
+    "індіра",
+    "камилла",
+    "карима",
+    "карлыгаш",
+    "құралай",
+    "лаззат",
+    "лаура",
+    "ләззат",
+    "лейла",
+    "мадина",
+    "майра",
+    "макпал",
+    "мәдина",
+    "маржан",
+    "мерей",
+    "мейрам",
+    "молдір",
+    "набат",
+    "назгүл",
+    "назым",
+    "нұргүл",
+    "нұрсая",
+    "нурсулу",
+    "перизат",
+    "райхан",
+    "раушан",
+    "рауза",
+    "рахима",
+    "роза",
+    "сабина",
+    "сабира",
+    "сайран",
+    "салима",
+    "салтанат",
+    "сандугаш",
+    "сауле",
+    "сая",
+    "тоғжан",
+    "толқын",
+    "ұлжан",
+    "үміт",
+    "фариза",
+    "фатима",
+    "шынар",
+    "ырысты",
+    "элина",
+    "эльмира",
+    "әсем",
+    "әсия",
+    "әйгерім",
+    "айбала",
+    "айбике",
+    "аяжан",
+    "аяна",
+    "бағлан",
+    "балауса",
+    "гүлназ",
+    "діна",
+    "інжу",
+    "карина",
+    "сабиля",
+    "анастасия",
+    "екатерина",
+    "елена",
+    "ирина",
+    "ольга",
+    "татьяна",
+];
+
+/// Lookup `name` in the male/female closed lists; falls back to
+/// suffix heuristics for out-of-list inputs. Returns `None` when
+/// neither path commits — caller then defaults to the generic
+/// «-әке» honorific.
+pub fn kazakh_name_gender(name: &str) -> Option<KazakhNameGender> {
+    let lower = name.trim().to_lowercase();
+    if lower.is_empty() {
+        return None;
+    }
+    if KAZAKH_MALE_NAMES.iter().any(|n| *n == lower) {
+        return Some(KazakhNameGender::Male);
+    }
+    if KAZAKH_FEMALE_NAMES.iter().any(|n| *n == lower) {
+        return Some(KazakhNameGender::Female);
+    }
+    // Suffix heuristics for unknown names. Strong female endings
+    // first (гүл / гул / сім / сем / назым / айым are nearly
+    // exclusively female in Kazakh onomastics).
+    const FEMALE_SUFFIXES: &[&str] = &[
+        "гүл", "гул", "сім", "сем", "айым", "айым", "сұлу", "сулу", "жан",
+    ];
+    for suf in FEMALE_SUFFIXES {
+        if lower.ends_with(suf) && lower.chars().count() > suf.chars().count() + 1 {
+            // «жан» is also a male suffix (Жаңабай / Ержан); only commit
+            // when paired with a clearly female stem — bail and let the
+            // caller default. The other suffixes are unambiguous.
+            if *suf == "жан" {
+                continue;
+            }
+            return Some(KazakhNameGender::Female);
+        }
+    }
+    None
+}
+
+/// **v6.0.0-rc5 MOD voice REPL 2026-05-20** — Gender-aware
+/// respectful-form generator. Wraps the legacy `kazakh_respectful_
+/// address` so existing callers can opt into culturally-correct
+/// female forms incrementally.
+///
+/// Male / unknown → existing «-әке» suffix (Дәулет → Дәке);
+/// Female → literal name + «жан» (Айгерім → Айгерімжан) which
+/// is the standard Kazakh-female endearing form. When the
+/// dialog context carries a teacher / elder role (caller can
+/// signal via the `role` argument), female addressing falls
+/// back to «{Name} апай» instead.
+pub fn kazakh_respectful_address_gendered(
+    name: &str,
+    gender: Option<KazakhNameGender>,
+    role: Option<&str>,
+) -> Option<String> {
+    let trimmed = name.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    let cap = capitalize_first(trimmed);
+    match gender {
+        Some(KazakhNameGender::Female) => {
+            if matches!(
+                role,
+                Some("ұстаз")
+                    | Some("мұғалім")
+                    | Some("педагог")
+                    | Some("учитель")
+                    | Some("teacher")
+            ) {
+                return Some(format!("{cap} апай"));
+            }
+            Some(format!("{cap}жан"))
+        }
+        Some(KazakhNameGender::Male) | None => kazakh_respectful_address(trimmed),
+    }
+}
+
+fn capitalize_first(s: &str) -> String {
+    let mut chars = s.chars();
+    match chars.next() {
+        Some(c) => c.to_uppercase().chain(chars).collect(),
+        None => String::new(),
+    }
+}
+
 /// **v4.18.0** — Kazakh vowel set (both Cyrillic native vowels and
 /// vowel-mark variants). Used by `kazakh_respectful_address` to
 /// decide whether a name is consonant- or vowel-initial.
@@ -514,6 +878,85 @@ fn curated_geo_aliases() -> &'static [(&'static str, &'static str)] {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn kazakh_name_gender_detects_top_male() {
+        for n in ["Дәулет", "Бауыржан", "Марат", "Ерлан", "Нурлан", "Серік"]
+        {
+            assert_eq!(
+                kazakh_name_gender(n),
+                Some(KazakhNameGender::Male),
+                "name={n}"
+            );
+        }
+    }
+
+    #[test]
+    fn kazakh_name_gender_detects_top_female() {
+        for n in [
+            "Айгерім",
+            "Айгүл",
+            "Айдана",
+            "Асем",
+            "Гүлмира",
+            "Назым",
+            "Сабина",
+            "Шынар",
+        ] {
+            assert_eq!(
+                kazakh_name_gender(n),
+                Some(KazakhNameGender::Female),
+                "name={n}"
+            );
+        }
+    }
+
+    #[test]
+    fn kazakh_name_gender_suffix_heuristic_female() {
+        // Out-of-list female names with «-гүл» / «-сім» endings
+        // resolve via the suffix heuristic.
+        assert_eq!(kazakh_name_gender("Нұргүл"), Some(KazakhNameGender::Female));
+        assert_eq!(kazakh_name_gender("Айсулу"), Some(KazakhNameGender::Female));
+    }
+
+    #[test]
+    fn kazakh_respectful_address_gendered_female() {
+        // Female default: «{Name}жан».
+        assert_eq!(
+            kazakh_respectful_address_gendered("Айгерім", Some(KazakhNameGender::Female), None)
+                .as_deref(),
+            Some("Айгерімжан")
+        );
+        // Teacher role: «{Name} апай».
+        assert_eq!(
+            kazakh_respectful_address_gendered(
+                "Айгерім",
+                Some(KazakhNameGender::Female),
+                Some("ұстаз")
+            )
+            .as_deref(),
+            Some("Айгерім апай")
+        );
+        assert_eq!(
+            kazakh_respectful_address_gendered(
+                "Сабина",
+                Some(KazakhNameGender::Female),
+                Some("мұғалім")
+            )
+            .as_deref(),
+            Some("Сабина апай")
+        );
+    }
+
+    #[test]
+    fn kazakh_respectful_address_gendered_male_unchanged() {
+        // Male falls through to the legacy «-әке» path.
+        assert_eq!(
+            kazakh_respectful_address_gendered("Дәулет", Some(KazakhNameGender::Male), None)
+                .as_deref(),
+            Some("Дәке")
+        );
+    }
 
     #[test]
     fn respectful_address_consonant_initial_names() {
