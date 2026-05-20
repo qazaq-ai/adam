@@ -3141,6 +3141,13 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "жұмыс күні",
     "жұмыс іздегенде",
     "қазақстан ұлттық валютасы",
+    // **v6.0.0-rc5 voice REPL 2026-05-20** — compound subjects
+    // surfaced by live REPL turn 16 «Танымалы адамдарды білесің бі?»
+    // (bare «адам» previously won, surfacing the «Адам — тіршілік
+    // иесі» tangential answer).
+    "танымал адамдар",
+    "танымал тұлғалар",
+    "танымалы адамдар",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
@@ -3963,13 +3970,18 @@ fn canonicalize_school_subject(input: &str) -> Option<&'static str> {
     // don't misroute.
     const SUBJECTS: &[(&str, &[&str])] = &[
         ("математика", &["математикалық", "математ", "математ "]),
-        ("физика", &["физикалық", "физик "]),
-        ("биология", &["биолог "]),
-        ("химия", &["химик ", "хими "]),
-        ("география", &["географ "]),
+        // **v6.0.0-rc5 voice REPL 2026-05-20** — Whisper-turbo
+        // transliterates Russian «физика» as Kazakh «фізика» (и→і),
+        // and the same `и↔і` confusion happens on every long Russian
+        // loanword («біологія / хімія / гєографія / асрономія»).
+        // Add the і-variants as Whisper-noise surface forms here.
+        ("физика", &["физикалық", "физик ", "фізика", "фізик"]),
+        ("биология", &["биолог ", "біологія", "біолог"]),
+        ("химия", &["химик ", "хими ", "хімія", "хімі"]),
+        ("география", &["географ ", "гєографія", "гєограф"]),
         ("тарих", &["истор", "истори"]),
-        ("информатика", &["информатик "]),
-        ("астрономия", &["астроном "]),
+        ("информатика", &["информатик ", "інформатика", "інформатик"]),
+        ("астрономия", &["астроном ", "асрономія", "астроном "]),
     ];
     // Pad input with leading + trailing space so word-boundary
     // matching with " stem " is robust.
@@ -4131,6 +4143,12 @@ pub(crate) fn detect_first_office_query(input: &str) -> Option<String> {
         "бірінші",
         "ең бірінші",
         "ең бірше", // Whisper-medium / large mishearing of «ең бірінші»
+        // **v6.0.0-rc5 voice REPL 2026-05-20** — Whisper-turbo
+        // transcribed «бірінші» as «бірінше» (final -і → -е) on the
+        // «Қазақстанның бірінше президенті кім болды?» turn,
+        // routing the query to "current president" instead of
+        // «тұңғыш президент» (Nazarbayev).
+        "бірінше",
         "алдымен",
         "1-ші",
         "1ші",

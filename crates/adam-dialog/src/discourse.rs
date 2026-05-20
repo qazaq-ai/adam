@@ -2274,6 +2274,15 @@ pub fn input_is_math_expression(input: &str) -> bool {
     // loan operator words common in spoken Kazakh and Whisper STT.
     const MATH_VERB_STEMS: &[&str] = &[
         "көбейт",
+        // **v6.0.0-rc5 voice REPL 2026-05-20** — Whisper-turbo
+        // transcribes «көбейт» as «кубейт» on the «он кубейт беске
+        // сосын екіге бөл» turn (10 × 5 ÷ 2). The о↔у confusion
+        // is a common Whisper mistake on Kazakh nasal-rounded
+        // vowels. Same pattern handled for the date / weather
+        // detectors in rc3 (е↔і, у↔ұ); adding the math-verb
+        // mirror here for symmetry.
+        "кубейт",
+        "көбейіт", // STT variant with diphthong artefact
         "бөл",
         "қос",
         "есепте",
