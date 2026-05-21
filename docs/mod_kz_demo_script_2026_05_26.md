@@ -89,25 +89,76 @@ cargo build --release --features voice -p adam-dialog --bin adam_chat
 | «Қазақстанның бірінші президенті кім болды?» | Нұрсұлтан Назарбаев |
 | «Қазақстанның ұлттық валютасы қандай?» | теңге |
 
-## Известные ограничения (про которые честно сказать, если спросят)
+## Что добавилось после первой версии этого скрипта (rc5)
 
-1. **Multi-turn anaphora** — «Ал ол қашан туылған?» после «Абай туралы айт» может не подхватить контекст. Workaround: повторить subject во втором turn.
-2. **Cross-fact comparison** — «Алматы Астанадан үлкен бе?» возвращает описание Алматы, не явное сравнение. Workaround: запросить отдельно «Алматы халық саны қанша?» / «Астана халық саны қанша?».
-3. **Multi-step word math** — «Алты қос үш, көбейт екіге» обработается частично; одношаговые («Үш көбейт екіге») работают.
+С момента подготовки этого скрипта (2026-05-19) закрыто
+несколько крупных пробелов — это стоит проговорить
+демонстраторам, потому что предыдущая «список ограничений»
+секция (ниже, обновлена) — уже не вся актуальна.
+
+| Область | Что было | Что сейчас |
+|---|---|---|
+| **Anaphora «Ол»** | «Ал ол қашан туылған?» не привязывался к Абай | Работает — nominative pronoun добавлен в DISCOURSE_ANAPHORS. Probe-aware retrieval выдаёт «Абай 1845 жылы туылған» |
+| **Binary comparison** | «Алматы Астанадан үлкен бе?» давал общий факт об Алматы | Распознаётся через `try_extract_binary_comparison`; ответ surfaces обе definitions + честный disclaimer о numerical comparison |
+| **Multi-step math** | «56-ны 3-ке көбейт те, 2-ге бөл, содан соң 7 қос» давал 44 | Сейчас 91 — chained ops через «содан соң / кейін» + Kazakh-word-math предпочитается перед arithmetic |
+| **Multi-fact requests** | «Екі дерек айтшы» давал один факт | Aggregator собирает N curated facts и рендерит numbered list |
+| **Recommendation refusal** | «Қандай кітап ұсынасыз?» возвращал stray R1 («Қазақ көз иеленеді») | Honest no-data refusal через `unknown.recommendation_no_data` |
+| **Self-harm safety** | НЕ обрабатывался отдельно | Dedicated crisis path: 1415 (Республикалық сенім телефоны) первой строкой, human-care note, без морализаторства |
+| **Medical / legal / financial** | Refusal-only «обратитесь к специалисту» | **Safety policy v6 (2026-05-21)** — `informational + emergency-triage + disclaimer`. Adam теперь полезен, не отписывается |
+| **Voice gender detection** | Не было | Pitch (F0) autocorrelation + session-persistent lock; address как «Дәке / Айәке / Апай» по голосу анонимного пользователя |
+| **Phonetic correction (voice)** | Whisper-noise («Жерма» / «Кубейт») ломала контекст | Phonetic graph search через 5 gates; «Жерма» → «жиырма» если есть FST coverage gap |
+
+## Опциональные neural transducers (NEW в rc5)
+
+Помимо детерминистического kernel, можно демонстрировать
+**два опциональных neural артефакта** — оба behind env flags,
+default off, не меняют поведение без явного включения:
+
+```bash
+# Со всеми опциональными слоями ON:
+ADAM_NEURAL_INTENT=1 ADAM_NEURAL_SLOTS=1 \
+  ./target/release/adam_chat --voice-input \
+  --whisper-bin /opt/homebrew/bin/whisper-cli \
+  --whisper-model /Users/dake/whisper-models/ggml-large-v3-turbo.bin
+```
+
+| Артефакт | Что делает | Метрики | Размер |
+|---|---|---|---|
+| **E1 — Intent Classifier** | Заменяет 60+ детекторов одной обучаемой моделью | 95.95 % test acc vs cascade 91.89 %, **+9 net wins**, 35 µs p99 | 2.2 MB |
+| **E2 — Slot Extractor** | Спасает session slots (name/age/city/occupation) когда cascade оставил пустыми | 0.667 micro-F1 на OOV holdout (honest), **+1 win vs cascade**, 29 µs p99 | 52 KB |
+
+Полные numbers + audit posture в
+[`docs/third_path_results.md`](third_path_results.md). Это документ
+для AI Law compliance disclosure (high-risk-domain audit
+требует traceability + audit log + human oversight — все
+mapped к concrete mechanism в репозитории).
+
+**Demo точка дать рукой:** запустить дважды — один раз с
+обоими flags, один раз без — и показать что (a) default
+поведение bit-identical, (b) flag-ON даёт measurable
+улучшения. Это и есть «opt-in neural в безопасной
+архитектуре» — главный USP перед инвестором / МО / партнёром.
+
+## Известные ограничения (обновлено 2026-05-21)
+
+Что **всё ещё** не работает — честно проговорить если спросят:
+
+1. **Slot extraction на predicate-copula формах имён** — «Мен Айдармын» (1sg-predicate-copula) не distrebutes в name slot. Cascade ожидает «менің атым X» / «есімім X» паттерны; classifier видел «айдар» в gazetteer, но не «айдармын» поверх. Workaround: «Менің атым Айдар».
+2. **Farewell-формы «Көріскенше / Бай-бай / Кейінірек кездесеміз»** — cascade gap, classifier rescue не сработал на minority-class data. «Сау бол» / «Қош бол» работают. Дисциплинированная dataset expansion в следующих раундах закроет.
+3. **OOV cities в slot extraction** — города НЕ в `kazakh_city_coords` (small Kazakh villages, исторические районы) попадают в OOV. F1 ≈ 0.46 на OOV. Workaround: использовать canonical названия областных центров.
 4. **Hypothetical / conditional** — «Егер X болса, Y қандай?» — нет symbolic reasoning. Adam дает честный refusal или описание X.
+5. **Cross-language ports** — пока только казахский. Архитектура designed для extension на 30+ агглютинативных языков но это research goal на 2027.
 
 ## Архитектурный мессадж для МО РК
 
-Adam основан на **деterministic kernel + verifier gates** — то есть НЕ генерирует ответы из probabilistic black-box, а возвращает их из curated graph (3439 entries, 4002 facts, 37 716 derivations). Это даёт:
+Adam основан на **деterministic kernel + verifier gates + opt-in discriminative neural слои** — НЕ генерирует ответы из probabilistic black-box, а возвращает их из curated graph (3439 entries, 4002 facts, 37 716 derivations) плюс optionally ранжирует / классифицирует через закрытые-output модели. Это даёт:
 
-- **0 hallucinations** на `factual_eval_100` benchmark (verified gate)
-- **Compliance с AI Law РК** (18.01.2026) — система relevantly классифицируется как **низкорискованная**, потому что:
-  - Каждый ответ trace-able до конкретного fact id (audit trail)
-  - Verifier (`adam-agg-model::verifier`) активно блокирует non-Kazakh script, FST round-trip failures, ungrounded claims
-  - Нет внешних API / cloud dependencies — fully on-device
-
-- **Pure Rust, CPU-only** — работает на любом ноутбуке, не требует GPU / cloud
+- **0 hallucinations** на `factual_eval_100` benchmark (verified gate); E1 / E2 neural модели **structurally не могут** выдать ничего вне closed label / BIO set
+- **Compliance с AI Law РК** (18.01.2026) — high-risk-domain audit checklist (traceability / audit log / human oversight / closed-set behaviour / deterministic fallback) **mapped к конкретным механизмам в репо** — см. [`docs/third_path_results.md`](third_path_results.md) для full mapping
+- **Safety policy v6 (2026-05-21)** — медицина / юр / финансы получают `info + emergency triage + специалист referral` (не пустой refusal); self-harm — крайне-приоритетный crisis-line path через 1415; политические recommendations / partisan judgements continue to refuse
+- **Pure Rust, CPU-only** — работает на любом ноутбуке (M2 / Linux), не требует GPU / cloud / external API
 - **Native Kazakh agglutinative kernel** — не translation layer, а direct FST + morpheme processing
+- **Reproducible methodology** — E1 и E2 oба прошли одинаковую трёх-раундовую дисциплину (scaffold → seed+synth → OOV+contingency+production wiring). Два эксперимента подряд = patterned discipline, не one-off luck
 
 ## Что просить от МО РК после демо
 
