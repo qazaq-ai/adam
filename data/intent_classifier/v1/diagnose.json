@@ -1,0 +1,389 @@
+{
+  "total_rows": 1047,
+  "matches": 998,
+  "mismatches": 49,
+  "seed_mismatches": 49,
+  "cascade_self_inconsistencies": 0,
+  "mismatches_by_seed_label": {
+    "StatementOfName": 1,
+    "Request": 3,
+    "AskHowAreYou": 3,
+    "Negation": 4,
+    "StatementOfWellbeing": 4,
+    "StatementOfLocation": 1,
+    "AskWeather": 2,
+    "Insult": 2,
+    "Compliment": 2,
+    "StatementOfFamily": 4,
+    "AskTime": 2,
+    "Farewell": 4,
+    "Greeting": 1,
+    "Thanks": 1,
+    "AskName": 4,
+    "AskFamily": 2,
+    "AskOccupation": 1,
+    "Affirmation": 1,
+    "StatementOfOccupation": 1,
+    "StatementOfAge": 1,
+    "Apology": 1,
+    "AskLocation": 2,
+    "WellWishes": 2
+  },
+  "mismatches_by_cascade_label": {
+    "StatementOfLocation": 1,
+    "FactualQuery": 25,
+    "AskHowAreYou": 1,
+    "UserDisagrees": 2,
+    "Thanks": 2,
+    "AskOccupation": 1,
+    "StatementOfWeather": 1,
+    "Unknown": 9,
+    "StatementOfWellbeing": 2,
+    "AskAboutSystem": 5
+  },
+  "rows": [
+    {
+      "id": "seed_g_07",
+      "input": "Сәлем, қалайсың",
+      "stored_label": "Greeting",
+      "cascade_label": "AskHowAreYou",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_f_03",
+      "input": "Көріскенше",
+      "stored_label": "Farewell",
+      "cascade_label": "Unknown",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_f_04",
+      "input": "Жақсы қал",
+      "stored_label": "Farewell",
+      "cascade_label": "StatementOfWellbeing",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_f_05",
+      "input": "Бай-бай",
+      "stored_label": "Farewell",
+      "cascade_label": "Unknown",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_f_06",
+      "input": "Кейінірек кездесеміз",
+      "stored_label": "Farewell",
+      "cascade_label": "Unknown",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_aff_06",
+      "input": "Келісемін",
+      "stored_label": "Affirmation",
+      "cascade_label": "Unknown",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_neg_02",
+      "input": "Олай емес",
+      "stored_label": "Negation",
+      "cascade_label": "UserDisagrees",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_neg_03",
+      "input": "Жоқ, дұрыс емес",
+      "stored_label": "Negation",
+      "cascade_label": "UserDisagrees",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_neg_04",
+      "input": "Келіспеймін",
+      "stored_label": "Negation",
+      "cascade_label": "Unknown",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_neg_05",
+      "input": "Жоқ рахмет",
+      "stored_label": "Negation",
+      "cascade_label": "Thanks",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_th_03",
+      "input": "Алғыс айтамын",
+      "stored_label": "Thanks",
+      "cascade_label": "Unknown",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_ap_04",
+      "input": "Айып етпеңіз",
+      "stored_label": "Apology",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_hau_03",
+      "input": "Хал ахуалың қалай",
+      "stored_label": "AskHowAreYou",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_hau_05",
+      "input": "Қалай тұрсыз",
+      "stored_label": "AskHowAreYou",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_hau_06",
+      "input": "Көңіл күйің қалай",
+      "stored_label": "AskHowAreYou",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_sow_02",
+      "input": "Жақсы рахмет",
+      "stored_label": "StatementOfWellbeing",
+      "cascade_label": "Thanks",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_sow_03",
+      "input": "Аман-есен",
+      "stored_label": "StatementOfWellbeing",
+      "cascade_label": "Unknown",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_sow_04",
+      "input": "Шүкір",
+      "stored_label": "StatementOfWellbeing",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_sow_05",
+      "input": "Жайбарақатпын",
+      "stored_label": "StatementOfWellbeing",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_son_03",
+      "input": "Мені Бекжан дейді",
+      "stored_label": "StatementOfName",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_san_05",
+      "input": "Мен жиырма жетідемін",
+      "stored_label": "StatementOfAge",
+      "cascade_label": "StatementOfLocation",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_sol_03",
+      "input": "Біз Астанадамыз",
+      "stored_label": "StatementOfLocation",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_sof_01",
+      "input": "Менің 2 баламыз бар",
+      "stored_label": "StatementOfFamily",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_sof_02",
+      "input": "Біздің отбасы үлкен",
+      "stored_label": "StatementOfFamily",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_sof_03",
+      "input": "Менің әпкем бар",
+      "stored_label": "StatementOfFamily",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_sof_04",
+      "input": "Үш бала тәрбиелеп жүрмін",
+      "stored_label": "StatementOfFamily",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_soa_04",
+      "input": "Менің мамандығым инженер",
+      "stored_label": "StatementOfOccupation",
+      "cascade_label": "AskOccupation",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_aw_02",
+      "input": "Қазір сыртта суық па",
+      "stored_label": "AskWeather",
+      "cascade_label": "StatementOfWeather",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_aw_03",
+      "input": "Ертең жаңбыр болады ма",
+      "stored_label": "AskWeather",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_at_02",
+      "input": "Қай уақыт",
+      "stored_label": "AskTime",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_at_04",
+      "input": "Бүгін қандай айдамыз",
+      "stored_label": "AskTime",
+      "cascade_label": "Unknown",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_co_02",
+      "input": "Сіз ақылдысыз",
+      "stored_label": "Compliment",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_co_04",
+      "input": "Сен мықтысың",
+      "stored_label": "Compliment",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_ww_03",
+      "input": "Жаңа жылыңмен",
+      "stored_label": "WellWishes",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_ww_04",
+      "input": "Туған күніңмен",
+      "stored_label": "WellWishes",
+      "cascade_label": "AskAboutSystem",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_in_02",
+      "input": "Сені жек көремін",
+      "stored_label": "Insult",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_in_03",
+      "input": "Сен жаман",
+      "stored_label": "Insult",
+      "cascade_label": "StatementOfWellbeing",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_an_01",
+      "input": "Сенің атың не",
+      "stored_label": "AskName",
+      "cascade_label": "AskAboutSystem",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_an_02",
+      "input": "Сіздің есіміңіз кім",
+      "stored_label": "AskName",
+      "cascade_label": "AskAboutSystem",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_an_03",
+      "input": "Атың не",
+      "stored_label": "AskName",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_an_04",
+      "input": "Қалай атайсың өзіңді",
+      "stored_label": "AskName",
+      "cascade_label": "AskAboutSystem",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_al_02",
+      "input": "Қай қаладансыз",
+      "stored_label": "AskLocation",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_al_03",
+      "input": "Қайдан келдіңіз",
+      "stored_label": "AskLocation",
+      "cascade_label": "Unknown",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_ao_03",
+      "input": "Қандай жұмыс істейсіз",
+      "stored_label": "AskOccupation",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_af_01",
+      "input": "Отбасың туралы айтып бер",
+      "stored_label": "AskFamily",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_af_03",
+      "input": "Үй ішің қанша адам",
+      "stored_label": "AskFamily",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_re_02",
+      "input": "Бір сұрағым бар",
+      "stored_label": "Request",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_re_03",
+      "input": "Маған бір нәрсе көрсете аласыз ба",
+      "stored_label": "Request",
+      "cascade_label": "AskAboutSystem",
+      "source_file": "seed"
+    },
+    {
+      "id": "seed_re_04",
+      "input": "Сұрайын деп едім",
+      "stored_label": "Request",
+      "cascade_label": "FactualQuery",
+      "source_file": "seed"
+    }
+  ]
+}

@@ -74,6 +74,7 @@ version = "6.0.0-rc5"
 dependencies = [
  "adam-agg-model",
  "adam-agg-tokenizer",
+ "adam-intent-classifier",
  "adam-kernel",
  "adam-kernel-fst",
  "adam-reasoning",
@@ -96,6 +97,26 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 2.0.18",
+]
+
+[[package]]
+name = "adam-intent-classifier"
+version = "6.0.0-rc5"
+dependencies = [
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+]
+
+[[package]]
+name = "adam-intent-dataset"
+version = "6.0.0-rc5"
+dependencies = [
+ "adam-dialog",
+ "adam-intent-classifier",
+ "adam-kernel-fst",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

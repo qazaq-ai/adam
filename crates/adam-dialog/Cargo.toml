@@ -13,6 +13,7 @@ adam-reasoning = { path = "../adam-reasoning" }
 adam-voice = { path = "../adam-voice", optional = true }
 adam-agg-model = { path = "../adam-agg-model", optional = true }
 adam-agg-tokenizer = { path = "../adam-agg-tokenizer", optional = true }
+adam-intent-classifier = { path = "../adam-intent-classifier" }
 burn = { version = "0.17", default-features = false, features = ["std", "ndarray"], optional = true }
 serde.workspace = true
 serde_json.workspace = true

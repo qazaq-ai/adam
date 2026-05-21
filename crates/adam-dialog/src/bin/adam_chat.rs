@@ -307,6 +307,35 @@ fn main() -> ExitCode {
         conv = conv.with_reasoning_chains(extracted, derived);
     }
 
+    // **v6.0.5 — E1 production wiring.** Opt-in load of a trained
+    // discriminative intent classifier (the experimental Rung-A
+    // artefact from the E1 research branch). Attached only when
+    // `ADAM_NEURAL_INTENT=1` AND the artefact file exists on disk;
+    // otherwise the cascade drives every turn unchanged. Even when
+    // attached, the classifier only rescues `Unknown` verdicts
+    // (see `apply_neural_intent_override` in
+    // `crates/adam-dialog/src/conversation.rs`) — confident
+    // cascade outputs always win, safety routing dominates,
+    // confidence gap < 0.15 yields to the cascade.
+    if std::env::var("ADAM_NEURAL_INTENT").as_deref() == Ok("1") {
+        let path = std::env::var("ADAM_NEURAL_INTENT_MODEL")
+            .unwrap_or_else(|_| "data/intent_classifier/v1/rung_a.json".to_string());
+        match adam_intent_classifier::Classifier::from_path(&path) {
+            Ok(classifier) => {
+                let label_count = classifier.labels().len();
+                conv = conv.with_neural_classifier(classifier);
+                eprintln!(
+                    "adam-chat: neural-intent ON — Rung-A classifier loaded from {path} ({label_count} classes)"
+                );
+            }
+            Err(e) => {
+                eprintln!(
+                    "adam-chat: neural-intent ON but model load FAILED ({e}); cascade-only path"
+                );
+            }
+        }
+    }
+
     // **v5.6.0** — domain index built from the world_core load
     // dispatched in parallel above. Build (Vec → HashMap) is
     // single-threaded because the API is non-Send across the

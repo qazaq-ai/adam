@@ -982,9 +982,18 @@ pub fn plan_response_with_epistemic(
     // — source-backed but product-dangerous misroute. Honest refusal
     // points the user at a qualified specialist.
     if let Some(category) = extra_slots.get("__safety_refusal__") {
-        let key = format!("safety_refusal.{category}");
+        // **v6.0.5 safety policy v6 (2026-05-21).** Medical /
+        // legal / financial domains migrated from refusal-only
+        // to informational + triage + disclaimer (template family
+        // family `safety_info.{slug}`). Self-harm + current-data
+        // remain on the refusal path — see
+        // `docs/safety_policy_v6.md` for the policy rationale.
+        let key = match category.as_str() {
+            "medical" | "legal" | "financial" => format!("safety_info.{category}"),
+            _ => format!("safety_refusal.{category}"),
+        };
         if !repo.get(&key).is_empty() {
-            trace.push(format!("planner: safety_refusal override → {key}"));
+            trace.push(format!("planner: safety override → {key}"));
             let applicable_all = repo.get(&key);
             let idx = (rng_seed as usize) % applicable_all.len().max(1);
             let chosen = applicable_all.get(idx).cloned().unwrap_or_default();

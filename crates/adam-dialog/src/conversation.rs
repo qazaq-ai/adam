@@ -224,6 +224,14 @@ pub struct Conversation {
     /// was built. `None` means «not yet built»; a mismatching
     /// signature triggers a rebuild on next normalisation call.
     pub phonetic_index_signature: Option<(usize, usize)>,
+    /// **v6.0.5 — E1 production wiring.** Optional trained
+    /// discriminative intent classifier. When `Some`, the turn loop
+    /// consults it as a confidence-rescue signal for `Unknown`
+    /// verdicts from the cascade (see
+    /// `apply_neural_intent_override`). When `None`, the cascade
+    /// drives every turn unchanged — this is the production
+    /// default.
+    pub neural_classifier: Option<adam_intent_classifier::Classifier>,
 }
 
 /// v4.0.25 — intermediate state captured by
@@ -607,6 +615,21 @@ impl Conversation {
         self
     }
 
+    /// **v6.0.5 — E1 production wiring.** Attach a trained
+    /// discriminative intent classifier. When attached, the turn
+    /// loop consults it as a confidence-rescue signal for cascade
+    /// `Unknown` verdicts. Caller is responsible for selecting the
+    /// right artefact (e.g. `data/intent_classifier/v1/rung_a.json`).
+    /// When `None` (the default), the classifier path is bypassed
+    /// entirely — cascade drives every turn unchanged.
+    pub fn with_neural_classifier(
+        mut self,
+        classifier: adam_intent_classifier::Classifier,
+    ) -> Self {
+        self.neural_classifier = Some(classifier);
+        self
+    }
+
     /// **v4.14.0** — builder: attach a `DomainIndex` so each turn
     /// can populate `dialog_context.current_domain` from the
     /// resolved topic. Built by the caller from `WorldCoreEntry`s
@@ -860,7 +883,37 @@ impl Conversation {
         adam_kernel_fst::populate_periphrastic_modality(&mut sem_frames);
         adam_kernel_fst::populate_ability_modality(&mut sem_frames);
         adam_kernel_fst::populate_sentential_negation(&mut sem_frames);
-        let raw_intent = interpret_text_with_lexicon(stripped, &parses, Some(lexicon));
+        let cascade_intent = interpret_text_with_lexicon(stripped, &parses, Some(lexicon));
+
+        // **v6.0.5 — E1 production wiring.** When
+        // `ADAM_NEURAL_INTENT=1` AND the loaded classifier confidently
+        // disagrees with the cascade's `Unknown` verdict, we let the
+        // classifier override the IntentKind. Conservative scope by
+        // design (see `docs/e1_intent_classifier_design.md` § "Production
+        // wiring"):
+        //
+        //   1. Override fires ONLY when the cascade returned `Unknown`
+        //      (with or without noun_hint) AND the classifier is
+        //      confident. Confident cascade verdicts win unchanged.
+        //   2. Confidence gate: classifier's `top_score - second_score
+        //      ≥ 0.15`. Below that, the classifier defers to the
+        //      cascade.
+        //   3. Safety override: when `detect_safety_topic` will fire
+        //      anyway, classifier never overrides — the safety routing
+        //      layer is the authority on those domains.
+        //   4. The classifier emits a *kind* (closed enum); we only
+        //      override into Intent variants that carry no data
+        //      (`Greeting`, `AskName`, `AskHowAreYou`, …). Variants
+        //      that need lexical data (`StatementOfName { name }`,
+        //      `StatementOfAge { years }`, …) keep the cascade's
+        //      analysis — the classifier has no way to know "what"
+        //      the name or age IS.
+        let raw_intent = apply_neural_intent_override(
+            cascade_intent,
+            input,
+            &parses,
+            self.neural_classifier.as_ref(),
+        );
 
         // v1.4.0: follow-up resolution. "ал сіз?" after AskHowAreYou
         // becomes a re-interpretation: "user is asking me the same
@@ -4098,6 +4151,99 @@ fn inflect(root: &str, case: Case) -> String {
     let mut features = NounFeatures::default();
     features.case = Some(case);
     synthesise_noun(root, features)
+}
+
+/// **v6.0.5 — E1 production wiring.** Confidence-rescue override
+/// for the deterministic cascade.
+///
+/// Returns the input `cascade_intent` unchanged in any of these
+/// safety-preserving cases:
+///   - The classifier is not attached (`classifier == None`).
+///   - The env flag `ADAM_NEURAL_INTENT` is not set to `1`.
+///   - The cascade returned a non-`Unknown` verdict — confident
+///     cascade outputs always win.
+///   - `detect_safety_topic` fires on the input — the safety
+///     routing layer is the authority on medical / legal /
+///     financial / self-harm domains and the classifier never
+///     overrides those.
+///   - The classifier itself fails to classify (model not loaded,
+///     no labels, …).
+///   - The classifier's confidence gap (`top_score - second_score`)
+///     is below 0.15 — design-doc-fixed uncertainty threshold.
+///   - The classifier predicts `FactualQuery` — the cascade's
+///     `Unknown { noun_hint: Some(_) }` is already the
+///     semantically-equivalent verdict; no override needed.
+///
+/// Otherwise — classifier predicts a confident, non-safety,
+/// non-FactualQuery class — replace the cascade's `Unknown` with a
+/// minimal instance of the predicted Intent variant. We only map
+/// **data-free** variants (`Greeting`, `AskName`, `AskHowAreYou`,
+/// `Affirmation`, …); data-carrying variants (`StatementOfName {
+/// name }`, `StatementOfAge { years }`, …) need lexical content
+/// the classifier doesn't have access to and stay with the
+/// cascade's analysis.
+fn apply_neural_intent_override(
+    cascade_intent: Intent,
+    input: &str,
+    _parses: &[adam_kernel_fst::parser::Analysis],
+    classifier: Option<&adam_intent_classifier::Classifier>,
+) -> Intent {
+    let Some(classifier) = classifier else {
+        return cascade_intent;
+    };
+    if std::env::var("ADAM_NEURAL_INTENT").as_deref() != Ok("1") {
+        return cascade_intent;
+    }
+    // Only rescue an `Unknown` verdict; confident cascade wins.
+    if !matches!(cascade_intent, Intent::Unknown { .. }) {
+        return cascade_intent;
+    }
+    // Safety routing dominates — never let the classifier
+    // pre-empt medical / legal / financial / self-harm / current-
+    // data domain refusals / informational routes.
+    if crate::discourse::detect_safety_topic(input).is_some() {
+        return cascade_intent;
+    }
+    let Ok(prediction) = classifier.classify(input) else {
+        return cascade_intent;
+    };
+    if prediction.confidence_gap() < 0.15 {
+        return cascade_intent;
+    }
+    // `FactualQuery` is the classifier's name for
+    // `Unknown { noun_hint: Some(_) }` — no semantic gain.
+    let label = prediction.top.as_str();
+    if label == "FactualQuery" {
+        return cascade_intent;
+    }
+    // Map the classifier label back to a data-free Intent
+    // variant. Variants carrying lexical content
+    // (`StatementOfName { name }`, `StatementOfAge { years }`, …)
+    // are NOT in this set — they require lexical analysis the
+    // classifier can't provide. The cascade keeps those.
+    match label {
+        "Greeting" => Intent::Greeting {
+            kind: crate::intent::GreetingKind::Casual,
+        },
+        "Farewell" => Intent::Farewell,
+        "Affirmation" => Intent::Affirmation,
+        "Negation" => Intent::Negation,
+        "Thanks" => Intent::Thanks,
+        "Apology" => Intent::Apology,
+        "UserDisagrees" => Intent::UserDisagrees,
+        "AskHowAreYou" => Intent::AskHowAreYou,
+        "AskName" => Intent::AskName,
+        "AskAge" => Intent::AskAge,
+        "AskLocation" => Intent::AskLocation,
+        "AskOccupation" => Intent::AskOccupation,
+        "AskActivity" => Intent::AskActivity,
+        "AskFamily" => Intent::AskFamily,
+        "AskWeather" => Intent::AskWeather,
+        "AskTime" => Intent::AskTime {
+            aspect: crate::intent::TimeAspect::Time,
+        },
+        _ => cascade_intent,
+    }
 }
 
 fn resolve_follow_up(raw: Intent, input: &str, active: Option<IntentKind>) -> Intent {

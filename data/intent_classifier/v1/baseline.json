@@ -1,0 +1,137 @@
+{
+  "dataset_path": "data/intent_classifier/v1/dataset.jsonl",
+  "total_examples": 84,
+  "overall_p50_ns": 103167,
+  "overall_p95_ns": 1295209,
+  "overall_p99_ns": 1535292,
+  "overall_max_ns": 1684417,
+  "self_consistency_pct": 100.0,
+  "per_class": [
+    {
+      "label": "AskPurpose",
+      "sample_count": 19,
+      "p50_ns": 329333,
+      "p95_ns": 1535292,
+      "p99_ns": 1684417
+    },
+    {
+      "label": "AskExercise",
+      "sample_count": 12,
+      "p50_ns": 335917,
+      "p95_ns": 1213458,
+      "p99_ns": 1219625
+    },
+    {
+      "label": "CodeRequest",
+      "sample_count": 10,
+      "p50_ns": 338375,
+      "p95_ns": 1231625,
+      "p99_ns": 1231625
+    },
+    {
+      "label": "AskAboutSystem",
+      "sample_count": 9,
+      "p50_ns": 22167,
+      "p95_ns": 53208,
+      "p99_ns": 53208
+    },
+    {
+      "label": "AskLocation",
+      "sample_count": 7,
+      "p50_ns": 83041,
+      "p95_ns": 119917,
+      "p99_ns": 119917
+    },
+    {
+      "label": "ExplainCompilerError",
+      "sample_count": 6,
+      "p50_ns": 1260916,
+      "p95_ns": 1346125,
+      "p99_ns": 1346125
+    },
+    {
+      "label": "AskName",
+      "sample_count": 5,
+      "p50_ns": 94917,
+      "p95_ns": 113625,
+      "p99_ns": 113625
+    },
+    {
+      "label": "AskWeather",
+      "sample_count": 4,
+      "p50_ns": 115667,
+      "p95_ns": 135958,
+      "p99_ns": 135958
+    },
+    {
+      "label": "StatementOfWellbeing",
+      "sample_count": 2,
+      "p50_ns": 98667,
+      "p95_ns": 98667,
+      "p99_ns": 98667
+    },
+    {
+      "label": "Request",
+      "sample_count": 2,
+      "p50_ns": 102000,
+      "p95_ns": 102000,
+      "p99_ns": 102000
+    },
+    {
+      "label": "SubmitSolution",
+      "sample_count": 1,
+      "p50_ns": 312833,
+      "p95_ns": 312833,
+      "p99_ns": 312833
+    },
+    {
+      "label": "StatementOfAge",
+      "sample_count": 1,
+      "p50_ns": 58041,
+      "p95_ns": 58041,
+      "p99_ns": 58041
+    },
+    {
+      "label": "Greeting",
+      "sample_count": 1,
+      "p50_ns": 12042,
+      "p95_ns": 12042,
+      "p99_ns": 12042
+    },
+    {
+      "label": "StatementOfOccupation",
+      "sample_count": 1,
+      "p50_ns": 67584,
+      "p95_ns": 67584,
+      "p99_ns": 67584
+    },
+    {
+      "label": "AskAge",
+      "sample_count": 1,
+      "p50_ns": 79458,
+      "p95_ns": 79458,
+      "p99_ns": 79458
+    },
+    {
+      "label": "AskNextTopic",
+      "sample_count": 1,
+      "p50_ns": 175709,
+      "p95_ns": 175709,
+      "p99_ns": 175709
+    },
+    {
+      "label": "StatementOfName",
+      "sample_count": 1,
+      "p50_ns": 23792,
+      "p95_ns": 23792,
+      "p99_ns": 23792
+    },
+    {
+      "label": "AskOccupation",
+      "sample_count": 1,
+      "p50_ns": 126500,
+      "p95_ns": 126500,
+      "p99_ns": 126500
+    }
+  ]
+}
