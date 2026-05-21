@@ -95,6 +95,21 @@ const DISCOURSE_ANAPHORS: &[&str] = &[
     "солардың",
     "мұлардың",
     "бұлардың",
+    // **v6.0.5 codex audit 2026-05-21** — bare nominative 3rd-person
+    // pronouns. Codex live transcript: «Абай туралы айтшы» →
+    // «Ал ол қашан туылған?» pre-v6.0.5 failed to resolve because
+    // bare «ол» / plural «олар» were missing from the anaphor list
+    // (only the case-marked forms above were registered). Adding
+    // them so the topic-resolution heuristic re-tags `noun_hint` to
+    // the prior turn's subject.
+    "ол",
+    "сол",
+    "осы",
+    "бұл",
+    "олар",
+    "солар",
+    "осылар",
+    "бұлар",
 ];
 
 /// Returns `true` if any whitespace-separated lowercase token of
@@ -3281,6 +3296,152 @@ pub fn try_check_answer(
 /// definition and prompts the user to query Y separately for the
 /// full pair. Full side-by-side comparison (both definitions in one
 /// turn) is deferred to v5+ when dual retrieval lands.
+/// **v6.0.5 codex audit 2026-05-21** — binary "is X bigger than Y?"
+/// extractor. Pattern: `X Y-DAN/DEN/TAN/TEN/NAN/NEN ADJ бе?` —
+/// the ablative case marks the standard of comparison and the
+/// adjective fixes the dimension. Closes the Codex audit finding
+/// «Алматы Астанадан үлкен бе?» → bare fact about Алматы.
+///
+/// Returns `Some((x_literal, y_stem, adjective))`. `x_literal` is
+/// the surface form of the head NP (case unstripped — proper noun
+/// preservation); `y_stem` is the form with the ablative suffix
+/// removed so the world_core IsA lookup can match the bare root;
+/// `adjective` is the comparison axis (`үлкен / кіші / көп / аз /
+/// жоғары / төмен / жылдам / баяу / ерте / кеш`).
+///
+/// Independent of [`try_extract_comparison_topics`] — that handles
+/// «X пен Y айырмашылығы» (open-difference question), whereas
+/// this handles «X is bigger than Y?» (binary yes/no question).
+pub fn try_extract_binary_comparison(input: &str) -> Option<(String, String, String)> {
+    let lower = input.to_lowercase();
+    const ABL_SUFFIXES: &[&str] = &["дан", "ден", "тан", "тен", "нан", "нен"];
+    const COMPARISON_ADJECTIVES: &[&str] = &[
+        "үлкен",
+        "кіші",
+        "көп",
+        "аз",
+        "жоғары",
+        "төмен",
+        "жылдам",
+        "баяу",
+        "ерте",
+        "кеш",
+        "ұзын",
+        "қысқа",
+        "ауыр",
+        "жеңіл",
+        "қымбат",
+        "арзан",
+    ];
+    let tokens: Vec<&str> = lower.split_whitespace().collect();
+    if tokens.len() < 3 {
+        return None;
+    }
+    for (i, raw_adj) in tokens.iter().enumerate() {
+        let bare_adj = raw_adj.trim_end_matches(['?', '.', ',', '!', '»', '«']);
+        if !COMPARISON_ADJECTIVES.contains(&bare_adj) {
+            continue;
+        }
+        if i == 0 {
+            continue;
+        }
+        // Scan backwards from the adjective for the closest token
+        // that ends in an ablative suffix. The standard-of-
+        // comparison Y can sit directly next to the adjective
+        // («Астанадан үлкен бе?») or be separated by a noun-phrase
+        // describing the dimension («Қазақстаннан халық саны көп
+        // бе?»).
+        let mut y_stem_owned: Option<String> = None;
+        let mut y_idx: Option<usize> = None;
+        for j in (0..i).rev() {
+            let y_form = tokens[j].trim_end_matches(['?', '.', ',', '!', '»', '«']);
+            for abl in ABL_SUFFIXES {
+                if let Some(stem) = y_form.strip_suffix(abl) {
+                    if stem.chars().count() >= 2 {
+                        y_stem_owned = Some(stem.to_string());
+                        y_idx = Some(j);
+                        break;
+                    }
+                }
+            }
+            if y_stem_owned.is_some() {
+                break;
+            }
+        }
+        let y_stem = match y_stem_owned {
+            Some(s) => s,
+            None => continue,
+        };
+        let y_pos = y_idx.unwrap();
+        if y_pos == 0 {
+            continue;
+        }
+        // X = the first content token in the prefix BEFORE Y (skip
+        // discourse particles like «ал», «онда», «бұл», etc.).
+        let prefix = &tokens[..y_pos];
+        const DISCOURSE_PARTICLES: &[&str] = &[
+            "ал",
+            "онда",
+            "бұл",
+            "сол",
+            "осы",
+            "енді",
+            "тағы",
+            "тек",
+            "тіпті",
+            "бірақ",
+        ];
+        let mut x: Option<&str> = None;
+        for tok in prefix {
+            let bare = tok.trim_end_matches(['?', '.', ',', '!', '»', '«']);
+            if !DISCOURSE_PARTICLES.contains(&bare) {
+                x = Some(bare);
+                break;
+            }
+        }
+        let x = x?;
+        return Some((x.to_string(), y_stem, bare_adj.to_string()));
+    }
+    None
+}
+
+#[cfg(test)]
+mod tests_binary_comparison_v6_0_5 {
+    use super::try_extract_binary_comparison;
+
+    #[test]
+    fn extracts_almaty_astana_size_v6_0_5() {
+        let r = try_extract_binary_comparison("Алматы Астанадан үлкен бе?");
+        assert_eq!(
+            r.as_ref()
+                .map(|(x, y, a)| (x.as_str(), y.as_str(), a.as_str())),
+            Some(("алматы", "астана", "үлкен"))
+        );
+    }
+
+    #[test]
+    fn extracts_rest_kz_population_v6_0_5() {
+        let r = try_extract_binary_comparison("Ресей Қазақстаннан халық саны көп бе?");
+        // X = ресей, Y = қазақстан (ablative -нан stripped),
+        // adjective = көп
+        assert_eq!(
+            r.as_ref()
+                .map(|(x, y, a)| (x.as_str(), y.as_str(), a.as_str())),
+            Some(("ресей", "қазақстан", "көп"))
+        );
+    }
+
+    #[test]
+    fn skips_when_no_ablative_v6_0_5() {
+        assert_eq!(try_extract_binary_comparison("Алматы үлкен қала"), None);
+    }
+
+    #[test]
+    fn skips_when_no_comparison_adjective_v6_0_5() {
+        assert_eq!(try_extract_binary_comparison("Алматы Астанадан алыс"), None);
+    }
+}
+
 pub fn try_extract_comparison_topics(input: &str) -> Option<(String, String)> {
     let lower = input.to_lowercase();
     let has_comparison_marker = lower.contains("айырмашылығы")
@@ -4534,6 +4695,206 @@ mod tests_gender_detection_explain_v6_rc5 {
             "Сен қалай білдің мектепте оқып жүргенімді?"
         ));
         assert!(!detect_ask_gender_detection_explain("Сәлем, қалайсың?"));
+    }
+}
+
+/// **v6.0.5 codex audit 2026-05-21** — detect open-ended recommendation
+/// / advice requests we do not have a curated source to answer
+/// honestly. Triggers a `unknown.recommendation_no_data` template
+/// route in the planner — that family acknowledges the absence of
+/// a curated list and offers what adam *can* do (cite a known
+/// author, define a concept, list facts for a specific named
+/// subject).
+///
+/// Examples that fire:
+///   - «Маған қандай қазақ кітабын ұсынасыз?»
+///   - «Жұмыс іздегенде қандай кеңес бересіз?»
+///   - «Маған бір ұсыныс беріңізші»
+///   - «Қазір не жасасам жақсы болады?»
+///   - «Қандай фильм көруге кеңес бересіз?»
+///
+/// Examples that do **not** fire (these have curated paths):
+///   - «Абай туралы айтшы»                   — factual query
+///   - «Қазақстан астанасы қай қала?»        — yes/no / WH-factual
+///   - «жаттығу беріңіз»                     — `detect_ask_exercise`
+///   - «код жаз»                              — `detect_code_request`
+///   - «Тоқаев жайында кеңес»                — political-recommendation
+///     refusal (separate path)
+pub fn detect_recommendation_request(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    // Recommendation verbs / nominalisations.
+    let has_recommend_marker = lower.contains("ұсын")
+        || lower.contains("кеңес бер")
+        || lower.contains("кеңесіңіз")
+        || lower.contains("кеңесіңді")
+        || lower.contains("кеңес айт")
+        || lower.contains("кеңес жоқ")
+        || lower.contains("кеңесім");
+    // "what should I do" framing.
+    let has_what_to_do = (lower.contains("не жаса") || lower.contains("не істе"))
+        && (lower.contains("жақсы") || lower.contains("дұрыс") || lower.contains("керек"));
+    if !(has_recommend_marker || has_what_to_do) {
+        return false;
+    }
+    // Exclude paths that have their own specialised handlers.
+    let is_exercise_path =
+        (lower.contains("жаттығу") || lower.contains("тапсырма") || lower.contains("есеп бер"))
+            && (lower.contains("бер") || lower.contains("ұсын"));
+    if is_exercise_path {
+        return false;
+    }
+    let is_code_path = (lower.contains("код") || lower.contains("мысал") || lower.contains("үлгі"))
+        && (lower.contains("жаз") || lower.contains("көрсет") || lower.contains("бер"));
+    if is_code_path {
+        return false;
+    }
+    // Political-recommendation refusal owns its own subspace.
+    if is_political_recommendation(input) {
+        return false;
+    }
+    // **v6.0.5 hotfix** — medical / legal / financial safety
+    // refusals also own their subspace via
+    // `detect_safety_topic`. They use «кеңес бер» phrasing too
+    // («Шарт жасасу бойынша заңды кеңес беріңізші»), so without
+    // this guard the recommendation_no_data refusal would
+    // pre-empt the safety_refusal path. Closes the
+    // adversarial_dialog_v1 srf_03 regression.
+    if detect_safety_topic(input).is_some() {
+        return false;
+    }
+    true
+}
+
+/// **v6.0.5 codex audit 2026-05-21** — detect a request asking for
+/// **N facts/reasons/items** about a topic. The user explicitly
+/// states the desired cardinality («екі дерек», «үш себеп»,
+/// «қысқаша 2 тармақ», «бес мысал»). Returns `Some(N)` with the
+/// requested count clamped to 2..=5 — adam doesn't have enough
+/// curated facts per topic to safely render 6+ unique items
+/// without leaning on tangential derivations.
+///
+/// Caller uses the count to aggregate N distinct facts about the
+/// turn's `noun_hint` into a `__multi_fact_list__` slot and route
+/// to the `unknown.multi_fact` template family.
+pub fn detect_count_hint(input: &str) -> Option<usize> {
+    let lower = input.to_lowercase();
+    // Item nouns the count attaches to. Wider than just «дерек»
+    // because adam's R1 graph isn't predicate-specific — «себеп /
+    // тармақ / нәрсе / мысал / жайт» are all asking for "items".
+    let has_item_noun = lower.contains("дерек")
+        || lower.contains("себеп")
+        || lower.contains("тармақ")
+        || lower.contains("мысал")
+        || lower.contains("жайт")
+        || lower.contains("нәрсе")
+        || lower.contains("факт");
+    if !has_item_noun {
+        return None;
+    }
+    // Cardinality markers: digits + spelled-out Kazakh numerals
+    // 2..=5 (one and 6+ are excluded — see doc comment).
+    const NUMERALS: &[(&str, usize)] = &[
+        ("екі", 2),
+        ("eki", 2),
+        ("2", 2),
+        ("үш", 3),
+        ("ush", 3),
+        ("3", 3),
+        ("төрт", 4),
+        ("4", 4),
+        ("бес", 5),
+        ("bes", 5),
+        ("5", 5),
+    ];
+    for (word, n) in NUMERALS {
+        if lower.contains(word) {
+            return Some(*n);
+        }
+    }
+    None
+}
+
+#[cfg(test)]
+mod tests_count_hint_v6_0_5 {
+    use super::detect_count_hint;
+
+    #[test]
+    fn detects_eki_derek_v6_0_5() {
+        assert_eq!(
+            detect_count_hint("Қазақстан туралы нақты екі дерек айтшы"),
+            Some(2)
+        );
+    }
+
+    #[test]
+    fn detects_ush_sebep_v6_0_5() {
+        assert_eq!(detect_count_hint("Үш себеп айтсаңызшы"), Some(3));
+    }
+
+    #[test]
+    fn detects_digit_form_v6_0_5() {
+        assert_eq!(detect_count_hint("Қысқаша 2 тармақ көрсетіңіз"), Some(2));
+    }
+
+    #[test]
+    fn does_not_fire_without_item_noun_v6_0_5() {
+        assert_eq!(detect_count_hint("Екі жігіт келді"), None);
+    }
+
+    #[test]
+    fn does_not_fire_without_count_v6_0_5() {
+        assert_eq!(detect_count_hint("Дерек айтшы"), None);
+    }
+}
+
+#[cfg(test)]
+mod tests_recommendation_request_v6_0_5 {
+    use super::detect_recommendation_request;
+
+    #[test]
+    fn fires_on_book_recommendation_v6_0_5() {
+        assert!(detect_recommendation_request(
+            "Маған қандай қазақ кітабын ұсынасыз?"
+        ));
+    }
+
+    #[test]
+    fn fires_on_job_advice_v6_0_5() {
+        assert!(detect_recommendation_request(
+            "Жұмыс іздегенде қандай кеңес бересіз?"
+        ));
+    }
+
+    #[test]
+    fn fires_on_what_to_do_v6_0_5() {
+        assert!(detect_recommendation_request(
+            "Қазір не жасасам жақсы болады?"
+        ));
+    }
+
+    #[test]
+    fn fires_on_film_recommendation_v6_0_5() {
+        assert!(detect_recommendation_request(
+            "Қандай фильм көруге кеңес бересіз?"
+        ));
+    }
+
+    #[test]
+    fn does_not_fire_on_exercise_request_v6_0_5() {
+        assert!(!detect_recommendation_request("Маған жаттығу беріңіз"));
+    }
+
+    #[test]
+    fn does_not_fire_on_code_request_v6_0_5() {
+        assert!(!detect_recommendation_request("Hello World коды бер"));
+    }
+
+    #[test]
+    fn does_not_fire_on_factual_query_v6_0_5() {
+        assert!(!detect_recommendation_request("Абай туралы айтшы"));
+        assert!(!detect_recommendation_request(
+            "Қазақстан астанасы қай қала?"
+        ));
     }
 }
 

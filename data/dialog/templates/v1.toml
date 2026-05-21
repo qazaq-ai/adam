@@ -618,6 +618,57 @@ templates = [
     "Сөзбен берілген есепті жауаптауды әзірге үйренген жоқпын. Сандарды операторлармен жазып берсеңіз, нәтижесін шығарып беремін.",
 ]
 
+# **v6.0.5 codex audit 2026-05-21** — recommendation / advice
+# refusal family. Routed via `__recommendation_no_data__` slot
+# set by `Conversation::turn` when
+# `discourse::detect_recommendation_request` fingerprints an
+# open-ended «ұсын / кеңес бер / не жасасам жақсы» query that
+# adam has no curated list to answer honestly. Closes the
+# Codex 2026-05-21 audit finding:
+#   «Маған қандай қазақ кітабын ұсынасыз?» → «Қазақ көз иеленеді.»
+# (a stray R1 derivation surfaced because the topic extractor
+# picked the loose noun `қазақ` and the chain reasoner returned
+# a tangential `RelatedTo` fact). The honest answer makes the
+# limitation explicit and invites a narrower question.
+[[families]]
+key = "unknown.recommendation_no_data"
+templates = [
+    "Бұл сұраққа сенімді ұсыныс беру үшін курацияланған тізімім жоқ. Нақты автор, шығарма немесе тақырып атасаңыз, сол жайында білетінімді айта аламын.",
+    "Ашығын айтайын: ұсыныс берерлік курация жасалмаған тізімім жоқ. Бірақ нақты есім немесе тақырып айтсаңыз, сол жайында дерек бере аламын.",
+    "Бұл салада курацияланған кеңесім әлі жоқ — соны ұсынғым келмейді, өйткені тексерілмеген болар еді. Нақты сұрақ қойсаңыз, не білетінімді бере аламын.",
+]
+
+# **v6.0.5 codex audit 2026-05-21** — multi-fact list response.
+# Conversation layer collects up to N distinct curated facts about
+# the turn's noun_hint and surfaces them as a pre-rendered numbered
+# list in `{multi_fact_list}`. The template just frames the list
+# with a brief Kazakh preamble. Routed via `__multi_fact_list__`
+# slot set by `Conversation::turn`. Closes the Codex 2026-05-21
+# audit finding that «екі дерек» / «үш себеп» asks returned only
+# a single item.
+[[families]]
+key = "unknown.multi_fact"
+templates = [
+    "{multi_fact_count} дерек:\n{multi_fact_list}",
+    "Міне сұрағаныңыз бойынша {multi_fact_count} дерек:\n{multi_fact_list}",
+]
+
+# **v6.0.5 codex audit 2026-05-21** — binary comparison response.
+# Conversation layer detected an "X is bigger / smaller / more /
+# less than Y?" question, looked up X and Y definitions in
+# world_core, and the planner routes here. Honest framing: surface
+# the definitions side-by-side and explicitly note that a
+# numerical verdict (which would require quantitative facts adam
+# does not yet carry) is out of scope. Closes the Codex audit
+# finding that comparisons silently fell through to a single fact
+# about X.
+[[families]]
+key = "unknown.binary_comparison"
+templates = [
+    "{compare_x_def} {compare_y_def} Нақты сандармен ({compare_axis}) салыстыруды әлі жасамаймын — деректі сан берсеңіз, есептей аламын.",
+    "Менің деректерімде: {compare_x_def} {compare_y_def} Бірақ нақты {compare_axis} салыстыруын әлі жасап бере алмаймын — нақты сандарды ұсынсаңыз, есептеп беремін.",
+]
+
 # v4.6.15 — Math answer template family. When
 # `discourse::try_evaluate_arithmetic` parses the input as pure
 # integer arithmetic and computes a value, the planner injects
@@ -1355,6 +1406,20 @@ templates = [
 key = "ask_weather"
 templates = [
     "Менде терезе жоқ — қалаңызды айтсаңыз («Мен Алматыда тұрамын») немесе `ADAM_WEATHER_CITY=Қостанай` орнатсаңыз, ауа райын тексере аламын.",
+]
+
+# **v6.0.5 codex audit 2026-05-21** — known-city no-data variant.
+# Routed by planner when AskWeather fires AND session.city is set
+# (user told adam their city) AND `__live_weather_set__` is NOT
+# (Open-Meteo fetch failed or returned unusable data). Closes the
+# Codex 2026-05-21 UX finding that even after «Мен Қостанайда
+# тұрамын», the bare `ask_weather` template still asks the user
+# to repeat the city.
+[[families]]
+key = "ask_weather.no_data_known_city"
+templates = [
+    "Сіз {city} қаласында тұратыныңызды білемін, бірақ қазір нақты ауа райы деректерін ала алмадым. Кейінірек қайта сұрап көріңіз.",
+    "{city} бойынша қазіргі ауа райын қазір тексере алмадым (желі қол жетімсіз болуы мүмкін). Сәл кейін қайта сұрасаңыз — қарап беремін.",
 ]
 
 # **v6.0** — live Open-Meteo answer subfamily. Routed by the

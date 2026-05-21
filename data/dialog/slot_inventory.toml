@@ -463,3 +463,24 @@ kind = "curated_fact"
 description = "Pre-rendered Kazakh-language live Open-Meteo weather answer for `Intent::AskWeather`. Populated by `weather::render_live(session)` which resolves a location via env (`ADAM_WEATHER_LAT/LON` or `ADAM_WEATHER_CITY`) or the session-belief `city` slot the user previously volunteered, then shells out to `curl https://api.open-meteo.com/v1/forecast`. Empty when no location resolves or the network call fails — the planner then falls back to the honest-refusal variant of `ask_weather`."
 example = "Қостанайда қазір ішінара бұлтты — ауа температурасы 12 °C, жел 8 км/сағ, ылғалдылық 55 %."
 variants = ["literal"]
+
+[[slots]]
+name = "multi_fact_list"
+kind = "curated_fact"
+description = "Pre-rendered numbered list (newline-separated `N. <fact>` lines) of up to N curated world_core facts about the turn's noun_hint. Populated by `Conversation::turn` when `discourse::detect_count_hint` detects a multi-fact request («екі дерек / үш себеп / бес мысал»). The planner routes to `unknown.multi_fact` to surface the list directly. Closes Codex 2026-05-21 audit: «екі дерек айтшы» previously returned only a single item."
+example = "1. Қазақстан Орталық Азиядағы ірі мемлекет.\n2. Қазақстан халқы 20 миллионға жетті."
+variants = ["literal"]
+
+[[slots]]
+name = "multi_fact_count"
+kind = "numeric"
+description = "Cardinality of the multi-fact list — copied from `discourse::detect_count_hint` (clamped 2..=5) after `Conversation::turn` aggregates the actual items. Used in the `unknown.multi_fact` template preamble («N дерек:») so the response matches the requested count even when fewer items were available (e.g. user asked for 5, world_core had 3)."
+example = "2"
+variants = ["literal"]
+
+[[slots]]
+name = "compare_axis"
+kind = "noun_term"
+description = "Comparison adjective (`үлкен / кіші / көп / аз / жоғары / төмен / жылдам / баяу / ерте / кеш / ұзын / қысқа / ауыр / жеңіл / қымбат / арзан`) extracted by `discourse::try_extract_binary_comparison` from a binary 'is X bigger than Y?' question. Surfaced in the `unknown.binary_comparison` template so the response names the dimension the user was comparing along. Closes Codex 2026-05-21 audit: «Алматы Астанадан үлкен бе?» previously fell through to a single fact about Алматы."
+example = "үлкен"
+variants = ["literal"]

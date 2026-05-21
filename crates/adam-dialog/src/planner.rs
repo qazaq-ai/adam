@@ -138,6 +138,17 @@ pub fn plan_response_with_session(
     if matches!(intent, Intent::AskWeather) && slots.contains_key("__live_weather_set__") {
         key = "ask_weather.live";
         trace.push(format!("planner: AskWeather sub-key → {key}"));
+    } else if matches!(intent, Intent::AskWeather) && session.contains_key("city") {
+        // **v6.0.5 codex audit 2026-05-21** — known-city honest
+        // refusal. Live fetch failed (no network, API timeout,
+        // city absent from `kazakh_city_coords`), but the user
+        // already told adam their city via «Мен X-те тұрамын». The
+        // bare `ask_weather` template asks them to repeat the city
+        // — frustrating UX. Route to a variant that acknowledges
+        // the known city and explains that live data is currently
+        // unavailable.
+        key = "ask_weather.no_data_known_city";
+        trace.push(format!("planner: AskWeather sub-key → {key}"));
     }
     // **v4.96.0** — Codex round-2 audit Bug 2 fix. Pedagogical
     // sub-routing (mirror of plan_response_with_epistemic block).
@@ -464,6 +475,88 @@ pub fn plan_response_with_epistemic(
                 if !k.starts_with("__") {
                     slots.insert(k.clone(), v.clone());
                 }
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
+    // **v6.0.5 codex audit 2026-05-21** — open-ended recommendation
+    // / advice refusal. Set by `Conversation::turn` via
+    // `discourse::detect_recommendation_request` whenever the user
+    // asks for a recommendation but adam has no curated list to
+    // honestly answer from. Route to the dedicated template family
+    // BEFORE topic-extraction / derivation-render so we never
+    // surface tangential R1 chains («Қазақ көз иеленеді» on a
+    // book-recommendation prompt).
+    if extra_slots.contains_key("__recommendation_no_data__") {
+        let key = "unknown.recommendation_no_data";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: recommendation_no_data override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
+    // **v6.0.5 codex audit 2026-05-21** — multi-fact list override.
+    // `Conversation::turn` already gathered N distinct world_core
+    // facts about the turn's noun_hint and rendered them as a
+    // numbered list in `multi_fact_list`. Route to the template
+    // family that surfaces the list directly. Both slots are
+    // mirrored without their leading `__` so the renderer can
+    // substitute `{multi_fact_list}` / `{multi_fact_count}`.
+    if extra_slots.contains_key("__multi_fact_list__") {
+        let key = "unknown.multi_fact";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: multi_fact override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                let public_key = k.trim_start_matches("__").trim_end_matches("__");
+                slots.insert(public_key.to_string(), v.clone());
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
+    // **v6.0.5 codex audit 2026-05-21** — binary comparison ("X is
+    // bigger than Y?") override. Conversation layer detected the
+    // pattern via `try_extract_binary_comparison`, looked up X and
+    // Y definitions from world_core, and surfaced them through the
+    // `compare_x_def` / `compare_y_def` slots. The template family
+    // is intentionally "honest acknowledge" — adam does not yet
+    // carry numeric quantitative facts to actually decide bigger /
+    // smaller, so it states both definitions and admits the
+    // numerical comparison is out of scope.
+    if extra_slots.contains_key("__binary_comparison__") {
+        let key = "unknown.binary_comparison";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: binary_comparison override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                let public_key = k.trim_start_matches("__").trim_end_matches("__");
+                slots.insert(public_key.to_string(), v.clone());
             }
             return ResponsePlan {
                 literal: chosen,

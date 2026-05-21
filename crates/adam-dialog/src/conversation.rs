@@ -1307,7 +1307,7 @@ impl Conversation {
             &intent,
             &self.belief,
         );
-        let intent_for_render = if verification.supported {
+        let mut intent_for_render = if verification.supported {
             intent.clone()
         } else {
             crate::verifier::strip_evidence(intent.clone())
@@ -1335,6 +1335,95 @@ impl Conversation {
             && crate::discourse::is_kazakh_word_problem(input)
         {
             extra_slots.insert("__word_problem__".into(), "1".into());
+        }
+        // **v6.0.5 codex audit 2026-05-21** — recommendation-without-
+        // curated-data refusal. When the user asks for an open-ended
+        // recommendation / advice («қандай кітап ұсынасыз», «қандай
+        // кеңес бересіз», «не жасасам жақсы»), the topic extractor
+        // routinely pulls a tangential noun (`қазақ`, `жұмыс`) and
+        // surfaces a stray R1 derivation («Қазақ көз иеленеді»)
+        // through the unknown.with_derived_chain family — semantic
+        // noise that breaks the demo. The honest answer is "I do
+        // not have a curated list — name a specific author / topic
+        // and I can speak to it". Route this turn to the new
+        // `unknown.recommendation_no_data` template family and
+        // strip the evidence slots so the planner cannot fall back
+        // to a derivation render.
+        let is_recommendation_request = matches!(intent, Intent::Unknown { .. })
+            && crate::discourse::detect_recommendation_request(input);
+        if is_recommendation_request {
+            extra_slots.insert("__recommendation_no_data__".into(), "1".into());
+            if let Intent::Unknown {
+                reasoning_chain,
+                example,
+                grounded_fact,
+                ..
+            } = &mut intent_for_render
+            {
+                *reasoning_chain = None;
+                *example = None;
+                *grounded_fact = None;
+            }
+        }
+        // **v6.0.5 codex audit 2026-05-21** — multi-fact aggregation.
+        // When the user explicitly asks for N distinct items
+        // («екі дерек / үш себеп / бес мысал»), gather up to N
+        // curated facts about the turn's noun_hint, surface them
+        // as a bullet-list in `__multi_fact_list__`, and route to
+        // the dedicated template family. We pull from
+        // `self.extracted_facts` because those are world_core /
+        // curated entries with `raw_text` (full Kazakh sentences),
+        // not from `derived_facts` which are R1+ chains rendered as
+        // «X пен Y бір-біріне байланысты» — recall-on-demand
+        // citations, not stand-alone items.
+        if !is_recommendation_request {
+            if let (Intent::Unknown { noun_hint, .. }, Some(n_requested)) = (
+                &intent_for_render,
+                crate::discourse::detect_count_hint(input),
+            ) {
+                if let Some(noun) = noun_hint {
+                    let noun_lower = noun.to_lowercase();
+                    let mut seen_objects: std::collections::HashSet<String> =
+                        std::collections::HashSet::new();
+                    let mut items: Vec<String> = Vec::new();
+                    for fact in &self.extracted_facts {
+                        if items.len() >= n_requested {
+                            break;
+                        }
+                        if fact.subject.root.to_lowercase() != noun_lower {
+                            continue;
+                        }
+                        // Skip duplicate-object facts so the list
+                        // is information-distinct.
+                        let obj_key = fact.object.root.to_lowercase();
+                        if !seen_objects.insert(obj_key) {
+                            continue;
+                        }
+                        items.push(fact.raw_text.clone());
+                    }
+                    if items.len() >= 2 {
+                        let list = items
+                            .iter()
+                            .enumerate()
+                            .map(|(i, s)| format!("{}. {}", i + 1, s))
+                            .collect::<Vec<_>>()
+                            .join("\n");
+                        extra_slots.insert("__multi_fact_list__".into(), list);
+                        extra_slots.insert("__multi_fact_count__".into(), items.len().to_string());
+                        if let Intent::Unknown {
+                            reasoning_chain,
+                            example,
+                            grounded_fact,
+                            ..
+                        } = &mut intent_for_render
+                        {
+                            *reasoning_chain = None;
+                            *example = None;
+                            *grounded_fact = None;
+                        }
+                    }
+                }
+            }
         }
         // **v5.24.0 — Codex 2026-05-12 audit bug 4.** Self/other
         // disambiguation for occupation queries. `detect_ask_occupation`
@@ -2041,6 +2130,69 @@ impl Conversation {
             }
             if let Some(y_def) = lookup(y_topic) {
                 extra_slots.insert("__compare_y_def__".into(), y_def);
+            }
+        }
+        // **v6.0.5 codex audit 2026-05-21** — binary comparison
+        // ("is X bigger than Y?") slot setup. Looks up X and Y
+        // definitions using the same world_core fact-pull machinery
+        // as the open-difference comparison above and routes to a
+        // dedicated honest-acknowledgement family. We do not
+        // currently carry numeric quantitative facts (population,
+        // area, etc.) so the response surfaces definitions only and
+        // explicitly states that numerical comparison isn't yet
+        // supported — closes the Codex audit finding without
+        // hallucinating a winner.
+        if extra_slots.get("__compare_x__").is_none() {
+            if let Some((x_str, y_str, adj)) =
+                crate::discourse::try_extract_binary_comparison(input)
+            {
+                let lookup_lit = |needle: &str| -> Option<String> {
+                    let needle_lower = needle.to_lowercase();
+                    let by_isa = self.extracted_facts.iter().find(|f| {
+                        f.subject.root.to_lowercase() == needle_lower
+                            && matches!(f.predicate, adam_reasoning::Predicate::IsA)
+                    });
+                    if let Some(f) = by_isa {
+                        return Some(f.raw_text.clone());
+                    }
+                    self.extracted_facts
+                        .iter()
+                        .find(|f| f.subject.root.to_lowercase() == needle_lower)
+                        .map(|f| f.raw_text.clone())
+                };
+                let lookup = |needle: &str| -> Option<String> {
+                    if let Some(f) = lookup_lit(needle) {
+                        return Some(f);
+                    }
+                    let stripped = crate::discourse::strip_trailing_case_for_lookup(needle);
+                    if stripped != needle {
+                        return lookup_lit(stripped);
+                    }
+                    None
+                };
+                extra_slots.insert("__binary_comparison__".into(), "1".into());
+                extra_slots.insert("__compare_x__".into(), x_str.clone());
+                extra_slots.insert("__compare_y__".into(), y_str.clone());
+                extra_slots.insert("__compare_axis__".into(), adj);
+                if let Some(x_def) = lookup(&x_str) {
+                    extra_slots.insert("__compare_x_def__".into(), x_def);
+                }
+                if let Some(y_def) = lookup(&y_str) {
+                    extra_slots.insert("__compare_y_def__".into(), y_def);
+                }
+                // Strip evidence on the intent so the planner cannot
+                // fall back to a stray derivation.
+                if let Intent::Unknown {
+                    reasoning_chain,
+                    example,
+                    grounded_fact,
+                    ..
+                } = &mut intent_for_render
+                {
+                    *reasoning_chain = None;
+                    *example = None;
+                    *grounded_fact = None;
+                }
             }
         }
         // **v4.98.5** — curriculum slot pre-stuffing for the
