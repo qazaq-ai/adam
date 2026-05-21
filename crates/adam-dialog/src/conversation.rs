@@ -1162,7 +1162,23 @@ impl Conversation {
                     let only_heuristic_anaphora =
                         crate::discourse::is_short_interrogative_followup(&lower)
                             && !crate::discourse::input_contains_explicit_anaphor(input);
-                    let current_overrides_prior = only_heuristic_anaphora
+                    // **v6.0.7 — 2026-05-21 user audit bug 9.** Weak
+                    // discourse-connector anaphors («онда / сонда /
+                    // мұнда / бұнда / осында») are sentence-level
+                    // connectives, not pronoun references; when one
+                    // is the ONLY anaphor token they shouldn't drag
+                    // the previous (often unrelated) topic into the
+                    // current turn. Live audit: after a math context
+                    // establishing `last_query_topic = жиырма`,
+                    // «онда маған ownership-ті қарапайым түсіндір»
+                    // pre-fix overrode `noun_hint = ownership` with
+                    // `жиырма` and surfaced a math-context answer.
+                    // Treat weak-connector-only input the same as
+                    // heuristic-only input — let a High-confidence
+                    // current-turn noun win.
+                    let only_weak_connector =
+                        crate::discourse::input_contains_only_weak_connector_anaphor(input);
+                    let current_overrides_prior = (only_heuristic_anaphora || only_weak_connector)
                         && matches!(
                             noun_hint_confidence,
                             crate::topic_extraction::TopicConfidence::High

@@ -133,6 +133,79 @@ pub fn input_contains_explicit_anaphor(input: &str) -> bool {
     input_contains_adnominal_demonstrative(input)
 }
 
+/// **v6.0.7 — 2026-05-21 user audit bug 9.** Weak discourse
+/// connectors («онда» / «сонда» / «мұнда» / «бұнда» / «осында»
+/// — locative-of-demonstrative forms used as Kazakh sentence
+/// connectors equivalent to English "then / in that case /
+/// here") look like anaphors but do NOT require resolving to a
+/// previous topic. They're discourse-level connectives more
+/// than pronouns. When such a connector is the ONLY anaphor
+/// token in the input, the current turn's content noun
+/// (if High-confidence) should win over the previous topic.
+///
+/// Audit example: after a math turn establishing «жиырма» as
+/// last_query_topic, «онда маған ownership-ті қарапайым
+/// түсіндір» (= "then explain ownership simply to me") pre-fix
+/// overrode `noun_hint = ownership` with `noun_hint = жиырма`,
+/// surfacing a math-context answer to a Rust-context question.
+///
+/// Returns `true` when the input contains at least one
+/// connector from the weak set AND no token from the strong-
+/// anaphor set (pronoun forms that genuinely require a
+/// referent: «оны / оған / оның / олар / оларды / одан /
+/// содан / бұны / соны / мұны / …»).
+pub fn input_contains_only_weak_connector_anaphor(input: &str) -> bool {
+    const WEAK_CONNECTORS: &[&str] = &["онда", "сонда", "мұнда", "бұнда", "осында"];
+    // **v6.0.7 refinement.** When a weak connector is
+    // immediately followed by an interrogative-quantifier the
+    // connector is acting as a *locative* anaphor («in it» /
+    // «in that»), NOT a sentence-connector. Example: «Ал онда
+    // қанша аймақ бар?» after «Қазақстан туралы …» — «онда»
+    // here references Kazakhstan and «аймақ» is the predicate
+    // noun being counted. The pre-existing v4.6.0 test
+    // `discourse_anaphora_resolves_to_previous_query_topic`
+    // pins exactly this case.
+    const INTERROGATIVE_FOLLOW: &[&str] = &[
+        "қанша",
+        "неше",
+        "қандай",
+        "қашан",
+        "қалай",
+        "не",
+        "кім",
+        "неге",
+        "неліктен",
+    ];
+    let lower = input.to_lowercase();
+    let tokens: Vec<&str> = lower
+        .split(|c: char| !c.is_alphabetic())
+        .filter(|t| !t.is_empty())
+        .collect();
+    let has_weak = tokens.iter().any(|t| WEAK_CONNECTORS.contains(t));
+    if !has_weak {
+        return false;
+    }
+    // Any DISCOURSE_ANAPHORS token NOT in WEAK_CONNECTORS is a
+    // "strong" anaphor. If present, the input is genuinely
+    // anaphoric and the previous-topic override should fire.
+    let has_strong = tokens
+        .iter()
+        .any(|t| DISCOURSE_ANAPHORS.contains(t) && !WEAK_CONNECTORS.contains(t));
+    if has_strong {
+        return false;
+    }
+    // Locative-anaphor disambiguation — see comment above.
+    for i in 0..tokens.len() {
+        if WEAK_CONNECTORS.contains(&tokens[i])
+            && let Some(next) = tokens.get(i + 1)
+            && INTERROGATIVE_FOLLOW.contains(next)
+        {
+            return false;
+        }
+    }
+    true
+}
+
 pub fn input_contains_discourse_anaphor(input: &str) -> bool {
     if input_contains_explicit_anaphor(input) {
         return true;

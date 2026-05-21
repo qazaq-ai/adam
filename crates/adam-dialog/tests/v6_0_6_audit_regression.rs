@@ -207,3 +207,65 @@ fn bug8_legal_bypass_triggers_legal_safety_refusal() {
         response
     );
 }
+
+#[test]
+fn bug9_weak_connector_does_not_drag_unrelated_topic_into_current_turn() {
+    let lex = load_lex();
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    // Setup: establish a math context as last_query_topic.
+    let _ = conv.turn("екі плюс екі қанша?", &lex, &repo, 0);
+    // Probe: a Rust-context follow-up using «онда» as a
+    // weak connector. The pre-fix override pulled the math
+    // topic into the Rust turn and surfaced a math-context
+    // answer; post-fix the High-confidence Rust noun
+    // («ownership») must win.
+    let response = conv.turn("онда маған ownership-ті қарапайым түсіндір", &lex, &repo, 0);
+    let lower = response.to_lowercase();
+    // The math context contained tokens like «жиырма» / «төрт»;
+    // the rust context is about «ownership». Reject any
+    // response that ECHOES math vocabulary in place of a Rust
+    // answer. The actual right answer is "I don't know
+    // ownership" / "ownership дегеніміз ..." — either is fine,
+    // as long as we don't return numeric-context content.
+    let leaks_math_context = lower.contains("жиырма")
+        || lower.contains("төрт")
+        || lower.contains("қос")
+        || lower.contains("плюс");
+    assert!(
+        !leaks_math_context,
+        "bug 9 regression: «онда маған ownership-ті қарапайым түсіндір» \
+         after a math turn leaked math-context content. Response: {response:?}"
+    );
+}
+
+#[test]
+fn bug5b_occupation_supersede_via_explicit_statement() {
+    let lex = load_lex();
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    // First occupation statement.
+    let _ = conv.turn("мен инженермін", &lex, &repo, 0);
+    assert!(
+        conv.session_value("occupation")
+            .as_deref()
+            .map(|s| s.to_lowercase().contains("инженер"))
+            .unwrap_or(false),
+        "setup failed: «мен инженермін» didn't set occupation = инженер; got {:?}",
+        conv.session_value("occupation")
+    );
+    // Explicit update.
+    let _ = conv.turn("мен бағдарламашымын", &lex, &repo, 0);
+    let occ = conv.session_value("occupation");
+    assert!(
+        occ.as_deref()
+            .map(|s| {
+                let lc = s.to_lowercase();
+                lc.contains("бағдарламашы") && !lc.contains("инженер")
+            })
+            .unwrap_or(false),
+        "bug 5b regression: «мен бағдарламашымын» after «мен инженермін» \
+         left occupation = {:?}; expected new value «бағдарламашы»",
+        occ
+    );
+}
