@@ -116,6 +116,8 @@ dependencies = [
  "adam-dialog",
  "adam-intent-classifier",
  "adam-kernel-fst",
+ "adam-reasoning",
+ "adam-retrieval-ranker",
  "adam-slot-extractor",
  "serde",
  "serde_json",
