@@ -108,3 +108,77 @@
 {"id":"seed_re_02","input":"Бір сұрағым бар","intent":"Request","source_file":"seed","confidence":"high"}
 {"id":"seed_re_03","input":"Маған бір нәрсе көрсете аласыз ба","intent":"Request","source_file":"seed","confidence":"high"}
 {"id":"seed_re_04","input":"Сұрайын деп едім","intent":"Request","source_file":"seed","confidence":"high"}
+{"id":"seed_safety_med_01","input":"Жүрегім ауырып тұр, қалай емдеймін","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_med_02","input":"Басым ауырып тұр, қандай дәрі ішейін","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_med_03","input":"Бала қызбалап жатыр, не істейін","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_med_04","input":"Жөтел қалай жоғалады","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_med_05","input":"Қандай дәруменін ішсем дұрыс","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_med_06","input":"Антибиотикті қалай дұрыс қабылдау керек","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_med_07","input":"Қан қысымы көтерілгенде не істеу керек","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_med_08","input":"Тіс ауырғанда не қол жетімді","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_leg_01","input":"Шарт жасасу бойынша кеңес беріңіз","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_leg_02","input":"Көршіммен таласпын сотта қалай ұтамын","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_leg_03","input":"Ажырасу үшін қандай құжаттар керек","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_leg_04","input":"Жалақым төленбеді не істеуім керек","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_leg_05","input":"Мұра қалай рәсімделеді","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_leg_06","input":"Алимент қалай сұралады","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_leg_07","input":"Айыппұл салынса не істеуге болады","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_leg_08","input":"Тұтынушы құқықтары туралы айтып беріңіз","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_fin_01","input":"Қандай криптоға ақшамды салайын","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_fin_02","input":"Несие алу керек пе айтсаңыз","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_fin_03","input":"Зейнетақы жинағын қалай дұрыс орналастырамын","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_fin_04","input":"Депозитті қай банкке сал","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_fin_05","input":"Ипотека алсам пайда бар ма","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_fin_06","input":"Салық декларациясы қалай толтырылады","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_fin_07","input":"Алаяқтар ақшамды алып кетті","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_safety_fin_08","input":"Инвестициялық қор деген не","intent":"FactualQuery","source_file":"seed_safety","confidence":"high"}
+{"id":"seed_th_07","input":"Көп көп рахмет","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_th_08","input":"Алла разы болсын","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_th_09","input":"Үлкен алғыс","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_th_10","input":"Сізге шексіз рахмет","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_th_11","input":"Көмегіңіз үшін рахмет","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_th_12","input":"Жауап бергеніңізге рахмет","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_re_05","input":"Маған қаламды беріңізші","intent":"Request","source_file":"seed","confidence":"high"}
+{"id":"seed_re_06","input":"Бір кеңес сұрайын","intent":"Request","source_file":"seed","confidence":"high"}
+{"id":"seed_re_07","input":"Сізден көмек керек","intent":"Request","source_file":"seed","confidence":"high"}
+{"id":"seed_re_08","input":"Өтінемін, тыңдаңыз","intent":"Request","source_file":"seed","confidence":"high"}
+{"id":"seed_re_09","input":"Менің бір өтінішім бар","intent":"Request","source_file":"seed","confidence":"high"}
+{"id":"seed_re_10","input":"Маған дұрыс жолды көрсетіңізші","intent":"Request","source_file":"seed","confidence":"high"}
+{"id":"seed_sol_06","input":"Мен Шымкент қаласынан келдім","intent":"StatementOfLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_sol_07","input":"Менің туған жерім Қарағанды","intent":"StatementOfLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_sol_08","input":"Орал қаласында тұрамын","intent":"StatementOfLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_sol_09","input":"Атырауда дүниеге келдім","intent":"StatementOfLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_sol_10","input":"Семей өңірінен","intent":"StatementOfLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_son_06","input":"Атым Бекжан","intent":"StatementOfName","source_file":"seed","confidence":"high"}
+{"id":"seed_son_07","input":"Мен Айдарамын","intent":"StatementOfName","source_file":"seed","confidence":"high"}
+{"id":"seed_son_08","input":"Әсем деген қызбын","intent":"StatementOfName","source_file":"seed","confidence":"high"}
+{"id":"seed_son_09","input":"Мені Нұрсұлтан атайды","intent":"StatementOfName","source_file":"seed","confidence":"high"}
+{"id":"seed_son_10","input":"Менің есімім Әмина","intent":"StatementOfName","source_file":"seed","confidence":"high"}
+{"id":"seed_soa_05","input":"Бағдарламашымын","intent":"StatementOfOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_soa_06","input":"Маркетолог болып істеймін","intent":"StatementOfOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_soa_07","input":"Жұмысым — мұғалім","intent":"StatementOfOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_soa_08","input":"Дизайнермін","intent":"StatementOfOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_soa_09","input":"Кәсібім бухгалтер","intent":"StatementOfOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_san_06","input":"23 жастамын","intent":"StatementOfAge","source_file":"seed","confidence":"high"}
+{"id":"seed_san_07","input":"Жасым 50","intent":"StatementOfAge","source_file":"seed","confidence":"high"}
+{"id":"seed_san_08","input":"Маған 19 жас","intent":"StatementOfAge","source_file":"seed","confidence":"high"}
+{"id":"seed_san_09","input":"Қырық жас алдым","intent":"StatementOfAge","source_file":"seed","confidence":"high"}
+{"id":"seed_san_10","input":"Менің жасым 35","intent":"StatementOfAge","source_file":"seed","confidence":"high"}
+{"id":"seed_sow_06","input":"Жаман емес","intent":"StatementOfWellbeing","source_file":"seed","confidence":"high"}
+{"id":"seed_sow_07","input":"Барысы дұрыс","intent":"StatementOfWellbeing","source_file":"seed","confidence":"high"}
+{"id":"seed_sow_08","input":"Көңіл күй жақсы","intent":"StatementOfWellbeing","source_file":"seed","confidence":"high"}
+{"id":"seed_sow_09","input":"Бәрі жайында","intent":"StatementOfWellbeing","source_file":"seed","confidence":"high"}
+{"id":"seed_sow_10","input":"Тыныш қана","intent":"StatementOfWellbeing","source_file":"seed","confidence":"high"}
+{"id":"seed_af_04","input":"Сіздің балаларыңыз бар ма","intent":"AskFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_af_05","input":"Үйленгенсіз бе","intent":"AskFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_af_06","input":"Ағайын-туыстарың туралы айтсаң","intent":"AskFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_af_07","input":"Анаң қандай адам","intent":"AskFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_ao_04","input":"Кәсібіңіз не","intent":"AskOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_ao_05","input":"Қай салада жұмыс істейсіз","intent":"AskOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_ao_06","input":"Күнделікті немен айналысасыз","intent":"AskOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_ao_07","input":"Сіз кім болып істейсіз","intent":"AskOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_cr_01","input":"Hello World кодын жаз","intent":"CodeRequest","source_file":"seed","confidence":"high"}
+{"id":"seed_cr_02","input":"Бір функция жазып бер","intent":"CodeRequest","source_file":"seed","confidence":"high"}
+{"id":"seed_cr_03","input":"Цикл мысалын көрсетіңіз","intent":"CodeRequest","source_file":"seed","confidence":"high"}
+{"id":"seed_cr_04","input":"if statement мысал","intent":"CodeRequest","source_file":"seed","confidence":"high"}
+{"id":"seed_cr_05","input":"Айнымалы жариялау мысалын беріңіз","intent":"CodeRequest","source_file":"seed","confidence":"high"}

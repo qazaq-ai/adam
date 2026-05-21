@@ -931,3 +931,112 @@
 {"id":"synth_00931","input":"сен неше жастасыз","intent":"AskAge","source_file":"synth_from:seed_aa_02","confidence":"high"}
 {"id":"synth_00932","input":"қанша жасыз бар","intent":"AskAge","source_file":"synth_from:seed_aa_03","confidence":"high"}
 {"id":"synth_00933","input":"отбасыз туралы айтып бер","intent":"AskFamily","source_file":"synth_from:seed_af_01","confidence":"high"}
+{"id":"synth_00934","input":"қандай дәруменін ішсем иә","intent":"FactualQuery","source_file":"synth_from:seed_safety_med_05","confidence":"high"}
+{"id":"synth_00935","input":"антибиотикті қалай иә қабылдау керек","intent":"FactualQuery","source_file":"synth_from:seed_safety_med_06","confidence":"high"}
+{"id":"synth_00936","input":"зейнетақы жинағын қалай иә орналастырамын","intent":"FactualQuery","source_file":"synth_from:seed_safety_fin_03","confidence":"high"}
+{"id":"synth_00937","input":"көп көп рақмет","intent":"Thanks","source_file":"synth_from:seed_th_07","confidence":"high"}
+{"id":"synth_00938","input":"сізге шексен рахмет","intent":"Thanks","source_file":"synth_from:seed_th_10","confidence":"high"}
+{"id":"synth_00939","input":"сізге шексіз рақмет","intent":"Thanks","source_file":"synth_from:seed_th_10","confidence":"high"}
+{"id":"synth_00940","input":"көмегіңіз үшін рақмет","intent":"Thanks","source_file":"synth_from:seed_th_11","confidence":"high"}
+{"id":"synth_00941","input":"жауап бергеніңізге рақмет","intent":"Thanks","source_file":"synth_from:seed_th_12","confidence":"high"}
+{"id":"synth_00942","input":"Бір өтінішім бар","intent":"Request","source_file":"synth_from:seed_re_09","confidence":"high"}
+{"id":"synth_00943","input":"маған иә жолды көрсетіңізші","intent":"Request","source_file":"synth_from:seed_re_10","confidence":"high"}
+{"id":"synth_00944","input":"Туған жерім Қарағанды","intent":"StatementOfLocation","source_file":"synth_from:seed_sol_07","confidence":"high"}
+{"id":"synth_00945","input":"Есімім Әмина","intent":"StatementOfName","source_file":"synth_from:seed_son_10","confidence":"high"}
+{"id":"synth_00946","input":"Жасым 35","intent":"StatementOfAge","source_file":"synth_from:seed_san_10","confidence":"high"}
+{"id":"synth_00947","input":"барысы иә","intent":"StatementOfWellbeing","source_file":"synth_from:seed_sow_07","confidence":"high"}
+{"id":"synth_00948","input":"Балаларыңыз бар ма","intent":"AskFamily","source_file":"synth_from:seed_af_04","confidence":"high"}
+{"id":"synth_00949","input":"сенің балаларыңыз бар ма","intent":"AskFamily","source_file":"synth_from:seed_af_04","confidence":"high"}
+{"id":"synth_00950","input":"үйленгенсен бе","intent":"AskFamily","source_file":"synth_from:seed_af_05","confidence":"high"}
+{"id":"synth_00951","input":"сен кім болып істейсіз","intent":"AskOccupation","source_file":"synth_from:seed_ao_07","confidence":"high"}
+{"id":"synth_00952","input":"қандай дәруменін ішсем дұрыс","intent":"FactualQuery","source_file":"synth_from:synth_00001","confidence":"high"}
+{"id":"synth_00953","input":"антибиотикті қалай дұрыс қабылдау керек","intent":"FactualQuery","source_file":"synth_from:synth_00002","confidence":"high"}
+{"id":"synth_00954","input":"зейнетақы жинағын қалай дұрыс орналастырамын","intent":"FactualQuery","source_file":"synth_from:synth_00003","confidence":"high"}
+{"id":"synth_00955","input":"көп көп рахмет","intent":"Thanks","source_file":"synth_from:synth_00004","confidence":"high"}
+{"id":"synth_00956","input":"сізге шексен рақмет","intent":"Thanks","source_file":"synth_from:synth_00005","confidence":"high"}
+{"id":"synth_00957","input":"сізге шексіз рахмет","intent":"Thanks","source_file":"synth_from:synth_00005","confidence":"high"}
+{"id":"synth_00958","input":"көмегіңіз үшін рахмет","intent":"Thanks","source_file":"synth_from:synth_00007","confidence":"high"}
+{"id":"synth_00959","input":"жауап бергеніңізге рахмет","intent":"Thanks","source_file":"synth_from:synth_00008","confidence":"high"}
+{"id":"synth_00960","input":"маған дұрыс жолды көрсетіңізші","intent":"Request","source_file":"synth_from:synth_00010","confidence":"high"}
+{"id":"synth_00961","input":"барысы дұрыс","intent":"StatementOfWellbeing","source_file":"synth_from:synth_00014","confidence":"high"}
+{"id":"synth_00962","input":"сіздің балаларыңыз бар ма","intent":"AskFamily","source_file":"synth_from:synth_00016","confidence":"high"}
+{"id":"synth_00963","input":"үйленгенсіз бе","intent":"AskFamily","source_file":"synth_from:synth_00017","confidence":"high"}
+{"id":"synth_00964","input":"сіз кім болып істейсіз","intent":"AskOccupation","source_file":"synth_from:synth_00018","confidence":"high"}
+{"id":"synth_00965","input":"сен менің атымды білесен ме?","intent":"AskName","source_file":"synth_from:synth_00022","confidence":"high"}
+{"id":"synth_00966","input":"сіз менің атымды білесіз ме?","intent":"AskName","source_file":"synth_from:synth_00022","confidence":"high"}
+{"id":"synth_00967","input":"сен менің атымды білесің ме?","intent":"AskName","source_file":"synth_from:synth_00023","confidence":"high"}
+{"id":"synth_00968","input":"сіз менің атымды білесіз?","intent":"AskName","source_file":"synth_from:synth_00023","confidence":"high"}
+{"id":"synth_00969","input":"сіз менің атымды білесен?","intent":"AskName","source_file":"synth_from:synth_00025","confidence":"high"}
+{"id":"synth_00970","input":"кредит алу дұрыс?","intent":"FactualQuery","source_file":"synth_from:synth_00027","confidence":"high"}
+{"id":"synth_00971","input":"кредит алу иә ме?","intent":"FactualQuery","source_file":"synth_from:synth_00027","confidence":"high"}
+{"id":"synth_00972","input":"несие алу иә па?","intent":"FactualQuery","source_file":"synth_from:synth_00030","confidence":"high"}
+{"id":"synth_00973","input":"несие алу дұрыс?","intent":"FactualQuery","source_file":"synth_from:synth_00031","confidence":"high"}
+{"id":"synth_00974","input":"несие алу иә ме?","intent":"FactualQuery","source_file":"synth_from:synth_00031","confidence":"high"}
+{"id":"synth_00975","input":"сен қайда тұрасыз?","intent":"AskLocation","source_file":"synth_from:synth_00034","confidence":"high"}
+{"id":"synth_00976","input":"сіз қайда тұрасыз ма?","intent":"AskLocation","source_file":"synth_from:synth_00034","confidence":"high"}
+{"id":"synth_00977","input":"сіз қайда тұрасың ма?","intent":"AskLocation","source_file":"synth_from:synth_00036","confidence":"high"}
+{"id":"synth_00978","input":"қайда сіз тұрасың?","intent":"AskLocation","source_file":"synth_from:synth_00036","confidence":"high"}
+{"id":"synth_00979","input":"қайда сен тұрасың ма?","intent":"AskLocation","source_file":"synth_from:synth_00037","confidence":"high"}
+{"id":"synth_00980","input":"қайда сен тұрасыз ма?","intent":"AskLocation","source_file":"synth_from:synth_00038","confidence":"high"}
+{"id":"synth_00981","input":"балаға дәрумен берсем дұрыс?","intent":"FactualQuery","source_file":"synth_from:synth_00040","confidence":"high"}
+{"id":"synth_00982","input":"балаға дәрумен берсем иә ме?","intent":"FactualQuery","source_file":"synth_from:synth_00040","confidence":"high"}
+{"id":"synth_00983","input":"rust бағдарламалау тілі туралы не білесен?","intent":"FactualQuery","source_file":"synth_from:synth_00044","confidence":"high"}
+{"id":"synth_00984","input":"rust бағдарламалау тілі туралы не білесіз ме?","intent":"FactualQuery","source_file":"synth_from:synth_00044","confidence":"high"}
+{"id":"synth_00985","input":"rust тілі туралы не білесен?","intent":"FactualQuery","source_file":"synth_from:synth_00047","confidence":"high"}
+{"id":"synth_00986","input":"rust тілі туралы не білесіз ме?","intent":"FactualQuery","source_file":"synth_from:synth_00047","confidence":"high"}
+{"id":"synth_00987","input":"жасымды білесен ме?","intent":"AskAge","source_file":"synth_from:synth_00052","confidence":"high"}
+{"id":"synth_00988","input":"жасымды білесіз?","intent":"AskAge","source_file":"synth_from:synth_00053","confidence":"high"}
+{"id":"synth_00989","input":"жасымды білесің ме?","intent":"AskAge","source_file":"synth_from:synth_00053","confidence":"high"}
+{"id":"synth_00990","input":"қай қалада тұратынымды білесен ме?","intent":"AskLocation","source_file":"synth_from:synth_00056","confidence":"high"}
+{"id":"synth_00991","input":"қай қалада тұратынымды білесіз?","intent":"AskLocation","source_file":"synth_from:synth_00057","confidence":"high"}
+{"id":"synth_00992","input":"қай қалада тұратынымды білесің ме?","intent":"AskLocation","source_file":"synth_from:synth_00057","confidence":"high"}
+{"id":"synth_00993","input":"қайдан келгенімді білесен ме?","intent":"AskLocation","source_file":"synth_from:synth_00060","confidence":"high"}
+{"id":"synth_00994","input":"қайдан келгенімді білесіз?","intent":"AskLocation","source_file":"synth_from:synth_00061","confidence":"high"}
+{"id":"synth_00995","input":"қайдан келгенімді білесің ме?","intent":"AskLocation","source_file":"synth_from:synth_00061","confidence":"high"}
+{"id":"synth_00996","input":"кімсіз сіз ме?","intent":"AskAboutSystem","source_file":"synth_from:synth_00069","confidence":"high"}
+{"id":"synth_00997","input":"кімсің Сен?","intent":"AskAboutSystem","source_file":"synth_from:synth_00069","confidence":"high"}
+{"id":"synth_00998","input":"сен кімсен ме?","intent":"AskAboutSystem","source_file":"synth_from:synth_00070","confidence":"high"}
+{"id":"synth_00999","input":"сіз кімсіз?","intent":"AskAboutSystem","source_file":"synth_from:synth_00070","confidence":"high"}
+{"id":"synth_01000","input":"сен кімсің ме?","intent":"AskAboutSystem","source_file":"synth_from:synth_00071","confidence":"high"}
+{"id":"synth_01001","input":"кімсің сіз ме?","intent":"AskAboutSystem","source_file":"synth_from:synth_00072","confidence":"high"}
+{"id":"synth_01002","input":"қандай тілде жазылғансыз?","intent":"AskAboutSystem","source_file":"synth_from:synth_00073","confidence":"high"}
+{"id":"synth_01003","input":"не істей аласыз?","intent":"AskAboutSystem","source_file":"synth_from:synth_00074","confidence":"high"}
+{"id":"synth_01004","input":"жасуша туралы не білесен ме?","intent":"FactualQuery","source_file":"synth_from:synth_00075","confidence":"high"}
+{"id":"synth_01005","input":"жасуша туралы не білесің ме?","intent":"FactualQuery","source_file":"synth_from:synth_00076","confidence":"high"}
+{"id":"synth_01006","input":"абай туралы білесіз ме?","intent":"FactualQuery","source_file":"synth_from:synth_00077","confidence":"high"}
+{"id":"synth_01007","input":"абай туралы білесің?","intent":"FactualQuery","source_file":"synth_from:synth_00078","confidence":"high"}
+{"id":"synth_01008","input":"абай туралы білесен?","intent":"FactualQuery","source_file":"synth_from:synth_00079","confidence":"high"}
+{"id":"synth_01009","input":"илон маск туралы не білесен ме?","intent":"FactualQuery","source_file":"synth_from:synth_00080","confidence":"high"}
+{"id":"synth_01010","input":"илон маск туралы не білесің ме?","intent":"FactualQuery","source_file":"synth_from:synth_00081","confidence":"high"}
+{"id":"synth_01011","input":"инвестиция жасайын ба, кеңес бересен ме?","intent":"FactualQuery","source_file":"synth_from:synth_00082","confidence":"high"}
+{"id":"synth_01012","input":"инвестиция жасайын ба, кеңес бересің ме?","intent":"FactualQuery","source_file":"synth_from:synth_00083","confidence":"high"}
+{"id":"synth_01013","input":"инвестиция жасайын ба, кеңес бересіз?","intent":"FactualQuery","source_file":"synth_from:synth_00085","confidence":"high"}
+{"id":"synth_01014","input":"rust-та мұрагерлік жоқ деген не ме?","intent":"FactualQuery","source_file":"synth_from:synth_00086","confidence":"high"}
+{"id":"synth_01015","input":"нысан-қауіпсіз трейт деген не ме?","intent":"FactualQuery","source_file":"synth_from:synth_00088","confidence":"high"}
+{"id":"synth_01016","input":"clone нысан-қауіпсіз емес деген не ме?","intent":"FactualQuery","source_file":"synth_from:synth_00090","confidence":"high"}
+{"id":"synth_01017","input":"қалай дұрыстаймын ма?","intent":"FactualQuery","source_file":"synth_from:synth_00099","confidence":"high"}
+{"id":"synth_01018","input":"сіздің атыңыз кім ме?","intent":"AskAboutSystem","source_file":"synth_from:synth_00102","confidence":"high"}
+{"id":"synth_01019","input":"атыңыз не ме?","intent":"AskAboutSystem","source_file":"synth_from:synth_00104","confidence":"high"}
+{"id":"synth_01020","input":"Атыңыз не ме?","intent":"AskAboutSystem","source_file":"synth_from:synth_00106","confidence":"high"}
+{"id":"synth_01021","input":"сенің атыңыз не ме?","intent":"AskAboutSystem","source_file":"synth_from:synth_00106","confidence":"high"}
+{"id":"synth_01022","input":"сен қандай тілде сөйлейсен?","intent":"AskAboutSystem","source_file":"synth_from:synth_00109","confidence":"high"}
+{"id":"synth_01023","input":"сіз қандай тілде сөйлейсіз ме?","intent":"AskAboutSystem","source_file":"synth_from:synth_00109","confidence":"high"}
+{"id":"synth_01024","input":"сіз қандай тілде сөйлейсің ме?","intent":"AskAboutSystem","source_file":"synth_from:synth_00111","confidence":"high"}
+{"id":"synth_01025","input":"сен қай тілде сөйлейсен ме?","intent":"AskAboutSystem","source_file":"synth_from:synth_00112","confidence":"high"}
+{"id":"synth_01026","input":"сіз қай тілде сөйлейсіз?","intent":"AskAboutSystem","source_file":"synth_from:synth_00112","confidence":"high"}
+{"id":"synth_01027","input":"сен қай тілде сөйлейсің ме?","intent":"AskAboutSystem","source_file":"synth_from:synth_00113","confidence":"high"}
+{"id":"synth_01028","input":"сәлеметсен беетсен бе","intent":"Greeting","source_file":"synth_from:synth_00115","confidence":"high"}
+{"id":"synth_01029","input":"сәлеметсіз беетсіз беетсен бе","intent":"Greeting","source_file":"synth_from:synth_00115","confidence":"high"}
+{"id":"synth_01030","input":"сәлеметсіз беетсен беетсен бе","intent":"Greeting","source_file":"synth_from:synth_00116","confidence":"high"}
+{"id":"synth_01031","input":"сәлеметсен беетсен беетсен бе","intent":"Greeting","source_file":"synth_from:synth_00117","confidence":"high"}
+{"id":"synth_01032","input":"сәлеметсіз беетсіз беетсіз беетсіз бе","intent":"Greeting","source_file":"synth_from:synth_00117","confidence":"high"}
+{"id":"synth_01033","input":"сәлеметсен бе, қалайсың","intent":"Greeting","source_file":"synth_from:synth_00119","confidence":"high"}
+{"id":"synth_01034","input":"сәлеметсіз беетсіз бе, қалайсыз","intent":"Greeting","source_file":"synth_from:synth_00119","confidence":"high"}
+{"id":"synth_01035","input":"сәлеметсіз беетсен бе, қалайсың","intent":"Greeting","source_file":"synth_from:synth_00120","confidence":"high"}
+{"id":"synth_01036","input":"сәлеметсен беетсен бе, қалайсың","intent":"Greeting","source_file":"synth_from:synth_00121","confidence":"high"}
+{"id":"synth_01037","input":"сәлеметсіз беетсіз беетсіз бе, қалайсың","intent":"Greeting","source_file":"synth_from:synth_00121","confidence":"high"}
+{"id":"synth_01038","input":"сәлеметсіз беетсен бе достар","intent":"Greeting","source_file":"synth_from:synth_00123","confidence":"high"}
+{"id":"synth_01039","input":"сәлеметсен беетсен бе достар","intent":"Greeting","source_file":"synth_from:synth_00124","confidence":"high"}
+{"id":"synth_01040","input":"сәлеметсіз беетсіз беетсіз бе достар","intent":"Greeting","source_file":"synth_from:synth_00124","confidence":"high"}
+{"id":"synth_01041","input":"өте сен жақсысың","intent":"Compliment","source_file":"synth_from:synth_00137","confidence":"high"}
+{"id":"synth_01042","input":"неше сіз жастасыз","intent":"AskAge","source_file":"synth_from:synth_00146","confidence":"high"}

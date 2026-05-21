@@ -258,8 +258,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map(serde_json::from_str)
         .collect::<Result<_, _>>()?;
 
+    // De-duplicate ONLY against authoritative sources (cascade
+    // and seed). Rows tagged `synth_from:*` were emitted by a
+    // **previous run of this binary** and should not block us
+    // from re-emitting them; otherwise a rebuild leaks variants
+    // every time the seed file grows. Closes the data-loss bug
+    // surfaced on the 2026-05-21 safety-seed expansion.
     let mut seen: std::collections::HashSet<(String, String)> = std::collections::HashSet::new();
     for ex in &examples {
+        if ex.source_file.starts_with("synth_from:") {
+            continue;
+        }
         seen.insert((ex.input.clone(), ex.intent.clone()));
     }
 
