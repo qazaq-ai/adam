@@ -2530,11 +2530,22 @@ fn action_planner_classifies_reasoning_chain_intent_as_run_reasoner() {
     );
 }
 
-/// v4.0.31 — belief contradiction routes action to
-/// `CheckContradiction` even when the current turn has evidence
-/// attached. Contradictions dominate everything else.
+/// **v6.0.6 (replaces v4.0.31).** Belief contradiction no longer
+/// dominates UNRELATED factual / educational queries — the
+/// 2026-05-21 user audit found that pre-v6.0.6 «жер туралы
+/// айтшы» (a Kazakh-poet / Earth definition question) after a
+/// pending city conflict was answered with a clarifying prompt
+/// about Alma-Ata vs Astana, which from the user's POV bricked
+/// every subsequent factual turn. The gate now requires the
+/// current intent to engage the contested slot (or be a
+/// resolution / paper-over-social shape). When the intent is a
+/// content-bearing factual probe, the contradiction stays in
+/// `belief.contradictions` for audit but doesn't dominate the
+/// planner. The pre-existing engagement case is kept by
+/// `action_planner_surfaces_contradiction_when_intent_engages_slot`
+/// below.
 #[test]
-fn action_planner_surfaces_contradiction_over_evidence() {
+fn action_planner_does_not_surface_contradiction_for_unrelated_factual_query() {
     let Some(lex) = load_lexicon() else { return };
     let repo = load_repo();
     let mut conv = Conversation::new();
@@ -2542,6 +2553,34 @@ fn action_planner_surfaces_contradiction_over_evidence() {
     conv.turn("мен алматыда тұрамын", &lex, &repo, 0);
     conv.turn("мен астанада тұрамын", &lex, &repo, 1);
     let (_, trace) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 2);
+
+    use adam_dialog::Action;
+    assert_ne!(
+        trace.action_digest.action,
+        Action::CheckContradiction,
+        "city conflict must not block an unrelated factual query (audit 2026-05-21)"
+    );
+    // Audit-trail preserved.
+    assert_eq!(conv.belief.contradictions.len(), 1);
+}
+
+/// **v6.0.6.** Counter-test to the negative case above — when
+/// the current intent DOES engage the contested slot
+/// (StatementOfLocation), the contradiction priority still
+/// fires. This is the engagement case the v4.0.31 design
+/// originally intended; v6.0.6 narrows it but does not remove
+/// it.
+#[test]
+fn action_planner_surfaces_contradiction_when_intent_engages_slot() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    conv.turn("мен алматыда тұрамын", &lex, &repo, 0);
+    conv.turn("мен астанада тұрамын", &lex, &repo, 1);
+    // Third StatementOfLocation engages the contested slot
+    // again — the planner must clarify.
+    let (_, trace) = conv.turn_with_trace("мен шымкентте тұрамын", &lex, &repo, 2);
 
     use adam_dialog::{Action, OutputKind};
     assert_eq!(trace.action_digest.action, Action::CheckContradiction);
@@ -2567,13 +2606,19 @@ fn action_planner_social_intent() {
     );
 }
 
-/// v4.0.34 Phase 5 part 2 — conflict-surfacing template family
-/// actually fires when belief has a contradiction + Unknown intent
-/// with noun_hint. Pre-v4.0.34 the gate stripped evidence and the
-/// reply was a generic noun-echo; post-v4.0.34 the user sees the
-/// two conflicting claims + a clarifying question.
+/// **v6.0.6 (replaces v4.0.34 Phase 5 part 2).** The conflict-
+/// surfacing template no longer fires for UNRELATED factual
+/// queries that happen to land while a contradiction is
+/// pending. Per the 2026-05-21 user audit, asking «жер туралы
+/// айтшы» (an Earth / Kazakh-poet definition question) while a
+/// city conflict sits in belief must NOT route the reply through
+/// `unknown.conflicted` — the user is asking about Earth, not
+/// arbitrating their own city slot. The reply should be a normal
+/// noun-hint fallback / definitional answer; the contradiction
+/// remains in belief for audit and resurfaces only when the user
+/// touches the contested slot again.
 #[test]
-fn conflict_surfaces_explicit_clarification_template() {
+fn conflict_does_not_surface_for_unrelated_factual_query() {
     let Some(lex) = load_lexicon() else { return };
     let repo = load_repo();
     let mut conv = Conversation::new();
@@ -2582,29 +2627,43 @@ fn conflict_surfaces_explicit_clarification_template() {
     conv.turn("мен астанада тұрамын", &lex, &repo, 1);
     let out = conv.turn("жер туралы айтшы", &lex, &repo, 2);
 
-    // Must contain both conflicting values — the whole point is
-    // making the user aware of the disagreement.
+    let lower = out.to_lowercase();
+    // The conflict template explicitly names both city values
+    // AND a clarification cue. Reject the whole signature.
+    let looks_like_conflict_template =
+        lower.contains("алматы") && lower.contains("астана") && lower.contains("қайсысы дұрыс");
     assert!(
-        out.to_lowercase().contains("алматы"),
-        "conflict reply must cite old value, got: {out:?}"
+        !looks_like_conflict_template,
+        "v6.0.6 contract: conflict template must not fire on \
+         «жер туралы айтшы» (an unrelated factual query). Got: {out:?}"
     );
+    // Sanity — contradiction record itself is preserved.
+    assert_eq!(conv.belief.contradictions.len(), 1);
+}
+
+/// **v6.0.6.** Counter-test — when the next turn DOES engage
+/// the contested city slot (a third StatementOfLocation), the
+/// clarification template must still fire and cite both values.
+/// This pins the "engagement case stays" half of v6.0.6.
+#[test]
+fn conflict_surfaces_explicit_clarification_template_when_intent_engages() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    conv.turn("мен алматыда тұрамын", &lex, &repo, 0);
+    conv.turn("мен астанада тұрамын", &lex, &repo, 1);
+    let out = conv.turn("мен шымкентте тұрамын", &lex, &repo, 2);
+
+    let lower = out.to_lowercase();
     assert!(
-        out.to_lowercase().contains("астана"),
-        "conflict reply must cite new value, got: {out:?}"
+        lower.contains("алматы") || lower.contains("астана"),
+        "engagement-case reply must cite a contested value, got: {out:?}"
     );
-    // Must route to clarification — some question marker / kazakh
-    // clarification cue. All three `unknown.conflicted` templates
-    // end with a question; any of «?» / «дұрыс» / «ма» / «нақтылай»
-    // suffices.
     let markers = ["?", "дұрыс", "нақтылай"];
     assert!(
         markers.iter().any(|m| out.contains(m)),
-        "conflict reply must look like a clarifying question, got: {out:?}"
-    );
-    // Sanity — must NOT still be the reasoning-chain marker.
-    assert!(
-        !out.contains("байланыс"),
-        "conflict path must not render a reasoning chain, got: {out:?}"
+        "engagement-case reply must look like a clarifying question, got: {out:?}"
     );
 }
 

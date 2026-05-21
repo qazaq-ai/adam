@@ -75,16 +75,12 @@
       }
     },
     {
-      "id": "contradiction_surfaces_in_reply",
+      "id": "contradiction_does_not_block_unrelated_factual_query",
       "category": "contradiction_handling",
-      "description": "After conflict + topic question, reply must cite both values + clarification cue.",
+      "description": "v6.0.6 semantics: a pending city conflict must NOT route an unrelated factual query (`жер туралы айтшы`) through the conflict template family. Pre-v6.0.6 the planner returned `CheckContradiction` for any non-Farewell intent, trapping the user behind the resolution prompt. Now the conflict stays in belief for audit and resurfaces only when the user touches the contested slot again. See `docs/third_path_results.md` and the 2026-05-21 user audit (bug 4).",
       "turns": ["мен алматыда тұрамын", "мен астанада тұрамын", "жер туралы айтшы"],
       "expect": {
-        "epistemic_status": "Conflicted",
-        "action": "CheckContradiction",
-        "output_contains_lower_any": ["алматы"],
-        "output_contains_lower_any_2": ["астана"],
-        "output_not_contains": ["байланыс"]
+        "output_not_contains_lower": ["қайсысы дұрыс"]
       }
     },
     {

@@ -910,7 +910,39 @@ impl Conversation {
         adam_kernel_fst::populate_periphrastic_modality(&mut sem_frames);
         adam_kernel_fst::populate_ability_modality(&mut sem_frames);
         adam_kernel_fst::populate_sentential_negation(&mut sem_frames);
-        let cascade_intent = interpret_text_with_lexicon(stripped, &parses, Some(lexicon));
+        // **v6.0.6 — NEG-correction rewrite.** Kazakh's contrastive
+        // negation pattern «PREFIX X емес[+copula], Y» means
+        // «PREFIX is not X, (rather) Y». 2026-05-21 audit:
+        //
+        //   - «менің атым Ерлан емес, Айдос»
+        //       → rewrite to «менің атым Айдос», name = Айдос
+        //   - «мен 25-те емеспін, 31-демін»
+        //       → rewrite to «мен 31-демін», age = 31
+        //   - «сау болыңыз емес, әлі сөйлесейік»
+        //       → rewrite to «әлі сөйлесейік», not a farewell
+        //
+        // The rewrite preserves the prefix («менің атым ») so the
+        // existing detect_statement_of_X trigger words still fire;
+        // only the rejected slot value is dropped. Parses are
+        // recomputed for the corrected text because token offsets
+        // and predicate-copula chains differ.
+        let (effective_input_owned, effective_parses);
+        let (effective_input, effective_parses_ref) =
+            match crate::semantics::apply_kazakh_negation_correction(stripped) {
+                Some(rewritten) => {
+                    effective_input_owned = rewritten;
+                    effective_parses = crate::parse_input_with_priors(
+                        &effective_input_owned,
+                        lexicon,
+                        self.suffix_priors.as_ref(),
+                        self.priors_alpha,
+                    );
+                    (effective_input_owned.as_str(), &effective_parses)
+                }
+                None => (stripped, &parses),
+            };
+        let cascade_intent =
+            interpret_text_with_lexicon(effective_input, effective_parses_ref, Some(lexicon));
 
         // **v6.0.5 — E1 production wiring.** When
         // `ADAM_NEURAL_INTENT=1` AND the loaded classifier confidently

@@ -42,6 +42,137 @@ pub fn interpret_text(input: &str, parses: &[Analysis]) -> Intent {
     interpret_text_with_lexicon(input, parses, None)
 }
 
+/// **v6.0.6** — Kazakh contrastive-negation correction.
+///
+/// Given an input that matches the shape `«PREFIX X
+/// емес[+copula], Y POSTFIX»` — Kazakh's idiomatic "not X,
+/// (rather) Y" pattern — returns the input rewritten as
+/// `«PREFIX Y POSTFIX»` (the rejected X is dropped, the
+/// preceding context is preserved). Returns `None` for inputs
+/// that don't match the shape, including:
+///
+///   - Bare NEG statements with no continuation
+///     («мен дәрігер емеспін» — assertion that I am not a
+///     doctor, NOT a self-correction). The comma is the
+///     trigger; without it we don't rewrite.
+///   - NEG-inside-quoted-or-embedded clauses with no top-
+///     level comma.
+///
+/// Preserving the prefix is critical: the
+/// `detect_statement_of_X` family looks for trigger words
+/// like «атым» / «жасым» / «кәсібім» that live in the
+/// prefix, not the corrected slot value. A naive
+/// "drop-everything-before-comma" rewrite loses the trigger
+/// and the slot never gets extracted.
+///
+/// 2026-05-21 audit findings this fixes:
+///
+///   - bug 2: «менің атым Ерлан емес, Айдос»
+///     → «менің атым Айдос» → name = Айдос
+///   - bug 3: «мен 25-те емеспін, 31-демін»
+///     → «мен 31-демін» → age = 31
+///   - bug 7: «сау болыңыз емес, әлі сөйлесейік»
+///     → «әлі сөйлесейік» → not a farewell
+///
+/// The supported NEG surface forms are the bare particle
+/// «емес» plus its 1Sg / 2Sg-informal / 2Sg-polite / 1Pl /
+/// 2Pl-polite predicate-copula inflections, matching the
+/// v4.34.0 FST extension for particle-copula inflection.
+pub fn apply_kazakh_negation_correction(input: &str) -> Option<String> {
+    // Surface forms of «емес» as a predicate-copula. Longer
+    // inflected forms come first so they win over the bare
+    // particle when both could match at the same position.
+    const NEG_FORMS: &[&str] = &["емеспіз", "емессіз", "емеспін", "емессің", "емес"];
+    let lower = input.to_lowercase();
+    // We expect a NEG-form followed by punctuation+content. The
+    // separator must include a comma so a bare-NEG assertion like
+    // «мен дәрігер емеспін» (no comma) doesn't fire.
+    const SEPARATORS: &[&str] = &[", ", " , ", ","];
+    let mut best: Option<(usize, usize)> = None;
+    for neg in NEG_FORMS {
+        for sep in SEPARATORS {
+            let needle = format!("{neg}{sep}");
+            if let Some(idx) = lower.find(&needle) {
+                // Anchor on word boundary — make sure the NEG-form
+                // isn't a substring of a longer word.
+                let before_ok = idx == 0
+                    || lower.as_bytes()[idx - 1].is_ascii_whitespace()
+                    || lower.as_bytes()[idx - 1] == b'-';
+                if !before_ok {
+                    continue;
+                }
+                let post_sep = idx + needle.len();
+                // Pick the EARLIEST match; if multiple NEG-forms
+                // start at the same position, the first iteration
+                // wins (NEG_FORMS ordered longest-first).
+                if best.map(|(b, _)| idx < b).unwrap_or(true) {
+                    best = Some((idx, post_sep));
+                }
+            }
+        }
+    }
+    let (neg_start, post_sep) = best?;
+    if !input.is_char_boundary(neg_start) || !input.is_char_boundary(post_sep) {
+        return None;
+    }
+    // Walk backward from `neg_start` to find the start of the
+    // rejected token (the "X" in «X емес, Y»). Specifically:
+    //   1. skip the single space that separates X from емес,
+    //   2. walk back past non-space chars until we hit either
+    //      input start OR a whitespace boundary.
+    // The result is the byte index where X begins; we keep
+    // input[..wrong_start] as the preserved prefix.
+    let bytes = input.as_bytes();
+    let mut wrong_start = neg_start;
+    while wrong_start > 0 && bytes[wrong_start - 1] == b' ' {
+        wrong_start -= 1;
+    }
+    while wrong_start > 0 {
+        let prev = bytes[wrong_start - 1];
+        if prev == b' ' || prev == b'\t' {
+            break;
+        }
+        wrong_start -= 1;
+    }
+    if !input.is_char_boundary(wrong_start) {
+        return None;
+    }
+    let prefix = &input[..wrong_start];
+    let after = &input[post_sep..];
+    if after.trim().is_empty() {
+        return None;
+    }
+    // **v6.0.6** — verb-phrase rejection bail-out. When the
+    // prefix ends with a known farewell head («сау» / «қош» /
+    // «аман» / «кездескенше»), the NEG-correction is rejecting
+    // the ENTIRE verb phrase, not a single slot value. Rewriting
+    // to «PREFIX Y» would leave a degenerate residue («сау әлі
+    // сөйлесейік») that still trips `detect_farewell`. Bail and
+    // let `detect_farewell`'s own «емес,» guard handle the
+    // original input. The guard is the cleaner fix for verb-
+    // phrase rejection because it has the full original context.
+    let prefix_lower = prefix.trim().to_lowercase();
+    let prefix_ends_with_farewell_head = prefix_lower.ends_with("сау")
+        || prefix_lower.ends_with("қош")
+        || prefix_lower.ends_with("аман")
+        || prefix_lower.contains("кездескенше");
+    if prefix_ends_with_farewell_head {
+        return None;
+    }
+    // Reconstruct with a single space between prefix and after,
+    // unless prefix is already empty.
+    let result = if prefix.trim().is_empty() {
+        after.trim().to_string()
+    } else {
+        format!("{}{}", prefix, after.trim_start())
+    };
+    let result = result.trim().to_string();
+    if result.is_empty() || result == input.trim() {
+        return None;
+    }
+    Some(result)
+}
+
 /// Lexicon-aware variant used by `Conversation::turn` and
 /// `respond_with_repo`. When a lexicon is supplied, the occupation
 /// recogniser does a generic 1sg-copula strip + noun lookup instead
@@ -638,6 +769,23 @@ fn detect_greeting(tokens: &[String], joined: &str) -> Option<Intent> {
 }
 
 fn detect_farewell(tokens: &[String], joined: &str) -> bool {
+    // **v6.0.6 — 2026-05-21 user audit.** Contrastive-NEG
+    // rejection of a farewell shape: «сау болыңыз емес, әлі
+    // сөйлесейік» means «not goodbye, let's keep talking».
+    // The token cleaner strips commas, so a string-level
+    // «емес,» test would miss this — we check for the «емес»
+    // particle (or inflected forms) as a discrete token with
+    // non-empty content tokens AFTER it. That captures the
+    // NEG-correction shape regardless of punctuation.
+    if let Some(neg_pos) = tokens.iter().position(|t| {
+        matches!(
+            t.as_str(),
+            "емес" | "емеспін" | "емессің" | "емессіз" | "емеспіз"
+        )
+    }) && neg_pos + 1 < tokens.len()
+    {
+        return false;
+    }
     tokens.first().is_some_and(|t| t == "сау" || t == "қош")
         || joined.contains("кездескенше")
         || joined.contains("сау бол")
@@ -2406,22 +2554,64 @@ fn detect_statement_of_name(
         )
     };
 
-    // Pattern 1: "атым X".
+    // **v6.0.6 — 2026-05-21 user audit.** Multi-token PER fold.
+    // Single-token name extraction misses Kazakh / Russian
+    // patronymics: «Айгерім Сейітжанқызы» was captured as just
+    // «Айгерім», dropping the patronymic. Kazakh patronymics end
+    // in `-қызы` (feminine) / `-ұлы` (masculine); Russian forms
+    // end in `-евич / -ович / -евна / -овна`. If the token
+    // immediately after the captured name has one of these
+    // endings (and is itself a proper-noun shape), fold both
+    // tokens into a single space-joined name. Recursion not
+    // needed — patronymics in Kazakh are always exactly one
+    // additional token.
+    let join_with_patronymic = |first: &str, next: Option<&String>| -> String {
+        const PAT_SUFFIXES: &[&str] = &[
+            "қызы",
+            "ұлы",
+            "евич",
+            "ович",
+            "евна",
+            "овна",
+            "евтич",
+            "ҚЫЗЫ",
+            "ҰЛЫ",
+        ];
+        if let Some(n) = next {
+            let n_lower = n.to_lowercase();
+            // Patronymic candidate: ends in a known suffix, has
+            // at least one preceding stem char, and itself begins
+            // with a Kazakh / Cyrillic letter.
+            let looks_like_patronymic = PAT_SUFFIXES.iter().any(|s| n_lower.ends_with(s))
+                && n_lower.chars().count() >= 5
+                && n.chars().next().map(|c| c.is_alphabetic()).unwrap_or(false);
+            if looks_like_patronymic {
+                return format!(
+                    "{} {}",
+                    normalize_proper_noun(first),
+                    normalize_proper_noun(n)
+                );
+            }
+        }
+        normalize_proper_noun(first)
+    };
+
+    // Pattern 1: "атым X [Y-патроним]?".
     if let Some(i) = tokens.iter().position(|t| t == "атым") {
         if let Some(name) = raw_tokens.get(i + 1) {
             if is_interrogative_pronoun(name) || is_personal_pronoun(name) {
                 return None;
             }
-            return Some(normalize_proper_noun(name));
+            return Some(join_with_patronymic(name, raw_tokens.get(i + 2)));
         }
     }
-    // Pattern 3: "есімім X".
+    // Pattern 3: "есімім X [Y-патроним]?".
     if let Some(i) = tokens.iter().position(|t| t == "есімім") {
         if let Some(name) = raw_tokens.get(i + 1) {
             if is_interrogative_pronoun(name) || is_personal_pronoun(name) {
                 return None;
             }
-            return Some(normalize_proper_noun(name));
+            return Some(join_with_patronymic(name, raw_tokens.get(i + 2)));
         }
     }
     // Pattern 2: "мені X деп атайды".
@@ -2435,7 +2625,14 @@ fn detect_statement_of_name(
                     if is_interrogative_pronoun(name) || is_personal_pronoun(name) {
                         return None;
                     }
-                    return Some(normalize_proper_noun(name));
+                    // Patronymic only valid if the «деп» comes
+                    // AFTER the optional second name token.
+                    let pat_candidate = if end > start + 2 {
+                        raw_tokens.get(start + 2)
+                    } else {
+                        None
+                    };
+                    return Some(join_with_patronymic(name, pat_candidate));
                 }
             }
         }
@@ -2506,7 +2703,34 @@ fn detect_ask_age(joined: &str) -> bool {
 /// no numeral was found, and `None` when the pattern didn't match at
 /// all (so the caller can continue dispatching).
 fn detect_statement_of_age(tokens: &[String], joined: &str) -> Option<Option<u32>> {
-    let matched = joined.contains("жасым")
+    // **v6.0.6 — 2026-05-21 user audit.** Locative-copula
+    // age form: «N-демін / N-дамын / N-темін / N-тамын» plus
+    // their bare-locative forms «N-да / N-де / N-та / N-те»
+    // (1sg.LOC age, idiomatic «I am at-N years»). Pre-v6.0.6
+    // these fell through — only «жасым / жастамын / жаспын /
+    // маған N жас» were recognised. Surfaced by the NEG-
+    // correction case «мен 25-те емеспін, 31-демін» that
+    // rewrites to «мен 31-демін»; the rewriter does its job
+    // but the receiver matcher must also know this form.
+    const AGE_LOC_SUFFIXES: &[&str] = &[
+        "-демін",
+        "-дамын",
+        "-темін",
+        "-тамын",
+        "-де",
+        "-да",
+        "-те",
+        "-та",
+    ];
+    let has_loc_age = tokens.iter().any(|t| {
+        AGE_LOC_SUFFIXES.iter().any(|suf| {
+            t.ends_with(suf)
+                && t.len() > suf.len()
+                && t[..t.len() - suf.len()].chars().all(|c| c.is_ascii_digit())
+        })
+    });
+    let matched = has_loc_age
+        || joined.contains("жасым")
         || tokens
             .iter()
             .any(|t| t == "жастамын" || t == "жастаймын" || t == "жаспын")
@@ -2529,7 +2753,25 @@ fn detect_statement_of_age(tokens: &[String], joined: &str) -> Option<Option<u32
     if joined.contains("қанша") || joined.contains("неше") {
         return None;
     }
-    Some(parse_kazakh_age(tokens))
+    if let Some(n) = parse_kazakh_age(tokens) {
+        return Some(Some(n));
+    }
+    // Fall back to extracting the digit prefix from a locative
+    // age token when `parse_kazakh_age` missed it (some tokenisers
+    // keep «31-демін» as a single token rather than splitting on
+    // the dash).
+    for t in tokens {
+        for suf in AGE_LOC_SUFFIXES {
+            if let Some(stem) = t.strip_suffix(suf) {
+                if let Ok(n) = stem.parse::<u32>() {
+                    if (1..200).contains(&n) {
+                        return Some(Some(n));
+                    }
+                }
+            }
+        }
+    }
+    Some(None)
 }
 
 /// Parse a Kazakh numeral in the range 1–99 out of a token stream.
@@ -3233,6 +3475,22 @@ fn detect_statement_of_occupation(
 ) -> Option<Option<String>> {
     use adam_kernel_fst::morphotactics::Predicate;
 
+    // **v6.0.6** — defer to `detect_ask_occupation` first (mirrors
+    // the v4.93.0 fix in `detect_statement_of_name`). 2026-05-21
+    // user audit found that «менің кәсібім қандай?» — which
+    // `detect_ask_occupation` correctly matches on the
+    // «кәсібім» + «қандай» pattern (line ~3178) — was being
+    // grabbed by the StatementOfOccupation branch first because
+    // it sits earlier in the dispatch table at the call site.
+    // Defer here so any input that LOOKS like an occupation-
+    // question gets routed to the question handler instead of
+    // recording a phantom slot. Belt-and-suspenders to the
+    // dispatch-order fix at the call site, so this function is
+    // safe even if a future caller re-orders.
+    if detect_ask_occupation(joined) {
+        return None;
+    }
+
     // Priority 1 — FST parse with P1Sg predicate. Only accept real
     // nouns (POS-filtered) — the parser also returns adjective
     // analyses under Analysis::Noun, but "жақсымын" (adj жақсы +
@@ -3603,6 +3861,23 @@ pub(crate) fn detect_occupation_in_compound(
         .filter(|t| !t.is_empty())
         .collect();
     if tokens.is_empty() {
+        return None;
+    }
+    // **v6.0.6 — 2026-05-21 user audit.** Defer to
+    // `detect_ask_occupation` first (mirrors the v4.93.0 fix for
+    // `detect_statement_of_name` and this round's fix for
+    // `detect_statement_of_occupation`). Pre-fix, the
+    // possessive-anchor scan below for «кәсібім X» grabbed the
+    // FIRST alpha token after «кәсібім» — for «менің кәсібім
+    // қандай?» that was «қандай», which then surfaced as
+    // `session.occupation = "қандай"`. Returning early on any
+    // input that looks like an occupation-question routes the
+    // turn to `Intent::AskOccupation` without writing a phantom
+    // slot. Belt-and-suspenders to the call-site `intent`
+    // guard in `Conversation::turn` — this function is now safe
+    // to call from any context.
+    let joined = tokens.join(" ");
+    if detect_ask_occupation(&joined) {
         return None;
     }
     // **v5.3.5** — possessive-form pattern «мамандығым X» / «кәсібім X»

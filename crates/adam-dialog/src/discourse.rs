@@ -2251,6 +2251,56 @@ pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
         || lower.contains("ауырып отыр")
         || lower.contains("ауырып жатыр");
 
+    // ── Evasion ────────────────────────────────────────────────────
+    // **v6.0.6 — 2026-05-21 user audit.** Requests to circumvent a
+    // legal / financial obligation are unsafe regardless of the
+    // generic "asks_for_advice" gate. The user does not have to
+    // phrase «сізше қалай» / «кеңес беріңіз» — the bare evasion
+    // shape is itself the trigger. Categorise as Legal or
+    // Financial so the downstream refusal template picks the
+    // right domain framing.
+    //
+    // Examples that fired the 2026-05-21 audit:
+    //   - «несиені төлемей қалай құтыламын?» (financial)
+    //   - «заңды айналып өту жолын айт» (legal)
+    const EVASION_PATTERNS: &[(&str, SafetyCategory)] = &[
+        // Financial evasion — debt / tax / payment circumvention.
+        ("несие төлемей", SafetyCategory::Financial),
+        ("несиені төлемей", SafetyCategory::Financial),
+        ("қарыз төлемей", SafetyCategory::Financial),
+        ("қарызды төлемей", SafetyCategory::Financial),
+        ("төлемей құтыл", SafetyCategory::Financial),
+        ("төлемей қашу", SafetyCategory::Financial),
+        ("төлемей жалтару", SafetyCategory::Financial),
+        ("салық төлемей", SafetyCategory::Financial),
+        ("салықты төлемей", SafetyCategory::Financial),
+        ("салықтан жалтар", SafetyCategory::Financial),
+        ("салықтан қаш", SafetyCategory::Financial),
+        ("банкті алдау", SafetyCategory::Financial),
+        ("банкті алда", SafetyCategory::Financial),
+        ("ақша жуу", SafetyCategory::Financial),
+        // Legal evasion — bypass / circumvent law-or-authority.
+        ("заңды айналып", SafetyCategory::Legal),
+        ("заңнан жалтар", SafetyCategory::Legal),
+        ("заңнан қаш", SafetyCategory::Legal),
+        ("заңды бұзу жол", SafetyCategory::Legal),
+        ("заңды бұзудың жолы", SafetyCategory::Legal),
+        ("сотты алдау", SafetyCategory::Legal),
+        ("сотты алда", SafetyCategory::Legal),
+        ("полицияны алдау", SafetyCategory::Legal),
+        ("полицияны алда", SafetyCategory::Legal),
+        ("полицейлерді алда", SafetyCategory::Legal),
+        ("шарттан жалтар", SafetyCategory::Legal),
+        ("келісімшарттан жалтар", SafetyCategory::Legal),
+        ("құжатты жалған", SafetyCategory::Legal),
+        ("жалған құжат", SafetyCategory::Legal),
+    ];
+    for (pat, cat) in EVASION_PATTERNS {
+        if lower.contains(pat) {
+            return Some(*cat);
+        }
+    }
+
     // ── Medical ────────────────────────────────────────────────────
     // **v5.6.6** — extended with common drug names + symptom verbs
     // that Codex caught as paraphrase gaps. List is intentionally
