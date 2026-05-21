@@ -17,6 +17,7 @@ members = [
   "crates/adam-curriculum",
   "crates/adam-intent-classifier",
   "crates/adam-slot-extractor",
+  "crates/adam-retrieval-ranker",
   "tools/intent_dataset",
 ]
 resolver = "2"

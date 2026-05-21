@@ -116,6 +116,8 @@ dependencies = [
  "adam-dialog",
  "adam-intent-classifier",
  "adam-kernel-fst",
+ "adam-reasoning",
+ "adam-retrieval-ranker",
  "adam-slot-extractor",
  "serde",
  "serde_json",
@@ -158,6 +160,15 @@ name = "adam-retrieval"
 version = "6.0.0-rc5"
 dependencies = [
  "adam-kernel-fst",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+]
+
+[[package]]
+name = "adam-retrieval-ranker"
+version = "6.0.0-rc5"
+dependencies = [
  "serde",
  "serde_json",
  "thiserror 2.0.18",
