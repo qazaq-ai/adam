@@ -1047,6 +1047,21 @@ templates = [
     "Бұл сұрақ нақты сәттегі деректі талап етеді — менде уақыт ағымына бағынатын ақпарат жоқ (бағалар, курстар, жаңалықтар, ауа-райы). Тірі дереккөзден тексеруіңізді ұсынамын.",
 ]
 
+# **v6.0.5 codex audit 2026-05-21 (BLOCKER)** — self-harm / crisis
+# response. The template MUST NOT lecture, moralise, dismiss, or
+# delay; it acknowledges the feeling, names the crisis line for
+# Kazakhstan (1415 — республикалық сенім телефоны / SOS Балалар
+# деревнясы), and invites the user to contact a real person. No
+# random-pick variants — a crisis-line phone number is not a
+# stylistic choice; we ship a single response so the planner can
+# never roll a worse variant. Routed via the existing
+# `__safety_refusal__ = self_harm` slot.
+[[families]]
+key = "safety_refusal.self_harm"
+templates = [
+    "Осыларды айтып отырғаныңыз менің назарымды аударды. Сіздің жайыңыз маған маңызды. Сіз қазір жалғыз емессіз — Қазақстан Республикалық сенім телефонына 1415 нөмірі арқылы тегін, құпия қоңырау шала аласыз (тәулік бойы). Жақын адамыңызға да хабарлап, жанында болуын сұраңыз. Мен — тілдік модельмін, бірақ адамдар сізге шынайы қол ұшын беруге дайын.",
+]
+
 # **v4.78.0** — political_safety. User asks adam to recommend a
 # political party, candidate, vote, or partisan position. adam is a
 # school tutor and must NOT push partisan views. Honest neutral

@@ -2754,11 +2754,36 @@ fn detect_statement_of_location(
     // (interrogatives, demonstratives, closed-class function words)
     // at the case-scan step. A legitimate city root is never in
     // `NOT_A_TOPIC`; an interrogative is.
+    // **v6.0.5 codex audit 2026-05-21** — emotional-state stopword
+    // gate. «Мен жаман көңіл күйдемін» FST-parses «күйдемін» as
+    // «күй» (mood / melody) + Locative + 1sg-predicate, which then
+    // pollutes the location belief slot as «Мекеніңіз Күй екенін
+    // ұқтым». These abstract-state roots are never legitimate
+    // cities; treat them as non-locations even when the FST returns
+    // a Locative analysis.
+    const NON_LOCATION_ROOTS: &[&str] = &[
+        "күй",    // mood / melody (көңіл күй)
+        "көңіл",  // mood / spirit
+        "жан",    // soul
+        "сезім",  // feeling
+        "сенім",  // belief
+        "ой",     // thought
+        "арман",  // dream / wish
+        "үміт",   // hope
+        "қайғы",  // grief
+        "қуаныш", // joy
+        "ашу",    // anger
+        "мұң",    // sorrow
+        "уайым",  // worry
+    ];
     let mut ablative_root: Option<String> = None;
     let mut locative_root: Option<String> = None;
     for p in parses {
         if let Analysis::Noun { root, features } = p {
             if NOT_A_TOPIC.contains(&root.root.as_str()) {
+                continue;
+            }
+            if NON_LOCATION_ROOTS.contains(&root.root.to_lowercase().as_str()) {
                 continue;
             }
             match features.case {
@@ -2789,6 +2814,9 @@ fn detect_statement_of_location(
     for p in parses {
         if let Analysis::Noun { root, features } = p {
             if NOT_A_TOPIC.contains(&root.root.as_str()) {
+                continue;
+            }
+            if NON_LOCATION_ROOTS.contains(&root.root.to_lowercase().as_str()) {
                 continue;
             }
             if features.case == Some(Case::Locative) && features.predicate == Some(Predicate::P1Sg)
@@ -3003,8 +3031,31 @@ fn detect_statement_of_location_rule_based(
     if let Some(name) = recover_named_place_before_origin_marker(tokens, raw_tokens) {
         return Some(Some(name));
     }
+    // **v6.0.5 codex audit 2026-05-21** — emotional-state stopword
+    // gate (mirror of FST-path block above). Catches the rule-based
+    // fallback for «көңіл күйдемін» / «арманымдамын» style — the
+    // copula-stripped stem can land on an abstract-state noun. We
+    // refuse to commit a location-belief slot in that case.
+    const NON_LOCATION_STEMS: &[&str] = &[
+        "күй",
+        "көңіл",
+        "жан",
+        "сезім",
+        "сенім",
+        "ой",
+        "арман",
+        "үміт",
+        "қайғы",
+        "қуаныш",
+        "ашу",
+        "мұң",
+        "уайым",
+    ];
     for (i, t) in tokens.iter().enumerate() {
         if let Some(root) = strip_locative_copula(t) {
+            if NON_LOCATION_STEMS.contains(&root.to_lowercase().as_str()) {
+                return None;
+            }
             let raw = raw_tokens
                 .get(i)
                 .map(|r| strip_locative_copula_preserving(r).unwrap_or_else(|| root.clone()))
@@ -3012,6 +3063,9 @@ fn detect_statement_of_location_rule_based(
             return Some(Some(normalize_place_name(&raw)));
         }
         if let Some(root) = strip_ablative_copula(t) {
+            if NON_LOCATION_STEMS.contains(&root.to_lowercase().as_str()) {
+                return None;
+            }
             let raw = raw_tokens
                 .get(i)
                 .map(|r| strip_ablative_copula_preserving(r).unwrap_or_else(|| root.clone()))

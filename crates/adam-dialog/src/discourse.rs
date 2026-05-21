@@ -457,6 +457,59 @@ mod safety_topic_tests {
         assert_eq!(detect_safety_topic("Инвестиция деген не?"), None);
     }
 
+    // **v6.0.5 codex audit 2026-05-21 (BLOCKER)** — self-harm /
+    // crisis detection. Statement of self-directed harm intent
+    // takes highest precedence and dominates every other safety
+    // category. Includes the four Codex-named patterns plus three
+    // additional first-person crisis phrasings.
+
+    #[test]
+    fn detects_self_harm_intent_v605() {
+        assert_eq!(
+            detect_safety_topic("Мен өзіме зиян келтіргім келеді"),
+            Some(SafetyCategory::SelfHarm)
+        );
+    }
+
+    #[test]
+    fn detects_death_wish_v605() {
+        assert_eq!(
+            detect_safety_topic("өлгім келеді"),
+            Some(SafetyCategory::SelfHarm)
+        );
+    }
+
+    #[test]
+    fn detects_life_rejection_v605() {
+        assert_eq!(
+            detect_safety_topic("өмір сүргім келмейді"),
+            Some(SafetyCategory::SelfHarm)
+        );
+    }
+
+    #[test]
+    fn detects_social_withdrawal_v605() {
+        assert_eq!(
+            detect_safety_topic("ешкіммен сөйлескім келмейді"),
+            Some(SafetyCategory::SelfHarm)
+        );
+    }
+
+    #[test]
+    fn detects_meaninglessness_v605() {
+        assert_eq!(
+            detect_safety_topic("Өмірдің мәні жоқ деп ойлаймын"),
+            Some(SafetyCategory::SelfHarm)
+        );
+    }
+
+    #[test]
+    fn does_not_fire_on_factual_death_query_v605() {
+        // Factual / definitional queries about death are NOT crisis
+        // signals — they fall through to other paths.
+        assert_eq!(detect_safety_topic("Өлім деген не?"), None);
+    }
+
     // **v5.9.5 — Codex follow-up review (B2).** New paraphrase coverage.
 
     #[test]
@@ -2020,6 +2073,15 @@ pub enum SafetyCategory {
     Legal,
     Financial,
     CurrentData,
+    /// **v6.0.5 codex audit 2026-05-21 (BLOCKER)** — self-harm / crisis
+    /// expressions. Catches first-person statements of intent to harm
+    /// the self («өзіме зиян», «өлгім келеді», «өмір сүргім келмейді»,
+    /// «ешкіммен сөйлескім келмейді»). Routes to a dedicated crisis-
+    /// support template that does NOT lecture, does NOT moralise, and
+    /// ALWAYS surfaces a Kazakh-speaking crisis line. Treated as
+    /// highest-precedence safety category — dominates every other
+    /// detector before any factual / topic-extraction path runs.
+    SelfHarm,
 }
 
 impl SafetyCategory {
@@ -2029,6 +2091,7 @@ impl SafetyCategory {
             Self::Legal => "legal",
             Self::Financial => "financial",
             Self::CurrentData => "current_data",
+            Self::SelfHarm => "self_harm",
         }
     }
 }
@@ -2048,12 +2111,49 @@ impl From<SafetyCategory> for crate::proof_object::SafetyDomain {
             SafetyCategory::Legal => Self::Legal,
             SafetyCategory::Financial => Self::Financial,
             SafetyCategory::CurrentData => Self::CurrentData,
+            SafetyCategory::SelfHarm => Self::SelfHarm,
         }
     }
 }
 
 pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
     let lower = input.to_lowercase();
+
+    // **v6.0.5 codex audit 2026-05-21 (BLOCKER)** — self-harm /
+    // crisis expressions take **highest precedence** and bypass the
+    // generic advice-seeking gate below. The user does not need to
+    // phrase a self-harm statement as a "request for advice" — the
+    // bare statement of intent («өзіме зиян келтіргім келеді»,
+    // «өлгім келеді») is itself the crisis signal. Closes the
+    // 2026-05-21 Codex audit BLOCKER finding.
+    //
+    // Patterns chosen are first-person, non-factual expressions of
+    // self-directed harm or hopelessness. Factual queries about
+    // suicide / self-harm as a TOPIC («өлім деген не», «суицид
+    // қалай болады») are explicitly NOT matched here — those fall
+    // through to the medical / definitional path.
+    const SELF_HARM_PATTERNS: &[&str] = &[
+        "өзіме зиян",
+        "өзіме қол сал",
+        "өзіме қол көтер",
+        "өлгім келеді",
+        "өлгім келіп",
+        "өлуді ойлап",
+        "өмір сүргім келмейді",
+        "өмірден өткім келеді",
+        "өмірден өтейін",
+        "өмірден өтсем",
+        "өзімді өлтір",
+        "тіршілікті тоқтат",
+        "ешкіммен сөйлескім келмейді",
+        "ешкімді көргім келмейді",
+        "жалғыз қалғым келеді",
+        "өмірдің мәні жоқ",
+        "ешкімге керек емеспін",
+    ];
+    if SELF_HARM_PATTERNS.iter().any(|p| lower.contains(p)) {
+        return Some(SafetyCategory::SelfHarm);
+    }
 
     // Advice-seeking shapes — present in all categories. Generic
     // factual «X деген не?» / «X кім?» do NOT match.
@@ -3637,7 +3737,28 @@ pub fn try_evaluate_kazakh_word_math(input: &str) -> Option<i64> {
         // отызға көбейт, сосын екіге бөл») chains the same way written
         // formal style does.
         .replace(" сосын ", " __CLAUSE_SEP__ ")
-        .replace(" соңында ", " __CLAUSE_SEP__ ");
+        .replace(" соңында ", " __CLAUSE_SEP__ ")
+        // **v6.0.5 codex audit 2026-05-21** — additional sequencing
+        // connectives surfaced by the 2026-05-21 crash-test.
+        // «содан соң» — synonym of «содан кейін»; «осыдан кейін» /
+        // «осыдан соң» — alternative deictic; «кейін» — bare
+        // postposition. Also the imperative-connective «X-Y те /
+        // де / та / да» that some speakers attach to the verb
+        // («көбейт те, ...» = "multiply, and then ...") — we
+        // normalise the trailing «те/да» particle out so the verb
+        // surface matches `detect_kazakh_math_op`.
+        .replace(" содан соң ", " __CLAUSE_SEP__ ")
+        .replace(" осыдан кейін ", " __CLAUSE_SEP__ ")
+        .replace(" осыдан соң ", " __CLAUSE_SEP__ ")
+        .replace(" кейін ", " __CLAUSE_SEP__ ")
+        .replace("көбейт те ", "көбейт __CLAUSE_SEP__ ")
+        .replace("көбейт де ", "көбейт __CLAUSE_SEP__ ")
+        .replace("бөл те ", "бөл __CLAUSE_SEP__ ")
+        .replace("бөл де ", "бөл __CLAUSE_SEP__ ")
+        .replace("қос та ", "қос __CLAUSE_SEP__ ")
+        .replace("қос да ", "қос __CLAUSE_SEP__ ")
+        .replace("азайт та ", "азайт __CLAUSE_SEP__ ")
+        .replace("азайт да ", "азайт __CLAUSE_SEP__ ");
     let clauses: Vec<&str> = normalized
         .split("__CLAUSE_SEP__")
         .map(str::trim)

@@ -1425,6 +1425,71 @@ impl Conversation {
                 }
             }
         }
+        // **v6.0.5 codex audit 2026-05-21** — probe-aware factual
+        // override. When the user asks a directed question about a
+        // resolved subject («Абайдың шын аты кім?», «Қашан туылған?»),
+        // surface the curated world_core raw_text whose subject AND
+        // probe keyword both match. Closes Codex finding «Оның шын
+        // аты кім?» → «Абай мен ибраһим өзара байланысты» — a stray
+        // R1 derivation in place of the curated «Абайдың шын аты —
+        // Ибраһим.»
+        //
+        // **Defensive override**: we only set `example`; we don't
+        // clear `reasoning_chain` because the planner's mode=Example
+        // / General routing already prefers `example` over derived
+        // chains when both are present. Leaving the chain in lets
+        // `--trace` show what would have been used as backup.
+        if let Intent::Unknown {
+            noun_hint: Some(noun),
+            example,
+            reasoning_chain,
+            grounded_fact,
+            ..
+        } = &mut intent_for_render
+        {
+            const PROBE_KEYWORDS: &[&str] = &[
+                "шын аты",
+                "туылған",
+                "туған",
+                "балалары",
+                "өмір сүрді",
+                "қайтыс",
+                "қашан",
+                "қандай шығарма",
+                "немен айналыс",
+                "ұлты",
+                "діні",
+                "тілі",
+            ];
+            let lower_input = input.to_lowercase();
+            let probe_hit = PROBE_KEYWORDS
+                .iter()
+                .find(|kw| lower_input.contains(*kw))
+                .copied();
+            if let Some(kw) = probe_hit {
+                let noun_lower = noun.to_lowercase();
+                let kw_first_word = kw.split_whitespace().next().unwrap_or(kw);
+                let direct = self.extracted_facts.iter().find(|f| {
+                    f.subject.root.to_lowercase() == noun_lower
+                        && f.raw_text.to_lowercase().contains(kw_first_word)
+                });
+                if let Some(fact) = direct {
+                    // **Override** all evidence slots so the planner
+                    // routes to `unknown.with_grounded_fact` (which
+                    // surfaces `{fact}` verbatim). We deliberately
+                    // avoid `example` because the General-mode
+                    // factual-query suppression filters
+                    // `unknown.with_evidence` on probe-shaped inputs
+                    // («қашан», «кім»). `grounded_fact` is the right
+                    // slot for a curated, on-topic, probe-matching
+                    // raw_text — no suppression, no template-pick
+                    // ambiguity.
+                    *grounded_fact = Some(fact.raw_text.clone());
+                    *example = None;
+                    *reasoning_chain = None;
+                }
+            }
+        }
         // **v5.24.0 — Codex 2026-05-12 audit bug 4.** Self/other
         // disambiguation for occupation queries. `detect_ask_occupation`
         // fires on «немен айналыс» for BOTH directions:
@@ -1991,9 +2056,34 @@ impl Conversation {
             let computed = if check_answer_fired {
                 None
             } else {
-                crate::discourse::try_evaluate_arithmetic(resolved_input.as_ref()).or_else(|| {
+                // **v6.0.5 codex audit 2026-05-21** — prefer Kazakh-
+                // word math when the input clearly carries a Kazakh
+                // math verb («көбейт / бөл / қос / азайт»). The bare
+                // arithmetic parser otherwise strips all non-digit /
+                // non-operator characters and eagerly accepts the
+                // residue: «56-ны 3-ке көбейт те, 2-ге бөл, содан
+                // соң 7 қос» → strip → «56-3-2-7» → evaluated as
+                // 44 instead of the intended (56*3)/2+7 = 91.
+                // When the Kazakh word-math path returns a value,
+                // it wins; otherwise the arithmetic path is the
+                // fallback for pure-digit inputs («56*3/2+7»).
+                let has_kazakh_math_verb = {
+                    let lower = resolved_input.to_lowercase();
+                    lower.contains("көбейт")
+                        || lower.contains("бөл")
+                        || lower.contains("қос")
+                        || lower.contains("азайт")
+                };
+                if has_kazakh_math_verb {
                     crate::discourse::try_evaluate_kazakh_word_math(resolved_input.as_ref())
-                })
+                        .or_else(|| {
+                            crate::discourse::try_evaluate_arithmetic(resolved_input.as_ref())
+                        })
+                } else {
+                    crate::discourse::try_evaluate_arithmetic(resolved_input.as_ref()).or_else(
+                        || crate::discourse::try_evaluate_kazakh_word_math(resolved_input.as_ref()),
+                    )
+                }
             };
             if check_answer_fired {
                 // Skip the rest of the math eval cascade — the

@@ -97,6 +97,9 @@ pub enum SafetyDomain {
     Financial,
     CurrentData,
     Political,
+    /// **v6.0.5 codex audit 2026-05-21 (BLOCKER)** — self-harm /
+    /// crisis bridge from the discourse-layer `SafetyCategory`.
+    SelfHarm,
 }
 
 /// The single proposition this answer asserts.
