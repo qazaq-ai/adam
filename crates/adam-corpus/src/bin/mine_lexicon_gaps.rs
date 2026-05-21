@@ -19,7 +19,7 @@
 //!     Auto-POS inference is deferred to a later release — wrong
 //!     guesses are worse than a flagged default.
 //!
-//! The output `docs/lexicon_gap_candidates.md` is a **native-speaker
+//! The output `data/lexicon_gap_candidates.md` is a **native-speaker
 //! review file**: one candidate per section, checkbox to approve, slots
 //! for reviewer-supplied root form + POS + harmony + final-sound
 //! overrides, and a Tally section at the bottom so the reviewer can
@@ -59,7 +59,7 @@ use serde::Deserialize;
 const CURATED_DIR: &str = "data/curated";
 const CURATED_ROOTS: &str = "data/tokenizer/segmentation_roots.json";
 const APERTIUM_ROOTS: &str = "data/lexicon_v1/apertium_imported_roots.json";
-const OUT_PATH: &str = "docs/lexicon_gap_candidates.md";
+const OUT_PATH: &str = "data/lexicon_gap_candidates.md";
 
 const DEFAULT_TOP: usize = 200;
 const DEFAULT_CONTEXTS_PER_CANDIDATE: usize = 3;

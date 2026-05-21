@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BUSL-1.1
 // Part of: adam · ARK (Agglutinative Reasoning Kernel) · github.com/qazaq-ai/adam
-//! Heuristic triage of `docs/lexicon_gap_candidates.md` into three
+//! Heuristic triage of `data/lexicon_gap_candidates.md` into three
 //! disjoint buckets, mirroring the rule set Codex applied during the
 //! 2026-05-18 peer-review pass:
 //!
@@ -44,7 +44,7 @@ use std::fs;
 use std::io::Write;
 use std::path::Path;
 
-const INPUT_PATH: &str = "docs/lexicon_gap_candidates.md";
+const INPUT_PATH: &str = "data/lexicon_gap_candidates.md";
 const OUTPUT_DIR: &str = "data/lexicon_v2";
 
 #[derive(Debug, Clone)]
