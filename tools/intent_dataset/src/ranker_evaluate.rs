@@ -31,6 +31,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Deserialize)]
 struct CandidateRow {
     features: [f32; RF::N],
+    #[allow(dead_code)]
     picked: u8,
     #[allow(dead_code)]
     subject: String,
