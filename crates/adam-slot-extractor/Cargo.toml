@@ -1,0 +1,14 @@
+[package]
+name = "adam-slot-extractor"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Experiment **E2** of the third-path research arc — a tiny discriminative sequence labeller (named-entity recogniser) for Kazakh slot extraction (PER / LOC / AGE / OCC / FAM) that aims to replace the hand-written `detect_statement_of_*` functions in `adam-dialog::semantics` at equal-or-better span-F1, ≤5 ms latency, ≤5 MB on disk, and zero hallucination by construction (closed BIO output). Pure Rust, no neural runtime dep. See docs/e2_slot_extractor_design.md."
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

@@ -29,10 +29,15 @@ path = "src/diagnose.rs"
 name = "intent_dataset_synth"
 path = "src/synth.rs"
 
+[[bin]]
+name = "slot_dataset_build"
+path = "src/slot_build.rs"
+
 [dependencies]
 adam-kernel-fst = { path = "../../crates/adam-kernel-fst" }
 adam-dialog = { path = "../../crates/adam-dialog" }
 adam-intent-classifier = { path = "../../crates/adam-intent-classifier" }
+adam-slot-extractor = { path = "../../crates/adam-slot-extractor" }
 serde.workspace = true
 serde_json.workspace = true
 
