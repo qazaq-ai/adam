@@ -27,6 +27,9 @@ use serde::{Deserialize, Serialize};
 use std::path::Path;
 use thiserror::Error;
 
+pub mod features;
+pub mod rung_a;
+
 /// The closed enum of intent labels the classifier can emit.
 ///
 /// **Why a string label and not a typed enum.** The design doc
@@ -104,37 +107,15 @@ pub enum ClassifierError {
 
 /// A trained classifier ready for inference.
 ///
-/// v0.0.1 is a stub — `classify` always returns
-/// `Err(ClassifierError::NotLoaded)`. The training pipeline is
-/// being scaffolded; subsequent commits on this branch will fill
-/// in:
-///   - artefact (on-disk JSON / binary)
-///   - feature extractor (hash trick over char n-grams + tokens)
-///   - inference (sparse dot product → softmax over label scores)
-///
-/// **Public surface is intentionally minimal**: load + classify +
-/// `labels()` for harness inspection. Anything more (training,
-/// dataset assembly, eval comparison vs. the cascade) lives in
-/// the companion `tools/intent_dataset/` and
-/// `crates/adam-intent-classifier/examples/` binaries — keeps
-/// production callers from accidentally importing training code.
-#[derive(Debug, Clone)]
+/// Wraps a [`rung_a::RungAModel`] artefact — the v0.0.1 hash-
+/// feature linear classifier. Future rungs (B: embedding + linear,
+/// C: tiny transformer) will swap the inner artefact while
+/// preserving this public API.
+#[derive(Debug, Clone, Default)]
 pub struct Classifier {
-    /// Stub holds nothing yet. The trained artefact (Rung A:
-    /// hash-feature weights; Rung B: embedding matrix + linear
-    /// head; Rung C: tiny transformer) will land here.
-    artefact: Option<Artefact>,
-}
-
-/// Stub model artefact. The on-disk JSON schema is documented in
-/// `docs/e1_intent_classifier_design.md` § Architectural ladder.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct Artefact {
-    /// Schema version of the on-disk artefact. Increment when
-    /// the JSON layout changes in a non-backward-compatible way.
-    schema_version: String,
-    /// The closed label inventory the model was trained against.
-    labels: Vec<IntentLabel>,
+    /// Loaded Rung-A artefact. `None` until [`Self::from_path`]
+    /// succeeds.
+    artefact: Option<rung_a::RungAModel>,
 }
 
 const SUPPORTED_SCHEMA_VERSION: &str = "0.0.1";
@@ -147,16 +128,24 @@ impl Classifier {
         Self { artefact: None }
     }
 
+    /// Wrap an already-loaded Rung-A model. Used by the training
+    /// harness (which produces the model in memory) to package it
+    /// into the public surface without round-tripping through
+    /// disk.
+    pub fn from_rung_a(model: rung_a::RungAModel) -> Self {
+        Self {
+            artefact: Some(model),
+        }
+    }
+
     /// Load a trained classifier from a JSON artefact on disk.
-    /// **Stub** — currently only validates the schema version
-    /// and label list; inference plumbing lands in a follow-up.
     pub fn from_path(path: impl AsRef<Path>) -> Result<Self, ClassifierError> {
         let path_str = path.as_ref().display().to_string();
         let bytes = std::fs::read(path.as_ref()).map_err(|e| ClassifierError::Io {
             path: path_str.clone(),
             source: e,
         })?;
-        let artefact: Artefact =
+        let artefact: rung_a::RungAModel =
             serde_json::from_slice(&bytes).map_err(|e| ClassifierError::Parse {
                 path: path_str.clone(),
                 source: e,
@@ -174,31 +163,35 @@ impl Classifier {
 
     /// The closed label inventory the loaded model can emit.
     /// Empty when no artefact is loaded.
-    pub fn labels(&self) -> &[IntentLabel] {
-        self.artefact.as_ref().map(|a| &a.labels[..]).unwrap_or(&[])
+    pub fn labels(&self) -> Vec<IntentLabel> {
+        self.artefact
+            .as_ref()
+            .map(|a| {
+                a.labels
+                    .iter()
+                    .map(|l| IntentLabel::new(l.clone()))
+                    .collect()
+            })
+            .unwrap_or_default()
     }
 
     /// Classify a Kazakh utterance.
     ///
-    /// **Stub** — returns `Err(ClassifierError::NotLoaded)`
-    /// until the inference path is wired. The closed-set
-    /// invariant is preserved: even when implemented, the output
-    /// is guaranteed to be one of `self.labels()` — hallucination
-    /// is structurally impossible.
-    pub fn classify(&self, _input: &str) -> Result<Classification, ClassifierError> {
-        if self.artefact.is_none() {
-            return Err(ClassifierError::NotLoaded);
-        }
-        // Stub: even with an artefact loaded, the inference path
-        // is not wired in v0.0.1. The next commit on this branch
-        // will replace this with the Rung A linear classifier.
-        Err(ClassifierError::NotLoaded)
-    }
-}
-
-impl Default for Classifier {
-    fn default() -> Self {
-        Self::empty()
+    /// **Closed-set invariant**: the output is guaranteed to be
+    /// one of `self.labels()` — hallucination is structurally
+    /// impossible.
+    pub fn classify(&self, input: &str) -> Result<Classification, ClassifierError> {
+        let model = self.artefact.as_ref().ok_or(ClassifierError::NotLoaded)?;
+        let (top_idx, top_score, runners_up_indexed) = model.predict(input);
+        let runners_up = runners_up_indexed
+            .into_iter()
+            .map(|(idx, score)| (IntentLabel::new(model.labels[idx].clone()), score))
+            .collect();
+        Ok(Classification {
+            top: IntentLabel::new(model.labels[top_idx].clone()),
+            top_score,
+            runners_up,
+        })
     }
 }
 

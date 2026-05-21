@@ -1,0 +1,110 @@
+{"id":"seed_g_01","input":"Сәлем","intent":"Greeting","source_file":"seed","confidence":"high"}
+{"id":"seed_g_02","input":"Сәлеметсіз бе","intent":"Greeting","source_file":"seed","confidence":"high"}
+{"id":"seed_g_03","input":"Қайырлы таң","intent":"Greeting","source_file":"seed","confidence":"high"}
+{"id":"seed_g_04","input":"Қайырлы күн","intent":"Greeting","source_file":"seed","confidence":"high"}
+{"id":"seed_g_05","input":"Қайырлы кеш","intent":"Greeting","source_file":"seed","confidence":"high"}
+{"id":"seed_g_06","input":"Ассалаумағалейкум","intent":"Greeting","source_file":"seed","confidence":"high"}
+{"id":"seed_g_07","input":"Сәлем, қалайсың","intent":"Greeting","source_file":"seed","confidence":"high"}
+{"id":"seed_g_08","input":"Сәлем достар","intent":"Greeting","source_file":"seed","confidence":"high"}
+{"id":"seed_f_01","input":"Сау бол","intent":"Farewell","source_file":"seed","confidence":"high"}
+{"id":"seed_f_02","input":"Қош бол","intent":"Farewell","source_file":"seed","confidence":"high"}
+{"id":"seed_f_03","input":"Көріскенше","intent":"Farewell","source_file":"seed","confidence":"high"}
+{"id":"seed_f_04","input":"Жақсы қал","intent":"Farewell","source_file":"seed","confidence":"high"}
+{"id":"seed_f_05","input":"Бай-бай","intent":"Farewell","source_file":"seed","confidence":"high"}
+{"id":"seed_f_06","input":"Кейінірек кездесеміз","intent":"Farewell","source_file":"seed","confidence":"high"}
+{"id":"seed_aff_01","input":"Иә","intent":"Affirmation","source_file":"seed","confidence":"high"}
+{"id":"seed_aff_02","input":"Дұрыс","intent":"Affirmation","source_file":"seed","confidence":"high"}
+{"id":"seed_aff_03","input":"Әрине","intent":"Affirmation","source_file":"seed","confidence":"high"}
+{"id":"seed_aff_04","input":"Иә, дұрыс","intent":"Affirmation","source_file":"seed","confidence":"high"}
+{"id":"seed_aff_05","input":"Мақұл","intent":"Affirmation","source_file":"seed","confidence":"high"}
+{"id":"seed_aff_06","input":"Келісемін","intent":"Affirmation","source_file":"seed","confidence":"high"}
+{"id":"seed_neg_01","input":"Жоқ","intent":"Negation","source_file":"seed","confidence":"high"}
+{"id":"seed_neg_02","input":"Олай емес","intent":"Negation","source_file":"seed","confidence":"high"}
+{"id":"seed_neg_03","input":"Жоқ, дұрыс емес","intent":"Negation","source_file":"seed","confidence":"high"}
+{"id":"seed_neg_04","input":"Келіспеймін","intent":"Negation","source_file":"seed","confidence":"high"}
+{"id":"seed_neg_05","input":"Жоқ рахмет","intent":"Negation","source_file":"seed","confidence":"high"}
+{"id":"seed_th_01","input":"Рахмет","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_th_02","input":"Көп рахмет","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_th_03","input":"Алғыс айтамын","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_th_04","input":"Үлкен рахмет","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_th_05","input":"Сізге рахмет","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_th_06","input":"Рахмет, көмектестіңіз","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_ap_01","input":"Кешіріңіз","intent":"Apology","source_file":"seed","confidence":"high"}
+{"id":"seed_ap_02","input":"Кешір","intent":"Apology","source_file":"seed","confidence":"high"}
+{"id":"seed_ap_03","input":"Ғафу етіңіз","intent":"Apology","source_file":"seed","confidence":"high"}
+{"id":"seed_ap_04","input":"Айып етпеңіз","intent":"Apology","source_file":"seed","confidence":"high"}
+{"id":"seed_ap_05","input":"Кешіріңіз, түсінбедім","intent":"Apology","source_file":"seed","confidence":"high"}
+{"id":"seed_hau_01","input":"Қалайсың","intent":"AskHowAreYou","source_file":"seed","confidence":"high"}
+{"id":"seed_hau_02","input":"Қалайсыз","intent":"AskHowAreYou","source_file":"seed","confidence":"high"}
+{"id":"seed_hau_03","input":"Хал ахуалың қалай","intent":"AskHowAreYou","source_file":"seed","confidence":"high"}
+{"id":"seed_hau_04","input":"Жағдайың қалай","intent":"AskHowAreYou","source_file":"seed","confidence":"high"}
+{"id":"seed_hau_05","input":"Қалай тұрсыз","intent":"AskHowAreYou","source_file":"seed","confidence":"high"}
+{"id":"seed_hau_06","input":"Көңіл күйің қалай","intent":"AskHowAreYou","source_file":"seed","confidence":"high"}
+{"id":"seed_sow_01","input":"Жақсымын","intent":"StatementOfWellbeing","source_file":"seed","confidence":"high"}
+{"id":"seed_sow_02","input":"Жақсы рахмет","intent":"StatementOfWellbeing","source_file":"seed","confidence":"high"}
+{"id":"seed_sow_03","input":"Аман-есен","intent":"StatementOfWellbeing","source_file":"seed","confidence":"high"}
+{"id":"seed_sow_04","input":"Шүкір","intent":"StatementOfWellbeing","source_file":"seed","confidence":"high"}
+{"id":"seed_sow_05","input":"Жайбарақатпын","intent":"StatementOfWellbeing","source_file":"seed","confidence":"high"}
+{"id":"seed_son_01","input":"Менің атым Дәулет","intent":"StatementOfName","source_file":"seed","confidence":"high"}
+{"id":"seed_son_02","input":"Атым Айгерім","intent":"StatementOfName","source_file":"seed","confidence":"high"}
+{"id":"seed_son_03","input":"Мені Бекжан дейді","intent":"StatementOfName","source_file":"seed","confidence":"high"}
+{"id":"seed_son_04","input":"Есімім Гүлназ","intent":"StatementOfName","source_file":"seed","confidence":"high"}
+{"id":"seed_son_05","input":"Менің есімім Әсел","intent":"StatementOfName","source_file":"seed","confidence":"high"}
+{"id":"seed_san_01","input":"Менің жасым 25","intent":"StatementOfAge","source_file":"seed","confidence":"high"}
+{"id":"seed_san_02","input":"30 жастамын","intent":"StatementOfAge","source_file":"seed","confidence":"high"}
+{"id":"seed_san_03","input":"Маған 42 жас","intent":"StatementOfAge","source_file":"seed","confidence":"high"}
+{"id":"seed_san_04","input":"Жасым он сегіз","intent":"StatementOfAge","source_file":"seed","confidence":"high"}
+{"id":"seed_san_05","input":"Мен жиырма жетідемін","intent":"StatementOfAge","source_file":"seed","confidence":"high"}
+{"id":"seed_sol_01","input":"Мен Алматыда тұрамын","intent":"StatementOfLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_sol_02","input":"Қостанайдан келдім","intent":"StatementOfLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_sol_03","input":"Біз Астанадамыз","intent":"StatementOfLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_sol_04","input":"Шымкент қаласындамын","intent":"StatementOfLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_sol_05","input":"Орал қаласынан келдім","intent":"StatementOfLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_sof_01","input":"Менің 2 баламыз бар","intent":"StatementOfFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_sof_02","input":"Біздің отбасы үлкен","intent":"StatementOfFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_sof_03","input":"Менің әпкем бар","intent":"StatementOfFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_sof_04","input":"Үш бала тәрбиелеп жүрмін","intent":"StatementOfFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_soa_01","input":"Мен бағдарламашымын","intent":"StatementOfOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_soa_02","input":"Мұғаліммін","intent":"StatementOfOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_soa_03","input":"Дәрігер ретінде жұмыс істеймін","intent":"StatementOfOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_soa_04","input":"Менің мамандығым инженер","intent":"StatementOfOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_aw_01","input":"Бүгін ауа райы қандай","intent":"AskWeather","source_file":"seed","confidence":"high"}
+{"id":"seed_aw_02","input":"Қазір сыртта суық па","intent":"AskWeather","source_file":"seed","confidence":"high"}
+{"id":"seed_aw_03","input":"Ертең жаңбыр болады ма","intent":"AskWeather","source_file":"seed","confidence":"high"}
+{"id":"seed_aw_04","input":"Қандай ауа райы","intent":"AskWeather","source_file":"seed","confidence":"high"}
+{"id":"seed_at_01","input":"Қазір сағат неше","intent":"AskTime","source_file":"seed","confidence":"high"}
+{"id":"seed_at_02","input":"Қай уақыт","intent":"AskTime","source_file":"seed","confidence":"high"}
+{"id":"seed_at_03","input":"Бүгін қандай күн","intent":"AskTime","source_file":"seed","confidence":"high"}
+{"id":"seed_at_04","input":"Бүгін қандай айдамыз","intent":"AskTime","source_file":"seed","confidence":"high"}
+{"id":"seed_co_01","input":"Сен өте жақсысың","intent":"Compliment","source_file":"seed","confidence":"high"}
+{"id":"seed_co_02","input":"Сіз ақылдысыз","intent":"Compliment","source_file":"seed","confidence":"high"}
+{"id":"seed_co_03","input":"Тамаша жасадың","intent":"Compliment","source_file":"seed","confidence":"high"}
+{"id":"seed_co_04","input":"Сен мықтысың","intent":"Compliment","source_file":"seed","confidence":"high"}
+{"id":"seed_ww_01","input":"Сәттілік тілеймін","intent":"WellWishes","source_file":"seed","confidence":"high"}
+{"id":"seed_ww_02","input":"Денсаулық тілеймін","intent":"WellWishes","source_file":"seed","confidence":"high"}
+{"id":"seed_ww_03","input":"Жаңа жылыңмен","intent":"WellWishes","source_file":"seed","confidence":"high"}
+{"id":"seed_ww_04","input":"Туған күніңмен","intent":"WellWishes","source_file":"seed","confidence":"high"}
+{"id":"seed_in_01","input":"Сен ақымақсың","intent":"Insult","source_file":"seed","confidence":"high"}
+{"id":"seed_in_02","input":"Сені жек көремін","intent":"Insult","source_file":"seed","confidence":"high"}
+{"id":"seed_in_03","input":"Сен жаман","intent":"Insult","source_file":"seed","confidence":"high"}
+{"id":"seed_an_01","input":"Сенің атың не","intent":"AskName","source_file":"seed","confidence":"high"}
+{"id":"seed_an_02","input":"Сіздің есіміңіз кім","intent":"AskName","source_file":"seed","confidence":"high"}
+{"id":"seed_an_03","input":"Атың не","intent":"AskName","source_file":"seed","confidence":"high"}
+{"id":"seed_an_04","input":"Қалай атайсың өзіңді","intent":"AskName","source_file":"seed","confidence":"high"}
+{"id":"seed_aa_01","input":"Жасың нешеде","intent":"AskAge","source_file":"seed","confidence":"high"}
+{"id":"seed_aa_02","input":"Сіз неше жастасыз","intent":"AskAge","source_file":"seed","confidence":"high"}
+{"id":"seed_aa_03","input":"Қанша жасың бар","intent":"AskAge","source_file":"seed","confidence":"high"}
+{"id":"seed_al_01","input":"Қайда тұрасың","intent":"AskLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_al_02","input":"Қай қаладансыз","intent":"AskLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_al_03","input":"Қайдан келдіңіз","intent":"AskLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_al_04","input":"Қай қалада тұрасыз","intent":"AskLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_ao_01","input":"Немен айналысасың","intent":"AskOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_ao_02","input":"Мамандығыңыз не","intent":"AskOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_ao_03","input":"Қандай жұмыс істейсіз","intent":"AskOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_af_01","input":"Отбасың туралы айтып бер","intent":"AskFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_af_02","input":"Балаларың бар ма","intent":"AskFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_af_03","input":"Үй ішің қанша адам","intent":"AskFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_re_01","input":"Маған көмектесіңізші","intent":"Request","source_file":"seed","confidence":"high"}
+{"id":"seed_re_02","input":"Бір сұрағым бар","intent":"Request","source_file":"seed","confidence":"high"}
+{"id":"seed_re_03","input":"Маған бір нәрсе көрсете аласыз ба","intent":"Request","source_file":"seed","confidence":"high"}
+{"id":"seed_re_04","input":"Сұрайын деп едім","intent":"Request","source_file":"seed","confidence":"high"}

@@ -13,6 +13,14 @@ path = "src/build.rs"
 name = "intent_dataset_baseline"
 path = "src/baseline.rs"
 
+[[bin]]
+name = "intent_train_rung_a"
+path = "src/train.rs"
+
+[[bin]]
+name = "intent_eval_rung_a"
+path = "src/evaluate.rs"
+
 [dependencies]
 adam-kernel-fst = { path = "../../crates/adam-kernel-fst" }
 adam-dialog = { path = "../../crates/adam-dialog" }

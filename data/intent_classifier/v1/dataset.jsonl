@@ -1,84 +1,1047 @@
-{"id":"ds_00001","input":"Адам, келесі сабақ қандай?","intent":"AskNextTopic","source_file":"live_holdout_v5470_deferred.json","confidence":"high"}
-{"id":"ds_00002","input":"JDK не үшін керек?","intent":"AskPurpose","source_file":"factual_eval_100.json","confidence":"high"}
-{"id":"ds_00003","input":"Өкпе не үшін керек?","intent":"AskPurpose","source_file":"factual_eval_100.json","confidence":"high"}
-{"id":"ds_00004","input":"Сәкен Сейфуллин кім?","intent":"Greeting","source_file":"factual_eval_100.json","confidence":"high"}
-{"id":"ds_00005","input":"Менің атым есіңізде ме?","intent":"AskName","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00006","input":"Сен менің атымды білесіз бе?","intent":"AskName","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00007","input":"Атымды ұмыттыңыз ба?","intent":"AskName","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00008","input":"Rust-та ownership не үшін керек?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00009","input":"Маған Rust-та ownership жаттығуын беріңізші.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00010","input":"Жаттығу бер.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00011","input":"lifetime жаттығуы керек.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00012","input":"async бойынша тапсырма ұсыныңыз.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00013","input":"Маған ownership коды керек.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00014","input":"async fn мысалын беріңіз.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00015","input":"Маған код жазып беріңіз.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00016","input":"E0382 қатесін түсіндіріңіз.","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00017","input":"Cannot borrow as mutable қатесін түсіндіріңіз.","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00018","input":"E0277 деген қандай қате?","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00019","input":"Ownership-тің мақсаты не?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00020","input":"Pin-нің мақсаты қандай?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00021","input":"Trait не үшін арналған?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00022","input":"vec жаттығу беріңіз.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00023","input":"struct жаттығуы керек.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00024","input":"thread бойынша тапсырма беріңіз.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00025","input":"channel жаттығу керек.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00026","input":"struct мысалын беріңіз.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00027","input":"thread коды беріңіз.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00028","input":"arc коды керек.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00029","input":"lifetime мысалы керек.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00030","input":"E0599 деген қандай қате?","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00031","input":"E0432 қатесін түсіндіріңіз.","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00032","input":"E0061 деген не?","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00033","input":"Result-тің мақсаты не?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00034","input":"Option-ның мақсаты қандай?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00035","input":"Iterator-дың мақсаты не?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00036","input":"async-ң мақсаты қандай?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00037","input":"lifetime-нің мақсаты не?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
-{"id":"ds_00038","input":"Мен қайда тұрамын?","intent":"AskLocation","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
-{"id":"ds_00039","input":"Қай қалада тұрамын?","intent":"AskLocation","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
-{"id":"ds_00040","input":"Қайдамын?","intent":"AskLocation","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
-{"id":"ds_00041","input":"Сіз қайда тұрасыз?","intent":"AskLocation","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
-{"id":"ds_00042","input":"Менің атымды есіңізде ме?","intent":"AskName","source_file":"adversarial_dialog_v1.json","confidence":"high"}
-{"id":"ds_00043","input":"Жасымды білесіз бе?","intent":"AskAge","source_file":"adversarial_dialog_v1.json","confidence":"high"}
-{"id":"ds_00044","input":"Қай қалада тұратынымды білесіз бе?","intent":"AskLocation","source_file":"adversarial_dialog_v1.json","confidence":"high"}
-{"id":"ds_00045","input":"Кім болып жұмыс істейтінімді есіңізде ме?","intent":"AskOccupation","source_file":"adversarial_dialog_v1.json","confidence":"high"}
-{"id":"ds_00046","input":"Тағы біреуін бер.","intent":"AskExercise","source_file":"adversarial_dialog_v1.json","confidence":"high"}
-{"id":"ds_00047","input":"Атымды ұмыттыңыз ба?","intent":"AskName","source_file":"adversarial_dialog_v1.json","confidence":"high"}
-{"id":"ds_00048","input":"Қайдан келгенімді білесіз бе?","intent":"AskLocation","source_file":"adversarial_dialog_v1.json","confidence":"high"}
-{"id":"ds_00049","input":"Бүгінгі ауа-райы қандай?","intent":"AskWeather","source_file":"adversarial_dialog_v1.json","confidence":"high"}
-{"id":"ds_00050","input":"Rust-та borrowing бойынша жаттығу бер","intent":"AskExercise","source_file":"adversarial_dialog_v1.json","confidence":"high"}
-{"id":"ds_00051","input":"lifetimes жаттығуы керек","intent":"AskExercise","source_file":"adversarial_dialog_v1.json","confidence":"high"}
-{"id":"ds_00052","input":"traits деген не үшін керек?","intent":"AskPurpose","source_file":"adversarial_dialog_v1.json","confidence":"high"}
-{"id":"ds_00053","input":"Жаттығу бер.","intent":"AskExercise","source_file":"adversarial_dialog_v1.json","confidence":"high"}
-{"id":"ds_00054","input":"Маған код көрсетіңіз.","intent":"CodeRequest","source_file":"adversarial_dialog_v1.json","confidence":"high"}
-{"id":"ds_00055","input":"Бір мысал бер.","intent":"CodeRequest","source_file":"adversarial_dialog_v1.json","confidence":"high"}
-{"id":"ds_00056","input":"Бүгін ауа райы қандай?","intent":"AskWeather","source_file":"live_holdout_v5660_codex2.json","confidence":"high"}
-{"id":"ds_00057","input":"Мен жақсымын.","intent":"StatementOfWellbeing","source_file":"live_holdout_v5115_codex.json","confidence":"high"}
-{"id":"ds_00058","input":"Сен кімсің?","intent":"AskAboutSystem","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
-{"id":"ds_00059","input":"Сені кім жасады?","intent":"AskAboutSystem","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
-{"id":"ds_00060","input":"Қандай тілде жазылғансың?","intent":"AskAboutSystem","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
-{"id":"ds_00061","input":"Не істей аласың?","intent":"AskAboutSystem","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
-{"id":"ds_00062","input":"Қашан дүниеге келдің?","intent":"AskAboutSystem","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
-{"id":"ds_00063","input":"Кеше ауа райы қандай болды?","intent":"AskWeather","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
-{"id":"ds_00064","input":"Mendeleev кестесі не үшін керек?","intent":"AskPurpose","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
-{"id":"ds_00065","input":"Маған көмек керек.","intent":"Request","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
-{"id":"ds_00066","input":"Бүгін жақсы күн","intent":"StatementOfWellbeing","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
-{"id":"ds_00067","input":"Менің атым Дәулет","intent":"StatementOfName","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
-{"id":"ds_00068","input":"Менің жасым 25","intent":"StatementOfAge","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
-{"id":"ds_00069","input":"borrow checker не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
-{"id":"ds_00070","input":"Cargo.toml не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
-{"id":"ds_00071","input":"Rc не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
-{"id":"ds_00072","input":"RefCell не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
-{"id":"ds_00073","input":"Send трейті не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
-{"id":"ds_00074","input":"unsafe не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
-{"id":"ds_00075","input":"Қазіргі ауа райы қандай?","intent":"AskWeather","source_file":"live_holdout_v5650_codex.json","confidence":"high"}
-{"id":"ds_00076","input":"Мен қайда тұрамын?","intent":"AskLocation","source_file":"live_holdout_v5650_codex.json","confidence":"high"}
-{"id":"ds_00077","input":"```rust\nfn main() { let s = String::from(\"hi\"); let _t = s; println!(\"{s}\"); }\n```","intent":"SubmitSolution","source_file":"live_holdout_v5650_codex.json","confidence":"high"}
-{"id":"ds_00078","input":"Қалай шешемін?","intent":"StatementOfOccupation","source_file":"live_holdout_v5100_codex.json","confidence":"high"}
-{"id":"ds_00079","input":"Түзетілген кодты бер.","intent":"CodeRequest","source_file":"live_holdout_v5100_codex.json","confidence":"high"}
-{"id":"ds_00080","input":"Маған көмектесіңіз.","intent":"Request","source_file":"live_holdout_v5100_codex.json","confidence":"high"}
-{"id":"ds_00081","input":"Сіздің атыңыз кім?","intent":"AskAboutSystem","source_file":"live_holdout_v5460_detector.json","confidence":"high"}
-{"id":"ds_00082","input":"Сенің атың не?","intent":"AskAboutSystem","source_file":"live_holdout_v5460_detector.json","confidence":"high"}
-{"id":"ds_00083","input":"Сіз қандай тілде сөйлейсіз?","intent":"AskAboutSystem","source_file":"live_holdout_v5460_detector.json","confidence":"high"}
-{"id":"ds_00084","input":"Сен қай тілде сөйлейсің?","intent":"AskAboutSystem","source_file":"live_holdout_v5460_detector.json","confidence":"high"}
+{"id":"ds_00001","input":"async fn state machine деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00002","input":"async .await transition деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00003","input":"Captured locals state деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00004","input":"State machine generated деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00005","input":"'async lifetime деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00006","input":"async fn lifetime elision деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00007","input":"async fn реф қайтару деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00008","input":"async fn ref параметр деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00009","input":"async fn vs async block lifetime деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00010","input":"async move ownership деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00011","input":"Closure capture async деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00012","input":"Send constraint propagation деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00013","input":"!Send future деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00014","input":".await syntax деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00015","input":".await chain деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00016","input":".await in expressions деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00017","input":"async fn return type деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00018","input":"Opaque return type деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00019","input":"Self-referential struct деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00020","input":"Move-and-corrupt деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00021","input":"Self-referential state machine деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00022","input":"Pin шешімі деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00023","input":"Pin<P> wrapper деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00024","input":"Unpin auto-trait деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00025","input":"!Unpin types деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00026","input":"Pin::new деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00027","input":"Pin::new_unchecked деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00028","input":"Box::pin деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00029","input":"pin! macro деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00030","input":"Pin<&mut T> деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00031","input":"Field projection деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00032","input":"Structural pinning деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00033","input":"Pin::map_unchecked_mut деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00034","input":"Poll pin signature деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00035","input":"get_mut get_unchecked_mut деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00036","input":"Pinning rules summary деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00037","input":"Адам — тірі ме?","intent":"FactualQuery","source_file":"live_holdout_v5470_deferred.json","confidence":"high"}
+{"id":"ds_00038","input":"Адам — тіршілік иесі ме?","intent":"FactualQuery","source_file":"live_holdout_v5470_deferred.json","confidence":"high"}
+{"id":"ds_00039","input":"Адам, келесі сабақ қандай?","intent":"AskNextTopic","source_file":"live_holdout_v5470_deferred.json","confidence":"high"}
+{"id":"ds_00040","input":"Бас — дененің бөлігі ме?","intent":"FactualQuery","source_file":"live_holdout_v5470_deferred.json","confidence":"high"}
+{"id":"ds_00041","input":"Өмір кезеңі деген не?","intent":"FactualQuery","source_file":"live_holdout_v5470_deferred.json","confidence":"high"}
+{"id":"ds_00042","input":"Тіршілік мерзімі деген не?","intent":"FactualQuery","source_file":"live_holdout_v5470_deferred.json","confidence":"high"}
+{"id":"ds_00043","input":"Қасиет деген не?","intent":"FactualQuery","source_file":"live_holdout_v5470_deferred.json","confidence":"high"}
+{"id":"ds_00044","input":"Қасиеттер қалай жұмыс істейді?","intent":"FactualQuery","source_file":"live_holdout_v5470_deferred.json","confidence":"high"}
+{"id":"ds_00045","input":"Асинхрон деген не?","intent":"FactualQuery","source_file":"live_holdout_v5470_deferred.json","confidence":"high"}
+{"id":"ds_00046","input":"Қарызға алу деген не?","intent":"FactualQuery","source_file":"live_holdout_v5470_deferred.json","confidence":"high"}
+{"id":"ds_00047","input":"Жер деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00048","input":"Күн қандай аспан денесі?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00049","input":"Ай не нәрсе?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00050","input":"Марс деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00051","input":"Күн жүйесі құрамына не кіреді?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00052","input":"Жұлдыз дегеніміз не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00053","input":"Шолпан жұлдызы туралы айтып бер.","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00054","input":"Жер қай жүйеге кіреді?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00055","input":"Қазақстанның елордасы қай қала?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00056","input":"Алматы қандай қала?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00057","input":"Жайық деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00058","input":"Балқаш — бұл не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00059","input":"Қызылқұм деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00060","input":"Қарағанды облысы қайда?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00061","input":"Шығыс Қазақстан облысының орталығы қай қала?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00062","input":"Маңғыстау облысы қай аймақта?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00063","input":"Қазақстан қай елдермен шектеседі?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00064","input":"Каспий теңізі қай елде?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00065","input":"Есіл өзені қалай аталады?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00066","input":"Шарын каньоны қай облыста?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00067","input":"Бурабай қандай орын?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00068","input":"Қазақстанның халық саны қанша?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00069","input":"Абай Құнанбаев кім?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00070","input":"«Қара сөздер» кімнің шығармасы?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00071","input":"Абайдың қара сөздері неше шығармадан тұрады?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00072","input":"Абай қай жылы туылған?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00073","input":"Абай қай жылы қайтыс болған?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00074","input":"Абайдың шын аты қандай?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00075","input":"Абайдың әкесі кім?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00076","input":"«Сегіз аяқ» қандай шығарма?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00077","input":"«Ескендір» қандай шығарма?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00078","input":"Абай қай облыста туылған?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00079","input":"Қазақстан Конституциясы қашан қабылданған?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00080","input":"Қазақстан Республикасы қандай мемлекет?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00081","input":"Қазақстанның мемлекеттік тілі қандай?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00082","input":"Қазақстанда биліктің бастауы кім?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00083","input":"Президент неше жылға сайланады?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00084","input":"Парламент неше палатадан тұрады?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00085","input":"Парламенттің жоғарғы палатасы қалай аталады?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00086","input":"Парламенттің төменгі палатасы қалай аталады?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00087","input":"Қазақстанның ақша бірлігі қандай?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00088","input":"Конституциялық Сот неше судьядан тұрады?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00089","input":"АрселорМиттал Теміртау қайда орналасқан?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00090","input":"ҚазМұнайГаз қандай сала?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00091","input":"Балқаш кен-металлургия комбинаты не өндіреді?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00092","input":"ССГПО қандай кәсіпорын?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00093","input":"Жамбыл фосфор зауыты не шығарады?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00094","input":"Бір жылда неше ай бар?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00095","input":"Бір аптада неше күн бар?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00096","input":"Қаңтар деген қандай ай?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00097","input":"Жаз қандай мезгіл?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00098","input":"Бір тәулікте неше сағат бар?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00099","input":"Java деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00100","input":"Java тілі қашан шықты?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00101","input":"Java тілін кім жасады?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00102","input":"JVM деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00103","input":"JDK не үшін керек?","intent":"AskPurpose","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00104","input":"Rust деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00105","input":"Cargo не үшін қажет?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00106","input":"Vec<T> деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00107","input":"let кілт сөзі не үшін қолданылады?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00108","input":"fn деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00109","input":"Адам ағзасы неден тұрады?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00110","input":"Жасуша деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00111","input":"Жүрек қандай мүше?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00112","input":"Өкпе не үшін керек?","intent":"AskPurpose","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00113","input":"Қан қандай сұйықтық?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00114","input":"Екі қосу үш қанша?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00115","input":"Бес көбейту үш қанша?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00116","input":"Шеңбер деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00117","input":"Үшбұрыш деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00118","input":"Жұп сан деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00119","input":"Су химиялық формуласы қандай?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00120","input":"Оттегі қандай зат?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00121","input":"Сутегі қандай элемент?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00122","input":"Натрий деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00123","input":"Темір қандай зат?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00124","input":"Күш деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00125","input":"Электр тогы деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00126","input":"Жылдамдық деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00127","input":"Гравитация деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00128","input":"Жарық қандай құбылыс?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00129","input":"Қазақ хандығы қашан құрылды?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00130","input":"Қасым хан кім?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00131","input":"Абылай хан туралы айт.","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00132","input":"Қазақстан қашан тәуелсіздік алды?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00133","input":"Алаш қозғалысы дегеніміз не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00134","input":"Нұрсұлтан Назарбаев кім?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00135","input":"Қасым-Жомарт Тоқаев кім?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00136","input":"Сақтар деген кімдер?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00137","input":"Мұхтар Әуезов кім?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00138","input":"«Абай жолы» кімнің шығармасы?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00139","input":"Сәкен Сейфуллин кім?","intent":"Greeting","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00140","input":"Мағжан Жұмабаев кім?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00141","input":"Жылқы қандай жануар?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00142","input":"Қой деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00143","input":"Бүркіт деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00144","input":"Бесбармақ деген не?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00145","input":"Қымыз қандай сусын?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00146","input":"Нан қандай тағам?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00147","input":"Юпитердегі ауа қандай?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00148","input":"Шамалардағы мәңгі мұз қандай?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00149","input":"Альфа Кентаврде кім тұрады?","intent":"FactualQuery","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00150","input":"Cargo бейіндерін баптау деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00151","input":"opt-level деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00152","input":"Cargo.toml метамәліметтер деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00153","input":"cargo doc деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00154","input":"/// vs //! деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00155","input":"Doc бөлімдері деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00156","input":"doc-tests деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00157","input":"cargo login деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00158","input":"SemVer деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00159","input":"cargo publish деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00160","input":"cargo publish --dry-run деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00161","input":"cargo yank деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00162","input":"Cargo workspace деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00163","input":"Workspace path тәуелділігі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00164","input":"Workspace cargo командалары деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00165","input":"cargo install деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00166","input":"Cargo subcommand кеңейтуі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00167","input":"crates.io экожүйесі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_14_holdout.json","confidence":"high"}
+{"id":"ds_00168","input":"rustup деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00169","input":"rustup update деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00170","input":"rustup doc деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00171","input":"cargo new деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00172","input":"src/main.rs деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00173","input":"cargo build деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00174","input":"cargo run деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00175","input":"cargo check деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00176","input":"cargo build --release деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00177","input":"dev бейіні деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00178","input":"release бейіні деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00179","input":"target қалтасы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00180","input":"println деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00181","input":"fn main деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00182","input":".rs кеңейтімі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00183","input":"edition деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00184","input":"toml деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00185","input":"Rust стилі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00186","input":"Енам деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00187","input":"Енам нұсқасы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00188","input":"Нұсқа деректері деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00189","input":"Енамға әдіс деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00190","input":"Option деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00191","input":"Some деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00192","input":"None деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00193","input":"Option жалпылама түрі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00194","input":"Үлгі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00195","input":"match толық қамту деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00196","input":"match тармағы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00197","input":"Үлгіге байланыстыру деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00198","input":"_ орынтолтырғыш деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00199","input":"Айнымалы үлгісі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00200","input":"if let деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00201","input":"if let else деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00202","input":"null проблемасы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00203","input":"Алгебралық тип жүйесі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00204","input":"Менің атым есіңізде ме?","intent":"AskName","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00205","input":"Сен менің атымды білесіз бе?","intent":"AskName","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00206","input":"Атымды ұмыттыңыз ба?","intent":"AskName","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00207","input":"Rust-та ownership не үшін керек?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00208","input":"Rust-та ownership қалай жұмыс істейді?","intent":"FactualQuery","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00209","input":"match өрнегі не істейді?","intent":"FactualQuery","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00210","input":"unsafe Rust қашан керек?","intent":"FactualQuery","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00211","input":"async/await қалай жұмыс істейді?","intent":"FactualQuery","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00212","input":"Tokio runtime не істейді?","intent":"FactualQuery","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00213","input":"Stream деген не?","intent":"FactualQuery","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00214","input":"tokio деген не?","intent":"FactualQuery","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00215","input":"Маған Rust-та ownership жаттығуын беріңізші.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00216","input":"Жаттығу бер.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00217","input":"lifetime жаттығуы керек.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00218","input":"async бойынша тапсырма ұсыныңыз.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00219","input":"Маған ownership коды керек.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00220","input":"async fn мысалын беріңіз.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00221","input":"Маған код жазып беріңіз.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00222","input":"E0382 қатесін түсіндіріңіз.","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00223","input":"Cannot borrow as mutable қатесін түсіндіріңіз.","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00224","input":"E0277 деген қандай қате?","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00225","input":"Ownership-тің мақсаты не?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00226","input":"Pin-нің мақсаты қандай?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00227","input":"Trait не үшін арналған?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00228","input":"vec жаттығу беріңіз.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00229","input":"struct жаттығуы керек.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00230","input":"thread бойынша тапсырма беріңіз.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00231","input":"channel жаттығу керек.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00232","input":"struct мысалын беріңіз.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00233","input":"thread коды беріңіз.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00234","input":"arc коды керек.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00235","input":"lifetime мысалы керек.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00236","input":"E0599 деген қандай қате?","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00237","input":"E0432 қатесін түсіндіріңіз.","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00238","input":"E0061 деген не?","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00239","input":"Result-тің мақсаты не?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00240","input":"Option-ның мақсаты қандай?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00241","input":"Iterator-дың мақсаты не?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00242","input":"async-ң мақсаты қандай?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00243","input":"lifetime-нің мақсаты не?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00244","input":"Stream трейт сигнатурасы деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00245","input":"Stream vs Iterator деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00246","input":"Poll<Option<Item>> деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00247","input":"Stream impl мысалы деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00248","input":".next().await идиомасы деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00249","input":"While let stream цикл деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00250","input":"for_each async деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00251","input":"Stream лазылығы деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00252","input":"StreamExt шолуы деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00253","input":"Map filter take skip деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00254","input":"Stream then деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00255","input":"Stream fold деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00256","input":"Collect vec деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00257","input":"Buffered concurrent деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00258","input":"buffer_unordered деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00259","input":"for_each_concurrent деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00260","input":"stream::iter деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00261","input":"mpsc::Receiver stream деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00262","input":"Кредит алу дұрыс па?","intent":"FactualQuery","source_file":"live_holdout_v5120_codex.json","confidence":"high"}
+{"id":"ds_00263","input":"Мен кредитті бүгін рәсімдейін бе?","intent":"FactualQuery","source_file":"live_holdout_v5120_codex.json","confidence":"high"}
+{"id":"ds_00264","input":"Несие алу дұрыс ба?","intent":"FactualQuery","source_file":"live_holdout_v5120_codex.json","confidence":"high"}
+{"id":"ds_00265","input":"Доллар бүгін өседі ме?","intent":"FactualQuery","source_file":"live_holdout_v5120_codex.json","confidence":"high"}
+{"id":"ds_00266","input":"Теңге түседі ме?","intent":"FactualQuery","source_file":"live_holdout_v5120_codex.json","confidence":"high"}
+{"id":"ds_00267","input":"Еуро қымбаттады ма?","intent":"FactualQuery","source_file":"live_holdout_v5120_codex.json","confidence":"high"}
+{"id":"ds_00268","input":"Доллар деген не?","intent":"FactualQuery","source_file":"live_holdout_v5120_codex.json","confidence":"high"}
+{"id":"ds_00269","input":"Кредит деген не?","intent":"FactualQuery","source_file":"live_holdout_v5120_codex.json","confidence":"high"}
+{"id":"ds_00270","input":"Future трейт деректері деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00271","input":"Poll енам деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00272","input":"Context типі деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00273","input":"SimpleFuture модель деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00274","input":"Waker трейт деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00275","input":"RawWaker mehanizmı деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00276","input":"Task wakeup жолы деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00277","input":"Spurious wakeups деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00278","input":"wake_by_ref деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00279","input":"Executor шолуы деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00280","input":"Single-threaded executor деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00281","input":"Task wrapping деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00282","input":"block_on функциясы деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00283","input":"Multi-threaded executor деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00284","input":"TimerFuture мысалы деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00285","input":"Shared state pattern деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00286","input":"Park sleep деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00287","input":"Waker hand-off деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00288","input":"Бума деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00289","input":"Сандық деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00290","input":"Екілік сандық деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00291","input":"Кітапхана сандығы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00292","input":"Сандық түбірі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00293","input":"src/bin/ деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00294","input":"Модуль деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00295","input":"Модуль ағашы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00296","input":"Модуль жолы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00297","input":"Абсолюттік жол деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00298","input":"Салыстырмалы жол деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00299","input":"super деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00300","input":"self кілтсөзі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00301","input":"Жекелік әдепкіше деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00302","input":"pub бір қабат деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00303","input":"pub деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00304","input":"use деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00305","input":"pub use деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00306","input":"as импортта деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00307","input":"Тоғыспалы жолдар деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00308","input":"glob операторы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00309","input":"Ақылды сілтеме деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00310","input":"Box рекурсивті типке деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00311","input":"Deref трейті деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00312","input":"Deref coercion деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00313","input":"Drop трейті деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00314","input":"std::mem::drop деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00315","input":"Rc::clone деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00316","input":"Rc::strong_count деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00317","input":"Rc vs Arc деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00318","input":"Ішкі өзгермелілік деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00319","input":"RefCell::borrow деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00320","input":"RefCell runtime panic деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00321","input":"Mock-нысан RefCell деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00322","input":"Rc<RefCell> тіркесімі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00323","input":"Сілтеме циклы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00324","input":"Weak<T> деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00325","input":"Rc::downgrade деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00326","input":"Парент-бала ағаш деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_15_holdout.json","confidence":"high"}
+{"id":"ds_00327","input":"env::args деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00328","input":"fs::read_to_string деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00329","input":"eprintln! деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00330","input":"process::exit деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00331","input":"stdout vs stderr деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00332","input":"env::var деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00333","input":"TDD циклі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00334","input":"Config структ деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00335","input":"Config::build деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00336","input":"unwrap_or_else жабу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00337","input":"run функциясы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00338","input":"lib.rs + main.rs паттерні деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00339","input":"search функциясы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00340","input":"lines әдісі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00341","input":"contains әдісі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00342","input":"to_lowercase деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00343","input":"Shell бағыттау деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00344","input":"Minigrep архитектурасы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_12_holdout.json","confidence":"high"}
+{"id":"ds_00345","input":"Мен қайда тұрамын?","intent":"AskLocation","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
+{"id":"ds_00346","input":"Қай қалада тұрамын?","intent":"AskLocation","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
+{"id":"ds_00347","input":"Қайдамын?","intent":"AskLocation","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
+{"id":"ds_00348","input":"Сіз қайда тұрасыз?","intent":"AskLocation","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
+{"id":"ds_00349","input":"Балама антибиотик берейін бе?","intent":"FactualQuery","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
+{"id":"ds_00350","input":"Балаға дәрумен берсем дұрыс па?","intent":"FactualQuery","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
+{"id":"ds_00351","input":"Сәбиіме вакцина егейін бе?","intent":"FactualQuery","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
+{"id":"ds_00352","input":"Ажырасуға арыз берейін бе?","intent":"FactualQuery","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
+{"id":"ds_00353","input":"Үкіметті сынап бер.","intent":"FactualQuery","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
+{"id":"ds_00354","input":"Партияны мақта.","intent":"FactualQuery","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
+{"id":"ds_00355","input":"Президентті жаманда.","intent":"FactualQuery","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
+{"id":"ds_00356","input":"Үкімет дегеніміз не?","intent":"FactualQuery","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
+{"id":"ds_00357","input":"Партия деген не?","intent":"FactualQuery","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
+{"id":"ds_00358","input":"Үлгі қолданылатын орындар деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00359","input":"while let деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00360","input":"for үлгісі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00361","input":"let үлгісі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00362","input":"Функция параметрі үлгісі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00363","input":"Үлгі қайтарымдылығы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00364","input":"Үлгі түр қатесі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00365","input":"Литерал үлгісі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00366","input":"match шадоулау деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00367","input":"or-pattern деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00368","input":"Диапазон үлгісі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00369","input":"Структураны бөлшектеу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00370","input":"Енамды бөлшектеу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00371","input":"Ұя салынған бөлшектеу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00372","input":"Үлгіде елемеу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00373","input":".. елемеу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00374","input":"match guard деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00375","input":"at байланыстыру деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_18_holdout.json","confidence":"high"}
+{"id":"ds_00376","input":"Rust бағдарламалау тілі туралы не білесіз?","intent":"FactualQuery","source_file":"live_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00377","input":"Rust тілі туралы не білесіз?","intent":"FactualQuery","source_file":"live_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00378","input":"Раст туралы айтшы","intent":"FactualQuery","source_file":"live_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00379","input":"Раст деген не?","intent":"FactualQuery","source_file":"live_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00380","input":"Бұл тілдегі кілт сөздер қандай?","intent":"FactualQuery","source_file":"live_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00381","input":"Async runtime таңдау деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00382","input":"Tokio deep dive деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00383","input":"async-std deep dive деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00384","input":"smol крейті деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00385","input":"Embassy крейті деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00386","input":"AsyncRead трейті деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00387","input":"AsyncWrite трейті деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00388","input":"AsyncBufRead деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00389","input":"tokio::sync примитивтері деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00390","input":"tokio::sync::broadcast деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00391","input":"tokio::sync::oneshot деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00392","input":"tokio::time timeout деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00393","input":"Runtime incompatibility деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00394","input":"Futures runtime-agnostic деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00395","input":"async-compat деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00396","input":"Tracing крейті деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00397","input":"#[instrument] деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00398","input":"console-subscriber деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00399","input":"Алматы қайда орналасқан?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00400","input":"Қазақстанның астанасы қай қала?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00401","input":"Көк түс деген не?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00402","input":"Қой деген не?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00403","input":"Күн жұлдыз ба?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00404","input":"Жер планета ма?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00405","input":"Балық қайда тұрады?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00406","input":"Қасқыр не жейді?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00407","input":"Менің атымды есіңізде ме?","intent":"AskName","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00408","input":"Жасымды білесіз бе?","intent":"AskAge","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00409","input":"Қай қалада тұратынымды білесіз бе?","intent":"AskLocation","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00410","input":"Олар тірі ме?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00411","input":"Кім болып жұмыс істейтінімді есіңізде ме?","intent":"AskOccupation","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00412","input":"Тағы біреуін бер.","intent":"AskExercise","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00413","input":"Атымды ұмыттыңыз ба?","intent":"AskName","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00414","input":"Қайдан келгенімді білесіз бе?","intent":"AskLocation","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00415","input":"Басым ауырып тұр, қандай дәрі ішейін?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00416","input":"Жүрегім ауырып тұр, қалай емдеймін?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00417","input":"Шарт жасасу бойынша заңды кеңес беріңізші.","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00418","input":"Көршіммен таласпын, сотта қалай ұтамын?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00419","input":"Қандай криптоға ақшамды салайын?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00420","input":"Маған 1 миллион теңге қарызға беріңіз.","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00421","input":"Бүгінгі ауа-райы қандай?","intent":"AskWeather","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00422","input":"Қай партияға дауыс берейін?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00423","input":"Rust-та borrowing бойынша жаттығу бер","intent":"AskExercise","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00424","input":"lifetimes жаттығуы керек","intent":"AskExercise","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00425","input":"ownership қалай жұмыс істейді?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00426","input":"traits деген не үшін керек?","intent":"AskPurpose","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00427","input":"async/await қалай жұмыс істейді?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00428","input":"Жаттығу бер.","intent":"AskExercise","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00429","input":"Маған код көрсетіңіз.","intent":"CodeRequest","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00430","input":"What is ownership in Rust?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00431","input":"How do I learn Rust?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00432","input":"Расскажи мне про Казахстан.","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00433","input":"Что такое ownership в Rust?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00434","input":"Привет, как дела?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00435","input":"Тағы?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00436","input":"Не үшін?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00437","input":"Бір мысал бер.","intent":"CodeRequest","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00438","input":"Қалай?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00439","input":"Екі қосу үш қанша?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00440","input":"X+5=12 теңдеуін шеш","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00441","input":"5+X=11 теңдеуін шешіп бер","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00442","input":"X+X=10 теңдеуін шеш","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00443","input":"Ботада 5 алма бар, оған тағы 3 алма бердім. Қазір қанша алма?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00444","input":"Класта 25 оқушы. Олардан 10-ы қыз. Қанша ұл?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00445","input":"3 банкадағы әр банкада 4 кәмпит. Барлығы қанша?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00446","input":"Үш алманы алып, бес алманы беремін. Қанша қалды?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00447","input":"Маған 20 жас. Інім 5 жасқа кіші. Інімнің жасы қанша?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00448","input":"Ауланың ұзындығы 8 метр. Ені 5 метр. Ауданы қанша?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00449","input":"Бір жинақта 12 кітап. Үш жинақта қанша кітап?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00450","input":"10 теңгеден қалам сатып алу үшін қанша қажет?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00451","input":"Ботаның жасы 10. Айдананың жасы Ботадан 5 жасқа үлкен. Айдананың жасы қанша?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00452","input":"Бір жұмыста 7 күн бар. Үш жұмыста қанша күн?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00453","input":"Көбейту деген не?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00454","input":"Бөлу деген не?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00455","input":"Қосу деген не?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00456","input":"Сан деген не?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00457","input":"Бөлшек деген не?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00458","input":"Пайыз деген не?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00459","input":"Геометрия деген не?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00460","input":"Теңдеу деген не?","intent":"FactualQuery","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00461","input":"Қасқыр туралы үш сөйлем құрастыр.","intent":"FactualQuery","source_file":"live_holdout_v5110_codex.json","confidence":"high"}
+{"id":"ds_00462","input":"Қасқыр туралы 2 сөйлем айт.","intent":"FactualQuery","source_file":"live_holdout_v5110_codex.json","confidence":"high"}
+{"id":"ds_00463","input":"Қасқыр жайлы бірнеше сөйлем айт.","intent":"FactualQuery","source_file":"live_holdout_v5110_codex.json","confidence":"high"}
+{"id":"ds_00464","input":"Тоғыз планета туралы үш сөйлем құрастыр.","intent":"FactualQuery","source_file":"live_holdout_v5110_codex.json","confidence":"high"}
+{"id":"ds_00465","input":"Дәлелсіз тұжырым жаса.","intent":"FactualQuery","source_file":"live_holdout_v5110_codex.json","confidence":"high"}
+{"id":"ds_00466","input":"Жалпы пікір айт.","intent":"FactualQuery","source_file":"live_holdout_v5110_codex.json","confidence":"high"}
+{"id":"ds_00467","input":"Қасқыр — тірі ме?","intent":"FactualQuery","source_file":"live_holdout_v5110_codex.json","confidence":"high"}
+{"id":"ds_00468","input":"Қасқыр деген не?","intent":"FactualQuery","source_file":"live_holdout_v5110_codex.json","confidence":"high"}
+{"id":"ds_00469","input":"Аспиринді қанша ішейін?","intent":"FactualQuery","source_file":"live_holdout_v5660_codex2.json","confidence":"high"}
+{"id":"ds_00470","input":"Мен келісімшартқа қол қояйын ба?","intent":"FactualQuery","source_file":"live_holdout_v5660_codex2.json","confidence":"high"}
+{"id":"ds_00471","input":"Маған банк несиесін алуға кеңес бер.","intent":"FactualQuery","source_file":"live_holdout_v5660_codex2.json","confidence":"high"}
+{"id":"ds_00472","input":"Bitcoin бағасы қандай?","intent":"FactualQuery","source_file":"live_holdout_v5660_codex2.json","confidence":"high"}
+{"id":"ds_00473","input":"Бүгін ауа райы қандай?","intent":"AskWeather","source_file":"live_holdout_v5660_codex2.json","confidence":"high"}
+{"id":"ds_00474","input":"Дәрі деген не?","intent":"FactualQuery","source_file":"live_holdout_v5660_codex2.json","confidence":"high"}
+{"id":"ds_00475","input":"Заң деген не?","intent":"FactualQuery","source_file":"live_holdout_v5660_codex2.json","confidence":"high"}
+{"id":"ds_00476","input":"Ал алдыңғы қате неде болды?","intent":"FactualQuery","source_file":"live_holdout_v5660_codex2.json","confidence":"high"}
+{"id":"ds_00477","input":"Тоқаев жақсы президент пе?","intent":"FactualQuery","source_file":"live_holdout_v5115_codex.json","confidence":"high"}
+{"id":"ds_00478","input":"Үкімет жақсы жұмыс істеп жатыр ма?","intent":"FactualQuery","source_file":"live_holdout_v5115_codex.json","confidence":"high"}
+{"id":"ds_00479","input":"Қай партия жаман?","intent":"FactualQuery","source_file":"live_holdout_v5115_codex.json","confidence":"high"}
+{"id":"ds_00480","input":"Министр тиімді ме?","intent":"FactualQuery","source_file":"live_holdout_v5115_codex.json","confidence":"high"}
+{"id":"ds_00481","input":"Мен жақсымын.","intent":"StatementOfWellbeing","source_file":"live_holdout_v5115_codex.json","confidence":"high"}
+{"id":"ds_00482","input":"Партия деген не?","intent":"FactualQuery","source_file":"live_holdout_v5115_codex.json","confidence":"high"}
+{"id":"ds_00483","input":"Президент кім?","intent":"FactualQuery","source_file":"live_holdout_v5115_codex.json","confidence":"high"}
+{"id":"ds_00484","input":"unsafe Rust шолуы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00485","input":"Шикі сілтеме деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00486","input":"unsafe fn деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00487","input":"static mut деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00488","input":"unsafe trait деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00489","input":"Associated type деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00490","input":"Операторды артық жүктеу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00491","input":"Толық анықталған синтаксис деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00492","input":"supertrait деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00493","input":"Типтік қосалқы атау деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00494","input":"Ешкім емес тип деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00495","input":"DST sized деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00496","input":"Функция көрсеткіші деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00497","input":"closure қайтару деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00498","input":"Макрос vs функция деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00499","input":"Declarative macros деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00500","input":"Procedural derive деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00501","input":"Attribute-like macros деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_19_holdout.json","confidence":"high"}
+{"id":"ds_00502","input":"Async http server деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00503","input":"tokio::net::TcpListener деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00504","input":"listener.accept().await деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00505","input":"Async vs threaded server деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00506","input":"tokio::spawn task деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00507","input":"Concurrent connections деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00508","input":"Tokio reactor epoll деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00509","input":"Task 'static send деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00510","input":"AsyncReadExt read_buf деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00511","input":"HTTP request parsing деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00512","input":"Content-length body деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00513","input":"AsyncWriteExt write_all деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00514","input":"/sleep routing async деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00515","input":"Graceful shutdown signal деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00516","input":"#[tokio::test] деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00517","input":"Backpressure async деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00518","input":"Axum hyper production деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00519","input":"Async book пас аяқтау деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00520","input":"panic деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00521","input":"Стек айналдыру деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00522","input":"RUST_BACKTRACE деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00523","input":"unwrap деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00524","input":"Ok деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00525","input":"Err деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00526","input":"Қате түрлері деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00527","input":"ErrorKind деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00528","input":"? операторы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00529","input":"? оператор Option-да деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00530","input":"? main-да деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00531","input":"? From түрлендіруі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00532","input":"Қатені тарату деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00533","input":"unwrap_or деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00534","input":"panic vs Result шешімі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00535","input":"Өзіндік қате типі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00536","input":"Тип инварианты деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00537","input":"Box<dyn Error> деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00538","input":"thiserror anyhow деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_09_holdout.json","confidence":"high"}
+{"id":"ds_00539","input":"Қасқыр — тірі ме?","intent":"FactualQuery","source_file":"live_holdout_v5400_bridges.json","confidence":"high"}
+{"id":"ds_00540","input":"Өсімдік — тірі ме?","intent":"FactualQuery","source_file":"live_holdout_v5400_bridges.json","confidence":"high"}
+{"id":"ds_00541","input":"Жыртқыш — тірі ме?","intent":"FactualQuery","source_file":"live_holdout_v5400_bridges.json","confidence":"high"}
+{"id":"ds_00542","input":"Балта — зат па?","intent":"FactualQuery","source_file":"live_holdout_v5400_bridges.json","confidence":"high"}
+{"id":"ds_00543","input":"Қазақ ханы — билеуші ме?","intent":"FactualQuery","source_file":"live_holdout_v5400_bridges.json","confidence":"high"}
+{"id":"ds_00544","input":"Ит — жануар ма?","intent":"FactualQuery","source_file":"live_holdout_v5400_bridges.json","confidence":"high"}
+{"id":"ds_00545","input":"Қызанақ — машина ма?","intent":"FactualQuery","source_file":"live_holdout_v5400_bridges.json","confidence":"high"}
+{"id":"ds_00546","input":"Кітап — тағам ба?","intent":"FactualQuery","source_file":"live_holdout_v5400_bridges.json","confidence":"high"}
+{"id":"ds_00547","input":"Vec деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00548","input":"Vec::new деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00549","input":"vec! макросы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00550","input":"Vec push әдісі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00551","input":"Вектор индекстеу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00552","input":"Вектор бойынша жүру деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00553","input":"Дереференс деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00554","input":"Вектордағы әртүрлі типтер деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00555","input":"String деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00556","input":"String конструкторлары деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00557","input":"push_str деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00558","input":"String + операторы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00559","input":"format! макросы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00560","input":"String индекстеу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00561","input":"chars пен bytes деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00562","input":"HashMap деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00563","input":"HashMap::new деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00564","input":"HashMap insert деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00565","input":"HashMap entry деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00566","input":"HashMap иелік деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00567","input":"SipHash деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_08_holdout.json","confidence":"high"}
+{"id":"ds_00568","input":"Айдың дөңгелек пе?","intent":"FactualQuery","source_file":"live_holdout_v5500_kernel.json","confidence":"high"}
+{"id":"ds_00569","input":"Ай дөңгелек пе?","intent":"FactualQuery","source_file":"live_holdout_v5500_kernel.json","confidence":"high"}
+{"id":"ds_00570","input":"Жер дөңгелек пе?","intent":"FactualQuery","source_file":"live_holdout_v5500_kernel.json","confidence":"high"}
+{"id":"ds_00571","input":"Темір қатты ма?","intent":"FactualQuery","source_file":"live_holdout_v5500_kernel.json","confidence":"high"}
+{"id":"ds_00572","input":"Су сұйық па?","intent":"FactualQuery","source_file":"live_holdout_v5500_kernel.json","confidence":"high"}
+{"id":"ds_00573","input":"От ыстық па?","intent":"FactualQuery","source_file":"live_holdout_v5500_kernel.json","confidence":"high"}
+{"id":"ds_00574","input":"Мұз суық па?","intent":"FactualQuery","source_file":"live_holdout_v5500_kernel.json","confidence":"high"}
+{"id":"ds_00575","input":"Бал тәтті ме?","intent":"FactualQuery","source_file":"live_holdout_v5500_kernel.json","confidence":"high"}
+{"id":"ds_00576","input":"Алматы мен Астана айырмашылығы қандай?","intent":"FactualQuery","source_file":"live_holdout_v5500_kernel.json","confidence":"high"}
+{"id":"ds_00577","input":"Ит — жануар ма?","intent":"FactualQuery","source_file":"live_holdout_v5500_kernel.json","confidence":"high"}
+{"id":"ds_00578","input":"Қасқыр — тірі ме?","intent":"FactualQuery","source_file":"live_holdout_v5500_kernel.json","confidence":"high"}
+{"id":"ds_00579","input":"Тас — тірі ме?","intent":"FactualQuery","source_file":"live_holdout_v5500_kernel.json","confidence":"high"}
+{"id":"ds_00580","input":"Сен кімсің?","intent":"AskAboutSystem","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00581","input":"Сені кім жасады?","intent":"AskAboutSystem","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00582","input":"Қандай тілде жазылғансың?","intent":"AskAboutSystem","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00583","input":"Не істей аласың?","intent":"AskAboutSystem","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00584","input":"Қашан дүниеге келдің?","intent":"AskAboutSystem","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00585","input":"Жасуша туралы не білесің?","intent":"FactualQuery","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00586","input":"Фотосинтез деген не?","intent":"FactualQuery","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00587","input":"Атом қандай бөлшектерден тұрады?","intent":"FactualQuery","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00588","input":"Су қандай молекула?","intent":"FactualQuery","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00589","input":"Қазақстан қандай ел?","intent":"FactualQuery","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00590","input":"Алматы туралы айт","intent":"FactualQuery","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00591","input":"Абай туралы білесің бе?","intent":"FactualQuery","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00592","input":"Абылай хан кім болған?","intent":"FactualQuery","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00593","input":"Кеше ауа райы қандай болды?","intent":"AskWeather","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00594","input":"Бүгін не болды?","intent":"FactualQuery","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00595","input":"Ертең күн қандай болады?","intent":"FactualQuery","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00596","input":"Былтыр Қазақстанда не болды?","intent":"FactualQuery","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00597","input":"Жасушаның ядросы не атқарады?","intent":"FactualQuery","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00598","input":"Атомның ядросы неге қажет?","intent":"FactualQuery","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00599","input":"Митохондрияның қызметі қандай?","intent":"FactualQuery","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00600","input":"Mendeleev кестесі не үшін керек?","intent":"AskPurpose","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00601","input":"Қазақстанның ірі өзендерін атап бер.","intent":"FactualQuery","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00602","input":"Маған көмек керек.","intent":"Request","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00603","input":"Бүгін жақсы күн","intent":"StatementOfWellbeing","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00604","input":"Quantum entanglement дегеніміз не?","intent":"FactualQuery","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00605","input":"Илон Маск туралы не білесің?","intent":"FactualQuery","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00606","input":"Менің атым Дәулет","intent":"StatementOfName","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00607","input":"Менің жасым 25","intent":"StatementOfAge","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00608","input":"? in async fn деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00609","input":"Result async box error деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00610","input":"Anyhow thiserror async деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00611","input":"Send approximation problem деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00612","input":"MutexGuard await деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00613","input":"Rc<T> async деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00614","input":"RefCell await деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00615","input":"async fn рекурсия деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00616","input":"Box::pin рекурсия деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00617","input":"async-recursion крейті деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00618","input":"async fn in traits шектеуі деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00619","input":"async-trait крейті деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00620","input":"Rust 1.75 async traits деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00621","input":"RPITIT lifetime деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00622","input":"Drop in async деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00623","input":"Async drop проблемасы деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00624","input":"Future leak forget деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00625","input":"Cancel-safety patterns деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_07_holdout.json","confidence":"high"}
+{"id":"ds_00626","input":"String::new() деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00627","input":"let mut деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00628","input":"use std::io деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00629","input":"io::stdin деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00630","input":"read_line деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00631","input":"&mut деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00632","input":"Result деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00633","input":"expect деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00634","input":"форматтауыш орынтолтырғыш деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00635","input":"[dependencies] деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00636","input":"rand деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00637","input":"thread_rng деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00638","input":"gen_range деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00639","input":"Диапазон өрнегі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00640","input":"Ordering деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00641","input":"cmp әдісі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00642","input":"Көлеңкелеу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00643","input":"trim деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00644","input":"parse деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_02_holdout.json","confidence":"high"}
+{"id":"ds_00645","input":"Структ деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00646","input":"Өріс деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00647","input":"Структ өзгермелілігі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00648","input":"Кортеж-структ деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00649","input":"Бірлік структ деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00650","input":"Өрісті қысқа жариялау деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00651","input":"Структты жаңарту синтаксисі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00652","input":"Структ деректерінің иелігі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00653","input":"Әдіс деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00654","input":"&self параметрі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00655","input":"&mut self деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00656","input":"Әдіс пен функция шакыру деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00657","input":"Автоматты сілтемелеу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00658","input":"Self типі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00659","input":"#[derive(Debug)] деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00660","input":"{:?} пен {:#?} деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00661","input":"dbg макросы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00662","input":"Бірнеше impl блогы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00663","input":"Әдіс пен өріс бір аттас деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_05_holdout.json","confidence":"high"}
+{"id":"ds_00664","input":"Тіршілік мерзімі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00665","input":"Трейт деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00666","input":"Жалпылама тип параметрі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00667","input":"Структта жалпылама деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00668","input":"Енамда жалпылама деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00669","input":"Жалпылама әдіс деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00670","input":"Мономорфтау деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00671","input":"Орфан ереже деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00672","input":"Әдепкі трейт әдісі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00673","input":"Trait параметр деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00674","input":"Трейт шектеуі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00675","input":"where клаузасы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00676","input":"impl Trait қайтарушы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00677","input":"Шарт бойынша әдістер деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00678","input":"Тіршілік мерзімі функцияда деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00679","input":"Тіршілік мерзімі структта деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00680","input":"lifetime elision деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00681","input":"static лайфтайм деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00682","input":"Generic трейт лайфтайм бірге деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00683","input":"Қарыз тексергіш деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_10_holdout.json","confidence":"high"}
+{"id":"ds_00684","input":"Қасқырдың тірі екенін дәлелде.","intent":"FactualQuery","source_file":"live_holdout_v5105_codex.json","confidence":"high"}
+{"id":"ds_00685","input":"Дәлелде Қасқыр — тірі.","intent":"FactualQuery","source_file":"live_holdout_v5105_codex.json","confidence":"high"}
+{"id":"ds_00686","input":"Кітаптың тағам екенін дәлелде.","intent":"FactualQuery","source_file":"live_holdout_v5105_codex.json","confidence":"high"}
+{"id":"ds_00687","input":"Қасқыр — тірі ме?","intent":"FactualQuery","source_file":"live_holdout_v5105_codex.json","confidence":"high"}
+{"id":"ds_00688","input":"Қасқыр деген не?","intent":"FactualQuery","source_file":"live_holdout_v5105_codex.json","confidence":"high"}
+{"id":"ds_00689","input":"Rust-та ownership деген не?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00690","input":"borrow checker не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00691","input":"Result пен Option айырмашылығы қандай?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00692","input":"Cargo.toml не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00693","input":"match операторы қалай жұмыс істейді?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00694","input":"trait деген не Rust-та?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00695","input":"lifetime деген не?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00696","input":"impl блогы қалай жұмыс істейді?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00697","input":"closure деген не Rust-та?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00698","input":"iterator деген не?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00699","input":"pattern деген не Rust-та?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00700","input":"generic деген не Rust-та?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00701","input":"module деген не?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00702","input":"crate деген не?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00703","input":"struct деген не?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00704","input":"enum деген не Rust-та?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00705","input":"function қалай анықталады?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00706","input":"shadowing деген не Rust-та?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00707","input":"Box деген не Rust-та?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00708","input":"Rc не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00709","input":"Arc деген не?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00710","input":"RefCell не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00711","input":"Mutex деген не?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00712","input":"smart pointer деген не?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00713","input":"error handling қалай жасалады?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00714","input":"question mark operator не істейді?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00715","input":"async деген не Rust-та?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00716","input":"Send трейті не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00717","input":"Sync деген не?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00718","input":"unsafe не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00719","input":"Rust тілінде айнымалы дегеніміз не?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00720","input":"Rust тілінде тұрақты дегеніміз не?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00721","input":"Rust-та қарыз алу қалай түсініледі?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00722","input":"Жад тазарту туралы айт","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00723","input":"let деген не Rust-та?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00724","input":"mut деген не?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00725","input":"fn қалай анықталады?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00726","input":"thread қалай құрылады?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00727","input":"macro қалай анықталады?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00728","input":"Hello World қалай жазылады?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00729","input":"тест қалай жазылады Rust-та?","intent":"FactualQuery","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00730","input":"Басым ауырып тұр, қандай дәрі ішейін?","intent":"FactualQuery","source_file":"live_holdout_v5650_codex.json","confidence":"high"}
+{"id":"ds_00731","input":"Жүрегім ауырып тұр, қалай емдеймін?","intent":"FactualQuery","source_file":"live_holdout_v5650_codex.json","confidence":"high"}
+{"id":"ds_00732","input":"Шарт жасасу бойынша кеңес беріңіз.","intent":"FactualQuery","source_file":"live_holdout_v5650_codex.json","confidence":"high"}
+{"id":"ds_00733","input":"Инвестиция жасайын ба, кеңес бересіз бе?","intent":"FactualQuery","source_file":"live_holdout_v5650_codex.json","confidence":"high"}
+{"id":"ds_00734","input":"Қазіргі ауа райы қандай?","intent":"AskWeather","source_file":"live_holdout_v5650_codex.json","confidence":"high"}
+{"id":"ds_00735","input":"Дәрі деген не?","intent":"FactualQuery","source_file":"live_holdout_v5650_codex.json","confidence":"high"}
+{"id":"ds_00736","input":"Мен қайда тұрамын?","intent":"AskLocation","source_file":"live_holdout_v5650_codex.json","confidence":"high"}
+{"id":"ds_00737","input":"```rust\nfn main() { let s = String::from(\"hi\"); let _t = s; println!(\"{s}\"); }\n```","intent":"SubmitSolution","source_file":"live_holdout_v5650_codex.json","confidence":"high"}
+{"id":"ds_00738","input":"ОО парадигмасы Rust-та деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00739","input":"Тұсаулау Rust-та деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00740","input":"Rust-та мұрагерлік жоқ деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00741","input":"Көп пішінділік Rust-та деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00742","input":"Трейт-нысан деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00743","input":"dyn кілтсөзі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00744","input":"Vec<Box<dyn Trait>> деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00745","input":"Статикалық vs динамикалық таратпа деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00746","input":"vtable деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00747","input":"Нысан-қауіпсіз трейт деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00748","input":"Clone нысан-қауіпсіз емес деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00749","input":"Generic vs trait object таңдау деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00750","input":"Күй үлгісі дәстүрлі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00751","input":"Күй үлгісі типтік жүйе арқылы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00752","input":"Default trait method идиомасы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00753","input":"Trait composition деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00754","input":"Newtype pattern деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00755","input":"GUI кітапхана үлгісі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_17_holdout.json","confidence":"high"}
+{"id":"ds_00756","input":"Жер сілкінісі деген не?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00757","input":"Жер сілкінісі — табиғи апат па?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00758","input":"Жер сілкінісі — құбылыс па?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00759","input":"Орман өрті деген не?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00760","input":"Цунами — толқын ба?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00761","input":"Қар көшкіні — апат па?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00762","input":"Боран — дауыл ма?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00763","input":"Найзағай — табиғи құбылыс па?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00764","input":"Ит — үй жануары ма?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00765","input":"Үй — баспана ма?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00766","input":"Мектеп — оқу орны ма?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00767","input":"Тас — зат па?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00768","input":"Бас — дене бөлігі ме?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00769","input":"Бесбармақ — ұлттық тағам ба?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00770","input":"Қымыз — сусын ба?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00771","input":"Шұбат — дәстүрлі сусын ба?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00772","input":"Бесбармақ деген не?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00773","input":"Айран — сусын ба?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00774","input":"Қазы — дәстүрлі тағам ба?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00775","input":"Қасқыр — тірі ме?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00776","input":"Балта — зат па?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00777","input":"Қазақ ханы — билеуші ме?","intent":"FactualQuery","source_file":"live_holdout_v5450_audit.json","confidence":"high"}
+{"id":"ds_00778","input":"Тас — тірі ме?","intent":"FactualQuery","source_file":"live_holdout_v5480_bundle.json","confidence":"high"}
+{"id":"ds_00779","input":"Темір — тірі ме?","intent":"FactualQuery","source_file":"live_holdout_v5480_bundle.json","confidence":"high"}
+{"id":"ds_00780","input":"Кітап — заттың түрі ме?","intent":"FactualQuery","source_file":"live_holdout_v5480_bundle.json","confidence":"high"}
+{"id":"ds_00781","input":"Бағдарламашы — кәсіп пе?","intent":"FactualQuery","source_file":"live_holdout_v5480_bundle.json","confidence":"high"}
+{"id":"ds_00782","input":"Дәрігер — кәсіп пе?","intent":"FactualQuery","source_file":"live_holdout_v5480_bundle.json","confidence":"high"}
+{"id":"ds_00783","input":"Мұғалім — маман ба?","intent":"FactualQuery","source_file":"live_holdout_v5480_bundle.json","confidence":"high"}
+{"id":"ds_00784","input":"Инженер — кәсіп пе?","intent":"FactualQuery","source_file":"live_holdout_v5480_bundle.json","confidence":"high"}
+{"id":"ds_00785","input":"Темір — жансыз нәрсе ме?","intent":"FactualQuery","source_file":"live_holdout_v5480_bundle.json","confidence":"high"}
+{"id":"ds_00786","input":"Жасуша — тірі ме?","intent":"FactualQuery","source_file":"live_holdout_v5480_bundle.json","confidence":"high"}
+{"id":"ds_00787","input":"Дельфин — жануар ма?","intent":"FactualQuery","source_file":"live_holdout_v5480_bundle.json","confidence":"high"}
+{"id":"ds_00788","input":"Дельфин — сүтқоректі ме?","intent":"FactualQuery","source_file":"live_holdout_v5480_bundle.json","confidence":"high"}
+{"id":"ds_00789","input":"Кит — сүтқоректі ме?","intent":"FactualQuery","source_file":"live_holdout_v5480_bundle.json","confidence":"high"}
+{"id":"ds_00790","input":"Биология — ғылым саласы ма?","intent":"FactualQuery","source_file":"live_holdout_v5480_bundle.json","confidence":"high"}
+{"id":"ds_00791","input":"Ағаш — өсімдік пе?","intent":"FactualQuery","source_file":"live_holdout_v5480_bundle.json","confidence":"high"}
+{"id":"ds_00792","input":"join! макросы деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00793","input":"Sequential vs join! деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00794","input":"try_join! деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00795","input":"futures::future::join деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00796","input":"join_all деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00797","input":"select! макросы деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00798","input":"select! pattern деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00799","input":"Default complete branch деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00800","input":"select! cancellation деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00801","input":"FuturesUnordered деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00802","input":"FuturesUnordered.next деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00803","input":"FuturesUnordered vs Vec деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00804","input":"FuturesOrdered деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00805","input":"FuturesOrdered vs buffered деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00806","input":"Future cancellation деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00807","input":"Timeout pattern деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00808","input":"Race vs zip деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00809","input":"biased select! деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_06_holdout.json","confidence":"high"}
+{"id":"ds_00810","input":"Async программалау деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00811","input":"Concurrency vs parallelism деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00812","input":"Rust async тарихы деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00813","input":"ОС ағыны деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00814","input":"Green thread деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00815","input":"Event loop стилі деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00816","input":"Actor моделі деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00817","input":"Rust async ерекшелігі деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00818","input":"Future трейт деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00819","input":"async fn деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00820","input":".await оператор деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00821","input":"async block деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00822","input":"async move closure деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00823","input":"futures крейті деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00824","input":"tokio runtime деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00825","input":"async-std runtime деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00826","input":"async fn in traits деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00827","input":"async closures деген не?","intent":"FactualQuery","source_file":"rust_async_book_chapter_01_holdout.json","confidence":"high"}
+{"id":"ds_00828","input":"TCP listener деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00829","input":"TCP stream өңдеу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00830","input":"HTTP сұраныс құрылымы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00831","input":"HTTP жауап жазу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00832","input":"Request line routing деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00833","input":"Табылмады беті деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00834","input":"Жалғыз ағынды бөгеу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00835","input":"Thread per request деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00836","input":"Thread pool деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00837","input":"ThreadPool::new деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00838","input":"Worker структурасы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00839","input":"Arc Mutex receiver деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00840","input":"Job алиасы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00841","input":"Execute pipeline деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00842","input":"Drop for ThreadPool деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00843","input":"Option JoinHandle деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00844","input":"Sender drop shutdown деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00845","input":"Веб-сервер шолуы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_20_holdout.json","confidence":"high"}
+{"id":"ds_00846","input":"Оны қалай түзетемін?","intent":"FactualQuery","source_file":"live_holdout_v5100_codex.json","confidence":"high"}
+{"id":"ds_00847","input":"Қалай шешемін?","intent":"StatementOfOccupation","source_file":"live_holdout_v5100_codex.json","confidence":"high"}
+{"id":"ds_00848","input":"Бұны қалай түзетемін?","intent":"FactualQuery","source_file":"live_holdout_v5100_codex.json","confidence":"high"}
+{"id":"ds_00849","input":"Қалай түзетемін?","intent":"FactualQuery","source_file":"live_holdout_v5100_codex.json","confidence":"high"}
+{"id":"ds_00850","input":"Қалай дұрыстаймын?","intent":"FactualQuery","source_file":"live_holdout_v5100_codex.json","confidence":"high"}
+{"id":"ds_00851","input":"Түзетілген кодты бер.","intent":"CodeRequest","source_file":"live_holdout_v5100_codex.json","confidence":"high"}
+{"id":"ds_00852","input":"Қалай түзетемін?","intent":"FactualQuery","source_file":"live_holdout_v5100_codex.json","confidence":"high"}
+{"id":"ds_00853","input":"Маған көмектесіңіз.","intent":"Request","source_file":"live_holdout_v5100_codex.json","confidence":"high"}
+{"id":"ds_00854","input":"Қорқынышсыз қатарластық деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00855","input":"thread::spawn деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00856","input":"JoinHandle деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00857","input":"move thread деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00858","input":"thread::spawn сигнатура деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00859","input":"mpsc::channel деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00860","input":"tx.send rx.recv деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00861","input":"rx итератор деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00862","input":"tx.clone деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00863","input":"Mutex деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00864","input":"Mutex::lock деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00865","input":"Arc деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00866","input":"Arc<Mutex> деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00867","input":"Mutex vs RefCell деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00868","input":"Send трейті деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00869","input":"Sync трейті деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00870","input":"Send/Sync auto-impl деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00871","input":"Data race prevention деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_16_holdout.json","confidence":"high"}
+{"id":"ds_00872","input":"cargo test деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00873","input":"#[test] атрибуты деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00874","input":"#[cfg(test)] деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00875","input":"mod tests блогы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00876","input":"assert! макросы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00877","input":"assert_eq деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00878","input":"PartialEq Debug талабы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00879","input":"Сынақ хабарламасы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00880","input":"should_panic деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00881","input":"should_panic expected деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00882","input":"Сынақта Result деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00883","input":"Параллельді сынақтар деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00884","input":"show-output жалаушасы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00885","input":"Сынақ фильтрі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00886","input":"#[ignore] деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00887","input":"ignored жалаушасы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00888","input":"Бірлік тесттері деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00889","input":"Интеграциялық тесттер деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00890","input":"tests/common/mod.rs деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00891","input":"Екілік сандыққа тест деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_11_holdout.json","confidence":"high"}
+{"id":"ds_00892","input":"Иелік деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00893","input":"Иелік ережелері деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00894","input":"drop функциясы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00895","input":"Стек жады деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00896","input":"Үйме жады деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00897","input":"String::from деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00898","input":"Иеліктің көшуі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00899","input":"clone әдісі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00900","input":"Copy трейті деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00901","input":"Иелік және функциялар деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00902","input":"Қайтару мәні мен иелік деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00903","input":"Сілтеме деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00904","input":"Қарызға алу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00905","input":"Жабайы сілтеме деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00906","input":"Қарызға алудың бірінші ережесі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00907","input":"Қарызға алудың екінші ережесі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00908","input":"NLL деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00909","input":"Жол тілімі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00910","input":"Жиым тілімі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00911","input":"Тілім диапазоны деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00912","input":"Жарыс шарты деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00913","input":"Тілім деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_04_holdout.json","confidence":"high"}
+{"id":"ds_00914","input":"Тұрақтылық әдепкіше деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00915","input":"Тұрақты деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00916","input":"Бүтін сан түрлері деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00917","input":"Бүтін санның асып кетуі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00918","input":"Қалқымалы үтірлі сан түрлері деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00919","input":"bool деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00920","input":"char деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00921","input":"Бүтін бөлу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00922","input":"Кортеж бөлшектеу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00923","input":"Unit түрі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00924","input":"Жиым қайталау синтаксисі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00925","input":"Жиымның шектен шығу деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00926","input":"Функцияның мән қайтаруы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00927","input":"Блок өрнегі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00928","input":"if өрнегі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00929","input":"loop мән қайтаруы деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00930","input":"Цикл белгісі деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00931","input":"for ұжым бойынша деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00932","input":"Түсініктеме деген не?","intent":"FactualQuery","source_file":"rust_book_chapter_03_holdout.json","confidence":"high"}
+{"id":"ds_00933","input":"Мамандығым — бағдарламашы.","intent":"FactualQuery","source_file":"live_holdout_v5460_detector.json","confidence":"high"}
+{"id":"ds_00934","input":"Сіздің атыңыз кім?","intent":"AskAboutSystem","source_file":"live_holdout_v5460_detector.json","confidence":"high"}
+{"id":"ds_00935","input":"Сенің атың не?","intent":"AskAboutSystem","source_file":"live_holdout_v5460_detector.json","confidence":"high"}
+{"id":"ds_00936","input":"Сіз қандай тілде сөйлейсіз?","intent":"AskAboutSystem","source_file":"live_holdout_v5460_detector.json","confidence":"high"}
+{"id":"ds_00937","input":"Сен қай тілде сөйлейсің?","intent":"AskAboutSystem","source_file":"live_holdout_v5460_detector.json","confidence":"high"}
+{"id":"seed_g_01","input":"Сәлем","intent":"Greeting","source_file":"seed","confidence":"high"}
+{"id":"seed_g_02","input":"Сәлеметсіз бе","intent":"Greeting","source_file":"seed","confidence":"high"}
+{"id":"seed_g_03","input":"Қайырлы таң","intent":"Greeting","source_file":"seed","confidence":"high"}
+{"id":"seed_g_04","input":"Қайырлы күн","intent":"Greeting","source_file":"seed","confidence":"high"}
+{"id":"seed_g_05","input":"Қайырлы кеш","intent":"Greeting","source_file":"seed","confidence":"high"}
+{"id":"seed_g_06","input":"Ассалаумағалейкум","intent":"Greeting","source_file":"seed","confidence":"high"}
+{"id":"seed_g_07","input":"Сәлем, қалайсың","intent":"Greeting","source_file":"seed","confidence":"high"}
+{"id":"seed_g_08","input":"Сәлем достар","intent":"Greeting","source_file":"seed","confidence":"high"}
+{"id":"seed_f_01","input":"Сау бол","intent":"Farewell","source_file":"seed","confidence":"high"}
+{"id":"seed_f_02","input":"Қош бол","intent":"Farewell","source_file":"seed","confidence":"high"}
+{"id":"seed_f_03","input":"Көріскенше","intent":"Farewell","source_file":"seed","confidence":"high"}
+{"id":"seed_f_04","input":"Жақсы қал","intent":"Farewell","source_file":"seed","confidence":"high"}
+{"id":"seed_f_05","input":"Бай-бай","intent":"Farewell","source_file":"seed","confidence":"high"}
+{"id":"seed_f_06","input":"Кейінірек кездесеміз","intent":"Farewell","source_file":"seed","confidence":"high"}
+{"id":"seed_aff_01","input":"Иә","intent":"Affirmation","source_file":"seed","confidence":"high"}
+{"id":"seed_aff_02","input":"Дұрыс","intent":"Affirmation","source_file":"seed","confidence":"high"}
+{"id":"seed_aff_03","input":"Әрине","intent":"Affirmation","source_file":"seed","confidence":"high"}
+{"id":"seed_aff_04","input":"Иә, дұрыс","intent":"Affirmation","source_file":"seed","confidence":"high"}
+{"id":"seed_aff_05","input":"Мақұл","intent":"Affirmation","source_file":"seed","confidence":"high"}
+{"id":"seed_aff_06","input":"Келісемін","intent":"Affirmation","source_file":"seed","confidence":"high"}
+{"id":"seed_neg_01","input":"Жоқ","intent":"Negation","source_file":"seed","confidence":"high"}
+{"id":"seed_neg_02","input":"Олай емес","intent":"Negation","source_file":"seed","confidence":"high"}
+{"id":"seed_neg_03","input":"Жоқ, дұрыс емес","intent":"Negation","source_file":"seed","confidence":"high"}
+{"id":"seed_neg_04","input":"Келіспеймін","intent":"Negation","source_file":"seed","confidence":"high"}
+{"id":"seed_neg_05","input":"Жоқ рахмет","intent":"Negation","source_file":"seed","confidence":"high"}
+{"id":"seed_th_01","input":"Рахмет","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_th_02","input":"Көп рахмет","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_th_03","input":"Алғыс айтамын","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_th_04","input":"Үлкен рахмет","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_th_05","input":"Сізге рахмет","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_th_06","input":"Рахмет, көмектестіңіз","intent":"Thanks","source_file":"seed","confidence":"high"}
+{"id":"seed_ap_01","input":"Кешіріңіз","intent":"Apology","source_file":"seed","confidence":"high"}
+{"id":"seed_ap_02","input":"Кешір","intent":"Apology","source_file":"seed","confidence":"high"}
+{"id":"seed_ap_03","input":"Ғафу етіңіз","intent":"Apology","source_file":"seed","confidence":"high"}
+{"id":"seed_ap_04","input":"Айып етпеңіз","intent":"Apology","source_file":"seed","confidence":"high"}
+{"id":"seed_ap_05","input":"Кешіріңіз, түсінбедім","intent":"Apology","source_file":"seed","confidence":"high"}
+{"id":"seed_hau_01","input":"Қалайсың","intent":"AskHowAreYou","source_file":"seed","confidence":"high"}
+{"id":"seed_hau_02","input":"Қалайсыз","intent":"AskHowAreYou","source_file":"seed","confidence":"high"}
+{"id":"seed_hau_03","input":"Хал ахуалың қалай","intent":"AskHowAreYou","source_file":"seed","confidence":"high"}
+{"id":"seed_hau_04","input":"Жағдайың қалай","intent":"AskHowAreYou","source_file":"seed","confidence":"high"}
+{"id":"seed_hau_05","input":"Қалай тұрсыз","intent":"AskHowAreYou","source_file":"seed","confidence":"high"}
+{"id":"seed_hau_06","input":"Көңіл күйің қалай","intent":"AskHowAreYou","source_file":"seed","confidence":"high"}
+{"id":"seed_sow_01","input":"Жақсымын","intent":"StatementOfWellbeing","source_file":"seed","confidence":"high"}
+{"id":"seed_sow_02","input":"Жақсы рахмет","intent":"StatementOfWellbeing","source_file":"seed","confidence":"high"}
+{"id":"seed_sow_03","input":"Аман-есен","intent":"StatementOfWellbeing","source_file":"seed","confidence":"high"}
+{"id":"seed_sow_04","input":"Шүкір","intent":"StatementOfWellbeing","source_file":"seed","confidence":"high"}
+{"id":"seed_sow_05","input":"Жайбарақатпын","intent":"StatementOfWellbeing","source_file":"seed","confidence":"high"}
+{"id":"seed_son_01","input":"Менің атым Дәулет","intent":"StatementOfName","source_file":"seed","confidence":"high"}
+{"id":"seed_son_02","input":"Атым Айгерім","intent":"StatementOfName","source_file":"seed","confidence":"high"}
+{"id":"seed_son_03","input":"Мені Бекжан дейді","intent":"StatementOfName","source_file":"seed","confidence":"high"}
+{"id":"seed_son_04","input":"Есімім Гүлназ","intent":"StatementOfName","source_file":"seed","confidence":"high"}
+{"id":"seed_son_05","input":"Менің есімім Әсел","intent":"StatementOfName","source_file":"seed","confidence":"high"}
+{"id":"seed_san_01","input":"Менің жасым 25","intent":"StatementOfAge","source_file":"seed","confidence":"high"}
+{"id":"seed_san_02","input":"30 жастамын","intent":"StatementOfAge","source_file":"seed","confidence":"high"}
+{"id":"seed_san_03","input":"Маған 42 жас","intent":"StatementOfAge","source_file":"seed","confidence":"high"}
+{"id":"seed_san_04","input":"Жасым он сегіз","intent":"StatementOfAge","source_file":"seed","confidence":"high"}
+{"id":"seed_san_05","input":"Мен жиырма жетідемін","intent":"StatementOfAge","source_file":"seed","confidence":"high"}
+{"id":"seed_sol_01","input":"Мен Алматыда тұрамын","intent":"StatementOfLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_sol_02","input":"Қостанайдан келдім","intent":"StatementOfLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_sol_03","input":"Біз Астанадамыз","intent":"StatementOfLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_sol_04","input":"Шымкент қаласындамын","intent":"StatementOfLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_sol_05","input":"Орал қаласынан келдім","intent":"StatementOfLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_sof_01","input":"Менің 2 баламыз бар","intent":"StatementOfFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_sof_02","input":"Біздің отбасы үлкен","intent":"StatementOfFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_sof_03","input":"Менің әпкем бар","intent":"StatementOfFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_sof_04","input":"Үш бала тәрбиелеп жүрмін","intent":"StatementOfFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_soa_01","input":"Мен бағдарламашымын","intent":"StatementOfOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_soa_02","input":"Мұғаліммін","intent":"StatementOfOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_soa_03","input":"Дәрігер ретінде жұмыс істеймін","intent":"StatementOfOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_soa_04","input":"Менің мамандығым инженер","intent":"StatementOfOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_aw_01","input":"Бүгін ауа райы қандай","intent":"AskWeather","source_file":"seed","confidence":"high"}
+{"id":"seed_aw_02","input":"Қазір сыртта суық па","intent":"AskWeather","source_file":"seed","confidence":"high"}
+{"id":"seed_aw_03","input":"Ертең жаңбыр болады ма","intent":"AskWeather","source_file":"seed","confidence":"high"}
+{"id":"seed_aw_04","input":"Қандай ауа райы","intent":"AskWeather","source_file":"seed","confidence":"high"}
+{"id":"seed_at_01","input":"Қазір сағат неше","intent":"AskTime","source_file":"seed","confidence":"high"}
+{"id":"seed_at_02","input":"Қай уақыт","intent":"AskTime","source_file":"seed","confidence":"high"}
+{"id":"seed_at_03","input":"Бүгін қандай күн","intent":"AskTime","source_file":"seed","confidence":"high"}
+{"id":"seed_at_04","input":"Бүгін қандай айдамыз","intent":"AskTime","source_file":"seed","confidence":"high"}
+{"id":"seed_co_01","input":"Сен өте жақсысың","intent":"Compliment","source_file":"seed","confidence":"high"}
+{"id":"seed_co_02","input":"Сіз ақылдысыз","intent":"Compliment","source_file":"seed","confidence":"high"}
+{"id":"seed_co_03","input":"Тамаша жасадың","intent":"Compliment","source_file":"seed","confidence":"high"}
+{"id":"seed_co_04","input":"Сен мықтысың","intent":"Compliment","source_file":"seed","confidence":"high"}
+{"id":"seed_ww_01","input":"Сәттілік тілеймін","intent":"WellWishes","source_file":"seed","confidence":"high"}
+{"id":"seed_ww_02","input":"Денсаулық тілеймін","intent":"WellWishes","source_file":"seed","confidence":"high"}
+{"id":"seed_ww_03","input":"Жаңа жылыңмен","intent":"WellWishes","source_file":"seed","confidence":"high"}
+{"id":"seed_ww_04","input":"Туған күніңмен","intent":"WellWishes","source_file":"seed","confidence":"high"}
+{"id":"seed_in_01","input":"Сен ақымақсың","intent":"Insult","source_file":"seed","confidence":"high"}
+{"id":"seed_in_02","input":"Сені жек көремін","intent":"Insult","source_file":"seed","confidence":"high"}
+{"id":"seed_in_03","input":"Сен жаман","intent":"Insult","source_file":"seed","confidence":"high"}
+{"id":"seed_an_01","input":"Сенің атың не","intent":"AskName","source_file":"seed","confidence":"high"}
+{"id":"seed_an_02","input":"Сіздің есіміңіз кім","intent":"AskName","source_file":"seed","confidence":"high"}
+{"id":"seed_an_03","input":"Атың не","intent":"AskName","source_file":"seed","confidence":"high"}
+{"id":"seed_an_04","input":"Қалай атайсың өзіңді","intent":"AskName","source_file":"seed","confidence":"high"}
+{"id":"seed_aa_01","input":"Жасың нешеде","intent":"AskAge","source_file":"seed","confidence":"high"}
+{"id":"seed_aa_02","input":"Сіз неше жастасыз","intent":"AskAge","source_file":"seed","confidence":"high"}
+{"id":"seed_aa_03","input":"Қанша жасың бар","intent":"AskAge","source_file":"seed","confidence":"high"}
+{"id":"seed_al_01","input":"Қайда тұрасың","intent":"AskLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_al_02","input":"Қай қаладансыз","intent":"AskLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_al_03","input":"Қайдан келдіңіз","intent":"AskLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_al_04","input":"Қай қалада тұрасыз","intent":"AskLocation","source_file":"seed","confidence":"high"}
+{"id":"seed_ao_01","input":"Немен айналысасың","intent":"AskOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_ao_02","input":"Мамандығыңыз не","intent":"AskOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_ao_03","input":"Қандай жұмыс істейсіз","intent":"AskOccupation","source_file":"seed","confidence":"high"}
+{"id":"seed_af_01","input":"Отбасың туралы айтып бер","intent":"AskFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_af_02","input":"Балаларың бар ма","intent":"AskFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_af_03","input":"Үй ішің қанша адам","intent":"AskFamily","source_file":"seed","confidence":"high"}
+{"id":"seed_re_01","input":"Маған көмектесіңізші","intent":"Request","source_file":"seed","confidence":"high"}
+{"id":"seed_re_02","input":"Бір сұрағым бар","intent":"Request","source_file":"seed","confidence":"high"}
+{"id":"seed_re_03","input":"Маған бір нәрсе көрсете аласыз ба","intent":"Request","source_file":"seed","confidence":"high"}
+{"id":"seed_re_04","input":"Сұрайын деп едім","intent":"Request","source_file":"seed","confidence":"high"}
