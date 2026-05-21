@@ -1,47 +1,105 @@
 {
-  "test_count": 26,
-  "per_slot": [
-    {
-      "slot": "AGE",
-      "tp": 7,
-      "fp": 0,
-      "fn_": 0,
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1": 1.0
-    },
-    {
-      "slot": "LOC",
-      "tp": 10,
-      "fp": 0,
-      "fn_": 0,
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1": 1.0
-    },
-    {
-      "slot": "OCC",
-      "tp": 4,
-      "fp": 0,
-      "fn_": 0,
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1": 1.0
-    },
-    {
-      "slot": "PER",
-      "tp": 5,
-      "fp": 0,
-      "fn_": 0,
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1": 1.0
-    }
-  ],
-  "micro_precision": 1.0,
-  "micro_recall": 1.0,
-  "micro_f1": 1.0,
-  "neural_p50_us": 23.292,
-  "neural_p99_us": 40.292,
-  "neural_max_us": 40.292
+  "test_split": {
+    "name": "test_split (gazetteer-covered)",
+    "row_count": 26,
+    "per_slot": [
+      {
+        "slot": "AGE",
+        "tp": 7,
+        "fp": 0,
+        "fn_": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "slot": "LOC",
+        "tp": 10,
+        "fp": 0,
+        "fn_": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "slot": "OCC",
+        "tp": 4,
+        "fp": 0,
+        "fn_": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "slot": "PER",
+        "tp": 5,
+        "fp": 0,
+        "fn_": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    ],
+    "micro_precision": 1.0,
+    "micro_recall": 1.0,
+    "micro_f1": 1.0,
+    "neural_p50_us": 20.0,
+    "neural_p99_us": 48.833,
+    "neural_max_us": 48.833
+  },
+  "holdout": {
+    "name": "holdout (OOV gazetteer)",
+    "row_count": 29,
+    "per_slot": [
+      {
+        "slot": "AGE",
+        "tp": 7,
+        "fp": 0,
+        "fn_": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "slot": "LOC",
+        "tp": 3,
+        "fp": 3,
+        "fn_": 4,
+        "precision": 0.5,
+        "recall": 0.42857142857142855,
+        "f1": 0.4615384615384615
+      },
+      {
+        "slot": "OCC",
+        "tp": 4,
+        "fp": 5,
+        "fn_": 3,
+        "precision": 0.4444444444444444,
+        "recall": 0.5714285714285714,
+        "f1": 0.5
+      },
+      {
+        "slot": "PER",
+        "tp": 5,
+        "fp": 1,
+        "fn_": 3,
+        "precision": 0.8333333333333334,
+        "recall": 0.625,
+        "f1": 0.7142857142857143
+      }
+    ],
+    "micro_precision": 0.6785714285714286,
+    "micro_recall": 0.6551724137931034,
+    "micro_f1": 0.6666666666666666,
+    "neural_p50_us": 14.417,
+    "neural_p99_us": 28.708,
+    "neural_max_us": 28.708
+  },
+  "holdout_contingency_vs_cascade": {
+    "double_win": 15,
+    "neural_only": 4,
+    "cascade_only": 3,
+    "both_miss": 7,
+    "cascade_p99_us": 25554.917
+  }
 }

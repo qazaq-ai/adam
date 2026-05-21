@@ -79,6 +79,7 @@ dependencies = [
  "adam-kernel-fst",
  "adam-reasoning",
  "adam-retrieval",
+ "adam-slot-extractor",
  "adam-voice",
  "burn",
  "criterion",

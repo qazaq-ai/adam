@@ -336,6 +336,30 @@ fn main() -> ExitCode {
         }
     }
 
+    // **v6.0.5 — E2 production wiring.** Opt-in load of the
+    // trained discriminative slot extractor (Rung-A from the E2
+    // research branch). Attached only when `ADAM_NEURAL_SLOTS=1`
+    // AND the artefact file exists on disk; otherwise the
+    // cascade handles slot extraction unchanged. Even when
+    // attached, the extractor only fills session slots the
+    // cascade left empty (see `apply_neural_slot_rescue`) —
+    // cascade values always win.
+    if std::env::var("ADAM_NEURAL_SLOTS").as_deref() == Ok("1") {
+        let path = std::env::var("ADAM_NEURAL_SLOTS_MODEL")
+            .unwrap_or_else(|_| "data/slot_extractor/v1/rung_a.json".to_string());
+        match adam_slot_extractor::SlotExtractor::from_path(&path) {
+            Ok(extractor) => {
+                conv = conv.with_neural_slot_extractor(extractor);
+                eprintln!("adam-chat: neural-slots ON — Rung-A slot extractor loaded from {path}");
+            }
+            Err(e) => {
+                eprintln!(
+                    "adam-chat: neural-slots ON but model load FAILED ({e}); cascade-only path"
+                );
+            }
+        }
+    }
+
     // **v5.6.0** — domain index built from the world_core load
     // dispatched in parallel above. Build (Vec → HashMap) is
     // single-threaded because the API is non-Send across the
