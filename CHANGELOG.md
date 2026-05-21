@@ -28,6 +28,50 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.0.0-rc5+E1] — 2026-05-21 — E1 research arc · safety policy v6 · classifier production-wired
+
+> Research milestone on the `experimental/agglutinative-neural`
+> branch. Two structural changes layered on top of the pre-existing
+> rc5 numbers:
+>
+>   - **E1 (discriminative intent classifier)** — the first
+>     completed experiment in the third-path research arc. A
+>     ~ 2.2 MB pure-Rust hash-feature linear classifier trained on a
+>     2 163-row corpus of labelled Kazakh phrases. On the project's
+>     frozen test split (222 rows) the classifier reaches **95.95 %
+>     accuracy** vs the deterministic cascade's **91.89 %** on the
+>     same rows. p99 latency **35 µs** vs cascade's full-pipeline
+>     ~ 35 ms (~ 600 × speedup). Output is one of 32 closed labels
+>     — hallucination is structurally impossible. **+9 net wins**
+>     against the cascade (12 improvements − 3 regressions on 222
+>     rows). Shipped as **opt-in** behind `ADAM_NEURAL_INTENT=1`;
+>     default-off path is bit-identical to pre-E1 runs. Design +
+>     anti-success criteria in
+>     [`docs/e1_intent_classifier_design.md`](docs/e1_intent_classifier_design.md).
+>
+>   - **Safety policy v6** — medical / legal / financial query
+>     templates migrated from refusal-only ("consult a specialist")
+>     to **informational + emergency-triage + specialist-referral
+>     disclaimer**. The user gets health / legal / financial
+>     literacy; safety preserved by triage line first + disclaimer
+>     line last; self-harm path unchanged (1415 crisis line stays
+>     first-line); current-data path unchanged. Documented in
+>     [`docs/safety_policy_v6.md`](docs/safety_policy_v6.md), incl.
+>     the explicit **information vs prescription** guardrail and
+>     the audit-log contract for AI Law compliance + МО РК pilot
+>     disclosure.
+>
+> Additional Codex-audit closures in this RC:
+> recommendation-no-data refusal, multi-fact count, nominative
+> anaphora resolution, weather × profile city, binary comparison
+> intent, self-harm safety category (BLOCKER), false-location
+> stopwords (« көңіл күй » → « Күй »), anaphora retrieval probe-
+> aware override, multi-step math chained ops.
+>
+> Test posture at this commit: 1 144 workspace lib tests pass,
+> 79 adam-dialog integration test binaries pass (incl. `end_to_end
+> = 191/191`), cargo fmt clean.
+
 ## [6.0.0-rc5] — 2026-05-20 — GA #4 closed · zero hallucinations on factual_eval_100 · branch finalisation
 
 > Fifth v6.0 release candidate, shipping as the **finalisation of the

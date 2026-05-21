@@ -145,10 +145,13 @@ self-assessment: 7/10 after v5.3.0; ongoing.
 - ✅ Contradiction recovery + explicit-pick resolution
 - ✅ Anaphora resolution with overcarry guard
 - ✅ Voice output via OS-bundled TTS
+- ✅ Voice input via whisper.cpp + pitch-based gender hint (v6.0.5)
 - ✅ Kazakh-only refusal for non-Kazakh inputs
 - ✅ Curriculum tree with adaptive difficulty (Rust track)
 - ✅ Codex round-3 audit closed (architectural pass)
 - ✅ Public repository (2026-05-08), BUSL-1.1 license
+- ✅ **Safety policy v6** (2026-05-21) — informational + emergency-triage + disclaimer for medical/legal/financial; crisis-line first for self-harm
+- ✅ **E1 — discriminative intent classifier** (2026-05-21) — first completed third-path experiment; 95.95 % test accuracy at 35 µs p99 latency, 2.2 MB on disk, zero hallucination by construction. Beats cascade by 4pp at 600× lower latency. Opt-in behind `ADAM_NEURAL_INTENT=1`. See [`docs/e1_intent_classifier_design.md`](docs/e1_intent_classifier_design.md).
 
 ### Q3 2026 — Kernel-pure voice + first port
 
