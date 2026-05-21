@@ -164,6 +164,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "adam-retrieval-ranker"
+version = "6.0.0-rc5"
+dependencies = [
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "adam-scaling"
 version = "6.0.0-rc5"
 dependencies = [

@@ -1,0 +1,14 @@
+[package]
+name = "adam-retrieval-ranker"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Experiment **E3** of the third-path research arc — a tiny pointwise learn-to-rank model that aims to replace the hand-set `SelectionWeights::default_v0` in `adam-dialog::selection` at equal-or-better `pick-rate-at-1` vs the cascade-picked fact, ≤5 ms ranking latency, ≤5 MB on disk (in practice ≤1 KB), and zero hallucination by construction (output is a score over a closed candidate set; novel facts are not emitted). Pure Rust, no neural runtime dep. See docs/e3_retrieval_ranker_design.md."
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true
