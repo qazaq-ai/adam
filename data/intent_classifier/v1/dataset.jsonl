@@ -1045,3 +1045,936 @@
 {"id":"seed_re_02","input":"Бір сұрағым бар","intent":"Request","source_file":"seed","confidence":"high"}
 {"id":"seed_re_03","input":"Маған бір нәрсе көрсете аласыз ба","intent":"Request","source_file":"seed","confidence":"high"}
 {"id":"seed_re_04","input":"Сұрайын деп едім","intent":"Request","source_file":"seed","confidence":"high"}
+{"id":"synth_00001","input":"async fn state machine деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00001","confidence":"high"}
+{"id":"synth_00002","input":"async .await transition деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00002","confidence":"high"}
+{"id":"synth_00003","input":"Captured locals state деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00003","confidence":"high"}
+{"id":"synth_00004","input":"State machine generated деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00004","confidence":"high"}
+{"id":"synth_00005","input":"'async lifetime деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00005","confidence":"high"}
+{"id":"synth_00006","input":"async fn lifetime elision деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00006","confidence":"high"}
+{"id":"synth_00007","input":"async fn реф қайтару деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00007","confidence":"high"}
+{"id":"synth_00008","input":"async fn ref параметр деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00008","confidence":"high"}
+{"id":"synth_00009","input":"async fn vs async block lifetime деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00009","confidence":"high"}
+{"id":"synth_00010","input":"async move ownership деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00010","confidence":"high"}
+{"id":"synth_00011","input":"Closure capture async деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00011","confidence":"high"}
+{"id":"synth_00012","input":"Send constraint propagation деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00012","confidence":"high"}
+{"id":"synth_00013","input":"!Send future деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00013","confidence":"high"}
+{"id":"synth_00014","input":".await syntax деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00014","confidence":"high"}
+{"id":"synth_00015","input":".await chain деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00015","confidence":"high"}
+{"id":"synth_00016","input":".await in expressions деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00016","confidence":"high"}
+{"id":"synth_00017","input":"async fn return type деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00017","confidence":"high"}
+{"id":"synth_00018","input":"Opaque return type деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00018","confidence":"high"}
+{"id":"synth_00019","input":"Self-referential struct деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00019","confidence":"high"}
+{"id":"synth_00020","input":"Move-and-corrupt деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00020","confidence":"high"}
+{"id":"synth_00021","input":"Self-referential state machine деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00021","confidence":"high"}
+{"id":"synth_00022","input":"Pin шешімі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00022","confidence":"high"}
+{"id":"synth_00023","input":"Pin<P> wrapper деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00023","confidence":"high"}
+{"id":"synth_00024","input":"Unpin auto-trait деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00024","confidence":"high"}
+{"id":"synth_00025","input":"!Unpin types деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00025","confidence":"high"}
+{"id":"synth_00026","input":"Pin::new деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00026","confidence":"high"}
+{"id":"synth_00027","input":"Pin::new_unchecked деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00027","confidence":"high"}
+{"id":"synth_00028","input":"Box::pin деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00028","confidence":"high"}
+{"id":"synth_00029","input":"pin! macro деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00029","confidence":"high"}
+{"id":"synth_00030","input":"Pin<&mut T> деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00030","confidence":"high"}
+{"id":"synth_00031","input":"Field projection деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00031","confidence":"high"}
+{"id":"synth_00032","input":"Structural pinning деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00032","confidence":"high"}
+{"id":"synth_00033","input":"Pin::map_unchecked_mut деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00033","confidence":"high"}
+{"id":"synth_00034","input":"Poll pin signature деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00034","confidence":"high"}
+{"id":"synth_00035","input":"get_mut get_unchecked_mut деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00035","confidence":"high"}
+{"id":"synth_00036","input":"Pinning rules summary деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00036","confidence":"high"}
+{"id":"synth_00037","input":"Адам — тірі?","intent":"FactualQuery","source_file":"synth_from:ds_00037","confidence":"high"}
+{"id":"synth_00038","input":"Адам — тіршілік иесі?","intent":"FactualQuery","source_file":"synth_from:ds_00038","confidence":"high"}
+{"id":"synth_00039","input":"Адам, келесі сабақ қандай ма?","intent":"AskNextTopic","source_file":"synth_from:ds_00039","confidence":"high"}
+{"id":"synth_00040","input":"Бас — дененің бөлігі?","intent":"FactualQuery","source_file":"synth_from:ds_00040","confidence":"high"}
+{"id":"synth_00041","input":"Өмір кезеңі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00041","confidence":"high"}
+{"id":"synth_00042","input":"Тіршілік мерзімі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00042","confidence":"high"}
+{"id":"synth_00043","input":"Қасиет деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00043","confidence":"high"}
+{"id":"synth_00044","input":"Қасиеттер қалай жұмыс істейді ме?","intent":"FactualQuery","source_file":"synth_from:ds_00044","confidence":"high"}
+{"id":"synth_00045","input":"Асинхрон деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00045","confidence":"high"}
+{"id":"synth_00046","input":"Қарызға алу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00046","confidence":"high"}
+{"id":"synth_00047","input":"Жер деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00047","confidence":"high"}
+{"id":"synth_00048","input":"Күн қандай аспан денесі ме?","intent":"FactualQuery","source_file":"synth_from:ds_00048","confidence":"high"}
+{"id":"synth_00049","input":"Ай не нәрсе ме?","intent":"FactualQuery","source_file":"synth_from:ds_00049","confidence":"high"}
+{"id":"synth_00050","input":"Марс деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00050","confidence":"high"}
+{"id":"synth_00051","input":"Күн жүйесі құрамына не кіреді ме?","intent":"FactualQuery","source_file":"synth_from:ds_00051","confidence":"high"}
+{"id":"synth_00052","input":"Жұлдыз дегеніміз не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00052","confidence":"high"}
+{"id":"synth_00053","input":"Жер қай жүйеге кіреді ме?","intent":"FactualQuery","source_file":"synth_from:ds_00054","confidence":"high"}
+{"id":"synth_00054","input":"Қазақстанның елордасы қай қала ма?","intent":"FactualQuery","source_file":"synth_from:ds_00055","confidence":"high"}
+{"id":"synth_00055","input":"Алматы қандай қала ма?","intent":"FactualQuery","source_file":"synth_from:ds_00056","confidence":"high"}
+{"id":"synth_00056","input":"Жайық деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00057","confidence":"high"}
+{"id":"synth_00057","input":"Балқаш — бұл не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00058","confidence":"high"}
+{"id":"synth_00058","input":"Қызылқұм деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00059","confidence":"high"}
+{"id":"synth_00059","input":"Қарағанды облысы қайда ма?","intent":"FactualQuery","source_file":"synth_from:ds_00060","confidence":"high"}
+{"id":"synth_00060","input":"Шығыс Қазақстан облысының орталығы қай қала ма?","intent":"FactualQuery","source_file":"synth_from:ds_00061","confidence":"high"}
+{"id":"synth_00061","input":"Маңғыстау облысы қай аймақта ма?","intent":"FactualQuery","source_file":"synth_from:ds_00062","confidence":"high"}
+{"id":"synth_00062","input":"Қазақстан қай елдермен шектеседі ме?","intent":"FactualQuery","source_file":"synth_from:ds_00063","confidence":"high"}
+{"id":"synth_00063","input":"Каспий теңізі қай елде ме?","intent":"FactualQuery","source_file":"synth_from:ds_00064","confidence":"high"}
+{"id":"synth_00064","input":"Есіл өзені қалай аталады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00065","confidence":"high"}
+{"id":"synth_00065","input":"Шарын каньоны қай облыста ма?","intent":"FactualQuery","source_file":"synth_from:ds_00066","confidence":"high"}
+{"id":"synth_00066","input":"Бурабай қандай орын ма?","intent":"FactualQuery","source_file":"synth_from:ds_00067","confidence":"high"}
+{"id":"synth_00067","input":"Қазақстанның халық саны қанша ма?","intent":"FactualQuery","source_file":"synth_from:ds_00068","confidence":"high"}
+{"id":"synth_00068","input":"Абай Құнанбаев кім ме?","intent":"FactualQuery","source_file":"synth_from:ds_00069","confidence":"high"}
+{"id":"synth_00069","input":"«Қара сөздер» кімнің шығармасы ма?","intent":"FactualQuery","source_file":"synth_from:ds_00070","confidence":"high"}
+{"id":"synth_00070","input":"Абайдың қара сөздері неше шығармадан тұрады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00071","confidence":"high"}
+{"id":"synth_00071","input":"Абай қай жылы туылған ма?","intent":"FactualQuery","source_file":"synth_from:ds_00072","confidence":"high"}
+{"id":"synth_00072","input":"Абай қай жылы қайтыс болған ма?","intent":"FactualQuery","source_file":"synth_from:ds_00073","confidence":"high"}
+{"id":"synth_00073","input":"Абайдың шын аты қандай ма?","intent":"FactualQuery","source_file":"synth_from:ds_00074","confidence":"high"}
+{"id":"synth_00074","input":"Абайдың әкесі кім ме?","intent":"FactualQuery","source_file":"synth_from:ds_00075","confidence":"high"}
+{"id":"synth_00075","input":"«Сегіз аяқ» қандай шығар?","intent":"FactualQuery","source_file":"synth_from:ds_00076","confidence":"high"}
+{"id":"synth_00076","input":"«Ескендір» қандай шығар?","intent":"FactualQuery","source_file":"synth_from:ds_00077","confidence":"high"}
+{"id":"synth_00077","input":"Абай қай облыста туылған ма?","intent":"FactualQuery","source_file":"synth_from:ds_00078","confidence":"high"}
+{"id":"synth_00078","input":"Қазақстан Конституциясы қашан қабылданған ма?","intent":"FactualQuery","source_file":"synth_from:ds_00079","confidence":"high"}
+{"id":"synth_00079","input":"Қазақстан Республикасы қандай мемлекет пе?","intent":"FactualQuery","source_file":"synth_from:ds_00080","confidence":"high"}
+{"id":"synth_00080","input":"Қазақстанның мемлекеттік тілі қандай ма?","intent":"FactualQuery","source_file":"synth_from:ds_00081","confidence":"high"}
+{"id":"synth_00081","input":"Қазақстанда биліктің бастауы кім ме?","intent":"FactualQuery","source_file":"synth_from:ds_00082","confidence":"high"}
+{"id":"synth_00082","input":"Президент неше жылға сайланады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00083","confidence":"high"}
+{"id":"synth_00083","input":"Парламент неше палатадан тұрады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00084","confidence":"high"}
+{"id":"synth_00084","input":"Парламенттің жоғарғы палатасы қалай аталады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00085","confidence":"high"}
+{"id":"synth_00085","input":"Парламенттің төменгі палатасы қалай аталады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00086","confidence":"high"}
+{"id":"synth_00086","input":"Қазақстанның ақша бірлігі қандай ма?","intent":"FactualQuery","source_file":"synth_from:ds_00087","confidence":"high"}
+{"id":"synth_00087","input":"Конституциялық Сот неше судьядан тұрады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00088","confidence":"high"}
+{"id":"synth_00088","input":"АрселорМиттал Теміртау қайда орналасқан ма?","intent":"FactualQuery","source_file":"synth_from:ds_00089","confidence":"high"}
+{"id":"synth_00089","input":"ҚазМұнайГаз қандай сала ма?","intent":"FactualQuery","source_file":"synth_from:ds_00090","confidence":"high"}
+{"id":"synth_00090","input":"Балқаш кен-металлургия комбинаты не өндіреді ме?","intent":"FactualQuery","source_file":"synth_from:ds_00091","confidence":"high"}
+{"id":"synth_00091","input":"ССГПО қандай кәсіпорын ма?","intent":"FactualQuery","source_file":"synth_from:ds_00092","confidence":"high"}
+{"id":"synth_00092","input":"Жамбыл фосфор зауыты не шығарады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00093","confidence":"high"}
+{"id":"synth_00093","input":"Бір жылда неше ай бар ма?","intent":"FactualQuery","source_file":"synth_from:ds_00094","confidence":"high"}
+{"id":"synth_00094","input":"Бір аптада неше күн бар ма?","intent":"FactualQuery","source_file":"synth_from:ds_00095","confidence":"high"}
+{"id":"synth_00095","input":"Қаңтар деген қандай ай ма?","intent":"FactualQuery","source_file":"synth_from:ds_00096","confidence":"high"}
+{"id":"synth_00096","input":"Жаз қандай мезгіл ме?","intent":"FactualQuery","source_file":"synth_from:ds_00097","confidence":"high"}
+{"id":"synth_00097","input":"Бір тәулікте неше сағат бар ма?","intent":"FactualQuery","source_file":"synth_from:ds_00098","confidence":"high"}
+{"id":"synth_00098","input":"Java деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00099","confidence":"high"}
+{"id":"synth_00099","input":"Java тілі қашан шықты ма?","intent":"FactualQuery","source_file":"synth_from:ds_00100","confidence":"high"}
+{"id":"synth_00100","input":"Java тілін кім жасады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00101","confidence":"high"}
+{"id":"synth_00101","input":"JVM деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00102","confidence":"high"}
+{"id":"synth_00102","input":"JDK не үшін керек пе?","intent":"AskPurpose","source_file":"synth_from:ds_00103","confidence":"high"}
+{"id":"synth_00103","input":"Rust деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00104","confidence":"high"}
+{"id":"synth_00104","input":"Cargo не үшін қажет пе?","intent":"FactualQuery","source_file":"synth_from:ds_00105","confidence":"high"}
+{"id":"synth_00105","input":"Vec<T> деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00106","confidence":"high"}
+{"id":"synth_00106","input":"let кілт сөзі не үшін қолданылады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00107","confidence":"high"}
+{"id":"synth_00107","input":"fn деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00108","confidence":"high"}
+{"id":"synth_00108","input":"Адам ағзасы неден тұрады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00109","confidence":"high"}
+{"id":"synth_00109","input":"Жасуша деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00110","confidence":"high"}
+{"id":"synth_00110","input":"Жүрек қандай мүше ме?","intent":"FactualQuery","source_file":"synth_from:ds_00111","confidence":"high"}
+{"id":"synth_00111","input":"Өкпе не үшін керек пе?","intent":"AskPurpose","source_file":"synth_from:ds_00112","confidence":"high"}
+{"id":"synth_00112","input":"Қан қандай сұйықтық па?","intent":"FactualQuery","source_file":"synth_from:ds_00113","confidence":"high"}
+{"id":"synth_00113","input":"Екі қосу үш қанша ма?","intent":"FactualQuery","source_file":"synth_from:ds_00114","confidence":"high"}
+{"id":"synth_00114","input":"Бес көбейту үш қанша ма?","intent":"FactualQuery","source_file":"synth_from:ds_00115","confidence":"high"}
+{"id":"synth_00115","input":"Шеңбер деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00116","confidence":"high"}
+{"id":"synth_00116","input":"Үшбұрыш деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00117","confidence":"high"}
+{"id":"synth_00117","input":"Жұп сан деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00118","confidence":"high"}
+{"id":"synth_00118","input":"Су химиялық формуласы қандай ма?","intent":"FactualQuery","source_file":"synth_from:ds_00119","confidence":"high"}
+{"id":"synth_00119","input":"Оттегі қандай зат па?","intent":"FactualQuery","source_file":"synth_from:ds_00120","confidence":"high"}
+{"id":"synth_00120","input":"Сутегі қандай элемент пе?","intent":"FactualQuery","source_file":"synth_from:ds_00121","confidence":"high"}
+{"id":"synth_00121","input":"Натрий деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00122","confidence":"high"}
+{"id":"synth_00122","input":"Темір қандай зат па?","intent":"FactualQuery","source_file":"synth_from:ds_00123","confidence":"high"}
+{"id":"synth_00123","input":"Күш деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00124","confidence":"high"}
+{"id":"synth_00124","input":"Электр тогы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00125","confidence":"high"}
+{"id":"synth_00125","input":"Жылдамдық деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00126","confidence":"high"}
+{"id":"synth_00126","input":"Гравитация деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00127","confidence":"high"}
+{"id":"synth_00127","input":"Жарық қандай құбылыс па?","intent":"FactualQuery","source_file":"synth_from:ds_00128","confidence":"high"}
+{"id":"synth_00128","input":"Қазақ хандығы қашан құрылды ма?","intent":"FactualQuery","source_file":"synth_from:ds_00129","confidence":"high"}
+{"id":"synth_00129","input":"Қасым хан кім ме?","intent":"FactualQuery","source_file":"synth_from:ds_00130","confidence":"high"}
+{"id":"synth_00130","input":"Қазақстан қашан тәуелсіздік алды ма?","intent":"FactualQuery","source_file":"synth_from:ds_00132","confidence":"high"}
+{"id":"synth_00131","input":"Алаш қозғалысы дегеніміз не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00133","confidence":"high"}
+{"id":"synth_00132","input":"Нұрсұлтан Назарбаев кім ме?","intent":"FactualQuery","source_file":"synth_from:ds_00134","confidence":"high"}
+{"id":"synth_00133","input":"Қасым-Жомарт Тоқаев кім ме?","intent":"FactualQuery","source_file":"synth_from:ds_00135","confidence":"high"}
+{"id":"synth_00134","input":"Сақтар деген кімдер ме?","intent":"FactualQuery","source_file":"synth_from:ds_00136","confidence":"high"}
+{"id":"synth_00135","input":"Мұхтар Әуезов кім ме?","intent":"FactualQuery","source_file":"synth_from:ds_00137","confidence":"high"}
+{"id":"synth_00136","input":"«Абай жолы» кімнің шығармасы ма?","intent":"FactualQuery","source_file":"synth_from:ds_00138","confidence":"high"}
+{"id":"synth_00137","input":"Сәкен Сейфуллин кім ме?","intent":"Greeting","source_file":"synth_from:ds_00139","confidence":"high"}
+{"id":"synth_00138","input":"Мағжан Жұмабаев кім ме?","intent":"FactualQuery","source_file":"synth_from:ds_00140","confidence":"high"}
+{"id":"synth_00139","input":"Жылқы қандай жануар ма?","intent":"FactualQuery","source_file":"synth_from:ds_00141","confidence":"high"}
+{"id":"synth_00140","input":"Қой деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00142","confidence":"high"}
+{"id":"synth_00141","input":"Бүркіт деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00143","confidence":"high"}
+{"id":"synth_00142","input":"Бесбармақ деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00144","confidence":"high"}
+{"id":"synth_00143","input":"Қымыз қандай сусын ма?","intent":"FactualQuery","source_file":"synth_from:ds_00145","confidence":"high"}
+{"id":"synth_00144","input":"Нан қандай тағам ма?","intent":"FactualQuery","source_file":"synth_from:ds_00146","confidence":"high"}
+{"id":"synth_00145","input":"Юпитердегі ауа қандай ма?","intent":"FactualQuery","source_file":"synth_from:ds_00147","confidence":"high"}
+{"id":"synth_00146","input":"Шамалардағы мәңгі мұз қандай ма?","intent":"FactualQuery","source_file":"synth_from:ds_00148","confidence":"high"}
+{"id":"synth_00147","input":"Альфа Кентаврде кім тұрады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00149","confidence":"high"}
+{"id":"synth_00148","input":"Cargo бейіндерін баптау деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00150","confidence":"high"}
+{"id":"synth_00149","input":"opt-level деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00151","confidence":"high"}
+{"id":"synth_00150","input":"Cargo.toml метамәліметтер деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00152","confidence":"high"}
+{"id":"synth_00151","input":"cargo doc деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00153","confidence":"high"}
+{"id":"synth_00152","input":"/// vs //! деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00154","confidence":"high"}
+{"id":"synth_00153","input":"Doc бөлімдері деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00155","confidence":"high"}
+{"id":"synth_00154","input":"doc-tests деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00156","confidence":"high"}
+{"id":"synth_00155","input":"cargo login деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00157","confidence":"high"}
+{"id":"synth_00156","input":"SemVer деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00158","confidence":"high"}
+{"id":"synth_00157","input":"cargo publish деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00159","confidence":"high"}
+{"id":"synth_00158","input":"cargo publish --dry-run деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00160","confidence":"high"}
+{"id":"synth_00159","input":"cargo yank деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00161","confidence":"high"}
+{"id":"synth_00160","input":"Cargo workspace деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00162","confidence":"high"}
+{"id":"synth_00161","input":"Workspace path тәуелділігі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00163","confidence":"high"}
+{"id":"synth_00162","input":"Workspace cargo командалары деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00164","confidence":"high"}
+{"id":"synth_00163","input":"cargo install деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00165","confidence":"high"}
+{"id":"synth_00164","input":"Cargo subcommand кеңейтуі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00166","confidence":"high"}
+{"id":"synth_00165","input":"crates.io экожүйесі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00167","confidence":"high"}
+{"id":"synth_00166","input":"rustup деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00168","confidence":"high"}
+{"id":"synth_00167","input":"rustup update деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00169","confidence":"high"}
+{"id":"synth_00168","input":"rustup doc деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00170","confidence":"high"}
+{"id":"synth_00169","input":"cargo new деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00171","confidence":"high"}
+{"id":"synth_00170","input":"src/main.rs деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00172","confidence":"high"}
+{"id":"synth_00171","input":"cargo build деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00173","confidence":"high"}
+{"id":"synth_00172","input":"cargo run деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00174","confidence":"high"}
+{"id":"synth_00173","input":"cargo check деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00175","confidence":"high"}
+{"id":"synth_00174","input":"cargo build --release деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00176","confidence":"high"}
+{"id":"synth_00175","input":"dev бейіні деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00177","confidence":"high"}
+{"id":"synth_00176","input":"release бейіні деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00178","confidence":"high"}
+{"id":"synth_00177","input":"target қалтасы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00179","confidence":"high"}
+{"id":"synth_00178","input":"println деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00180","confidence":"high"}
+{"id":"synth_00179","input":"fn main деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00181","confidence":"high"}
+{"id":"synth_00180","input":".rs кеңейтімі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00182","confidence":"high"}
+{"id":"synth_00181","input":"edition деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00183","confidence":"high"}
+{"id":"synth_00182","input":"toml деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00184","confidence":"high"}
+{"id":"synth_00183","input":"Rust стилі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00185","confidence":"high"}
+{"id":"synth_00184","input":"Енам деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00186","confidence":"high"}
+{"id":"synth_00185","input":"Енам нұсқасы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00187","confidence":"high"}
+{"id":"synth_00186","input":"Нұсқа деректері деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00188","confidence":"high"}
+{"id":"synth_00187","input":"Енамға әдіс деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00189","confidence":"high"}
+{"id":"synth_00188","input":"Option деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00190","confidence":"high"}
+{"id":"synth_00189","input":"Some деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00191","confidence":"high"}
+{"id":"synth_00190","input":"None деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00192","confidence":"high"}
+{"id":"synth_00191","input":"Option жалпылама түрі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00193","confidence":"high"}
+{"id":"synth_00192","input":"Үлгі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00194","confidence":"high"}
+{"id":"synth_00193","input":"match толық қамту деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00195","confidence":"high"}
+{"id":"synth_00194","input":"match тармағы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00196","confidence":"high"}
+{"id":"synth_00195","input":"Үлгіге байланыстыру деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00197","confidence":"high"}
+{"id":"synth_00196","input":"_ орынтолтырғыш деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00198","confidence":"high"}
+{"id":"synth_00197","input":"Айнымалы үлгісі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00199","confidence":"high"}
+{"id":"synth_00198","input":"if let деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00200","confidence":"high"}
+{"id":"synth_00199","input":"if let else деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00201","confidence":"high"}
+{"id":"synth_00200","input":"null проблемасы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00202","confidence":"high"}
+{"id":"synth_00201","input":"Алгебралық тип жүйесі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00203","confidence":"high"}
+{"id":"synth_00202","input":"Атым есіңізде ме?","intent":"AskName","source_file":"synth_from:ds_00204","confidence":"high"}
+{"id":"synth_00203","input":"Менің атым есіңізде?","intent":"AskName","source_file":"synth_from:ds_00204","confidence":"high"}
+{"id":"synth_00204","input":"Сен менің атымды білесіз?","intent":"AskName","source_file":"synth_from:ds_00205","confidence":"high"}
+{"id":"synth_00205","input":"сен менің атымды білесен бе?","intent":"AskName","source_file":"synth_from:ds_00205","confidence":"high"}
+{"id":"synth_00206","input":"сіз менің атымды білесіз бе?","intent":"AskName","source_file":"synth_from:ds_00205","confidence":"high"}
+{"id":"synth_00207","input":"Атымды ұмыттыңыз?","intent":"AskName","source_file":"synth_from:ds_00206","confidence":"high"}
+{"id":"synth_00208","input":"Rust-та ownership не үшін керек пе?","intent":"AskPurpose","source_file":"synth_from:ds_00207","confidence":"high"}
+{"id":"synth_00209","input":"Rust-та ownership қалай жұмыс істейді ме?","intent":"FactualQuery","source_file":"synth_from:ds_00208","confidence":"high"}
+{"id":"synth_00210","input":"match өрнегі не істейді ме?","intent":"FactualQuery","source_file":"synth_from:ds_00209","confidence":"high"}
+{"id":"synth_00211","input":"unsafe Rust қашан керек пе?","intent":"FactualQuery","source_file":"synth_from:ds_00210","confidence":"high"}
+{"id":"synth_00212","input":"async/await қалай жұмыс істейді ме?","intent":"FactualQuery","source_file":"synth_from:ds_00211","confidence":"high"}
+{"id":"synth_00213","input":"Tokio runtime не істейді ме?","intent":"FactualQuery","source_file":"synth_from:ds_00212","confidence":"high"}
+{"id":"synth_00214","input":"Stream деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00213","confidence":"high"}
+{"id":"synth_00215","input":"tokio деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00214","confidence":"high"}
+{"id":"synth_00216","input":"E0277 деген қандай қате ме?","intent":"ExplainCompilerError","source_file":"synth_from:ds_00224","confidence":"high"}
+{"id":"synth_00217","input":"Ownership-тің мақсаты не ме?","intent":"AskPurpose","source_file":"synth_from:ds_00225","confidence":"high"}
+{"id":"synth_00218","input":"Pin-нің мақсаты қандай ма?","intent":"AskPurpose","source_file":"synth_from:ds_00226","confidence":"high"}
+{"id":"synth_00219","input":"Trait не үшін арналған ма?","intent":"AskPurpose","source_file":"synth_from:ds_00227","confidence":"high"}
+{"id":"synth_00220","input":"E0599 деген қандай қате ме?","intent":"ExplainCompilerError","source_file":"synth_from:ds_00236","confidence":"high"}
+{"id":"synth_00221","input":"E0061 деген не ме?","intent":"ExplainCompilerError","source_file":"synth_from:ds_00238","confidence":"high"}
+{"id":"synth_00222","input":"Result-тің мақсаты не ме?","intent":"AskPurpose","source_file":"synth_from:ds_00239","confidence":"high"}
+{"id":"synth_00223","input":"Option-ның мақсаты қандай ма?","intent":"AskPurpose","source_file":"synth_from:ds_00240","confidence":"high"}
+{"id":"synth_00224","input":"Iterator-дың мақсаты не ме?","intent":"AskPurpose","source_file":"synth_from:ds_00241","confidence":"high"}
+{"id":"synth_00225","input":"async-ң мақсаты қандай ма?","intent":"AskPurpose","source_file":"synth_from:ds_00242","confidence":"high"}
+{"id":"synth_00226","input":"lifetime-нің мақсаты не ме?","intent":"AskPurpose","source_file":"synth_from:ds_00243","confidence":"high"}
+{"id":"synth_00227","input":"Stream трейт сигнатурасы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00244","confidence":"high"}
+{"id":"synth_00228","input":"Stream vs Iterator деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00245","confidence":"high"}
+{"id":"synth_00229","input":"Poll<Option<Item>> деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00246","confidence":"high"}
+{"id":"synth_00230","input":"Stream impl мысалы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00247","confidence":"high"}
+{"id":"synth_00231","input":".next().await идиомасы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00248","confidence":"high"}
+{"id":"synth_00232","input":"While let stream цикл деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00249","confidence":"high"}
+{"id":"synth_00233","input":"for_each async деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00250","confidence":"high"}
+{"id":"synth_00234","input":"Stream лазылығы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00251","confidence":"high"}
+{"id":"synth_00235","input":"StreamExt шолуы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00252","confidence":"high"}
+{"id":"synth_00236","input":"Map filter take skip деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00253","confidence":"high"}
+{"id":"synth_00237","input":"Stream then деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00254","confidence":"high"}
+{"id":"synth_00238","input":"Stream fold деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00255","confidence":"high"}
+{"id":"synth_00239","input":"Collect vec деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00256","confidence":"high"}
+{"id":"synth_00240","input":"Buffered concurrent деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00257","confidence":"high"}
+{"id":"synth_00241","input":"buffer_unordered деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00258","confidence":"high"}
+{"id":"synth_00242","input":"for_each_concurrent деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00259","confidence":"high"}
+{"id":"synth_00243","input":"stream::iter деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00260","confidence":"high"}
+{"id":"synth_00244","input":"mpsc::Receiver stream деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00261","confidence":"high"}
+{"id":"synth_00245","input":"Кредит алу дұрыс?","intent":"FactualQuery","source_file":"synth_from:ds_00262","confidence":"high"}
+{"id":"synth_00246","input":"кредит алу иә па?","intent":"FactualQuery","source_file":"synth_from:ds_00262","confidence":"high"}
+{"id":"synth_00247","input":"Мен кредитті бүгін рәсімдейін?","intent":"FactualQuery","source_file":"synth_from:ds_00263","confidence":"high"}
+{"id":"synth_00248","input":"Несие алу дұрыс?","intent":"FactualQuery","source_file":"synth_from:ds_00264","confidence":"high"}
+{"id":"synth_00249","input":"несие алу иә ба?","intent":"FactualQuery","source_file":"synth_from:ds_00264","confidence":"high"}
+{"id":"synth_00250","input":"Доллар бүгін өседі?","intent":"FactualQuery","source_file":"synth_from:ds_00265","confidence":"high"}
+{"id":"synth_00251","input":"Теңге түседі?","intent":"FactualQuery","source_file":"synth_from:ds_00266","confidence":"high"}
+{"id":"synth_00252","input":"Еуро қымбаттады?","intent":"FactualQuery","source_file":"synth_from:ds_00267","confidence":"high"}
+{"id":"synth_00253","input":"Доллар деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00268","confidence":"high"}
+{"id":"synth_00254","input":"Кредит деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00269","confidence":"high"}
+{"id":"synth_00255","input":"Future трейт деректері деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00270","confidence":"high"}
+{"id":"synth_00256","input":"Poll енам деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00271","confidence":"high"}
+{"id":"synth_00257","input":"Context типі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00272","confidence":"high"}
+{"id":"synth_00258","input":"SimpleFuture модель деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00273","confidence":"high"}
+{"id":"synth_00259","input":"Waker трейт деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00274","confidence":"high"}
+{"id":"synth_00260","input":"RawWaker mehanizmı деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00275","confidence":"high"}
+{"id":"synth_00261","input":"Task wakeup жолы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00276","confidence":"high"}
+{"id":"synth_00262","input":"Spurious wakeups деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00277","confidence":"high"}
+{"id":"synth_00263","input":"wake_by_ref деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00278","confidence":"high"}
+{"id":"synth_00264","input":"Executor шолуы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00279","confidence":"high"}
+{"id":"synth_00265","input":"Single-threaded executor деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00280","confidence":"high"}
+{"id":"synth_00266","input":"Task wrapping деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00281","confidence":"high"}
+{"id":"synth_00267","input":"block_on функциясы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00282","confidence":"high"}
+{"id":"synth_00268","input":"Multi-threaded executor деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00283","confidence":"high"}
+{"id":"synth_00269","input":"TimerFuture мысалы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00284","confidence":"high"}
+{"id":"synth_00270","input":"Shared state pattern деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00285","confidence":"high"}
+{"id":"synth_00271","input":"Park sleep деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00286","confidence":"high"}
+{"id":"synth_00272","input":"Waker hand-off деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00287","confidence":"high"}
+{"id":"synth_00273","input":"Бума деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00288","confidence":"high"}
+{"id":"synth_00274","input":"Сандық деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00289","confidence":"high"}
+{"id":"synth_00275","input":"Екілік сандық деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00290","confidence":"high"}
+{"id":"synth_00276","input":"Кітапхана сандығы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00291","confidence":"high"}
+{"id":"synth_00277","input":"Сандық түбірі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00292","confidence":"high"}
+{"id":"synth_00278","input":"src/bin/ деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00293","confidence":"high"}
+{"id":"synth_00279","input":"Модуль деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00294","confidence":"high"}
+{"id":"synth_00280","input":"Модуль ағашы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00295","confidence":"high"}
+{"id":"synth_00281","input":"Модуль жолы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00296","confidence":"high"}
+{"id":"synth_00282","input":"Абсолюттік жол деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00297","confidence":"high"}
+{"id":"synth_00283","input":"Салыстырмалы жол деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00298","confidence":"high"}
+{"id":"synth_00284","input":"super деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00299","confidence":"high"}
+{"id":"synth_00285","input":"self кілтсөзі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00300","confidence":"high"}
+{"id":"synth_00286","input":"Жекелік әдепкіше деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00301","confidence":"high"}
+{"id":"synth_00287","input":"pub бір қабат деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00302","confidence":"high"}
+{"id":"synth_00288","input":"pub деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00303","confidence":"high"}
+{"id":"synth_00289","input":"use деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00304","confidence":"high"}
+{"id":"synth_00290","input":"pub use деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00305","confidence":"high"}
+{"id":"synth_00291","input":"as импортта деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00306","confidence":"high"}
+{"id":"synth_00292","input":"Тоғыспалы жолдар деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00307","confidence":"high"}
+{"id":"synth_00293","input":"glob операторы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00308","confidence":"high"}
+{"id":"synth_00294","input":"Ақылды сілтеме деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00309","confidence":"high"}
+{"id":"synth_00295","input":"Box рекурсивті типке деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00310","confidence":"high"}
+{"id":"synth_00296","input":"Deref трейті деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00311","confidence":"high"}
+{"id":"synth_00297","input":"Deref coercion деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00312","confidence":"high"}
+{"id":"synth_00298","input":"Drop трейті деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00313","confidence":"high"}
+{"id":"synth_00299","input":"std::mem::drop деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00314","confidence":"high"}
+{"id":"synth_00300","input":"Rc::clone деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00315","confidence":"high"}
+{"id":"synth_00301","input":"Rc::strong_count деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00316","confidence":"high"}
+{"id":"synth_00302","input":"Rc vs Arc деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00317","confidence":"high"}
+{"id":"synth_00303","input":"Ішкі өзгермелілік деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00318","confidence":"high"}
+{"id":"synth_00304","input":"RefCell::borrow деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00319","confidence":"high"}
+{"id":"synth_00305","input":"RefCell runtime panic деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00320","confidence":"high"}
+{"id":"synth_00306","input":"Mock-нысан RefCell деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00321","confidence":"high"}
+{"id":"synth_00307","input":"Rc<RefCell> тіркесімі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00322","confidence":"high"}
+{"id":"synth_00308","input":"Сілтеме циклы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00323","confidence":"high"}
+{"id":"synth_00309","input":"Weak<T> деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00324","confidence":"high"}
+{"id":"synth_00310","input":"Rc::downgrade деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00325","confidence":"high"}
+{"id":"synth_00311","input":"Парент-бала ағаш деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00326","confidence":"high"}
+{"id":"synth_00312","input":"env::args деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00327","confidence":"high"}
+{"id":"synth_00313","input":"fs::read_to_string деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00328","confidence":"high"}
+{"id":"synth_00314","input":"eprintln! деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00329","confidence":"high"}
+{"id":"synth_00315","input":"process::exit деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00330","confidence":"high"}
+{"id":"synth_00316","input":"stdout vs stderr деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00331","confidence":"high"}
+{"id":"synth_00317","input":"env::var деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00332","confidence":"high"}
+{"id":"synth_00318","input":"TDD циклі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00333","confidence":"high"}
+{"id":"synth_00319","input":"Config структ деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00334","confidence":"high"}
+{"id":"synth_00320","input":"Config::build деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00335","confidence":"high"}
+{"id":"synth_00321","input":"unwrap_or_else жабу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00336","confidence":"high"}
+{"id":"synth_00322","input":"run функциясы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00337","confidence":"high"}
+{"id":"synth_00323","input":"lib.rs + main.rs паттерні деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00338","confidence":"high"}
+{"id":"synth_00324","input":"search функциясы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00339","confidence":"high"}
+{"id":"synth_00325","input":"lines әдісі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00340","confidence":"high"}
+{"id":"synth_00326","input":"contains әдісі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00341","confidence":"high"}
+{"id":"synth_00327","input":"to_lowercase деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00342","confidence":"high"}
+{"id":"synth_00328","input":"Shell бағыттау деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00343","confidence":"high"}
+{"id":"synth_00329","input":"Minigrep архитектурасы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00344","confidence":"high"}
+{"id":"synth_00330","input":"Мен қайда тұрамын ма?","intent":"AskLocation","source_file":"synth_from:ds_00345","confidence":"high"}
+{"id":"synth_00331","input":"қайда Мен тұрамын?","intent":"AskLocation","source_file":"synth_from:ds_00345","confidence":"high"}
+{"id":"synth_00332","input":"Қай қалада тұрамын ма?","intent":"AskLocation","source_file":"synth_from:ds_00346","confidence":"high"}
+{"id":"synth_00333","input":"Қайдамын ма?","intent":"AskLocation","source_file":"synth_from:ds_00347","confidence":"high"}
+{"id":"synth_00334","input":"Сіз қайда тұрасыз ма?","intent":"AskLocation","source_file":"synth_from:ds_00348","confidence":"high"}
+{"id":"synth_00335","input":"сен қайда тұрасың?","intent":"AskLocation","source_file":"synth_from:ds_00348","confidence":"high"}
+{"id":"synth_00336","input":"қайда Сіз тұрасыз?","intent":"AskLocation","source_file":"synth_from:ds_00348","confidence":"high"}
+{"id":"synth_00337","input":"Балама антибиотик берейін?","intent":"FactualQuery","source_file":"synth_from:ds_00349","confidence":"high"}
+{"id":"synth_00338","input":"Балаға дәрумен берсем дұрыс?","intent":"FactualQuery","source_file":"synth_from:ds_00350","confidence":"high"}
+{"id":"synth_00339","input":"балаға дәрумен берсем иә па?","intent":"FactualQuery","source_file":"synth_from:ds_00350","confidence":"high"}
+{"id":"synth_00340","input":"Сәбиіме вакцина егейін?","intent":"FactualQuery","source_file":"synth_from:ds_00351","confidence":"high"}
+{"id":"synth_00341","input":"Ажырасуға арыз берейін?","intent":"FactualQuery","source_file":"synth_from:ds_00352","confidence":"high"}
+{"id":"synth_00342","input":"Үкімет дегеніміз не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00356","confidence":"high"}
+{"id":"synth_00343","input":"Партия деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00357","confidence":"high"}
+{"id":"synth_00344","input":"Үлгі қолданылатын орындар деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00358","confidence":"high"}
+{"id":"synth_00345","input":"while let деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00359","confidence":"high"}
+{"id":"synth_00346","input":"for үлгісі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00360","confidence":"high"}
+{"id":"synth_00347","input":"let үлгісі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00361","confidence":"high"}
+{"id":"synth_00348","input":"Функция параметрі үлгісі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00362","confidence":"high"}
+{"id":"synth_00349","input":"Үлгі қайтарымдылығы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00363","confidence":"high"}
+{"id":"synth_00350","input":"Үлгі түр қатесі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00364","confidence":"high"}
+{"id":"synth_00351","input":"Литерал үлгісі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00365","confidence":"high"}
+{"id":"synth_00352","input":"match шадоулау деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00366","confidence":"high"}
+{"id":"synth_00353","input":"or-pattern деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00367","confidence":"high"}
+{"id":"synth_00354","input":"Диапазон үлгісі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00368","confidence":"high"}
+{"id":"synth_00355","input":"Структураны бөлшектеу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00369","confidence":"high"}
+{"id":"synth_00356","input":"Енамды бөлшектеу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00370","confidence":"high"}
+{"id":"synth_00357","input":"Ұя салынған бөлшектеу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00371","confidence":"high"}
+{"id":"synth_00358","input":"Үлгіде елемеу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00372","confidence":"high"}
+{"id":"synth_00359","input":".. елемеу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00373","confidence":"high"}
+{"id":"synth_00360","input":"match guard деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00374","confidence":"high"}
+{"id":"synth_00361","input":"at байланыстыру деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00375","confidence":"high"}
+{"id":"synth_00362","input":"Rust бағдарламалау тілі туралы не білесіз ме?","intent":"FactualQuery","source_file":"synth_from:ds_00376","confidence":"high"}
+{"id":"synth_00363","input":"rust бағдарламалау тілі туралы не білесің?","intent":"FactualQuery","source_file":"synth_from:ds_00376","confidence":"high"}
+{"id":"synth_00364","input":"Rust тілі туралы не білесіз ме?","intent":"FactualQuery","source_file":"synth_from:ds_00377","confidence":"high"}
+{"id":"synth_00365","input":"rust тілі туралы не білесің?","intent":"FactualQuery","source_file":"synth_from:ds_00377","confidence":"high"}
+{"id":"synth_00366","input":"Раст деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00379","confidence":"high"}
+{"id":"synth_00367","input":"Бұл тілдегі кілт сөздер қандай ма?","intent":"FactualQuery","source_file":"synth_from:ds_00380","confidence":"high"}
+{"id":"synth_00368","input":"Async runtime таңдау деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00381","confidence":"high"}
+{"id":"synth_00369","input":"Tokio deep dive деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00382","confidence":"high"}
+{"id":"synth_00370","input":"async-std deep dive деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00383","confidence":"high"}
+{"id":"synth_00371","input":"smol крейті деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00384","confidence":"high"}
+{"id":"synth_00372","input":"Embassy крейті деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00385","confidence":"high"}
+{"id":"synth_00373","input":"AsyncRead трейті деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00386","confidence":"high"}
+{"id":"synth_00374","input":"AsyncWrite трейті деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00387","confidence":"high"}
+{"id":"synth_00375","input":"AsyncBufRead деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00388","confidence":"high"}
+{"id":"synth_00376","input":"tokio::sync примитивтері деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00389","confidence":"high"}
+{"id":"synth_00377","input":"tokio::sync::broadcast деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00390","confidence":"high"}
+{"id":"synth_00378","input":"tokio::sync::oneshot деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00391","confidence":"high"}
+{"id":"synth_00379","input":"tokio::time timeout деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00392","confidence":"high"}
+{"id":"synth_00380","input":"Runtime incompatibility деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00393","confidence":"high"}
+{"id":"synth_00381","input":"Futures runtime-agnostic деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00394","confidence":"high"}
+{"id":"synth_00382","input":"async-compat деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00395","confidence":"high"}
+{"id":"synth_00383","input":"Tracing крейті деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00396","confidence":"high"}
+{"id":"synth_00384","input":"#[instrument] деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00397","confidence":"high"}
+{"id":"synth_00385","input":"console-subscriber деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00398","confidence":"high"}
+{"id":"synth_00386","input":"Алматы қайда орналасқан ма?","intent":"FactualQuery","source_file":"synth_from:ds_00399","confidence":"high"}
+{"id":"synth_00387","input":"Қазақстанның астанасы қай қала ма?","intent":"FactualQuery","source_file":"synth_from:ds_00400","confidence":"high"}
+{"id":"synth_00388","input":"Көк түс деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00401","confidence":"high"}
+{"id":"synth_00389","input":"Күн жұлдыз?","intent":"FactualQuery","source_file":"synth_from:ds_00403","confidence":"high"}
+{"id":"synth_00390","input":"Жер планета?","intent":"FactualQuery","source_file":"synth_from:ds_00404","confidence":"high"}
+{"id":"synth_00391","input":"Балық қайда тұрады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00405","confidence":"high"}
+{"id":"synth_00392","input":"Қасқыр не жейді ме?","intent":"FactualQuery","source_file":"synth_from:ds_00406","confidence":"high"}
+{"id":"synth_00393","input":"Атымды есіңізде ме?","intent":"AskName","source_file":"synth_from:ds_00407","confidence":"high"}
+{"id":"synth_00394","input":"Менің атымды есіңізде?","intent":"AskName","source_file":"synth_from:ds_00407","confidence":"high"}
+{"id":"synth_00395","input":"Жасымды білесіз?","intent":"AskAge","source_file":"synth_from:ds_00408","confidence":"high"}
+{"id":"synth_00396","input":"жасымды білесен бе?","intent":"AskAge","source_file":"synth_from:ds_00408","confidence":"high"}
+{"id":"synth_00397","input":"Қай қалада тұратынымды білесіз?","intent":"AskLocation","source_file":"synth_from:ds_00409","confidence":"high"}
+{"id":"synth_00398","input":"қай қалада тұратынымды білесен бе?","intent":"AskLocation","source_file":"synth_from:ds_00409","confidence":"high"}
+{"id":"synth_00399","input":"Олар тірі?","intent":"FactualQuery","source_file":"synth_from:ds_00410","confidence":"high"}
+{"id":"synth_00400","input":"Кім болып жұмыс істейтінімді есіңізде?","intent":"AskOccupation","source_file":"synth_from:ds_00411","confidence":"high"}
+{"id":"synth_00401","input":"Қайдан келгенімді білесіз?","intent":"AskLocation","source_file":"synth_from:ds_00414","confidence":"high"}
+{"id":"synth_00402","input":"қайдан келгенімді білесен бе?","intent":"AskLocation","source_file":"synth_from:ds_00414","confidence":"high"}
+{"id":"synth_00403","input":"Басым ауырып тұр, қандай дәрі ішейін ме?","intent":"FactualQuery","source_file":"synth_from:ds_00415","confidence":"high"}
+{"id":"synth_00404","input":"Жүрегім ауырып тұр, қалай емдеймін ме?","intent":"FactualQuery","source_file":"synth_from:ds_00416","confidence":"high"}
+{"id":"synth_00405","input":"Көршіммен таласпын, сотта қалай ұтамын ма?","intent":"FactualQuery","source_file":"synth_from:ds_00418","confidence":"high"}
+{"id":"synth_00406","input":"Қандай криптоға ақшамды салайын ма?","intent":"FactualQuery","source_file":"synth_from:ds_00419","confidence":"high"}
+{"id":"synth_00407","input":"Бүгінгі ауа-райы қандай ма?","intent":"AskWeather","source_file":"synth_from:ds_00421","confidence":"high"}
+{"id":"synth_00408","input":"Қай партияға дауыс берейін ме?","intent":"FactualQuery","source_file":"synth_from:ds_00422","confidence":"high"}
+{"id":"synth_00409","input":"ownership қалай жұмыс істейді ме?","intent":"FactualQuery","source_file":"synth_from:ds_00425","confidence":"high"}
+{"id":"synth_00410","input":"traits деген не үшін керек пе?","intent":"AskPurpose","source_file":"synth_from:ds_00426","confidence":"high"}
+{"id":"synth_00411","input":"Привет, как дела ма?","intent":"FactualQuery","source_file":"synth_from:ds_00434","confidence":"high"}
+{"id":"synth_00412","input":"Тағы ма?","intent":"FactualQuery","source_file":"synth_from:ds_00435","confidence":"high"}
+{"id":"synth_00413","input":"Не үшін ме?","intent":"FactualQuery","source_file":"synth_from:ds_00436","confidence":"high"}
+{"id":"synth_00414","input":"Қалай ма?","intent":"FactualQuery","source_file":"synth_from:ds_00438","confidence":"high"}
+{"id":"synth_00415","input":"Ботада 5 алма бар, оған тағы 3 алма бердім. Қазір қанша ал?","intent":"FactualQuery","source_file":"synth_from:ds_00443","confidence":"high"}
+{"id":"synth_00416","input":"Класта 25 оқушы. Олардан 10-ы қыз. Қанша ұл ма?","intent":"FactualQuery","source_file":"synth_from:ds_00444","confidence":"high"}
+{"id":"synth_00417","input":"3 банкадағы әр банкада 4 кәмпит. Барлығы қанша ма?","intent":"FactualQuery","source_file":"synth_from:ds_00445","confidence":"high"}
+{"id":"synth_00418","input":"Үш алманы алып, бес алманы беремін. Қанша қалды ма?","intent":"FactualQuery","source_file":"synth_from:ds_00446","confidence":"high"}
+{"id":"synth_00419","input":"Маған 20 жас. Інім 5 жасқа кіші. Інімнің жасы қанша ма?","intent":"FactualQuery","source_file":"synth_from:ds_00447","confidence":"high"}
+{"id":"synth_00420","input":"Ауланың ұзындығы 8 метр. Ені 5 метр. Ауданы қанша ма?","intent":"FactualQuery","source_file":"synth_from:ds_00448","confidence":"high"}
+{"id":"synth_00421","input":"Бір жинақта 12 кітап. Үш жинақта қанша кітап па?","intent":"FactualQuery","source_file":"synth_from:ds_00449","confidence":"high"}
+{"id":"synth_00422","input":"10 теңгеден қалам сатып алу үшін қанша қажет пе?","intent":"FactualQuery","source_file":"synth_from:ds_00450","confidence":"high"}
+{"id":"synth_00423","input":"Ботаның жасы 10. Айдананың жасы Ботадан 5 жасқа үлкен. Айдананың жасы қанша ма?","intent":"FactualQuery","source_file":"synth_from:ds_00451","confidence":"high"}
+{"id":"synth_00424","input":"Бір жұмыста 7 күн бар. Үш жұмыста қанша күн ме?","intent":"FactualQuery","source_file":"synth_from:ds_00452","confidence":"high"}
+{"id":"synth_00425","input":"Көбейту деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00453","confidence":"high"}
+{"id":"synth_00426","input":"Бөлу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00454","confidence":"high"}
+{"id":"synth_00427","input":"Қосу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00455","confidence":"high"}
+{"id":"synth_00428","input":"Сан деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00456","confidence":"high"}
+{"id":"synth_00429","input":"Бөлшек деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00457","confidence":"high"}
+{"id":"synth_00430","input":"Пайыз деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00458","confidence":"high"}
+{"id":"synth_00431","input":"Геометрия деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00459","confidence":"high"}
+{"id":"synth_00432","input":"Теңдеу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00460","confidence":"high"}
+{"id":"synth_00433","input":"дәлелсен тұжырым жаса.","intent":"FactualQuery","source_file":"synth_from:ds_00465","confidence":"high"}
+{"id":"synth_00434","input":"Қасқыр — тірі?","intent":"FactualQuery","source_file":"synth_from:ds_00467","confidence":"high"}
+{"id":"synth_00435","input":"Қасқыр деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00468","confidence":"high"}
+{"id":"synth_00436","input":"Аспиринді қанша ішейін ме?","intent":"FactualQuery","source_file":"synth_from:ds_00469","confidence":"high"}
+{"id":"synth_00437","input":"Мен келісімшартқа қол қояйын?","intent":"FactualQuery","source_file":"synth_from:ds_00470","confidence":"high"}
+{"id":"synth_00438","input":"Bitcoin бағасы қандай ма?","intent":"FactualQuery","source_file":"synth_from:ds_00472","confidence":"high"}
+{"id":"synth_00439","input":"Бүгін ауа райы қандай ма?","intent":"AskWeather","source_file":"synth_from:ds_00473","confidence":"high"}
+{"id":"synth_00440","input":"Дәрі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00474","confidence":"high"}
+{"id":"synth_00441","input":"Заң деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00475","confidence":"high"}
+{"id":"synth_00442","input":"Ал алдыңғы қате неде болды ма?","intent":"FactualQuery","source_file":"synth_from:ds_00476","confidence":"high"}
+{"id":"synth_00443","input":"Алдыңғы қате неде болды?","intent":"FactualQuery","source_file":"synth_from:ds_00476","confidence":"high"}
+{"id":"synth_00444","input":"Тоқаев жақсы президент?","intent":"FactualQuery","source_file":"synth_from:ds_00477","confidence":"high"}
+{"id":"synth_00445","input":"Үкімет жақсы жұмыс істеп жатыр?","intent":"FactualQuery","source_file":"synth_from:ds_00478","confidence":"high"}
+{"id":"synth_00446","input":"Қай партия жаман ма?","intent":"FactualQuery","source_file":"synth_from:ds_00479","confidence":"high"}
+{"id":"synth_00447","input":"Министр тиімді?","intent":"FactualQuery","source_file":"synth_from:ds_00480","confidence":"high"}
+{"id":"synth_00448","input":"Президент кім ме?","intent":"FactualQuery","source_file":"synth_from:ds_00483","confidence":"high"}
+{"id":"synth_00449","input":"unsafe Rust шолуы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00484","confidence":"high"}
+{"id":"synth_00450","input":"Шикі сілтеме деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00485","confidence":"high"}
+{"id":"synth_00451","input":"unsafe fn деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00486","confidence":"high"}
+{"id":"synth_00452","input":"static mut деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00487","confidence":"high"}
+{"id":"synth_00453","input":"unsafe trait деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00488","confidence":"high"}
+{"id":"synth_00454","input":"Associated type деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00489","confidence":"high"}
+{"id":"synth_00455","input":"Операторды артық жүктеу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00490","confidence":"high"}
+{"id":"synth_00456","input":"Толық анықталған синтаксис деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00491","confidence":"high"}
+{"id":"synth_00457","input":"supertrait деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00492","confidence":"high"}
+{"id":"synth_00458","input":"Типтік қосалқы атау деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00493","confidence":"high"}
+{"id":"synth_00459","input":"Ешкім емес тип деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00494","confidence":"high"}
+{"id":"synth_00460","input":"DST sized деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00495","confidence":"high"}
+{"id":"synth_00461","input":"Функция көрсеткіші деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00496","confidence":"high"}
+{"id":"synth_00462","input":"closure қайтару деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00497","confidence":"high"}
+{"id":"synth_00463","input":"Макрос vs функция деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00498","confidence":"high"}
+{"id":"synth_00464","input":"Declarative macros деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00499","confidence":"high"}
+{"id":"synth_00465","input":"Procedural derive деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00500","confidence":"high"}
+{"id":"synth_00466","input":"Attribute-like macros деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00501","confidence":"high"}
+{"id":"synth_00467","input":"Async http server деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00502","confidence":"high"}
+{"id":"synth_00468","input":"tokio::net::TcpListener деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00503","confidence":"high"}
+{"id":"synth_00469","input":"listener.accept().await деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00504","confidence":"high"}
+{"id":"synth_00470","input":"Async vs threaded server деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00505","confidence":"high"}
+{"id":"synth_00471","input":"tokio::spawn task деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00506","confidence":"high"}
+{"id":"synth_00472","input":"Concurrent connections деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00507","confidence":"high"}
+{"id":"synth_00473","input":"Tokio reactor epoll деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00508","confidence":"high"}
+{"id":"synth_00474","input":"Task 'static send деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00509","confidence":"high"}
+{"id":"synth_00475","input":"AsyncReadExt read_buf деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00510","confidence":"high"}
+{"id":"synth_00476","input":"HTTP request parsing деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00511","confidence":"high"}
+{"id":"synth_00477","input":"Content-length body деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00512","confidence":"high"}
+{"id":"synth_00478","input":"AsyncWriteExt write_all деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00513","confidence":"high"}
+{"id":"synth_00479","input":"/sleep routing async деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00514","confidence":"high"}
+{"id":"synth_00480","input":"Graceful shutdown signal деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00515","confidence":"high"}
+{"id":"synth_00481","input":"#[tokio::test] деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00516","confidence":"high"}
+{"id":"synth_00482","input":"Backpressure async деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00517","confidence":"high"}
+{"id":"synth_00483","input":"Axum hyper production деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00518","confidence":"high"}
+{"id":"synth_00484","input":"Async book пас аяқтау деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00519","confidence":"high"}
+{"id":"synth_00485","input":"panic деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00520","confidence":"high"}
+{"id":"synth_00486","input":"Стек айналдыру деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00521","confidence":"high"}
+{"id":"synth_00487","input":"RUST_BACKTRACE деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00522","confidence":"high"}
+{"id":"synth_00488","input":"unwrap деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00523","confidence":"high"}
+{"id":"synth_00489","input":"Ok деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00524","confidence":"high"}
+{"id":"synth_00490","input":"Err деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00525","confidence":"high"}
+{"id":"synth_00491","input":"Қате түрлері деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00526","confidence":"high"}
+{"id":"synth_00492","input":"ErrorKind деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00527","confidence":"high"}
+{"id":"synth_00493","input":"? операторы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00528","confidence":"high"}
+{"id":"synth_00494","input":"? оператор Option-да деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00529","confidence":"high"}
+{"id":"synth_00495","input":"? main-да деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00530","confidence":"high"}
+{"id":"synth_00496","input":"? From түрлендіруі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00531","confidence":"high"}
+{"id":"synth_00497","input":"Қатені тарату деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00532","confidence":"high"}
+{"id":"synth_00498","input":"unwrap_or деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00533","confidence":"high"}
+{"id":"synth_00499","input":"panic vs Result шешімі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00534","confidence":"high"}
+{"id":"synth_00500","input":"Өзіндік қате типі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00535","confidence":"high"}
+{"id":"synth_00501","input":"Тип инварианты деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00536","confidence":"high"}
+{"id":"synth_00502","input":"Box<dyn Error> деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00537","confidence":"high"}
+{"id":"synth_00503","input":"thiserror anyhow деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00538","confidence":"high"}
+{"id":"synth_00504","input":"Өсімдік — тірі?","intent":"FactualQuery","source_file":"synth_from:ds_00540","confidence":"high"}
+{"id":"synth_00505","input":"Жыртқыш — тірі?","intent":"FactualQuery","source_file":"synth_from:ds_00541","confidence":"high"}
+{"id":"synth_00506","input":"Балта — зат?","intent":"FactualQuery","source_file":"synth_from:ds_00542","confidence":"high"}
+{"id":"synth_00507","input":"Қазақ ханы — билеуші?","intent":"FactualQuery","source_file":"synth_from:ds_00543","confidence":"high"}
+{"id":"synth_00508","input":"Ит — жануар?","intent":"FactualQuery","source_file":"synth_from:ds_00544","confidence":"high"}
+{"id":"synth_00509","input":"Қызанақ — машина?","intent":"FactualQuery","source_file":"synth_from:ds_00545","confidence":"high"}
+{"id":"synth_00510","input":"Кітап — тағам?","intent":"FactualQuery","source_file":"synth_from:ds_00546","confidence":"high"}
+{"id":"synth_00511","input":"Vec деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00547","confidence":"high"}
+{"id":"synth_00512","input":"Vec::new деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00548","confidence":"high"}
+{"id":"synth_00513","input":"vec! макросы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00549","confidence":"high"}
+{"id":"synth_00514","input":"Vec push әдісі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00550","confidence":"high"}
+{"id":"synth_00515","input":"Вектор индекстеу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00551","confidence":"high"}
+{"id":"synth_00516","input":"Вектор бойынша жүру деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00552","confidence":"high"}
+{"id":"synth_00517","input":"Дереференс деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00553","confidence":"high"}
+{"id":"synth_00518","input":"Вектордағы әртүрлі типтер деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00554","confidence":"high"}
+{"id":"synth_00519","input":"String деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00555","confidence":"high"}
+{"id":"synth_00520","input":"String конструкторлары деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00556","confidence":"high"}
+{"id":"synth_00521","input":"push_str деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00557","confidence":"high"}
+{"id":"synth_00522","input":"String + операторы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00558","confidence":"high"}
+{"id":"synth_00523","input":"format! макросы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00559","confidence":"high"}
+{"id":"synth_00524","input":"String индекстеу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00560","confidence":"high"}
+{"id":"synth_00525","input":"chars пен bytes деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00561","confidence":"high"}
+{"id":"synth_00526","input":"HashMap деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00562","confidence":"high"}
+{"id":"synth_00527","input":"HashMap::new деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00563","confidence":"high"}
+{"id":"synth_00528","input":"HashMap insert деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00564","confidence":"high"}
+{"id":"synth_00529","input":"HashMap entry деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00565","confidence":"high"}
+{"id":"synth_00530","input":"HashMap иелік деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00566","confidence":"high"}
+{"id":"synth_00531","input":"SipHash деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00567","confidence":"high"}
+{"id":"synth_00532","input":"Айдың дөңгелек?","intent":"FactualQuery","source_file":"synth_from:ds_00568","confidence":"high"}
+{"id":"synth_00533","input":"Ай дөңгелек?","intent":"FactualQuery","source_file":"synth_from:ds_00569","confidence":"high"}
+{"id":"synth_00534","input":"Жер дөңгелек?","intent":"FactualQuery","source_file":"synth_from:ds_00570","confidence":"high"}
+{"id":"synth_00535","input":"Темір қатты?","intent":"FactualQuery","source_file":"synth_from:ds_00571","confidence":"high"}
+{"id":"synth_00536","input":"Су сұйық?","intent":"FactualQuery","source_file":"synth_from:ds_00572","confidence":"high"}
+{"id":"synth_00537","input":"От ыстық?","intent":"FactualQuery","source_file":"synth_from:ds_00573","confidence":"high"}
+{"id":"synth_00538","input":"Мұз суық?","intent":"FactualQuery","source_file":"synth_from:ds_00574","confidence":"high"}
+{"id":"synth_00539","input":"Бал тәтті?","intent":"FactualQuery","source_file":"synth_from:ds_00575","confidence":"high"}
+{"id":"synth_00540","input":"Алматы мен Астана айырмашылығы қандай ма?","intent":"FactualQuery","source_file":"synth_from:ds_00576","confidence":"high"}
+{"id":"synth_00541","input":"Тас — тірі?","intent":"FactualQuery","source_file":"synth_from:ds_00579","confidence":"high"}
+{"id":"synth_00542","input":"Сен кімсің ме?","intent":"AskAboutSystem","source_file":"synth_from:ds_00580","confidence":"high"}
+{"id":"synth_00543","input":"сіз кімсің?","intent":"AskAboutSystem","source_file":"synth_from:ds_00580","confidence":"high"}
+{"id":"synth_00544","input":"Сені кім жасады ма?","intent":"AskAboutSystem","source_file":"synth_from:ds_00581","confidence":"high"}
+{"id":"synth_00545","input":"Қандай тілде жазылғансың ма?","intent":"AskAboutSystem","source_file":"synth_from:ds_00582","confidence":"high"}
+{"id":"synth_00546","input":"Не істей аласың ма?","intent":"AskAboutSystem","source_file":"synth_from:ds_00583","confidence":"high"}
+{"id":"synth_00547","input":"Қашан дүниеге келдің ме?","intent":"AskAboutSystem","source_file":"synth_from:ds_00584","confidence":"high"}
+{"id":"synth_00548","input":"Жасуша туралы не білесің ме?","intent":"FactualQuery","source_file":"synth_from:ds_00585","confidence":"high"}
+{"id":"synth_00549","input":"жасуша туралы не білесіз?","intent":"FactualQuery","source_file":"synth_from:ds_00585","confidence":"high"}
+{"id":"synth_00550","input":"Фотосинтез деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00586","confidence":"high"}
+{"id":"synth_00551","input":"Атом қандай бөлшектерден тұрады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00587","confidence":"high"}
+{"id":"synth_00552","input":"Су қандай молекула ма?","intent":"FactualQuery","source_file":"synth_from:ds_00588","confidence":"high"}
+{"id":"synth_00553","input":"Қазақстан қандай ел ме?","intent":"FactualQuery","source_file":"synth_from:ds_00589","confidence":"high"}
+{"id":"synth_00554","input":"Абай туралы білесің?","intent":"FactualQuery","source_file":"synth_from:ds_00591","confidence":"high"}
+{"id":"synth_00555","input":"абай туралы білесіз бе?","intent":"FactualQuery","source_file":"synth_from:ds_00591","confidence":"high"}
+{"id":"synth_00556","input":"Абылай хан кім болған ма?","intent":"FactualQuery","source_file":"synth_from:ds_00592","confidence":"high"}
+{"id":"synth_00557","input":"Кеше ауа райы қандай болды ма?","intent":"AskWeather","source_file":"synth_from:ds_00593","confidence":"high"}
+{"id":"synth_00558","input":"Бүгін не болды ма?","intent":"FactualQuery","source_file":"synth_from:ds_00594","confidence":"high"}
+{"id":"synth_00559","input":"Ертең күн қандай болады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00595","confidence":"high"}
+{"id":"synth_00560","input":"Былтыр Қазақстанда не болды ма?","intent":"FactualQuery","source_file":"synth_from:ds_00596","confidence":"high"}
+{"id":"synth_00561","input":"Жасушаның ядросы не атқарады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00597","confidence":"high"}
+{"id":"synth_00562","input":"Атомның ядросы неге қажет пе?","intent":"FactualQuery","source_file":"synth_from:ds_00598","confidence":"high"}
+{"id":"synth_00563","input":"Митохондрияның қызметі қандай ма?","intent":"FactualQuery","source_file":"synth_from:ds_00599","confidence":"high"}
+{"id":"synth_00564","input":"Mendeleev кестесі не үшін керек пе?","intent":"AskPurpose","source_file":"synth_from:ds_00600","confidence":"high"}
+{"id":"synth_00565","input":"Quantum entanglement дегеніміз не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00604","confidence":"high"}
+{"id":"synth_00566","input":"Илон Маск туралы не білесің ме?","intent":"FactualQuery","source_file":"synth_from:ds_00605","confidence":"high"}
+{"id":"synth_00567","input":"илон маск туралы не білесіз?","intent":"FactualQuery","source_file":"synth_from:ds_00605","confidence":"high"}
+{"id":"synth_00568","input":"Атым Дәулет","intent":"StatementOfName","source_file":"synth_from:ds_00606","confidence":"high"}
+{"id":"synth_00569","input":"Жасым 25","intent":"StatementOfAge","source_file":"synth_from:ds_00607","confidence":"high"}
+{"id":"synth_00570","input":"? in async fn деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00608","confidence":"high"}
+{"id":"synth_00571","input":"Result async box error деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00609","confidence":"high"}
+{"id":"synth_00572","input":"Anyhow thiserror async деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00610","confidence":"high"}
+{"id":"synth_00573","input":"Send approximation problem деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00611","confidence":"high"}
+{"id":"synth_00574","input":"MutexGuard await деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00612","confidence":"high"}
+{"id":"synth_00575","input":"Rc<T> async деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00613","confidence":"high"}
+{"id":"synth_00576","input":"RefCell await деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00614","confidence":"high"}
+{"id":"synth_00577","input":"async fn рекурсия деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00615","confidence":"high"}
+{"id":"synth_00578","input":"Box::pin рекурсия деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00616","confidence":"high"}
+{"id":"synth_00579","input":"async-recursion крейті деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00617","confidence":"high"}
+{"id":"synth_00580","input":"async fn in traits шектеуі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00618","confidence":"high"}
+{"id":"synth_00581","input":"async-trait крейті деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00619","confidence":"high"}
+{"id":"synth_00582","input":"Rust 1.75 async traits деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00620","confidence":"high"}
+{"id":"synth_00583","input":"RPITIT lifetime деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00621","confidence":"high"}
+{"id":"synth_00584","input":"Drop in async деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00622","confidence":"high"}
+{"id":"synth_00585","input":"Async drop проблемасы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00623","confidence":"high"}
+{"id":"synth_00586","input":"Future leak forget деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00624","confidence":"high"}
+{"id":"synth_00587","input":"Cancel-safety patterns деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00625","confidence":"high"}
+{"id":"synth_00588","input":"String::new() деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00626","confidence":"high"}
+{"id":"synth_00589","input":"let mut деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00627","confidence":"high"}
+{"id":"synth_00590","input":"use std::io деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00628","confidence":"high"}
+{"id":"synth_00591","input":"io::stdin деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00629","confidence":"high"}
+{"id":"synth_00592","input":"read_line деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00630","confidence":"high"}
+{"id":"synth_00593","input":"&mut деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00631","confidence":"high"}
+{"id":"synth_00594","input":"Result деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00632","confidence":"high"}
+{"id":"synth_00595","input":"expect деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00633","confidence":"high"}
+{"id":"synth_00596","input":"форматтауыш орынтолтырғыш деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00634","confidence":"high"}
+{"id":"synth_00597","input":"[dependencies] деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00635","confidence":"high"}
+{"id":"synth_00598","input":"rand деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00636","confidence":"high"}
+{"id":"synth_00599","input":"thread_rng деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00637","confidence":"high"}
+{"id":"synth_00600","input":"gen_range деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00638","confidence":"high"}
+{"id":"synth_00601","input":"Диапазон өрнегі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00639","confidence":"high"}
+{"id":"synth_00602","input":"Ordering деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00640","confidence":"high"}
+{"id":"synth_00603","input":"cmp әдісі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00641","confidence":"high"}
+{"id":"synth_00604","input":"Көлеңкелеу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00642","confidence":"high"}
+{"id":"synth_00605","input":"trim деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00643","confidence":"high"}
+{"id":"synth_00606","input":"parse деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00644","confidence":"high"}
+{"id":"synth_00607","input":"Структ деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00645","confidence":"high"}
+{"id":"synth_00608","input":"Өріс деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00646","confidence":"high"}
+{"id":"synth_00609","input":"Структ өзгермелілігі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00647","confidence":"high"}
+{"id":"synth_00610","input":"Кортеж-структ деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00648","confidence":"high"}
+{"id":"synth_00611","input":"Бірлік структ деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00649","confidence":"high"}
+{"id":"synth_00612","input":"Өрісті қысқа жариялау деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00650","confidence":"high"}
+{"id":"synth_00613","input":"Структты жаңарту синтаксисі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00651","confidence":"high"}
+{"id":"synth_00614","input":"Структ деректерінің иелігі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00652","confidence":"high"}
+{"id":"synth_00615","input":"Әдіс деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00653","confidence":"high"}
+{"id":"synth_00616","input":"&self параметрі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00654","confidence":"high"}
+{"id":"synth_00617","input":"&mut self деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00655","confidence":"high"}
+{"id":"synth_00618","input":"Әдіс пен функция шакыру деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00656","confidence":"high"}
+{"id":"synth_00619","input":"Автоматты сілтемелеу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00657","confidence":"high"}
+{"id":"synth_00620","input":"Self типі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00658","confidence":"high"}
+{"id":"synth_00621","input":"#[derive(Debug)] деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00659","confidence":"high"}
+{"id":"synth_00622","input":"{:?} пен {:#?} деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00660","confidence":"high"}
+{"id":"synth_00623","input":"dbg макросы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00661","confidence":"high"}
+{"id":"synth_00624","input":"Бірнеше impl блогы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00662","confidence":"high"}
+{"id":"synth_00625","input":"Әдіс пен өріс бір аттас деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00663","confidence":"high"}
+{"id":"synth_00626","input":"Трейт деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00665","confidence":"high"}
+{"id":"synth_00627","input":"Жалпылама тип параметрі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00666","confidence":"high"}
+{"id":"synth_00628","input":"Структта жалпылама деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00667","confidence":"high"}
+{"id":"synth_00629","input":"Енамда жалпылама деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00668","confidence":"high"}
+{"id":"synth_00630","input":"Жалпылама әдіс деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00669","confidence":"high"}
+{"id":"synth_00631","input":"Мономорфтау деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00670","confidence":"high"}
+{"id":"synth_00632","input":"Орфан ереже деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00671","confidence":"high"}
+{"id":"synth_00633","input":"Әдепкі трейт әдісі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00672","confidence":"high"}
+{"id":"synth_00634","input":"Trait параметр деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00673","confidence":"high"}
+{"id":"synth_00635","input":"Трейт шектеуі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00674","confidence":"high"}
+{"id":"synth_00636","input":"where клаузасы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00675","confidence":"high"}
+{"id":"synth_00637","input":"impl Trait қайтарушы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00676","confidence":"high"}
+{"id":"synth_00638","input":"Шарт бойынша әдістер деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00677","confidence":"high"}
+{"id":"synth_00639","input":"Тіршілік мерзімі функцияда деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00678","confidence":"high"}
+{"id":"synth_00640","input":"Тіршілік мерзімі структта деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00679","confidence":"high"}
+{"id":"synth_00641","input":"lifetime elision деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00680","confidence":"high"}
+{"id":"synth_00642","input":"static лайфтайм деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00681","confidence":"high"}
+{"id":"synth_00643","input":"Generic трейт лайфтайм бірге деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00682","confidence":"high"}
+{"id":"synth_00644","input":"Қарыз тексергіш деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00683","confidence":"high"}
+{"id":"synth_00645","input":"Rust-та ownership деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00689","confidence":"high"}
+{"id":"synth_00646","input":"borrow checker не үшін керек пе?","intent":"AskPurpose","source_file":"synth_from:ds_00690","confidence":"high"}
+{"id":"synth_00647","input":"Result пен Option айырмашылығы қандай ма?","intent":"FactualQuery","source_file":"synth_from:ds_00691","confidence":"high"}
+{"id":"synth_00648","input":"Cargo.toml не үшін керек пе?","intent":"AskPurpose","source_file":"synth_from:ds_00692","confidence":"high"}
+{"id":"synth_00649","input":"match операторы қалай жұмыс істейді ме?","intent":"FactualQuery","source_file":"synth_from:ds_00693","confidence":"high"}
+{"id":"synth_00650","input":"trait деген не Rust-та ма?","intent":"FactualQuery","source_file":"synth_from:ds_00694","confidence":"high"}
+{"id":"synth_00651","input":"lifetime деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00695","confidence":"high"}
+{"id":"synth_00652","input":"impl блогы қалай жұмыс істейді ме?","intent":"FactualQuery","source_file":"synth_from:ds_00696","confidence":"high"}
+{"id":"synth_00653","input":"closure деген не Rust-та ма?","intent":"FactualQuery","source_file":"synth_from:ds_00697","confidence":"high"}
+{"id":"synth_00654","input":"iterator деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00698","confidence":"high"}
+{"id":"synth_00655","input":"pattern деген не Rust-та ма?","intent":"FactualQuery","source_file":"synth_from:ds_00699","confidence":"high"}
+{"id":"synth_00656","input":"generic деген не Rust-та ма?","intent":"FactualQuery","source_file":"synth_from:ds_00700","confidence":"high"}
+{"id":"synth_00657","input":"module деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00701","confidence":"high"}
+{"id":"synth_00658","input":"crate деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00702","confidence":"high"}
+{"id":"synth_00659","input":"struct деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00703","confidence":"high"}
+{"id":"synth_00660","input":"enum деген не Rust-та ма?","intent":"FactualQuery","source_file":"synth_from:ds_00704","confidence":"high"}
+{"id":"synth_00661","input":"function қалай анықталады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00705","confidence":"high"}
+{"id":"synth_00662","input":"shadowing деген не Rust-та ма?","intent":"FactualQuery","source_file":"synth_from:ds_00706","confidence":"high"}
+{"id":"synth_00663","input":"Box деген не Rust-та ма?","intent":"FactualQuery","source_file":"synth_from:ds_00707","confidence":"high"}
+{"id":"synth_00664","input":"Rc не үшін керек пе?","intent":"AskPurpose","source_file":"synth_from:ds_00708","confidence":"high"}
+{"id":"synth_00665","input":"Arc деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00709","confidence":"high"}
+{"id":"synth_00666","input":"RefCell не үшін керек пе?","intent":"AskPurpose","source_file":"synth_from:ds_00710","confidence":"high"}
+{"id":"synth_00667","input":"Mutex деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00711","confidence":"high"}
+{"id":"synth_00668","input":"smart pointer деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00712","confidence":"high"}
+{"id":"synth_00669","input":"error handling қалай жасалады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00713","confidence":"high"}
+{"id":"synth_00670","input":"question mark operator не істейді ме?","intent":"FactualQuery","source_file":"synth_from:ds_00714","confidence":"high"}
+{"id":"synth_00671","input":"async деген не Rust-та ма?","intent":"FactualQuery","source_file":"synth_from:ds_00715","confidence":"high"}
+{"id":"synth_00672","input":"Send трейті не үшін керек пе?","intent":"AskPurpose","source_file":"synth_from:ds_00716","confidence":"high"}
+{"id":"synth_00673","input":"Sync деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00717","confidence":"high"}
+{"id":"synth_00674","input":"unsafe не үшін керек пе?","intent":"AskPurpose","source_file":"synth_from:ds_00718","confidence":"high"}
+{"id":"synth_00675","input":"Rust тілінде айнымалы дегеніміз не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00719","confidence":"high"}
+{"id":"synth_00676","input":"Rust тілінде тұрақты дегеніміз не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00720","confidence":"high"}
+{"id":"synth_00677","input":"Rust-та қарыз алу қалай түсініледі ме?","intent":"FactualQuery","source_file":"synth_from:ds_00721","confidence":"high"}
+{"id":"synth_00678","input":"let деген не Rust-та ма?","intent":"FactualQuery","source_file":"synth_from:ds_00723","confidence":"high"}
+{"id":"synth_00679","input":"mut деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00724","confidence":"high"}
+{"id":"synth_00680","input":"fn қалай анықталады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00725","confidence":"high"}
+{"id":"synth_00681","input":"thread қалай құрылады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00726","confidence":"high"}
+{"id":"synth_00682","input":"macro қалай анықталады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00727","confidence":"high"}
+{"id":"synth_00683","input":"Hello World қалай жазылады ма?","intent":"FactualQuery","source_file":"synth_from:ds_00728","confidence":"high"}
+{"id":"synth_00684","input":"тест қалай жазылады Rust-та ма?","intent":"FactualQuery","source_file":"synth_from:ds_00729","confidence":"high"}
+{"id":"synth_00685","input":"Инвестиция жасайын ба, кеңес бересіз?","intent":"FactualQuery","source_file":"synth_from:ds_00733","confidence":"high"}
+{"id":"synth_00686","input":"инвестиция жасайын ба, кеңес бересен бе?","intent":"FactualQuery","source_file":"synth_from:ds_00733","confidence":"high"}
+{"id":"synth_00687","input":"Қазіргі ауа райы қандай ма?","intent":"AskWeather","source_file":"synth_from:ds_00734","confidence":"high"}
+{"id":"synth_00688","input":"ОО парадигмасы Rust-та деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00738","confidence":"high"}
+{"id":"synth_00689","input":"Тұсаулау Rust-та деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00739","confidence":"high"}
+{"id":"synth_00690","input":"Rust-та мұрагерлік жоқ деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00740","confidence":"high"}
+{"id":"synth_00691","input":"rust-та мұрагерлік жоғырқ деген не?","intent":"FactualQuery","source_file":"synth_from:ds_00740","confidence":"high"}
+{"id":"synth_00692","input":"Көп пішінділік Rust-та деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00741","confidence":"high"}
+{"id":"synth_00693","input":"Трейт-нысан деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00742","confidence":"high"}
+{"id":"synth_00694","input":"dyn кілтсөзі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00743","confidence":"high"}
+{"id":"synth_00695","input":"Vec<Box<dyn Trait>> деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00744","confidence":"high"}
+{"id":"synth_00696","input":"Статикалық vs динамикалық таратпа деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00745","confidence":"high"}
+{"id":"synth_00697","input":"vtable деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00746","confidence":"high"}
+{"id":"synth_00698","input":"Нысан-қауіпсіз трейт деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00747","confidence":"high"}
+{"id":"synth_00699","input":"нысан-қауіпсен трейт деген не?","intent":"FactualQuery","source_file":"synth_from:ds_00747","confidence":"high"}
+{"id":"synth_00700","input":"Clone нысан-қауіпсіз емес деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00748","confidence":"high"}
+{"id":"synth_00701","input":"clone нысан-қауіпсен емес деген не?","intent":"FactualQuery","source_file":"synth_from:ds_00748","confidence":"high"}
+{"id":"synth_00702","input":"Generic vs trait object таңдау деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00749","confidence":"high"}
+{"id":"synth_00703","input":"Күй үлгісі дәстүрлі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00750","confidence":"high"}
+{"id":"synth_00704","input":"Күй үлгісі типтік жүйе арқылы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00751","confidence":"high"}
+{"id":"synth_00705","input":"Default trait method идиомасы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00752","confidence":"high"}
+{"id":"synth_00706","input":"Trait composition деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00753","confidence":"high"}
+{"id":"synth_00707","input":"Newtype pattern деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00754","confidence":"high"}
+{"id":"synth_00708","input":"GUI кітапхана үлгісі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00755","confidence":"high"}
+{"id":"synth_00709","input":"Жер сілкінісі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00756","confidence":"high"}
+{"id":"synth_00710","input":"Жер сілкінісі — табиғи апат?","intent":"FactualQuery","source_file":"synth_from:ds_00757","confidence":"high"}
+{"id":"synth_00711","input":"Жер сілкінісі — құбылыс?","intent":"FactualQuery","source_file":"synth_from:ds_00758","confidence":"high"}
+{"id":"synth_00712","input":"Орман өрті деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00759","confidence":"high"}
+{"id":"synth_00713","input":"Цунами — толқын?","intent":"FactualQuery","source_file":"synth_from:ds_00760","confidence":"high"}
+{"id":"synth_00714","input":"Қар көшкіні — апат?","intent":"FactualQuery","source_file":"synth_from:ds_00761","confidence":"high"}
+{"id":"synth_00715","input":"Боран — дауыл?","intent":"FactualQuery","source_file":"synth_from:ds_00762","confidence":"high"}
+{"id":"synth_00716","input":"Найзағай — табиғи құбылыс?","intent":"FactualQuery","source_file":"synth_from:ds_00763","confidence":"high"}
+{"id":"synth_00717","input":"Ит — үй жануары?","intent":"FactualQuery","source_file":"synth_from:ds_00764","confidence":"high"}
+{"id":"synth_00718","input":"Үй — баспана?","intent":"FactualQuery","source_file":"synth_from:ds_00765","confidence":"high"}
+{"id":"synth_00719","input":"Мектеп — оқу орны?","intent":"FactualQuery","source_file":"synth_from:ds_00766","confidence":"high"}
+{"id":"synth_00720","input":"Тас — зат?","intent":"FactualQuery","source_file":"synth_from:ds_00767","confidence":"high"}
+{"id":"synth_00721","input":"Бас — дене бөлігі?","intent":"FactualQuery","source_file":"synth_from:ds_00768","confidence":"high"}
+{"id":"synth_00722","input":"Бесбармақ — ұлттық тағам?","intent":"FactualQuery","source_file":"synth_from:ds_00769","confidence":"high"}
+{"id":"synth_00723","input":"Қымыз — сусын?","intent":"FactualQuery","source_file":"synth_from:ds_00770","confidence":"high"}
+{"id":"synth_00724","input":"Шұбат — дәстүрлі сусын?","intent":"FactualQuery","source_file":"synth_from:ds_00771","confidence":"high"}
+{"id":"synth_00725","input":"Айран — сусын?","intent":"FactualQuery","source_file":"synth_from:ds_00773","confidence":"high"}
+{"id":"synth_00726","input":"Қазы — дәстүрлі тағам?","intent":"FactualQuery","source_file":"synth_from:ds_00774","confidence":"high"}
+{"id":"synth_00727","input":"Темір — тірі?","intent":"FactualQuery","source_file":"synth_from:ds_00779","confidence":"high"}
+{"id":"synth_00728","input":"Кітап — заттың түрі?","intent":"FactualQuery","source_file":"synth_from:ds_00780","confidence":"high"}
+{"id":"synth_00729","input":"Бағдарламашы — кәсіп?","intent":"FactualQuery","source_file":"synth_from:ds_00781","confidence":"high"}
+{"id":"synth_00730","input":"Дәрігер — кәсіп?","intent":"FactualQuery","source_file":"synth_from:ds_00782","confidence":"high"}
+{"id":"synth_00731","input":"Мұғалім — маман?","intent":"FactualQuery","source_file":"synth_from:ds_00783","confidence":"high"}
+{"id":"synth_00732","input":"Инженер — кәсіп?","intent":"FactualQuery","source_file":"synth_from:ds_00784","confidence":"high"}
+{"id":"synth_00733","input":"Темір — жансыз нәрсе?","intent":"FactualQuery","source_file":"synth_from:ds_00785","confidence":"high"}
+{"id":"synth_00734","input":"Жасуша — тірі?","intent":"FactualQuery","source_file":"synth_from:ds_00786","confidence":"high"}
+{"id":"synth_00735","input":"Дельфин — жануар?","intent":"FactualQuery","source_file":"synth_from:ds_00787","confidence":"high"}
+{"id":"synth_00736","input":"Дельфин — сүтқоректі?","intent":"FactualQuery","source_file":"synth_from:ds_00788","confidence":"high"}
+{"id":"synth_00737","input":"Кит — сүтқоректі?","intent":"FactualQuery","source_file":"synth_from:ds_00789","confidence":"high"}
+{"id":"synth_00738","input":"Биология — ғылым саласы?","intent":"FactualQuery","source_file":"synth_from:ds_00790","confidence":"high"}
+{"id":"synth_00739","input":"Ағаш — өсімдік?","intent":"FactualQuery","source_file":"synth_from:ds_00791","confidence":"high"}
+{"id":"synth_00740","input":"join! макросы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00792","confidence":"high"}
+{"id":"synth_00741","input":"Sequential vs join! деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00793","confidence":"high"}
+{"id":"synth_00742","input":"try_join! деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00794","confidence":"high"}
+{"id":"synth_00743","input":"futures::future::join деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00795","confidence":"high"}
+{"id":"synth_00744","input":"join_all деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00796","confidence":"high"}
+{"id":"synth_00745","input":"select! макросы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00797","confidence":"high"}
+{"id":"synth_00746","input":"select! pattern деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00798","confidence":"high"}
+{"id":"synth_00747","input":"Default complete branch деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00799","confidence":"high"}
+{"id":"synth_00748","input":"select! cancellation деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00800","confidence":"high"}
+{"id":"synth_00749","input":"FuturesUnordered деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00801","confidence":"high"}
+{"id":"synth_00750","input":"FuturesUnordered.next деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00802","confidence":"high"}
+{"id":"synth_00751","input":"FuturesUnordered vs Vec деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00803","confidence":"high"}
+{"id":"synth_00752","input":"FuturesOrdered деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00804","confidence":"high"}
+{"id":"synth_00753","input":"FuturesOrdered vs buffered деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00805","confidence":"high"}
+{"id":"synth_00754","input":"Future cancellation деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00806","confidence":"high"}
+{"id":"synth_00755","input":"Timeout pattern деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00807","confidence":"high"}
+{"id":"synth_00756","input":"Race vs zip деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00808","confidence":"high"}
+{"id":"synth_00757","input":"biased select! деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00809","confidence":"high"}
+{"id":"synth_00758","input":"Async программалау деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00810","confidence":"high"}
+{"id":"synth_00759","input":"Concurrency vs parallelism деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00811","confidence":"high"}
+{"id":"synth_00760","input":"Rust async тарихы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00812","confidence":"high"}
+{"id":"synth_00761","input":"ОС ағыны деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00813","confidence":"high"}
+{"id":"synth_00762","input":"Green thread деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00814","confidence":"high"}
+{"id":"synth_00763","input":"Event loop стилі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00815","confidence":"high"}
+{"id":"synth_00764","input":"Actor моделі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00816","confidence":"high"}
+{"id":"synth_00765","input":"Rust async ерекшелігі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00817","confidence":"high"}
+{"id":"synth_00766","input":"Future трейт деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00818","confidence":"high"}
+{"id":"synth_00767","input":"async fn деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00819","confidence":"high"}
+{"id":"synth_00768","input":".await оператор деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00820","confidence":"high"}
+{"id":"synth_00769","input":"async block деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00821","confidence":"high"}
+{"id":"synth_00770","input":"async move closure деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00822","confidence":"high"}
+{"id":"synth_00771","input":"futures крейті деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00823","confidence":"high"}
+{"id":"synth_00772","input":"tokio runtime деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00824","confidence":"high"}
+{"id":"synth_00773","input":"async-std runtime деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00825","confidence":"high"}
+{"id":"synth_00774","input":"async fn in traits деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00826","confidence":"high"}
+{"id":"synth_00775","input":"async closures деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00827","confidence":"high"}
+{"id":"synth_00776","input":"TCP listener деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00828","confidence":"high"}
+{"id":"synth_00777","input":"TCP stream өңдеу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00829","confidence":"high"}
+{"id":"synth_00778","input":"HTTP сұраныс құрылымы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00830","confidence":"high"}
+{"id":"synth_00779","input":"HTTP жауап жазу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00831","confidence":"high"}
+{"id":"synth_00780","input":"Request line routing деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00832","confidence":"high"}
+{"id":"synth_00781","input":"Табылмады беті деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00833","confidence":"high"}
+{"id":"synth_00782","input":"Жалғыз ағынды бөгеу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00834","confidence":"high"}
+{"id":"synth_00783","input":"Thread per request деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00835","confidence":"high"}
+{"id":"synth_00784","input":"Thread pool деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00836","confidence":"high"}
+{"id":"synth_00785","input":"ThreadPool::new деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00837","confidence":"high"}
+{"id":"synth_00786","input":"Worker структурасы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00838","confidence":"high"}
+{"id":"synth_00787","input":"Arc Mutex receiver деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00839","confidence":"high"}
+{"id":"synth_00788","input":"Job алиасы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00840","confidence":"high"}
+{"id":"synth_00789","input":"Execute pipeline деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00841","confidence":"high"}
+{"id":"synth_00790","input":"Drop for ThreadPool деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00842","confidence":"high"}
+{"id":"synth_00791","input":"Option JoinHandle деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00843","confidence":"high"}
+{"id":"synth_00792","input":"Sender drop shutdown деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00844","confidence":"high"}
+{"id":"synth_00793","input":"Веб-сервер шолуы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00845","confidence":"high"}
+{"id":"synth_00794","input":"Оны қалай түзетемін ме?","intent":"FactualQuery","source_file":"synth_from:ds_00846","confidence":"high"}
+{"id":"synth_00795","input":"Қалай шешемін ме?","intent":"StatementOfOccupation","source_file":"synth_from:ds_00847","confidence":"high"}
+{"id":"synth_00796","input":"Бұны қалай түзетемін ме?","intent":"FactualQuery","source_file":"synth_from:ds_00848","confidence":"high"}
+{"id":"synth_00797","input":"Қалай түзетемін ме?","intent":"FactualQuery","source_file":"synth_from:ds_00849","confidence":"high"}
+{"id":"synth_00798","input":"Қалай дұрыстаймын ма?","intent":"FactualQuery","source_file":"synth_from:ds_00850","confidence":"high"}
+{"id":"synth_00799","input":"қалай иәтаймын?","intent":"FactualQuery","source_file":"synth_from:ds_00850","confidence":"high"}
+{"id":"synth_00800","input":"Қорқынышсыз қатарластық деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00854","confidence":"high"}
+{"id":"synth_00801","input":"thread::spawn деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00855","confidence":"high"}
+{"id":"synth_00802","input":"JoinHandle деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00856","confidence":"high"}
+{"id":"synth_00803","input":"move thread деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00857","confidence":"high"}
+{"id":"synth_00804","input":"thread::spawn сигнатура деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00858","confidence":"high"}
+{"id":"synth_00805","input":"mpsc::channel деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00859","confidence":"high"}
+{"id":"synth_00806","input":"tx.send rx.recv деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00860","confidence":"high"}
+{"id":"synth_00807","input":"rx итератор деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00861","confidence":"high"}
+{"id":"synth_00808","input":"tx.clone деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00862","confidence":"high"}
+{"id":"synth_00809","input":"Mutex::lock деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00864","confidence":"high"}
+{"id":"synth_00810","input":"Arc<Mutex> деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00866","confidence":"high"}
+{"id":"synth_00811","input":"Mutex vs RefCell деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00867","confidence":"high"}
+{"id":"synth_00812","input":"Send трейті деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00868","confidence":"high"}
+{"id":"synth_00813","input":"Sync трейті деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00869","confidence":"high"}
+{"id":"synth_00814","input":"Send/Sync auto-impl деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00870","confidence":"high"}
+{"id":"synth_00815","input":"Data race prevention деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00871","confidence":"high"}
+{"id":"synth_00816","input":"cargo test деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00872","confidence":"high"}
+{"id":"synth_00817","input":"#[test] атрибуты деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00873","confidence":"high"}
+{"id":"synth_00818","input":"#[cfg(test)] деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00874","confidence":"high"}
+{"id":"synth_00819","input":"mod tests блогы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00875","confidence":"high"}
+{"id":"synth_00820","input":"assert! макросы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00876","confidence":"high"}
+{"id":"synth_00821","input":"assert_eq деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00877","confidence":"high"}
+{"id":"synth_00822","input":"PartialEq Debug талабы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00878","confidence":"high"}
+{"id":"synth_00823","input":"Сынақ хабарламасы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00879","confidence":"high"}
+{"id":"synth_00824","input":"should_panic деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00880","confidence":"high"}
+{"id":"synth_00825","input":"should_panic expected деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00881","confidence":"high"}
+{"id":"synth_00826","input":"Сынақта Result деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00882","confidence":"high"}
+{"id":"synth_00827","input":"Параллельді сынақтар деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00883","confidence":"high"}
+{"id":"synth_00828","input":"show-output жалаушасы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00884","confidence":"high"}
+{"id":"synth_00829","input":"Сынақ фильтрі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00885","confidence":"high"}
+{"id":"synth_00830","input":"#[ignore] деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00886","confidence":"high"}
+{"id":"synth_00831","input":"ignored жалаушасы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00887","confidence":"high"}
+{"id":"synth_00832","input":"Бірлік тесттері деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00888","confidence":"high"}
+{"id":"synth_00833","input":"Интеграциялық тесттер деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00889","confidence":"high"}
+{"id":"synth_00834","input":"tests/common/mod.rs деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00890","confidence":"high"}
+{"id":"synth_00835","input":"Екілік сандыққа тест деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00891","confidence":"high"}
+{"id":"synth_00836","input":"Иелік деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00892","confidence":"high"}
+{"id":"synth_00837","input":"Иелік ережелері деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00893","confidence":"high"}
+{"id":"synth_00838","input":"drop функциясы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00894","confidence":"high"}
+{"id":"synth_00839","input":"Стек жады деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00895","confidence":"high"}
+{"id":"synth_00840","input":"Үйме жады деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00896","confidence":"high"}
+{"id":"synth_00841","input":"String::from деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00897","confidence":"high"}
+{"id":"synth_00842","input":"Иеліктің көшуі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00898","confidence":"high"}
+{"id":"synth_00843","input":"clone әдісі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00899","confidence":"high"}
+{"id":"synth_00844","input":"Copy трейті деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00900","confidence":"high"}
+{"id":"synth_00845","input":"Иелік және функциялар деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00901","confidence":"high"}
+{"id":"synth_00846","input":"Қайтару мәні мен иелік деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00902","confidence":"high"}
+{"id":"synth_00847","input":"Сілтеме деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00903","confidence":"high"}
+{"id":"synth_00848","input":"Жабайы сілтеме деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00905","confidence":"high"}
+{"id":"synth_00849","input":"Қарызға алудың бірінші ережесі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00906","confidence":"high"}
+{"id":"synth_00850","input":"Қарызға алудың екінші ережесі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00907","confidence":"high"}
+{"id":"synth_00851","input":"NLL деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00908","confidence":"high"}
+{"id":"synth_00852","input":"Жол тілімі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00909","confidence":"high"}
+{"id":"synth_00853","input":"Жиым тілімі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00910","confidence":"high"}
+{"id":"synth_00854","input":"Тілім диапазоны деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00911","confidence":"high"}
+{"id":"synth_00855","input":"Жарыс шарты деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00912","confidence":"high"}
+{"id":"synth_00856","input":"Тілім деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00913","confidence":"high"}
+{"id":"synth_00857","input":"Тұрақтылық әдепкіше деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00914","confidence":"high"}
+{"id":"synth_00858","input":"Тұрақты деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00915","confidence":"high"}
+{"id":"synth_00859","input":"Бүтін сан түрлері деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00916","confidence":"high"}
+{"id":"synth_00860","input":"Бүтін санның асып кетуі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00917","confidence":"high"}
+{"id":"synth_00861","input":"Қалқымалы үтірлі сан түрлері деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00918","confidence":"high"}
+{"id":"synth_00862","input":"bool деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00919","confidence":"high"}
+{"id":"synth_00863","input":"char деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00920","confidence":"high"}
+{"id":"synth_00864","input":"Бүтін бөлу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00921","confidence":"high"}
+{"id":"synth_00865","input":"Кортеж бөлшектеу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00922","confidence":"high"}
+{"id":"synth_00866","input":"Unit түрі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00923","confidence":"high"}
+{"id":"synth_00867","input":"Жиым қайталау синтаксисі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00924","confidence":"high"}
+{"id":"synth_00868","input":"Жиымның шектен шығу деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00925","confidence":"high"}
+{"id":"synth_00869","input":"Функцияның мән қайтаруы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00926","confidence":"high"}
+{"id":"synth_00870","input":"Блок өрнегі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00927","confidence":"high"}
+{"id":"synth_00871","input":"if өрнегі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00928","confidence":"high"}
+{"id":"synth_00872","input":"loop мән қайтаруы деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00929","confidence":"high"}
+{"id":"synth_00873","input":"Цикл белгісі деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00930","confidence":"high"}
+{"id":"synth_00874","input":"for ұжым бойынша деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00931","confidence":"high"}
+{"id":"synth_00875","input":"Түсініктеме деген не ме?","intent":"FactualQuery","source_file":"synth_from:ds_00932","confidence":"high"}
+{"id":"synth_00876","input":"Атыңыз кім?","intent":"AskAboutSystem","source_file":"synth_from:ds_00934","confidence":"high"}
+{"id":"synth_00877","input":"Сіздің атыңыз кім ме?","intent":"AskAboutSystem","source_file":"synth_from:ds_00934","confidence":"high"}
+{"id":"synth_00878","input":"сенің атыңыз кім?","intent":"AskAboutSystem","source_file":"synth_from:ds_00934","confidence":"high"}
+{"id":"synth_00879","input":"Атың не?","intent":"AskAboutSystem","source_file":"synth_from:ds_00935","confidence":"high"}
+{"id":"synth_00880","input":"Сенің атың не ме?","intent":"AskAboutSystem","source_file":"synth_from:ds_00935","confidence":"high"}
+{"id":"synth_00881","input":"сіздің атыңыз не?","intent":"AskAboutSystem","source_file":"synth_from:ds_00935","confidence":"high"}
+{"id":"synth_00882","input":"Сіз қандай тілде сөйлейсіз ме?","intent":"AskAboutSystem","source_file":"synth_from:ds_00936","confidence":"high"}
+{"id":"synth_00883","input":"сен қандай тілде сөйлейсің?","intent":"AskAboutSystem","source_file":"synth_from:ds_00936","confidence":"high"}
+{"id":"synth_00884","input":"Сен қай тілде сөйлейсің ме?","intent":"AskAboutSystem","source_file":"synth_from:ds_00937","confidence":"high"}
+{"id":"synth_00885","input":"сіз қай тілде сөйлейсің?","intent":"AskAboutSystem","source_file":"synth_from:ds_00937","confidence":"high"}
+{"id":"synth_00886","input":"сәлеметсіз бе","intent":"Greeting","source_file":"synth_from:seed_g_01","confidence":"high"}
+{"id":"synth_00887","input":"сәлем","intent":"Greeting","source_file":"synth_from:seed_g_02","confidence":"high"}
+{"id":"synth_00888","input":"сәлеметсен бе","intent":"Greeting","source_file":"synth_from:seed_g_02","confidence":"high"}
+{"id":"synth_00889","input":"сәлеметсіз беетсіз бе","intent":"Greeting","source_file":"synth_from:seed_g_02","confidence":"high"}
+{"id":"synth_00890","input":"сәлем, қалайсыз","intent":"Greeting","source_file":"synth_from:seed_g_07","confidence":"high"}
+{"id":"synth_00891","input":"сәлеметсіз бе, қалайсың","intent":"Greeting","source_file":"synth_from:seed_g_07","confidence":"high"}
+{"id":"synth_00892","input":"сәлеметсіз бе достар","intent":"Greeting","source_file":"synth_from:seed_g_08","confidence":"high"}
+{"id":"synth_00893","input":"дұрыс","intent":"Affirmation","source_file":"synth_from:seed_aff_01","confidence":"high"}
+{"id":"synth_00894","input":"иә","intent":"Affirmation","source_file":"synth_from:seed_aff_02","confidence":"high"}
+{"id":"synth_00895","input":"дұрыс, дұрыс","intent":"Affirmation","source_file":"synth_from:seed_aff_04","confidence":"high"}
+{"id":"synth_00896","input":"иә, иә","intent":"Affirmation","source_file":"synth_from:seed_aff_04","confidence":"high"}
+{"id":"synth_00897","input":"жоғырқ","intent":"Negation","source_file":"synth_from:seed_neg_01","confidence":"high"}
+{"id":"synth_00898","input":"жоғырқ, дұрыс емес","intent":"Negation","source_file":"synth_from:seed_neg_03","confidence":"high"}
+{"id":"synth_00899","input":"жоқ, иә емес","intent":"Negation","source_file":"synth_from:seed_neg_03","confidence":"high"}
+{"id":"synth_00900","input":"жоғырқ рахмет","intent":"Negation","source_file":"synth_from:seed_neg_05","confidence":"high"}
+{"id":"synth_00901","input":"жоқ рақмет","intent":"Negation","source_file":"synth_from:seed_neg_05","confidence":"high"}
+{"id":"synth_00902","input":"рақмет","intent":"Thanks","source_file":"synth_from:seed_th_01","confidence":"high"}
+{"id":"synth_00903","input":"көп рақмет","intent":"Thanks","source_file":"synth_from:seed_th_02","confidence":"high"}
+{"id":"synth_00904","input":"үлкен рақмет","intent":"Thanks","source_file":"synth_from:seed_th_04","confidence":"high"}
+{"id":"synth_00905","input":"сізге рақмет","intent":"Thanks","source_file":"synth_from:seed_th_05","confidence":"high"}
+{"id":"synth_00906","input":"рақмет, көмектестіңіз","intent":"Thanks","source_file":"synth_from:seed_th_06","confidence":"high"}
+{"id":"synth_00907","input":"қалайсыз","intent":"AskHowAreYou","source_file":"synth_from:seed_hau_01","confidence":"high"}
+{"id":"synth_00908","input":"қалайсың","intent":"AskHowAreYou","source_file":"synth_from:seed_hau_02","confidence":"high"}
+{"id":"synth_00909","input":"қалай тұрсың","intent":"AskHowAreYou","source_file":"synth_from:seed_hau_05","confidence":"high"}
+{"id":"synth_00910","input":"жақсы рақмет","intent":"StatementOfWellbeing","source_file":"synth_from:seed_sow_02","confidence":"high"}
+{"id":"synth_00911","input":"Есімім Әсел","intent":"StatementOfName","source_file":"synth_from:seed_son_05","confidence":"high"}
+{"id":"synth_00912","input":"жиырма Мен жетідемін","intent":"StatementOfAge","source_file":"synth_from:seed_san_05","confidence":"high"}
+{"id":"synth_00913","input":"Алматыда Мен тұрамын","intent":"StatementOfLocation","source_file":"synth_from:seed_sol_01","confidence":"high"}
+{"id":"synth_00914","input":"2 баламыз бар","intent":"StatementOfFamily","source_file":"synth_from:seed_sof_01","confidence":"high"}
+{"id":"synth_00915","input":"Отбасы үлкен","intent":"StatementOfFamily","source_file":"synth_from:seed_sof_02","confidence":"high"}
+{"id":"synth_00916","input":"Әпкем бар","intent":"StatementOfFamily","source_file":"synth_from:seed_sof_03","confidence":"high"}
+{"id":"synth_00917","input":"Мамандығым инженер","intent":"StatementOfOccupation","source_file":"synth_from:seed_soa_04","confidence":"high"}
+{"id":"synth_00918","input":"сіз өте жақсысың","intent":"Compliment","source_file":"synth_from:seed_co_01","confidence":"high"}
+{"id":"synth_00919","input":"өте Сен жақсысың","intent":"Compliment","source_file":"synth_from:seed_co_01","confidence":"high"}
+{"id":"synth_00920","input":"сен ақылдысыз","intent":"Compliment","source_file":"synth_from:seed_co_02","confidence":"high"}
+{"id":"synth_00921","input":"сіз мықтысың","intent":"Compliment","source_file":"synth_from:seed_co_04","confidence":"high"}
+{"id":"synth_00922","input":"сіз ақымақсың","intent":"Insult","source_file":"synth_from:seed_in_01","confidence":"high"}
+{"id":"synth_00923","input":"сіз жаман","intent":"Insult","source_file":"synth_from:seed_in_03","confidence":"high"}
+{"id":"synth_00924","input":"сіздің атыңыз не","intent":"AskName","source_file":"synth_from:seed_an_01","confidence":"high"}
+{"id":"synth_00925","input":"Есіміңіз кім","intent":"AskName","source_file":"synth_from:seed_an_02","confidence":"high"}
+{"id":"synth_00926","input":"сенің есіміңіз кім","intent":"AskName","source_file":"synth_from:seed_an_02","confidence":"high"}
+{"id":"synth_00927","input":"атыңыз не","intent":"AskName","source_file":"synth_from:seed_an_03","confidence":"high"}
+{"id":"synth_00928","input":"қалай атайсыз өзіңді","intent":"AskName","source_file":"synth_from:seed_an_04","confidence":"high"}
+{"id":"synth_00929","input":"жасыз нешеде","intent":"AskAge","source_file":"synth_from:seed_aa_01","confidence":"high"}
+{"id":"synth_00930","input":"неше Сіз жастасыз","intent":"AskAge","source_file":"synth_from:seed_aa_02","confidence":"high"}
+{"id":"synth_00931","input":"сен неше жастасыз","intent":"AskAge","source_file":"synth_from:seed_aa_02","confidence":"high"}
+{"id":"synth_00932","input":"қанша жасыз бар","intent":"AskAge","source_file":"synth_from:seed_aa_03","confidence":"high"}
+{"id":"synth_00933","input":"отбасыз туралы айтып бер","intent":"AskFamily","source_file":"synth_from:seed_af_01","confidence":"high"}

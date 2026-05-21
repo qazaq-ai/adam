@@ -139,23 +139,32 @@ impl Classifier {
     }
 
     /// Load a trained classifier from a JSON artefact on disk.
+    /// Accepts both the v0.0.1 dense layout and the v0.0.2 sparse
+    /// layout; the loader rebuilds the runtime dense buffer from
+    /// whichever field is populated. New artefacts ship the
+    /// sparse layout — much smaller on disk (real-world Rung-A
+    /// weights are ~ 85 % zero).
     pub fn from_path(path: impl AsRef<Path>) -> Result<Self, ClassifierError> {
         let path_str = path.as_ref().display().to_string();
         let bytes = std::fs::read(path.as_ref()).map_err(|e| ClassifierError::Io {
             path: path_str.clone(),
             source: e,
         })?;
-        let artefact: rung_a::RungAModel =
+        let mut artefact: rung_a::RungAModel =
             serde_json::from_slice(&bytes).map_err(|e| ClassifierError::Parse {
                 path: path_str.clone(),
                 source: e,
             })?;
-        if artefact.schema_version != SUPPORTED_SCHEMA_VERSION {
+        // Accept any 0.0.x schema that this crate's loader can
+        // materialise. Reject only on a different major / minor
+        // family.
+        if !artefact.schema_version.starts_with("0.0.") {
             return Err(ClassifierError::SchemaVersion {
                 got: artefact.schema_version,
                 supported: SUPPORTED_SCHEMA_VERSION.to_string(),
             });
         }
+        artefact.ensure_dense();
         Ok(Self {
             artefact: Some(artefact),
         })

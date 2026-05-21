@@ -135,7 +135,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut best_dev_acc = 0.0_f64;
     let mut best_epoch = 0usize;
     let mut epochs_since_best = 0usize;
-    let mut best_weights = trainer.model.weights.clone();
+    let mut best_weights = trainer.model.dense.clone();
 
     let start = Instant::now();
     for epoch in 1..=MAX_EPOCHS {
@@ -157,7 +157,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         if dev_acc > best_dev_acc + 1e-6 {
             best_dev_acc = dev_acc;
             best_epoch = epoch;
-            best_weights = trainer.model.weights.clone();
+            best_weights = trainer.model.dense.clone();
             epochs_since_best = 0;
         } else {
             epochs_since_best += 1;
@@ -172,17 +172,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let train_secs = start.elapsed().as_secs_f64();
 
     // Restore best-dev weights.
-    trainer.model.weights = best_weights;
+    trainer.model.dense = best_weights;
 
     // Final eval on dev + frozen test.
     let (dev_acc_final, dev_loss_final) = trainer.evaluate(&dev_set);
     let (test_acc_final, test_loss_final) = trainer.evaluate(&test_set);
 
-    // Save model.
+    // Save model — compact dense weights into the sparse layout
+    // so the on-disk artefact only carries non-zero buckets.
     let model_path = Path::new(MODEL_OUT);
     if let Some(parent) = model_path.parent() {
         fs::create_dir_all(parent)?;
     }
+    trainer.model.compact_to_sparse();
     fs::write(model_path, serde_json::to_string(&trainer.model)?)?;
     let model_size_kb = fs::metadata(model_path)?.len() as f64 / 1024.0;
 

@@ -75,6 +75,7 @@ struct LabelledExample {
 
 const DATASET_OUT: &str = "data/intent_classifier/v1/dataset.jsonl";
 const SEED_IN: &str = "data/intent_classifier/v1/seed_examples.jsonl";
+const SYNTH_IN: &str = "data/intent_classifier/v1/dataset_synth.jsonl";
 const LEXICON_CURATED: &str = "data/tokenizer/segmentation_roots.json";
 const LEXICON_APERTIUM: &str = "data/lexicon_v1/apertium_imported_roots.json";
 const EVAL_DIR: &str = "data/eval";
@@ -222,6 +223,31 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         eprintln!("note: no seed file at {SEED_IN} — skipping seed merge");
     }
 
+    // **Synth examples merge** — paraphrase variants produced by
+    // `intent_dataset_synth`. Loaded after cascade-derived and
+    // seed rows so the classifier sees a well-mixed training
+    // distribution. Empty when the synth file doesn't exist
+    // (first-build or after a clean checkout).
+    let mut synth_count = 0usize;
+    if let Ok(synth_raw) = fs::read_to_string(SYNTH_IN) {
+        for line in synth_raw.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() || trimmed.starts_with('#') {
+                continue;
+            }
+            match serde_json::from_str::<LabelledExample>(trimmed) {
+                Ok(ex) => {
+                    *per_intent_count.entry(ex.intent.clone()).or_default() += 1;
+                    emitted.push(ex);
+                    synth_count += 1;
+                }
+                Err(e) => {
+                    eprintln!("skip synth row: {e}");
+                }
+            }
+        }
+    }
+
     // Write dataset.
     let out_path = Path::new(DATASET_OUT);
     if let Some(parent) = out_path.parent() {
@@ -244,6 +270,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         100.0 * (emitted.len() - seed_count) as f64 / total_seen.max(1) as f64
     );
     eprintln!("seed rows merged:    {seed_count}");
+    eprintln!("synth rows merged:   {synth_count}");
     eprintln!("total emitted:       {}", emitted.len());
     eprintln!(
         "dropped (Unknown):   {total_unknown} ({:.1}%)",
