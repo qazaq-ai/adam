@@ -64,11 +64,12 @@ struct EvalEnvelope {
     prompts: Option<Vec<EvalCase>>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct LabelledExample {
     id: String,
     tokens: Vec<String>,
     tags: Vec<String>,
+    #[serde(default)]
     source_file: String,
 }
 
@@ -76,6 +77,16 @@ const DATASET_OUT: &str = "data/slot_extractor/v1/dataset.jsonl";
 const LEXICON_CURATED: &str = "data/tokenizer/segmentation_roots.json";
 const LEXICON_APERTIUM: &str = "data/lexicon_v1/apertium_imported_roots.json";
 const EVAL_DIR: &str = "data/eval";
+/// **E2 round 2 finding** — eval corpora are 99.7 % factual
+/// queries, so cascade-on-eval yields only ~3 labelled rows.
+/// E1's `seed_examples.jsonl` already carries ~ 50 self-
+/// introduction rows tagged `StatementOf{Name, Age, Location,
+/// Occupation, Family}` — those are the natural primary source
+/// for E2. Build path: scan the seed file, isolate the
+/// slot-bearing rows, run the cascade to extract the slot
+/// value, then BIO-tag.
+const SEED_IN: &str = "data/intent_classifier/v1/seed_examples.jsonl";
+const SYNTH_IN: &str = "data/slot_extractor/v1/dataset_synth.jsonl";
 
 /// Whitespace-tokenise + lowercase + strip surrounding
 /// punctuation. Same pre-processing as the classifier so the two
@@ -274,6 +285,128 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
+    // **E2 round 2 — seed-row merge.** Read every row from the
+    // E1 seed file whose intent is a `StatementOf*` variant,
+    // re-run the cascade on it to extract the slot value, and
+    // emit a BIO-tagged training row. This lifts the dataset
+    // from the cascade-on-eval floor (3 rows) to a usable size
+    // without any new hand-authored data.
+    let mut seed_loaded = 0usize;
+    let mut seed_skipped_no_slot = 0usize;
+    if let Ok(seed_raw) = fs::read_to_string(SEED_IN) {
+        for line in seed_raw.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() || trimmed.starts_with('#') {
+                continue;
+            }
+            // Lenient parse — we only care about the `input` and
+            // `intent` fields; the rest of the row is irrelevant
+            // to E2.
+            let row: serde_json::Value = match serde_json::from_str(trimmed) {
+                Ok(v) => v,
+                Err(_) => continue,
+            };
+            let input = match row.get("input").and_then(|v| v.as_str()) {
+                Some(s) => s.trim(),
+                None => continue,
+            };
+            let intent_label = match row.get("intent").and_then(|v| v.as_str()) {
+                Some(s) => s,
+                None => continue,
+            };
+            // Only consume slot-bearing intent labels — the
+            // greeting / farewell / etc. rows have no slot value
+            // to extract.
+            const SLOT_INTENTS: &[&str] = &[
+                "StatementOfName",
+                "StatementOfAge",
+                "StatementOfLocation",
+                "StatementOfOccupation",
+                "StatementOfFamily",
+            ];
+            if !SLOT_INTENTS.contains(&intent_label) {
+                continue;
+            }
+            seed_loaded += 1;
+            total_seen += 1;
+            let parses: Vec<adam_kernel_fst::parser::Analysis> = input
+                .split_whitespace()
+                .flat_map(|tok| {
+                    let cleaned: String = tok
+                        .chars()
+                        .filter(|c| c.is_alphabetic() || c.is_ascii_digit() || *c == '-')
+                        .flat_map(|c| c.to_lowercase())
+                        .collect();
+                    if cleaned.is_empty() {
+                        Vec::new()
+                    } else {
+                        adam_kernel_fst::parser::analyse(&cleaned, &lexicon)
+                    }
+                })
+                .collect();
+            let intent: Intent =
+                adam_dialog::semantics::interpret_text_with_lexicon(input, &parses, Some(&lexicon));
+            let slot_values = slots_from_intent(&intent);
+            if slot_values.is_empty() {
+                seed_skipped_no_slot += 1;
+                continue;
+            }
+            let tokens = tokenise(input);
+            if tokens.is_empty() {
+                continue;
+            }
+            let slots_refs: Vec<(adam_slot_extractor::SlotType, &str)> =
+                slot_values.iter().map(|(s, v)| (*s, v.as_str())).collect();
+            let tags = build_tags(&tokens, &slots_refs);
+            if tags.iter().all(|t| *t == BioTag::O) {
+                seed_skipped_no_slot += 1;
+                continue;
+            }
+            for (slot, _) in &slot_values {
+                *per_slot_count.entry(slot.slug().to_string()).or_default() += 1;
+            }
+            let id = format!("ds_{:05}", emitted.len() + 1);
+            emitted.push(LabelledExample {
+                id,
+                tokens,
+                tags: tags.iter().map(|t| t.slug().to_string()).collect(),
+                source_file: "seed".to_string(),
+            });
+        }
+    }
+
+    // **Synth merge.** Same shape as the E1 build: cascade →
+    // seed → synth, so the trainer sees a mixed distribution.
+    let mut synth_count = 0usize;
+    if let Ok(synth_raw) = fs::read_to_string(SYNTH_IN) {
+        for line in synth_raw.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() || trimmed.starts_with('#') {
+                continue;
+            }
+            match serde_json::from_str::<LabelledExample>(trimmed) {
+                Ok(ex) => {
+                    // Per-slot count from tags.
+                    for tag in &ex.tags {
+                        if let Some(slot) = match tag.as_str() {
+                            "B-PER" => Some("person"),
+                            "B-LOC" => Some("location"),
+                            "B-AGE" => Some("age"),
+                            "B-OCC" => Some("occupation"),
+                            "B-FAM" => Some("family"),
+                            _ => None,
+                        } {
+                            *per_slot_count.entry(slot.to_string()).or_default() += 1;
+                        }
+                    }
+                    emitted.push(ex);
+                    synth_count += 1;
+                }
+                Err(_) => {}
+            }
+        }
+    }
+
     let out_path = Path::new(DATASET_OUT);
     if let Some(parent) = out_path.parent() {
         fs::create_dir_all(parent)?;
@@ -286,12 +419,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     fs::write(out_path, buf)?;
 
     eprintln!("=== E2 slot-dataset build summary ===");
-    eprintln!("eval files scanned:    {}", eval_files.len());
-    eprintln!("queries seen:           {total_seen}");
+    eprintln!("eval files scanned:     {}", eval_files.len());
+    eprintln!("queries seen total:     {total_seen}");
     eprintln!(
-        "skipped (no slot):      {total_skipped_no_slot} ({:.1}%)",
-        100.0 * total_skipped_no_slot as f64 / total_seen.max(1) as f64
+        "  · cascade-on-eval:    {} kept, {} skipped (no slot)",
+        emitted.len() - (seed_loaded - seed_skipped_no_slot),
+        total_skipped_no_slot
     );
+    eprintln!(
+        "  · seed (slot-bearing): {seed_loaded} considered, {} kept, {seed_skipped_no_slot} skipped",
+        seed_loaded - seed_skipped_no_slot,
+    );
+    eprintln!("  · synth merged:       {synth_count}");
     eprintln!("labelled emitted:       {}", emitted.len());
     eprintln!("output:                 {DATASET_OUT}");
     eprintln!();

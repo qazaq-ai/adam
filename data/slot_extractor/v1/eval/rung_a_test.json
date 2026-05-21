@@ -1,0 +1,47 @@
+{
+  "test_count": 26,
+  "per_slot": [
+    {
+      "slot": "AGE",
+      "tp": 7,
+      "fp": 0,
+      "fn_": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    {
+      "slot": "LOC",
+      "tp": 10,
+      "fp": 0,
+      "fn_": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    {
+      "slot": "OCC",
+      "tp": 4,
+      "fp": 0,
+      "fn_": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    {
+      "slot": "PER",
+      "tp": 5,
+      "fp": 0,
+      "fn_": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    }
+  ],
+  "micro_precision": 1.0,
+  "micro_recall": 1.0,
+  "micro_f1": 1.0,
+  "neural_p50_us": 23.292,
+  "neural_p99_us": 40.292,
+  "neural_max_us": 40.292
+}
