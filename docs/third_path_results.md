@@ -67,6 +67,31 @@ off. When on: classifier rescues `Unknown` verdicts from the
 cascade only; confident cascade verdicts always win;
 `detect_safety_topic` firing dominates over the override.
 
+**Honest characterisation of mapping coverage.** The classifier
+predicts one of 32 labels, but the production rescue path only
+consumes 16 of them — the data-free intents
+(`Greeting`, `Farewell`, `Affirmation`, `Negation`, `Thanks`,
+`Apology`, `UserDisagrees`, `AskHowAreYou`, `AskName`,
+`AskAge`, `AskLocation`, `AskOccupation`, `AskActivity`,
+`AskFamily`, `AskWeather`, `AskTime`). The remaining 16
+(`StatementOfName`, `StatementOfAge`, `StatementOfLocation`,
+`StatementOfOccupation`, `StatementOfActivity`,
+`StatementOfFamily`, `StatementOfWellbeing`,
+`StatementOfWeather`, `CodeRequest`, `Insult`, `Compliment`,
+`Request`, `WellWishes`, `UserAcknowledgement`,
+`AskWillingness`, `AskAboutSystem`, `AskCurriculumContent`,
+`AskExercise`, `ExplainCompilerError`, `AskPurpose`,
+`CrossLanguageContrast`, `SubmitSolution`, `AskNextTopic`,
+`AskCurrentProgress`, `FactualQuery`) currently fall through
+to the deterministic cascade. The architectural reason is that
+slot-bearing variants (`StatementOfName { name }`, etc.) carry
+a required lexical value the classifier doesn't produce —
+mapping them blindly would lose the slot. The 95.95 % overall
+test accuracy therefore reflects classifier quality across all
+32 labels; the **net-wins / production-lift** number (+9) is
+the more honest measure of what the deployment actually
+delivers, and is the one to cite. Audit 2026-05-21.
+
 ### E2 — Discriminative slot extractor (NER)
 
 | criterion                  | target  | actual                                       | verdict        |
@@ -98,8 +123,30 @@ paraphrase synth variants). Output: one of 11 closed BIO labels.
 off. When on: extractor fills session slots
 (`name` / `age` / `city` / `occupation`) the cascade left
 empty; cascade values always win when both extract.
-Lightweight gazetteer validation discards span values that
-fail sanity checks.
+
+**Audit 2026-05-21 — false-positive pollution fix.** Manual
+`adam_chat` testing revealed the extractor was firing on every
+turn regardless of intent, polluting session state on
+greetings («сәлеметсіз бе» → `name=Бе`), thanks («рахмет»
+later became `occupation=рахмет`), and ice-breakers
+(«танысайық» → `occupation=танысайық`). Three defences were
+added before the per-slot write:
+1. **Intent gate** at the call site — rescue runs only on
+   `StatementOf{Name,Age,Location,Occupation,Activity,Family}`
+   and `Unknown` (the OOV catch-all the experiment was
+   designed for).
+2. **Per-slot stopword denylist** of Kazakh discourse
+   particles / wh-words / slot-name nouns that the BIO model
+   was empirically prone to mis-tag.
+3. **Per-slot shape checks** — name min 3 chars; occupation
+   min 4 chars + must end in a known Kazakh occupational
+   suffix (`-шы / -ші / -кер / -гер / -ист / -лог / -ор /
+   -ер / -пын / -пін / -мын / -мін`) OR match a small bare-
+   root allowlist; confidence threshold 0.6 across all slots.
+
+Pinned by regression test
+`tests/neural_slots_no_pollution.rs` with 7 false-positive
+negative cases and a `менің атым Қанат` positive control.
 
 ### E3 — Retrieval re-ranker (HONEST FAIL — not promoted)
 

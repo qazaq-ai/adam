@@ -74,6 +74,10 @@ running learned models with the same opt-in / cascade-fallback
 - A production-gated integration point so the new ranker is
   reachable behind `ADAM_NEURAL_RANKER=1` while the default
   path stays deterministic.
+  **[2026-05-21 post-Rung-A update]** — *not built.* Rung A
+  hit its predeclared anti-success bar (0.7634 test pick-rate
+  vs ≥ 0.95 target). The flag was never wired. See the
+  "Production wiring (cancelled)" section below.
 
 **Out of scope (for now).**
 
@@ -174,19 +178,35 @@ argmax matches the cascade-picked fact.
    argmaxes over a closed candidate set; novel facts are not
    emitted.
 
-## Production wiring
+## Production wiring (cancelled — 2026-05-21)
 
-`ADAM_NEURAL_RANKER={1|0}` env flag, default off.
+**Original plan (kept for the audit trail).** An
+`ADAM_NEURAL_RANKER={1|0}` env flag, default off; when on,
+`Tool::SearchRetrieval` would use the learned weights instead
+of `SelectionWeights::default_v0` for its `select_top` call;
+candidate set unchanged; only the ranking criterion differs.
+A cascade `ConfidenceKind::HumanApproved` override would keep
+the cascade pick for high-confidence rows.
 
-When on, `Tool::SearchRetrieval` uses the learned weights
-instead of `SelectionWeights::default_v0` for its
-`select_top` call. The candidate set is unchanged; only the
-ranking criterion differs.
+**What was actually built.** Nothing on the production side.
+Rung A training shipped (`data/retrieval_ranker/v1/rung_a.json`,
+`tools/intent_dataset/src/ranker_{build,train,evaluate}.rs`),
+hit 0.7634 test pick-rate vs the 0.95 anti-success bar, and
+the experiment was closed without flag wiring. There is no
+`ADAM_NEURAL_RANKER` env var anywhere in production code.
 
-**Safety override**: when the cascade has high-confidence
-specific evidence (e.g. `ConfidenceKind::HumanApproved` on the
-top candidate), we keep the cascade pick. The learned ranker
-is a tie-breaker for moderate-confidence cases.
+**Why no wiring.** The training dataset uses the cascade as
+oracle, so any learned ranker is bounded above by 1.0
+pick-rate-at-1 (perfect imitation of cascade). Improving the
+metric means imitating the cascade more closely with extra
+parameters — strictly information loss. Wiring would degrade
+the production system relative to `default_v0` for zero
+qualitative gain.
+
+See [`docs/third_path_results.md`](third_path_results.md) §
+"E3 — Retrieval re-ranker" for the closure narrative and
+[the merge commit](https://github.com/qazaq-ai/adam/commit/dd9ffa9)
+for the audit-trail commit message.
 
 ## Implementation plan (first sprint)
 

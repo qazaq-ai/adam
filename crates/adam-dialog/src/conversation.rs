@@ -1291,8 +1291,29 @@ impl Conversation {
             // the extractor only fills slots the cascade left
             // empty. See `apply_neural_slot_rescue` for the
             // contract.
+            // **v6.0.5+ — intent gate.** The extractor is allowed to
+            // fire only on turns whose cascade-classified intent can
+            // semantically carry a personal slot, plus the OOV
+            // catch-all (`Unknown`) — that's the rescue case the
+            // experiment was designed for. Pre-gate, the extractor
+            // ran on every turn and pulled spurious slots out of
+            // greetings («сәлеметсіз бе» → name=Бе), thanks
+            // («рахмет» → later occupation=рахмет), and
+            // ice-breakers («танысайық» → occupation=танысайық).
+            // Audit 2026-05-21.
+            let intent_admits_neural_slots = matches!(
+                intent,
+                crate::intent::Intent::StatementOfName { .. }
+                    | crate::intent::Intent::StatementOfAge { .. }
+                    | crate::intent::Intent::StatementOfLocation { .. }
+                    | crate::intent::Intent::StatementOfOccupation { .. }
+                    | crate::intent::Intent::StatementOfActivity { .. }
+                    | crate::intent::Intent::StatementOfFamily
+                    | crate::intent::Intent::Unknown { .. }
+            );
             if std::env::var("ADAM_NEURAL_SLOTS").as_deref() == Ok("1")
                 && self.neural_slot_extractor.is_some()
+                && intent_admits_neural_slots
             {
                 self.apply_neural_slot_rescue(input);
             }
@@ -3265,6 +3286,129 @@ impl Conversation {
     /// truth — the cascade's belief-state writes remain the
     /// authoritative record.
     pub(crate) fn apply_neural_slot_rescue(&mut self, input: &str) {
+        // **v6.0.5+ defensive contract.** Even when this function
+        // is reached (intent gate passed and env flag on), every
+        // span the extractor proposes runs through three filters
+        // before it can write to session:
+        //
+        //   1. **Confidence floor** — `span.score >= MIN_CONF`.
+        //      Blocks low-confidence BIO predictions that the
+        //      argmax decoder would otherwise emit on greetings
+        //      and short utterances.
+        //   2. **Stopword denylist** — `NEURAL_SLOT_STOPWORDS`
+        //      lists Kazakh discourse particles and ice-breaker
+        //      words the BIO model is empirically prone to mis-
+        //      tag («бе» as name, «рахмет» as occupation,
+        //      «танысайық» as occupation). Denylisted spans are
+        //      dropped silently.
+        //   3. **Slot-specific shape check** — names need ≥ 3
+        //      characters, ages must parse as `u32 ≤ 120`,
+        //      cities must hit the gazetteer, occupations need
+        //      ≥ 4 characters and an empirically-plausible
+        //      Kazakh occupational suffix or root.
+        //
+        // The combination is intentionally conservative: false
+        // negatives (silently dropping a real slot) are cheap;
+        // false positives ("Adam thinks my name is Бе") are
+        // user-trust-destroying for the МО РК demo.
+        const MIN_CONF: f32 = 0.6;
+        // Lowercase, case-stripped tokens the BIO model
+        // empirically mis-tags as name / occupation / city.
+        // Source: 2026-05-21 audit of `adam_chat` real runs.
+        const NEURAL_SLOT_STOPWORDS: &[&str] = &[
+            // Interrogative / discourse particles.
+            "бе",
+            "ба",
+            "па",
+            "ма",
+            "ме",
+            "ғой",
+            "да",
+            "де",
+            // Affirmation / negation.
+            "иә",
+            "ия",
+            "жоқ",
+            "ок",
+            "ok",
+            // Greetings.
+            "сәлем",
+            "сәлеметсіз",
+            "сәлеметсіздер",
+            "ассалаумағалейкум",
+            "танысайық",
+            // Thanks / apology / well-wishes.
+            "рахмет",
+            "рақмет",
+            "кешір",
+            "кешіріңіз",
+            "кешіріңізші",
+            "сау",
+            "саубол",
+            "сауболыңыз",
+            "жақсы",
+            "жаман",
+            "дұрыс",
+            "ал",
+            // Wh-words.
+            "не",
+            "кім",
+            "қалай",
+            "қандай",
+            "қашан",
+            "қайда",
+            "қайдан",
+            "қанша",
+            // Slot-name nouns ("name", "age") themselves.
+            "есім",
+            "есімі",
+            "есімім",
+            "атым",
+            "атың",
+            "аты",
+            "жасым",
+            "жасың",
+            "жасы",
+            "жыл",
+            "жас",
+            "мамандық",
+            "мамандығы",
+            "мамандығым",
+            // First-person pronoun + copula leftovers.
+            "мен",
+            "сен",
+            "сіз",
+            "ол",
+        ];
+        // Occupation needs more than just non-empty text — accept
+        // only spans whose lowercased text ends in a known Kazakh
+        // occupational suffix OR matches a small set of bare
+        // occupation roots that lack such a suffix.
+        const OCC_SUFFIXES: &[&str] = &[
+            "шы", "ші", // -шы / -ші (бағдарламашы, оқушы)
+            "кер", "гер", // қызметкер, саудагер
+            "ист", // журналист
+            "лог", // психолог, биолог
+            "ор", "ер", // профессор, доктор, инженер
+            "пын", "пін", "мын",
+            "мін", // copula-suffix occupations: пилотпын, мұғаліммін
+        ];
+        const OCC_BARE_ROOTS: &[&str] = &[
+            "пилот",
+            "доктор",
+            "инженер",
+            "ұстаз",
+            "хирург",
+            "пианист",
+            "тілші",
+            "сатушы",
+        ];
+
+        let stopword = |text: &str| -> bool {
+            let lower = text.trim().to_lowercase();
+            NEURAL_SLOT_STOPWORDS.iter().any(|s| *s == lower)
+        };
+
         let extractor = match self.neural_slot_extractor.as_ref() {
             Some(e) => e,
             None => return,
@@ -3290,23 +3434,36 @@ impl Conversation {
             Err(_) => return,
         };
         for span in &extraction.spans {
+            if span.score < MIN_CONF {
+                continue;
+            }
+            let trimmed = span.text.trim();
+            if trimmed.is_empty() {
+                continue;
+            }
             match span.slot {
                 adam_slot_extractor::SlotType::Person => {
                     if self.session.contains_key("name") {
                         continue;
                     }
-                    // Light validation: at least one character.
-                    if span.text.trim().is_empty() {
+                    if stopword(trimmed) {
                         continue;
                     }
-                    let normalised = crate::language_core::normalize_proper_noun(span.text.trim());
+                    // Block 1- and 2-character "names" — Kazakh
+                    // proper nouns are virtually always ≥ 3 chars
+                    // and the model's most common false positives
+                    // («Бе», «Ма») are 2-char particles.
+                    if trimmed.chars().count() < 3 {
+                        continue;
+                    }
+                    let normalised = crate::language_core::normalize_proper_noun(trimmed);
                     self.session.insert("name".into(), normalised);
                 }
                 adam_slot_extractor::SlotType::Age => {
                     if self.session.contains_key("age") {
                         continue;
                     }
-                    if let Ok(y) = span.text.trim().parse::<u32>() {
+                    if let Ok(y) = trimmed.parse::<u32>() {
                         if y <= 120 {
                             self.session.insert("age".into(), y.to_string());
                         }
@@ -3319,21 +3476,29 @@ impl Conversation {
                     // Only commit when the span text matches a
                     // known Kazakh city; otherwise discard.
                     let stripped =
-                        crate::discourse::strip_trailing_case_for_lookup(span.text.trim())
-                            .to_lowercase();
+                        crate::discourse::strip_trailing_case_for_lookup(trimmed).to_lowercase();
                     if crate::weather::kazakh_city_coords().contains_key(stripped.as_str()) {
-                        self.session
-                            .insert("city".into(), span.text.trim().to_string());
+                        self.session.insert("city".into(), trimmed.to_string());
                     }
                 }
                 adam_slot_extractor::SlotType::Occupation => {
                     if self.session.contains_key("occupation") {
                         continue;
                     }
-                    if !span.text.trim().is_empty() {
-                        self.session
-                            .insert("occupation".into(), span.text.trim().to_string());
+                    if stopword(trimmed) {
+                        continue;
                     }
+                    let lower = trimmed.to_lowercase();
+                    if lower.chars().count() < 4 {
+                        continue;
+                    }
+                    let suffix_ok = OCC_SUFFIXES.iter().any(|s| lower.ends_with(s));
+                    let root_ok = OCC_BARE_ROOTS.iter().any(|r| lower == *r);
+                    if !(suffix_ok || root_ok) {
+                        continue;
+                    }
+                    self.session
+                        .insert("occupation".into(), trimmed.to_string());
                 }
                 adam_slot_extractor::SlotType::Family => {
                     // Family spans not yet committed to session
