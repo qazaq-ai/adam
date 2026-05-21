@@ -79,6 +79,7 @@ dependencies = [
  "adam-kernel-fst",
  "adam-reasoning",
  "adam-retrieval",
+ "adam-slot-extractor",
  "adam-voice",
  "burn",
  "criterion",
@@ -115,6 +116,7 @@ dependencies = [
  "adam-dialog",
  "adam-intent-classifier",
  "adam-kernel-fst",
+ "adam-slot-extractor",
  "serde",
  "serde_json",
 ]
@@ -171,6 +173,15 @@ dependencies = [
  "serde",
  "serde_json",
  "tempfile",
+]
+
+[[package]]
+name = "adam-slot-extractor"
+version = "6.0.0-rc5"
+dependencies = [
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
 ]
 
 [[package]]

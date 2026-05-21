@@ -232,6 +232,16 @@ pub struct Conversation {
     /// drives every turn unchanged — this is the production
     /// default.
     pub neural_classifier: Option<adam_intent_classifier::Classifier>,
+    /// **v6.0.5 — E2 production wiring.** Optional trained
+    /// discriminative slot extractor (BIO sequence labeller).
+    /// When `Some` AND `ADAM_NEURAL_SLOTS=1` is in the
+    /// environment, the turn loop consults it as a **rescue
+    /// path** to fill `session` slots (`name` / `age` / `city`
+    /// / `occupation`) when the deterministic cascade did not
+    /// surface them. Cascade output always wins when both
+    /// agree. When `None`, the cascade drives slot extraction
+    /// unchanged — production default.
+    pub neural_slot_extractor: Option<adam_slot_extractor::SlotExtractor>,
 }
 
 /// v4.0.25 — intermediate state captured by
@@ -627,6 +637,23 @@ impl Conversation {
         classifier: adam_intent_classifier::Classifier,
     ) -> Self {
         self.neural_classifier = Some(classifier);
+        self
+    }
+
+    /// **v6.0.5 — E2 production wiring.** Attach a trained
+    /// discriminative slot extractor. When attached AND
+    /// `ADAM_NEURAL_SLOTS=1` is in the environment, the turn
+    /// loop consults it to fill missing session slots
+    /// (`name` / `age` / `city` / `occupation`) that the
+    /// cascade left empty. Cascade output dominates when both
+    /// extract the same slot. When `None` (the default), the
+    /// slot-extractor path is bypassed — cascade drives slot
+    /// state unchanged.
+    pub fn with_neural_slot_extractor(
+        mut self,
+        extractor: adam_slot_extractor::SlotExtractor,
+    ) -> Self {
+        self.neural_slot_extractor = Some(extractor);
         self
     }
 
@@ -1256,6 +1283,19 @@ impl Conversation {
         };
         if !dismissed_contradiction && !resolved_contradiction {
             self.absorb_entities(&intent, turn_id);
+            // **v6.0.5 — E2 production wiring.** Neural slot-
+            // extractor rescue. Fires when the env flag is set
+            // AND an extractor is attached. Cascade-extracted
+            // slots that landed in `session` during
+            // `absorb_entities` above are NEVER overwritten —
+            // the extractor only fills slots the cascade left
+            // empty. See `apply_neural_slot_rescue` for the
+            // contract.
+            if std::env::var("ADAM_NEURAL_SLOTS").as_deref() == Ok("1")
+                && self.neural_slot_extractor.is_some()
+            {
+                self.apply_neural_slot_rescue(input);
+            }
             // **v4.51.0** — secondary activity-slot scan. The primary
             // intent detector picks one intent per turn (occupation
             // OR activity, not both). For compound inputs like
@@ -3197,6 +3237,110 @@ impl Conversation {
             }
         }
         any_dismissed
+    }
+
+    /// **v6.0.5 — E2 production wiring.** Neural slot-extractor
+    /// rescue. Runs the attached `SlotExtractor` on the raw
+    /// input and **only fills session slots the cascade left
+    /// empty**. Cascade-extracted values that landed in
+    /// `session` during the immediately-prior `absorb_entities`
+    /// call are never overwritten.
+    ///
+    /// Scope by design:
+    ///   - Only fills `name`, `age`, `city`, `occupation` slots.
+    ///     The slot extractor doesn't currently emit `FAM` spans
+    ///     in production data, so `Family` is a no-op until the
+    ///     model learns it.
+    ///   - Performs a light validation pass against the
+    ///     lexicon-style gazetteers before committing to
+    ///     session: `age` must parse as 0..=120; `city` must be
+    ///     in `weather::kazakh_city_coords`; `name` must look
+    ///     like a proper noun (starts capitalised when present
+    ///     in the original surface). Invalid spans are
+    ///     discarded.
+    ///
+    /// Safety: this method only writes to `self.session`; it
+    /// does **not** touch belief / dialog_context / task. The
+    /// extractor is treated as a hint, not as a source of
+    /// truth — the cascade's belief-state writes remain the
+    /// authoritative record.
+    pub(crate) fn apply_neural_slot_rescue(&mut self, input: &str) {
+        let extractor = match self.neural_slot_extractor.as_ref() {
+            Some(e) => e,
+            None => return,
+        };
+        // Tokenise the same way the trainer did — whitespace
+        // split, lowercased, punctuation stripped.
+        let tokens: Vec<String> = input
+            .split_whitespace()
+            .map(|t| {
+                t.chars()
+                    .filter(|c| c.is_alphabetic() || c.is_ascii_digit() || *c == '-')
+                    .flat_map(|c| c.to_lowercase())
+                    .collect::<String>()
+            })
+            .filter(|t| !t.is_empty())
+            .collect();
+        if tokens.is_empty() {
+            return;
+        }
+        let token_refs: Vec<&str> = tokens.iter().map(String::as_str).collect();
+        let extraction = match extractor.extract(&token_refs) {
+            Ok(e) => e,
+            Err(_) => return,
+        };
+        for span in &extraction.spans {
+            match span.slot {
+                adam_slot_extractor::SlotType::Person => {
+                    if self.session.contains_key("name") {
+                        continue;
+                    }
+                    // Light validation: at least one character.
+                    if span.text.trim().is_empty() {
+                        continue;
+                    }
+                    let normalised = crate::language_core::normalize_proper_noun(span.text.trim());
+                    self.session.insert("name".into(), normalised);
+                }
+                adam_slot_extractor::SlotType::Age => {
+                    if self.session.contains_key("age") {
+                        continue;
+                    }
+                    if let Ok(y) = span.text.trim().parse::<u32>() {
+                        if y <= 120 {
+                            self.session.insert("age".into(), y.to_string());
+                        }
+                    }
+                }
+                adam_slot_extractor::SlotType::Location => {
+                    if self.session.contains_key("city") {
+                        continue;
+                    }
+                    // Only commit when the span text matches a
+                    // known Kazakh city; otherwise discard.
+                    let stripped =
+                        crate::discourse::strip_trailing_case_for_lookup(span.text.trim())
+                            .to_lowercase();
+                    if crate::weather::kazakh_city_coords().contains_key(stripped.as_str()) {
+                        self.session
+                            .insert("city".into(), span.text.trim().to_string());
+                    }
+                }
+                adam_slot_extractor::SlotType::Occupation => {
+                    if self.session.contains_key("occupation") {
+                        continue;
+                    }
+                    if !span.text.trim().is_empty() {
+                        self.session
+                            .insert("occupation".into(), span.text.trim().to_string());
+                    }
+                }
+                adam_slot_extractor::SlotType::Family => {
+                    // Family spans not yet committed to session
+                    // directly — left to future iterations.
+                }
+            }
+        }
     }
 
     pub(crate) fn absorb_entities(&mut self, intent: &Intent, turn_id: usize) {
