@@ -1,0 +1,24 @@
+[package]
+name = "adam-intent-dataset"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Dataset builder + baseline harness for the E1 intent-classifier experiment. Walks `data/eval/*.json`, runs each `query` through the existing deterministic cascade (`adam-dialog::interpret_text_with_lexicon`), and emits a `(input, intent_label, source, confidence)` JSONL alongside per-cascade latency and accuracy metrics. The classifier in `adam-intent-classifier` learns from this output and is judged against the baseline this binary produces."
+
+[[bin]]
+name = "intent_dataset_build"
+path = "src/build.rs"
+
+[[bin]]
+name = "intent_dataset_baseline"
+path = "src/baseline.rs"
+
+[dependencies]
+adam-kernel-fst = { path = "../../crates/adam-kernel-fst" }
+adam-dialog = { path = "../../crates/adam-dialog" }
+adam-intent-classifier = { path = "../../crates/adam-intent-classifier" }
+serde.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

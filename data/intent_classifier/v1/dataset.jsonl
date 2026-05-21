@@ -1,0 +1,84 @@
+{"id":"ds_00001","input":"Адам, келесі сабақ қандай?","intent":"AskNextTopic","source_file":"live_holdout_v5470_deferred.json","confidence":"high"}
+{"id":"ds_00002","input":"JDK не үшін керек?","intent":"AskPurpose","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00003","input":"Өкпе не үшін керек?","intent":"AskPurpose","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00004","input":"Сәкен Сейфуллин кім?","intent":"Greeting","source_file":"factual_eval_100.json","confidence":"high"}
+{"id":"ds_00005","input":"Менің атым есіңізде ме?","intent":"AskName","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00006","input":"Сен менің атымды білесіз бе?","intent":"AskName","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00007","input":"Атымды ұмыттыңыз ба?","intent":"AskName","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00008","input":"Rust-та ownership не үшін керек?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00009","input":"Маған Rust-та ownership жаттығуын беріңізші.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00010","input":"Жаттығу бер.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00011","input":"lifetime жаттығуы керек.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00012","input":"async бойынша тапсырма ұсыныңыз.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00013","input":"Маған ownership коды керек.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00014","input":"async fn мысалын беріңіз.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00015","input":"Маған код жазып беріңіз.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00016","input":"E0382 қатесін түсіндіріңіз.","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00017","input":"Cannot borrow as mutable қатесін түсіндіріңіз.","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00018","input":"E0277 деген қандай қате?","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00019","input":"Ownership-тің мақсаты не?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00020","input":"Pin-нің мақсаты қандай?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00021","input":"Trait не үшін арналған?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00022","input":"vec жаттығу беріңіз.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00023","input":"struct жаттығуы керек.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00024","input":"thread бойынша тапсырма беріңіз.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00025","input":"channel жаттығу керек.","intent":"AskExercise","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00026","input":"struct мысалын беріңіз.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00027","input":"thread коды беріңіз.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00028","input":"arc коды керек.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00029","input":"lifetime мысалы керек.","intent":"CodeRequest","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00030","input":"E0599 деген қандай қате?","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00031","input":"E0432 қатесін түсіндіріңіз.","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00032","input":"E0061 деген не?","intent":"ExplainCompilerError","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00033","input":"Result-тің мақсаты не?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00034","input":"Option-ның мақсаты қандай?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00035","input":"Iterator-дың мақсаты не?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00036","input":"async-ң мақсаты қандай?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00037","input":"lifetime-нің мақсаты не?","intent":"AskPurpose","source_file":"live_holdout_codex_2026_05_07.json","confidence":"high"}
+{"id":"ds_00038","input":"Мен қайда тұрамын?","intent":"AskLocation","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
+{"id":"ds_00039","input":"Қай қалада тұрамын?","intent":"AskLocation","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
+{"id":"ds_00040","input":"Қайдамын?","intent":"AskLocation","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
+{"id":"ds_00041","input":"Сіз қайда тұрасыз?","intent":"AskLocation","source_file":"live_holdout_v5950_codex.json","confidence":"high"}
+{"id":"ds_00042","input":"Менің атымды есіңізде ме?","intent":"AskName","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00043","input":"Жасымды білесіз бе?","intent":"AskAge","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00044","input":"Қай қалада тұратынымды білесіз бе?","intent":"AskLocation","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00045","input":"Кім болып жұмыс істейтінімді есіңізде ме?","intent":"AskOccupation","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00046","input":"Тағы біреуін бер.","intent":"AskExercise","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00047","input":"Атымды ұмыттыңыз ба?","intent":"AskName","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00048","input":"Қайдан келгенімді білесіз бе?","intent":"AskLocation","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00049","input":"Бүгінгі ауа-райы қандай?","intent":"AskWeather","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00050","input":"Rust-та borrowing бойынша жаттығу бер","intent":"AskExercise","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00051","input":"lifetimes жаттығуы керек","intent":"AskExercise","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00052","input":"traits деген не үшін керек?","intent":"AskPurpose","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00053","input":"Жаттығу бер.","intent":"AskExercise","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00054","input":"Маған код көрсетіңіз.","intent":"CodeRequest","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00055","input":"Бір мысал бер.","intent":"CodeRequest","source_file":"adversarial_dialog_v1.json","confidence":"high"}
+{"id":"ds_00056","input":"Бүгін ауа райы қандай?","intent":"AskWeather","source_file":"live_holdout_v5660_codex2.json","confidence":"high"}
+{"id":"ds_00057","input":"Мен жақсымын.","intent":"StatementOfWellbeing","source_file":"live_holdout_v5115_codex.json","confidence":"high"}
+{"id":"ds_00058","input":"Сен кімсің?","intent":"AskAboutSystem","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00059","input":"Сені кім жасады?","intent":"AskAboutSystem","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00060","input":"Қандай тілде жазылғансың?","intent":"AskAboutSystem","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00061","input":"Не істей аласың?","intent":"AskAboutSystem","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00062","input":"Қашан дүниеге келдің?","intent":"AskAboutSystem","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00063","input":"Кеше ауа райы қандай болды?","intent":"AskWeather","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00064","input":"Mendeleev кестесі не үшін керек?","intent":"AskPurpose","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00065","input":"Маған көмек керек.","intent":"Request","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00066","input":"Бүгін жақсы күн","intent":"StatementOfWellbeing","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00067","input":"Менің атым Дәулет","intent":"StatementOfName","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00068","input":"Менің жасым 25","intent":"StatementOfAge","source_file":"live_holdout_2026_05_01.json","confidence":"high"}
+{"id":"ds_00069","input":"borrow checker не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00070","input":"Cargo.toml не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00071","input":"Rc не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00072","input":"RefCell не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00073","input":"Send трейті не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00074","input":"unsafe не үшін керек?","intent":"AskPurpose","source_file":"rust_concepts_holdout_2026_05_02.json","confidence":"high"}
+{"id":"ds_00075","input":"Қазіргі ауа райы қандай?","intent":"AskWeather","source_file":"live_holdout_v5650_codex.json","confidence":"high"}
+{"id":"ds_00076","input":"Мен қайда тұрамын?","intent":"AskLocation","source_file":"live_holdout_v5650_codex.json","confidence":"high"}
+{"id":"ds_00077","input":"```rust\nfn main() { let s = String::from(\"hi\"); let _t = s; println!(\"{s}\"); }\n```","intent":"SubmitSolution","source_file":"live_holdout_v5650_codex.json","confidence":"high"}
+{"id":"ds_00078","input":"Қалай шешемін?","intent":"StatementOfOccupation","source_file":"live_holdout_v5100_codex.json","confidence":"high"}
+{"id":"ds_00079","input":"Түзетілген кодты бер.","intent":"CodeRequest","source_file":"live_holdout_v5100_codex.json","confidence":"high"}
+{"id":"ds_00080","input":"Маған көмектесіңіз.","intent":"Request","source_file":"live_holdout_v5100_codex.json","confidence":"high"}
+{"id":"ds_00081","input":"Сіздің атыңыз кім?","intent":"AskAboutSystem","source_file":"live_holdout_v5460_detector.json","confidence":"high"}
+{"id":"ds_00082","input":"Сенің атың не?","intent":"AskAboutSystem","source_file":"live_holdout_v5460_detector.json","confidence":"high"}
+{"id":"ds_00083","input":"Сіз қандай тілде сөйлейсіз?","intent":"AskAboutSystem","source_file":"live_holdout_v5460_detector.json","confidence":"high"}
+{"id":"ds_00084","input":"Сен қай тілде сөйлейсің?","intent":"AskAboutSystem","source_file":"live_holdout_v5460_detector.json","confidence":"high"}

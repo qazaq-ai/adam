@@ -1,0 +1,14 @@
+[package]
+name = "adam-intent-classifier"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Experiment **E1** of the third-path research arc — a tiny discriminative intent classifier that aims to replace the hand-written `detect_*` cascade in `adam-dialog::semantics` at equal-or-better accuracy, ≤5ms latency, ≤5MB on disk, and zero hallucination by construction (closed-set output). Pure-Rust, no neural runtime dep. See docs/e1_intent_classifier_design.md."
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true
