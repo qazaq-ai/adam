@@ -28,6 +28,108 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.0.0] — 2026-05-22 — research arc merged · audit-driven relevance polish · main reaches v6 GA-ready
+
+> Merge of `experimental/agglutinative-neural` (124 commits)
+> into `main`. Lands the v6.0 research arc (E1 intent
+> classifier / E2 slot extractor / E3 retrieval ranker, all
+> opt-in behind `ADAM_NEURAL_*=1` flags; E3 explicitly
+> documented as HONEST FAIL, not promoted), seven rounds of
+> user-driven audit fixes, the KRU / Baitursynuly / AI-Law
+> domain (`data/world_core/kru_baitursynov.jsonl`), and the
+> v6.0.15 relevance polish (IsA preference + predicate-keyword
+> routing + cyber-defense multiword + canonical-predicate
+> rewrite).
+>
+> **Default behaviour is bit-identical to v5.32.0 cascade**
+> unless one of the neural opt-in flags is set. The cascade
+> bug-fixes (interrogative gates, conflict-gate engagement
+> narrowing, multi-token PER, NEG-aware absorption, evasion
+> safety patterns, etc.) are pure improvements on the
+> existing deterministic surface.
+>
+> **GA blockers documented but still open** per
+> `docs/codex_briefs/v6_ga_external_blockers_2026_05_18.md`:
+> Lexicon V2 native-speaker review, arXiv submission, alpha
+> partner deployment. These are people-driven, not technical.
+> The v6.0.0 tag captures TECHNICAL GA — the codebase is
+> ready for the external pilot work that closes the
+> non-technical GA criteria.
+
+### Highlights vs. v5.32.0 cascade-only main
+
+- **Research arc (opt-in)** — E1 intent rescue
+  (`ADAM_NEURAL_INTENT=1`, 32-class classifier, +9 net wins
+  on free-dialog test set, 35 µs p99, 2.2 MB on disk) and E2
+  slot extractor (`ADAM_NEURAL_SLOTS=1`, BIO sequence
+  tagging, 11 closed labels, +1 win on OOV holdout). E3
+  retrieval ranker shipped as documented HONEST FAIL — not
+  wired to production.
+
+- **Audit-driven cascade fixes (rounds 1-4d, 29 pinned
+  regression cases)** —
+  * Interrogative gates on `detect_statement_of_*` so «менің
+    кәсібім қандай?» doesn't pollute the occupation slot.
+  * Contradiction-priority gate now engagement-aware — an
+    unrelated factual query («Абай кім?») after a city
+    conflict no longer gets routed through
+    `unknown.conflicted`.
+  * Multi-token PER fold for Kazakh patronymics
+    («Айгерім Сейітжанқызы»).
+  * NEG-aware absorption rewrites «X емес, Y» before
+    cascade extraction.
+  * Evasion safety patterns close debt / legal / classified-
+    info extraction attempts.
+  * Voice REPL `vad_silence_after_speech` bumped 800 ms →
+    1300 ms per user feedback.
+  * Self-identity coverage extended for «LLM-сің бе?» /
+    «қалай жұмыс істейсің?» / «жауаптарыңды қалай
+    тексересің?» / offline / auditability questions.
+
+- **KRU / Baitursynuly / AI-Law domain (17 + auxiliary
+  entries)** — `data/world_core/kru_baitursynov.jsonl`
+  covers Ahmet Baitursynuly (life, role, Alash, төте жазу,
+  rehabilitation), Kostanay Regional University (location,
+  founding, rename, faculties, КРУ abbreviation), Kazakhstan
+  AI Law (effective date 18.01.2026, risk-classification
+  scheme, defence-AI as high-risk), and cyber-defence /
+  cyber-attack definitions.
+
+- **Pre-action-plan curated-subject probe** — narrows
+  retrieval to the KRU whitelist for the new compounds whose
+  pre-built morpheme-index doesn't cover them; uses IsA
+  preference + predicate-keyword routing for relevance.
+
+- **Documentation refresh** — v6.0 architecture spec, arXiv
+  preprint v0, migration playbook v5 → v6, MANIFESTO + SPDX
+  sweep, audit-driven README badges + currency check.
+
+### Known scope deferred to v6.1.0+
+
+- Predicate enum extension (BornIn / EffectiveFrom /
+  Classifies / RiskLevel / FoundedIn) and a predicate-aware
+  retrieval planner.
+- P8 silent-supersede UX via explicit-revert mechanism.
+- Morphology-aware slot extractor v2 consuming
+  `Vec<Analysis>` instead of `Vec<String>`.
+- 3-token patronymic NEG correction.
+- «дата инженер» multi-token occupation segmentation.
+- Multi-step math chaining.
+- GA blockers (Lexicon V2 review, arXiv submission, alpha
+  partner deployment) — external work.
+
+### Verified
+
+- `cargo fmt --all --check` clean
+- `cargo test --workspace --release` 0 failures
+- `factual_eval_100`: 3 hallucinations (at the v6.0.0
+  ceiling, no regressions)
+- 29 audit-regression cases pass
+- `cognitive_eval` canonical scenarios all green
+- `end_to_end` 193 cases pass
+- `scripts/check_metrics_currency.sh` all green
+- `scripts/validate_foundation.sh` all green
+
 ## [6.0.0-rc5+E1] — 2026-05-21 — E1 research arc · safety policy v6 · classifier production-wired
 
 > Research milestone on the `experimental/agglutinative-neural`

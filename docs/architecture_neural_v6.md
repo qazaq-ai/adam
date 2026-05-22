@@ -2,7 +2,7 @@
 
 **Status:** SPECIFICATION (not yet implemented in `main`). Target
 release: v6.0.0. Branch of record: `experimental/agglutinative-neural`.
-**Implementation note for v6.0.0-rc5:** the neural stack is present as
+**Implementation note for v6.0.0:** the neural stack is present as
 an opt-in preview surface (`--features neural`, `--neural-model`, and
 the `/neural` slash command). Automatic L5.5 composition inside the
 normal dialog turn loop remains deferred to v6.0.5+; the deterministic
