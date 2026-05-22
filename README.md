@@ -40,10 +40,14 @@
 
 ## What's new in v6.0.0
 
-**Release candidate**, not GA. The deterministic kernel path is
-unchanged from v5.32.0 — every existing v5.x test still passes.
-This RC adds two opt-in research transducers that extend the
-kernel without altering its default behaviour:
+**Technical GA** (external GA blockers — Lexicon V2 native-speaker
+review, arXiv submission, alpha partner deployment — remain open
+work, see [`docs/codex_briefs/v6_ga_external_blockers_2026_05_18.md`](docs/codex_briefs/v6_ga_external_blockers_2026_05_18.md)).
+The deterministic kernel path is unchanged from v5.32.0 — every
+existing v5.x test still passes. v6.0.0 adds opt-in research
+transducers that extend the kernel without altering its default
+behaviour, plus seven rounds of user-driven audit fixes on the
+existing cascade:
 
   - **L5.5 TinyAgt neural composer** behind
     `--features neural` + `--neural-model <checkpoint-dir>` —
@@ -51,18 +55,45 @@ kernel without altering its default behaviour:
     rc1).
   - **E1 discriminative intent classifier** behind
     `ADAM_NEURAL_INTENT=1` — first completed experiment in the
-    "third path" research arc on the
-    `experimental/agglutinative-neural` branch. A 2.2 MB
-    pure-Rust hash-feature linear classifier that, on the
-    project's frozen test split, matches and slightly exceeds
-    the hand-written cascade (95.95 % vs 91.89 % accuracy) at
-    ~ 600 × lower latency (35 µs p99 vs ~ 35 ms full-pipeline
-    p99). Zero hallucination by construction — output is one
-    of 32 closed labels. Off by default; production-bypassed
-    when not enabled. Design + numbers + anti-success criteria
-    in [`docs/e1_intent_classifier_design.md`](docs/e1_intent_classifier_design.md).
+    "third path" research arc. A 2.2 MB pure-Rust hash-feature
+    linear classifier that, on the project's frozen test split,
+    matches and slightly exceeds the hand-written cascade
+    (95.95 % vs 91.89 % accuracy) at ~ 600 × lower latency
+    (35 µs p99 vs ~ 35 ms full-pipeline p99). Zero hallucination
+    by construction — output is one of 32 closed labels. Off by
+    default; production-bypassed when not enabled. Design +
+    numbers + anti-success criteria in
+    [`docs/e1_intent_classifier_design.md`](docs/e1_intent_classifier_design.md).
+  - **E2 discriminative slot extractor** behind
+    `ADAM_NEURAL_SLOTS=1` — BIO sequence-tagger over 11 closed
+    labels, 52 KB on disk, 29 µs p99 latency. PARTIAL PASS
+    (0.667 OOV F1, +1 net win on holdout). Design in
+    [`docs/e2_slot_extractor_design.md`](docs/e2_slot_extractor_design.md).
+  - **E3 retrieval ranker** — documented HONEST FAIL (0.7634
+    pick-rate-at-1 vs cascade 1.000 oracle). NOT wired to
+    production. Kept in the workspace + this CHANGELOG entry
+    as discipline evidence — the research arc fails honestly
+    rather than hides the negative result. See
+    [`docs/e3_retrieval_ranker_design.md`](docs/e3_retrieval_ranker_design.md)
+    and [`docs/third_path_results.md`](docs/third_path_results.md).
+  - **KRU / Baitursynuly / AI-Law domain** —
+    `data/world_core/kru_baitursynov.jsonl` adds 17 curated
+    entries covering Ahmet Baitursynuly, Kostanay Regional
+    University, the Kazakhstan AI Law (effective 18.01.2026),
+    and cyber-defense definitions. Backed by IsA preference +
+    predicate-keyword routing in the pre-action-plan probe so
+    definition-style queries surface the canonical fact.
+  - **Audit-round 1-4d cascade fixes (29 pinned regression
+    cases)** — interrogative gates on `detect_statement_of_*`,
+    contradiction-priority gate engagement-narrowing,
+    multi-token PER patronymic fold, NEG-aware absorption,
+    evasion safety patterns (debt / legal / classified-info),
+    voice REPL silence-after-speech bumped 800 ms → 1300 ms,
+    self-identity coverage for «LLM-сің бе?», «қалай жұмыс
+    істейсің?», «жауаптарыңды қалай тексересің?», offline /
+    auditability questions.
 
-Highlights this RC arc (rc1 → rc5):
+Highlights this release arc (rc1 → rc5 → 6.0.0):
 - **L5.5 TinyAgt neural composer preview** — runnable, verifier-bounded.
 - **Live OS clock + Open-Meteo weather** for `Intent::AskTime` and `AskWeather` (opt-in by env).
 - **Multi-clause word-math** restored — «56 × 3, содан кейін ÷ 2» → 84.

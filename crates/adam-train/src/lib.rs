@@ -2589,11 +2589,9 @@ fn build_clean_training_miss_audit_report_with_run_name(
 ) -> Result<TinyCleanTrainingMissAuditReport, TrainingError> {
     let analysis = analyze_tiny_clean_training(manifest, registry, rules, report, pack)?;
     let validation_miss_count = analysis.validation_misses.len();
-    let validation_miss_rate_bps = if analysis.validation_next_token_count == 0 {
-        0
-    } else {
-        validation_miss_count * 10_000 / analysis.validation_next_token_count
-    };
+    let validation_miss_rate_bps = (validation_miss_count * 10_000)
+        .checked_div(analysis.validation_next_token_count)
+        .unwrap_or(0);
     let unseen_context_miss_count = analysis
         .validation_misses
         .iter()
@@ -4406,11 +4404,9 @@ fn analyze_tiny_clean_training(
             .then_with(|| left.actual_next_token.cmp(&right.actual_next_token))
     });
 
-    let validation_exact_match_rate_bps = if validation_next_token_count == 0 {
-        0
-    } else {
-        validation_exact_match_count * 10_000 / validation_next_token_count
-    };
+    let validation_exact_match_rate_bps = (validation_exact_match_count * 10_000)
+        .checked_div(validation_next_token_count)
+        .unwrap_or(0);
 
     let mut category_stats = BTreeMap::<String, (usize, usize)>::new();
     for sample in &ordered_samples {

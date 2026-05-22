@@ -225,7 +225,7 @@ fn main() {
                 }
                 i += 1;
             }
-            let in_quoted_record = quotes % 2 != 0;
+            let in_quoted_record = !quotes.is_multiple_of(2);
             if in_quoted_record {
                 continue;
             }

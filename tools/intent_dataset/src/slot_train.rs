@@ -274,7 +274,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let n_train = ((n as f64) * TRAIN_RATIO).round() as usize;
         let n_dev = ((n as f64) * DEV_RATIO).round() as usize;
         let n_train = n_train.min(n.saturating_sub(1));
-        let n_dev = n_dev.min(n.saturating_sub(n_train + 1).max(0));
+        let n_dev = n_dev.min(n.saturating_sub(n_train + 1));
         train_set.extend(items.iter().take(n_train).copied());
         dev_set.extend(items.iter().skip(n_train).take(n_dev).copied());
         test_set.extend(items.iter().skip(n_train + n_dev).copied());

@@ -1,32 +1,35 @@
 # Research arc
 
-This document is the detailed research roadmap for **Qazaq IR** — the
-deterministic AI kernel built on agglutinative-language morphology,
-and (as of 2026-05-16) its algebra-anchored neural extension.
+This document is the detailed research roadmap for **Qazaq IR / ARK**
+(Agglutinative Reasoning Kernel) — the deterministic AI kernel built
+on agglutinative-language morphology, and (since 2026-05-22) its
+algebra-anchored neural extension wired into `main` as the v6.0.0
+release.
 
-The high-level mission is in [`MISSION.md`](MISSION.md). The
-"why we are perpendicular to LLMs" position is in
-[`docs/MANIFESTO.md`](docs/MANIFESTO.md). The first experimental
-research arc (`experimental/agglutinative-neural`, started 2026-05-15)
-is detailed in [`RESEARCH_AGGLUTINATIVE_NEURAL.md`](RESEARCH_AGGLUTINATIVE_NEURAL.md).
-The PoC-scale empirical results are in
+The high-level mission lives in [`MISSION.md`](MISSION.md). The
+"why we are perpendicular to LLMs" position lives in
+[`docs/MANIFESTO.md`](docs/MANIFESTO.md). PoC empirical results are in
 [`docs/research/results_real_mix_2026_05_16.md`](docs/research/results_real_mix_2026_05_16.md).
-The production architecture spec for the resulting v6.0 release is in
+The production architecture spec for the v6.0.0 release is in
 [`docs/architecture_neural_v6.md`](docs/architecture_neural_v6.md).
+The three-experiment third-path arc (E1 / E2 / E3) is summarised in
+[`docs/third_path_results.md`](docs/third_path_results.md).
 
-This document zooms into open research questions, methodology, and
-milestones at the layer below those documents.
+This document zooms into open research questions, methodology, the
+completed research arcs, and the upcoming milestones at the layer
+below those documents.
 
 ## Open research questions
 
 ### Q1. Can a deterministic kernel match LLMs on conversational coherence?
 
-**Status.** Partially answered. adam (v5.3.x) demonstrates multi-turn
+**Status.** Partially answered. adam (v6.0.0) demonstrates multi-turn
 dialog with belief-state tracking, contradiction recovery, anaphora
-resolution, and curriculum-aware self-recall — all without
+resolution, predicate-keyword routing for KRU-domain answer
+relevance, and curriculum-aware self-recall — all without
 neural-style generation. The remaining gap is **scope**: adam covers
-~41 intent variants and a curated `world_core` of ~3000 facts, far
-narrower than what an LLM is trained on.
+41 intent variants and a curated `world_core` of 3 461 entries / 4 114
+facts across 66 domains, far narrower than what an LLM is trained on.
 
 **Open sub-questions:**
 - How does the curated-graph approach scale as the fact base grows
@@ -39,18 +42,28 @@ narrower than what an LLM is trained on.
 
 ### Q2. Where is the boundary between «kernel» and «trainable component»?
 
-**Status (updated 2026-05-16).** Working hypothesis confirmed at PoC
+**Status (updated 2026-05-22).** Working hypothesis confirmed at PoC
 scale and extended: **tiny ML lives inside the algebraic envelope;
-large ML doesn't.** v5.x ships a 24-byte selection-weights perceptron
-(6 f32) for template ranking, suffix-chain bigram priors (~31 k
-bigrams), and root-affinity PMI (~10 k roots). The
-`experimental/agglutinative-neural` arc demonstrated that a ~2 M-
-parameter decoder transformer (CPU, pure Rust, no GPU) trained on
-FST-validated morpheme sequences mixed with real Kazakh corpora
-generalises well — held-out CE gap of 0.031 on a 100-prefix eval
-set, exact-match rate 15 %. Critically, *all* of its outputs go
-through the same FST mask + verifier as the rest of the kernel, so
-inspectability is preserved. The v6.0 architecture spec
+large ML doesn't.** The v6.0.0 release ships this hypothesis as a
+working production artefact:
+
+- **E1 (intent classifier)** — discriminative model rescues
+  `Intent::Unknown` verdicts behind `ADAM_NEURAL_INTENT=1`. 95.95 %
+  test accuracy, +9 net wins vs the cascade on a free-dialog test
+  set, 35 µs p99 latency, 2.2 MB on disk. See
+  [`docs/e1_intent_classifier_design.md`](docs/e1_intent_classifier_design.md).
+- **E2 (slot extractor)** — BIO sequence-tagger fills personal slots
+  behind `ADAM_NEURAL_SLOTS=1`. 11 closed labels, +1 win on the OOV
+  holdout. PARTIAL PASS (deferred fixes catalogued in
+  [`docs/e2_slot_extractor_design.md`](docs/e2_slot_extractor_design.md)).
+- **E3 (retrieval ranker)** — pointwise logistic regression.
+  Documented HONEST FAIL (not promoted to production); see
+  [`docs/e3_retrieval_ranker_design.md`](docs/e3_retrieval_ranker_design.md).
+
+All shipping neural artefacts run on CPU, are bounded outputs (no
+generative free-form text), and have inspectable JSON weight files.
+Default behaviour without the opt-in flags is bit-identical to the
+deterministic cascade. The v6.0 architecture spec
 ([`architecture_neural_v6.md`](docs/architecture_neural_v6.md))
 formalises this as L5.5 in the pipeline.
 
@@ -113,6 +126,127 @@ Closed the Codex round-2 audit of educational use case.
 - How does the cargo-check verifier loop generalise to non-Rust
   languages with different toolchain expectations?
 
+## Completed research arc — Agglutinative-Neural (2026-05-15 → 2026-05-22)
+
+The `experimental/agglutinative-neural` branch ran for one week as a
+parallel research arc to test whether neural training, weights,
+tokens, and generation could be used **inside** the deterministic
+envelope without inheriting the three structural LLM problems
+(opacity, cloud cost, hallucination). It merged to `main` as the
+v6.0.0 release.
+
+### Thesis
+
+The LLM industry uses neural networks **one way**: scale everything,
+train on the internet, push parameters to hundreds of billions, accept
+opacity and hallucination as the price. The hypothesis of this arc:
+**the same tools can be used differently.** Small corpus → clean data
+→ agglutinative structure → discrete weights → CPU inference →
+deterministic verifier on top. The result is a model that is
+**smarter by virtue of compactness and structure**, not by mass.
+
+This is not a retreat from the deterministic kernel. It is its
+extension with a mathematically-bounded neural layer that:
+
+- Cannot generate facts absent from the curated corpus (verifier
+  blocks).
+- Cannot produce morphologically invalid Kazakh (FST blocks).
+- Cannot drift into fantasy beyond N tokens without verification
+  (token budget per reply).
+- Can improve **how** something is said — word choice, ordering,
+  composition — i.e. the surface layer currently driven by templates.
+
+### What's neural, what stays deterministic
+
+| Component | Implementation |
+|---|---|
+| Intent recognition | deterministic cascade + opt-in neural rescue (E1) |
+| Topic extraction | deterministic (FST + multiword_entities) |
+| Fact lookup | deterministic (retrieval over world_core + curated probe) |
+| Reasoning chain | deterministic (R1-R10 forward chaining) |
+| Slot fill | deterministic cascade + opt-in neural BIO extractor (E2) |
+| Retrieval ranking | deterministic `default_v0` (E3 trained but NOT promoted) |
+| Morphological synthesis | deterministic (FST) |
+| Verifier | deterministic (`proof_object`, no claim ships without support) |
+| Realiser | deterministic (template leak guard, quality checks) |
+
+**Principle.** The neural layer may **choose how to say something**,
+but **may not invent what to say**. Every factual claim passes
+through `proof_object` and `verifier::is_supported`.
+
+### Hard budgets (preserved)
+
+| Resource | Limit | Status |
+|---|---|---|
+| Model parameters | ≤ 10 M (PoC) → ≤ 100 M (if PoC passed) | E1 = 2.2 MB sparse JSON, E2 = 52 KB, E3 = 0.21 KB — far below cap |
+| RSS at inference | ≤ 1 GB | confirmed |
+| Latency p50 on CPU | ≤ 200 ms | confirmed (E1 35 µs / E2 29 µs p99) |
+| CPU inference must work | M2 8 GB — primary target | confirmed |
+| GPU inference | acceptable as speedup, not as dependency | preserved |
+| Cloud in any form | **forbidden** at every phase | preserved |
+
+### Three sub-experiments
+
+The arc decomposed into three discriminative-neural experiments, each
+predeclaring its anti-success criteria before training. Citation-
+ready summary in
+[`docs/third_path_results.md`](docs/third_path_results.md).
+
+| # | Experiment | Result | Production wiring |
+|---|---|---|---|
+| **E1** | Intent classifier (32 closed labels) | **PASS** — 95.95 % test acc, +9 net wins | `ADAM_NEURAL_INTENT=1` (opt-in) |
+| **E2** | Slot extractor (11 BIO labels) | **PARTIAL PASS** — 0.667 OOV F1 | `ADAM_NEURAL_SLOTS=1` (opt-in) |
+| **E3** | Retrieval ranker (pointwise LR) | **HONEST FAIL** — 0.7634 pick-rate-at-1 vs cascade 1.000 oracle | **NOT wired** (documented; the cascade-as-oracle setup capped the upper bound at imitation) |
+
+### What did NOT happen on this branch
+
+- ❌ No `main` was disturbed — the branch ran in parallel and the
+  merge to `main` only flipped the default-off opt-in flags.
+- ❌ No cloud training. Everything ran on M2 8 GB CPU + small Rust
+  helpers.
+- ❌ No pretrained third-party weights. Every artefact trained from
+  scratch on FST-synthesised data + cascade-labelled corpus.
+- ❌ No rebranding of deterministic as «retrograde». Deterministic
+  cascade remains the production-default route.
+- ❌ No claim of «we are now an LLM replacement». The arc explicitly
+  re-thinks what the neural tools can do **within** the deterministic
+  envelope; it does NOT claim to replace LLM-breadth coverage.
+
+### What this arc deferred
+
+The v6.0.0 merge documents the following items as known scope for the
+next research arc (v6.1.0+):
+
+- **Predicate-aware retrieval** — extend the `Predicate` enum with
+  `BornIn / EffectiveFrom / Classifies / RiskLevel / FoundedIn`, and
+  add a question-shape → predicate planner so multi-predicate-per-
+  subject queries («X қашан туылған?», «X қандай санаттарға
+  жіктейді?») route to the right fact rather than the first IsA match.
+- **Morphology-aware slot extractor v2** — consume `Vec<Analysis>`
+  (POS / case / particle / predicate-copula) instead of `Vec<String>`,
+  so the gates the v6.0.6+ audit added as denylist patches become
+  structural rather than band-aid.
+- **P8 explicit-revert UX** — let the user supersede a profile slot
+  silently when intent is to update rather than to disambiguate.
+- **3-token patronymic NEG correction** + multi-token occupation
+  segmentation (`дата инженер`) + multi-step math chaining.
+
+### Memory-directive lineage
+
+For continuity, the directives that gated this arc:
+
+- [`project_retrieval_not_neural_v2`](memory/project_retrieval_not_neural_v2.md) —
+  the arc IS the production realisation of this directive.
+- [`project_deterministic_directive_confirmed`](memory/project_deterministic_directive_confirmed.md) —
+  reaffirmed for `main`; relaxed for `experimental` arcs as
+  «reject LLM scale + opacity + cloud, accept neural tools used
+  differently».
+- [`project_v4_direction`](memory/project_v4_direction.md) —
+  «no LLM-breadth race» preserved: smart-narrow not broad-mediocre.
+- [`project_engineering_framing`](memory/project_engineering_framing.md) —
+  agglutinative algebra of meaning stays the central concept; this
+  arc was its mathematical implementation.
+
 ## Methodology
 
 The research is empirical-engineering, not theoretical. We follow
@@ -133,9 +267,10 @@ this loop:
 6. **Release** — bundle 1-7 innovations per release, version per
    significance (`feedback_versioning_post_1_0`).
 
-Three Codex audit rounds completed so far (2026-04-29 / 2026-05-07 /
-2026-05-08), each surfacing 7-8 issues. Investor-readiness
-self-assessment: 7/10 after v5.3.0; ongoing.
+Investor-readiness self-assessment after v6.0.0: pre-seed / angel /
+strategic-pilot READY; institutional VC seed pending GA blocker
+closure (Lexicon V2 native-speaker review, arXiv submission, alpha
+partner deployment).
 
 ## Milestones
 
@@ -150,8 +285,12 @@ self-assessment: 7/10 after v5.3.0; ongoing.
 - ✅ Curriculum tree with adaptive difficulty (Rust track)
 - ✅ Codex round-3 audit closed (architectural pass)
 - ✅ Public repository (2026-05-08), BUSL-1.1 license
-- ✅ **Safety policy v6** (2026-05-21) — informational + emergency-triage + disclaimer for medical/legal/financial; crisis-line first for self-harm
-- ✅ **E1 — discriminative intent classifier** (2026-05-21) — first completed third-path experiment; 95.95 % test accuracy at 35 µs p99 latency, 2.2 MB on disk, zero hallucination by construction. Beats cascade by 4pp at 600× lower latency. Opt-in behind `ADAM_NEURAL_INTENT=1`. See [`docs/e1_intent_classifier_design.md`](docs/e1_intent_classifier_design.md).
+- ✅ **Safety policy v6** (2026-05-21) — informational + emergency-
+  triage + disclaimer for medical/legal/financial; crisis-line first
+  for self-harm
+- ✅ **Agglutinative-Neural research arc shipped as v6.0.0**
+  (2026-05-22) — E1 PASS, E2 PARTIAL PASS, E3 HONEST FAIL, all
+  opt-in behind env flags
 
 ### Q3 2026 — Kernel-pure voice + first port
 
@@ -200,7 +339,7 @@ deterministic kernel:
 ## How this is funded
 
 The research is currently self-funded (founder time + minimal
-infrastructure costs — 0% GPU).
+infrastructure costs — 0 % GPU).
 
 We are pursuing **two parallel funding tracks**:
 
@@ -229,6 +368,8 @@ framework, including investor-engagement terms.
 
 - [adam GitHub repository](https://github.com/qazaq-ai/adam) — source
   of truth (BUSL-1.1)
-- (Planned) Habr / Medium technical blog post — Q2 2026
+- [`docs/preprint/arxiv_v0_draft.md`](docs/preprint/arxiv_v0_draft.md) —
+  arXiv submission v0 draft (algebra-anchored neural composition)
+- (Planned) Habr / Medium technical blog post — Q3 2026
 - (Planned) Comparative paper on Karakalpak port — Q4 2026
 - (Planned) TLA+ verified-kernel artefact — 2027

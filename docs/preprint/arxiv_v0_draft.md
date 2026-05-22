@@ -456,9 +456,12 @@ The v6.0 release architecture is in
 [`docs/architecture_neural_v6.md`](../architecture_neural_v6.md).
 The v6.0 → v7.0 public roadmap is in
 [`docs/roadmap_v6_v7.md`](../roadmap_v6_v7.md). The research-arc
-charter is in
-[`RESEARCH_AGGLUTINATIVE_NEURAL.md`](../../RESEARCH_AGGLUTINATIVE_NEURAL.md)
-at the repository root.
+charter (origin thesis, what's neural vs deterministic, hard
+budgets, the three sub-experiments and their results) was
+consolidated into the
+[`RESEARCH.md`](../../RESEARCH.md) «Completed research arc —
+Agglutinative-Neural» section at the repository root when the
+branch merged into `main` as v6.0.0 on 2026-05-22.
 
 ---
 

@@ -11,7 +11,7 @@ We are a **research-stage company** investigating whether agglutinative-language
 - [`docs/MANIFESTO.md`](docs/MANIFESTO.md) — four-inversion position (algebra not statistics, CPU not cloud, verifier not RLHF, agglutinative-first).
 - [`docs/architecture_neural_v6.md`](docs/architecture_neural_v6.md) — production spec for the v6.0.0 release that introduces the neural layer additively.
 - [`docs/research/results_real_mix_2026_05_16.md`](docs/research/results_real_mix_2026_05_16.md) — empirical results that triggered the v6.0 plan.
-- [`RESEARCH_AGGLUTINATIVE_NEURAL.md`](RESEARCH_AGGLUTINATIVE_NEURAL.md) — research arc charter.
+- [`RESEARCH.md`](RESEARCH.md) — research roadmap; the «Completed research arc — Agglutinative-Neural» section consolidates what was previously a standalone charter (merged into `main` and shipped as v6.0.0 on 2026-05-22).
 
 **adam** (this repository) is the first applied demonstrator of that architecture (Qazaq IR / ARK = Agglutinative Reasoning Kernel). It is **not the goal** — the architecture is the goal; adam is what proves the architecture works. Current applied form: a Kazakh-language Rust-programming tutor.
 
@@ -671,7 +671,7 @@ given current heuristics.
   outreach_candidates).
 - `docs/codex_briefs/v6_ga_external_blockers_2026_05_18.md` —
   peer-review brief for the three remaining external blockers.
-- `RESEARCH_AGGLUTINATIVE_NEURAL.md` — research-arc charter.
+- `RESEARCH_AGGLUTINATIVE_NEURAL.md` — research-arc charter (consolidated into `RESEARCH.md` on 2026-05-22 as the «Completed research arc — Agglutinative-Neural» section).
 
 ### Tests
 

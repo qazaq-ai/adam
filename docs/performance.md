@@ -1,8 +1,10 @@
 # Performance — adam v6.0.0 (deterministic path; neural preview is opt-in)
 
-> **v6.0.0-rc1 note (2026-05-18).** The numbers below cover the
-> **deterministic kernel path** which is the default in v6.0.0-rc1
-> (identical behaviour to v5.32.0). For the opt-in v6.0 L5.5
+> **v6.0.0 note (originally drafted 2026-05-18 for rc1, current at
+> the 2026-05-22 GA merge).** The numbers below cover the
+> **deterministic kernel path** which remains the default in v6.0.0
+> (identical behaviour to v5.32.0; opt-in neural transducers do not
+> change the default path). For the opt-in v6.0 L5.5
 > neural-composer latency see
 > [`bench/neural_inference_2026_05_16.md`](bench/neural_inference_2026_05_16.md)
 > (M2 8 GB baseline; 88× headroom over the v6.0 target). The v6.0
