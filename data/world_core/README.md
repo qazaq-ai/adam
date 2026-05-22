@@ -105,7 +105,7 @@ Validator checks:
 
 ## Current scale (v6.0.0-rc4)
 
-**Live totals: 3460 entries / 4114 facts across 66 domains**, all `approved`
+**Live totals: 3461 entries / 4114 facts across 66 domains**, all `approved`
 by `shaman`. v6.0.9 adds `kru_baitursynov.jsonl` (17 entries on Ahmet
 Baitursynuly + Kostanay Regional University + Kazakhstan AI Law +
 cyber-defense), rewritten in v6.0.13 with canonical `is_a / part_of /

@@ -1506,11 +1506,65 @@ impl Conversation {
             let noun_lower = noun.to_lowercase();
             let is_kru_subject = KRU_DOMAIN_SUBJECTS.iter().any(|s| noun_lower == *s);
             if is_kru_subject && grounded_fact.is_none() {
-                if let Some(fact) = self
+                // **v6.0.15 — 2026-05-21 user audit round 4d
+                // follow-up.** Three-tier fact-selection for KRU
+                // domain queries:
+                //
+                //   1. **Predicate-keyword routing** — if the
+                //      input carries a predicate-leaning keyword
+                //      («санат / жіктей / тәуекел / құрылған /
+                //      туылған / күшіне»), pick the fact whose
+                //      raw_text mentions that keyword. Closes the
+                //      «X қандай санаттарға жіктейді?» case where
+                //      the categories list lives in a RelatedTo
+                //      row (kru_014) and IsA-preference would
+                //      grab the effective-date row instead.
+                //   2. **IsA preference** — pure definition
+                //      probes («X деген не?», «X кім?») want the
+                //      canonical IsA row, not a creation-history
+                //      RelatedTo row. The latter typically has a
+                //      raw_text emphasising action/history
+                //      («Төте жазу» pre-fix → «Ахмет Байтұрсынұлы
+                //      1912 жылы…»). v6.0.15 splits kru_005 into
+                //      a clean IsA row («Төте жазу — …») + a
+                //      history RelatedTo row, so this tier picks
+                //      the clean def.
+                //   3. **Any subject match** — last resort.
+                //
+                // Future v6.1.0+ replaces tier 1 with a typed
+                // predicate enum (BornIn / EffectiveFrom /
+                // Classifies / RiskLevel) and a question-shape
+                // → predicate planner.
+                let lower_input = input.to_lowercase();
+                const PREDICATE_KEYWORDS: &[&str] = &[
+                    "санат",
+                    "жіктей",
+                    "тәуекел",
+                    "құрылған",
+                    "туылған",
+                    "туған",
+                    "күшіне",
+                    "ақталды",
+                    "ақтал",
+                ];
+                let kw_hit = PREDICATE_KEYWORDS
+                    .iter()
+                    .find(|kw| lower_input.contains(*kw));
+                let kw_fact = kw_hit.and_then(|kw| {
+                    self.extracted_facts.iter().find(|f| {
+                        f.subject.root.to_lowercase() == noun_lower
+                            && f.raw_text.to_lowercase().contains(*kw)
+                    })
+                });
+                let isa_fact = self.extracted_facts.iter().find(|f| {
+                    f.subject.root.to_lowercase() == noun_lower
+                        && matches!(f.predicate, adam_reasoning::Predicate::IsA)
+                });
+                let any_fact = self
                     .extracted_facts
                     .iter()
-                    .find(|f| f.subject.root.to_lowercase() == noun_lower)
-                {
+                    .find(|f| f.subject.root.to_lowercase() == noun_lower);
+                if let Some(fact) = kw_fact.or(isa_fact).or(any_fact) {
                     *grounded_fact = Some(fact.raw_text.clone());
                     *example = None;
                     *reasoning_chain = None;

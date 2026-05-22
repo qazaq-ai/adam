@@ -509,6 +509,15 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     // **v6.0.9 — 2026-05-21 user audit round 4.** KRU /
     // Baitursynuly / AI-Law domain compounds — added with
     // `data/world_core/kru_baitursynov.jsonl`.
+    // **v6.0.15 — round 4d follow-up.** Added cyber-defense
+    // compounds; `multiword_entity_hint` matches single-token
+    // entries by exact `lowered_tokens.contains` lookup, so
+    // hyphenated terms must be registered as-is. Without
+    // these, the topic extractor returned the bare head noun
+    // («қорғаныс») and the v6.0.13 KRU-subject whitelist in
+    // the pre-action-plan probe didn't match.
+    "кибер-қорғаныс",
+    "кибершабуыл",
     "ахмет байтұрсынұлы атындағы қостанай өңірлік университеті",
     "қорғаныс саласындағы жасанды интеллект",
     "ахмет байтұрсынұлы",

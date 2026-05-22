@@ -1,7 +1,7 @@
 {
   "version": "6.0.0-rc5",
   "status": "completed",
-  "elapsed_s": 70,
+  "elapsed_s": 63,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -29045,10 +29045,10 @@
       "pattern": "world_core/kru_baitursynov",
       "source": {
         "pack": "world_core/kru_baitursynov.jsonl",
-        "sample_id": "kru_005"
+        "sample_id": "kru_005a"
       },
       "confidence": "HumanApproved",
-      "raw_text": "Ахмет Байтұрсынұлы 1912 жылы «төте жазу» — қазақ тіліне арналған араб графикасы негізіндегі әліпбиді жасады."
+      "raw_text": "Төте жазу — қазақ тіліне арналған араб графикасы негізіндегі әліпби."
     },
     {
       "subject": {
@@ -29065,7 +29065,7 @@
       "pattern": "world_core/kru_baitursynov",
       "source": {
         "pack": "world_core/kru_baitursynov.jsonl",
-        "sample_id": "kru_005"
+        "sample_id": "kru_005b"
       },
       "confidence": "HumanApproved",
       "raw_text": "Ахмет Байтұрсынұлы 1912 жылы «төте жазу» — қазақ тіліне арналған араб графикасы негізіндегі әліпбиді жасады."
@@ -29085,7 +29085,7 @@
       "pattern": "world_core/kru_baitursynov",
       "source": {
         "pack": "world_core/kru_baitursynov.jsonl",
-        "sample_id": "kru_005"
+        "sample_id": "kru_005b"
       },
       "confidence": "HumanApproved",
       "raw_text": "Ахмет Байтұрсынұлы 1912 жылы «төте жазу» — қазақ тіліне арналған араб графикасы негізіндегі әліпбиді жасады."
