@@ -2048,6 +2048,20 @@ fn detect_ask_about_system(
         // a physics-of-«жұмыс» retrieval miss.
         || (has_addressee
             && (joined.contains("қалай жұмыс істе") || joined.contains("қалай істе")))
+        // **v6.0.14 — 2026-05-21 user audit round 4d follow-up.**
+        // The 2nd-person verb suffix is itself the addressee
+        // marker — «істейсің / істейсіз» CAN ONLY address the
+        // system. The bare «Қалай жұмыс істейсің?» pre-fix tripped
+        // a physics-of-«жұмыс» retrieval miss because the
+        // has_addressee gate required an explicit pronoun. Drop
+        // the gate when the verb stem carries the 2nd-person
+        // ending directly.
+        || joined.contains("қалай жұмыс істейсің")
+        || joined.contains("қалай жұмыс істейсіз")
+        || joined.contains("қалай істейсің")
+        || joined.contains("қалай істейсіз")
+        || joined.contains("қалай жауап бересің")
+        || joined.contains("қалай жауап бересіз")
         || joined.contains("интернетке қосыл")
         || joined.contains("интернетсіз жұмыс")
         || joined.contains("интернетсіз істе")

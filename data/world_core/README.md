@@ -105,8 +105,12 @@ Validator checks:
 
 ## Current scale (v6.0.0-rc4)
 
-**Live totals: 3443 entries / 4082 facts across 65 domains**, all `approved`
-by `shaman`. v6.0.0-rc4 adds `kz_constitution.jsonl` (32 entries on the 1995
+**Live totals: 3460 entries / 4114 facts across 66 domains**, all `approved`
+by `shaman`. v6.0.9 adds `kru_baitursynov.jsonl` (17 entries on Ahmet
+Baitursynuly + Kostanay Regional University + Kazakhstan AI Law +
+cyber-defense), rewritten in v6.0.13 with canonical `is_a / part_of /
+related_to` predicates so every fact reaches `facts.json`. v6.0.0-rc4
+adds `kz_constitution.jsonl` (32 entries on the 1995
 Constitution: 9 разделов, president 7-year mandate, parliament Senate+Mäjilis,
 languages, symbols) + `programming_java.jsonl` (30 entries on the kk.wikibooks
 Java tutorial: JDK/JRE/JVM, литералдар, айнымалылар, методтер) + 25 individual
