@@ -84,14 +84,67 @@ impl UncertaintyPolicy {
         intent: &Intent,
         belief: &BeliefState,
     ) -> EpistemicStatus {
-        // 1. Contradictions always win. Even if the realiser will
-        // fall through to a safe fallback (because the Phase 4 gate
-        // stripped evidence), the epistemic truth is that the
-        // system *knows it has a conflict*. Phase 5 part 2 will
-        // produce a conflict-surfacing template; v4.0.33 just
-        // records the status.
+        // 1. Contradictions win — but only when the current intent
+        // engages the contested slot. Pre-v6.0.6 ANY pending
+        // contradiction returned Conflicted, which routed
+        // unrelated factual queries («Абай кім?» after a city
+        // conflict) to the `unknown.conflicted` template family,
+        // surfacing a clarifying prompt about the user's city in
+        // place of a Kazakh-poet definition. Audit 2026-05-21.
+        //
+        // The gate logic mirrors the action-planner fix in
+        // [`ActionPlanner::plan_inner`]: a contradiction
+        // dominates only when the user's current intent operates
+        // on the contested predicate (Statement/Ask on the
+        // contested slot) OR is a resolution shape
+        // (Affirmation / Negation / UserDisagrees — picks a
+        // side, papers over, or rejects the question). Unrelated
+        // intents pass through to the normal action-based
+        // status; the contradiction remains in
+        // `belief.contradictions` for audit and resurfaces the
+        // next time the user touches that slot.
         if !belief.contradictions.is_empty() {
-            return EpistemicStatus::Conflicted;
+            let intent_engages_contested = {
+                let contested: std::collections::HashSet<&str> = belief
+                    .contradictions
+                    .iter()
+                    .map(|c| c.predicate.as_str())
+                    .collect();
+                let slot_relevant = contested.iter().any(|pred| match *pred {
+                    "city" | "location" => matches!(
+                        intent,
+                        Intent::StatementOfLocation { .. } | Intent::AskLocation
+                    ),
+                    "name" => matches!(intent, Intent::StatementOfName { .. } | Intent::AskName),
+                    "occupation" => matches!(
+                        intent,
+                        Intent::StatementOfOccupation { .. } | Intent::AskOccupation
+                    ),
+                    "age" => matches!(intent, Intent::StatementOfAge { .. } | Intent::AskAge),
+                    _ => false,
+                });
+                let resolution_shape = matches!(
+                    intent,
+                    Intent::Affirmation | Intent::Negation | Intent::UserDisagrees
+                );
+                // v6.0 paper-over-social policy preserved: polite
+                // exchanges keep hitting Conflicted so the user
+                // can't dodge a city conflict with a thanks /
+                // greeting.
+                let paper_over_social = matches!(
+                    intent,
+                    Intent::Greeting { .. }
+                        | Intent::Thanks
+                        | Intent::Apology
+                        | Intent::AskHowAreYou
+                        | Intent::Compliment
+                        | Intent::WellWishes
+                );
+                slot_relevant || resolution_shape || paper_over_social
+            };
+            if intent_engages_contested {
+                return EpistemicStatus::Conflicted;
+            }
         }
 
         // 2. Verifier flagged `ContradictoryBelief` without the
@@ -213,19 +266,46 @@ mod tests {
     }
 
     #[test]
-    fn belief_contradiction_dominates_to_conflicted() {
+    fn belief_contradiction_dominates_when_intent_engages_contested_slot() {
         let mut belief = BeliefState::new();
         belief.record_user_fact(USER_SELF_KEY, "city", "алматы", 0);
         belief.record_user_fact(USER_SELF_KEY, "city", "астана", 1);
-        // Even if action is RunReasoner and verifier somehow passes,
-        // the live conflict in belief must win.
+        // v6.0.6: contradiction dominates only when the current
+        // intent engages the contested predicate. Here intent
+        // is StatementOfLocation (city) — contradiction wins.
         let status = UncertaintyPolicy::derive(
             &plan(Action::RunReasoner),
             &report(vec![], true),
-            &unknown(Some("жер"), Some("chain"), None),
+            &Intent::StatementOfLocation {
+                city: Some("Шымкент".into()),
+            },
             &belief,
         );
         assert_eq!(status, EpistemicStatus::Conflicted);
+    }
+
+    #[test]
+    fn belief_contradiction_does_not_dominate_unrelated_factual_query() {
+        // v6.0.6 — 2026-05-21 user audit. A pending city conflict
+        // must NOT route an unrelated factual query («Абай кім?»,
+        // Intent::Unknown about a Kazakh poet) to the
+        // `unknown.conflicted` template family. The conflict stays
+        // in belief for audit and resurfaces only when the user
+        // touches the city slot again.
+        let mut belief = BeliefState::new();
+        belief.record_user_fact(USER_SELF_KEY, "city", "алматы", 0);
+        belief.record_user_fact(USER_SELF_KEY, "city", "астана", 1);
+        let status = UncertaintyPolicy::derive(
+            &plan(Action::RunReasoner),
+            &report(vec![], true),
+            &unknown(Some("абай"), Some("chain"), None),
+            &belief,
+        );
+        assert_ne!(
+            status,
+            EpistemicStatus::Conflicted,
+            "city conflict should not turn an Unknown(абай) query into Conflicted"
+        );
     }
 
     #[test]

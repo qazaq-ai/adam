@@ -618,6 +618,57 @@ templates = [
     "Сөзбен берілген есепті жауаптауды әзірге үйренген жоқпын. Сандарды операторлармен жазып берсеңіз, нәтижесін шығарып беремін.",
 ]
 
+# **v6.0.5 codex audit 2026-05-21** — recommendation / advice
+# refusal family. Routed via `__recommendation_no_data__` slot
+# set by `Conversation::turn` when
+# `discourse::detect_recommendation_request` fingerprints an
+# open-ended «ұсын / кеңес бер / не жасасам жақсы» query that
+# adam has no curated list to answer honestly. Closes the
+# Codex 2026-05-21 audit finding:
+#   «Маған қандай қазақ кітабын ұсынасыз?» → «Қазақ көз иеленеді.»
+# (a stray R1 derivation surfaced because the topic extractor
+# picked the loose noun `қазақ` and the chain reasoner returned
+# a tangential `RelatedTo` fact). The honest answer makes the
+# limitation explicit and invites a narrower question.
+[[families]]
+key = "unknown.recommendation_no_data"
+templates = [
+    "Бұл сұраққа сенімді ұсыныс беру үшін курацияланған тізімім жоқ. Нақты автор, шығарма немесе тақырып атасаңыз, сол жайында білетінімді айта аламын.",
+    "Ашығын айтайын: ұсыныс берерлік курация жасалмаған тізімім жоқ. Бірақ нақты есім немесе тақырып айтсаңыз, сол жайында дерек бере аламын.",
+    "Бұл салада курацияланған кеңесім әлі жоқ — соны ұсынғым келмейді, өйткені тексерілмеген болар еді. Нақты сұрақ қойсаңыз, не білетінімді бере аламын.",
+]
+
+# **v6.0.5 codex audit 2026-05-21** — multi-fact list response.
+# Conversation layer collects up to N distinct curated facts about
+# the turn's noun_hint and surfaces them as a pre-rendered numbered
+# list in `{multi_fact_list}`. The template just frames the list
+# with a brief Kazakh preamble. Routed via `__multi_fact_list__`
+# slot set by `Conversation::turn`. Closes the Codex 2026-05-21
+# audit finding that «екі дерек» / «үш себеп» asks returned only
+# a single item.
+[[families]]
+key = "unknown.multi_fact"
+templates = [
+    "{multi_fact_count} дерек:\n{multi_fact_list}",
+    "Міне сұрағаныңыз бойынша {multi_fact_count} дерек:\n{multi_fact_list}",
+]
+
+# **v6.0.5 codex audit 2026-05-21** — binary comparison response.
+# Conversation layer detected an "X is bigger / smaller / more /
+# less than Y?" question, looked up X and Y definitions in
+# world_core, and the planner routes here. Honest framing: surface
+# the definitions side-by-side and explicitly note that a
+# numerical verdict (which would require quantitative facts adam
+# does not yet carry) is out of scope. Closes the Codex audit
+# finding that comparisons silently fell through to a single fact
+# about X.
+[[families]]
+key = "unknown.binary_comparison"
+templates = [
+    "{compare_x_def} {compare_y_def} Нақты сандармен ({compare_axis}) салыстыруды әлі жасамаймын — деректі сан берсеңіз, есептей аламын.",
+    "Менің деректерімде: {compare_x_def} {compare_y_def} Бірақ нақты {compare_axis} салыстыруын әлі жасап бере алмаймын — нақты сандарды ұсынсаңыз, есептеп беремін.",
+]
+
 # v4.6.15 — Math answer template family. When
 # `discourse::try_evaluate_arithmetic` parses the input as pure
 # integer arithmetic and computes a value, the planner injects
@@ -636,10 +687,20 @@ key = "math_answer"
 # results > 999_999_999 the renderer returns None and the
 # planner inserts an empty string; templates fall through to a
 # plain digit form via the alternates that don't use the slot.
+# **v6.0.0-rc5 voice REPL round 7** — TTS double-pronunciation
+# fix. Previously templates were «нәтижесі: 40 (қырық)»; the
+# macOS `say` voice reads BOTH the digit «40» (as «сорок» under
+# the Kazakh voice, or rendered numerically) and the Kazakh word
+# form «қырық», producing a parrot-like repetition. User feedback
+# (round-7 transcript) — drop the word-form trailer; the digit
+# alone is concise and unambiguous in both text and TTS surfaces.
+# `{math_words}` slot stays surfaced by the planner so future
+# templates (e.g. an explicit «word answer» request) can still
+# use it; default templates here no longer do.
 templates = [
-    "нәтижесі: {math_value}{math_words}",
-    "жауабы — {math_value}{math_words}",
-    "есептедім: {math_value}{math_words}",
+    "нәтижесі: {math_value}",
+    "жауабы — {math_value}",
+    "есептедім: {math_value}",
 ]
 
 # **v4.75.5** — Check-answer template families. User submits their
@@ -951,31 +1012,63 @@ templates = [
 # refusal points the user at a qualified specialist instead.
 #
 # Detector: `discourse::detect_safety_topic` returns
-# `SafetyCategory::{Medical, Legal, Financial, CurrentData}` when
-# topic + advice-seeking shape co-occur. Planner sentinel:
-# `__safety_refusal__ = <slug>`.
+# **v6.0.5 safety policy v6 (2026-05-21).** High-stakes domains —
+# medical / legal / financial — now ship **informational +
+# emergency-triage + disclaimer** responses instead of the
+# pre-v6 refusal-only path. Rationale documented in
+# `docs/safety_policy_v6.md`: a bare "обратитесь к специалисту"
+# is a non-answer for the Kazakh-speaking user, especially in
+# rural areas with limited specialist access. The new policy
+# delivers user-care literacy while preserving safety via:
+#
+#   1. **Emergency triage FIRST line** — phone number / action
+#      goes at the very top of the response so even readers who
+#      stop after one sentence know where to call.
+#   2. **Information BUT NOT prescription** — facts about
+#      conditions / laws / instruments are surfaced; individualised
+#      diagnoses ("you have X disease") or specific prescriptions
+#      ("take drug Y at dose Z") are not. The line is documented
+#      in `docs/safety_policy_v6.md` § "informational vs
+#      prescriptive".
+#   3. **Disclaimer LAST line** — every response ends with a
+#      one-sentence reminder to consult a qualified specialist
+#      for the specific case.
+#
+# Self-harm path (`safety_refusal.self_harm`) is unchanged —
+# crisis intervention has different ethics from health-literacy
+# delivery and the 1415 crisis-line response must stay first-line.
+# CurrentData path (`safety_refusal.current_data`) is also
+# unchanged — adam still has no live data feed; the refusal
+# remains the honest answer.
+#
+# Template family keys for the rewritten paths are renamed
+# `safety_info.{medical,legal,financial}` to reflect the new
+# semantics; planner routing was updated in lockstep.
+#
+# `SafetyCategory` enum slugs still drive the family selection
+# via `__safety_refusal__ = <slug>` planner sentinel.
 [[families]]
-key = "safety_refusal.medical"
+key = "safety_info.medical"
 templates = [
-    "Денсаулыққа қатысты нақты кеңес бере алмаймын — мен дәрігер емеспін. Симптомдарыңыз бойынша дәл диагноз қою және дәрі тағайындау үшін терапевке немесе жанұя дәрігеріне жүгініңіз. Жалпы анатомия немесе медициналық термин туралы фактілік ақпарат қажет болса, сұраңыз.",
-    "Мен медициналық кеңес бере алмайтын тілдік модельмін. Денсаулыққа қатысты сұрақтар бойынша білікті дәрігер консультациясы керек. Жедел жағдайда — 103 (жедел жәрдем). Жалпы анатомия / физиология сұрақтарына жауап беруге дайынмын.",
-    "Денсаулық туралы шешімді дәрігермен бірге қабылдау керек — өз бетімше дәрі тағайындауға кеңес бермеймін. Терапевке жүгінуді ұсынамын. Жалпы тақырып бойынша факт сұрасаңыз — көмектесемін.",
+    "Жедел жағдайда дереу 103 жедел жәрдем шақырыңыз. Жалпы анықтама: симптомдарды бағалау, негізгі алғашқы көмек, профилактика жайында дерек бере аламын. Бірақ сіздің жеке жағдайыңызға нақты диагноз қою және емді тағайындау үшін дәрігерге жүгініңіз.",
+    "Шұғыл болса — 103 (жедел жәрдем). Содан кейін: жалпы медициналық дерек, симптомдар сипаттамасы, алғашқы көмек қадамдары жайында айта аламын. Бұл — анықтамалық ақпарат, жеке диагноз емес — нақты жағдай үшін емханаға / дәрігерге жүгініңіз.",
+    "Денсаулыққа қауіп төнсе, бірден 103 шақырыңыз. Әйтпесе: жалпы анатомия, физиология, ауру белгілері, профилактика, негізгі алғашқы көмек жайында білетінімді бере аламын. Нақты диагноз және ем — дәрігердің құзіреті, жанұя дәрігеріне жүгінуді ұсынамын.",
 ]
 
 [[families]]
-key = "safety_refusal.legal"
+key = "safety_info.legal"
 templates = [
-    "Заңдық кеңес бере алмаймын — мен заңгер емеспін. Нақты жағдайға кеңес алу үшін кәсіби заңгерге немесе адвокатқа жүгінуіңізді ұсынамын. Заң ұғымы немесе нормасы туралы жалпы факт сұрасаңыз — соған жауап беремін.",
-    "Сот процесі, шарт жасасу немесе дау-дамай шешу жөнінде нақты ұсыныс бере алмаймын — әр істің мән-жайы өзгеше, кәсіби заңгер бағалауы қажет. Заңдық институттар немесе негізгі ұғымдар туралы фактіні білуге болады.",
-    "Бұл — заңдық сипаттағы шешім; оны мен қабылдай алмаймын. Адвокатпен немесе нотариуспен ақылдасуыңызды ұсынамын. Жалпы құқықтық ұғым жайында сұрасаңыз — түсіндіремін.",
+    "Қылмыс орын алса, 102 (полиция) шақырыңыз. Жалпы заңдық анықтама: ҚР АК / ҚК негізгі баптары, шарт түрлері, азаматтық құқықтар, сот процедурасы жайында дерек бере аламын. Сіздің нақты жағдайыңыз үшін заңгер / адвокатпен ақылдасыңыз.",
+    "Шұғыл бұзушылық — 102. Жалпы құқықтық сауатқа арналған ақпарат: шарт реквизиттері, мерзімдер, азаматтық / еңбек / отбасы құқығы негіздері, сотқа арыз беру тәртібі — соларды айта аламын. Нақты іс үшін кәсіби заңгерге жүгініңіз.",
+    "Заңды бұзушылықтың куәсі болсаңыз — 102. Жалпы заңдық дерек (нормалар, рәсімдер, азаматтық құқықтар) — мен білетінімді бере аламын. Бұл анықтамалық ақпарат, нақты ұсыныс емес — істің мән-жайын адвокат бағалауы керек.",
 ]
 
 [[families]]
-key = "safety_refusal.financial"
+key = "safety_info.financial"
 templates = [
-    "Қаржылық немесе инвестициялық кеңес бере алмаймын — нарық мәліметтерім жоқ және кәсіби кеңесші емеспін. Несие, инвестиция немесе салым бойынша шешім қабылдамас бұрын білікті қаржы кеңесшісімен ақылдасыңыз. Жалпы экономикалық ұғым туралы факт қажет болса — сұраңыз.",
-    "Инвестициялық таңдау, валюта курсы туралы кеңес немесе ақша орналастыру стратегиясын ұсынбаймын. Білікті қаржылық кеңесші немесе банк менеджеріне жүгінуіңізді ұсынамын.",
-    "Бұл сұрақ қаржылық шешімге қатысты — оны мен қабылдай алмаймын, өйткені жауапкершілік адамға тиесілі. Кәсіби кеңесшіге жүгініңіз. Қаржылық ұғым жайында түсінік қажет болса — соны айтып бере аламын.",
+    "Қаржылық алаяқтық байқалса — банкіңіздің қиналыстағы клиент-сервисі (көбіне 24/7) + 102 (полиция). Жалпы қаржылық сауат: банктік өнімдер, несие түрлері, инвестиция тәуекелдері, салық негіздері — солар жайында дерек бере аламын. Нақты инвестициялық шешім үшін білікті қаржылық кеңесшіге жүгініңіз.",
+    "Алаяқтық жағдайда: банкіңіздің клиент-сервисіне (қарта блоктау) + 102 хабарласыңыз. Әйтпесе: жалпы экономикалық ұғымдар, тәуекелдерді бағалау тәсілдері, бюджеттеу, зейнетақы жинақтары — солар жайында білетінімді бере аламын. Дербес қаржылық стратегия — кеңесшінің ісі.",
+    "Қаржылық тәуекел жағдайында бірінші — банкіңіздің клиент-сервисі + 102. Жалпы ақпарат: депозит, несие, инвестиция түрлері, олардың тәуекел/табыс сипаттамалары, диверсификация принциптері — соларды айта аламын. Нақты қаржылық шешім қабылдамас бұрын білікті кеңесшіге жүгінуіңізді ұсынамын.",
 ]
 
 [[families]]
@@ -984,6 +1077,21 @@ templates = [
     "Қазіргі немесе бүгінгі мәліметтерге кіруім жоқ — менде уақытқа байланысты өзгеретін деректер сақталмайды (валюта курсы, ауа-райы, жаңалықтар, бағалар). Тура осы сәттегі ақпаратты ресми дереккөзден тексеруіңізді ұсынамын. Жалпы тақырып туралы фактілер қажет болса — сұраңыз.",
     "Соңғы / қазіргі деректі айта алмаймын: менің білім қорым уақыт бойынша өзгеретін мәліметтерді қамтымайды. Жаңалықтар, бағалар, ауа-райы үшін ресми дереккөзге жүгініңіз.",
     "Бұл сұрақ нақты сәттегі деректі талап етеді — менде уақыт ағымына бағынатын ақпарат жоқ (бағалар, курстар, жаңалықтар, ауа-райы). Тірі дереккөзден тексеруіңізді ұсынамын.",
+]
+
+# **v6.0.5 codex audit 2026-05-21 (BLOCKER)** — self-harm / crisis
+# response. The template MUST NOT lecture, moralise, dismiss, or
+# delay; it acknowledges the feeling, names the crisis line for
+# Kazakhstan (1415 — республикалық сенім телефоны / SOS Балалар
+# деревнясы), and invites the user to contact a real person. No
+# random-pick variants — a crisis-line phone number is not a
+# stylistic choice; we ship a single response so the planner can
+# never roll a worse variant. Routed via the existing
+# `__safety_refusal__ = self_harm` slot.
+[[families]]
+key = "safety_refusal.self_harm"
+templates = [
+    "Осыларды айтып отырғаныңыз менің назарымды аударды. Сіздің жайыңыз маған маңызды. Сіз қазір жалғыз емессіз — Қазақстан Республикалық сенім телефонына 1415 нөмірі арқылы тегін, құпия қоңырау шала аласыз (тәулік бойы). Жақын адамыңызға да хабарлап, жанында болуын сұраңыз. Мен — тілдік модельмін, бірақ адамдар сізге шынайы қол ұшын беруге дайын.",
 ]
 
 # **v4.78.0** — political_safety. User asks adam to recommend a
@@ -1344,9 +1452,32 @@ templates = [
 [[families]]
 key = "ask_weather"
 templates = [
-    "менде терезе жоқ",
-    "ауа райын білмеймін",
-    "сыртта қалай екенін айтыңызшы",
+    "Менде терезе жоқ — қалаңызды айтсаңыз («Мен Алматыда тұрамын») немесе `ADAM_WEATHER_CITY=Қостанай` орнатсаңыз, ауа райын тексере аламын.",
+]
+
+# **v6.0.5 codex audit 2026-05-21** — known-city no-data variant.
+# Routed by planner when AskWeather fires AND session.city is set
+# (user told adam their city) AND `__live_weather_set__` is NOT
+# (Open-Meteo fetch failed or returned unusable data). Closes the
+# Codex 2026-05-21 UX finding that even after «Мен Қостанайда
+# тұрамын», the bare `ask_weather` template still asks the user
+# to repeat the city.
+[[families]]
+key = "ask_weather.no_data_known_city"
+templates = [
+    "Сіз {city} қаласында тұратыныңызды білемін, бірақ қазір нақты ауа райы деректерін ала алмадым. Кейінірек қайта сұрап көріңіз.",
+    "{city} бойынша қазіргі ауа райын қазір тексере алмадым (желі қол жетімсіз болуы мүмкін). Сәл кейін қайта сұрасаңыз — қарап беремін.",
+]
+
+# **v6.0** — live Open-Meteo answer subfamily. Routed by the
+# `__live_weather_set__` sentinel in `extract_slots_with_session`
+# whenever a location was resolved AND the network fetch succeeded.
+# Single template so the planner never rolls onto a refusal when
+# real data is available.
+[[families]]
+key = "ask_weather.live"
+templates = [
+    "{live_weather_answer}",
 ]
 
 [[families]]
@@ -1360,9 +1491,7 @@ templates = [
 [[families]]
 key = "ask_time"
 templates = [
-    "уақытты білмеймін",
-    "менде сағат жоқ",
-    "уақыт — асыл қазына",
+    "{live_clock_answer}",
 ]
 
 [[families]]

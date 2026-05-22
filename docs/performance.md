@@ -1,4 +1,15 @@
-# Performance — adam v5.32.0
+# Performance — adam v6.0.0-rc5 (deterministic path; neural preview is opt-in)
+
+> **v6.0.0-rc1 note (2026-05-18).** The numbers below cover the
+> **deterministic kernel path** which is the default in v6.0.0-rc1
+> (identical behaviour to v5.32.0). For the opt-in v6.0 L5.5
+> neural-composer latency see
+> [`bench/neural_inference_2026_05_16.md`](bench/neural_inference_2026_05_16.md)
+> (M2 8 GB baseline; 88× headroom over the v6.0 target). The v6.0
+> release-blocking performance contracts are in
+> [`architecture_neural_v6.md`](architecture_neural_v6.md) §5; this
+> file remains the deterministic-path baseline that v6.0 must not
+> regress against.
 
 ## Headline KPI: cost per correct answer
 

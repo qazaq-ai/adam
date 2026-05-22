@@ -75,16 +75,12 @@
       }
     },
     {
-      "id": "contradiction_surfaces_in_reply",
+      "id": "contradiction_does_not_block_unrelated_factual_query",
       "category": "contradiction_handling",
-      "description": "After conflict + topic question, reply must cite both values + clarification cue.",
+      "description": "v6.0.6 semantics: a pending city conflict must NOT route an unrelated factual query (`жер туралы айтшы`) through the conflict template family. Pre-v6.0.6 the planner returned `CheckContradiction` for any non-Farewell intent, trapping the user behind the resolution prompt. Now the conflict stays in belief for audit and resurfaces only when the user touches the contested slot again. See `docs/third_path_results.md` and the 2026-05-21 user audit (bug 4).",
       "turns": ["мен алматыда тұрамын", "мен астанада тұрамын", "жер туралы айтшы"],
       "expect": {
-        "epistemic_status": "Conflicted",
-        "action": "CheckContradiction",
-        "output_contains_lower_any": ["алматы"],
-        "output_contains_lower_any_2": ["астана"],
-        "output_not_contains": ["байланыс"]
+        "output_not_contains_lower": ["қайсысы дұрыс"]
       }
     },
     {
@@ -149,14 +145,13 @@
       }
     },
     {
-      "id": "verification_conflict_blocks",
+      "id": "verification_does_not_block_unrelated_factual_after_self_conflict",
       "category": "verification_gating",
-      "description": "Belief conflict + reasoning chain → verifier rejects, evidence stripped, output is conflict-surfacing.",
+      "description": "**v6.0.8 — 2026-05-21 user audit round 3.** A self-profile city conflict must NOT block an unrelated factual query («жер туралы айтшы»). Pre-v6.0.8 the verifier added `ContradictoryBelief` unconditionally whenever belief had any contradiction AND the intent had answer shape, which routed the third turn to the `unknown.conflicted` template. Fix: verifier's contradiction gate now mirrors the engagement check used by ActionPlanner / UncertaintyPolicy — unrelated factual / educational / identity intents pass through, the contradiction stays in belief for audit.",
       "turns": ["мен алматыда тұрамын", "мен астанада тұрамын", "жер туралы айтшы"],
       "with_reasoning": true,
       "expect": {
-        "verification_supported": false,
-        "output_not_contains": ["байланыс"]
+        "verification_supported": true
       }
     },
     {
@@ -197,13 +192,13 @@
       }
     },
     {
-      "id": "epistemic_conflicted_dominates",
+      "id": "epistemic_does_not_conflict_on_unrelated_factual_after_self_conflict",
       "category": "epistemic_routing",
-      "description": "Belief contradiction + topic with chain → Conflicted (dominates Derived).",
+      "description": "**v6.0.8 — 2026-05-21 user audit round 3.** Self-profile city conflict must NOT route an unrelated factual query («жер туралы айтшы», Intent::Unknown about Earth) to `Conflicted`. v6.0.8 narrows the contradiction-dominance check to intents that engage the contested predicate (StatementOf/Ask on the contested slot, plus resolution / paper-over shapes). Forward-moving factual queries fall through to action-based status (`Derived` when reasoning chain attached, `Supported` for retrieval, etc.).",
       "turns": ["мен алматыда тұрамын", "мен астанада тұрамын", "жер туралы айтшы"],
       "with_reasoning": true,
       "expect": {
-        "epistemic_status": "Conflicted"
+        "epistemic_status": "Derived"
       }
     },
     {

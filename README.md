@@ -11,7 +11,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-5.32.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <b>Why this project exists →</b> <a href="docs/MANIFESTO.md"><code>docs/MANIFESTO.md</code></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.0.0--rc5-FBC02D?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -21,21 +25,66 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/tests-1442%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-1563%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/p50%20turn%20latency-21%20ms-2EA44F?style=flat-square" alt="latency">
   <img src="https://img.shields.io/badge/RSS-~160%20MB-2EA44F?style=flat-square" alt="rss">
   <img src="https://img.shields.io/badge/GPU-0%25-2EA44F?style=flat-square" alt="gpu">
-  <img src="https://img.shields.io/badge/derived%20facts-37%20062-9CCC65?style=flat-square" alt="derived facts">
-  <img src="https://img.shields.io/badge/world%20core-3244%20curated%20/%203650%20facts%20%2F%2061%20domains-9CCC65?style=flat-square" alt="world core">
+  <img src="https://img.shields.io/badge/derived%20facts-37%20984-9CCC65?style=flat-square" alt="derived facts">
+  <img src="https://img.shields.io/badge/world%20core-3461%20curated%20/%204114%20facts%20%2F%2066%20domains-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/lexicon-25.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/intents-41-2EA44F?style=flat-square" alt="intents">
+  <img src="https://img.shields.io/badge/factual_eval_100-0%20hallucinations%20%2F%20100%25%20grounded-2EA44F?style=flat-square" alt="factual eval">
 </p>
+
+---
+
+## What's new in v6.0.0-rc5
+
+**Release candidate**, not GA. The deterministic kernel path is
+unchanged from v5.32.0 — every existing v5.x test still passes.
+This RC adds two opt-in research transducers that extend the
+kernel without altering its default behaviour:
+
+  - **L5.5 TinyAgt neural composer** behind
+    `--features neural` + `--neural-model <checkpoint-dir>` —
+    runnable, verifier-bounded preview surface (unchanged since
+    rc1).
+  - **E1 discriminative intent classifier** behind
+    `ADAM_NEURAL_INTENT=1` — first completed experiment in the
+    "third path" research arc on the
+    `experimental/agglutinative-neural` branch. A 2.2 MB
+    pure-Rust hash-feature linear classifier that, on the
+    project's frozen test split, matches and slightly exceeds
+    the hand-written cascade (95.95 % vs 91.89 % accuracy) at
+    ~ 600 × lower latency (35 µs p99 vs ~ 35 ms full-pipeline
+    p99). Zero hallucination by construction — output is one
+    of 32 closed labels. Off by default; production-bypassed
+    when not enabled. Design + numbers + anti-success criteria
+    in [`docs/e1_intent_classifier_design.md`](docs/e1_intent_classifier_design.md).
+
+Highlights this RC arc (rc1 → rc5):
+- **L5.5 TinyAgt neural composer preview** — runnable, verifier-bounded.
+- **Live OS clock + Open-Meteo weather** for `Intent::AskTime` and `AskWeather` (opt-in by env).
+- **Multi-clause word-math** restored — «56 × 3, содан кейін ÷ 2» → 84.
+- **kz_industry domain** — 64 major enterprises across 17 oblasts.
+- **6 STT-noise recovery fixes** from voice-REPL probes.
+- **Alpha onboarding kit** — 8-file package for external partners.
+- **arXiv preprint draft v0.2** — Codex peer-review pass applied.
+- **Voice REPL** — Whisper.cpp STT + macOS Aru TTS + pitch-based gender hint + session-locked voice profile.
+- **Safety policy v6** (2026-05-21) — medical / legal / financial query templates migrated from refusal-only to **informational + emergency-triage + disclaimer**. Self-harm crisis path (1415 trust-line first) is unchanged. Documented in [`docs/safety_policy_v6.md`](docs/safety_policy_v6.md).
+- **Codex audit closures** — recommendation refusal, multi-fact count, nominative anaphora, weather × profile city, binary comparison, self-harm safety category, false-location stopwords, anaphora retrieval, multi-step math.
+- **E1 milestone** — first proof that discriminative neural can be ≥ cascade accuracy at 600× less latency with zero hallucination.
+
+Three v6.0 GA acceptance criteria remain open (Lexicon V2 native-
+speaker review, arXiv submission, alpha-partner deployment) —
+all blocked by external parties. See
+[`docs/codex_briefs/v6_ga_external_blockers_2026_05_18.md`](docs/codex_briefs/v6_ga_external_blockers_2026_05_18.md).
 
 ---
 
 ## 30-second pitch
 
-> **adam is a deterministic AI research kernel** — the first applied demonstrator of an alternative to probabilistic large language models, built on the agglutinative morphology of the Kazakh language. Three guarantees by architecture: every output traces to a curated source (**predictability**), runs as a single binary on M2 8GB with 0% GPU and ~21 ms p50 latency (**cheapness**), and **emits no unsupported claims** — every fact-bearing reply cites a curated source or grounded reasoning chain, with safety-refusal templates for high-stakes topics (medical / legal / financial / current-data) (**safety**). Designed to extend across ~30 catalogued agglutinative languages — currently demonstrated on Kazakh; cross-language ports are a research goal, not a shipped capability. Pure Rust. BUSL-1.1.
+> **adam is a deterministic AI research kernel** — the first applied demonstrator of an alternative to probabilistic large language models, built on the agglutinative morphology of the Kazakh language. Three guarantees by architecture: every output traces to a curated source (**predictability**), runs as a single binary on M2 8GB with 0% GPU and ~21 ms p50 latency (**cheapness**), and **emits no unsupported claims** — every fact-bearing reply cites a curated source or grounded reasoning chain, with **informational + emergency-triage + disclaimer** responses for high-stakes topics (medical / legal / financial — see [`docs/safety_policy_v6.md`](docs/safety_policy_v6.md)) and a dedicated crisis-line path for self-harm (**safety**). Designed to extend across ~30 catalogued agglutinative languages — currently demonstrated on Kazakh; cross-language ports are a research goal, not a shipped capability. Pure Rust. BUSL-1.1.
 
 > **Reading order:** [MISSION.md](MISSION.md) (thesis) → [RESEARCH.md](RESEARCH.md) (open questions) → [COLLABORATION.md](COLLABORATION.md) (partner terms) → [AGENTS.md](AGENTS.md) (orientation for automated scouts) → [CHANGELOG.md](CHANGELOG.md) (full release history).
 
@@ -47,7 +96,7 @@ Modern LLMs carry three structural problems we treat as **not inevitable**:
 |---|---|
 | **Black box** — opaque internals, no source attribution, no auditable explanation for any specific output | **Predictability** — every claim traceable to a curated source; every reasoning step inspectable |
 | **Resource cost** — billions of parameters, GPU clusters, datacentre inference, kilowatt-scale energy per query | **Cheapness** — single binary on M2 8GB, **0% GPU**, ~21 ms p50 latency, ~300 MB RSS |
-| **Hallucination risk** — confident generation of plausible-sounding but factually wrong content, no internal mechanism to flag it | **Safety** — every fact-bearing reply cites a curated source, a grounded reasoning chain, or refuses honestly; high-stakes topics (medical / legal / financial / current-data) route to dedicated safety-refusal templates instead of nearest-noun retrieval |
+| **Hallucination risk** — confident generation of plausible-sounding but factually wrong content, no internal mechanism to flag it | **Safety** — every fact-bearing reply cites a curated source, a grounded reasoning chain, or refuses honestly; high-stakes topics (medical / legal / financial) route to **informational + emergency-triage + specialist-referral** templates (policy v6 — see [`docs/safety_policy_v6.md`](docs/safety_policy_v6.md)); self-harm queries route to a dedicated crisis-line response; current-data queries route to honest "no live feed" refusal |
 
 **Hypothesis:** agglutinative languages — Kazakh in particular — exhibit unusually mathematical morphology. Every word decomposes into a root plus a predictable sequence of typed suffixes (case, number, tense, person, possessive, polarity, modality). Composition is **rule-bound, not learned**. That structure is the substrate for a deterministic runtime: FST morphology + typed suffix priors as deterministic prior layers, a curated knowledge graph as the only fact source, templates as the only path from fact to text. **No probabilistic free generation. No retrained-from-scratch behaviour per release.**
 
@@ -144,7 +193,7 @@ For a full evidence dump on any Kazakh root, run [`adam_inspect`](crates/adam-di
 
 | Metric | Value | Notes |
 |---|---|---|
-| Workspace tests | **1 378 passing** | + 17 ignored + adversarial_dialog_v1 (95 cases, **100%**); voice V3 normalizer + priming; Kazakh fuzzy entity matcher; **math echo specificity** (transparent refusal); CI on every release |
+| Workspace tests | **1 556 passing** | default + `--features neural` builds both green; 5 new crates (`adam-agg-tokenizer` / `adam-agg-synth` / `adam-agg-model` / `adam-curriculum` + neural-preview module in `adam-dialog`); v5.x release-blocker invariants preserved |
 | Release cadence | **487+ versioned releases in 5 weeks** | every release CI-verified |
 | p50 turn latency | **21 ms** | vs Llama-3 8B fp16 800–1500 ms; vs GPT-4 50–200 ms |
 | Memory footprint | **~300 MB RSS** | vs LLM 16+ GB VRAM |

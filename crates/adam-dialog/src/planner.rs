@@ -77,7 +77,7 @@ pub fn plan_response_with_session(
     // Merge per-turn slots with persistent session entities. Per-turn
     // wins on collision.
     let mut slots = session.clone();
-    for (k, v) in extract_slots(intent) {
+    for (k, v) in extract_slots_with_session(intent, session) {
         slots.insert(k, v);
     }
     ensure_geo_kind_slot(&mut slots);
@@ -127,6 +127,28 @@ pub fn plan_response_with_session(
             _ => "submit_solution.env_error",
         };
         trace.push(format!("planner: SubmitSolution sub-key → {key}"));
+    }
+    // **v6.0** — AskWeather sub-routing. Same pattern as
+    // AskExercise / CodeRequest below: when the sentinel
+    // `__live_weather_set__` is present, the weather provider
+    // returned a fresh reading and the dedicated `.live` family
+    // (single-template) must fire. Without it the seed-mod picker
+    // rolls between the live answer and the honest-refusal variant
+    // ~50 % of turns.
+    if matches!(intent, Intent::AskWeather) && slots.contains_key("__live_weather_set__") {
+        key = "ask_weather.live";
+        trace.push(format!("planner: AskWeather sub-key → {key}"));
+    } else if matches!(intent, Intent::AskWeather) && session.contains_key("city") {
+        // **v6.0.5 codex audit 2026-05-21** — known-city honest
+        // refusal. Live fetch failed (no network, API timeout,
+        // city absent from `kazakh_city_coords`), but the user
+        // already told adam their city via «Мен X-те тұрамын». The
+        // bare `ask_weather` template asks them to repeat the city
+        // — frustrating UX. Route to a variant that acknowledges
+        // the known city and explains that live data is currently
+        // unavailable.
+        key = "ask_weather.no_data_known_city";
+        trace.push(format!("planner: AskWeather sub-key → {key}"));
     }
     // **v4.96.0** — Codex round-2 audit Bug 2 fix. Pedagogical
     // sub-routing (mirror of plan_response_with_epistemic block).
@@ -363,7 +385,21 @@ pub fn plan_response_with_epistemic(
         if !repo.get(key).is_empty() {
             trace.push(format!("planner: resolve_contradiction override → {key}"));
             let applicable_all = repo.get(key);
-            let mut slots = session.clone();
+            // **v6.0.10 — 2026-05-21 user audit round 4 follow-up.**
+            // Build the slot map ONLY from `extra_slots` (the
+            // resolution-aware caller has injected just the one
+            // slot matching the just-resolved predicate). Do NOT
+            // start from `session.clone()` — that pulls in every
+            // stale profile slot (e.g. `city = Алматы` from a
+            // previous turn) and the template-fillable filter
+            // would then accept the {city} variant on an
+            // occupation resolution. The `resolve_contradiction`
+            // template family already has slot-bearing variants
+            // for city / name / occupation plus a topic-less
+            // fallback; restricting `slots` to the resolved
+            // predicate's value (plus any non-sentinel extras)
+            // forces the template picker to the correct variant.
+            let mut slots: HashMap<String, String> = HashMap::new();
             for (k, v) in extra_slots {
                 if !k.starts_with("__") {
                     slots.insert(k.clone(), v.clone());
@@ -453,6 +489,88 @@ pub fn plan_response_with_epistemic(
                 if !k.starts_with("__") {
                     slots.insert(k.clone(), v.clone());
                 }
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
+    // **v6.0.5 codex audit 2026-05-21** — open-ended recommendation
+    // / advice refusal. Set by `Conversation::turn` via
+    // `discourse::detect_recommendation_request` whenever the user
+    // asks for a recommendation but adam has no curated list to
+    // honestly answer from. Route to the dedicated template family
+    // BEFORE topic-extraction / derivation-render so we never
+    // surface tangential R1 chains («Қазақ көз иеленеді» on a
+    // book-recommendation prompt).
+    if extra_slots.contains_key("__recommendation_no_data__") {
+        let key = "unknown.recommendation_no_data";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: recommendation_no_data override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
+    // **v6.0.5 codex audit 2026-05-21** — multi-fact list override.
+    // `Conversation::turn` already gathered N distinct world_core
+    // facts about the turn's noun_hint and rendered them as a
+    // numbered list in `multi_fact_list`. Route to the template
+    // family that surfaces the list directly. Both slots are
+    // mirrored without their leading `__` so the renderer can
+    // substitute `{multi_fact_list}` / `{multi_fact_count}`.
+    if extra_slots.contains_key("__multi_fact_list__") {
+        let key = "unknown.multi_fact";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: multi_fact override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                let public_key = k.trim_start_matches("__").trim_end_matches("__");
+                slots.insert(public_key.to_string(), v.clone());
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
+    // **v6.0.5 codex audit 2026-05-21** — binary comparison ("X is
+    // bigger than Y?") override. Conversation layer detected the
+    // pattern via `try_extract_binary_comparison`, looked up X and
+    // Y definitions from world_core, and surfaced them through the
+    // `compare_x_def` / `compare_y_def` slots. The template family
+    // is intentionally "honest acknowledge" — adam does not yet
+    // carry numeric quantitative facts to actually decide bigger /
+    // smaller, so it states both definitions and admits the
+    // numerical comparison is out of scope.
+    if extra_slots.contains_key("__binary_comparison__") {
+        let key = "unknown.binary_comparison";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: binary_comparison override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                let public_key = k.trim_start_matches("__").trim_end_matches("__");
+                slots.insert(public_key.to_string(), v.clone());
             }
             return ResponsePlan {
                 literal: chosen,
@@ -878,9 +996,18 @@ pub fn plan_response_with_epistemic(
     // — source-backed but product-dangerous misroute. Honest refusal
     // points the user at a qualified specialist.
     if let Some(category) = extra_slots.get("__safety_refusal__") {
-        let key = format!("safety_refusal.{category}");
+        // **v6.0.5 safety policy v6 (2026-05-21).** Medical /
+        // legal / financial domains migrated from refusal-only
+        // to informational + triage + disclaimer (template family
+        // family `safety_info.{slug}`). Self-harm + current-data
+        // remain on the refusal path — see
+        // `docs/safety_policy_v6.md` for the policy rationale.
+        let key = match category.as_str() {
+            "medical" | "legal" | "financial" => format!("safety_info.{category}"),
+            _ => format!("safety_refusal.{category}"),
+        };
         if !repo.get(&key).is_empty() {
-            trace.push(format!("planner: safety_refusal override → {key}"));
+            trace.push(format!("planner: safety override → {key}"));
             let applicable_all = repo.get(&key);
             let idx = (rng_seed as usize) % applicable_all.len().max(1);
             let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
@@ -1274,7 +1401,7 @@ pub fn plan_response_with_epistemic(
     };
 
     let mut slots = session.clone();
-    for (k, v) in extract_slots(intent) {
+    for (k, v) in extract_slots_with_session(intent, session) {
         slots.insert(k, v);
     }
     // Per-turn extras (e.g. conflict predicate / old_value /
@@ -1340,6 +1467,10 @@ pub fn plan_response_with_epistemic(
             _ => "submit_solution.env_error",
         };
         trace.push(format!("planner: SubmitSolution sub-key → {new_key}"));
+        new_key
+    } else if matches!(intent, Intent::AskWeather) && slots.contains_key("__live_weather_set__") {
+        let new_key = "ask_weather.live";
+        trace.push(format!("planner: AskWeather sub-key → {new_key}"));
         new_key
     } else if matches!(intent, Intent::AskExercise { .. }) {
         let new_key = if slots.contains_key("topic") && slots.contains_key("exercise_body") {
@@ -1520,8 +1651,41 @@ fn template_is_fillable(template: &str, slots: &HashMap<String, String>) -> bool
 /// v0.9.0: `{name}`, `{age}`, `{city}`, `{occupation}` — every intent
 /// that carries an optional entity contributes its slot when the
 /// entity is present.
-fn extract_slots(intent: &Intent) -> HashMap<String, String> {
+fn extract_slots_with_session(
+    intent: &Intent,
+    session: &HashMap<String, String>,
+) -> HashMap<String, String> {
     let mut slots = HashMap::new();
+    // **v6.0** — live OS-clock readout for `Intent::AskTime`. The
+    // slot `live_clock_answer` carries the Kazakh-formatted answer
+    // for the requested aspect (time / date / weekday / month /
+    // year / datetime). The `ask_time` template family is now a
+    // single `{live_clock_answer}` placeholder; pre-v6.0 the family
+    // hard-coded a refusal regardless of variant.
+    if let Intent::AskTime { aspect } = intent {
+        slots.insert(
+            "live_clock_answer".into(),
+            crate::system_clock::render_live(*aspect),
+        );
+    }
+    // **v6.0** — live Open-Meteo weather readout for
+    // `Intent::AskWeather`. Resolved via env (`ADAM_WEATHER_LAT/LON`
+    // or `ADAM_WEATHER_CITY`) or the session-belief `city` slot the
+    // user previously volunteered. On network failure or missing
+    // location, leaves the slot unset so the planner falls back to
+    // the existing «менде терезе жоқ» refusal template.
+    if matches!(intent, Intent::AskWeather)
+        && let Some(line) = crate::weather::render_live(session)
+    {
+        slots.insert("live_weather_answer".into(), line);
+        // Sentinel routes the planner to the dedicated `ask_weather.live`
+        // subfamily (single-template). Without this, the seed-mod
+        // template picker rolls between the live answer and the
+        // honest-refusal variant in `ask_weather` — half the turns
+        // would silently say «менде терезе жоқ» despite live data
+        // being available.
+        slots.insert("__live_weather_set__".into(), "1".into());
+    }
     match intent {
         Intent::StatementOfName { name } => {
             slots.insert("name".into(), name.clone());
@@ -1738,6 +1902,74 @@ fn uses_geo_feature_location_family(kind: &str) -> bool {
 mod tests {
     use super::*;
     use crate::intent::Intent;
+
+    // **v6.0.0-rc4** — guard regression tests for the
+    // `factual_eval_100` 34 → 13 hallucination ratchet. Each block
+    // pins one specific prompt shape from the eval set so that
+    // future refactors of the guard cannot silently re-open the
+    // proverb-fallback / definitional regressions.
+
+    #[test]
+    fn factual_guard_catches_temporal_specific() {
+        assert!(is_specific_factual_query(
+            "қазақстан конституциясы қашан қабылданған"
+        ));
+        assert!(is_specific_factual_query("абай қай жылы туылған"));
+        assert!(is_specific_factual_query("java тілі қашан шықты"));
+    }
+
+    #[test]
+    fn factual_guard_catches_counted_quantity() {
+        assert!(is_specific_factual_query(
+            "абайдың қара сөздері неше шығармадан тұрады"
+        ));
+        assert!(is_specific_factual_query("парламент неше палатадан тұрады"));
+        // «қазір» suppresses — that's the live-clock case, not factual.
+        assert!(!is_specific_factual_query("қазір сағат неше"));
+    }
+
+    #[test]
+    fn factual_guard_catches_named_attributes() {
+        assert!(is_specific_factual_query(
+            "қазақстанның ақша бірлігі қандай"
+        ));
+        assert!(is_specific_factual_query("су химиялық формуласы қандай"));
+        assert!(is_specific_factual_query("абайдың шын аты қандай"));
+        assert!(is_specific_factual_query(
+            "қазақстанда биліктің бастауы кім"
+        ));
+    }
+
+    #[test]
+    fn factual_guard_catches_definitional_x_qandai_y() {
+        assert!(is_specific_factual_query("ай не нәрсе"));
+        assert!(is_specific_factual_query("жаз қандай мезгіл"));
+        assert!(is_specific_factual_query("жарық қандай құбылыс"));
+        assert!(is_specific_factual_query("қан қандай сұйықтық"));
+        assert!(is_specific_factual_query("бурабай қандай орын"));
+    }
+
+    #[test]
+    fn locative_property_guard_catches_locative_qualified_qandai() {
+        // «X-дегі/дағы Y қандай?» — sub-property of a parent entity.
+        assert!(is_locative_property_query("юпитердегі ауа қандай"));
+        assert!(is_locative_property_query("шамалардағы мәңгі мұз қандай"));
+        assert!(is_locative_property_query(
+            "антарктидадағы температура қандай"
+        ));
+        // Locative present but no «қандай» — wh-/who-questions about
+        // sub-entities should still pass through to grounded retrieval.
+        assert!(!is_locative_property_query("қазақстандағы президент кім"));
+        assert!(!is_locative_property_query("қазақстандағы өзендер"));
+    }
+
+    #[test]
+    fn factual_guard_lets_through_open_questions() {
+        // Open / conversational queries — example fallback is fine.
+        assert!(!is_specific_factual_query("қазақстан туралы айт"));
+        assert!(!is_specific_factual_query("мысал келтір"));
+        assert!(!is_specific_factual_query("сәлем"));
+    }
 
     #[test]
     fn template_without_placeholder_is_always_fillable() {
@@ -2013,7 +2245,7 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::StatementOfFamily => "statement_of_family",
         Intent::AskWeather => "ask_weather",
         Intent::StatementOfWeather => "statement_of_weather",
-        Intent::AskTime => "ask_time",
+        Intent::AskTime { .. } => "ask_time",
         Intent::Compliment => "compliment",
         Intent::Request => "request",
         Intent::WellWishes => "well_wishes",
@@ -2357,6 +2589,39 @@ pub fn intent_key(intent: &Intent) -> &'static str {
                     }
                 }
                 UnknownAnswerMode::General => {
+                    // **v6.0.0-rc4 factual_eval hardening** — when the
+                    // turn is a *specific factual query* (asks for a
+                    // year, a single named referent, a formula, an
+                    // explicit «бастауы кім / қашан / неше / қандай
+                    // зат» …), suppress the corpus-sample fallback
+                    // (`unknown.with_evidence`) because it produces
+                    // «{noun} туралы мынаны айта аламын: «<random
+                    // proverb mentioning noun>»» which reads as a
+                    // confident answer but is content-wise off-topic
+                    // (rc4 `factual_eval_100` had ~10 such cases).
+                    // Other Unknown routes (citation requests, generic
+                    // «X не нәрсе?» without a specific aspect, anything
+                    // landing in Example mode) still receive corpus
+                    // quotes as before — regression-tested by the
+                    // `compose_mode_*` / `unknown_with_retrieval_*` /
+                    // `adapted_evidence_*` end-to-end suites.
+                    let factual_joined = raw_tokens.join(" ").to_lowercase();
+                    let factual = is_specific_factual_query(&factual_joined);
+                    let example_ok = !factual;
+                    // Numeric-grounded guard + locative-grounded
+                    // guard both explored 2026-05-19 and reverted:
+                    // - numeric: dropped 5 legit grounded answers
+                    //   in const_005/006/010 for 2 hallucinations.
+                    // - locative: dropped 4 legit
+                    //   `Қазақстандағы өзендер/көлдер/шөлдер/таулар`
+                    //   PartOf-derived answers for 1 hallucination.
+                    // Both Category-C / Category-D hallucinations
+                    // documented as open in
+                    // `docs/factual_eval_hallucination_*` — proper
+                    // fix needs predicate-aware fact selection
+                    // upstream of the router, not a post-hoc
+                    // heuristic on the answer string or the query
+                    // shape.
                     if example.is_some()
                         && unknown_prefers_quoted_example(raw_tokens)
                         && *example_adapted
@@ -2366,9 +2631,9 @@ pub fn intent_key(intent: &Intent) -> &'static str {
                         "unknown.with_evidence"
                     } else if grounded_fact.is_some() {
                         "unknown.with_grounded_fact"
-                    } else if example.is_some() && *example_adapted {
+                    } else if example_ok && example.is_some() && *example_adapted {
                         "unknown.with_adapted_evidence"
-                    } else if example.is_some() {
+                    } else if example_ok && example.is_some() {
                         "unknown.with_evidence"
                     } else if reasoning_chain.is_some() {
                         "unknown.with_derived_chain"
@@ -2381,4 +2646,106 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             }
         }
     }
+}
+
+/// **v6.0.0-rc4 factual_eval_100 guard.** Detect specific factual
+/// queries that ask for a single grounded answer (year, formula,
+/// named source / author / currency, counted quantity). When a
+/// query of this shape lacks a curated fact, surfacing a corpus-
+/// sample (`unknown.with_evidence`) yields the «{noun} туралы
+/// мынаны айта аламын: «<random proverb>»» hallucination pattern
+/// that GA #4 prohibits. The General-mode Unknown router uses
+/// this predicate to suppress the example fallback for such
+/// queries, falling back instead to noun-echo / bare unknown
+/// (which the `factual_eval_100` runner counts as Refusal — i.e.
+/// grounded).
+fn is_specific_factual_query(joined: &str) -> bool {
+    // Temporal-specific
+    if joined.contains("қашан") || joined.contains("қай жылы") || joined.contains("нешеуінде")
+    {
+        return true;
+    }
+    // Counted quantity («неше X-DAT тұрады», «неше шумақтан»,
+    // «неше сағат бар»). The duration guard in detect_ask_time
+    // already steers obvious time-period reads away; the remaining
+    // «неше» queries are factual numeric.
+    if (joined.contains("неше") || joined.contains("қанша")) && !joined.contains("қазір")
+    {
+        return true;
+    }
+    // Authorship / structural-source asking phrases.
+    if joined.contains("бастауы")
+        || joined.contains("авторы")
+        || joined.contains("иесі")
+        || joined.contains("шын аты")
+        || joined.contains("әкесі")
+    {
+        return true;
+    }
+    // Named-attribute factual nouns.
+    if joined.contains("ақша бірлігі")
+        || joined.contains("формуласы")
+        || joined.contains("елордасы")
+        || joined.contains("халық саны")
+        || joined.contains("ұлттық валюта")
+        || joined.contains("ұлттық тіл")
+        || joined.contains("ұлттық рәміз")
+    {
+        return true;
+    }
+    // **Definitional shape «X қандай Y / X не Y»** where Y is a
+    // generic-class noun. The corpus-sample fallback on this shape
+    // surfaces an off-topic proverb mentioning Y (e.g. astro_003
+    // «Ай не нәрсе?» → quote about money, time_004 «Жаз қандай
+    // мезгіл?» → quote about prisoners). Treat as factual so the
+    // router prefers `unknown.with_noun` (honest hedge) over the
+    // proverb fallback.
+    let definitional_y = [
+        "қандай нәрсе",
+        "қандай зат",
+        "қандай орын",
+        "қандай мезгіл",
+        "қандай құбылыс",
+        "қандай сұйықтық",
+        "қандай газ",
+        "қандай ай",
+        "қандай аспан денесі",
+        "қандай мемлекет",
+        "не нәрсе",
+        "не зат",
+    ];
+    if definitional_y.iter().any(|p| joined.contains(p)) {
+        return true;
+    }
+    // **Locative-qualified property** «X-дегі/дағы/ндегі/ндағы Y
+    // қандай?». The user asks about a *sub-property* of an entity
+    // (Юпитердегі ауа = atmosphere on Jupiter, Антарктидадағы
+    // температура = temperature in Antarctica). adam routinely
+    // has the parent-entity fact («Юпитер — газ ғаламшары») but
+    // not the locative sub-property, so the corpus-sample fallback
+    // produces an off-topic proverb mentioning the parent. Narrow
+    // co-occurrence with «қандай» keeps wh-/who- queries like
+    // «Қазақстандағы президент кім?» out of this branch.
+    if is_locative_property_query(joined) {
+        return true;
+    }
+    false
+}
+
+/// Detect the **locative-qualified property** shape «X-дегі/дағы Y
+/// қандай?» — used by `is_specific_factual_query` AND independently
+/// by the General-mode router to suppress `unknown.with_grounded_fact`
+/// for this shape (the curated graph normally has a fact about the
+/// PARENT entity X, not its sub-property Y, so surfacing the parent
+/// fact is a confident off-topic answer). Narrowest-possible
+/// suppression to avoid disturbing the `const_005/006/010` numeric
+/// grounded answers that survived the prior numeric-guard rollback.
+fn is_locative_property_query(joined: &str) -> bool {
+    let has_locative = joined.contains("дегі")
+        || joined.contains("дағы")
+        || joined.contains("ндағы")
+        || joined.contains("ндегі")
+        || joined.contains("лардағы")
+        || joined.contains("лердегі");
+    has_locative && joined.contains("қандай")
 }

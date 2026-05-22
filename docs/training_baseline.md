@@ -2,6 +2,8 @@
 
 > **Legacy context (transformer era, v0.1 – v0.4).** The v1.0.0 dialog pipeline does not train or evaluate a transformer. The assembly contracts and regression reports documented here are preserved because `scripts/validate_foundation.sh` still exercises them as CI regression surface (see `data/training/README.md`). For the v1.0.0 architecture see [`docs/kazakh_grammar/07_dialog_architecture.md`](kazakh_grammar/07_dialog_architecture.md).
 
+> **v6.0 forward-looking note (2026-05-16).** The v0.4 transformer described here is unrelated to the v6.0 algebra-anchored neural composition layer. The v6.0 training pipeline (FST-validated synthetic + Root-decomposed real corpus, ~109k pairs, ~1M parameters, M2 CPU, 39 minutes end-to-end) is documented in [`research/results_real_mix_2026_05_16.md`](research/results_real_mix_2026_05_16.md). The training source binary is `crates/adam-agg-model/src/bin/poc_kazakh_train.rs`.
+
 ## Purpose
 
 Before any real training run, the repository should be able to assemble a

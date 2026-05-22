@@ -124,7 +124,44 @@ pub fn analyse(surface: &str, lex: &LexiconV1) -> Vec<Analysis> {
     // adds the missing analyses without disturbing the regular
     // candidates.
     out.extend(crate::pronoun_paradigm::try_pronoun_paradigm(surface, lex));
+    // **v6.0 (Codex / proptest finding)** — longest-root preference.
+    //
+    // When the lexicon contains both a long noun root and a shorter
+    // root that, with the right inflection, produces the same surface,
+    // the previous lex-order rule could pick the shorter root. Example:
+    // surface `бостық` is both the noun «бостық» (bare Nominative) and
+    // the verb «бос» + PastDefinite + 1pl. Lex order put «бос» first,
+    // and `verb_to_tokens` then dropped the number field across the
+    // token boundary, so detokenize re-synthesised the 1sg form
+    // («бостым»). The proptest `noun_round_trip` shrinks straight to
+    // this case.
+    //
+    // Disambiguation rule: longer root wins; tie-break on the original
+    // determinism order (lex of `(root, id)`, already established by
+    // `entries_ordered`). `sort_by` is stable, so equal-length roots
+    // keep their original relative position.
+    //
+    // Why this is safe for the v2.1+ "`.into_iter().next()` is stable"
+    // contract: the previous order was a stable function of the
+    // Lexicon; the new order is also a stable function of the
+    // Lexicon (no random keys, no clock, no hash seed). The contract
+    // says "stable", not "lex-first" — downstream callers were
+    // already promised reproducibility, not a specific tie-breaking
+    // rule.
+    out.sort_by(|a, b| {
+        let len_a = analysis_root_len(a);
+        let len_b = analysis_root_len(b);
+        len_b.cmp(&len_a)
+    });
     out
+}
+
+fn analysis_root_len(a: &Analysis) -> usize {
+    let root = match a {
+        Analysis::Noun { root, .. } => &root.root,
+        Analysis::Verb { root, .. } => &root.root,
+    };
+    root.chars().count()
 }
 
 #[cfg(test)]

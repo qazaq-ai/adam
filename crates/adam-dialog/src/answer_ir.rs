@@ -469,6 +469,7 @@ fn canonical_safety_body(domain: SafetyDomain) -> &'static str {
         SafetyDomain::Political => {
             "Саяси кеңес немесе партиялық таңдау бойынша ұсыныс бере алмаймын."
         }
+        SafetyDomain::SelfHarm => "Сіздің жайыңыз маған маңызды — сіз қазір жалғыз емессіз.",
     }
 }
 
@@ -481,6 +482,9 @@ fn hedge_surface_for_domain(domain: SafetyDomain) -> &'static str {
         }
         SafetyDomain::CurrentData => "Ресми дереккөзден тексеруіңізді ұсынамын.",
         SafetyDomain::Political => "Партиялық жүйе туралы фактілер қажет болса — сұраңыз.",
+        SafetyDomain::SelfHarm => {
+            "Қазақстан Республикалық сенім телефонына 1415 нөмірі арқылы (тегін, тәулік бойы) қоңырау шала аласыз. Жақын адамыңызбен сөйлесіңіз."
+        }
     }
 }
 

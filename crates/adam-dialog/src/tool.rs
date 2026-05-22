@@ -395,7 +395,25 @@ impl Tool {
                     // the Latin spelling. Conservative — only the
                     // top-3 most likely typed in Cyrillic.
                     ("руст", "rust"),
+                    // **v6.0.0-rc5 voice REPL 2026-05-20** — Whisper-
+                    // turbo drops the «у» from «руст» on bare-utterance
+                    // turns («Раст?» asking about Rust), so add the
+                    // single-syllable Cyrillic spelling here too.
+                    ("раст", "rust"),
+                    // **v6.0.0-rc5 voice REPL round 4** — Whisper-turbo
+                    // collapses «Раст бағдарламалы тілі» to «Рас» (lost
+                    // final «-т») when the speaker chains the language
+                    // name with the following noun. «Рас» is also the
+                    // Kazakh word for «truth», so the synonym fires
+                    // only inside SearchGraph subject lookup (where the
+                    // context is already a programming-language query)
+                    // — the bare word «рас» elsewhere stays a normal
+                    // adjective.
+                    ("рас", "rust"),
                     ("питон", "python"),
+                    // Whisper-turbo «Pythоn» / «Пайтон» — voice-input
+                    // surface for python.
+                    ("пайтон", "python"),
                     ("джава", "java"),
                 ];
                 let mut matches: Vec<&ReasFact> = ctx
@@ -512,8 +530,28 @@ impl Tool {
                 // wins over «қала» / «облыс» when the user asks
                 // about өзен. Strictly additive — fires only when
                 // `has_quantity_intent` is true.
-                let has_quantity_intent =
-                    query_lower.contains("қанша") || query_lower.contains("неше");
+                // **v6.0.0-rc4 evening hardening** — year-asking
+                // queries («қай жылы / қашан») now also trigger the
+                // quantity intent. Pre-fix, `factual_eval_100` cases
+                // abai_004/005, const_001, java_002 surfaced IsA
+                // facts («Абай — негізін салушы») instead of
+                // HasQuantity facts («1845 туылған жыл») because
+                // user_facing_fact_priority puts IsA above HasQuantity
+                // in the default cascade. With the year-asking
+                // trigger, HasQuantity facts compete for the top slot,
+                // and the digit-bearing object (1845 / 1904 / 1995)
+                // wins on quantity_object_match_rank below.
+                //
+                // **2026-05-20 morning** — formula-asking analogue
+                // («формуласы қандай»). Same shape: chem_001
+                // surfaces the IsA generic «Су — өмір негізі» when
+                // the HasQuantity branch «су → H2O формуласы»
+                // would be on-topic.
+                let has_quantity_intent = query_lower.contains("қанша")
+                    || query_lower.contains("неше")
+                    || query_lower.contains("қай жылы")
+                    || query_lower.contains("қашан")
+                    || query_lower.contains("формуласы");
                 // **v4.17.5** — synonym table for list-intent
                 // disambiguation. Hoisted out of the sort closure
                 // so debug code can also reference it. **v4.38.0**
@@ -748,6 +786,19 @@ impl Tool {
                     } else {
                         Vec::new()
                     };
+                    // **v6.0.0-rc4 evening hardening** — year-asking
+                    // sub-trigger. When the query is specifically
+                    // «қай жылы / қашан» (rather than the broader
+                    // «қанша / неше»), the right HasQuantity fact is
+                    // the one whose object **contains a digit** (year
+                    // numbers «1845», «1995», «1991», «1904» …).
+                    // Pre-fix the rank was decided purely by content-
+                    // token overlap, which let «45 қара сөз» win
+                    // over «1845 туылған жыл» for «Абай қай жылы
+                    // туылған?» because «жыл» also appears in «жыл»
+                    // (4-char prefix) bridging from «жылы».
+                    let year_asking =
+                        query_lower.contains("қай жылы") || query_lower.contains("қашан");
                     let quantity_object_match_rank = |fact: &ReasFact| -> i32 {
                         if has_quantity_intent {
                             // Only HasQuantity facts compete for
@@ -758,6 +809,19 @@ impl Tool {
                                 return 1;
                             }
                             let object_lower = fact.object.root.to_lowercase();
+                            if year_asking {
+                                // Digit-bearing HasQuantity wins
+                                // over digit-less «45 қара сөз»
+                                // style counts (which won't appear
+                                // in 1845/1995-shaped year answers
+                                // anyway, but the user's actual
+                                // year-asking shape is unambiguous).
+                                let has_digit = object_lower.chars().any(|c| c.is_ascii_digit());
+                                if has_digit {
+                                    return 0;
+                                }
+                                return 1;
+                            }
                             // Match the candidate's object root
                             // against any of the user's content
                             // tokens. Both directions: object
@@ -799,6 +863,18 @@ impl Tool {
                             }
                         }
                     };
+                    // Name-asking rerank explored 2026-05-20 and
+                    // rolled back: «шын аты қандай» query (abai_006)
+                    // expects the RelatedTo edge «абай → ибраһим»,
+                    // but upstream SearchGraph dispatch already
+                    // applies a predicate filter that drops
+                    // RelatedTo for «what is X?» shape queries,
+                    // so the rerank tier received an empty
+                    // RelatedTo cohort and only changed the
+                    // already-hallucinating IsA answer into a
+                    // reasoning-chain hallucination of equivalent
+                    // wrongness. Proper fix needs predicate-filter
+                    // bypass at the dispatch level, scoped to rc5.
                     // **v4.17.5** — when has_list_intent fires,
                     // list_intent_rank takes precedence over the
                     // v4.4.11 overlap reranker. Reason: spurious
@@ -1130,7 +1206,30 @@ fn query_content_tokens(input: &str, subject: &str) -> Vec<String> {
             if trimmed.is_empty() {
                 return None;
             }
-            if trimmed.chars().count() < 4 {
+            // **v6.0.0-rc4 morning 2026-05-20 part 3** — relaxed
+            // threshold 4 → 3 chars with a stop-word blacklist.
+            // The 4-char minimum dropped 3-char Kazakh content
+            // tokens like «шын» / «аты» / «көл» that ARE
+            // semantically content-bearing. Surfaced by
+            // `factual_eval_100::abai_006` «Абайдың шын аты
+            // қандай?» where tokens reduced to ["абайдың", "қандай"]
+            // and the abai-RelatedTo-Ибраһим fact lost to the
+            // abai-RelatedTo-қазақ-әдебиеті fact (no «шын аты»
+            // signal in the ranker). 3-char content tokens fire
+            // EXCEPT for generic stop-words like «бар / жоқ /
+            // ма / ба / қай / не» that would spuriously match
+            // many facts and disrupt list-query sorting
+            // (repl_replay's kazakhstan_lakes / mountains /
+            // deserts cases regressed when «бар» landed in the
+            // token set unfiltered).
+            if trimmed.chars().count() < 3 {
+                return None;
+            }
+            const STOP_TOKENS: &[&str] = &[
+                "бар", "жоқ", "ма", "ба", "қай", "не", "сен", "сіз", "мен", "біз", "ол", "бұл",
+                "осы", "сол", "де",
+            ];
+            if STOP_TOKENS.contains(&trimmed) {
                 return None;
             }
             if trimmed == subject_lower {

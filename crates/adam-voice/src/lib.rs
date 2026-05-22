@@ -70,6 +70,7 @@ pub mod aec;
 pub mod error;
 pub mod mic;
 pub mod normalizer;
+pub mod pitch;
 pub mod playback;
 pub mod stt;
 

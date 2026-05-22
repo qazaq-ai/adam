@@ -70,6 +70,7 @@ pub mod semantics;
 pub mod sentence_decomp;
 pub mod slot_inventory;
 pub mod slot_syntax;
+pub mod system_clock;
 pub mod system_identity;
 pub mod task;
 pub mod templates;
@@ -78,6 +79,13 @@ pub mod topic_extraction;
 pub mod tts;
 pub mod uncertainty;
 pub mod verifier;
+pub mod weather;
+
+// **v6.0.0-rc1** — opt-in L5.5 neural composer preview. Compiled
+// only with `--features neural` so the burn-runtime dependencies
+// stay out of the default build.
+#[cfg(feature = "neural")]
+pub mod neural_preview;
 
 pub use action::{Action, ActionDigest, ActionPlan, ActionPlanner, OutputKind};
 pub use belief::{

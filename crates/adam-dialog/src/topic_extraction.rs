@@ -506,6 +506,39 @@ fn is_deverbal_participle_root(root: &str) -> bool {
 ///
 /// Codex v4.0.19 review #2 — direct implementation.
 pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
+    // **v6.0.9 — 2026-05-21 user audit round 4.** KRU /
+    // Baitursynuly / AI-Law domain compounds — added with
+    // `data/world_core/kru_baitursynov.jsonl`.
+    // **v6.0.15 — round 4d follow-up.** Added cyber-defense
+    // compounds; `multiword_entity_hint` matches single-token
+    // entries by exact `lowered_tokens.contains` lookup, so
+    // hyphenated terms must be registered as-is. Without
+    // these, the topic extractor returned the bare head noun
+    // («қорғаныс») and the v6.0.13 KRU-subject whitelist in
+    // the pre-action-plan probe didn't match.
+    "кибер-қорғаныс",
+    "кибершабуыл",
+    "ахмет байтұрсынұлы атындағы қостанай өңірлік университеті",
+    "қорғаныс саласындағы жасанды интеллект",
+    "ахмет байтұрсынұлы",
+    "қостанай өңірлік университеті",
+    "жасанды интеллект туралы заң",
+    "қазақ ағартушысы",
+    "жоғары оқу орны",
+    "жоғары тәуекелді",
+    "торғай облысы",
+    "тәуекел деңгейі",
+    "төте жазу",
+    "ақпараттық қылмыс",
+    "қазақстан заңы",
+    "қорғау шарасы",
+    "1872 жылы 5 қыркүйек",
+    "1937 жылы 8 желтоқсан",
+    "2026 жылы 18 қаңтар",
+    "1912 жыл",
+    "1939 жыл",
+    "1988 жыл",
+    "2021 жыл",
     // length 25+ (v4.17.5 — rich Kazakhstan IsA fact)
     "орталық азиядағы тәуелсіз мемлекет",
     // length 16+
@@ -2906,6 +2939,282 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "әскери орналастыру",
     "әскери тәртіп",
     "әскери қағида",
+    // **v6.0** — Kazakh industry domain (`data/world_core/
+    // kz_industry.jsonl`). 60+ enterprise / mine / generating-station
+    // entries surface compound subjects + objects that pass through
+    // topic-extraction. Required by `world_core_multiword_coverage`.
+    // Mix of specific named entities («арселормиттал теміртау»,
+    // «қарашығанақ кен орны») and generic IsA / produces objects
+    // («металлургия комбинаты», «мұнай өңдеу зауыты», «темір рудасы»).
+    "петропавл ауыр машина жасау зауыты",
+    "көкшетау минералды су зауыты",
+    "ақтөбе хром қосылыстары зауыты",
+    "балқаш кен-металлургия комбинаты",
+    "қарағанды резеңке-техника зауыты",
+    "риддер кен-металлургия комбинаты",
+    "талдықорған акцентр зауыты",
+    "қарағанды металлургия комбинаты",
+    "қазақстан электролиз зауыты",
+    "қызылорда мұнай-химия зауыты",
+    "қапшағай су электр станциясы",
+    "атырау жылу электр станциясы",
+    "павлодар мұнай өңдеу зауыты",
+    "шымкент мұнай өңдеу зауыты",
+    "өскемен металлургия комбинаты",
+    "атырау мұнай өңдеу зауыты",
+    "кентау трансформатор зауыты",
+    "арселормиттал теміртау",
+    "қазақстан каспий шельфі",
+    "соколов-сарыбай гөбк",
+    "қостанай комбайн зауыты",
+    "қаратау фосфорит кеніші",
+    "ақтау теңіз порты",
+    "түркістан цемент зауыты",
+    "үлбі металлургия зауыты",
+    "семей цемент зауыты",
+    "тараз цемент зауыты",
+    "павлодар алюминий зауыты",
+    "жамбыл фосфор зауыты",
+    "жезқазған мыс зауыты",
+    "қарашығанақ кен орны",
+    "қашаған кен орны",
+    "ауыл шаруашылық техникасы",
+    "қазақстан темір жолы",
+    "қазақмыс корпорациясы",
+    "электротехникалық зауыт",
+    "шымкент сыра зауыты",
+    "алматы қант зауыты",
+    "бозшакөл кеніші",
+    "ақтоғай кеніші",
+    "семей ет комбинаты",
+    "оңтүстік полиметалл",
+    "петропавл мұнаймаш",
+    "орал зауыты зенит",
+    "дөң гөбк",
+    "степногорск гхк",
+    "екібастұз грэс",
+    "су электр станциясы",
+    "ферроқорытпа компаниясы",
+    "темір жол компаниясы",
+    "вагон жасау зауыты",
+    "машина жасау зауыты",
+    "мұнай өңдеу зауыты",
+    "электр энергиясы",
+    "мұнай жабдықтары",
+    "мұнай кен орны",
+    "мұнай компаниясы",
+    "уран компаниясы",
+    "мырыш компаниясы",
+    "химия компаниясы",
+    "мыс компаниясы",
+    "кен-байыту комбинаты",
+    "кен-химия кешені",
+    "металлургия комбинаты",
+    "болат комбинаты",
+    "ет комбинаты",
+    "металлургия зауыты",
+    "автомобиль зауыты",
+    "алюминий зауыты",
+    "цемент зауыты",
+    "цемент зауыты",
+    "химия зауыты",
+    "сыра зауыты",
+    "сүт зауыты",
+    "қант зауыты",
+    "мыс комбинаты",
+    "мыс зауыты",
+    // **v6.0.0-rc3** — Abai works domain (abai_works.jsonl).
+    "абайдың қара сөздері",
+    "алла деген сөз жеңіл",
+    "әзім әңгімесі",
+    "сегіз аяқ",
+    "семей облысы",
+    "шығарма жинағы",
+    "әдебиет негізін салушы",
+    "электр станциясы",
+    "энергетикалық кешен",
+    "түсті металл зауыты",
+    "резеңке зауыты",
+    "кәмпит фабрикасы",
+    "сусын зауыты",
+    "минералды су",
+    "сүт өнімдері",
+    "темір рудасы",
+    "табиғи газ",
+    "теңіз портасы",
+    "жолаушы вагоны",
+    "кен орны",
+    "кен орталығы",
+    // **v6.0.0-rc4** — kz_constitution.jsonl + programming_java.jsonl
+    // + expanded abai_works.jsonl compound subjects/objects.
+    ".class кеңейтілуі",
+    ".java кеңейтілуі",
+    "11 судья",
+    "1845 туылған жыл",
+    "1890 жылдары жазылған",
+    "1904 қайтыс болған жыл",
+    "1995 шығарылған жыл",
+    "1995 қабылданған жыл",
+    "2 палата",
+    "45 қара сөз",
+    "7 жыл өкілеттік мерзімі",
+    "8 жыл өкілеттік мерзімі",
+    "8 шумақ",
+    "9 бөлім",
+    "book of words",
+    "c тілі",
+    "c++ тілі",
+    "james gosling",
+    "java байт-код",
+    "java байт-коды",
+    "java бастапқы код",
+    "java компиляция",
+    "main әдісі",
+    "sun microsystems",
+    "try catch",
+    "абсолютті құқық",
+    "адам және азамат",
+    "адам құқықтары",
+    "алтыншы қара сөз",
+    "атаулар кеңістігі",
+    "атқарушы тармақ",
+    "ақша бірлігі",
+    "бастапқы нүкте",
+    "бағдарламалау құралы",
+    "бесінші қара сөз",
+    "билік бастауы",
+    "біртұтас мемлекет",
+    "бірінші қара сөз",
+    "виртуалды машина",
+    "демократиялық мемлекет",
+    "екінші қара сөз",
+    "ерекше жағдайды өңдеу",
+    "жалпы ережелер",
+    "жер қойнауы",
+    "жергілікті басқару бөлімі",
+    "жетінші қара сөз",
+    "жиырма бесінші қара сөз",
+    "жиырма тоғызыншы қара сөз",
+    "жиырмасыншы қара сөз",
+    "зайырлы мемлекет",
+    "заң шығарушы тармақ",
+    "класс данасы",
+    "конституциялық принцип",
+    "конституциялық сот бөлімі",
+    "конституциялық сот судьясы",
+    "конституциялық құқық",
+    "мемлекет меншігі",
+    "мемлекеттен бөлек институт",
+    "мемлекеттік билік",
+    "мемлекеттік ту",
+    "мемлекеттік тіл",
+    "мән сақтаушы",
+    "негізгі заң",
+    "негізгі тип",
+    "объектіге бағыттылық принципі",
+    "он сегізінші қара сөз",
+    "он тоғызыншы қара сөз",
+    "он үшінші қара сөз",
+    "оныншы қара сөз",
+    "орындау ортасы",
+    "орыс тілі",
+    "отыз бесінші қара сөз",
+    "отыз екінші қара сөз",
+    "отыз сегізінші қара сөз",
+    "отыз тоғызыншы қара сөз",
+    "отызыншы қара сөз",
+    "парламент бөлімі",
+    "парламент палатасы",
+    "платформа-тәуелсіз тіл",
+    "президент бөлімі",
+    "президенттік республика",
+    "ресми тіл",
+    "саяси көп түрлілік",
+    "сегізінші қара сөз",
+    "сот бөлімі",
+    "сот тармағы",
+    "типтік құрылым",
+    "тоғызыншы қара сөз",
+    "тұрақты мән",
+    "төртінші қара сөз",
+    "цикл блогы",
+    "шартты блок",
+    "қазақстан азаматтығы",
+    "қорытынды ережелер",
+    "қырық бесінші қара сөз",
+    "қырық бірінші қара сөз",
+    "үкімет бөлімі",
+    "үшінші қара сөз",
+    "әдістер контрактысы",
+    // **v6.0.0-rc4 morning 2026-05-20** — chemistry formulas +
+    // Caspian/Mangystau geography + Jupiter atmosphere additions
+    // for `factual_eval_100` data gaps.
+    "CO2 формуласы",
+    "H2 формуласы",
+    "H2O формуласы",
+    "N2 формуласы",
+    "NaCl формуласы",
+    "O2 формуласы",
+    "ас тұз",
+    "батыс қазақстан",
+    "каспий теңізі",
+    "көмірқышқыл газ",
+    "сутегі-гелий атмосферасы",
+    "юпитердегі ауа",
+    "ішкі теңіз",
+    // **v6.0.0-rc4 morning 2026-05-20 part 3** — compound subjects
+    // surfaced by `factual_eval_100` const_001 / ind_004 / phys_005.
+    "қазақстан конституциясы",
+    "су химиялық формуласы",
+    "ссгпо",
+    // **v6.0.0-rc5 finalisation 2026-05-20** — novel-smoke
+    // findings: currency / employment-vs-physics word-sense
+    // disambiguation.
+    "ұлттық валюта",
+    "жұмыс күні",
+    "жұмыс іздегенде",
+    "қазақстан ұлттық валютасы",
+    // **v6.0.0-rc5 voice REPL 2026-05-20** — compound subjects
+    // surfaced by live REPL turn 16 «Танымалы адамдарды білесің бі?»
+    // (bare «адам» previously won, surfacing the «Адам — тіршілік
+    // иесі» tangential answer).
+    "танымал адамдар",
+    "танымал тұлғалар",
+    "танымалы адамдар",
+    // **v6.0.0-rc5 MOD presentation prep (26 May 2026)** —
+    // defense / AI-law / international-cooperation compounds for
+    // the upcoming Ministry of Defence demo. Closes 24 MULTIWORD
+    // gaps surfaced by `world_core_multiword_coverage`.
+    "2026 ашылған жыл",
+    "2026 қабылданған жыл",
+    "defense tech it парк",
+    "ақпараттық қауіпсіздік",
+    "бейбітшілік үшін серіктестік",
+    "беспилотты ұшу аппараты",
+    "жалпыхалықтық жұмылдыру",
+    "жасанды интеллект туралы заң",
+    "жер әскерлері",
+    "жоғары тәуекелді жүйе",
+    "мемлекеттік заң",
+    "стратегиялық құжат",
+    "төтенше жағдай",
+    "халықаралық әскери одақ",
+    "шанхай ынтымақтастық ұйымы",
+    "қорғаныс жасанды интеллекті",
+    "қорғаныс саласы",
+    "ұжымдық қауіпсіздік шарты ұйымы",
+    "әскери барлау",
+    "әскери доктрина",
+    "әскери техника",
+    "әскери технологиялар алаңы",
+    "әуе күштері",
+    "әуе шабуылына қарсы қорғаныс",
+    // **v6.0.0-rc5 MOD voice REPL 2026-05-20** — Whisper-turbo
+    // transliterates Latin defense terms into Cyrillic and merges
+    // adjacent words. Adding the captured surfaces so the compound
+    // topic detector finds them on live voice input.
+    "дефенс тех айти парк",
+    "жасанды интеллекторалы заң",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
@@ -2916,6 +3225,21 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
 pub(crate) fn multiword_entity_hint(input: &str) -> Option<String> {
     let lowered = input.to_lowercase();
     let lowered_tokens: Vec<&str> = lowered.split_whitespace().collect();
+    // **v6.0.0-rc4 morning 2026-05-20** — Y-side suppression for
+    // «X қандай Y?» shape. In `Күн қандай аспан денесі?` the
+    // multiword «аспан денесі» is the *category* (Y), not the
+    // subject (X) — Adam should retrieve facts about Күн, not
+    // about «аспан денесі». Pre-fix the longest-first cascade
+    // returned «аспан денесі» because it's a registered compound,
+    // overriding the single-word «күн». When the input contains
+    // the «қандай / не нәрсе / не зат» marker, we skip multiword
+    // matches whose match position is AFTER the marker and prefer
+    // matches whose position is BEFORE it (or single-token
+    // fallback). Same fix unlocks `astro_002` in `factual_eval_100`.
+    let qandai_pos = lowered
+        .find(" қандай ")
+        .or_else(|| lowered.find(" не нәрсе"))
+        .or_else(|| lowered.find(" не зат"));
     // **v4.79.0** — actually iterate longest-first so multi-token
     // compounds containing shorter ones (e.g. «cargo build --release»
     // vs «cargo build») resolve to the most specific match. Earlier
@@ -2942,7 +3266,17 @@ pub(crate) fn multiword_entity_hint(input: &str) -> Option<String> {
         // punctuation that breaks token equality. Substring is the
         // right semantic for `::`-paths.
         if entity.contains(' ') || entity.contains("::") {
-            if lowered.contains(**entity) {
+            if let Some(match_pos) = lowered.find(**entity) {
+                // Y-side suppression: if «қандай / не нәрсе / не зат»
+                // marker exists and the multiword match starts AFTER
+                // it, this compound is the category (Y), not the
+                // subject (X). Skip — the single-word fallback (X
+                // before the marker) is the right topic.
+                if let Some(qp) = qandai_pos {
+                    if match_pos > qp {
+                        continue;
+                    }
+                }
                 return Some((**entity).to_string());
             }
         } else if lowered_tokens.contains(*entity) {
@@ -2993,6 +3327,18 @@ pub(crate) fn multiword_entity_hint(input: &str) -> Option<String> {
         }
         for window in tokens.windows(2) {
             if window[0] == parts[0] && window[1].starts_with(stem_2.as_str()) {
+                // Y-side suppression (second pass mirror of first
+                // pass) — if the matched compound begins AFTER the
+                // «қандай / не нәрсе / не зат» marker, it is the
+                // category, not the subject. Approximate position
+                // by searching `parts[0]` in lowered string.
+                if let Some(qp) = qandai_pos {
+                    if let Some(mp) = lowered.find(parts[0]) {
+                        if mp > qp {
+                            continue;
+                        }
+                    }
+                }
                 return Some((*entity).to_string());
             }
         }
@@ -3033,6 +3379,14 @@ pub(crate) fn multiword_entity_hint(input: &str) -> Option<String> {
                     && window[0].starts_with(parts[0])
                     && window[0].ends_with(suf)
                 {
+                    // Y-side suppression (third pass mirror).
+                    if let Some(qp) = qandai_pos {
+                        if let Some(mp) = lowered.find(window[0]) {
+                            if mp > qp {
+                                continue;
+                            }
+                        }
+                    }
                     return Some((*entity).to_string());
                 }
             }
@@ -3655,10 +4009,89 @@ pub(crate) fn topic_marker_hint(input: &str, parses: &[Analysis]) -> Option<Stri
 /// form. `first_noun_root_with_confidence` reports its own band.
 /// `accusative_form_hint` reports `Low` because it strips a suffix
 /// without lexicon validation (string-level fallback for FST gaps).
+/// **v6.0 (live REPL 2026-05-18)** — Whisper STT systematically clips
+/// the final vowel of common school-subject names («Физика» → «Физик»,
+/// «Биология» → «Биолог», «История» / «Тарих» loss, …). The clipped
+/// stem is in the Lexicon as a different word (e.g. «физик» =
+/// "physicist") which then dominates the topic-extraction ranking
+/// and surfaces a tangential IsA fact. This canonicaliser maps the
+/// known clipped variants back to the school-subject canonical form.
+///
+/// Triggers ONLY when the input also contains a knowledge-question
+/// marker («не білесің» / «не білесіз» / «не айтасың» / «туралы») —
+/// outside that context, «физик» genuinely refers to a physicist and
+/// must not be rewritten.
+fn canonicalize_school_subject(input: &str) -> Option<&'static str> {
+    let lower = input.to_lowercase();
+    let has_knowledge_marker = lower.contains("не білесің")
+        || lower.contains("не білесіз")
+        || lower.contains("не айтасың")
+        || lower.contains("не айтасыз")
+        || lower.contains("туралы");
+    if !has_knowledge_marker {
+        return None;
+    }
+    // Each entry: list of clipped surface forms that should resolve
+    // to the canonical full-name school-subject topic. Order is
+    // longest-prefix first within each subject so partial overlaps
+    // don't misroute.
+    const SUBJECTS: &[(&str, &[&str])] = &[
+        ("математика", &["математикалық", "математ", "математ "]),
+        // **v6.0.0-rc5 voice REPL 2026-05-20** — Whisper-turbo
+        // transliterates Russian «физика» as Kazakh «фізика» (и→і),
+        // and the same `и↔і` confusion happens on every long Russian
+        // loanword («біологія / хімія / гєографія / асрономія»).
+        // Add the і-variants as Whisper-noise surface forms here.
+        ("физика", &["физикалық", "физик ", "фізика", "фізик"]),
+        ("биология", &["биолог ", "біологія", "біолог"]),
+        ("химия", &["химик ", "хими ", "хімія", "хімі"]),
+        ("география", &["географ ", "гєографія", "гєограф"]),
+        ("тарих", &["истор", "истори"]),
+        ("информатика", &["информатик ", "інформатика", "інформатик"]),
+        ("астрономия", &["астроном ", "асрономія", "астроном "]),
+    ];
+    // Pad input with leading + trailing space so word-boundary
+    // matching with " stem " is robust.
+    let padded = format!(" {} ", lower);
+    for (canonical, clipped_forms) in SUBJECTS {
+        // Already in canonical form → no rewrite needed; let normal
+        // extraction handle it.
+        if padded.contains(&format!(" {} ", canonical)) {
+            return None;
+        }
+        for stem in *clipped_forms {
+            // Each `stem` ends with a space inside the literal where
+            // we want strict word boundary («физик » not «физика»).
+            // Forms without trailing space match anywhere.
+            let probe = if stem.ends_with(' ') {
+                format!(" {}", stem)
+            } else {
+                format!(" {} ", stem)
+            };
+            if padded.contains(&probe) {
+                return Some(canonical);
+            }
+        }
+    }
+    None
+}
+
 pub(crate) fn best_noun_hint_with_confidence(
     input: &str,
     parses: &[Analysis],
 ) -> Option<(String, TopicConfidence)> {
+    // **v6.0 (live REPL 2026-05-18)** — Whisper STT regularly clips
+    // the trailing vowel from common school-subject names: «Физика
+    // туралы…» becomes «Физик туралы…», «Биология» becomes «Биолог»,
+    // «История» becomes «Истор». The truncated stem is a different
+    // word (e.g. «физик» = "physicist"), so the planner surfaces an
+    // unrelated definition instead of the school-subject summary.
+    // Canonicalise these stems back to their full surface forms
+    // BEFORE any of the other extraction strategies run.
+    let canonical = canonicalize_school_subject(input);
+    if let Some(subj) = canonical {
+        return Some((subj.to_string(), TopicConfidence::High));
+    }
     // **v5.23.0** — first-president normaliser. Live-feedback
     // 2026-05-12: «Ең бірше қазақстанның президенті кім болды?» and
     // «Алдымен қазақстанның президенті кім болды?» both surfaced
@@ -3709,8 +4142,42 @@ pub(crate) fn best_noun_hint_with_confidence(
     if let Some(la) = locative_attributive_hint(input) {
         return Some((la, TopicConfidence::High));
     }
-    if let Some(pair) = first_noun_root_with_confidence(parses) {
-        return Some(pair);
+    if let Some((root, conf)) = first_noun_root_with_confidence(parses) {
+        // **v6.0.0-rc4 morning 2026-05-20 part 3** — Y-suppress at
+        // first-noun fallback. When `first_noun_root` lands on the
+        // category noun AFTER the «қандай» marker (e.g.
+        // `factual_eval_100::phys_005` «Жарық қандай құбылыс?»
+        // → FST first-noun = «құбылыс»), look for an earlier noun
+        // in the parse stream that sits BEFORE the marker and
+        // prefer it. Falls through to the original pick if no
+        // earlier noun is available.
+        let lower = input.to_lowercase();
+        let qandai_pos = lower
+            .find(" қандай ")
+            .or_else(|| lower.find(" не нәрсе"))
+            .or_else(|| lower.find(" не зат"));
+        if let Some(qp) = qandai_pos {
+            if let Some(rp) = lower.find(root.as_str()) {
+                if rp > qp {
+                    // Look earlier in parses for a noun whose root
+                    // surfaces BEFORE the marker.
+                    for p in parses.iter() {
+                        if let Analysis::Noun { root: r, .. } = p {
+                            let cand = r.root.to_lowercase();
+                            if NOT_A_TOPIC.contains(&cand.as_str()) {
+                                continue;
+                            }
+                            if let Some(cp) = lower.find(cand.as_str()) {
+                                if cp < qp {
+                                    return Some((cand, TopicConfidence::High));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return Some((root, conf));
     }
     accusative_form_hint(input).map(|s| (s, TopicConfidence::Low))
 }
@@ -3743,6 +4210,12 @@ pub(crate) fn detect_first_office_query(input: &str) -> Option<String> {
         "бірінші",
         "ең бірінші",
         "ең бірше", // Whisper-medium / large mishearing of «ең бірінші»
+        // **v6.0.0-rc5 voice REPL 2026-05-20** — Whisper-turbo
+        // transcribed «бірінші» as «бірінше» (final -і → -е) on the
+        // «Қазақстанның бірінше президенті кім болды?» turn,
+        // routing the query to "current president" instead of
+        // «тұңғыш президент» (Nazarbayev).
+        "бірінше",
         "алдымен",
         "1-ші",
         "1ші",
@@ -3750,6 +4223,16 @@ pub(crate) fn detect_first_office_query(input: &str) -> Option<String> {
     ];
     let has_first = FIRST_MARKERS.iter().any(|m| lowered.contains(m));
     if !has_first {
+        // **v6.0 (live REPL 2026-05-18)** — bare-question variant
+        // without an explicit «қазіргі» marker: «Қазақстанда кім
+        // президент?» / «Кім президент?». Live REPL surfaced the
+        // republic-structure IsA fact instead of Tokayev. When the
+        // input has BOTH «президент» and «кім» — but no first-marker
+        // — route to the «қазіргі президент» world_core topic which
+        // is grounded on the current head-of-state fact.
+        if lowered.contains("президент") && lowered.contains("кім") {
+            return Some("қазіргі президент".to_string());
+        }
         return None;
     }
     if lowered.contains("президент") {
@@ -3905,6 +4388,19 @@ pub(crate) fn genitive_topic_hint_for_list(input: &str, parses: &[Analysis]) -> 
                 Some(adam_kernel_fst::morphotactics::Case::Genitive)
             ) && !NOT_A_TOPIC.contains(&root.root.as_str()) =>
         {
+            // **v6.0.0-rc4 morning 2026-05-20 part 3** — when the
+            // input contains a registered compound «X-ның Y-сы»
+            // whose first word matches this genitive root, prefer
+            // the compound (more informative subject for the
+            // SearchGraph). Closes `factual_eval_100::abai_003`
+            // where the genitive subject «абай» was returned
+            // before the compound «абайдың қара сөздері» could
+            // win in the multiword cascade.
+            if let Some(mw) = multiword_entity_hint(input) {
+                if mw.starts_with(&root.root) || mw.contains(root.root.as_str()) {
+                    return Some(mw);
+                }
+            }
             Some(root.root.clone())
         }
         _ => None,
@@ -4086,12 +4582,15 @@ mod tests {
     }
 
     #[test]
-    fn detect_first_office_query_ignores_current() {
-        // No first-marker → return None; lets the existing
-        // «қазіргі президент» / «қазақстан президенті» multiword
-        // handle current-president questions.
+    fn detect_first_office_query_returns_current_when_no_first_marker_v6() {
+        // **v6.0** — bare «X-ң президенті кім?» without a
+        // first-marker now routes to «қазіргі президент» so the
+        // current head-of-state fact wins over the republic-
+        // structure IsA fact. Live REPL 2026-05-18: «Қазақстанда
+        // кім президент?» surfaced «Қазақстан — президенттік-
+        // парламенттік аралас республика.» pre-v6.0.
         let hit = detect_first_office_query("Қазір қазақстанның президенті кім?");
-        assert!(hit.is_none());
+        assert_eq!(hit.as_deref(), Some("қазіргі президент"));
     }
 
     #[test]

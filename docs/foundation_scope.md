@@ -1,8 +1,25 @@
 # Foundation Scope
 
+> **Forward-looking update 2026-05-16.** The "no probabilistic free
+> generation" line below describes v5.x. v6.0.0 introduces an
+> additive **algebra-anchored neural composition layer (L5.5)** —
+> see [`architecture_neural_v6.md`](architecture_neural_v6.md) for
+> the spec and [`MANIFESTO.md`](MANIFESTO.md) for the position. The
+> v6.0 path remains predictable, auditable, and CPU-resident; the
+> neural layer sits between the deterministic template (L5) and the
+> verifier (L6), and a missing model file boots-and-runs the v5.x
+> behaviour unchanged.
+
 ## Goal
 
 Deliver a **predictable, auditable Kazakh reasoning engine** built entirely in Rust and runnable on a MacBook Air M2 8 GB. Every layer's decision must be traceable. No probabilistic free generation in the recognised-intent path. **Not** an LLM clone — intentionally narrower, intentionally cheaper, intentionally provenance-first.
+
+In v6.0.0 (forthcoming, see Q3 2026 milestone) this goal extends:
+deterministic core remains load-bearing, **plus** an algebra-anchored
+neural composition layer that selects among morpho-valid surface
+variants under the same verifier gate. Hallucination remains
+architecturally impossible because the verifier still blocks any
+output that doesn't ground in `world_core` / `facts.json`.
 
 ## In scope (v1.0.0 → v4.22.5 delivered)
 
@@ -87,7 +104,7 @@ Deliver a **predictable, auditable Kazakh reasoning engine** built entirely in R
 - **79.48 % morpheme coverage** of the committed pool (v1.5.5 audit baseline).
 
 ### Quality gates
-- **Full regression test suite — 969 workspace tests passing as of v4.52.5, 0 failing, 4 ignored**. (Cumulative growth from 822 at v4.22.5 → 969 at v4.52.5: +147 tests across the parse-disambig framework, the v4.45.0–v4.50.0 Stage B selection-weights substrate, the v4.51.0 user-activity slot extraction, and the v4.51.5–v4.52.0 transcript-driven detector extensions.)
+- **Full regression test suite — 1 557 workspace tests passing as of v6.0.0-rc4, 0 failing, 2 ignored**. (Cumulative growth from 822 at v4.22.5 → 969 at v4.52.5 → 1 528 (mid-arc) → 1 556 at v6.0.0-rc1 with full L5.5/L6 wire-up → **1 557 at v6.0.0-rc4** adding `factual_eval_100` gate.)
 - `scripts/validate_foundation.sh` — foundation CI (lex / FST / corpus / world_core / reasoner end-to-end).
 - `scripts/verify_release_version.sh` — manifest-consistency gate (every committed JSON pinned to current crate version).
 - `scripts/run_slow_roundtrip.sh` (v4.1.6+) — runs the four `#[ignore]`d FST synthesis-analysis roundtrip tests on demand.

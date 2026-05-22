@@ -5,7 +5,12 @@ every direction. This document is the concrete onboarding framework
 per partner class.
 
 For the research thesis itself, see [`MISSION.md`](MISSION.md). For
-the detailed research roadmap, see [`RESEARCH.md`](RESEARCH.md).
+the four-inversion architectural position, see
+[`docs/MANIFESTO.md`](docs/MANIFESTO.md). For the detailed research
+roadmap, see [`RESEARCH.md`](RESEARCH.md). For the v6.0 architecture
+spec (algebra-anchored neural composition layer added to the
+deterministic kernel), see
+[`docs/architecture_neural_v6.md`](docs/architecture_neural_v6.md).
 
 ## TL;DR — start here
 

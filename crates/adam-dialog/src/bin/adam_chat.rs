@@ -70,6 +70,11 @@ use adam_kernel_fst::suffix_priors::SuffixPriors;
 use adam_reasoning::{Fact as ReasFact, reasoner::DerivedFact};
 use adam_retrieval::MorphemeIndex;
 
+// **v6.0.0-rc1** — L5.5 neural composer preview module. Lives in
+// the library under `--features neural`; absent without it.
+#[cfg(feature = "neural")]
+use adam_dialog::neural_preview;
+
 const RETRIEVAL_INDEX_PATH: &str = "data/retrieval/morpheme_index.json";
 const FACTS_PATH: &str = "data/retrieval/facts.json";
 const DERIVED_FACTS_PATH: &str = "data/retrieval/derived_facts.json";
@@ -158,6 +163,23 @@ fn main() -> ExitCode {
         .find(|w| w[0] == "--whisper-confidence-threshold")
         .and_then(|w| w[1].parse().ok())
         .unwrap_or(0.5);
+
+    // **v6.0.0-rc1** — opt-in L5.5 neural composer. `--neural-model
+    // <path>` points at a checkpoint directory produced by
+    // `poc_kazakh_train` (config.json + labels.json + training.json +
+    // model.mpk). When set AND the `neural` cargo feature is on, the
+    // REPL accepts a `/neural <root>` slash command that runs
+    // constrained generation, verifies the output through L6, and
+    // prints both the raw surface and the verdict. Without the flag,
+    // adam runs as the deterministic v5.x kernel — no behaviour
+    // change.
+    //
+    // Migration plan: `docs/migration_v5_to_v6.md` §4 ("Wiring L5.5
+    // into the dialog loop").
+    let neural_model_arg = args
+        .windows(2)
+        .find(|w| w[0] == "--neural-model")
+        .map(|w| w[1].clone());
 
     // **v5.6.0** — parallel cold-start load. Heavy I/O resources
     // (retrieval index ~18 MB, derived facts ~22 MB, root affinity
@@ -259,6 +281,16 @@ fn main() -> ExitCode {
     if let Some(idx) = index {
         conv = conv.with_morpheme_index(idx);
     }
+    // **v6.0.5** — gate Kazakh phonetic-substitution to STT mode.
+    // Voice input is noisy (Whisper mishears «көбейт» as «Кубейт»,
+    // «жиырма» as «Жерма») and benefits from in-pipeline phonetic
+    // normalisation. Typed input is intentional and should pass
+    // through verbatim. The session slot drives `phonetic_normalize`
+    // in `Conversation::turn_with_trace`.
+    if voice_input {
+        conv.session
+            .insert("voice_input_mode".into(), "true".to_string());
+    }
     if compose {
         conv = conv.with_compose_mode(ComposeMode::InSampleCitySwap);
         eprintln!(
@@ -273,6 +305,59 @@ fn main() -> ExitCode {
     }
     if !derived.is_empty() || !extracted.is_empty() {
         conv = conv.with_reasoning_chains(extracted, derived);
+    }
+
+    // **v6.0.5 — E1 production wiring.** Opt-in load of a trained
+    // discriminative intent classifier (the experimental Rung-A
+    // artefact from the E1 research branch). Attached only when
+    // `ADAM_NEURAL_INTENT=1` AND the artefact file exists on disk;
+    // otherwise the cascade drives every turn unchanged. Even when
+    // attached, the classifier only rescues `Unknown` verdicts
+    // (see `apply_neural_intent_override` in
+    // `crates/adam-dialog/src/conversation.rs`) — confident
+    // cascade outputs always win, safety routing dominates,
+    // confidence gap < 0.15 yields to the cascade.
+    if std::env::var("ADAM_NEURAL_INTENT").as_deref() == Ok("1") {
+        let path = std::env::var("ADAM_NEURAL_INTENT_MODEL")
+            .unwrap_or_else(|_| "data/intent_classifier/v1/rung_a.json".to_string());
+        match adam_intent_classifier::Classifier::from_path(&path) {
+            Ok(classifier) => {
+                let label_count = classifier.labels().len();
+                conv = conv.with_neural_classifier(classifier);
+                eprintln!(
+                    "adam-chat: neural-intent ON — Rung-A classifier loaded from {path} ({label_count} classes)"
+                );
+            }
+            Err(e) => {
+                eprintln!(
+                    "adam-chat: neural-intent ON but model load FAILED ({e}); cascade-only path"
+                );
+            }
+        }
+    }
+
+    // **v6.0.5 — E2 production wiring.** Opt-in load of the
+    // trained discriminative slot extractor (Rung-A from the E2
+    // research branch). Attached only when `ADAM_NEURAL_SLOTS=1`
+    // AND the artefact file exists on disk; otherwise the
+    // cascade handles slot extraction unchanged. Even when
+    // attached, the extractor only fills session slots the
+    // cascade left empty (see `apply_neural_slot_rescue`) —
+    // cascade values always win.
+    if std::env::var("ADAM_NEURAL_SLOTS").as_deref() == Ok("1") {
+        let path = std::env::var("ADAM_NEURAL_SLOTS_MODEL")
+            .unwrap_or_else(|_| "data/slot_extractor/v1/rung_a.json".to_string());
+        match adam_slot_extractor::SlotExtractor::from_path(&path) {
+            Ok(extractor) => {
+                conv = conv.with_neural_slot_extractor(extractor);
+                eprintln!("adam-chat: neural-slots ON — Rung-A slot extractor loaded from {path}");
+            }
+            Err(e) => {
+                eprintln!(
+                    "adam-chat: neural-slots ON but model load FAILED ({e}); cascade-only path"
+                );
+            }
+        }
     }
 
     // **v5.6.0** — domain index built from the world_core load
@@ -383,6 +468,27 @@ fn main() -> ExitCode {
     let tts_handle: Option<&dyn adam_dialog::tts::TtsBackend> =
         if tts_enabled { Some(&*tts_box) } else { None };
 
+    // **v6.0.0-rc1** — initialise the L5.5 preview if the user asked
+    // for it AND the `neural` cargo feature is on. Returns `None`
+    // silently when the feature is off OR the checkpoint is
+    // missing — deterministic kernel keeps working unchanged.
+    #[cfg(feature = "neural")]
+    let neural_state = neural_model_arg.as_deref().and_then(|p| {
+        neural_preview::init(
+            std::path::Path::new(p),
+            "data/tokenizer/segmentation_roots.json",
+            "data/lexicon_v1/apertium_imported_roots.json",
+            FACTS_PATH,
+        )
+    });
+    #[cfg(not(feature = "neural"))]
+    if neural_model_arg.is_some() {
+        eprintln!(
+            "adam-chat --neural-model: requires the `neural` cargo feature. \
+             Rebuild with `cargo build --release -p adam-dialog --bin adam_chat --features neural`."
+        );
+    }
+
     if let Some(pos) = args.iter().position(|a| a == "--once") {
         if let Some(input) = args.get(pos + 1) {
             let (_refused, out) = run_turn(&mut conv, input, &lex, &repo, trace, turn_seed(0));
@@ -453,6 +559,40 @@ fn main() -> ExitCode {
     for line in stdin.lock().lines() {
         let Ok(line) = line else { break };
         if let Some(assembled) = absorb_line(&line, &mut block_buf) {
+            // **v6.0.0-rc1** — `/neural <prompt>` opt-in slash command.
+            // Runs the L5.5 preview composer when a checkpoint was
+            // loaded; otherwise prints a hint. Done BEFORE the regular
+            // dialog dispatch so the slash command never leaks into the
+            // kernel turn pipeline. Audit trail printed verbatim so
+            // alpha partners see exactly what the neural layer
+            // produced + what the L6 verifier did with it.
+            if let Some(prompt) = assembled.strip_prefix("/neural ") {
+                #[cfg(feature = "neural")]
+                {
+                    match neural_state.as_ref() {
+                        Some(state) => {
+                            let audit = neural_preview::compose(state, prompt);
+                            println!("{audit}");
+                        }
+                        None => {
+                            println!(
+                                "/neural: no checkpoint loaded. Launch with \
+                                 `--neural-model <path-to-checkpoint-dir>`."
+                            );
+                        }
+                    }
+                }
+                #[cfg(not(feature = "neural"))]
+                {
+                    let _ = prompt;
+                    println!(
+                        "/neural: this binary was built without the `neural` feature. \
+                         Rebuild with `--features neural`."
+                    );
+                }
+                stdout.lock().flush().ok();
+                continue;
+            }
             // **v5.24.5 — Voice arc V4 (push-to-talk barge-in).** The
             // user just submitted a new turn. If TTS from the previous
             // turn is still playing, kill it immediately so it
@@ -878,6 +1018,49 @@ fn run_voice_repl(
             samples.len() as f64 / adam_voice::mic::WHISPER_SAMPLE_RATE as f64
         );
         io::stderr().lock().flush().ok();
+        // **v6.0.0-rc5 MOD voice REPL 2026-05-20** — pitch-based
+        // gender hint. Compute F0 on the captured audio before
+        // Whisper. The hint is opportunistic: dialog still prefers
+        // name-based gender (set when the user introduces themselves
+        // by name) — voice pitch only fills the slot when the
+        // speaker hasn't named themselves yet, so anonymous Q&A
+        // can still address them as «ағай» / «апай».
+        let voice_gender_hint =
+            adam_voice::pitch::estimate_pitch_hz(&samples, adam_voice::mic::WHISPER_SAMPLE_RATE)
+                .and_then(adam_voice::pitch::classify_gender);
+        if let Some(g) = voice_gender_hint {
+            let label = match g {
+                adam_voice::pitch::PitchGender::Male => "male",
+                adam_voice::pitch::PitchGender::Female => "female",
+            };
+            // **v6.0.5** — session-persistent voice profile. Per-
+            // turn F0 estimation is noisy (room acoustics, segment
+            // length, octave-error). Once the same gender label
+            // wins on two non-overlapping segments we lock it for
+            // the session — subsequent turns no longer overwrite
+            // it, which prevents the round-8 "male / female / male"
+            // flapping when a single speaker's voice straddles the
+            // 155–175 Hz dead-band.
+            let counter_key = format!("voice_gender_count_{label}");
+            let prior_count: u32 = conv
+                .session
+                .get(&counter_key)
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(0);
+            let new_count = prior_count + 1;
+            conv.session.insert(counter_key, new_count.to_string());
+            let locked = conv.session.get("voice_gender_locked").cloned().is_some();
+            if !locked {
+                eprintln!("[voice] pitch-gender hint = {label}");
+                conv.session
+                    .insert("voice_gender_hint".into(), label.to_string());
+                if new_count >= 2 {
+                    eprintln!("[voice] pitch-gender locked = {label} (2+ consistent estimates)");
+                    conv.session
+                        .insert("voice_gender_locked".into(), label.to_string());
+                }
+            }
+        }
         let tmp_dir = std::env::temp_dir();
         let wav_path = tmp_dir.join(format!("adam_voice_turn_{}.wav", *turn + 1));
         if let Err(e) = write_wav(&samples, &wav_path) {

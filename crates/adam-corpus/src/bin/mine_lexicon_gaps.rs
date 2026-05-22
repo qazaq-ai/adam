@@ -19,7 +19,7 @@
 //!     Auto-POS inference is deferred to a later release — wrong
 //!     guesses are worse than a flagged default.
 //!
-//! The output `docs/lexicon_gap_candidates.md` is a **native-speaker
+//! The output `data/lexicon_gap_candidates.md` is a **native-speaker
 //! review file**: one candidate per section, checkbox to approve, slots
 //! for reviewer-supplied root form + POS + harmony + final-sound
 //! overrides, and a Tally section at the bottom so the reviewer can
@@ -59,7 +59,7 @@ use serde::Deserialize;
 const CURATED_DIR: &str = "data/curated";
 const CURATED_ROOTS: &str = "data/tokenizer/segmentation_roots.json";
 const APERTIUM_ROOTS: &str = "data/lexicon_v1/apertium_imported_roots.json";
-const OUT_PATH: &str = "docs/lexicon_gap_candidates.md";
+const OUT_PATH: &str = "data/lexicon_gap_candidates.md";
 
 const DEFAULT_TOP: usize = 200;
 const DEFAULT_CONTEXTS_PER_CANDIDATE: usize = 3;
@@ -79,6 +79,12 @@ const SOURCE_PACKS: &[&str] = &[
     "kazakh_textbooks_pack.json",
     // v4.7.1 — Rust Book Kazakh translation pack.
     "rust_book_kk_pack.json",
+    // **v6.0.0-rc3** — Kazakh Wikibooks corpus (CC-BY-SA-3.0).
+    // 17 k curriculum-focused sentences: Abai literature, Kazakh
+    // Constitution, Java tutorial in Kazakh, language textbooks.
+    // Complements wikipedia_kz_pack (encyclopaedic breadth) with
+    // structured-content depth. See `data/external/wikibooks_kk/`.
+    "wikibooks_kk_pack.json",
 ];
 
 #[derive(Debug, Deserialize)]
@@ -129,40 +135,80 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
-    eprintln!(
-        "mine_lexicon_gaps: loaded {} Lexicon roots (≥ {MIN_ROOT_LEN} chars)",
-        roots.len()
-    );
+    // load_roots() prints its own diagnostics including the
+    // short-closed-class count.
+
+    // **v6.0.0-rc2** — apply the Lexicon-V2 auto-exclude filter
+    // built by `triage_lexicon_v2`. Surfaces in
+    // `data/lexicon_v2/auto_exclude.csv` are confirmed loanwords /
+    // OCR artefacts / abbreviations / already-covered proper nouns
+    // and should never resurface in the gap pool. Missing CSV →
+    // empty set → pre-rc2 behaviour preserved.
+    let excludes = load_lexicon_v2_excludes();
+    if !excludes.is_empty() {
+        eprintln!(
+            "mine_lexicon_gaps: Lexicon-V2 auto-exclude filter active ({} surfaces skipped from gap pool)",
+            excludes.len()
+        );
+    }
 
     // Pass 1: count uncovered token frequencies across all packs.
     // Pass 2: collect first-N contexts for each top-frequency candidate.
     // Doing it in two passes lets us keep the contexts Vec capped at
     // contexts_per, without retaining all sample texts in memory.
+    //
+    // Pass 1 is parallelised across packs: every pack worker builds
+    // a local freq map, then maps are merged at the boundary. With
+    // 10+ packs on M2 (8 cores) this is near-linear speedup, since
+    // the per-pack workload is dominated by has_known_prefix calls
+    // which are fully independent.
+    use rayon::prelude::*;
+    type PackStats = (HashMap<String, usize>, usize, usize, bool);
+    let pack_results: Vec<PackStats> = SOURCE_PACKS
+        .par_iter()
+        .map(|pack_name| {
+            let path = Path::new(CURATED_DIR).join(pack_name);
+            let Ok(pack) = load_pack(&path) else {
+                eprintln!("skipping {} (missing or malformed)", path.display());
+                return (HashMap::new(), 0, 0, false);
+            };
+            let mut local_freq: HashMap<String, usize> = HashMap::new();
+            let mut local_samples = 0usize;
+            let mut local_tokens = 0usize;
+            for s in &pack.samples {
+                local_samples += 1;
+                for word in s.text.split_whitespace() {
+                    let cleaned = normalise(word);
+                    if cleaned.chars().count() < MIN_TOKEN_LEN {
+                        continue;
+                    }
+                    local_tokens += 1;
+                    if has_known_prefix(&cleaned, &roots) {
+                        continue;
+                    }
+                    // v6.0.0-rc2 — drop confirmed-noise surfaces.
+                    if excludes.contains(&cleaned) {
+                        continue;
+                    }
+                    *local_freq.entry(cleaned).or_insert(0) += 1;
+                }
+            }
+            (local_freq, local_samples, local_tokens, true)
+        })
+        .collect();
+
     let mut freq: HashMap<String, usize> = HashMap::new();
     let mut packs_loaded = 0usize;
     let mut total_tokens = 0usize;
     let mut total_samples = 0usize;
-
-    for pack_name in SOURCE_PACKS {
-        let path = Path::new(CURATED_DIR).join(pack_name);
-        let Ok(pack) = load_pack(&path) else {
-            eprintln!("skipping {} (missing or malformed)", path.display());
-            continue;
-        };
-        packs_loaded += 1;
-        for s in &pack.samples {
-            total_samples += 1;
-            for word in s.text.split_whitespace() {
-                let cleaned = normalise(word);
-                if cleaned.chars().count() < MIN_TOKEN_LEN {
-                    continue;
-                }
-                total_tokens += 1;
-                if has_known_prefix(&cleaned, &roots) {
-                    continue;
-                }
-                *freq.entry(cleaned).or_insert(0) += 1;
-            }
+    for (local_freq, local_samples, local_tokens, loaded) in pack_results {
+        if loaded {
+            packs_loaded += 1;
+        }
+        total_samples += local_samples;
+        total_tokens += local_tokens;
+        for (k, v) in local_freq {
+            *freq.entry(k).or_insert(0) += v;
         }
     }
     eprintln!(
@@ -375,6 +421,33 @@ fn normalise(word: &str) -> String {
         .to_lowercase()
 }
 
+/// **v6.0.0-rc2** — load the Lexicon-V2 auto-exclude CSV produced
+/// by `triage_lexicon_v2`. Surfaces listed there are confirmed
+/// loanwords / OCR artefacts / abbreviations / already-covered
+/// proper nouns; the gap miner skips them so the candidate pool
+/// keeps shrinking instead of resurfacing the same noise.
+///
+/// Returns an empty set when the CSV is missing — keeps pre-rc2
+/// behaviour identical for callers who haven't run the triage yet.
+fn load_lexicon_v2_excludes() -> HashSet<String> {
+    let path = Path::new("data/lexicon_v2/auto_exclude.csv");
+    let mut set = HashSet::new();
+    let Ok(text) = std::fs::read_to_string(path) else {
+        return set;
+    };
+    for (i, line) in text.lines().enumerate() {
+        if i == 0 {
+            continue; // header
+        }
+        // CSV format: n,surface,freq,harmony,final_class,reason
+        let parts: Vec<&str> = line.split(',').collect();
+        if parts.len() >= 2 {
+            set.insert(parts[1].trim().to_lowercase());
+        }
+    }
+    set
+}
+
 fn load_pack(path: &PathBuf) -> Result<PackFile, String> {
     let raw = fs::read_to_string(path).map_err(|e| e.to_string())?;
     serde_json::from_str(&raw).map_err(|e| e.to_string())
@@ -382,25 +455,70 @@ fn load_pack(path: &PathBuf) -> Result<PackFile, String> {
 
 fn load_roots() -> Result<HashSet<String>, String> {
     let mut set = HashSet::new();
+    let mut short_kept = 0usize;
+    let mut leading_dash_normalised = 0usize;
+    // Pre-seed with irregular pronoun surfaces — the FST's
+    // pronoun_paradigm catches these analytically, but mine_lexicon_
+    // gaps's prefix-match doesn't (stems alternate: ол → оғ-, бұл →
+    // бұғ-). Without this seed, "оған" / "одан" / "бұған" / etc would
+    // be flagged as uncovered despite being fully analysable.
+    let irreg_count = adam_kernel_fst::pronoun_paradigm::irregular_pronoun_surfaces().count();
+    for surface in adam_kernel_fst::pronoun_paradigm::irregular_pronoun_surfaces() {
+        set.insert(surface.to_lowercase());
+    }
     for path in [CURATED_ROOTS, APERTIUM_ROOTS] {
         let raw = fs::read_to_string(path).map_err(|e| format!("{path}: {e}"))?;
         let file: RootsFile = serde_json::from_str(&raw).map_err(|e| format!("{path}: {e}"))?;
         for entry in &file.roots {
-            let r = entry.root.trim().to_lowercase();
-            if r.chars().count() >= MIN_ROOT_LEN {
-                set.insert(r);
+            let mut r = entry.root.trim().to_lowercase();
+            // Normalise the legacy `-` prefix used in some lexicon
+            // entries (`-аят`, `-ба`) — that dash is a curator
+            // marker, not part of the surface. Stripping it lets
+            // prefix-match see «аяттың» / «бабалары» / etc.
+            if let Some(stripped) = r.strip_prefix('-') {
+                r = stripped.to_string();
+                leading_dash_normalised += 1;
             }
+            if r.is_empty() {
+                continue;
+            }
+            let len = r.chars().count();
+            // Trust the Lexicon curation. Both noun and verb stems
+            // ship at 2-character length for common Kazakh roots
+            // (`ал`, `бер`, `өт`, `ел`, `жыл`, ...); filtering them
+            // out misses millions of inflected surfaces. The previous
+            // MIN_ROOT_LEN = 3 dropped them; we keep every Lexicon
+            // entry regardless of length. False-positive prefix
+            // matches are bounded by the Lexicon curation itself.
+            if len < MIN_ROOT_LEN {
+                short_kept += 1;
+            }
+            set.insert(r);
         }
     }
+    eprintln!(
+        "mine_lexicon_gaps: loaded {} Lexicon roots ({} short \
+         < {MIN_ROOT_LEN} chars kept, {} normalised `-` prefix, \
+         +{} irregular pronoun surfaces seeded)",
+        set.len(),
+        short_kept,
+        leading_dash_normalised,
+        irreg_count
+    );
     Ok(set)
 }
 
 fn has_known_prefix(word: &str, roots: &HashSet<String>) -> bool {
-    // Take prefixes of length 3..=word.len(), check if any is a known
-    // root. Short-circuits on first match.
+    // Take prefixes of length 2..=word.len(), check if any is a known
+    // root. The minimum 2 lets short closed-class roots ("ол", "не",
+    // "мен", "сен") match their oblique surfaces ("оның", "неге",
+    // "маған", "саған"). Long-root behaviour is unchanged because
+    // any 2-char prefix of a noun/verb stem rarely matches a Lexicon
+    // entry (those are length ≥ 3 by construction). Short-circuits
+    // on first match.
     let chars: Vec<char> = word.chars().collect();
     let n = chars.len();
-    for take in MIN_ROOT_LEN..=n {
+    for take in 2..=n {
         let prefix: String = chars.iter().take(take).collect();
         if roots.contains(&prefix) {
             return true;
@@ -518,10 +636,29 @@ mod tests {
     }
 
     #[test]
-    fn has_known_prefix_ignores_sub_min_length() {
-        // MIN_ROOT_LEN=3; a 2-char root shouldn't match.
+    fn has_known_prefix_accepts_short_closed_class_root() {
+        // Phase A wave 1 (2026-05-17): the prefix-match window
+        // starts at 2 chars so short closed-class roots («ол»,
+        // «не», «ба») cover their inflected surfaces («оны»,
+        // «неге», «балалар»). Length filtering moved upstream
+        // into `load_roots()` which trusts Lexicon curation —
+        // short roots only enter the set if they were curated in.
+        // See docs/research/coverage_progress_2026_05_16.md for
+        // the −33 % uncovered-surface delta this change unlocked.
         let mut roots = HashSet::new();
-        roots.insert("ба".to_string()); // normally filtered at load
-        assert!(!has_known_prefix("бала", &roots));
+        roots.insert("ба".to_string());
+        assert!(has_known_prefix("бала", &roots));
+    }
+
+    #[test]
+    fn has_known_prefix_rejects_word_shorter_than_any_root() {
+        // Defensive: a word too short to contain any prefix of
+        // length ≥ 2 should never match. The loop iterates
+        // take ∈ 2..=word.len() so a 1-char word has no
+        // candidate prefixes.
+        let mut roots = HashSet::new();
+        roots.insert("ба".to_string());
+        roots.insert("бала".to_string());
+        assert!(!has_known_prefix("б", &roots));
     }
 }

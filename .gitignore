@@ -3,7 +3,20 @@
 /.idea
 /.vscode
 *.log
-data/external/
+data/external/*
+!data/external/textbooks_kz/
+!data/external/huggingface_kz/
+!data/external/wikibooks_kk/
+data/external/textbooks_kz/*.pdf
+data/external/huggingface_kz/*.csv
+data/external/huggingface_kz/*.parquet
+data/external/huggingface_kz/*.tsv
+data/external/huggingface_kz/*.json
+# v6.0.0-rc3 — wikibooks_kk page dump is regenerable via
+# `bash scripts/fetch_kk_wikibooks.sh`. Only the README and
+# `_manifest.json` are committed; per-page JSONs are local-only.
+data/external/wikibooks_kk/page_*.json
+data/external/wikibooks_kk/_manifest.json
 .claude/
 
 # External reference material (Apertium-kaz source repo, etc.) — 39+ MB each.
@@ -17,6 +30,11 @@ data/external/apertium/
 data/curated/adam_training_corpus_pack.json
 data/curated/adam_pretokenized_corpus_pack.json
 data/curated/adam_training_ids_pack.json
+
+# Real-corpus morpheme pairs regenerable via
+# `cargo run --release -p adam-agg-synth --bin build_real_corpus_pairs`.
+# ~23 MB; depends on data/curated/*_pack.json + huggingface_kz/kazakhBooks.csv.
+data/curated/real_corpus_pairs.json
 
 # Wikipedia shard files 02+ (v1.3.5+). Only shard 01 lives at the
 # canonical committed path `wikipedia_kz_pack.json`; the rest are
@@ -36,3 +54,8 @@ data/retrieval/morpheme_index_full.json
 data/training/*.safetensors
 data/training/*.safetensors.bak
 data/training/*.safetensors.bak2
+
+# v6.0 PoC neural checkpoints (regeneratable via `cargo run --release
+# -p adam-agg-model --bin poc_kazakh_train`). Each run writes a fresh
+# timestamped directory; sizes 3–30 MB depending on hyperparameters.
+data/checkpoints/

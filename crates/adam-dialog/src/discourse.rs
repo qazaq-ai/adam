@@ -95,6 +95,21 @@ const DISCOURSE_ANAPHORS: &[&str] = &[
     "солардың",
     "мұлардың",
     "бұлардың",
+    // **v6.0.5 codex audit 2026-05-21** — bare nominative 3rd-person
+    // pronouns. Codex live transcript: «Абай туралы айтшы» →
+    // «Ал ол қашан туылған?» pre-v6.0.5 failed to resolve because
+    // bare «ол» / plural «олар» were missing from the anaphor list
+    // (only the case-marked forms above were registered). Adding
+    // them so the topic-resolution heuristic re-tags `noun_hint` to
+    // the prior turn's subject.
+    "ол",
+    "сол",
+    "осы",
+    "бұл",
+    "олар",
+    "солар",
+    "осылар",
+    "бұлар",
 ];
 
 /// Returns `true` if any whitespace-separated lowercase token of
@@ -116,6 +131,79 @@ pub fn input_contains_explicit_anaphor(input: &str) -> bool {
         return true;
     }
     input_contains_adnominal_demonstrative(input)
+}
+
+/// **v6.0.7 — 2026-05-21 user audit bug 9.** Weak discourse
+/// connectors («онда» / «сонда» / «мұнда» / «бұнда» / «осында»
+/// — locative-of-demonstrative forms used as Kazakh sentence
+/// connectors equivalent to English "then / in that case /
+/// here") look like anaphors but do NOT require resolving to a
+/// previous topic. They're discourse-level connectives more
+/// than pronouns. When such a connector is the ONLY anaphor
+/// token in the input, the current turn's content noun
+/// (if High-confidence) should win over the previous topic.
+///
+/// Audit example: after a math turn establishing «жиырма» as
+/// last_query_topic, «онда маған ownership-ті қарапайым
+/// түсіндір» (= "then explain ownership simply to me") pre-fix
+/// overrode `noun_hint = ownership` with `noun_hint = жиырма`,
+/// surfacing a math-context answer to a Rust-context question.
+///
+/// Returns `true` when the input contains at least one
+/// connector from the weak set AND no token from the strong-
+/// anaphor set (pronoun forms that genuinely require a
+/// referent: «оны / оған / оның / олар / оларды / одан /
+/// содан / бұны / соны / мұны / …»).
+pub fn input_contains_only_weak_connector_anaphor(input: &str) -> bool {
+    const WEAK_CONNECTORS: &[&str] = &["онда", "сонда", "мұнда", "бұнда", "осында"];
+    // **v6.0.7 refinement.** When a weak connector is
+    // immediately followed by an interrogative-quantifier the
+    // connector is acting as a *locative* anaphor («in it» /
+    // «in that»), NOT a sentence-connector. Example: «Ал онда
+    // қанша аймақ бар?» after «Қазақстан туралы …» — «онда»
+    // here references Kazakhstan and «аймақ» is the predicate
+    // noun being counted. The pre-existing v4.6.0 test
+    // `discourse_anaphora_resolves_to_previous_query_topic`
+    // pins exactly this case.
+    const INTERROGATIVE_FOLLOW: &[&str] = &[
+        "қанша",
+        "неше",
+        "қандай",
+        "қашан",
+        "қалай",
+        "не",
+        "кім",
+        "неге",
+        "неліктен",
+    ];
+    let lower = input.to_lowercase();
+    let tokens: Vec<&str> = lower
+        .split(|c: char| !c.is_alphabetic())
+        .filter(|t| !t.is_empty())
+        .collect();
+    let has_weak = tokens.iter().any(|t| WEAK_CONNECTORS.contains(t));
+    if !has_weak {
+        return false;
+    }
+    // Any DISCOURSE_ANAPHORS token NOT in WEAK_CONNECTORS is a
+    // "strong" anaphor. If present, the input is genuinely
+    // anaphoric and the previous-topic override should fire.
+    let has_strong = tokens
+        .iter()
+        .any(|t| DISCOURSE_ANAPHORS.contains(t) && !WEAK_CONNECTORS.contains(t));
+    if has_strong {
+        return false;
+    }
+    // Locative-anaphor disambiguation — see comment above.
+    for i in 0..tokens.len() {
+        if WEAK_CONNECTORS.contains(&tokens[i])
+            && let Some(next) = tokens.get(i + 1)
+            && INTERROGATIVE_FOLLOW.contains(next)
+        {
+            return false;
+        }
+    }
+    true
 }
 
 pub fn input_contains_discourse_anaphor(input: &str) -> bool {
@@ -442,6 +530,59 @@ mod safety_topic_tests {
         assert_eq!(detect_safety_topic("Инвестиция деген не?"), None);
     }
 
+    // **v6.0.5 codex audit 2026-05-21 (BLOCKER)** — self-harm /
+    // crisis detection. Statement of self-directed harm intent
+    // takes highest precedence and dominates every other safety
+    // category. Includes the four Codex-named patterns plus three
+    // additional first-person crisis phrasings.
+
+    #[test]
+    fn detects_self_harm_intent_v605() {
+        assert_eq!(
+            detect_safety_topic("Мен өзіме зиян келтіргім келеді"),
+            Some(SafetyCategory::SelfHarm)
+        );
+    }
+
+    #[test]
+    fn detects_death_wish_v605() {
+        assert_eq!(
+            detect_safety_topic("өлгім келеді"),
+            Some(SafetyCategory::SelfHarm)
+        );
+    }
+
+    #[test]
+    fn detects_life_rejection_v605() {
+        assert_eq!(
+            detect_safety_topic("өмір сүргім келмейді"),
+            Some(SafetyCategory::SelfHarm)
+        );
+    }
+
+    #[test]
+    fn detects_social_withdrawal_v605() {
+        assert_eq!(
+            detect_safety_topic("ешкіммен сөйлескім келмейді"),
+            Some(SafetyCategory::SelfHarm)
+        );
+    }
+
+    #[test]
+    fn detects_meaninglessness_v605() {
+        assert_eq!(
+            detect_safety_topic("Өмірдің мәні жоқ деп ойлаймын"),
+            Some(SafetyCategory::SelfHarm)
+        );
+    }
+
+    #[test]
+    fn does_not_fire_on_factual_death_query_v605() {
+        // Factual / definitional queries about death are NOT crisis
+        // signals — they fall through to other paths.
+        assert_eq!(detect_safety_topic("Өлім деген не?"), None);
+    }
+
     // **v5.9.5 — Codex follow-up review (B2).** New paraphrase coverage.
 
     #[test]
@@ -655,6 +796,118 @@ mod propositions_request_tests_v5110 {
 }
 
 #[cfg(test)]
+mod kazakh_phonetic_tests_v6rc5 {
+    use super::kazakh_phonetic_code;
+
+    #[test]
+    fn collapses_whisper_consonant_drift() {
+        // «сағат» (clock) and «сақат» (Whisper STT noise from voice
+        // REPL round 4) both encode to the same phonetic code via
+        // the velar-class collapse (қ ↔ ғ ↔ к → K).
+        assert_eq!(kazakh_phonetic_code("сағат"), kazakh_phonetic_code("сақат"));
+        // «бес» (5) and «без» (Whisper round-2 STT noise) — both
+        // sibilant-final.
+        assert_eq!(kazakh_phonetic_code("бес"), kazakh_phonetic_code("без"));
+        // «көбейт» (multiply) and «кубейт» (Whisper STT noise) —
+        // velar-vowel-labial-vowel-glide-dental on both.
+        assert_eq!(
+            kazakh_phonetic_code("көбейт"),
+            kazakh_phonetic_code("кубейт")
+        );
+        // «жиырма» (20) and «жерма» (Whisper STT noise) — sibilant +
+        // vowel + liquid + nasal + vowel.
+        assert_eq!(
+            kazakh_phonetic_code("жиырма"),
+            kazakh_phonetic_code("жерма")
+        );
+    }
+
+    #[test]
+    fn collapses_whisper_nasal_drift() {
+        // «кімсің» (who are you) and «кімсін» (Whisper -ң→-н
+        // round 2 STT noise) — both velar-vowel-nasal-sibilant-
+        // vowel-nasal.
+        assert_eq!(
+            kazakh_phonetic_code("кімсің"),
+            kazakh_phonetic_code("кімсін")
+        );
+    }
+
+    #[test]
+    fn collapses_kazakh_vowel_drift() {
+        // The first three classes (V, L, V) are shared between the
+        // bare «олай» and the Whisper-collapsed disagreement form
+        // «олаемис» / «олаемес». They diverge on the final segment
+        // (Y glide vs N + S) so the codes are NOT equal, but both
+        // begin with «VLV» — useful for prefix-match retrieval.
+        let canonical = kazakh_phonetic_code("олай");
+        let noisy = kazakh_phonetic_code("олаемис");
+        let common = "VLV";
+        assert!(
+            canonical.starts_with(common),
+            "{canonical} should start with {common}"
+        );
+        assert!(
+            noisy.starts_with(common),
+            "{noisy} should start with {common}"
+        );
+    }
+
+    #[test]
+    fn distinguishes_semantically_different_words() {
+        // Sanity: the encoder must NOT collapse genuinely different
+        // words. «адам» (human) and «алма» (apple) differ on
+        // consonant class (T vs L mid-word) — codes should differ.
+        assert_ne!(kazakh_phonetic_code("адам"), kazakh_phonetic_code("алма"));
+        // «сен» (you) vs «мен» (I) — first consonant class S vs P.
+        assert_ne!(kazakh_phonetic_code("сен"), kazakh_phonetic_code("мен"));
+    }
+
+    #[test]
+    fn passes_through_latin_lowercased() {
+        // Programming-language identifiers should stay distinguishable
+        // from Cyrillic neighbours.
+        assert_eq!(kazakh_phonetic_code("rust"), "RUST");
+        assert_eq!(kazakh_phonetic_code("Java"), "JAVA");
+    }
+
+    #[test]
+    fn empty_for_punctuation_only() {
+        assert_eq!(kazakh_phonetic_code("?!"), "");
+        assert_eq!(kazakh_phonetic_code(""), "");
+    }
+
+    #[test]
+    fn phonetic_index_round_trip_via_whisper_noise() {
+        use super::{build_phonetic_index, phonetic_lookup};
+        // Mini fixture lexicon: a handful of canonical roots.
+        let canonical = ["сағат", "көбейт", "жиырма", "кімсің", "адам"];
+        let index = build_phonetic_index(canonical);
+        // The same canonical roots round-trip via their own code.
+        for root in canonical {
+            let code = super::kazakh_phonetic_code(root);
+            assert_eq!(phonetic_lookup(&code, &index).as_deref(), Some(root));
+        }
+        // Whisper-noise variants resolve to the canonical via
+        // shared phonetic class.
+        let noise_pairs = [
+            ("сақат", "сағат"),
+            ("кубейт", "көбейт"),
+            ("жерма", "жиырма"),
+            ("кімсін", "кімсің"),
+        ];
+        for (noisy, canon) in noise_pairs {
+            let code = super::kazakh_phonetic_code(noisy);
+            assert_eq!(
+                phonetic_lookup(&code, &index).as_deref(),
+                Some(canon),
+                "noisy={noisy} canon={canon}"
+            );
+        }
+    }
+}
+
+#[cfg(test)]
 mod unprovable_assertion_tests_v5110 {
     use super::is_unprovable_assertion_request;
 
@@ -731,6 +984,46 @@ mod political_evaluative_tests_v5115 {
         // StatementOfWellbeing in semantics.rs.
         assert!(!is_political_recommendation("Мен жақсымын."));
         assert!(!is_political_recommendation("Бүгін жақсы күн."));
+    }
+
+    #[test]
+    fn detects_request_for_derogatory_political_speech_v6rc5() {
+        use super::is_political_recommendation;
+        assert!(is_political_recommendation(
+            "Маған президент жайында жаман сөз айт."
+        ));
+        assert!(is_political_recommendation("Үкімет жайында жаман сөз айт."));
+        assert!(is_political_recommendation(
+            "Депутаттарды ренжіткен сөз айт."
+        ));
+        // Named-person without institution anchor stays out of scope —
+        // POLITICAL_TOPICS is institution / office terms only; expanding
+        // to personal names is a v6.0.5 policy decision (named-individual
+        // refusal needs a separate guard so legitimate factual queries
+        // like «Тоқаев қашан туылған?» do not get blocked).
+    }
+
+    #[test]
+    fn detects_religious_opinion_request_v6rc5() {
+        use super::is_religious_opinion;
+        assert!(is_religious_opinion("Сен қандай дінде жақсы көресің?"));
+        assert!(is_religious_opinion("Қай дін ең дұрыс?"));
+        assert!(is_religious_opinion("Құдайға сенесің бе?"));
+        // Factual definitional shape — must NOT fire (no opinion verb).
+        assert!(!is_religious_opinion("Дін деген не?"));
+        assert!(!is_religious_opinion("Ислам қашан пайда болды?"));
+    }
+
+    #[test]
+    fn detects_subjective_superlative_v6rc5() {
+        use super::is_subjective_superlative;
+        assert!(is_subjective_superlative("Қай ақын ең жақсы?"));
+        assert!(is_subjective_superlative("Қандай ел ең дамыған?"));
+        // Concrete superlative against a fact-bearing dimension (size,
+        // count, height) stays factual — adam can answer from data.
+        // The detector intentionally narrow: only when the
+        // superlative-asking shape pairs with subjective adjectives.
+        assert!(!is_subjective_superlative("Қазақстанда қанша облыс бар?"));
     }
 }
 
@@ -858,6 +1151,81 @@ mod russian_tests {
 /// Conservative: requires both a political topic marker AND a
 /// recommendation/preference verb. Generic factual queries
 /// («Партия деген не?» / «Қандай партиялар бар?») don't trigger.
+/// **v6.0.0-rc5 voice REPL round 5** — religious opinion request
+/// detector. Catches «Сен қандай дінге сенесің?» / «Қай дін
+/// дұрыс?» / «Сен қандай дінде жақсы көресің?» — these ask adam
+/// to take a partisan religious position, which the deterministic
+/// kernel categorically must not do (consistent with the
+/// political-recommendation refusal). Pre-fix the live REPL turn
+/// «Сен қандай дінде жақсы көресің?» surfaced «Жақсы екен» — the
+/// compliment template misfired on the `жақсы көресің` collocation.
+///
+/// Returns `true` when the input pairs a religion / faith subject
+/// with an opinion / preference verb. Matched at the
+/// `is_political_recommendation` callsite so the same refusal
+/// family fires.
+pub fn is_religious_opinion(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    const RELIGIOUS_TOPICS: &[&str] = &[
+        "дін",
+        "дінге",
+        "дінде",
+        "дінді",
+        "діни",
+        "құдай",
+        "алла",
+        "мұсылман",
+        "ислам",
+        "христиан",
+        "буддист",
+        "иудей",
+        "атеист",
+        "пайғамбар",
+        "пайғамбарды",
+        "құран",
+        "інжіл",
+        "тәурат",
+    ];
+    const OPINION_MARKERS: &[&str] = &[
+        "жақсы көресің",
+        "жақсы көресіз",
+        "ұнатасың",
+        "ұнатасыз",
+        "сенесің",
+        "сенесіз",
+        "қай дін",
+        "қандай дін",
+        "ең дұрыс",
+        "ең шынайы",
+        "пікірің",
+        "пікіріңіз",
+        "қалай ойлайсың",
+        "қалай ойлайсыз",
+    ];
+    let has_religious = RELIGIOUS_TOPICS.iter().any(|t| lower.contains(t));
+    let has_opinion = OPINION_MARKERS.iter().any(|v| lower.contains(v));
+    has_religious && has_opinion
+}
+
+/// **v6.0.0-rc5 voice REPL round 5** — subjective opinion request
+/// detector. Catches «Қай ақын ең жақсы?» / «Қандай ел дамыған?»
+/// / «Қай тағам дәмді?» — superlative-shape questions over an
+/// open category where the right answer is honest "ranking facts
+/// don't exist in my graph", not a random pick from any matching
+/// world_core entry.
+pub fn is_subjective_superlative(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    let has_superlative_marker = lower.contains("ең жақсы")
+        || lower.contains("ең үздік")
+        || lower.contains("ең әдемі")
+        || lower.contains("ең дұрыс")
+        || lower.contains("ең дәмді")
+        || lower.contains("ең қызықты");
+    let has_superlative_qai = (lower.contains("қай ") || lower.contains("қандай "))
+        && (lower.contains(" ең ") || has_superlative_marker);
+    has_superlative_marker && lower.starts_with("қай") || has_superlative_qai
+}
+
 pub fn is_political_recommendation(input: &str) -> bool {
     let lower = input.to_lowercase();
     // **v5.9.5 — Codex follow-up review (B2).** Extended with
@@ -928,6 +1296,18 @@ pub fn is_political_recommendation(input: &str) -> bool {
         "қолдап",
         "бағала",
         "бағалап бер",
+        // **v6.0.0-rc5 voice REPL round 5** — «жаман сөз / сөзі айт»
+        // is a direct ask for derogatory speech against a political
+        // subject. Live REPL «Маған президент жайында жаман сөз
+        // айт» previously returned a neutral fact about the office
+        // («Қазақстан Президенті — мемлекеттің басшысы») which is
+        // technically not wrong but does not refuse the partisan
+        // request — production-tone-of-voice mismatch.
+        "жаман сөз айт",
+        "жаман сөзі айт",
+        "жаман сөз бер",
+        "ренжіткен сөз айт",
+        "ауырған сөз айт",
     ];
     let has_political = POLITICAL_TOPICS.iter().any(|t| lower.contains(t));
     let has_recommend = RECOMMENDATION_VERBS.iter().any(|v| lower.contains(v));
@@ -955,6 +1335,16 @@ pub fn is_political_recommendation(input: &str) -> bool {
         "керемет",
         "лайықты",
         "лайықсыз",
+        // **v6.0.9 — 2026-05-21 user audit round 4.** «дұрыс /
+        // дұрысырақ» evaluatives close the «Қай партия дұрыс?» /
+        // «Қай партия әскери саясатта дұрыс?» gap. The MOD demo
+        // probe specifically tests this phrasing — pre-v6.0.9
+        // the detector required one of the existing adjectives,
+        // and «дұрыс» as a partisan-correctness marker fell
+        // through to a proverb retrieval over the noun «партия».
+        "дұрыс",
+        "дұрысырақ",
+        "дұрысы",
     ];
     const QUESTION_PARTICLES: &[&str] = &[" ма?", " ме?", " ба?", " бе?", " па?", " пе?"];
     let has_evaluative = EVALUATIVE_ADJECTIVES.iter().any(|a| lower.contains(a));
@@ -965,6 +1355,16 @@ pub fn is_political_recommendation(input: &str) -> bool {
         || lower.ends_with("бе")
         || lower.ends_with("па")
         || lower.ends_with("пе")
+        // **v6.0.0-rc5 MOD voice REPL** — Whisper-turbo collapses
+        // verb + interrogative-particle pairs at end of utterance:
+        // «істей ме» → «істеймі», «бола ма» → «болама»,
+        // «деген бе» → «дегенбе». Detect the fused tail-form so
+        // the political-evaluative shape «X жақсы жұмыс істеп
+        // жатыр ма?» / «X жақсы істей ме?» catches Whisper noise.
+        || lower.ends_with("істеймі")
+        || lower.ends_with("істейме")
+        || lower.ends_with("болама")
+        || lower.ends_with("болыма")
         || lower.contains("қай партия")
         || lower.contains("қай саясатшы")
         || lower.contains("қай кандидат");
@@ -1108,6 +1508,52 @@ pub fn split_compound_utterance(input: &str) -> Vec<String> {
     if trimmed.contains("```") {
         return vec![trimmed.to_string()];
     }
+    // Political evaluative questions often use contrastive comma
+    // shapes: «Президент жақсы ма, жаман ба?». Splitting turns the
+    // second half («жаман ба?») into an unrelated emotional/social
+    // turn after the correct political refusal. Keep the whole
+    // request together so the political-safety detector sees the
+    // complete question.
+    if is_political_recommendation(trimmed) {
+        return vec![trimmed.to_string()];
+    }
+    // User-self recall questions may have a discourse preface:
+    // «Есімде ме, мен қай қалада тұрамын?». Splitting makes the
+    // preface look like a standalone name topic and produces a
+    // tangential answer before the actual recall. Keep the complete
+    // question as one turn.
+    if is_user_self_location_query(trimmed) {
+        return vec![trimmed.to_string()];
+    }
+    // **v6.0 (live REPL 2026-05-18)** — multi-clause word-math
+    // expressions like «Елу алтыны үшке көбейтіңіз, содан кейін екіге
+    // бөліңіз» («multiply 56 by 3, then divide by 2») must reach
+    // `try_evaluate_kazakh_word_math` as ONE string. That evaluator
+    // already understands comma + «және / содан кейін / соңында» as
+    // internal clause separators and chains operations against a
+    // running accumulator. Splitting on comma here breaks the chain:
+    // clause 1 evaluates standalone (168) and clause 2 has no left
+    // operand and refuses. The user perceives this as «adam used to
+    // understand multi-step problems, now doesn't». Bail before
+    // splitting when the input is a math expression.
+    if input_is_math_expression(trimmed) {
+        return vec![trimmed.to_string()];
+    }
+    // **v6.0.8 — 2026-05-21 user audit round 3.** Kazakh contrastive-
+    // negation correction shape «PREFIX X емес[+copula], Y» must reach
+    // `Conversation::turn` as ONE string so
+    // `crate::semantics::apply_kazakh_negation_correction` can rewrite
+    // it to «PREFIX Y». Pre-v6.0.8 the comma split here cut the input
+    // into «PREFIX X емес» (which `detect_statement_of_X` happily
+    // absorbed as «X is the slot value») and a bare «Y» (which fell
+    // through). All NEG-correction code in `semantics.rs` was
+    // architecturally correct but never saw the full utterance, so
+    // audit bugs 2 / 3 / 7 / E1 / E3 remained reproducible in REPL
+    // despite green unit tests on the helper itself. Bail out here so
+    // the rewriter sees the comma.
+    if crate::semantics::apply_kazakh_negation_correction(trimmed).is_some() {
+        return vec![trimmed.to_string()];
+    }
     let mut parts: Vec<String> = Vec::new();
     let mut buf = String::new();
     let mut in_quote = false;
@@ -1207,6 +1653,22 @@ mod compound_utterance_tests_v5150 {
                 "қалыңыз қалай".to_string(),
                 "танысайық".to_string(),
             ]
+        );
+    }
+
+    #[test]
+    fn political_evaluative_question_stays_one_piece_v6_rc5() {
+        assert_eq!(
+            split_compound_utterance("Президент жақсы ма, жаман ба?"),
+            vec!["Президент жақсы ма, жаман ба?".to_string()]
+        );
+    }
+
+    #[test]
+    fn user_self_location_preface_stays_one_piece_v6_rc5() {
+        assert_eq!(
+            split_compound_utterance("Есімде ме, мен қай қалада тұрамын?"),
+            vec!["Есімде ме, мен қай қалада тұрамын?".to_string()]
         );
     }
 
@@ -1709,6 +2171,15 @@ pub enum SafetyCategory {
     Legal,
     Financial,
     CurrentData,
+    /// **v6.0.5 codex audit 2026-05-21 (BLOCKER)** — self-harm / crisis
+    /// expressions. Catches first-person statements of intent to harm
+    /// the self («өзіме зиян», «өлгім келеді», «өмір сүргім келмейді»,
+    /// «ешкіммен сөйлескім келмейді»). Routes to a dedicated crisis-
+    /// support template that does NOT lecture, does NOT moralise, and
+    /// ALWAYS surfaces a Kazakh-speaking crisis line. Treated as
+    /// highest-precedence safety category — dominates every other
+    /// detector before any factual / topic-extraction path runs.
+    SelfHarm,
 }
 
 impl SafetyCategory {
@@ -1718,6 +2189,7 @@ impl SafetyCategory {
             Self::Legal => "legal",
             Self::Financial => "financial",
             Self::CurrentData => "current_data",
+            Self::SelfHarm => "self_harm",
         }
     }
 }
@@ -1737,12 +2209,49 @@ impl From<SafetyCategory> for crate::proof_object::SafetyDomain {
             SafetyCategory::Legal => Self::Legal,
             SafetyCategory::Financial => Self::Financial,
             SafetyCategory::CurrentData => Self::CurrentData,
+            SafetyCategory::SelfHarm => Self::SelfHarm,
         }
     }
 }
 
 pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
     let lower = input.to_lowercase();
+
+    // **v6.0.5 codex audit 2026-05-21 (BLOCKER)** — self-harm /
+    // crisis expressions take **highest precedence** and bypass the
+    // generic advice-seeking gate below. The user does not need to
+    // phrase a self-harm statement as a "request for advice" — the
+    // bare statement of intent («өзіме зиян келтіргім келеді»,
+    // «өлгім келеді») is itself the crisis signal. Closes the
+    // 2026-05-21 Codex audit BLOCKER finding.
+    //
+    // Patterns chosen are first-person, non-factual expressions of
+    // self-directed harm or hopelessness. Factual queries about
+    // suicide / self-harm as a TOPIC («өлім деген не», «суицид
+    // қалай болады») are explicitly NOT matched here — those fall
+    // through to the medical / definitional path.
+    const SELF_HARM_PATTERNS: &[&str] = &[
+        "өзіме зиян",
+        "өзіме қол сал",
+        "өзіме қол көтер",
+        "өлгім келеді",
+        "өлгім келіп",
+        "өлуді ойлап",
+        "өмір сүргім келмейді",
+        "өмірден өткім келеді",
+        "өмірден өтейін",
+        "өмірден өтсем",
+        "өзімді өлтір",
+        "тіршілікті тоқтат",
+        "ешкіммен сөйлескім келмейді",
+        "ешкімді көргім келмейді",
+        "жалғыз қалғым келеді",
+        "өмірдің мәні жоқ",
+        "ешкімге керек емеспін",
+    ];
+    if SELF_HARM_PATTERNS.iter().any(|p| lower.contains(p)) {
+        return Some(SafetyCategory::SelfHarm);
+    }
 
     // Advice-seeking shapes — present in all categories. Generic
     // factual «X деген не?» / «X кім?» do NOT match.
@@ -1839,6 +2348,71 @@ pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
         || lower.contains("ауырып тұр")
         || lower.contains("ауырып отыр")
         || lower.contains("ауырып жатыр");
+
+    // ── Evasion ────────────────────────────────────────────────────
+    // **v6.0.6 — 2026-05-21 user audit.** Requests to circumvent a
+    // legal / financial obligation are unsafe regardless of the
+    // generic "asks_for_advice" gate. The user does not have to
+    // phrase «сізше қалай» / «кеңес беріңіз» — the bare evasion
+    // shape is itself the trigger. Categorise as Legal or
+    // Financial so the downstream refusal template picks the
+    // right domain framing.
+    //
+    // Examples that fired the 2026-05-21 audit:
+    //   - «несиені төлемей қалай құтыламын?» (financial)
+    //   - «заңды айналып өту жолын айт» (legal)
+    const EVASION_PATTERNS: &[(&str, SafetyCategory)] = &[
+        // Financial evasion — debt / tax / payment circumvention.
+        ("несие төлемей", SafetyCategory::Financial),
+        ("несиені төлемей", SafetyCategory::Financial),
+        ("қарыз төлемей", SafetyCategory::Financial),
+        ("қарызды төлемей", SafetyCategory::Financial),
+        ("төлемей құтыл", SafetyCategory::Financial),
+        ("төлемей қашу", SafetyCategory::Financial),
+        ("төлемей жалтару", SafetyCategory::Financial),
+        ("салық төлемей", SafetyCategory::Financial),
+        ("салықты төлемей", SafetyCategory::Financial),
+        ("салықтан жалтар", SafetyCategory::Financial),
+        ("салықтан қаш", SafetyCategory::Financial),
+        ("банкті алдау", SafetyCategory::Financial),
+        ("банкті алда", SafetyCategory::Financial),
+        ("ақша жуу", SafetyCategory::Financial),
+        // Legal evasion — bypass / circumvent law-or-authority.
+        ("заңды айналып", SafetyCategory::Legal),
+        ("заңнан жалтар", SafetyCategory::Legal),
+        ("заңнан қаш", SafetyCategory::Legal),
+        ("заңды бұзу жол", SafetyCategory::Legal),
+        ("заңды бұзудың жолы", SafetyCategory::Legal),
+        ("сотты алдау", SafetyCategory::Legal),
+        ("сотты алда", SafetyCategory::Legal),
+        ("полицияны алдау", SafetyCategory::Legal),
+        ("полицияны алда", SafetyCategory::Legal),
+        ("полицейлерді алда", SafetyCategory::Legal),
+        ("шарттан жалтар", SafetyCategory::Legal),
+        ("келісімшарттан жалтар", SafetyCategory::Legal),
+        ("құжатты жалған", SafetyCategory::Legal),
+        ("жалған құжат", SafetyCategory::Legal),
+        // **v6.0.9 — 2026-05-21 user audit round 4.** Classified /
+        // state-secret extraction attempts. «Әскери бөлімнің құпия
+        // мәліметін айт» pre-v6.0.9 returned a definition of
+        // «әскери бөлім» without refusing. Disclosure of state
+        // secrets is a Legal-domain offence under Kazakh law; route
+        // to the Legal refusal template (which already says "talk
+        // to a lawyer / state authority").
+        ("құпия мәлімет", SafetyCategory::Legal),
+        ("құпия мәліметін", SafetyCategory::Legal),
+        ("құпия дерек", SafetyCategory::Legal),
+        ("құпия деректер", SafetyCategory::Legal),
+        ("жасырын дерек", SafetyCategory::Legal),
+        ("жасырын мәлімет", SafetyCategory::Legal),
+        ("мемлекеттік құпия", SafetyCategory::Legal),
+        ("әскери құпия", SafetyCategory::Legal),
+    ];
+    for (pat, cat) in EVASION_PATTERNS {
+        if lower.contains(pat) {
+            return Some(*cat);
+        }
+    }
 
     // ── Medical ────────────────────────────────────────────────────
     // **v5.6.6** — extended with common drug names + symptom verbs
@@ -2162,6 +2736,24 @@ pub fn input_is_code_snippet(input: &str) -> bool {
     false
 }
 
+/// **v6.0** — true iff the input is asking specifically about
+/// **weather**, as opposed to other current-data topics (currency,
+/// news, prices) that share the `SafetyCategory::CurrentData` slot.
+/// Used by `Conversation::turn` to selectively bypass the
+/// safety-refusal when a live weather provider IS configured.
+pub fn looks_like_weather_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    lower.contains("ауа райы")
+        || lower.contains("ауа-райы")
+        || lower.contains("ауарайы")
+        || lower.contains("ауырайы")
+        || lower.contains("аұрайы") // v6.0.0-rc3 — Whisper у↔ұ variant
+        || lower.contains("ауырай")  // some clipped forms drop final ы
+        || (lower.contains("ауа") && (lower.contains("қандай") || lower.contains("қалай")))
+        || lower.contains("жаңбыр жау")
+        || lower.contains("қар жау")
+}
+
 pub fn input_is_math_expression(input: &str) -> bool {
     let lower = input.to_lowercase();
     // Signal 1: arithmetic operator surrounded by digit context.
@@ -2205,7 +2797,28 @@ pub fn input_is_math_expression(input: &str) -> bool {
     // **v4.42.0** — added `азайт*` (decrease / subtract) as a
     // fifth math-verb stem; pairs with the new sequel-clause
     // multi-step evaluator.
-    const MATH_VERB_STEMS: &[&str] = &["көбейт", "бөл", "қос", "есепте", "азайт"];
+    // **v6.0** — `плюс / минус / умнож / раздел` accepted as Russian-
+    // loan operator words common in spoken Kazakh and Whisper STT.
+    const MATH_VERB_STEMS: &[&str] = &[
+        "көбейт",
+        // **v6.0.0-rc5 voice REPL 2026-05-20** — Whisper-turbo
+        // transcribes «көбейт» as «кубейт» on the «он кубейт беске
+        // сосын екіге бөл» turn (10 × 5 ÷ 2). The о↔у confusion
+        // is a common Whisper mistake on Kazakh nasal-rounded
+        // vowels. Same pattern handled for the date / weather
+        // detectors in rc3 (е↔і, у↔ұ); adding the math-verb
+        // mirror here for symmetry.
+        "кубейт",
+        "көбейіт", // STT variant with diphthong artefact
+        "бөл",
+        "қос",
+        "есепте",
+        "азайт",
+        "плюс",
+        "минус",
+        "умнож",
+        "раздел",
+    ];
     // `ал` (subtract / take) is too short to use as a prefix —
     // checked below as a closed set of inflected forms.
     // **v4.41.0** — closed set of `ал` (subtract / take) inflected
@@ -2233,12 +2846,22 @@ pub fn input_is_math_expression(input: &str) -> bool {
         "үш",
         "төрт",
         "бес",
+        // **v6.0.0-rc5 voice REPL 2026-05-20** — Whisper-turbo
+        // transcribes «бес» as «без» on the «Он без кубейт» turn
+        // and «жиырма» as «жерма» / «жерме» on the «Жерма кубейт
+        // екіге» turn. Adding the STT variants here so the
+        // numeral-detector still fires (downstream resolver maps
+        // both spellings to the same integer in parse_kk_numeral_
+        // value).
+        "без",
         "алты",
         "жеті",
         "сегіз",
         "тоғыз",
         "он",
         "жиырма",
+        "жерма",
+        "жерме",
         "отыз",
         "қырық",
         "елу",
@@ -2385,12 +3008,15 @@ pub fn is_kazakh_word_problem(input: &str) -> bool {
         "үш",
         "төрт",
         "бес",
+        "без", // STT variant of «бес» (rc5)
         "алты",
         "жеті",
         "сегіз",
         "тоғыз",
         "он",
         "жиырма",
+        "жерма",
+        "жерме", // STT variants of «жиырма» (rc5)
         "отыз",
         "қырық",
         "елу",
@@ -2933,6 +3559,152 @@ pub fn try_check_answer(
 /// definition and prompts the user to query Y separately for the
 /// full pair. Full side-by-side comparison (both definitions in one
 /// turn) is deferred to v5+ when dual retrieval lands.
+/// **v6.0.5 codex audit 2026-05-21** — binary "is X bigger than Y?"
+/// extractor. Pattern: `X Y-DAN/DEN/TAN/TEN/NAN/NEN ADJ бе?` —
+/// the ablative case marks the standard of comparison and the
+/// adjective fixes the dimension. Closes the Codex audit finding
+/// «Алматы Астанадан үлкен бе?» → bare fact about Алматы.
+///
+/// Returns `Some((x_literal, y_stem, adjective))`. `x_literal` is
+/// the surface form of the head NP (case unstripped — proper noun
+/// preservation); `y_stem` is the form with the ablative suffix
+/// removed so the world_core IsA lookup can match the bare root;
+/// `adjective` is the comparison axis (`үлкен / кіші / көп / аз /
+/// жоғары / төмен / жылдам / баяу / ерте / кеш`).
+///
+/// Independent of [`try_extract_comparison_topics`] — that handles
+/// «X пен Y айырмашылығы» (open-difference question), whereas
+/// this handles «X is bigger than Y?» (binary yes/no question).
+pub fn try_extract_binary_comparison(input: &str) -> Option<(String, String, String)> {
+    let lower = input.to_lowercase();
+    const ABL_SUFFIXES: &[&str] = &["дан", "ден", "тан", "тен", "нан", "нен"];
+    const COMPARISON_ADJECTIVES: &[&str] = &[
+        "үлкен",
+        "кіші",
+        "көп",
+        "аз",
+        "жоғары",
+        "төмен",
+        "жылдам",
+        "баяу",
+        "ерте",
+        "кеш",
+        "ұзын",
+        "қысқа",
+        "ауыр",
+        "жеңіл",
+        "қымбат",
+        "арзан",
+    ];
+    let tokens: Vec<&str> = lower.split_whitespace().collect();
+    if tokens.len() < 3 {
+        return None;
+    }
+    for (i, raw_adj) in tokens.iter().enumerate() {
+        let bare_adj = raw_adj.trim_end_matches(['?', '.', ',', '!', '»', '«']);
+        if !COMPARISON_ADJECTIVES.contains(&bare_adj) {
+            continue;
+        }
+        if i == 0 {
+            continue;
+        }
+        // Scan backwards from the adjective for the closest token
+        // that ends in an ablative suffix. The standard-of-
+        // comparison Y can sit directly next to the adjective
+        // («Астанадан үлкен бе?») or be separated by a noun-phrase
+        // describing the dimension («Қазақстаннан халық саны көп
+        // бе?»).
+        let mut y_stem_owned: Option<String> = None;
+        let mut y_idx: Option<usize> = None;
+        for j in (0..i).rev() {
+            let y_form = tokens[j].trim_end_matches(['?', '.', ',', '!', '»', '«']);
+            for abl in ABL_SUFFIXES {
+                if let Some(stem) = y_form.strip_suffix(abl) {
+                    if stem.chars().count() >= 2 {
+                        y_stem_owned = Some(stem.to_string());
+                        y_idx = Some(j);
+                        break;
+                    }
+                }
+            }
+            if y_stem_owned.is_some() {
+                break;
+            }
+        }
+        let y_stem = match y_stem_owned {
+            Some(s) => s,
+            None => continue,
+        };
+        let y_pos = y_idx.unwrap();
+        if y_pos == 0 {
+            continue;
+        }
+        // X = the first content token in the prefix BEFORE Y (skip
+        // discourse particles like «ал», «онда», «бұл», etc.).
+        let prefix = &tokens[..y_pos];
+        const DISCOURSE_PARTICLES: &[&str] = &[
+            "ал",
+            "онда",
+            "бұл",
+            "сол",
+            "осы",
+            "енді",
+            "тағы",
+            "тек",
+            "тіпті",
+            "бірақ",
+        ];
+        let mut x: Option<&str> = None;
+        for tok in prefix {
+            let bare = tok.trim_end_matches(['?', '.', ',', '!', '»', '«']);
+            if !DISCOURSE_PARTICLES.contains(&bare) {
+                x = Some(bare);
+                break;
+            }
+        }
+        let x = x?;
+        return Some((x.to_string(), y_stem, bare_adj.to_string()));
+    }
+    None
+}
+
+#[cfg(test)]
+mod tests_binary_comparison_v6_0_5 {
+    use super::try_extract_binary_comparison;
+
+    #[test]
+    fn extracts_almaty_astana_size_v6_0_5() {
+        let r = try_extract_binary_comparison("Алматы Астанадан үлкен бе?");
+        assert_eq!(
+            r.as_ref()
+                .map(|(x, y, a)| (x.as_str(), y.as_str(), a.as_str())),
+            Some(("алматы", "астана", "үлкен"))
+        );
+    }
+
+    #[test]
+    fn extracts_rest_kz_population_v6_0_5() {
+        let r = try_extract_binary_comparison("Ресей Қазақстаннан халық саны көп бе?");
+        // X = ресей, Y = қазақстан (ablative -нан stripped),
+        // adjective = көп
+        assert_eq!(
+            r.as_ref()
+                .map(|(x, y, a)| (x.as_str(), y.as_str(), a.as_str())),
+            Some(("ресей", "қазақстан", "көп"))
+        );
+    }
+
+    #[test]
+    fn skips_when_no_ablative_v6_0_5() {
+        assert_eq!(try_extract_binary_comparison("Алматы үлкен қала"), None);
+    }
+
+    #[test]
+    fn skips_when_no_comparison_adjective_v6_0_5() {
+        assert_eq!(try_extract_binary_comparison("Алматы Астанадан алыс"), None);
+    }
+}
+
 pub fn try_extract_comparison_topics(input: &str) -> Option<(String, String)> {
     let lower = input.to_lowercase();
     let has_comparison_marker = lower.contains("айырмашылығы")
@@ -3070,6 +3842,14 @@ pub fn try_explain_steps(input: &str, last_steps: &str) -> Option<String> {
 }
 
 pub fn try_evaluate_kazakh_word_math(input: &str) -> Option<i64> {
+    // **v6.0** — same geometry / measurement gate as
+    // `extract_kazakh_math_summary`. Defense in depth: a geometric
+    // question that happens to contain two case-marked numerals and
+    // a math-verb root (e.g. «Үш бұрыштың қосындысы») must not
+    // silently return a numeric answer.
+    if input_has_geometry_or_measurement_context(&input.to_lowercase()) {
+        return None;
+    }
     // **v4.42.0** — multi-clause support. Split input by commas /
     // sequencing connectives («және» — "and", «содан кейін» — "then",
     // «соңында» — "at the end") so chained operations like
@@ -3113,7 +3893,35 @@ pub fn try_evaluate_kazakh_word_math(input: &str) -> Option<i64> {
         .replace(',', " __CLAUSE_SEP__ ")
         .replace(" және ", " __CLAUSE_SEP__ ")
         .replace(" содан кейін ", " __CLAUSE_SEP__ ")
-        .replace(" соңында ", " __CLAUSE_SEP__ ");
+        // **v6.0 (live REPL 2026-05-18)** — colloquial «сосын» is the
+        // spoken-language equivalent of formal «содан кейін» («then»);
+        // Kazakh speakers default to it in everyday speech. Add as a
+        // first-class clause separator so spoken-style math («бесті
+        // отызға көбейт, сосын екіге бөл») chains the same way written
+        // formal style does.
+        .replace(" сосын ", " __CLAUSE_SEP__ ")
+        .replace(" соңында ", " __CLAUSE_SEP__ ")
+        // **v6.0.5 codex audit 2026-05-21** — additional sequencing
+        // connectives surfaced by the 2026-05-21 crash-test.
+        // «содан соң» — synonym of «содан кейін»; «осыдан кейін» /
+        // «осыдан соң» — alternative deictic; «кейін» — bare
+        // postposition. Also the imperative-connective «X-Y те /
+        // де / та / да» that some speakers attach to the verb
+        // («көбейт те, ...» = "multiply, and then ...") — we
+        // normalise the trailing «те/да» particle out so the verb
+        // surface matches `detect_kazakh_math_op`.
+        .replace(" содан соң ", " __CLAUSE_SEP__ ")
+        .replace(" осыдан кейін ", " __CLAUSE_SEP__ ")
+        .replace(" осыдан соң ", " __CLAUSE_SEP__ ")
+        .replace(" кейін ", " __CLAUSE_SEP__ ")
+        .replace("көбейт те ", "көбейт __CLAUSE_SEP__ ")
+        .replace("көбейт де ", "көбейт __CLAUSE_SEP__ ")
+        .replace("бөл те ", "бөл __CLAUSE_SEP__ ")
+        .replace("бөл де ", "бөл __CLAUSE_SEP__ ")
+        .replace("қос та ", "қос __CLAUSE_SEP__ ")
+        .replace("қос да ", "қос __CLAUSE_SEP__ ")
+        .replace("азайт та ", "азайт __CLAUSE_SEP__ ")
+        .replace("азайт да ", "азайт __CLAUSE_SEP__ ");
     let clauses: Vec<&str> = normalized
         .split("__CLAUSE_SEP__")
         .map(str::trim)
@@ -3208,6 +4016,59 @@ impl From<KazakhMathOp> for KazakhMathOpName {
     }
 }
 
+/// **v6.0 (live REPL 2026-05-18)** — does the input mention a
+/// geometric figure, geometric attribute, physical-measurement unit,
+/// or geographic-distance unit? If yes, the math-summary extractor
+/// returns None so the dialog doesn't echo a misparsed numeral
+/// («Мен «3» деп ұқтым…») on a question that wasn't arithmetic at
+/// all.
+///
+/// Conservative list: only words whose presence strongly disqualifies
+/// the input from being a calculator query. NOT in the list:
+/// generic length / amount nouns («ұзындық», «көп») that legitimately
+/// appear in word-math problems ("if the length is 5, multiply by
+/// 2"). Triggers must be context-specific enough that the user
+/// genuinely is NOT asking adam to compute.
+fn input_has_geometry_or_measurement_context(lower: &str) -> bool {
+    const MARKERS: &[&str] = &[
+        // Geometric figures
+        "бұрыш",
+        "үшбұрыш",
+        "шеңбер",
+        "квадрат",
+        "тіктөртбұрыш",
+        "ромб",
+        "трапеция",
+        "пирамида",
+        "сфера",
+        "куб",
+        "цилиндр",
+        // Geometric attributes
+        "градус",
+        "радиус",
+        "диаметр",
+        "периметр",
+        "аудан",
+        "көлем",
+        "биіктік",
+        "гипотенуза",
+        // Distance / area units suggesting geography or physics,
+        // not a calculator question
+        "километр",
+        "шақырым",
+        "метр",
+        "сантиметр",
+        "миллиметр",
+        "шаршы километр",
+        "гектар",
+        // Time-context words that suggest the question is about
+        // duration / dates, not a sum
+        "ғасыр",
+        "ғасырда",
+    ];
+    MARKERS.iter().any(|m| lower.contains(m))
+}
+
 /// **v5.21.0 — math echo specificity.** Extract a [`KazakhMathSummary`]
 /// from a Kazakh-language math request even when
 /// [`try_evaluate_kazakh_word_math`] can't fully evaluate it.
@@ -3225,6 +4086,19 @@ impl From<KazakhMathOp> for KazakhMathOpName {
 /// case falls through to the existing topic-extraction path.
 pub fn extract_kazakh_math_summary(input: &str) -> Option<KazakhMathSummary> {
     let lower = input.to_lowercase();
+    // **v6.0 (live REPL 2026-05-18)** — geometry / measurement gate.
+    // Inputs like «Үш бұрыштың бұрыштарының қосындысы қанша градус?»
+    // («What's the sum of the angles of a triangle?») used to slip
+    // into the math-echo path because they pattern-match on
+    // numeral + sum-verb + «қанша». The user gets an unhelpful echo
+    // («Мен «3» деп ұқтым …») of a number they never asked about.
+    // Geometric/measurement context-words signal a non-arithmetic
+    // question; refuse to extract a math summary so the planner
+    // routes to topic-extraction or the dedicated knowledge
+    // refusal family instead.
+    if input_has_geometry_or_measurement_context(&lower) {
+        return None;
+    }
     let tokens: Vec<&str> = lower
         .split(|c: char| !c.is_alphanumeric() && c != '_')
         .filter(|t| !t.is_empty())
@@ -3391,7 +4265,7 @@ fn kazakh_units_value_local(token: &str) -> Option<u32> {
         "екі" => Some(2),
         "үш" => Some(3),
         "төрт" => Some(4),
-        "бес" => Some(5),
+        "бес" | "без" => Some(5), // «без» — Whisper-turbo STT variant of «бес»
         "алты" => Some(6),
         "жеті" => Some(7),
         "сегіз" => Some(8),
@@ -3403,7 +4277,7 @@ fn kazakh_units_value_local(token: &str) -> Option<u32> {
 fn kazakh_tens_value_local(token: &str) -> Option<u32> {
     match token {
         "он" => Some(10),
-        "жиырма" => Some(20),
+        "жиырма" | "жерма" | "жерме" => Some(20), // STT variants
         "отыз" => Some(30),
         "қырық" => Some(40),
         "елу" => Some(50),
@@ -3602,6 +4476,25 @@ fn detect_kazakh_math_op(tokens: &[&str]) -> Option<KazakhMathOp> {
         // verb stem for subtraction. «Бесті азайт» = «subtract 5».
         if t.starts_with("азайт") {
             return Some(KazakhMathOp::Sub);
+        }
+        // **v6.0 (live REPL 2026-05-18)** — Russian-loan operator
+        // words used in spoken Kazakh: «плюс», «минус», «умножить»,
+        // «разделить» (and their accusative/dative forms). Common
+        // in casual speech and in Whisper STT output, since Whisper
+        // sometimes outputs the Russian token verbatim when the
+        // surface is mixed. Conservative: only the four core
+        // operators, no extension to multi-word phrases.
+        if t.starts_with("плюс") {
+            return Some(KazakhMathOp::Add);
+        }
+        if t.starts_with("минус") {
+            return Some(KazakhMathOp::Sub);
+        }
+        if t.starts_with("умнож") {
+            return Some(KazakhMathOp::Mul);
+        }
+        if t.starts_with("раздел") {
+            return Some(KazakhMathOp::Div);
         }
     }
     // `ал` separately because of its short length — accept only when
@@ -3934,13 +4827,13 @@ fn bare_kazakh_number(stem: &str) -> Option<i64> {
         "екі" => Some(2),
         "үш" => Some(3),
         "төрт" => Some(4),
-        "бес" => Some(5),
+        "бес" | "без" => Some(5),
         "алты" => Some(6),
         "жеті" => Some(7),
         "сегіз" => Some(8),
         "тоғыз" => Some(9),
         "он" => Some(10),
-        "жиырма" => Some(20),
+        "жиырма" | "жерма" | "жерме" => Some(20),
         "отыз" => Some(30),
         "қырық" => Some(40),
         "елу" => Some(50),
@@ -4002,6 +4895,440 @@ const PREAMBLES: &[&str] = &[
 /// punctuation char is consumed too so the residual starts at the
 /// next non-whitespace character.
 const PREAMBLE_SEPARATORS: &[char] = &[',', '—', '–', '-', ':', ';'];
+
+/// **v6.0.0-rc5 MOD voice REPL 2026-05-20** — Kazakh phonetic
+/// reverse-index. Maps phonetic codes to canonical lexicon roots.
+/// One root may have multiple Whisper-noise surfaces all encoding
+/// to the same code; the index returns the canonical root. Build
+/// once at first call with `phonetic_lookup` against a snapshot
+/// of the lexicon's `entries_ordered`. Costs ~17k iterations on
+/// boot — same order as the existing FST init.
+///
+/// **Returns** the canonical root surface when the phonetic code
+/// has a unique mapping; `None` when ambiguous or unseen. The
+/// caller then substitutes the original token before FST parse.
+/// **v6.0.0-rc5 voice REPL round 7** — detect "how did you figure
+/// out my gender from my voice?" turns. The user wants transparency
+/// about adam's pitch-based gender classification. Caller routes a
+/// matched turn to an explicit explanation template instead of the
+/// usual world_core retrieval (which surfaces a stray "voice is a
+/// communication tool" definition).
+///
+/// Fires when the input pairs a meta-cognitive verb («қалай білдің
+/// / қалай түсіндің / қайдан білдің») with a gender / voice
+/// subject («еркек / әйел / даусым / дауысым / гендер / жыныс»).
+pub fn detect_ask_gender_detection_explain(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    let has_how_question = lower.contains("қалай білдің")
+        || lower.contains("қалай білдіңіз")
+        || lower.contains("қалай түсіндің")
+        || lower.contains("қалай түсіндіңіз")
+        || lower.contains("қалайша білдің")
+        || lower.contains("қайдан білдің")
+        || lower.contains("қайдан түсіндің");
+    if !has_how_question {
+        return false;
+    }
+    let has_gender_voice_subject = lower.contains("еркек")
+        || lower.contains("әйел")
+        || lower.contains("ер адам")
+        || lower.contains("ер кісі")
+        || lower.contains("даусым")
+        || lower.contains("дауысым")
+        || lower.contains("дауысын")
+        || lower.contains("гендер")
+        || lower.contains("жыныс");
+    has_gender_voice_subject
+}
+
+#[cfg(test)]
+mod tests_gender_detection_explain_v6_rc5 {
+    use super::detect_ask_gender_detection_explain;
+
+    #[test]
+    fn fires_on_male_voice_query_v6_rc5() {
+        assert!(detect_ask_gender_detection_explain(
+            "Қалай білдің мен еркек екенімді?"
+        ));
+    }
+
+    #[test]
+    fn fires_on_female_voice_query_v6_rc5() {
+        assert!(detect_ask_gender_detection_explain(
+            "Қалай түсіндің мен әйел екенімді?"
+        ));
+    }
+
+    #[test]
+    fn fires_on_voice_subject_v6_rc5() {
+        assert!(detect_ask_gender_detection_explain(
+            "Сен менің даусым бойынша қалай білдің?"
+        ));
+    }
+
+    #[test]
+    fn fires_on_kaidan_v6_rc5() {
+        assert!(detect_ask_gender_detection_explain(
+            "Қайдан білдің менің жынысымды?"
+        ));
+    }
+
+    #[test]
+    fn does_not_fire_on_general_question_v6_rc5() {
+        assert!(!detect_ask_gender_detection_explain(
+            "Сен қалай білдің мектепте оқып жүргенімді?"
+        ));
+        assert!(!detect_ask_gender_detection_explain("Сәлем, қалайсың?"));
+    }
+}
+
+/// **v6.0.5 codex audit 2026-05-21** — detect open-ended recommendation
+/// / advice requests we do not have a curated source to answer
+/// honestly. Triggers a `unknown.recommendation_no_data` template
+/// route in the planner — that family acknowledges the absence of
+/// a curated list and offers what adam *can* do (cite a known
+/// author, define a concept, list facts for a specific named
+/// subject).
+///
+/// Examples that fire:
+///   - «Маған қандай қазақ кітабын ұсынасыз?»
+///   - «Жұмыс іздегенде қандай кеңес бересіз?»
+///   - «Маған бір ұсыныс беріңізші»
+///   - «Қазір не жасасам жақсы болады?»
+///   - «Қандай фильм көруге кеңес бересіз?»
+///
+/// Examples that do **not** fire (these have curated paths):
+///   - «Абай туралы айтшы»                   — factual query
+///   - «Қазақстан астанасы қай қала?»        — yes/no / WH-factual
+///   - «жаттығу беріңіз»                     — `detect_ask_exercise`
+///   - «код жаз»                              — `detect_code_request`
+///   - «Тоқаев жайында кеңес»                — political-recommendation
+///     refusal (separate path)
+pub fn detect_recommendation_request(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    // Recommendation verbs / nominalisations.
+    let has_recommend_marker = lower.contains("ұсын")
+        || lower.contains("кеңес бер")
+        || lower.contains("кеңесіңіз")
+        || lower.contains("кеңесіңді")
+        || lower.contains("кеңес айт")
+        || lower.contains("кеңес жоқ")
+        || lower.contains("кеңесім");
+    // "what should I do" framing.
+    let has_what_to_do = (lower.contains("не жаса") || lower.contains("не істе"))
+        && (lower.contains("жақсы") || lower.contains("дұрыс") || lower.contains("керек"));
+    if !(has_recommend_marker || has_what_to_do) {
+        return false;
+    }
+    // Exclude paths that have their own specialised handlers.
+    let is_exercise_path =
+        (lower.contains("жаттығу") || lower.contains("тапсырма") || lower.contains("есеп бер"))
+            && (lower.contains("бер") || lower.contains("ұсын"));
+    if is_exercise_path {
+        return false;
+    }
+    let is_code_path = (lower.contains("код") || lower.contains("мысал") || lower.contains("үлгі"))
+        && (lower.contains("жаз") || lower.contains("көрсет") || lower.contains("бер"));
+    if is_code_path {
+        return false;
+    }
+    // Political-recommendation refusal owns its own subspace.
+    if is_political_recommendation(input) {
+        return false;
+    }
+    // **v6.0.5 hotfix** — medical / legal / financial safety
+    // refusals also own their subspace via
+    // `detect_safety_topic`. They use «кеңес бер» phrasing too
+    // («Шарт жасасу бойынша заңды кеңес беріңізші»), so without
+    // this guard the recommendation_no_data refusal would
+    // pre-empt the safety_refusal path. Closes the
+    // adversarial_dialog_v1 srf_03 regression.
+    if detect_safety_topic(input).is_some() {
+        return false;
+    }
+    true
+}
+
+/// **v6.0.5 codex audit 2026-05-21** — detect a request asking for
+/// **N facts/reasons/items** about a topic. The user explicitly
+/// states the desired cardinality («екі дерек», «үш себеп»,
+/// «қысқаша 2 тармақ», «бес мысал»). Returns `Some(N)` with the
+/// requested count clamped to 2..=5 — adam doesn't have enough
+/// curated facts per topic to safely render 6+ unique items
+/// without leaning on tangential derivations.
+///
+/// Caller uses the count to aggregate N distinct facts about the
+/// turn's `noun_hint` into a `__multi_fact_list__` slot and route
+/// to the `unknown.multi_fact` template family.
+pub fn detect_count_hint(input: &str) -> Option<usize> {
+    let lower = input.to_lowercase();
+    // Item nouns the count attaches to. Wider than just «дерек»
+    // because adam's R1 graph isn't predicate-specific — «себеп /
+    // тармақ / нәрсе / мысал / жайт» are all asking for "items".
+    let has_item_noun = lower.contains("дерек")
+        || lower.contains("себеп")
+        || lower.contains("тармақ")
+        || lower.contains("мысал")
+        || lower.contains("жайт")
+        || lower.contains("нәрсе")
+        || lower.contains("факт");
+    if !has_item_noun {
+        return None;
+    }
+    // Cardinality markers: digits + spelled-out Kazakh numerals
+    // 2..=5 (one and 6+ are excluded — see doc comment).
+    const NUMERALS: &[(&str, usize)] = &[
+        ("екі", 2),
+        ("eki", 2),
+        ("2", 2),
+        ("үш", 3),
+        ("ush", 3),
+        ("3", 3),
+        ("төрт", 4),
+        ("4", 4),
+        ("бес", 5),
+        ("bes", 5),
+        ("5", 5),
+    ];
+    for (word, n) in NUMERALS {
+        if lower.contains(word) {
+            return Some(*n);
+        }
+    }
+    None
+}
+
+#[cfg(test)]
+mod tests_count_hint_v6_0_5 {
+    use super::detect_count_hint;
+
+    #[test]
+    fn detects_eki_derek_v6_0_5() {
+        assert_eq!(
+            detect_count_hint("Қазақстан туралы нақты екі дерек айтшы"),
+            Some(2)
+        );
+    }
+
+    #[test]
+    fn detects_ush_sebep_v6_0_5() {
+        assert_eq!(detect_count_hint("Үш себеп айтсаңызшы"), Some(3));
+    }
+
+    #[test]
+    fn detects_digit_form_v6_0_5() {
+        assert_eq!(detect_count_hint("Қысқаша 2 тармақ көрсетіңіз"), Some(2));
+    }
+
+    #[test]
+    fn does_not_fire_without_item_noun_v6_0_5() {
+        assert_eq!(detect_count_hint("Екі жігіт келді"), None);
+    }
+
+    #[test]
+    fn does_not_fire_without_count_v6_0_5() {
+        assert_eq!(detect_count_hint("Дерек айтшы"), None);
+    }
+}
+
+#[cfg(test)]
+mod tests_recommendation_request_v6_0_5 {
+    use super::detect_recommendation_request;
+
+    #[test]
+    fn fires_on_book_recommendation_v6_0_5() {
+        assert!(detect_recommendation_request(
+            "Маған қандай қазақ кітабын ұсынасыз?"
+        ));
+    }
+
+    #[test]
+    fn fires_on_job_advice_v6_0_5() {
+        assert!(detect_recommendation_request(
+            "Жұмыс іздегенде қандай кеңес бересіз?"
+        ));
+    }
+
+    #[test]
+    fn fires_on_what_to_do_v6_0_5() {
+        assert!(detect_recommendation_request(
+            "Қазір не жасасам жақсы болады?"
+        ));
+    }
+
+    #[test]
+    fn fires_on_film_recommendation_v6_0_5() {
+        assert!(detect_recommendation_request(
+            "Қандай фильм көруге кеңес бересіз?"
+        ));
+    }
+
+    #[test]
+    fn does_not_fire_on_exercise_request_v6_0_5() {
+        assert!(!detect_recommendation_request("Маған жаттығу беріңіз"));
+    }
+
+    #[test]
+    fn does_not_fire_on_code_request_v6_0_5() {
+        assert!(!detect_recommendation_request("Hello World коды бер"));
+    }
+
+    #[test]
+    fn does_not_fire_on_factual_query_v6_0_5() {
+        assert!(!detect_recommendation_request("Абай туралы айтшы"));
+        assert!(!detect_recommendation_request(
+            "Қазақстан астанасы қай қала?"
+        ));
+    }
+}
+
+pub fn phonetic_lookup(
+    phonetic_code: &str,
+    lexicon_index: &std::collections::HashMap<String, Vec<String>>,
+) -> Option<String> {
+    if phonetic_code.is_empty() {
+        return None;
+    }
+    let candidates = lexicon_index.get(phonetic_code)?;
+    if candidates.len() == 1 {
+        return Some(candidates[0].clone());
+    }
+    // Ambiguous code with multiple roots — let downstream FST
+    // pick from the alternates. Returning `None` is safer than
+    // committing to an arbitrary winner.
+    None
+}
+
+/// Build the phonetic reverse-index from a slice of lexicon roots.
+/// Pure function so callers can cache the result (e.g. via
+/// `std::sync::OnceLock` on lexicon load).
+pub fn build_phonetic_index<I, S>(roots: I) -> std::collections::HashMap<String, Vec<String>>
+where
+    I: IntoIterator<Item = S>,
+    S: AsRef<str>,
+{
+    let mut index: std::collections::HashMap<String, Vec<String>> =
+        std::collections::HashMap::new();
+    for root in roots {
+        let r = root.as_ref();
+        let code = kazakh_phonetic_code(r);
+        if code.is_empty() {
+            continue;
+        }
+        index.entry(code).or_default().push(r.to_string());
+    }
+    // Sort + dedup each cohort for deterministic lookup.
+    for cohort in index.values_mut() {
+        cohort.sort();
+        cohort.dedup();
+    }
+    index
+}
+
+/// **v6.0.0-rc5 MOD voice REPL 2026-05-20** — Kazakh phonetic
+/// encoder for the «math-graph of nearest-meaning words» the user
+/// keeps asking for. Collapses surface tokens to a canonical
+/// phonetic code so Whisper-noise variants («сағат» / «сақат»,
+/// «бес» / «без», «көбейт» / «кубейт», «жиырма» / «жерма» / «жерме»)
+/// all hash to the same code and can be looked up against the
+/// lexicon via a single shared index.
+///
+/// Encoding rules (Kazakh sound-class collapse):
+/// - Vowels {а, ә, ы, е, і, и, э, о, ұ, у, ө, ү, я, ю, ё} → V
+///   (any vowel; collapses front/back/rounded/unrounded distinctions
+///   because Whisper systematically conflates them);
+/// - Velars {қ, к, г, ғ, х, һ} → K;
+/// - Nasals {м, н, ң} → N;
+/// - Sibilants {с, з, ш, ж, ч, щ, ц} → S;
+/// - Liquids {л, р} → L;
+/// - Labials {п, б, ф, в} → P;
+/// - Dentals {т, д} → T;
+/// - Glides {й, у-as-glide} → Y.
+/// - Latin letters are passed through lowercase (so «rust» / «java»
+///   stay distinguishable from Cyrillic forms);
+/// - Non-alphabetic chars are dropped.
+///
+/// Consecutive same-class characters compress to one (Soundex-style):
+/// «сағат» → s-V-K-V-T → "SVKVT" — but VV repeats collapse, so
+/// "SVKVT" → "SVKVT" (no collapse here). «сақат» → s-V-K-V-T →
+/// "SVKVT". Match.
+///
+/// Returns the phonetic code as an uppercase string. Empty input
+/// produces an empty string.
+pub fn kazakh_phonetic_code(word: &str) -> String {
+    let lower = word.to_lowercase();
+    let mut code = String::new();
+    let mut last_class: Option<char> = None;
+    for c in lower.chars() {
+        let class = match c {
+            'а' | 'ә' | 'ы' | 'е' | 'і' | 'и' | 'э' | 'о' | 'ұ' | 'у' | 'ө' | 'ү' | 'я' | 'ю'
+            | 'ё' => Some('V'),
+            'қ' | 'к' | 'г' | 'ғ' | 'х' | 'һ' => Some('K'),
+            'м' | 'н' | 'ң' => Some('N'),
+            'с' | 'з' | 'ш' | 'ж' | 'ч' | 'щ' | 'ц' => Some('S'),
+            'л' | 'р' => Some('L'),
+            'п' | 'б' | 'ф' | 'в' => Some('P'),
+            'т' | 'д' => Some('T'),
+            'й' => Some('Y'),
+            'a'..='z' => Some(c.to_ascii_uppercase()),
+            _ => None,
+        };
+        if let Some(cl) = class {
+            if last_class != Some(cl) {
+                code.push(cl);
+                last_class = Some(cl);
+            }
+        }
+    }
+    code
+}
+
+/// **v6.0.0-rc5 voice REPL round 4** — Whisper-turbo splits long
+/// Kazakh compounds at non-existent word boundaries. Live REPL
+/// surfaced «Мен қостан айда тұрамын» (true: «Мен Қостанайда
+/// тұрамын») — the city locative «Қостанайда» got split into
+/// «қостан айда», so the noun_hint extractor picked the spurious
+/// «қос» (pair) instead of the city. Same drift hits Astana
+/// («астан ада»), Almaty («алмат ыда»), and several others.
+/// This pre-processor rejoins the canonical compound BEFORE
+/// FST parsing sees the input.
+///
+/// Closed-list (top cities + key compounds). For each pair
+/// (`left`, `right`), the input is scanned for the bigram «left
+/// right» (case-insensitive, exact spaces) and replaced with the
+/// concatenation `leftright`. Conservative — single-byte-boundary
+/// matches only, never alters interior word characters.
+pub fn rejoin_whisper_splits(input: &str) -> String {
+    const PAIRS: &[(&str, &str)] = &[
+        ("қостан", "айда"),  // Қостанайда
+        ("қостан", "айдан"), // Қостанайдан
+        ("астан", "ада"),    // Астанада
+        ("астан", "адан"),   // Астанадан
+        ("алмат", "ыда"),    // Алматыда
+        ("алмат", "ыдан"),   // Алматыдан
+        ("шымкент", "те"),   // Шымкентте (already one token, harmless)
+        ("қарағанд", "ыда"), // Қарағандыда
+        ("ақтөб", "еде"),    // Ақтөбеде
+        ("тарас", "айық"),   // танысайық — Whisper split that broke round-3
+        ("таныс", "айық"),   // танысайық (canonical first half)
+    ];
+    let mut out = input.to_string();
+    let lower = out.to_lowercase();
+    for (left, right) in PAIRS {
+        let needle = format!("{left} {right}");
+        if let Some(pos) = lower.find(&needle) {
+            // Splice replacement into the original-case buffer at the
+            // same byte offset. Whisper produces lowercase / mixed-
+            // case both — the resulting locative usually starts a
+            // sentence and gets re-cased downstream by NLG.
+            let replacement = format!("{left}{right}");
+            out.replace_range(pos..pos + needle.len(), &replacement);
+            // Restart on the rejoined string for cascading fixes.
+            return rejoin_whisper_splits(&out);
+        }
+    }
+    out
+}
 
 /// **v4.6.20** — strip a leading discourse preamble from the
 /// input, returning the residual. If the input does not start with
@@ -4300,6 +5627,17 @@ pub fn input_is_self_comparison_question(input: &str) -> bool {
 /// a topical compound (a *kind* of thing) rather than a named
 /// entity.
 const ADJ_NOUN_COMPOUND_HINTS: &[&str] = &[
+    // **v6.0.10 — 2026-05-21 user audit round 4 follow-up.** AI-Law
+    // domain compounds. The longer phrases must precede the
+    // shorter «жасанды интеллект» in length so the longest-match
+    // policy of `find_adj_noun_compound` returns the more
+    // specific topic when input contains the full phrase. The
+    // function picks the longest hint whose lowercased substring
+    // matches — without these entries, every AI-law query was
+    // grounded on the generic «жасанды интеллект» fact and
+    // surfaced an unrelated definition.
+    "қорғаныс саласындағы жасанды интеллект",
+    "жасанды интеллект туралы заң",
     "машиналық оқыту",
     "терең оқыту",
     "жасанды интеллект",
@@ -4403,6 +5741,67 @@ mod math_tests {
         assert!(!input_is_math_expression("Қазақстанда 17 облыс бар."));
         assert!(!input_is_math_expression("Менің жасым 30"));
         assert!(!input_is_math_expression("Алты қаласы Қазақстанда"));
+    }
+
+    /// **v6.0 (live REPL 2026-05-18)** — multi-clause math expressions
+    /// must NOT be comma-split at the discourse layer. The math
+    /// evaluator handles commas internally as clause separators and
+    /// chains operations against a running accumulator; splitting
+    /// them at this layer breaks the chain (clause 1 evaluates
+    /// standalone, clause 2 has no left operand).
+    #[test]
+    fn split_compound_keeps_math_one_piece_v6() {
+        let cases = [
+            "Елу алтыны үшке көбейтіңіз, содан кейін екіге бөліңіз",
+            "Жиырма бесті бес көбейтсек, содан кейін онға бөл",
+            "Бесті отызға көбейт, сосын екіге бөл",
+            "56 * 3 / 2",
+        ];
+        for c in cases {
+            let pieces = super::split_compound_utterance(c);
+            assert_eq!(
+                pieces.len(),
+                1,
+                "math input must not be split (input={c:?}, got pieces={pieces:?})"
+            );
+        }
+    }
+
+    /// Counter-test: non-math compound inputs continue to split as
+    /// before so the per-clause dispatch path stays intact for normal
+    /// dialog turns.
+    #[test]
+    fn split_compound_still_splits_non_math_v6() {
+        let pieces = super::split_compound_utterance("Сәлем, менің атым Дәулет");
+        assert_eq!(pieces.len(), 2);
+        assert_eq!(pieces[0], "Сәлем");
+        assert_eq!(pieces[1], "менің атым Дәулет");
+    }
+
+    /// **v6.0** — colloquial «сосын» («then») recognised as a clause
+    /// separator alongside formal «содан кейін» for spoken-style math
+    /// chains.
+    #[test]
+    fn word_math_sosyn_separator_v6() {
+        // 5 × 30 = 150, then ÷ 2 = 75.
+        assert_eq!(
+            super::try_evaluate_kazakh_word_math("Бесті отызға көбейт, сосын екіге бөл"),
+            Some(75)
+        );
+    }
+
+    /// **v6.0** — the user's exact phrasing from the 2026-05-18 voice
+    /// REPL that motivated the multi-clause fix: «Елу алтыны үшке
+    /// көбейтіңіз, содан кейін екіге бөліңіз» = «56 × 3 then ÷ 2».
+    /// Should compute to 84.
+    #[test]
+    fn word_math_user_56x3_div2_v6() {
+        assert_eq!(
+            super::try_evaluate_kazakh_word_math(
+                "Елу алтыны үшке көбейтіңіз, содан кейін екіге бөліңіз"
+            ),
+            Some(84)
+        );
     }
 
     /// **v4.41.0** — word-form math evaluator tests.
@@ -4688,6 +6087,48 @@ mod math_summary_tests_v5210 {
     fn no_summary_for_non_math_input_v5210() {
         // Plain dialog turn, no numbers / operators / quantity question.
         assert!(extract_kazakh_math_summary("Сәлем! Қалыңыз қалай?").is_none());
+    }
+
+    /// **v6.0 (live REPL 2026-05-18)** — geometric / measurement
+    /// questions pattern-match on numeral + sum-verb + «қанша» but
+    /// must not produce a math summary. Pre-fix the live REPL
+    /// surfaced «Мен «3» деп ұқтым…» on the triangle-angle question,
+    /// echoing back a number the user never asked about.
+    #[test]
+    fn geometry_questions_yield_no_math_summary_v6() {
+        let cases = [
+            "Үш бұрыштың бұрыштарының қосындысы қанша градус?",
+            "Шеңбердің ауданы қалай есептеледі?",
+            "Алматы мен Астана арасы қанша километр?",
+            "Кубтың көлемі қалай табылады?",
+            "Үшбұрыштың периметрі дегеніміз не?",
+        ];
+        for c in cases {
+            assert!(
+                extract_kazakh_math_summary(c).is_none(),
+                "geometry/measurement input must not produce math summary: {c:?}"
+            );
+            assert!(
+                try_evaluate_kazakh_word_math(c).is_none(),
+                "geometry/measurement input must not evaluate to a number: {c:?}"
+            );
+        }
+    }
+
+    /// Counter-test: pure arithmetic and Kazakh word-math remain
+    /// untouched by the geometry guard. False positives here would
+    /// silently break the calculator UX.
+    #[test]
+    fn arithmetic_and_word_math_unaffected_by_geometry_guard_v6() {
+        // Pure arithmetic — must keep evaluating.
+        assert!(extract_kazakh_math_summary("2 + 2 қанша?").is_some());
+        assert!(extract_kazakh_math_summary("12 + 35 қанша?").is_some());
+        // Kazakh word-math — must keep evaluating to a number.
+        assert_eq!(
+            try_evaluate_kazakh_word_math("Бесті отызға көбейтсем"),
+            Some(150)
+        );
+        assert_eq!(try_evaluate_kazakh_word_math("Бес пен үш қос"), Some(8));
     }
 
     #[test]

@@ -3386,6 +3386,13 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
+      "id": "noun_v605_бесбармақ",
+      "root": "бесбармақ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
       "id": "noun_bib",
       "root": "биб",
       "part_of_speech": "noun",
@@ -26273,6 +26280,34 @@
       "root": "қалиев",
       "part_of_speech": "noun",
       "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "adverb_qalay_v605",
+      "root": "қалай",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adverb_qalaysyn_v605",
+      "root": "қалайсың",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "adverb_qalaysyz_v605",
+      "root": "қалайсыз",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "adverb_qalaysyndar_v605",
+      "root": "қалайсыңдар",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "back",
       "final_sound_class": "voiced_consonant"
     },
     {

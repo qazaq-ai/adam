@@ -1,0 +1,40 @@
+[package]
+name = "adam-agg-model"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Tiny pure-Rust transformer + L6 verifier for the v6.0 algebra-anchored neural composition layer. Built on burn (CPU via ndarray; optional Metal/WGPU via feature flags in v6.3+). ≤ 10M params target. See docs/architecture_neural_v6.md."
+
+[dependencies]
+adam-kernel = { path = "../adam-kernel" }
+adam-kernel-fst = { path = "../adam-kernel-fst" }
+adam-agg-tokenizer = { path = "../adam-agg-tokenizer" }
+adam-agg-synth = { path = "../adam-agg-synth" }
+burn = { version = "0.17", default-features = false, features = ["std", "train", "autodiff", "ndarray"] }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+rand = "0.9"
+
+[[bin]]
+name = "poc_kazakh_train"
+path = "src/bin/poc_kazakh_train.rs"
+
+[[bin]]
+name = "verifier_demo"
+path = "src/bin/verifier_demo.rs"
+
+[dev-dependencies]
+criterion = { version = "0.5", default-features = false, features = ["cargo_bench_support"] }
+tempfile = "3"
+
+[[bench]]
+name = "neural_inference"
+harness = false
+
+[[bench]]
+name = "verifier_latency"
+harness = false
+
+[lints]
+workspace = true

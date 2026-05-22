@@ -484,10 +484,20 @@ mod tests {
     use std::sync::atomic::{AtomicUsize, Ordering};
 
     /// Helper: write a brief synthetic mono WAV at 16 kHz to a temp
-    /// path. Returns the path.
+    /// path. Returns the path. Uses a process-wide atomic counter so
+    /// concurrent test threads never reuse the same on-disk path —
+    /// a race that previously caused
+    /// `read_wav_mono_f32_decodes_16bit_v5255` (100 samples) to be
+    /// silently overwritten by `read_wav_with_rate_preserves_22050_v5285`
+    /// (50 samples) before its assertions ran.
     fn write_temp_wav(samples: &[i16], rate: u32) -> std::path::PathBuf {
-        let tmp =
-            std::env::temp_dir().join(format!("adam_playback_test_{}.wav", std::process::id()));
+        static SEQ: AtomicUsize = AtomicUsize::new(0);
+        let n = SEQ.fetch_add(1, Ordering::SeqCst);
+        let tmp = std::env::temp_dir().join(format!(
+            "adam_playback_test_{}_{}.wav",
+            std::process::id(),
+            n
+        ));
         let spec = hound::WavSpec {
             channels: 1,
             sample_rate: rate,

@@ -771,15 +771,42 @@ fn response_statement_of_family() {
 }
 
 #[test]
-fn response_ask_weather() {
-    assert_response_with_toml(
-        "ауа райы қалай",
-        &[
-            "менде терезе жоқ",
-            "ауа райын білмеймін",
-            "сыртта қалай екенін айтыңызшы",
-        ],
+fn response_ask_weather_falls_back_to_refusal_without_location_v6() {
+    // **v6.0** — without `ADAM_WEATHER_*` env vars AND without a
+    // session-belief city, AskWeather falls back to the refusal
+    // template. We don't pin the literal text (it now nudges the
+    // user to configure a city) — we assert the shape: must mention
+    // «терезе жоқ» OR «қалаңыз» (the refusal vocabulary). Also
+    // guarantees we DON'T accidentally render an empty
+    // `{live_weather_answer}` placeholder.
+    let prev_lat = std::env::var("ADAM_WEATHER_LAT").ok();
+    let prev_lon = std::env::var("ADAM_WEATHER_LON").ok();
+    let prev_city = std::env::var("ADAM_WEATHER_CITY").ok();
+    unsafe {
+        std::env::remove_var("ADAM_WEATHER_LAT");
+        std::env::remove_var("ADAM_WEATHER_LON");
+        std::env::remove_var("ADAM_WEATHER_CITY");
+    }
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let out = respond_with_repo("ауа райы қалай", &lex, &repo, 0);
+    assert!(
+        out.to_lowercase().contains("терезе") || out.to_lowercase().contains("қалаңыз"),
+        "AskWeather refusal must mention терезе/қалаңыз (got: {out:?})"
     );
+    assert!(
+        !out.contains("{"),
+        "refusal must not render an unfilled slot placeholder (got: {out:?})"
+    );
+    if let Some(v) = prev_lat {
+        unsafe { std::env::set_var("ADAM_WEATHER_LAT", v) }
+    }
+    if let Some(v) = prev_lon {
+        unsafe { std::env::set_var("ADAM_WEATHER_LON", v) }
+    }
+    if let Some(v) = prev_city {
+        unsafe { std::env::set_var("ADAM_WEATHER_CITY", v) }
+    }
 }
 
 #[test]
@@ -795,14 +822,67 @@ fn response_statement_of_weather() {
 }
 
 #[test]
-fn response_ask_time() {
-    assert_response_with_toml(
-        "сағат неше",
-        &[
-            "уақытты білмеймін",
-            "менде сағат жоқ",
-            "уақыт — асыл қазына",
-        ],
+fn response_ask_time_reads_live_clock_v6() {
+    // **v6.0** — `Intent::AskTime` reads the OS clock and emits a
+    // literal time / date answer. Pre-v6.0 returned one of three
+    // refusal templates; that family is now `{live_clock_answer}`
+    // populated from `system_clock::render_live`. We don't pin a
+    // specific clock value (would flake on the CI clock), but we
+    // assert the SHAPE: the output mentions either «сағат» (for
+    // the time path) or a Kazakh month name (for the date path)
+    // and contains a digit somewhere.
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let out = respond_with_repo("сағат неше", &lex, &repo, 0);
+    assert!(
+        out.contains("сағат") && out.chars().any(|c| c.is_ascii_digit()),
+        "AskTime/Time must render «сағат NN:NN» (got: {out:?})"
+    );
+}
+
+#[test]
+fn response_ask_date_renders_month_name_v6() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let out = respond_with_repo("бүгін қандай күн", &lex, &repo, 0);
+    // At least one Kazakh month name + at least one digit (year or
+    // day-of-month).
+    const MONTHS: &[&str] = &[
+        "қаңтар",
+        "ақпан",
+        "наурыз",
+        "сәуір",
+        "мамыр",
+        "маусым",
+        "шілде",
+        "тамыз",
+        "қыркүйек",
+        "қазан",
+        "қараша",
+        "желтоқсан",
+    ];
+    assert!(
+        MONTHS.iter().any(|m| out.contains(m)),
+        "AskTime/Date must render Kazakh month name (got: {out:?})"
+    );
+    assert!(
+        out.chars().any(|c| c.is_ascii_digit()),
+        "AskTime/Date must include a digit for day or year (got: {out:?})"
+    );
+}
+
+#[test]
+fn response_ask_year_renders_4_digit_year_v6() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let out = respond_with_repo("қазір қай жыл", &lex, &repo, 0);
+    // Pull contiguous digit runs; at least one should be 4 digits.
+    let has_4_digit_run = out
+        .split(|c: char| !c.is_ascii_digit())
+        .any(|run| run.len() == 4);
+    assert!(
+        has_4_digit_run && out.contains("жыл"),
+        "AskTime/Year must render «NNNN жыл» (got: {out:?})"
     );
 }
 
@@ -1445,8 +1525,17 @@ fn graph_admissibility_flags_support_pattern_mismatch() {
     );
 }
 
+/// **v6.0.8 (replaces v4.0.32 leak-detection test).** The
+/// 2026-05-21 user audit narrowed the verifier's contradiction
+/// gate to engagement-aware — unrelated factual queries no
+/// longer trigger verification failure under a self-profile
+/// conflict. The original test asserted EvidenceLeakAfter
+/// VerificationFailure fires; under the new policy
+/// verification.supported = true, no leak. This test now pins
+/// the inverse: the leak issue must NOT be flagged when the
+/// query is genuinely unrelated.
 #[test]
-fn trace_faithfulness_flags_reasoning_leak_after_verification_failure() {
+fn trace_faithfulness_no_leak_for_unrelated_chain_under_self_conflict() {
     use adam_reasoning::reasoner::DerivedFact;
     use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
 
@@ -1488,10 +1577,11 @@ fn trace_faithfulness_flags_reasoning_leak_after_verification_failure() {
     };
     let faithfulness = audit_trace_faithfulness(&leaked, &trace);
     assert!(
-        faithfulness
+        !faithfulness
             .issues
             .contains(&TraceFaithfulnessIssue::EvidenceLeakAfterVerificationFailure),
-        "expected evidence leak issue, got {:?}",
+        "v6.0.8: verification passes for unrelated query under self-conflict, \
+         so no evidence-leak issue should fire; got {:?}",
         faithfulness.issues
     );
 }
@@ -2450,11 +2540,22 @@ fn action_planner_classifies_reasoning_chain_intent_as_run_reasoner() {
     );
 }
 
-/// v4.0.31 — belief contradiction routes action to
-/// `CheckContradiction` even when the current turn has evidence
-/// attached. Contradictions dominate everything else.
+/// **v6.0.6 (replaces v4.0.31).** Belief contradiction no longer
+/// dominates UNRELATED factual / educational queries — the
+/// 2026-05-21 user audit found that pre-v6.0.6 «жер туралы
+/// айтшы» (a Kazakh-poet / Earth definition question) after a
+/// pending city conflict was answered with a clarifying prompt
+/// about Alma-Ata vs Astana, which from the user's POV bricked
+/// every subsequent factual turn. The gate now requires the
+/// current intent to engage the contested slot (or be a
+/// resolution / paper-over-social shape). When the intent is a
+/// content-bearing factual probe, the contradiction stays in
+/// `belief.contradictions` for audit but doesn't dominate the
+/// planner. The pre-existing engagement case is kept by
+/// `action_planner_surfaces_contradiction_when_intent_engages_slot`
+/// below.
 #[test]
-fn action_planner_surfaces_contradiction_over_evidence() {
+fn action_planner_does_not_surface_contradiction_for_unrelated_factual_query() {
     let Some(lex) = load_lexicon() else { return };
     let repo = load_repo();
     let mut conv = Conversation::new();
@@ -2462,6 +2563,34 @@ fn action_planner_surfaces_contradiction_over_evidence() {
     conv.turn("мен алматыда тұрамын", &lex, &repo, 0);
     conv.turn("мен астанада тұрамын", &lex, &repo, 1);
     let (_, trace) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 2);
+
+    use adam_dialog::Action;
+    assert_ne!(
+        trace.action_digest.action,
+        Action::CheckContradiction,
+        "city conflict must not block an unrelated factual query (audit 2026-05-21)"
+    );
+    // Audit-trail preserved.
+    assert_eq!(conv.belief.contradictions.len(), 1);
+}
+
+/// **v6.0.6.** Counter-test to the negative case above — when
+/// the current intent DOES engage the contested slot
+/// (StatementOfLocation), the contradiction priority still
+/// fires. This is the engagement case the v4.0.31 design
+/// originally intended; v6.0.6 narrows it but does not remove
+/// it.
+#[test]
+fn action_planner_surfaces_contradiction_when_intent_engages_slot() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    conv.turn("мен алматыда тұрамын", &lex, &repo, 0);
+    conv.turn("мен астанада тұрамын", &lex, &repo, 1);
+    // Third StatementOfLocation engages the contested slot
+    // again — the planner must clarify.
+    let (_, trace) = conv.turn_with_trace("мен шымкентте тұрамын", &lex, &repo, 2);
 
     use adam_dialog::{Action, OutputKind};
     assert_eq!(trace.action_digest.action, Action::CheckContradiction);
@@ -2487,13 +2616,19 @@ fn action_planner_social_intent() {
     );
 }
 
-/// v4.0.34 Phase 5 part 2 — conflict-surfacing template family
-/// actually fires when belief has a contradiction + Unknown intent
-/// with noun_hint. Pre-v4.0.34 the gate stripped evidence and the
-/// reply was a generic noun-echo; post-v4.0.34 the user sees the
-/// two conflicting claims + a clarifying question.
+/// **v6.0.6 (replaces v4.0.34 Phase 5 part 2).** The conflict-
+/// surfacing template no longer fires for UNRELATED factual
+/// queries that happen to land while a contradiction is
+/// pending. Per the 2026-05-21 user audit, asking «жер туралы
+/// айтшы» (an Earth / Kazakh-poet definition question) while a
+/// city conflict sits in belief must NOT route the reply through
+/// `unknown.conflicted` — the user is asking about Earth, not
+/// arbitrating their own city slot. The reply should be a normal
+/// noun-hint fallback / definitional answer; the contradiction
+/// remains in belief for audit and resurfaces only when the user
+/// touches the contested slot again.
 #[test]
-fn conflict_surfaces_explicit_clarification_template() {
+fn conflict_does_not_surface_for_unrelated_factual_query() {
     let Some(lex) = load_lexicon() else { return };
     let repo = load_repo();
     let mut conv = Conversation::new();
@@ -2502,29 +2637,43 @@ fn conflict_surfaces_explicit_clarification_template() {
     conv.turn("мен астанада тұрамын", &lex, &repo, 1);
     let out = conv.turn("жер туралы айтшы", &lex, &repo, 2);
 
-    // Must contain both conflicting values — the whole point is
-    // making the user aware of the disagreement.
+    let lower = out.to_lowercase();
+    // The conflict template explicitly names both city values
+    // AND a clarification cue. Reject the whole signature.
+    let looks_like_conflict_template =
+        lower.contains("алматы") && lower.contains("астана") && lower.contains("қайсысы дұрыс");
     assert!(
-        out.to_lowercase().contains("алматы"),
-        "conflict reply must cite old value, got: {out:?}"
+        !looks_like_conflict_template,
+        "v6.0.6 contract: conflict template must not fire on \
+         «жер туралы айтшы» (an unrelated factual query). Got: {out:?}"
     );
+    // Sanity — contradiction record itself is preserved.
+    assert_eq!(conv.belief.contradictions.len(), 1);
+}
+
+/// **v6.0.6.** Counter-test — when the next turn DOES engage
+/// the contested city slot (a third StatementOfLocation), the
+/// clarification template must still fire and cite both values.
+/// This pins the "engagement case stays" half of v6.0.6.
+#[test]
+fn conflict_surfaces_explicit_clarification_template_when_intent_engages() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    conv.turn("мен алматыда тұрамын", &lex, &repo, 0);
+    conv.turn("мен астанада тұрамын", &lex, &repo, 1);
+    let out = conv.turn("мен шымкентте тұрамын", &lex, &repo, 2);
+
+    let lower = out.to_lowercase();
     assert!(
-        out.to_lowercase().contains("астана"),
-        "conflict reply must cite new value, got: {out:?}"
+        lower.contains("алматы") || lower.contains("астана"),
+        "engagement-case reply must cite a contested value, got: {out:?}"
     );
-    // Must route to clarification — some question marker / kazakh
-    // clarification cue. All three `unknown.conflicted` templates
-    // end with a question; any of «?» / «дұрыс» / «ма» / «нақтылай»
-    // suffices.
     let markers = ["?", "дұрыс", "нақтылай"];
     assert!(
         markers.iter().any(|m| out.contains(m)),
-        "conflict reply must look like a clarifying question, got: {out:?}"
-    );
-    // Sanity — must NOT still be the reasoning-chain marker.
-    assert!(
-        !out.contains("байланыс"),
-        "conflict path must not render a reasoning chain, got: {out:?}"
+        "engagement-case reply must look like a clarifying question, got: {out:?}"
     );
 }
 
@@ -2593,20 +2742,30 @@ fn epistemic_status_classifies_kinds_of_turn() {
     let (_, t2) = conv.turn_with_trace("рахмет", &lex, &repo, 1);
     assert_eq!(t2.epistemic_status, EpistemicStatus::Certain);
 
-    // Contradiction → Conflicted.
+    // **v6.0.8 — 2026-05-21 user audit round 3.** City conflict
+    // alone does NOT route an unrelated «жер» query to
+    // Conflicted — the v6.0.8 narrowing makes the contradiction
+    // dominance gate engagement-aware. The third turn is
+    // Intent::Unknown(жер), unrelated to city; status falls
+    // through to action-based (Derived from RunReasoner).
     conv.turn("мен алматыда тұрамын", &lex, &repo, 2);
     conv.turn("мен астанада тұрамын", &lex, &repo, 3);
     let (_, t4) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 4);
-    assert_eq!(t4.epistemic_status, EpistemicStatus::Conflicted);
+    assert_eq!(t4.epistemic_status, EpistemicStatus::Derived);
 }
 
-/// v4.0.32 Phase 4 — Verifier gates evidence rendering when a belief
-/// contradiction exists. Pre-v4.0.32 the dialog would happily surface
-/// a reasoning chain about «жер» even while the user's own city was
-/// contested. Post-v4.0.32 the gate strips the chain before template
-/// rendering, so the reply falls back to the safe noun-echo.
+/// **v6.0.8 (replaces v4.0.32 Phase 4 design).** Verifier no
+/// longer gates evidence rendering for UNRELATED factual
+/// queries when a user-self belief contradiction exists. Per
+/// the 2026-05-21 user audit round 3, the broad gate caused
+/// "city conflict bricks every subsequent factual query" — a
+/// reasoning chain about «жер» (Earth) should render normally
+/// regardless of whether the user has an outstanding choice
+/// between two cities. The contradiction stays in
+/// `belief.contradictions` for audit and resurfaces only when
+/// the user touches the contested slot.
 #[test]
-fn verifier_gates_reasoning_chain_under_belief_contradiction() {
+fn verifier_passes_unrelated_reasoning_chain_despite_self_conflict() {
     use adam_reasoning::reasoner::DerivedFact;
     use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
 
@@ -2640,22 +2799,22 @@ fn verifier_gates_reasoning_chain_under_belief_contradiction() {
     let (out, trace) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 2);
 
     assert!(
-        !trace.verification.supported,
-        "verifier must reject under unresolved contradiction, got {:?}",
+        trace.verification.supported,
+        "v6.0.8: verifier passes unrelated reasoning chain even \
+         under a self-profile conflict, got {:?}",
         trace.verification
     );
-    assert!(
-        !out.contains("байланыс"),
-        "gated output must not cite the reasoning chain, got: {out:?}"
-    );
+    // The reasoning chain survives — the output may cite it.
+    let _ = out;
     if let adam_dialog::Intent::Unknown {
-        reasoning_chain,
-        example,
-        ..
+        reasoning_chain, ..
     } = &trace.intent_after_verification
     {
-        assert!(reasoning_chain.is_none());
-        assert!(example.is_none());
+        assert!(
+            reasoning_chain.is_some(),
+            "v6.0.8: reasoning chain about «жер» preserved despite \
+             unrelated city conflict"
+        );
     } else {
         panic!(
             "expected Intent::Unknown, got {:?}",
@@ -3532,8 +3691,21 @@ fn qaldarynyz_qalai_does_not_poison_city_memory() {
         "wellbeing-style question must not be absorbed as session.city"
     );
 
+    // **v6.0** — STT garbage guard now requires the city to be in
+    // the canonical-geo catalog OR the weather city table (29
+    // oblast centres + major towns). Hallucinated village names
+    // like «Қашар» (Whisper's mangling of «Қостанай облысында»)
+    // are no longer stored — they would propagate into every later
+    // turn as a phantom location. Genuine non-catalog villages can
+    // still be added via `geo_catalog` / `weather::kazakh_city_coords`.
     let _ = conv.turn("Мен Қашар ауылынанмын.", &lex, &repo, 0);
-    assert_eq!(conv.session.get("city"), Some(&"Қашар".to_string()));
+    assert!(
+        !conv.session.contains_key("city"),
+        "unknown village must not pollute session.city — only canonical / table-listed names are persisted"
+    );
+    // Sanity: a real city (in the weather catalog) still flows in.
+    let _ = conv.turn("Мен Қостанайда тұрамын.", &lex, &repo, 0);
+    assert_eq!(conv.session.get("city"), Some(&"Қостанай".to_string()));
 }
 
 /// v4.0.3: `Conversation::with_curated_only_reasoning(true)` — the
@@ -3878,6 +4050,32 @@ fn ask_about_system_does_not_swallow_statement_of_name() {
         Some(&"Мәулет".to_string()),
         "StatementOfName must still record the name; AskAboutSystem detector must not preempt it"
     );
+}
+
+/// **v6.0** — reflexive «өзің кімсің» / «өзіңіз кімсіз» must also
+/// resolve to AskAboutSystem. The «өзі-» reflexive form replaces
+/// the pronoun and is a natural Kazakh phrasing for the same
+/// "who are you" question. Real-REPL 2026-05-18 turn 5 surfaced an
+/// unrelated Abai quote because the detector's pronoun gate
+/// rejected the reflexive form.
+#[test]
+fn ask_about_system_handles_reflexive_phrasings() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    for question in ["өзің кімсің", "өзіңіз кімсіз"] {
+        let mut conv = Conversation::new();
+        let out = conv.turn(question, &lex, &repo, 0);
+        let lower = out.to_lowercase();
+        assert!(
+            lower.contains("адам"),
+            "reflexive AskAboutSystem reply must mention `адам` (got for {question:?}: {out:?})"
+        );
+        assert!(
+            out.contains("Agglutinative Reasoning Kernel") || out.contains("ARK"),
+            "reflexive AskAboutSystem reply must mention full name or abbreviation \
+             (got for {question:?}: {out:?})"
+        );
+    }
 }
 
 /// **v4.3.4** — `AskAboutSystem { aspect: General }` mentions the

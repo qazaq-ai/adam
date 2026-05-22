@@ -1,0 +1,71 @@
+[package]
+name = "adam-intent-dataset"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Dataset builder + baseline harness for the E1 intent-classifier experiment. Walks `data/eval/*.json`, runs each `query` through the existing deterministic cascade (`adam-dialog::interpret_text_with_lexicon`), and emits a `(input, intent_label, source, confidence)` JSONL alongside per-cascade latency and accuracy metrics. The classifier in `adam-intent-classifier` learns from this output and is judged against the baseline this binary produces."
+
+[[bin]]
+name = "intent_dataset_build"
+path = "src/build.rs"
+
+[[bin]]
+name = "intent_dataset_baseline"
+path = "src/baseline.rs"
+
+[[bin]]
+name = "intent_train_rung_a"
+path = "src/train.rs"
+
+[[bin]]
+name = "intent_eval_rung_a"
+path = "src/evaluate.rs"
+
+[[bin]]
+name = "intent_dataset_diagnose"
+path = "src/diagnose.rs"
+
+[[bin]]
+name = "intent_dataset_synth"
+path = "src/synth.rs"
+
+[[bin]]
+name = "slot_dataset_build"
+path = "src/slot_build.rs"
+
+[[bin]]
+name = "slot_dataset_synth"
+path = "src/slot_synth.rs"
+
+[[bin]]
+name = "slot_train_rung_a"
+path = "src/slot_train.rs"
+
+[[bin]]
+name = "slot_eval_rung_a"
+path = "src/slot_evaluate.rs"
+
+[[bin]]
+name = "ranker_dataset_build"
+path = "src/ranker_build.rs"
+
+[[bin]]
+name = "ranker_train_rung_a"
+path = "src/ranker_train.rs"
+
+[[bin]]
+name = "ranker_eval_rung_a"
+path = "src/ranker_evaluate.rs"
+
+[dependencies]
+adam-kernel-fst = { path = "../../crates/adam-kernel-fst" }
+adam-dialog = { path = "../../crates/adam-dialog" }
+adam-intent-classifier = { path = "../../crates/adam-intent-classifier" }
+adam-slot-extractor = { path = "../../crates/adam-slot-extractor" }
+adam-retrieval-ranker = { path = "../../crates/adam-retrieval-ranker" }
+adam-reasoning = { path = "../../crates/adam-reasoning" }
+serde.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

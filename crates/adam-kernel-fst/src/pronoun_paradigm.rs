@@ -212,6 +212,17 @@ fn all_forms() -> &'static [PronounForm] {
     PRONOUN_FORMS
 }
 
+/// **2026-05-17 / v6.0 hook** — public read-only view of the
+/// hardcoded irregular-pronoun surfaces. Used by
+/// `adam-corpus::mine_lexicon_gaps` to mark these surfaces as
+/// "covered" without re-running the FST analyser on every token
+/// (Pass-1 of the gap miner is prefix-match; the irregulars are
+/// the textbook case it can't catch). Keep this in sync with
+/// `PRONOUN_FORMS` above — only the `.surface` field is exposed.
+pub fn irregular_pronoun_surfaces() -> impl Iterator<Item = &'static str> {
+    PRONOUN_FORMS.iter().map(|f| f.surface)
+}
+
 /// **v4.21.0** — try matching the surface form against the
 /// hardcoded irregular pronoun paradigms. Returns every matching
 /// `Analysis::Noun` whose surface equals `surface` (typically

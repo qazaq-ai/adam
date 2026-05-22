@@ -5,6 +5,11 @@ long version lives in `docs/roadmap.md` (release-by-release history),
 the per-crate READMEs, and the `feedback_*` / `project_*` discussions
 linked from individual decisions.
 
+Before contributing changes that touch architecture, please also read:
+- [`docs/MANIFESTO.md`](docs/MANIFESTO.md) — what we will and will not do.
+- [`docs/architecture_neural_v6.md`](docs/architecture_neural_v6.md) — v6.0 contract for the algebra-anchored neural composition layer.
+- [`RESEARCH_AGGLUTINATIVE_NEURAL.md`](RESEARCH_AGGLUTINATIVE_NEURAL.md) — the experimental research-arc charter.
+
 ## Stack policies (contract-tested)
 
 - **Rust-only.** No Python / Node / TypeScript / other-language source

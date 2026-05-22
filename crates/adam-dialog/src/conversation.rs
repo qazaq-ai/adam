@@ -213,6 +213,35 @@ pub struct Conversation {
     /// `cargo_status` slot resolves to `passed` or `failed`. Empty
     /// when no lesson-state turns have happened yet.
     pub curriculum_progress: HashMap<String, crate::curriculum::StageProgress>,
+    /// **v6.0.0-rc5 MOD voice REPL 2026-05-20** — cached Kazakh
+    /// phonetic reverse-index, built lazily on the first
+    /// `phonetic_normalize` call. Invalidated when the lexicon
+    /// pointer / length changes (see `phonetic_index_signature`).
+    /// Maps phonetic code → canonical root surfaces. Used by the
+    /// Whisper-noise normaliser in the input-preprocessor chain.
+    pub phonetic_index: HashMap<String, Vec<String>>,
+    /// Lexicon identity (ptr + len) under which `phonetic_index`
+    /// was built. `None` means «not yet built»; a mismatching
+    /// signature triggers a rebuild on next normalisation call.
+    pub phonetic_index_signature: Option<(usize, usize)>,
+    /// **v6.0.5 — E1 production wiring.** Optional trained
+    /// discriminative intent classifier. When `Some`, the turn loop
+    /// consults it as a confidence-rescue signal for `Unknown`
+    /// verdicts from the cascade (see
+    /// `apply_neural_intent_override`). When `None`, the cascade
+    /// drives every turn unchanged — this is the production
+    /// default.
+    pub neural_classifier: Option<adam_intent_classifier::Classifier>,
+    /// **v6.0.5 — E2 production wiring.** Optional trained
+    /// discriminative slot extractor (BIO sequence labeller).
+    /// When `Some` AND `ADAM_NEURAL_SLOTS=1` is in the
+    /// environment, the turn loop consults it as a **rescue
+    /// path** to fill `session` slots (`name` / `age` / `city`
+    /// / `occupation`) when the deterministic cascade did not
+    /// surface them. Cascade output always wins when both
+    /// agree. When `None`, the cascade drives slot extraction
+    /// unchanged — production default.
+    pub neural_slot_extractor: Option<adam_slot_extractor::SlotExtractor>,
 }
 
 /// v4.0.25 — intermediate state captured by
@@ -392,7 +421,7 @@ impl From<&Intent> for IntentKind {
             Intent::StatementOfFamily => Self::StatementOfFamily,
             Intent::AskWeather => Self::AskWeather,
             Intent::StatementOfWeather => Self::StatementOfWeather,
-            Intent::AskTime => Self::AskTime,
+            Intent::AskTime { .. } => Self::AskTime,
             Intent::Compliment => Self::Compliment,
             Intent::Request => Self::Request,
             Intent::WellWishes => Self::WellWishes,
@@ -414,6 +443,135 @@ impl From<&Intent> for IntentKind {
 }
 
 impl Conversation {
+    /// **v6.0.0-rc5 MOD voice REPL 2026-05-20** — Whisper-noise
+    /// normaliser via Kazakh phonetic graph search.
+    ///
+    /// For each whitespace-separated token in `input`:
+    ///   1. If the bare lowercase token is present in `lexicon.by_
+    ///      surface` (canonical, FST-parseable), keep as-is;
+    ///   2. Otherwise compute its phonetic code via `kazakh_phonetic_
+    ///      code` and look up the canonical root via the cached
+    ///      phonetic reverse-index (built once per lexicon and
+    ///      stored in `Conversation::phonetic_index`);
+    ///   3. If the lookup produces a unique match, replace the
+    ///      token with the canonical surface; otherwise keep
+    ///      original so downstream FST still gets a chance.
+    ///
+    /// The result is a re-joined string with whitespace preserved.
+    /// Performance: O(N tokens × HashMap lookup) per turn —
+    /// negligible against the ~20 ms turn latency.
+    fn phonetic_normalize(&mut self, input: &str, lexicon: &LexiconV1) -> String {
+        // Build or reuse the phonetic index + root-prefix set.
+        // Both are keyed by the lexicon identity (entries pointer +
+        // len) and invalidated on lexicon swap. For the common case
+        // of one lexicon per process, this initialisation happens
+        // exactly once.
+        let lex_signature = (
+            lexicon.entries_ordered.as_ptr() as usize,
+            lexicon.entries_ordered.len(),
+        );
+        if self.phonetic_index_signature != Some(lex_signature) {
+            let roots: Vec<&str> = lexicon
+                .entries_ordered
+                .iter()
+                .map(|e| e.root.as_str())
+                .collect();
+            self.phonetic_index = crate::discourse::build_phonetic_index(roots.iter().copied());
+            self.phonetic_index_signature = Some(lex_signature);
+        }
+        let mut out_parts: Vec<String> = Vec::new();
+        for raw in input.split_whitespace() {
+            // Strip trailing punctuation for the lookup but keep
+            // it on the output token. Whisper turbo often emits
+            // «деген?» with the question mark glued on; the
+            // canonical root is «деген», so we want to look that
+            // up, not «деген?».
+            let mut tail = String::new();
+            let mut core = raw;
+            while let Some(last) = core.chars().last() {
+                if last.is_ascii_punctuation() {
+                    tail.insert(0, last);
+                    core = &core[..core.len() - last.len_utf8()];
+                } else {
+                    break;
+                }
+            }
+            let core_lower = core.to_lowercase();
+            // **Gate 1** — exact lexicon match (canonical root).
+            // «адам», «сәлем», «жоқ»: bare roots pass through
+            // untouched and FST handles the analysis.
+            if lexicon.by_surface.contains_key(&core_lower) {
+                out_parts.push(format!("{core}{tail}"));
+                continue;
+            }
+            // **Gate 2 (v6.0.5)** — FST-parseability check. The
+            // canonical answer to "is this token a valid Kazakh
+            // word?" is "does the FST accept it?". If the
+            // morphotactics-driven `analyse()` returns any
+            // analyses, the token is a legitimate inflected form
+            // («Алматыда», «танысып», «алайық», «көбейтсе») and
+            // we hand it to the FST untouched. Only when the FST
+            // rejects the surface entirely do we even consider
+            // phonetic substitution — that is the precise gate
+            // that distinguishes Whisper noise («Кубейт») from
+            // valid inflection («көбейтсе»).
+            //
+            // Cost: one `analyse` call (~16k prefix-scan iterations
+            // with early exit) per non-bare-root token. At 30
+            // tokens / turn this is < 1 ms — negligible against
+            // the ~20 ms turn budget.
+            if !adam_kernel_fst::parser::analyse(&core_lower, lexicon).is_empty() {
+                out_parts.push(format!("{core}{tail}"));
+                continue;
+            }
+            // **Gate 3** — length window. Tokens shorter than 3
+            // chars give too many phonetic collisions (e.g.
+            // «не» / «бе» / «са»); tokens longer than 12 chars
+            // very rarely fail the FST gate AND map to a short
+            // root with edit-distance ≤ 2 — so substitution at
+            // that scale is a near-zero-signal coin flip.
+            let core_chars: Vec<char> = core_lower.chars().collect();
+            let char_count = core_chars.len();
+            if !(3..=12).contains(&char_count) {
+                out_parts.push(format!("{core}{tail}"));
+                continue;
+            }
+            let code = crate::discourse::kazakh_phonetic_code(core);
+            if let Some(canonical) = crate::discourse::phonetic_lookup(&code, &self.phonetic_index)
+            {
+                // **Gate 4** — edit-distance ≤ 2 vs. the canonical.
+                // The same phonetic code can match radically
+                // different roots (VLNT → «алмат» / «олимп» /
+                // «олонт»); near-spelling-equality blocks those
+                // false matches. Closes round-2 `mta_03` regression.
+                if !crate::semantics::edit_distance_lte_2(&core_lower, &canonical) {
+                    out_parts.push(format!("{core}{tail}"));
+                    continue;
+                }
+                // **Gate 5 (v6.0.5)** — leading-character agreement.
+                // Whisper-turbo rarely mis-hears the opening
+                // phoneme of a Kazakh word; STT noise concentrates
+                // in the medial / final vowels and consonant
+                // clusters. A substitution that flips the first
+                // character is almost certainly the wrong root.
+                // Closes the round-8 regression where «алайық»
+                // (optative-1pl) was being rewritten to «ылайық»
+                // (а→ы) and the IntroProposal greeting detector
+                // then lost the canonical surface.
+                let orig_first = core_lower.chars().next();
+                let canon_first = canonical.chars().next();
+                if orig_first != canon_first {
+                    out_parts.push(format!("{core}{tail}"));
+                    continue;
+                }
+                out_parts.push(format!("{canonical}{tail}"));
+            } else {
+                out_parts.push(format!("{core}{tail}"));
+            }
+        }
+        out_parts.join(" ")
+    }
+
     /// Start a fresh session — no remembered entities and no history.
     pub fn new() -> Self {
         let mut conv = Self::default();
@@ -464,6 +622,38 @@ impl Conversation {
     ) -> Self {
         self.extracted_facts = extracted;
         self.derived_facts = derived;
+        self
+    }
+
+    /// **v6.0.5 — E1 production wiring.** Attach a trained
+    /// discriminative intent classifier. When attached, the turn
+    /// loop consults it as a confidence-rescue signal for cascade
+    /// `Unknown` verdicts. Caller is responsible for selecting the
+    /// right artefact (e.g. `data/intent_classifier/v1/rung_a.json`).
+    /// When `None` (the default), the classifier path is bypassed
+    /// entirely — cascade drives every turn unchanged.
+    pub fn with_neural_classifier(
+        mut self,
+        classifier: adam_intent_classifier::Classifier,
+    ) -> Self {
+        self.neural_classifier = Some(classifier);
+        self
+    }
+
+    /// **v6.0.5 — E2 production wiring.** Attach a trained
+    /// discriminative slot extractor. When attached AND
+    /// `ADAM_NEURAL_SLOTS=1` is in the environment, the turn
+    /// loop consults it to fill missing session slots
+    /// (`name` / `age` / `city` / `occupation`) that the
+    /// cascade left empty. Cascade output dominates when both
+    /// extract the same slot. When `None` (the default), the
+    /// slot-extractor path is bypassed — cascade drives slot
+    /// state unchanged.
+    pub fn with_neural_slot_extractor(
+        mut self,
+        extractor: adam_slot_extractor::SlotExtractor,
+    ) -> Self {
+        self.neural_slot_extractor = Some(extractor);
         self
     }
 
@@ -607,7 +797,92 @@ impl Conversation {
         // (parses, noun_hint, retrieval) see only the meaningful
         // residual; surface-level checks (Russian/math detection)
         // still operate on the raw input above.
-        let stripped = crate::discourse::strip_addressee(crate::discourse::strip_preamble(input));
+        // **v6.0.0-rc5 voice REPL round 4** — Whisper-turbo splits
+        // long Kazakh compounds at non-existent word boundaries
+        // («Қостанайда» → «қостан айда», «танысайық» → «таныс
+        // айық»), making downstream noun_hint extraction pick the
+        // first fragment as the topic. Rejoin known splits BEFORE
+        // preamble / addressee stripping so all later layers see
+        // the canonical surface.
+        let rejoined = crate::discourse::rejoin_whisper_splits(input);
+        // **v6.0.0-rc5 voice REPL round 7** — detect "how did you
+        // figure out my gender from voice?" so we can override the
+        // final output with an honest pitch-detection explanation
+        // (the normal pipeline would otherwise surface a stray
+        // «дауыс — сөйлеу құралы» definition). Override happens at
+        // function tail to keep the full TurnTrace populated.
+        let gender_explain_override: Option<String> =
+            if crate::discourse::detect_ask_gender_detection_explain(&rejoined) {
+                let hint = self.session.get("voice_gender_hint").cloned();
+                let detail = match hint.as_deref() {
+                    Some("male") => "Сіздің даусыңыз 140 Гц-тен төмен жиілікте — еркектің дауысы.",
+                    Some("female") => {
+                        "Сіздің даусыңыз 180 Гц-тен жоғары жиілікте — әйелдің дауысы."
+                    }
+                    _ => "Сіздің даусыңыздың жиілігін дөп басу мүмкін болмады.",
+                };
+                Some(format!(
+                    "Сіздің даусыңыздың негізгі жиілігін (F0) талдадым. \
+                    Еркектің дауысы әдетте 85–180 Гц аралығында, ал әйелдің дауысы — 165–255 Гц. \
+                    Менің бағалауымша {detail} Бұл деректер сақталмайды — тек ағымдағы сөйлесу барысында пайдаланылады."
+                ))
+            } else {
+                None
+            };
+        // **v6.0.0-rc5 MOD voice REPL 2026-05-20** — gender-vocative
+        // fallback. If the speaker has not introduced themselves by
+        // name (no `name` slot in session) but the voice pipeline
+        // captured a confident pitch-based gender hint
+        // (`voice_gender_hint = "male" | "female"`), synthesise a
+        // generic Kazakh honorific into `name_respect` so any
+        // template that interpolates `{name_respect}` gets a
+        // culturally-appropriate vocative («Ағай» for male,
+        // «Апай» for female). Cleared once the user introduces
+        // themselves — name-based detection overwrites the slot
+        // with the personal honorific («Дәке» / «Айгерімжан»).
+        if !self.session.contains_key("name") {
+            if let Some(hint) = self.session.get("voice_gender_hint") {
+                let vocative = match hint.as_str() {
+                    "male" => Some("Ағай"),
+                    "female" => Some("Апай"),
+                    _ => None,
+                };
+                if let Some(v) = vocative {
+                    self.session.insert("name_respect".into(), v.to_string());
+                }
+            }
+        }
+        // **v6.0.5** — Kazakh phonetic normalisation, scoped to
+        // voice-input turns. The substitution corrects Whisper-
+        // noise variants («Кубейт» → «көбейт», «Жерма» → «жиырма»,
+        // «екеге» → «екіге») using a five-gate cascade in
+        // `phonetic_normalize`:
+        //   1. exact lexicon-root match (preserved);
+        //   2. FST-parseability via `analyse()` (preserved);
+        //   3. length window 3..=12 chars;
+        //   4. edit-distance ≤ 2 vs. the canonical;
+        //   5. leading-character agreement (Whisper rarely
+        //      mishears the opening phoneme).
+        // Text-mode turns are assumed intentional and pass through
+        // unchanged — a typed «Бесбармақ деген не?» must not be
+        // rewritten to «Бешбармақ» just because the latter is the
+        // lexicon's canonical surface for that food. The voice-
+        // mode signal is the session slot `voice_input_mode = "true"`
+        // set by `adam_chat` when running with `--voice-input` or
+        // `--push-to-talk`; absence of the slot disables
+        // substitution entirely.
+        let voice_mode = self
+            .session
+            .get("voice_input_mode")
+            .map(|v| v == "true")
+            .unwrap_or(false);
+        let normalised = if voice_mode {
+            self.phonetic_normalize(&rejoined, lexicon)
+        } else {
+            rejoined.clone()
+        };
+        let stripped =
+            crate::discourse::strip_addressee(crate::discourse::strip_preamble(&normalised));
         // **v4.15.5 + v4.16.5** — priors-aware parse path. When a
         // trained `SuffixPriors` artifact is attached, each
         // token's candidate analyses are re-ranked by `P(chain)`
@@ -635,7 +910,69 @@ impl Conversation {
         adam_kernel_fst::populate_periphrastic_modality(&mut sem_frames);
         adam_kernel_fst::populate_ability_modality(&mut sem_frames);
         adam_kernel_fst::populate_sentential_negation(&mut sem_frames);
-        let raw_intent = interpret_text_with_lexicon(stripped, &parses, Some(lexicon));
+        // **v6.0.6 — NEG-correction rewrite.** Kazakh's contrastive
+        // negation pattern «PREFIX X емес[+copula], Y» means
+        // «PREFIX is not X, (rather) Y». 2026-05-21 audit:
+        //
+        //   - «менің атым Ерлан емес, Айдос»
+        //       → rewrite to «менің атым Айдос», name = Айдос
+        //   - «мен 25-те емеспін, 31-демін»
+        //       → rewrite to «мен 31-демін», age = 31
+        //   - «сау болыңыз емес, әлі сөйлесейік»
+        //       → rewrite to «әлі сөйлесейік», not a farewell
+        //
+        // The rewrite preserves the prefix («менің атым ») so the
+        // existing detect_statement_of_X trigger words still fire;
+        // only the rejected slot value is dropped. Parses are
+        // recomputed for the corrected text because token offsets
+        // and predicate-copula chains differ.
+        let (effective_input_owned, effective_parses);
+        let (effective_input, effective_parses_ref) =
+            match crate::semantics::apply_kazakh_negation_correction(stripped) {
+                Some(rewritten) => {
+                    effective_input_owned = rewritten;
+                    effective_parses = crate::parse_input_with_priors(
+                        &effective_input_owned,
+                        lexicon,
+                        self.suffix_priors.as_ref(),
+                        self.priors_alpha,
+                    );
+                    (effective_input_owned.as_str(), &effective_parses)
+                }
+                None => (stripped, &parses),
+            };
+        let cascade_intent =
+            interpret_text_with_lexicon(effective_input, effective_parses_ref, Some(lexicon));
+
+        // **v6.0.5 — E1 production wiring.** When
+        // `ADAM_NEURAL_INTENT=1` AND the loaded classifier confidently
+        // disagrees with the cascade's `Unknown` verdict, we let the
+        // classifier override the IntentKind. Conservative scope by
+        // design (see `docs/e1_intent_classifier_design.md` § "Production
+        // wiring"):
+        //
+        //   1. Override fires ONLY when the cascade returned `Unknown`
+        //      (with or without noun_hint) AND the classifier is
+        //      confident. Confident cascade verdicts win unchanged.
+        //   2. Confidence gate: classifier's `top_score - second_score
+        //      ≥ 0.15`. Below that, the classifier defers to the
+        //      cascade.
+        //   3. Safety override: when `detect_safety_topic` will fire
+        //      anyway, classifier never overrides — the safety routing
+        //      layer is the authority on those domains.
+        //   4. The classifier emits a *kind* (closed enum); we only
+        //      override into Intent variants that carry no data
+        //      (`Greeting`, `AskName`, `AskHowAreYou`, …). Variants
+        //      that need lexical data (`StatementOfName { name }`,
+        //      `StatementOfAge { years }`, …) keep the cascade's
+        //      analysis — the classifier has no way to know "what"
+        //      the name or age IS.
+        let raw_intent = apply_neural_intent_override(
+            cascade_intent,
+            input,
+            &parses,
+            self.neural_classifier.as_ref(),
+        );
 
         // v1.4.0: follow-up resolution. "ал сіз?" after AskHowAreYou
         // becomes a re-interpretation: "user is asking me the same
@@ -825,7 +1162,23 @@ impl Conversation {
                     let only_heuristic_anaphora =
                         crate::discourse::is_short_interrogative_followup(&lower)
                             && !crate::discourse::input_contains_explicit_anaphor(input);
-                    let current_overrides_prior = only_heuristic_anaphora
+                    // **v6.0.7 — 2026-05-21 user audit bug 9.** Weak
+                    // discourse-connector anaphors («онда / сонда /
+                    // мұнда / бұнда / осында») are sentence-level
+                    // connectives, not pronoun references; when one
+                    // is the ONLY anaphor token they shouldn't drag
+                    // the previous (often unrelated) topic into the
+                    // current turn. Live audit: after a math context
+                    // establishing `last_query_topic = жиырма`,
+                    // «онда маған ownership-ті қарапайым түсіндір»
+                    // pre-fix overrode `noun_hint = ownership` with
+                    // `жиырма` and surfaced a math-context answer.
+                    // Treat weak-connector-only input the same as
+                    // heuristic-only input — let a High-confidence
+                    // current-turn noun win.
+                    let only_weak_connector =
+                        crate::discourse::input_contains_only_weak_connector_anaphor(input);
+                    let current_overrides_prior = (only_heuristic_anaphora || only_weak_connector)
                         && matches!(
                             noun_hint_confidence,
                             crate::topic_extraction::TopicConfidence::High
@@ -971,13 +1324,69 @@ impl Conversation {
         // also skip absorb_entities — it was a meta-dialog answer,
         // not a fresh claim.
         let dismissed_contradiction = self.try_dismiss_pending_contradiction(input);
-        let resolved_contradiction = if dismissed_contradiction {
-            false
+        // **v6.0.10 — 2026-05-21 user audit round 4 follow-up.**
+        // `try_resolve_pending_contradiction` now returns
+        // `Option<String>` (the predicate that was just resolved)
+        // so the renderer can pick the matching template variant
+        // and inject only the relevant slot. Pre-v6.0.10 it
+        // returned a bool, the caller injected ALL profile slots
+        // from session (any of which may carry stale values from
+        // earlier turns), and the renderer occasionally picked
+        // the «Жарайды, {city} болсын» template after an
+        // occupation resolution — surfacing the wrong slot.
+        let resolved_predicate: Option<String> = if dismissed_contradiction {
+            None
         } else {
             self.try_resolve_pending_contradiction(input, &intent)
         };
+        let resolved_contradiction = resolved_predicate.is_some();
         if !dismissed_contradiction && !resolved_contradiction {
             self.absorb_entities(&intent, turn_id);
+            // **v6.0.5 — E2 production wiring.** Neural slot-
+            // extractor rescue. Fires when the env flag is set
+            // AND an extractor is attached. Cascade-extracted
+            // slots that landed in `session` during
+            // `absorb_entities` above are NEVER overwritten —
+            // the extractor only fills slots the cascade left
+            // empty. See `apply_neural_slot_rescue` for the
+            // contract.
+            // **v6.0.5 — intent gate.** Restrict the extractor to
+            // turns whose intent can semantically carry a personal
+            // slot. **v6.0.9 — 2026-05-21 user audit round 4.**
+            // `Intent::Unknown` REMOVED from the allow-list. The
+            // original rationale was OOV rescue (cascade gives up
+            // → neural catches the name / city / occupation the
+            // cascade missed), but free-dialog audits showed the
+            // cost — E2 mis-tagged content tokens from factual
+            // queries and wrote noise like:
+            //   - «Әскери қызмет дегеніміз не?»     → name=Қызмет
+            //   - «Қай армия ең күшті?»             → name=Армия
+            //   - «Оны қарапайым түсіндірші»        → occupation=түсіндірші
+            //   - «Кибер шабуылдан қорғану жолын айт» → occupation=кибер
+            //   - «Қостанай өңірлік университеті туралы …» → city=қостанай
+            // Closing the Unknown branch is the cheapest way to
+            // make neural opt-in safe for free-form audience
+            // dialog. The OOV rescue path is forfeit until v6.1.0+
+            // restricts the per-token shape checks to be
+            // sufficiently confident on factual-query content.
+            // The user can still get the rescue effect by
+            // re-stating in canonical form («менің атым X») —
+            // those route through Statement* and DO fire E2.
+            let intent_admits_neural_slots = matches!(
+                intent,
+                crate::intent::Intent::StatementOfName { .. }
+                    | crate::intent::Intent::StatementOfAge { .. }
+                    | crate::intent::Intent::StatementOfLocation { .. }
+                    | crate::intent::Intent::StatementOfOccupation { .. }
+                    | crate::intent::Intent::StatementOfActivity { .. }
+                    | crate::intent::Intent::StatementOfFamily
+            );
+            if std::env::var("ADAM_NEURAL_SLOTS").as_deref() == Ok("1")
+                && self.neural_slot_extractor.is_some()
+                && intent_admits_neural_slots
+            {
+                self.apply_neural_slot_rescue(input);
+            }
             // **v4.51.0** — secondary activity-slot scan. The primary
             // intent detector picks one intent per turn (occupation
             // OR activity, not both). For compound inputs like
@@ -1042,6 +1451,126 @@ impl Conversation {
         // dismissal explicitly rather than fall through to a
         // generic "I don't understand". Mirrors the v4.0.41 short-
         // circuit pattern for resolution turns.
+        // **v6.0.13 — 2026-05-21 user audit round 4c.** Pre-action-
+        // plan curated definition probe — NARROWED whitelist
+        // version.
+        //
+        // History:
+        //   - v6.0.11 added the broad pre-plan probe so KRU /
+        //     Baitursynuly / AI-Law queries surfaced their
+        //     curated world_core facts (the post-plan probe was
+        //     too late — action was already AskClarification).
+        //   - v6.0.12 user audit found factual_eval_100 jumped
+        //     from 3 → 4 hallucinations. Investigating with
+        //     `factual_eval_100` traces, the broad probe was
+        //     mis-firing on tangentially-shaped questions even
+        //     after the «interrogative-as-tail» tightening,
+        //     because the topic extractor for definitional
+        //     queries OUTSIDE the new KRU domain picked
+        //     pre-existing noun_hints that the probe then
+        //     grabbed an unrelated curated fact for.
+        //
+        // The narrow fix: only run the pre-plan probe for the
+        // SPECIFIC subjects added in `kru_baitursynov.jsonl`
+        // (audit round 4 directive). For all other subjects,
+        // the existing retrieval / graph pipeline + the post-
+        // plan PROBE_KEYWORDS path stay authoritative — both
+        // had been stable on the factual_eval ceiling for
+        // months. This keeps free-dialog readiness for the new
+        // KRU domain WITHOUT regressing the rest of the
+        // factual surface.
+        //
+        // Future v6.1.0+ will replace this whitelist with a
+        // predicate-aware retrieval planner (the cleaner fix
+        // documented in the round-4 audit report).
+        if let Intent::Unknown {
+            noun_hint: Some(noun),
+            grounded_fact,
+            example,
+            reasoning_chain,
+            ..
+        } = &mut intent
+        {
+            const KRU_DOMAIN_SUBJECTS: &[&str] = &[
+                "ахмет байтұрсынұлы",
+                "ахмет байтұрсынұлы атындағы қостанай өңірлік университеті",
+                "қостанай өңірлік университеті",
+                "кру",
+                "жасанды интеллект туралы заң",
+                "қорғаныс саласындағы жасанды интеллект",
+                "кибер-қорғаныс",
+                "кибершабуыл",
+                "төте жазу",
+                "алаш қозғалысы",
+            ];
+            let noun_lower = noun.to_lowercase();
+            let is_kru_subject = KRU_DOMAIN_SUBJECTS.iter().any(|s| noun_lower == *s);
+            if is_kru_subject && grounded_fact.is_none() {
+                // **v6.0.15 — 2026-05-21 user audit round 4d
+                // follow-up.** Three-tier fact-selection for KRU
+                // domain queries:
+                //
+                //   1. **Predicate-keyword routing** — if the
+                //      input carries a predicate-leaning keyword
+                //      («санат / жіктей / тәуекел / құрылған /
+                //      туылған / күшіне»), pick the fact whose
+                //      raw_text mentions that keyword. Closes the
+                //      «X қандай санаттарға жіктейді?» case where
+                //      the categories list lives in a RelatedTo
+                //      row (kru_014) and IsA-preference would
+                //      grab the effective-date row instead.
+                //   2. **IsA preference** — pure definition
+                //      probes («X деген не?», «X кім?») want the
+                //      canonical IsA row, not a creation-history
+                //      RelatedTo row. The latter typically has a
+                //      raw_text emphasising action/history
+                //      («Төте жазу» pre-fix → «Ахмет Байтұрсынұлы
+                //      1912 жылы…»). v6.0.15 splits kru_005 into
+                //      a clean IsA row («Төте жазу — …») + a
+                //      history RelatedTo row, so this tier picks
+                //      the clean def.
+                //   3. **Any subject match** — last resort.
+                //
+                // Future v6.1.0+ replaces tier 1 with a typed
+                // predicate enum (BornIn / EffectiveFrom /
+                // Classifies / RiskLevel) and a question-shape
+                // → predicate planner.
+                let lower_input = input.to_lowercase();
+                const PREDICATE_KEYWORDS: &[&str] = &[
+                    "санат",
+                    "жіктей",
+                    "тәуекел",
+                    "құрылған",
+                    "туылған",
+                    "туған",
+                    "күшіне",
+                    "ақталды",
+                    "ақтал",
+                ];
+                let kw_hit = PREDICATE_KEYWORDS
+                    .iter()
+                    .find(|kw| lower_input.contains(*kw));
+                let kw_fact = kw_hit.and_then(|kw| {
+                    self.extracted_facts.iter().find(|f| {
+                        f.subject.root.to_lowercase() == noun_lower
+                            && f.raw_text.to_lowercase().contains(*kw)
+                    })
+                });
+                let isa_fact = self.extracted_facts.iter().find(|f| {
+                    f.subject.root.to_lowercase() == noun_lower
+                        && matches!(f.predicate, adam_reasoning::Predicate::IsA)
+                });
+                let any_fact = self
+                    .extracted_facts
+                    .iter()
+                    .find(|f| f.subject.root.to_lowercase() == noun_lower);
+                if let Some(fact) = kw_fact.or(isa_fact).or(any_fact) {
+                    *grounded_fact = Some(fact.raw_text.clone());
+                    *example = None;
+                    *reasoning_chain = None;
+                }
+            }
+        }
         let action_plan = if dismissed_contradiction {
             crate::action::ActionPlan::new(
                 crate::action::Action::DismissContradiction,
@@ -1082,7 +1611,7 @@ impl Conversation {
             &intent,
             &self.belief,
         );
-        let intent_for_render = if verification.supported {
+        let mut intent_for_render = if verification.supported {
             intent.clone()
         } else {
             crate::verifier::strip_evidence(intent.clone())
@@ -1110,6 +1639,254 @@ impl Conversation {
             && crate::discourse::is_kazakh_word_problem(input)
         {
             extra_slots.insert("__word_problem__".into(), "1".into());
+        }
+        // **v6.0.5 codex audit 2026-05-21** — recommendation-without-
+        // curated-data refusal. When the user asks for an open-ended
+        // recommendation / advice («қандай кітап ұсынасыз», «қандай
+        // кеңес бересіз», «не жасасам жақсы»), the topic extractor
+        // routinely pulls a tangential noun (`қазақ`, `жұмыс`) and
+        // surfaces a stray R1 derivation («Қазақ көз иеленеді»)
+        // through the unknown.with_derived_chain family — semantic
+        // noise that breaks the demo. The honest answer is "I do
+        // not have a curated list — name a specific author / topic
+        // and I can speak to it". Route this turn to the new
+        // `unknown.recommendation_no_data` template family and
+        // strip the evidence slots so the planner cannot fall back
+        // to a derivation render.
+        let is_recommendation_request = matches!(intent, Intent::Unknown { .. })
+            && crate::discourse::detect_recommendation_request(input);
+        if is_recommendation_request {
+            extra_slots.insert("__recommendation_no_data__".into(), "1".into());
+            if let Intent::Unknown {
+                reasoning_chain,
+                example,
+                grounded_fact,
+                ..
+            } = &mut intent_for_render
+            {
+                *reasoning_chain = None;
+                *example = None;
+                *grounded_fact = None;
+            }
+        }
+        // **v6.0.5 codex audit 2026-05-21** — multi-fact aggregation.
+        // When the user explicitly asks for N distinct items
+        // («екі дерек / үш себеп / бес мысал»), gather up to N
+        // curated facts about the turn's noun_hint, surface them
+        // as a bullet-list in `__multi_fact_list__`, and route to
+        // the dedicated template family. We pull from
+        // `self.extracted_facts` because those are world_core /
+        // curated entries with `raw_text` (full Kazakh sentences),
+        // not from `derived_facts` which are R1+ chains rendered as
+        // «X пен Y бір-біріне байланысты» — recall-on-demand
+        // citations, not stand-alone items.
+        if !is_recommendation_request {
+            if let (Intent::Unknown { noun_hint, .. }, Some(n_requested)) = (
+                &intent_for_render,
+                crate::discourse::detect_count_hint(input),
+            ) {
+                if let Some(noun) = noun_hint {
+                    let noun_lower = noun.to_lowercase();
+                    let mut seen_objects: std::collections::HashSet<String> =
+                        std::collections::HashSet::new();
+                    let mut items: Vec<String> = Vec::new();
+                    for fact in &self.extracted_facts {
+                        if items.len() >= n_requested {
+                            break;
+                        }
+                        if fact.subject.root.to_lowercase() != noun_lower {
+                            continue;
+                        }
+                        // Skip duplicate-object facts so the list
+                        // is information-distinct.
+                        let obj_key = fact.object.root.to_lowercase();
+                        if !seen_objects.insert(obj_key) {
+                            continue;
+                        }
+                        items.push(fact.raw_text.clone());
+                    }
+                    if items.len() >= 2 {
+                        let list = items
+                            .iter()
+                            .enumerate()
+                            .map(|(i, s)| format!("{}. {}", i + 1, s))
+                            .collect::<Vec<_>>()
+                            .join("\n");
+                        extra_slots.insert("__multi_fact_list__".into(), list);
+                        extra_slots.insert("__multi_fact_count__".into(), items.len().to_string());
+                        if let Intent::Unknown {
+                            reasoning_chain,
+                            example,
+                            grounded_fact,
+                            ..
+                        } = &mut intent_for_render
+                        {
+                            *reasoning_chain = None;
+                            *example = None;
+                            *grounded_fact = None;
+                        }
+                    }
+                }
+            }
+        }
+        // **v6.0.5 codex audit 2026-05-21** — probe-aware factual
+        // override. When the user asks a directed question about a
+        // resolved subject («Абайдың шын аты кім?», «Қашан туылған?»),
+        // surface the curated world_core raw_text whose subject AND
+        // probe keyword both match. Closes Codex finding «Оның шын
+        // аты кім?» → «Абай мен ибраһим өзара байланысты» — a stray
+        // R1 derivation in place of the curated «Абайдың шын аты —
+        // Ибраһим.»
+        //
+        // **Defensive override**: we only set `example`; we don't
+        // clear `reasoning_chain` because the planner's mode=Example
+        // / General routing already prefers `example` over derived
+        // chains when both are present. Leaving the chain in lets
+        // `--trace` show what would have been used as backup.
+        if let Intent::Unknown {
+            noun_hint: Some(noun),
+            example,
+            reasoning_chain,
+            grounded_fact,
+            ..
+        } = &mut intent_for_render
+        {
+            const PROBE_KEYWORDS: &[&str] = &[
+                "шын аты",
+                "туылған",
+                "туған",
+                "балалары",
+                "өмір сүрді",
+                "қайтыс",
+                "қашан",
+                "қандай шығарма",
+                "немен айналыс",
+                "ұлты",
+                "діні",
+                "тілі",
+            ];
+            // **v6.0.10 — 2026-05-21 user audit round 4 follow-up.**
+            // Definition-style probes («кім?» / «не?» / «деген не?»
+            // / «дегеніміз не?») don't expect the probe word in the
+            // FACT body — the answer is a description. The original
+            // probe loop required `raw_text` to contain the
+            // keyword, which works for «туылған / қайтыс / қашан»
+            // (the fact sentence has those tokens) but FAILS for
+            // «X кім?» / «X деген не?» where the fact says «X — Y»
+            // (no «кім» / «не» in the answer). This branch is
+            // checked SEPARATELY: subject-match only, no raw-text
+            // keyword. Closes the KRU / Baitursynuly / AI-Law
+            // retrieval gap reported in audit round 4.
+            const DEFINITION_PROBES: &[&str] = &[
+                "деген не",
+                "дегеніміз не",
+                "дегенің не",
+                "кім екен",
+                "не екен",
+                "туралы не білесің",
+                "туралы не білесіз",
+            ];
+            let lower_input = input.to_lowercase();
+            let noun_lower = noun.to_lowercase();
+            // **v6.0.12 — 2026-05-21 user audit round 4c.** Bare
+            // interrogative must be the TAIL token. See
+            // documentation on the pre-action-plan twin above. The
+            // post-action-plan path mirrors that contract so the
+            // two layers agree on which inputs are definition-
+            // shaped.
+            let stripped_tail: Vec<&str> = lower_input
+                .split_whitespace()
+                .map(|t| t.trim_end_matches('?').trim_end_matches('.'))
+                .filter(|t| !t.is_empty())
+                .collect();
+            let tail_is_interrogative = matches!(
+                stripped_tail.last().copied(),
+                Some("кім") | Some("не") | Some("қашан")
+            );
+            let definition_probe = DEFINITION_PROBES.iter().any(|kw| lower_input.contains(*kw))
+                || tail_is_interrogative;
+            // **v6.0.11 — 2026-05-21 user audit round 4b live REPL
+            // follow-up.** Definition probe runs WITH `example`
+            // override (matches the surrounding PROBE_KEYWORDS
+            // semantics at the same call site): when a definition-
+            // shaped query has a curated world_core fact whose
+            // subject matches the noun_hint, the curated fact
+            // wins over a morpheme-index retrieval `example` —
+            // because retrieval routinely returns an off-topic
+            // quote when the new compound subject isn't in the
+            // pre-built index. v6.0.10 (with `example.is_none()`
+            // guard) passed unit tests but failed in live REPL:
+            // KRU / Baitursynuly queries triggered retrieval that
+            // returned irrelevant other-university examples, which
+            // blocked the fallback from firing.
+            //
+            // Safety net preserved:
+            //   - `grounded_fact.is_none()` — don't overwrite a
+            //     more specific grounded_fact set earlier (PROBE_
+            //     KEYWORDS branch above).
+            //   - `has_genitive_possessive` skip — «X-нің Y-сі»
+            //     asks about a property of X, not X itself;
+            //     bare-IsA fact about X would be a hallucination
+            //     («Абайдың әкесі кім?» → fact about Абай).
+            //   - `extracted_facts` source restriction: only the
+            //     HumanApproved curated world_core entries are
+            //     candidates; retrieval-found examples already
+            //     went through their own ranking.
+            let has_genitive_possessive = lower_input.contains("ның ")
+                || lower_input.contains("нің ")
+                || lower_input.contains("дың ")
+                || lower_input.contains("дің ")
+                || lower_input.contains("тың ")
+                || lower_input.contains("тің ");
+            // **v6.0.13 — 2026-05-21 user audit round 4c.** Restored
+            // the v6.0.10 `example.is_none()` discipline on the
+            // post-action-plan path so a curated definition probe
+            // here doesn't overwrite a retrieval-bound `example`.
+            // The KRU live-retrieval coverage is now handled by
+            // the narrowly-whitelisted PRE-action-plan probe above,
+            // so this branch can stay conservative and avoid
+            // pre-empting the rest of the factual surface.
+            if definition_probe
+                && grounded_fact.is_none()
+                && example.is_none()
+                && !has_genitive_possessive
+            {
+                if let Some(fact) = self
+                    .extracted_facts
+                    .iter()
+                    .find(|f| f.subject.root.to_lowercase() == noun_lower)
+                {
+                    *grounded_fact = Some(fact.raw_text.clone());
+                    *example = None;
+                    *reasoning_chain = None;
+                }
+            }
+            let probe_hit = PROBE_KEYWORDS
+                .iter()
+                .find(|kw| lower_input.contains(*kw))
+                .copied();
+            if let Some(kw) = probe_hit {
+                let kw_first_word = kw.split_whitespace().next().unwrap_or(kw);
+                let direct = self.extracted_facts.iter().find(|f| {
+                    f.subject.root.to_lowercase() == noun_lower
+                        && f.raw_text.to_lowercase().contains(kw_first_word)
+                });
+                if let Some(fact) = direct {
+                    // **Override** all evidence slots so the planner
+                    // routes to `unknown.with_grounded_fact` (which
+                    // surfaces `{fact}` verbatim). We deliberately
+                    // avoid `example` because the General-mode
+                    // factual-query suppression filters
+                    // `unknown.with_evidence` on probe-shaped inputs
+                    // («қашан», «кім»). `grounded_fact` is the right
+                    // slot for a curated, on-topic, probe-matching
+                    // raw_text — no suppression, no template-pick
+                    // ambiguity.
+                    *grounded_fact = Some(fact.raw_text.clone());
+                    *example = None;
+                    *reasoning_chain = None;
+                }
+            }
         }
         // **v5.24.0 — Codex 2026-05-12 audit bug 4.** Self/other
         // disambiguation for occupation queries. `detect_ask_occupation`
@@ -1248,18 +2025,39 @@ impl Conversation {
         // емес.») — wrong response. The marker routes the planner
         // to an explicit resolution-acceptance template that mirrors
         // statement_of_location semantics with the chosen value.
-        if resolved_contradiction {
+        if let Some(predicate) = &resolved_predicate {
             extra_slots.insert("__resolve_contradiction__".into(), "1".into());
-            // Surface the chosen value as a slot so the template can
-            // confirm: «Түсіндім, мекеніңіз — Алматы екен.»
-            if let Some(city) = self.session.get("city").cloned() {
-                extra_slots.insert("city".into(), city);
-            }
-            if let Some(name) = self.session.get("name").cloned() {
-                extra_slots.insert("name".into(), name);
-            }
-            if let Some(occupation) = self.session.get("occupation").cloned() {
-                extra_slots.insert("occupation".into(), occupation);
+            // **v6.0.10 — 2026-05-21 user audit round 4 follow-up.**
+            // Inject ONLY the slot matching the just-resolved
+            // predicate, plus a marker for the slot type so the
+            // template picker can choose the right
+            // `resolve_contradiction.<slot>` variant. Pre-v6.0.10
+            // all three slots were injected and the template
+            // picker sometimes chose «{city}» on an occupation
+            // resolution, surfacing the wrong slot.
+            extra_slots.insert("__resolve_contradiction_slot__".into(), predicate.clone());
+            match predicate.as_str() {
+                "city" => {
+                    if let Some(city) = self.session.get("city").cloned() {
+                        extra_slots.insert("city".into(), city);
+                    }
+                }
+                "name" => {
+                    if let Some(name) = self.session.get("name").cloned() {
+                        extra_slots.insert("name".into(), name);
+                    }
+                }
+                "occupation" => {
+                    if let Some(occupation) = self.session.get("occupation").cloned() {
+                        extra_slots.insert("occupation".into(), occupation);
+                    }
+                }
+                "age" => {
+                    if let Some(age) = self.session.get("age").cloned() {
+                        extra_slots.insert("age".into(), age);
+                    }
+                }
+                _ => {}
             }
         }
         // **v4.4.5** — symmetric marker for `Action::CheckContradiction`
@@ -1303,6 +2101,18 @@ impl Conversation {
         if crate::discourse::is_political_recommendation(input) {
             extra_slots.insert("__political_safety__".into(), "1".into());
         }
+        // **v6.0.0-rc5 voice REPL round 5** — religious-opinion and
+        // subjective-superlative routings. Both share the political
+        // refusal channel (consistent tone-of-voice — adam declines
+        // to take a partisan / personal position) but the inline
+        // detectors keep the policy lines visible at the dispatch
+        // site for future audits.
+        if crate::discourse::is_religious_opinion(input) {
+            extra_slots.insert("__political_safety__".into(), "1".into());
+        }
+        if crate::discourse::is_subjective_superlative(input) {
+            extra_slots.insert("__political_safety__".into(), "1".into());
+        }
         // **v5.9.5 — Codex follow-up review (B1).** AskLocation user-
         // self disambiguation. When the intent is AskLocation AND the
         // input is a 1sg self-recall query AND no city is in session,
@@ -1337,17 +2147,33 @@ impl Conversation {
         let mut proof_object: Option<crate::proof_object::ProofObject> = None;
 
         if let Some(category) = crate::discourse::detect_safety_topic(input) {
-            extra_slots.insert("__safety_refusal__".into(), category.slug().into());
-            // **v5.8.5 — G2.5.** Build the typed proof for this safety
-            // refusal. The refusal IS the proof — no curated support
-            // is required because the kernel is honestly declining
-            // a high-stakes domain. SafetyDomain captures which kind.
-            let domain: crate::proof_object::SafetyDomain = category.into();
-            proof_object = Some(crate::proof_object::ProofObject::safety_refusal(
-                input.to_string(),
-                category.slug().to_string(),
-                domain,
-            ));
+            // **v6.0** — weather exception. The CurrentData category
+            // includes «ауа райы» queries because adam historically
+            // had no live data feed. With the Open-Meteo opt-in
+            // (`weather::render_live`) adam DOES have live weather
+            // when a location is resolved — env coords / env city /
+            // session-belief city. If the resolution succeeds, skip
+            // the safety refusal and let `ask_weather` family
+            // surface the actual reading. Other CurrentData topics
+            // (currency, news, prices) still hit the safety refusal
+            // because adam has no live feed for them.
+            let weather_overrides =
+                matches!(category, crate::discourse::SafetyCategory::CurrentData)
+                    && crate::discourse::looks_like_weather_query(input)
+                    && crate::weather::resolve_location(&self.session).is_some();
+            if !weather_overrides {
+                extra_slots.insert("__safety_refusal__".into(), category.slug().into());
+                // **v5.8.5 — G2.5.** Build the typed proof for this safety
+                // refusal. The refusal IS the proof — no curated support
+                // is required because the kernel is honestly declining
+                // a high-stakes domain. SafetyDomain captures which kind.
+                let domain: crate::proof_object::SafetyDomain = category.into();
+                proof_object = Some(crate::proof_object::ProofObject::safety_refusal(
+                    input.to_string(),
+                    category.slug().to_string(),
+                    domain,
+                ));
+            }
         }
         // **v5.6.6 — Codex follow-up review.** AskPreviousError recall
         // route. Pre-v5.6.6 «Ал алдыңғы қате неде болды?» fell to
@@ -1649,9 +2475,34 @@ impl Conversation {
             let computed = if check_answer_fired {
                 None
             } else {
-                crate::discourse::try_evaluate_arithmetic(resolved_input.as_ref()).or_else(|| {
+                // **v6.0.5 codex audit 2026-05-21** — prefer Kazakh-
+                // word math when the input clearly carries a Kazakh
+                // math verb («көбейт / бөл / қос / азайт»). The bare
+                // arithmetic parser otherwise strips all non-digit /
+                // non-operator characters and eagerly accepts the
+                // residue: «56-ны 3-ке көбейт те, 2-ге бөл, содан
+                // соң 7 қос» → strip → «56-3-2-7» → evaluated as
+                // 44 instead of the intended (56*3)/2+7 = 91.
+                // When the Kazakh word-math path returns a value,
+                // it wins; otherwise the arithmetic path is the
+                // fallback for pure-digit inputs («56*3/2+7»).
+                let has_kazakh_math_verb = {
+                    let lower = resolved_input.to_lowercase();
+                    lower.contains("көбейт")
+                        || lower.contains("бөл")
+                        || lower.contains("қос")
+                        || lower.contains("азайт")
+                };
+                if has_kazakh_math_verb {
                     crate::discourse::try_evaluate_kazakh_word_math(resolved_input.as_ref())
-                })
+                        .or_else(|| {
+                            crate::discourse::try_evaluate_arithmetic(resolved_input.as_ref())
+                        })
+                } else {
+                    crate::discourse::try_evaluate_arithmetic(resolved_input.as_ref()).or_else(
+                        || crate::discourse::try_evaluate_kazakh_word_math(resolved_input.as_ref()),
+                    )
+                }
             };
             if check_answer_fired {
                 // Skip the rest of the math eval cascade — the
@@ -1788,6 +2639,69 @@ impl Conversation {
             }
             if let Some(y_def) = lookup(y_topic) {
                 extra_slots.insert("__compare_y_def__".into(), y_def);
+            }
+        }
+        // **v6.0.5 codex audit 2026-05-21** — binary comparison
+        // ("is X bigger than Y?") slot setup. Looks up X and Y
+        // definitions using the same world_core fact-pull machinery
+        // as the open-difference comparison above and routes to a
+        // dedicated honest-acknowledgement family. We do not
+        // currently carry numeric quantitative facts (population,
+        // area, etc.) so the response surfaces definitions only and
+        // explicitly states that numerical comparison isn't yet
+        // supported — closes the Codex audit finding without
+        // hallucinating a winner.
+        if extra_slots.get("__compare_x__").is_none() {
+            if let Some((x_str, y_str, adj)) =
+                crate::discourse::try_extract_binary_comparison(input)
+            {
+                let lookup_lit = |needle: &str| -> Option<String> {
+                    let needle_lower = needle.to_lowercase();
+                    let by_isa = self.extracted_facts.iter().find(|f| {
+                        f.subject.root.to_lowercase() == needle_lower
+                            && matches!(f.predicate, adam_reasoning::Predicate::IsA)
+                    });
+                    if let Some(f) = by_isa {
+                        return Some(f.raw_text.clone());
+                    }
+                    self.extracted_facts
+                        .iter()
+                        .find(|f| f.subject.root.to_lowercase() == needle_lower)
+                        .map(|f| f.raw_text.clone())
+                };
+                let lookup = |needle: &str| -> Option<String> {
+                    if let Some(f) = lookup_lit(needle) {
+                        return Some(f);
+                    }
+                    let stripped = crate::discourse::strip_trailing_case_for_lookup(needle);
+                    if stripped != needle {
+                        return lookup_lit(stripped);
+                    }
+                    None
+                };
+                extra_slots.insert("__binary_comparison__".into(), "1".into());
+                extra_slots.insert("__compare_x__".into(), x_str.clone());
+                extra_slots.insert("__compare_y__".into(), y_str.clone());
+                extra_slots.insert("__compare_axis__".into(), adj);
+                if let Some(x_def) = lookup(&x_str) {
+                    extra_slots.insert("__compare_x_def__".into(), x_def);
+                }
+                if let Some(y_def) = lookup(&y_str) {
+                    extra_slots.insert("__compare_y_def__".into(), y_def);
+                }
+                // Strip evidence on the intent so the planner cannot
+                // fall back to a stray derivation.
+                if let Intent::Unknown {
+                    reasoning_chain,
+                    example,
+                    grounded_fact,
+                    ..
+                } = &mut intent_for_render
+                {
+                    *reasoning_chain = None;
+                    *example = None;
+                    *grounded_fact = None;
+                }
             }
         }
         // **v4.98.5** — curriculum slot pre-stuffing for the
@@ -2232,7 +3146,13 @@ impl Conversation {
             proof_object,
             verification_outcome,
         };
-        (output, trace)
+        // **v6.0.0-rc5 voice REPL round 7** — final-stage override
+        // for the gender-detection explanation. Computed at the top
+        // of the turn (from `rejoined`), applied here so the trace
+        // remains authoritative for any consumer that inspects what
+        // the pipeline would have said.
+        let final_output = gender_explain_override.unwrap_or(output);
+        (final_output, trace)
     }
 
     /// v2.7: for `Intent::Unknown { noun_hint: Some(n), .. }`, scan
@@ -2487,9 +3407,13 @@ impl Conversation {
     /// chosen value isn't recorded as a duplicate `Active` fact.
     ///
     /// Returns `true` iff at least one contradiction was resolved.
-    fn try_resolve_pending_contradiction(&mut self, input: &str, intent: &Intent) -> bool {
+    fn try_resolve_pending_contradiction(
+        &mut self,
+        input: &str,
+        intent: &Intent,
+    ) -> Option<String> {
         if self.belief.contradictions.is_empty() {
-            return false;
+            return None;
         }
         let input_lc = input.to_lowercase();
         let pending: Vec<(String, String)> = self
@@ -2498,7 +3422,7 @@ impl Conversation {
             .iter()
             .map(|c| (c.subject.clone(), c.predicate.clone()))
             .collect();
-        let mut any_resolved = false;
+        let mut resolved_predicate: Option<String> = None;
         for (subject, predicate) in pending {
             let candidates: Vec<String> = self
                 .belief
@@ -2538,7 +3462,7 @@ impl Conversation {
                     .belief
                     .resolve_contradiction(&subject, &predicate, &value)
                 {
-                    any_resolved = true;
+                    resolved_predicate = Some(predicate.clone());
                     // **v5.3.0** — Codex round-3 audit Bug 2 fix.
                     // Sync session profile slot to the chosen value
                     // so subsequent Ask{Predicate} turns surface it
@@ -2560,7 +3484,7 @@ impl Conversation {
                 }
             }
         }
-        any_resolved
+        resolved_predicate
     }
 
     /// **v4.4.0** — Companion to
@@ -2645,6 +3569,332 @@ impl Conversation {
         any_dismissed
     }
 
+    /// **v6.0.5 — E2 production wiring.** Neural slot-extractor
+    /// rescue. Runs the attached `SlotExtractor` on the raw
+    /// input and **only fills session slots the cascade left
+    /// empty**. Cascade-extracted values that landed in
+    /// `session` during the immediately-prior `absorb_entities`
+    /// call are never overwritten.
+    ///
+    /// Scope by design:
+    ///   - Only fills `name`, `age`, `city`, `occupation` slots.
+    ///     The slot extractor doesn't currently emit `FAM` spans
+    ///     in production data, so `Family` is a no-op until the
+    ///     model learns it.
+    ///   - Performs a light validation pass against the
+    ///     lexicon-style gazetteers before committing to
+    ///     session: `age` must parse as 0..=120; `city` must be
+    ///     in `weather::kazakh_city_coords`; `name` must look
+    ///     like a proper noun (starts capitalised when present
+    ///     in the original surface). Invalid spans are
+    ///     discarded.
+    ///
+    /// Safety: this method only writes to `self.session`; it
+    /// does **not** touch belief / dialog_context / task. The
+    /// extractor is treated as a hint, not as a source of
+    /// truth — the cascade's belief-state writes remain the
+    /// authoritative record.
+    pub(crate) fn apply_neural_slot_rescue(&mut self, input: &str) {
+        // **v6.0.5+ defensive contract.** Even when this function
+        // is reached (intent gate passed and env flag on), every
+        // span the extractor proposes runs through three filters
+        // before it can write to session:
+        //
+        //   1. **Confidence floor** — `span.score >= MIN_CONF`.
+        //      Blocks low-confidence BIO predictions that the
+        //      argmax decoder would otherwise emit on greetings
+        //      and short utterances.
+        //   2. **Stopword denylist** — `NEURAL_SLOT_STOPWORDS`
+        //      lists Kazakh discourse particles and ice-breaker
+        //      words the BIO model is empirically prone to mis-
+        //      tag («бе» as name, «рахмет» as occupation,
+        //      «танысайық» as occupation). Denylisted spans are
+        //      dropped silently.
+        //   3. **Slot-specific shape check** — names need ≥ 3
+        //      characters, ages must parse as `u32 ≤ 120`,
+        //      cities must hit the gazetteer, occupations need
+        //      ≥ 4 characters and an empirically-plausible
+        //      Kazakh occupational suffix or root.
+        //
+        // The combination is intentionally conservative: false
+        // negatives (silently dropping a real slot) are cheap;
+        // false positives ("Adam thinks my name is Бе") are
+        // user-trust-destroying for the МО РК demo.
+        const MIN_CONF: f32 = 0.6;
+        // Lowercase, case-stripped tokens the BIO model
+        // empirically mis-tags as name / occupation / city.
+        // Source: 2026-05-21 audit of `adam_chat` real runs.
+        const NEURAL_SLOT_STOPWORDS: &[&str] = &[
+            // Interrogative / discourse particles.
+            "бе",
+            "ба",
+            "па",
+            "ма",
+            "ме",
+            "ғой",
+            "да",
+            "де",
+            // Affirmation / negation.
+            "иә",
+            "ия",
+            "жоқ",
+            "ок",
+            "ok",
+            // Greetings.
+            "сәлем",
+            "сәлеметсіз",
+            "сәлеметсіздер",
+            "ассалаумағалейкум",
+            "танысайық",
+            // Thanks / apology / well-wishes.
+            "рахмет",
+            "рақмет",
+            "кешір",
+            "кешіріңіз",
+            "кешіріңізші",
+            "сау",
+            "саубол",
+            "сауболыңыз",
+            "жақсы",
+            "жаман",
+            "дұрыс",
+            "ал",
+            // Wh-words.
+            "не",
+            "кім",
+            "қалай",
+            "қандай",
+            "қашан",
+            "қайда",
+            "қайдан",
+            "қанша",
+            // Slot-name nouns ("name", "age") themselves.
+            "есім",
+            "есімі",
+            "есімім",
+            "атым",
+            "атың",
+            "аты",
+            "жасым",
+            "жасың",
+            "жасы",
+            "жыл",
+            "жас",
+            "мамандық",
+            "мамандығы",
+            "мамандығым",
+            // First-person pronoun + copula leftovers.
+            "мен",
+            "сен",
+            "сіз",
+            "ол",
+        ];
+        // Occupation needs more than just non-empty text — accept
+        // only spans whose lowercased text ends in a known Kazakh
+        // occupational suffix OR matches a small set of bare
+        // occupation roots that lack such a suffix.
+        const OCC_SUFFIXES: &[&str] = &[
+            "шы", "ші", // -шы / -ші (бағдарламашы, оқушы)
+            "кер", "гер", // қызметкер, саудагер
+            "ист", // журналист
+            "лог", // психолог, биолог
+            "ор", "ер", // профессор, доктор, инженер
+            "пын", "пін", "мын",
+            "мін", // copula-suffix occupations: пилотпын, мұғаліммін
+        ];
+        const OCC_BARE_ROOTS: &[&str] = &[
+            "пилот",
+            "доктор",
+            "инженер",
+            "ұстаз",
+            "хирург",
+            "пианист",
+            "тілші",
+            "сатушы",
+        ];
+
+        let stopword = |text: &str| -> bool {
+            let lower = text.trim().to_lowercase();
+            NEURAL_SLOT_STOPWORDS.iter().any(|s| *s == lower)
+        };
+
+        let extractor = match self.neural_slot_extractor.as_ref() {
+            Some(e) => e,
+            None => return,
+        };
+        // Tokenise the same way the trainer did — whitespace
+        // split, lowercased, punctuation stripped.
+        let tokens: Vec<String> = input
+            .split_whitespace()
+            .map(|t| {
+                t.chars()
+                    .filter(|c| c.is_alphabetic() || c.is_ascii_digit() || *c == '-')
+                    .flat_map(|c| c.to_lowercase())
+                    .collect::<String>()
+            })
+            .filter(|t| !t.is_empty())
+            .collect();
+        if tokens.is_empty() {
+            return;
+        }
+        let token_refs: Vec<&str> = tokens.iter().map(String::as_str).collect();
+        let extraction = match extractor.extract(&token_refs) {
+            Ok(e) => e,
+            Err(_) => return,
+        };
+        for span in &extraction.spans {
+            if span.score < MIN_CONF {
+                continue;
+            }
+            let trimmed = span.text.trim();
+            if trimmed.is_empty() {
+                continue;
+            }
+            match span.slot {
+                adam_slot_extractor::SlotType::Person => {
+                    if self.session.contains_key("name") {
+                        continue;
+                    }
+                    if stopword(trimmed) {
+                        continue;
+                    }
+                    // Block 1- and 2-character "names" — Kazakh
+                    // proper nouns are virtually always ≥ 3 chars
+                    // and the model's most common false positives
+                    // («Бе», «Ма») are 2-char particles.
+                    if trimmed.chars().count() < 3 {
+                        continue;
+                    }
+                    // **v6.0.8 — 2026-05-21 user audit round 3.**
+                    // Reject names that look like Kazakh common
+                    // nouns or verbal participles. Audit cases:
+                    //   - «Ал онда қанша аймақ бар?» → BIO model
+                    //     tagged «аймақ» (region) as B-PER.
+                    //   - «ал ол қашан туылған?» → BIO model
+                    //     tagged «туылған» (past participle
+                    //     "was-born") as B-PER.
+                    // These are real-word classes the patronymic /
+                    // length / stopword checks don't cover.
+                    let lower = trimmed.to_lowercase();
+                    const COMMON_NOUN_BLOCKLIST: &[&str] = &[
+                        "аймақ",
+                        "облыс",
+                        "қала",
+                        "ауыл",
+                        "жер",
+                        "ел",
+                        "уақыт",
+                        "жыл",
+                        "адам",
+                        "күн",
+                        "түн",
+                        "тіл",
+                        "сабақ",
+                        "сұрақ",
+                        "жауап",
+                        "сөз",
+                        "ат",
+                        "есім",
+                        "жас",
+                        "мамандық",
+                        "кәсіп",
+                        "өмір",
+                        "өлім",
+                        "дүние",
+                    ];
+                    if COMMON_NOUN_BLOCKLIST.iter().any(|n| lower == *n) {
+                        continue;
+                    }
+                    const VERBAL_PARTICIPLE_SUFFIXES: &[&str] =
+                        &["ған", "ген", "қан", "кен", "ып", "іп", "уы", "уі"];
+                    if VERBAL_PARTICIPLE_SUFFIXES.iter().any(|s| {
+                        lower.ends_with(s) && lower.chars().count() > s.chars().count() + 2
+                    }) {
+                        continue;
+                    }
+                    let normalised = crate::language_core::normalize_proper_noun(trimmed);
+                    self.session.insert("name".into(), normalised);
+                }
+                adam_slot_extractor::SlotType::Age => {
+                    if self.session.contains_key("age") {
+                        continue;
+                    }
+                    if let Ok(y) = trimmed.parse::<u32>() {
+                        if y <= 120 {
+                            self.session.insert("age".into(), y.to_string());
+                        }
+                    }
+                }
+                adam_slot_extractor::SlotType::Location => {
+                    if self.session.contains_key("city") {
+                        continue;
+                    }
+                    // Only commit when the span text matches a
+                    // known Kazakh city; otherwise discard.
+                    let stripped =
+                        crate::discourse::strip_trailing_case_for_lookup(trimmed).to_lowercase();
+                    if crate::weather::kazakh_city_coords().contains_key(stripped.as_str()) {
+                        self.session.insert("city".into(), trimmed.to_string());
+                    }
+                }
+                adam_slot_extractor::SlotType::Occupation => {
+                    if self.session.contains_key("occupation") {
+                        continue;
+                    }
+                    if stopword(trimmed) {
+                        continue;
+                    }
+                    let lower = trimmed.to_lowercase();
+                    if lower.chars().count() < 4 {
+                        continue;
+                    }
+                    // **v6.0.8 — 2026-05-21 user audit round 3.**
+                    // Reject occupation spans that contain digits
+                    // (e.g. «31-демін» — age-locative form the BIO
+                    // model misclassified as B-OCC during an age
+                    // statement) and spans that look like verb
+                    // forms rather than profession nouns
+                    // («құтыламын» — 1Sg of «escape», tagged B-OCC
+                    // during a safety-evasion turn). The OCC_SUFFIXES
+                    // allowlist below admits «-мын / -мін / -пын /
+                    // -пін» which copula-suffixed occupations share
+                    // with 1Sg verbs — string-level we can't tell
+                    // them apart without FST analysis, so we add
+                    // these defensive shape checks.
+                    if lower.chars().any(|c| c.is_ascii_digit()) {
+                        continue;
+                    }
+                    const VERB_LIKE_SUFFIXES: &[&str] = &[
+                        "ламын",
+                        "лемін",
+                        "лаймын",
+                        "леймін",
+                        "ймын",
+                        "ймін",
+                        "тамын",
+                        "темін",
+                        "ағамын",
+                        "егемін",
+                    ];
+                    if VERB_LIKE_SUFFIXES.iter().any(|s| lower.ends_with(s)) {
+                        continue;
+                    }
+                    let suffix_ok = OCC_SUFFIXES.iter().any(|s| lower.ends_with(s));
+                    let root_ok = OCC_BARE_ROOTS.iter().any(|r| lower == *r);
+                    if !(suffix_ok || root_ok) {
+                        continue;
+                    }
+                    self.session
+                        .insert("occupation".into(), trimmed.to_string());
+                }
+                adam_slot_extractor::SlotType::Family => {
+                    // Family spans not yet committed to session
+                    // directly — left to future iterations.
+                }
+            }
+        }
+    }
+
     pub(crate) fn absorb_entities(&mut self, intent: &Intent, turn_id: usize) {
         use crate::belief::{EntityKind, USER_SELF_KEY};
         match intent {
@@ -2668,14 +3918,31 @@ impl Conversation {
                 if let Some(person) = crate::language_core::canonical_person_entity(name) {
                     self.session.insert("name".into(), person.canonical.clone());
                     self.session.insert("name_id".into(), person.id.clone());
-                    // **v4.18.0** — also store the respectful
-                    // address form. Adam uses `{name_respect}` in
-                    // most templates so every post-introduction
-                    // turn addresses the user as «Дәке / Мәке /
-                    // Сәке» per Kazakh tradition. Vowel-initial
-                    // names fall back to the literal name.
-                    let respect_opt =
-                        crate::language_core::kazakh_respectful_address(&person.canonical);
+                    // **v6.0.0-rc5 MOD voice REPL 2026-05-20** —
+                    // gender-aware respectful form. Female names
+                    // get «-жан» / role-aware «апай»; male / unknown
+                    // names keep the legacy «-әке» honorific. Also
+                    // stash the detected gender so downstream
+                    // templates (and future role-aware addressing)
+                    // can read it.
+                    let gender = crate::language_core::kazakh_name_gender(&person.canonical);
+                    let role = self.session.get("occupation").map(|s| s.as_str());
+                    let respect_opt = crate::language_core::kazakh_respectful_address_gendered(
+                        &person.canonical,
+                        gender,
+                        role,
+                    );
+                    if let Some(g) = gender {
+                        self.session.insert(
+                            "user_gender".into(),
+                            match g {
+                                crate::language_core::KazakhNameGender::Male => "male".to_string(),
+                                crate::language_core::KazakhNameGender::Female => {
+                                    "female".to_string()
+                                }
+                            },
+                        );
+                    }
                     let respect = respect_opt
                         .clone()
                         .unwrap_or_else(|| person.canonical.clone());
@@ -2704,10 +3971,25 @@ impl Conversation {
                 } else {
                     self.session.insert("name".into(), name.clone());
                     self.session.remove("name_id");
-                    // **v4.18.0** — same respectful form for non-
-                    // canonical-registry names (covers any
-                    // person-name shape the FST recovered).
-                    let respect_opt = crate::language_core::kazakh_respectful_address(name);
+                    // **v6.0.0-rc5 MOD voice REPL 2026-05-20** —
+                    // gender-aware respectful form for non-canonical-
+                    // registry names too.
+                    let gender = crate::language_core::kazakh_name_gender(name);
+                    let role = self.session.get("occupation").map(|s| s.as_str());
+                    let respect_opt = crate::language_core::kazakh_respectful_address_gendered(
+                        name, gender, role,
+                    );
+                    if let Some(g) = gender {
+                        self.session.insert(
+                            "user_gender".into(),
+                            match g {
+                                crate::language_core::KazakhNameGender::Male => "male".to_string(),
+                                crate::language_core::KazakhNameGender::Female => {
+                                    "female".to_string()
+                                }
+                            },
+                        );
+                    }
                     let respect = respect_opt.clone().unwrap_or_else(|| name.clone());
                     self.session.insert("name_respect".into(), respect);
                     if let Some(distinct) = respect_opt {
@@ -2756,7 +4038,14 @@ impl Conversation {
                     );
                     self.belief
                         .record_user_fact(USER_SELF_KEY, "city", &entity.canonical, turn_id);
-                } else {
+                } else if crate::weather::kazakh_city_coords().contains_key(&city.to_lowercase()) {
+                    // **v6.0** — city is in the weather module's
+                    // closed-list of Kazakhstani settlements (29
+                    // cities including all oblast centres) but
+                    // missing from the smaller `canonical_geo_entity`
+                    // catalog. Still trustworthy — record without
+                    // city_id / geo_kind so the planner knows it's
+                    // a non-canonical slot.
                     self.session.insert("city".into(), city.clone());
                     self.session.remove("city_id");
                     self.session.remove("geo_kind");
@@ -2764,6 +4053,23 @@ impl Conversation {
                         .touch_entity(city, EntityKind::Place, city, city, None, turn_id);
                     self.belief
                         .record_user_fact(USER_SELF_KEY, "city", city, turn_id);
+                } else {
+                    // **v6.0 (live REPL 2026-05-18)** — STT garbage
+                    // guard. Whisper sometimes mangles «Қостанай
+                    // облысында тұрамын» into «қачар ауылда тұрамын»
+                    // and the unfiltered fallback then stored
+                    // «қачар» as the user's city, propagating into
+                    // every later turn («Мекеніңіз Қачар екенін
+                    // ұқтым»). Drop the slot when the surface is
+                    // neither canonical-geo nor in the weather city
+                    // list — adam will say «I didn't catch your
+                    // location» instead of pretending to remember
+                    // a hallucinated place. Genuine villages outside
+                    // the catalog can be added via `geo_catalog` or
+                    // `weather::kazakh_city_coords`.
+                    self.session.remove("city");
+                    self.session.remove("city_id");
+                    self.session.remove("geo_kind");
                 }
             }
             Intent::StatementOfOccupation {
@@ -2924,6 +4230,24 @@ fn graph_predicate_hint(intent: &Intent) -> Option<String> {
         .any(|token| matches!(token.as_str(), "қанша" | "неше"))
     {
         return Some("has_quantity".into());
+    }
+    // **v6.0.0-rc4 morning 2026-05-20 part 3** — name-asking shape.
+    // «шын аты / нағыз аты / бастапқы аты / туған аты» targets the
+    // RelatedTo edge from the entity to its birth name (e.g.
+    // `abai → ибраһим` in world_core). Without this hint, the
+    // first SearchGraph dispatch ran with predicate=None and the
+    // ranker cascade put IsA (rank 0 in user_facing_fact_priority)
+    // above RelatedTo (rank 6), so the curated «Абай — әдебиет
+    // негізін салушы» IsA fact won over «Абайдың шын аты — Ибраһим»
+    // — confident off-topic answer flagged as hallucination by
+    // `factual_eval_100::abai_006`.
+    let joined = raw_tokens.join(" ").to_lowercase();
+    if joined.contains("шын аты")
+        || joined.contains("нағыз аты")
+        || joined.contains("бастапқы аты")
+        || joined.contains("туған аты")
+    {
+        return Some("related_to".into());
     }
     None
 }
@@ -3525,6 +4849,99 @@ fn inflect(root: &str, case: Case) -> String {
     synthesise_noun(root, features)
 }
 
+/// **v6.0.5 — E1 production wiring.** Confidence-rescue override
+/// for the deterministic cascade.
+///
+/// Returns the input `cascade_intent` unchanged in any of these
+/// safety-preserving cases:
+///   - The classifier is not attached (`classifier == None`).
+///   - The env flag `ADAM_NEURAL_INTENT` is not set to `1`.
+///   - The cascade returned a non-`Unknown` verdict — confident
+///     cascade outputs always win.
+///   - `detect_safety_topic` fires on the input — the safety
+///     routing layer is the authority on medical / legal /
+///     financial / self-harm domains and the classifier never
+///     overrides those.
+///   - The classifier itself fails to classify (model not loaded,
+///     no labels, …).
+///   - The classifier's confidence gap (`top_score - second_score`)
+///     is below 0.15 — design-doc-fixed uncertainty threshold.
+///   - The classifier predicts `FactualQuery` — the cascade's
+///     `Unknown { noun_hint: Some(_) }` is already the
+///     semantically-equivalent verdict; no override needed.
+///
+/// Otherwise — classifier predicts a confident, non-safety,
+/// non-FactualQuery class — replace the cascade's `Unknown` with a
+/// minimal instance of the predicted Intent variant. We only map
+/// **data-free** variants (`Greeting`, `AskName`, `AskHowAreYou`,
+/// `Affirmation`, …); data-carrying variants (`StatementOfName {
+/// name }`, `StatementOfAge { years }`, …) need lexical content
+/// the classifier doesn't have access to and stay with the
+/// cascade's analysis.
+fn apply_neural_intent_override(
+    cascade_intent: Intent,
+    input: &str,
+    _parses: &[adam_kernel_fst::parser::Analysis],
+    classifier: Option<&adam_intent_classifier::Classifier>,
+) -> Intent {
+    let Some(classifier) = classifier else {
+        return cascade_intent;
+    };
+    if std::env::var("ADAM_NEURAL_INTENT").as_deref() != Ok("1") {
+        return cascade_intent;
+    }
+    // Only rescue an `Unknown` verdict; confident cascade wins.
+    if !matches!(cascade_intent, Intent::Unknown { .. }) {
+        return cascade_intent;
+    }
+    // Safety routing dominates — never let the classifier
+    // pre-empt medical / legal / financial / self-harm / current-
+    // data domain refusals / informational routes.
+    if crate::discourse::detect_safety_topic(input).is_some() {
+        return cascade_intent;
+    }
+    let Ok(prediction) = classifier.classify(input) else {
+        return cascade_intent;
+    };
+    if prediction.confidence_gap() < 0.15 {
+        return cascade_intent;
+    }
+    // `FactualQuery` is the classifier's name for
+    // `Unknown { noun_hint: Some(_) }` — no semantic gain.
+    let label = prediction.top.as_str();
+    if label == "FactualQuery" {
+        return cascade_intent;
+    }
+    // Map the classifier label back to a data-free Intent
+    // variant. Variants carrying lexical content
+    // (`StatementOfName { name }`, `StatementOfAge { years }`, …)
+    // are NOT in this set — they require lexical analysis the
+    // classifier can't provide. The cascade keeps those.
+    match label {
+        "Greeting" => Intent::Greeting {
+            kind: crate::intent::GreetingKind::Casual,
+        },
+        "Farewell" => Intent::Farewell,
+        "Affirmation" => Intent::Affirmation,
+        "Negation" => Intent::Negation,
+        "Thanks" => Intent::Thanks,
+        "Apology" => Intent::Apology,
+        "UserDisagrees" => Intent::UserDisagrees,
+        "AskHowAreYou" => Intent::AskHowAreYou,
+        "AskName" => Intent::AskName,
+        "AskAge" => Intent::AskAge,
+        "AskLocation" => Intent::AskLocation,
+        "AskOccupation" => Intent::AskOccupation,
+        "AskActivity" => Intent::AskActivity,
+        "AskFamily" => Intent::AskFamily,
+        "AskWeather" => Intent::AskWeather,
+        "AskTime" => Intent::AskTime {
+            aspect: crate::intent::TimeAspect::Time,
+        },
+        _ => cascade_intent,
+    }
+}
+
 fn resolve_follow_up(raw: Intent, input: &str, active: Option<IntentKind>) -> Intent {
     let normalised: String = input.to_lowercase();
     let is_reflective = normalised.trim() == "ал сіз"
@@ -3557,5 +4974,84 @@ fn resolve_follow_up(raw: Intent, input: &str, active: Option<IntentKind>) -> In
             Intent::AskOccupation
         }
         _ => raw,
+    }
+}
+
+#[cfg(test)]
+mod phonetic_normalize_v6_0_5_tests {
+    //! **v6.0.5** — round-8 voice REPL regression coverage. The
+    //! Whisper-noise pre-processor must (a) substitute genuine
+    //! misrenderings («Кубейт» → «көбейт») and (b) leave valid
+    //! inflected forms untouched («Алматыда», «танысып», «алайық»
+    //! — these all caused round-2 / round-6 regressions when the
+    //! gates were weaker).
+    use super::*;
+    use adam_kernel_fst::lexicon::LexiconV1;
+
+    fn lex() -> LexiconV1 {
+        // Crate-relative paths so `cargo test -p adam-dialog` works.
+        let curated = "../../data/tokenizer/segmentation_roots.json";
+        let apertium = "../../data/lexicon_v1/apertium_imported_roots.json";
+        LexiconV1::load(curated, apertium).expect("phonetic_normalize_v6_0_5_tests: lexicon load")
+    }
+
+    #[test]
+    fn substitutes_whisper_noise_kubeit_to_kobeit_v6_0_5() {
+        let mut conv = Conversation::new();
+        let out = conv.phonetic_normalize("Жерманы екеге Кубейт.", &lex());
+        // Either «көбейт» (root) or close variant should appear;
+        // the bare «Кубейт» must NOT survive.
+        assert!(
+            !out.to_lowercase().contains("кубейт"),
+            "expected substitution away from «кубейт», got: {out}"
+        );
+    }
+
+    #[test]
+    fn preserves_locative_inflection_almatyda_v6_0_5() {
+        // Round-2 regression: «Алматыда» was substituted with an
+        // unrelated root. Gate-2 (root-prefix «алмат») must keep it.
+        let mut conv = Conversation::new();
+        let out = conv.phonetic_normalize("Мен Алматыда тұрамын.", &lex());
+        assert!(
+            out.contains("Алматыда"),
+            "expected «Алматыда» preserved, got: {out}"
+        );
+    }
+
+    #[test]
+    fn preserves_converb_head_tanysyp_v6_0_5() {
+        // Round-6 regression risk: «Танысып алайық» is the
+        // IntroProposal greeting; «танысып» (FST-parseable converb
+        // of «таныс») must survive untouched so the greeting
+        // detector still routes to `IntroProposal`. The trailing
+        // optative suffix «алайық» is not FST-covered yet, so the
+        // unit test does not assert its preservation — the
+        // [`end_to_end::intro_proposal_variants_route_to_intro_proposal_family`]
+        // integration test gates the end-to-end routing.
+        let mut conv = Conversation::new();
+        let out = conv.phonetic_normalize("Танысып алайық.", &lex());
+        assert!(
+            out.contains("Танысып"),
+            "expected «Танысып» preserved, got: {out}"
+        );
+    }
+
+    #[test]
+    fn preserves_question_word_qalaysiz_v6_0_5() {
+        let mut conv = Conversation::new();
+        let out = conv.phonetic_normalize("қалайсыз", &lex());
+        assert!(
+            out.to_lowercase().contains("қалайсыз"),
+            "expected «қалайсыз» preserved, got: {out}"
+        );
+    }
+
+    #[test]
+    fn preserves_bare_root_sәlem_v6_0_5() {
+        // Sanity: a bare root in the lexicon survives gate-1.
+        let mut conv = Conversation::new();
+        let out = conv.phonetic_normalize("Сәлем!", &lex());
+        assert!(out.contains("Сәлем"), "got: {out}");
     }
 }

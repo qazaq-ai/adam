@@ -1,5 +1,15 @@
 # Precision audit — native-speaker review
 
+> **v6.0 forward-looking note (2026-05-16).** This audit covers the
+> deterministic retrieval + derivation pipeline (v5.x). The v6.0
+> neural composition layer carries its own factual-grounding gate
+> ([`verifier_demo` prototype](../crates/adam-agg-model/src/bin/verifier_demo.rs);
+> production wiring tracked in [`roadmap_v6_v7.md`](roadmap_v6_v7.md)
+> as release-blocker #2) that must reach 0-hallucination on a
+> 100-prompt factual eval set before v6.0.0 GA. This document's
+> precision baseline (deterministic side) becomes the lower bound
+> the v6.0 verifier-gated path must match or exceed.
+
 **Target:** 50-fact sample + 50-derivation sample from the committed artifacts, seed `42`.
 
 - `facts.json`: 13745 facts total (upstream status: `completed`) — sampled 50 here.

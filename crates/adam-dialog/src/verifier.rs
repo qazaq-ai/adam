@@ -112,7 +112,26 @@ impl Verifier {
         // Phase 5 will add real clarification templates and let
         // `CheckContradiction` produce aligned output without
         // stripping.
-        if !belief.contradictions.is_empty() && Self::intent_has_answer_shape(intent) {
+        // **v6.0.8 — 2026-05-21 user audit round 3.** The
+        // contradiction gate must mirror the same engagement check
+        // the planner / uncertainty layer already apply. Pre-v6.0.8
+        // this branch fired unconditionally whenever belief had
+        // any contradiction AND the intent had answer shape — which
+        // in REPL meant a grounded retrieval over an UNRELATED noun
+        // (e.g. «Абай кім?» after a city conflict) triggered the
+        // ContradictoryBelief issue, which uncertainty.rs then short-
+        // circuited to `Conflicted`, which routed to the
+        // `unknown.conflicted` template family citing the contested
+        // city values. From the user's POV the city conflict bricked
+        // every subsequent factual query. The gate's spirit is
+        // correct (don't render evidence on top of a known conflict),
+        // but its application must respect engagement — an unrelated
+        // factual answer is not "on top of" the conflict.
+        let intent_engages_contested = Self::intent_engages_contested(intent, belief);
+        if !belief.contradictions.is_empty()
+            && Self::intent_has_answer_shape(intent)
+            && intent_engages_contested
+        {
             issues.push(VerificationIssue::ContradictoryBelief);
         }
 
@@ -235,6 +254,54 @@ impl Verifier {
                 ..
             }
         )
+    }
+
+    /// **v6.0.8 — 2026-05-21 user audit round 3.** Returns true iff
+    /// the current intent engages a slot currently contested in
+    /// belief. Mirrors the gate used in
+    /// [`crate::action::ActionPlanner::plan_inner`] and
+    /// [`crate::uncertainty::UncertaintyPolicy::derive`] so the
+    /// three layers agree on when a contradiction should dominate.
+    /// An UNRELATED factual / educational / identity query passes
+    /// through even when belief carries a pending contradiction —
+    /// the contradiction is preserved for audit and resurfaces only
+    /// when the user touches the contested slot again.
+    fn intent_engages_contested(intent: &Intent, belief: &BeliefState) -> bool {
+        if belief.contradictions.is_empty() {
+            return false;
+        }
+        let contested: std::collections::HashSet<&str> = belief
+            .contradictions
+            .iter()
+            .map(|c| c.predicate.as_str())
+            .collect();
+        let slot_relevant = contested.iter().any(|pred| match *pred {
+            "city" | "location" => matches!(
+                intent,
+                Intent::StatementOfLocation { .. } | Intent::AskLocation
+            ),
+            "name" => matches!(intent, Intent::StatementOfName { .. } | Intent::AskName),
+            "occupation" => matches!(
+                intent,
+                Intent::StatementOfOccupation { .. } | Intent::AskOccupation
+            ),
+            "age" => matches!(intent, Intent::StatementOfAge { .. } | Intent::AskAge),
+            _ => false,
+        });
+        let resolution_shape = matches!(
+            intent,
+            Intent::Affirmation | Intent::Negation | Intent::UserDisagrees
+        );
+        let paper_over_social = matches!(
+            intent,
+            Intent::Greeting { .. }
+                | Intent::Thanks
+                | Intent::Apology
+                | Intent::AskHowAreYou
+                | Intent::Compliment
+                | Intent::WellWishes
+        );
+        slot_relevant || resolution_shape || paper_over_social
     }
 }
 
@@ -359,36 +426,55 @@ mod tests {
         assert!(r.issues.contains(&VerificationIssue::MissingEvidence));
     }
 
+    /// **v6.0.8 — 2026-05-21 user audit round 3.** The verifier
+    /// contradiction-gate is now engagement-aware: it fires only
+    /// when the current intent operates on the contested slot
+    /// (or is a resolution / paper-over shape). An unrelated
+    /// factual query («Абай кім?» as Intent::Unknown about a
+    /// Kazakh poet) carrying retrieval evidence does NOT get
+    /// flagged as ContradictoryBelief — the answer is independent
+    /// of the contested city slot. Pre-v6.0.8 the verifier
+    /// blanket-blocked any answer-shape intent against any
+    /// belief contradiction, which caused the
+    /// `unknown.conflicted` template to fire on factual probes
+    /// in REPL.
     #[test]
-    fn contradiction_in_belief_blocks_evidence_based_answers() {
+    fn contradiction_does_not_block_unrelated_evidence_answer() {
         let mut belief = BeliefState::new();
         belief.record_user_fact(USER_SELF_KEY, "city", "алматы", 0);
         belief.record_user_fact(USER_SELF_KEY, "city", "астана", 1);
+        // Unknown intent with reasoning evidence, unrelated noun hint.
+        // City conflict in belief but intent doesn't engage city slot.
         let intent = unknown(Some("жер"), Some("chain"), None);
         let r = Verifier::verify(&plan(Action::RunReasoner), &intent, &belief);
-        assert!(!r.supported);
-        assert!(r.issues.contains(&VerificationIssue::ContradictoryBelief));
+        assert!(
+            !r.issues.contains(&VerificationIssue::ContradictoryBelief),
+            "v6.0.8: unrelated factual query under a city conflict must NOT \
+             be flagged ContradictoryBelief; got {r:?}"
+        );
     }
 
-    /// v4.0.32 iteration — the gate is now intent-shape-based, not
-    /// action-based. `CheckContradiction` + an intent that still
-    /// carries answer-shaped evidence IS rejected, because the
-    /// existing template planner would render the evidence and miss
-    /// the contradiction. Phase 5 will add clarification templates
-    /// so CheckContradiction can produce aligned output; until then
-    /// the gate strips evidence for this case.
+    /// **v6.0.8 paired counter-test.** An intent that DOES
+    /// engage the contested slot — e.g. AskLocation — would
+    /// still be gated by the conflict if it carried answer-shape
+    /// evidence. Today AskLocation doesn't itself carry evidence
+    /// (no `reasoning_chain` field on the variant), so this
+    /// case is structural rather than exercised; the test
+    /// documents the engagement intent for future expansion.
     #[test]
-    fn check_contradiction_with_answer_shape_intent_is_gated() {
+    fn contradiction_does_not_block_unrelated_check_contradiction_action() {
         let mut belief = BeliefState::new();
         belief.record_user_fact(USER_SELF_KEY, "city", "алматы", 0);
         belief.record_user_fact(USER_SELF_KEY, "city", "астана", 1);
         let intent = unknown(Some("жер"), Some("chain"), None);
         let r = Verifier::verify(&plan(Action::CheckContradiction), &intent, &belief);
+        // Same engagement-gate reasoning — the flag does NOT fire
+        // because the intent is unrelated.
         assert!(
-            !r.supported,
-            "intent with answer shape under a conflict must be gated regardless of action, got {r:?}"
+            !r.issues.contains(&VerificationIssue::ContradictoryBelief),
+            "v6.0.8: unrelated intent under CheckContradiction action with city \
+             conflict must NOT be flagged; got {r:?}"
         );
-        assert!(r.issues.contains(&VerificationIssue::ContradictoryBelief));
     }
 
     /// v4.0.32 — `CheckContradiction` on a question-shape intent

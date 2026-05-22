@@ -42,6 +42,172 @@ pub fn interpret_text(input: &str, parses: &[Analysis]) -> Intent {
     interpret_text_with_lexicon(input, parses, None)
 }
 
+/// **v6.0.6** — Kazakh contrastive-negation correction.
+///
+/// Given an input that matches the shape `«PREFIX X
+/// емес[+copula], Y POSTFIX»` — Kazakh's idiomatic "not X,
+/// (rather) Y" pattern — returns the input rewritten as
+/// `«PREFIX Y POSTFIX»` (the rejected X is dropped, the
+/// preceding context is preserved). Returns `None` for inputs
+/// that don't match the shape, including:
+///
+///   - Bare NEG statements with no continuation
+///     («мен дәрігер емеспін» — assertion that I am not a
+///     doctor, NOT a self-correction). The comma is the
+///     trigger; without it we don't rewrite.
+///   - NEG-inside-quoted-or-embedded clauses with no top-
+///     level comma.
+///
+/// Preserving the prefix is critical: the
+/// `detect_statement_of_X` family looks for trigger words
+/// like «атым» / «жасым» / «кәсібім» that live in the
+/// prefix, not the corrected slot value. A naive
+/// "drop-everything-before-comma" rewrite loses the trigger
+/// and the slot never gets extracted.
+///
+/// 2026-05-21 audit findings this fixes:
+///
+///   - bug 2: «менің атым Ерлан емес, Айдос»
+///     → «менің атым Айдос» → name = Айдос
+///   - bug 3: «мен 25-те емеспін, 31-демін»
+///     → «мен 31-демін» → age = 31
+///   - bug 7: «сау болыңыз емес, әлі сөйлесейік»
+///     → «әлі сөйлесейік» → not a farewell
+///
+/// The supported NEG surface forms are the bare particle
+/// «емес» plus its 1Sg / 2Sg-informal / 2Sg-polite / 1Pl /
+/// 2Pl-polite predicate-copula inflections, matching the
+/// v4.34.0 FST extension for particle-copula inflection.
+pub fn apply_kazakh_negation_correction(input: &str) -> Option<String> {
+    // Surface forms of «емес» as a predicate-copula. Longer
+    // inflected forms come first so they win over the bare
+    // particle when both could match at the same position.
+    const NEG_FORMS: &[&str] = &["емеспіз", "емессіз", "емеспін", "емессің", "емес"];
+    let lower = input.to_lowercase();
+    // We expect a NEG-form followed by punctuation+content. The
+    // separator must include a comma so a bare-NEG assertion like
+    // «мен дәрігер емеспін» (no comma) doesn't fire.
+    const SEPARATORS: &[&str] = &[", ", " , ", ","];
+    let mut best: Option<(usize, usize)> = None;
+    for neg in NEG_FORMS {
+        for sep in SEPARATORS {
+            let needle = format!("{neg}{sep}");
+            if let Some(idx) = lower.find(&needle) {
+                // Anchor on word boundary — make sure the NEG-form
+                // isn't a substring of a longer word.
+                let before_ok = idx == 0
+                    || lower.as_bytes()[idx - 1].is_ascii_whitespace()
+                    || lower.as_bytes()[idx - 1] == b'-';
+                if !before_ok {
+                    continue;
+                }
+                let post_sep = idx + needle.len();
+                // Pick the EARLIEST match; if multiple NEG-forms
+                // start at the same position, the first iteration
+                // wins (NEG_FORMS ordered longest-first).
+                if best.map(|(b, _)| idx < b).unwrap_or(true) {
+                    best = Some((idx, post_sep));
+                }
+            }
+        }
+    }
+    let (neg_start, post_sep) = best?;
+    if !input.is_char_boundary(neg_start) || !input.is_char_boundary(post_sep) {
+        return None;
+    }
+    // Walk backward from `neg_start` to find the start of the
+    // rejected token (the "X" in «X емес, Y»). Specifically:
+    //   1. skip the single space that separates X from емес,
+    //   2. walk back past non-space chars until we hit either
+    //      input start OR a whitespace boundary.
+    // The result is the byte index where X begins; we keep
+    // input[..wrong_start] as the preserved prefix.
+    let bytes = input.as_bytes();
+    let mut wrong_start = neg_start;
+    while wrong_start > 0 && bytes[wrong_start - 1] == b' ' {
+        wrong_start -= 1;
+    }
+    while wrong_start > 0 {
+        let prev = bytes[wrong_start - 1];
+        if prev == b' ' || prev == b'\t' {
+            break;
+        }
+        wrong_start -= 1;
+    }
+    if !input.is_char_boundary(wrong_start) {
+        return None;
+    }
+    // **v6.0.8 — 2026-05-21 user audit round 3.** When the
+    // rejected token is a verb form (predicate-copula
+    // suffix), walk back ONE more token to include the noun /
+    // locative that's the semantic argument of the verb.
+    // Example: «мен Алматыда тұрамын емес, Астанада тұрамын» —
+    // single-token walkback hits «тұрамын» (verb) and leaves
+    // «мен Алматыда» as prefix, giving the mangled
+    // «мен Алматыда Астанада тұрамын». Two-token walkback
+    // hits «Алматыда тұрамын» and prefix becomes «мен »,
+    // result «мен Астанада тұрамын» — clean.
+    const VERB_PREDICATE_SUFFIXES: &[&str] = &[
+        "мын", "мін", "сың", "сің", "сыз", "сіз", "пыз", "піз", "ды", "ді", "ты", "ті",
+    ];
+    let wrong_token_slice = input[wrong_start..neg_start].trim();
+    let wrong_token_lower = wrong_token_slice.to_lowercase();
+    let looks_like_verb = wrong_token_lower.chars().count() > 3
+        && VERB_PREDICATE_SUFFIXES
+            .iter()
+            .any(|s| wrong_token_lower.ends_with(s));
+    if looks_like_verb {
+        let mut probe = wrong_start;
+        while probe > 0 && bytes[probe - 1] == b' ' {
+            probe -= 1;
+        }
+        while probe > 0 {
+            let prev = bytes[probe - 1];
+            if prev == b' ' || prev == b'\t' {
+                break;
+            }
+            probe -= 1;
+        }
+        if input.is_char_boundary(probe) && probe < wrong_start {
+            wrong_start = probe;
+        }
+    }
+    let prefix = &input[..wrong_start];
+    let after = &input[post_sep..];
+    if after.trim().is_empty() {
+        return None;
+    }
+    // **v6.0.6** — verb-phrase rejection bail-out. When the
+    // prefix ends with a known farewell head («сау» / «қош» /
+    // «аман» / «кездескенше»), the NEG-correction is rejecting
+    // the ENTIRE verb phrase, not a single slot value. Rewriting
+    // to «PREFIX Y» would leave a degenerate residue («сау әлі
+    // сөйлесейік») that still trips `detect_farewell`. Bail and
+    // let `detect_farewell`'s own «емес,» guard handle the
+    // original input. The guard is the cleaner fix for verb-
+    // phrase rejection because it has the full original context.
+    let prefix_lower = prefix.trim().to_lowercase();
+    let prefix_ends_with_farewell_head = prefix_lower.ends_with("сау")
+        || prefix_lower.ends_with("қош")
+        || prefix_lower.ends_with("аман")
+        || prefix_lower.contains("кездескенше");
+    if prefix_ends_with_farewell_head {
+        return None;
+    }
+    // Reconstruct with a single space between prefix and after,
+    // unless prefix is already empty.
+    let result = if prefix.trim().is_empty() {
+        after.trim().to_string()
+    } else {
+        format!("{}{}", prefix, after.trim_start())
+    };
+    let result = result.trim().to_string();
+    if result.is_empty() || result == input.trim() {
+        return None;
+    }
+    Some(result)
+}
+
 /// Lexicon-aware variant used by `Conversation::turn` and
 /// `respond_with_repo`. When a lexicon is supplied, the occupation
 /// recogniser does a generic 1sg-copula strip + noun lookup instead
@@ -298,8 +464,8 @@ pub fn interpret_text_with_lexicon(
     if detect_ask_weather(&joined) {
         return Intent::AskWeather;
     }
-    if detect_ask_time(&joined) {
-        return Intent::AskTime;
+    if let Some(aspect) = detect_ask_time(&joined) {
+        return Intent::AskTime { aspect };
     }
     if detect_compliment(&tokens, &joined) {
         return Intent::Compliment;
@@ -562,6 +728,15 @@ fn detect_greeting(tokens: &[String], joined: &str) -> Option<Intent> {
         || joined.contains("сәлямет")
         || joined.contains("саламет")
         || joined.contains("салеметсіз")
+        // **v6.0.0-rc5 voice REPL round 3** — Whisper-turbo drops
+        // intermediate syllables on the polite greeting: «сәлеметспе»
+        // (lost «-сіз»), «сәлеметсіб» (lost «бе»), and bare «сәлемет»
+        // / «сәлемат». Live REPL round 3 fell to «Айтқаныңыз маған
+        // әлі түсініксіз» on the «Сәлеметспе» opener.
+        || joined.contains("сәлеметспе")
+        || joined.contains("сәлеметсіб")
+        || joined.contains("сәлемат")
+        || joined.starts_with("сәлемет")
     {
         return Some(Intent::Greeting {
             kind: GreetingKind::Polite,
@@ -591,6 +766,30 @@ fn detect_greeting(tokens: &[String], joined: &str) -> Option<Intent> {
     // strict sense, but it opens an introduction exchange and
     // belongs in the Greeting bucket so the planner volunteers
     // adam's name and asks for the user's.
+    // **v6.0.0-rc5 voice REPL round 3** — fuzzy-graph fallback.
+    // When the exact greeting forms above didn't fire, do an
+    // edit-distance-2 pass over the first token against a closed
+    // set of canonical greetings. This catches Whisper-dialect
+    // drift (speakers with speech-pathology / non-broadcast diction
+    // produce slurred or partial surfaces that pure substring
+    // matchers miss).
+    if let Some(first) = tokens.first() {
+        const CANON_GREETINGS: &[(&str, GreetingKind)] = &[
+            ("сәлем", GreetingKind::Casual),
+            ("салем", GreetingKind::Casual),
+            ("сәлеметсіз", GreetingKind::Polite),
+            ("сәлеметсің", GreetingKind::Polite),
+            ("салеметсіз", GreetingKind::Polite),
+            ("ассалам", GreetingKind::Polite),
+            ("ассалаумағалейкум", GreetingKind::Polite),
+        ];
+        for (canon, kind) in CANON_GREETINGS {
+            if first.chars().count() >= 4 && edit_distance_lte_2(first, canon) {
+                return Some(Intent::Greeting { kind: *kind });
+            }
+        }
+    }
+
     if tokens
         .iter()
         .any(|t| t == "танысайық" || t == "танысалық" || t == "танысыңыз")
@@ -605,6 +804,23 @@ fn detect_greeting(tokens: &[String], joined: &str) -> Option<Intent> {
 }
 
 fn detect_farewell(tokens: &[String], joined: &str) -> bool {
+    // **v6.0.6 — 2026-05-21 user audit.** Contrastive-NEG
+    // rejection of a farewell shape: «сау болыңыз емес, әлі
+    // сөйлесейік» means «not goodbye, let's keep talking».
+    // The token cleaner strips commas, so a string-level
+    // «емес,» test would miss this — we check for the «емес»
+    // particle (or inflected forms) as a discrete token with
+    // non-empty content tokens AFTER it. That captures the
+    // NEG-correction shape regardless of punctuation.
+    if let Some(neg_pos) = tokens.iter().position(|t| {
+        matches!(
+            t.as_str(),
+            "емес" | "емеспін" | "емессің" | "емессіз" | "емеспіз"
+        )
+    }) && neg_pos + 1 < tokens.len()
+    {
+        return false;
+    }
     tokens.first().is_some_and(|t| t == "сау" || t == "қош")
         || joined.contains("кездескенше")
         || joined.contains("сау бол")
@@ -669,6 +885,45 @@ fn detect_apology(tokens: &[String], joined: &str) -> bool {
 /// the correction's content. Future bundles may add proper
 /// correction-content extraction (filed in
 /// `project_retrieval_not_neural_v2.md` Stage A roadmap).
+/// **v6.0.0-rc5 voice REPL round 3** — fuzzy-graph fallback shared
+/// by the greeting / identity / disagreement detectors. Returns
+/// `true` when `surface` is within Levenshtein distance 2 of
+/// `canonical`. Stops early if the absolute length gap is already
+/// > 2 (a hard upper bound on edit distance). The bound 2 lets us
+/// rescue most Whisper-noise variants («сәлеметспе» ≈ «сәлеметсіз»
+/// distance 2, «сең кімсің» ≈ «сен кімсің» distance 1, «олаемис»
+/// ≈ «олаемес» distance 1) without over-firing on genuinely
+/// different words. Memory-fixed O(|canonical|) via the
+/// two-row dynamic-programming variant.
+pub(crate) fn edit_distance_lte_2(surface: &str, canonical: &str) -> bool {
+    let a: Vec<char> = surface.chars().collect();
+    let b: Vec<char> = canonical.chars().collect();
+    let (la, lb) = (a.len(), b.len());
+    if la.abs_diff(lb) > 2 {
+        return false;
+    }
+    let mut prev: Vec<usize> = (0..=lb).collect();
+    let mut curr: Vec<usize> = vec![0; lb + 1];
+    for i in 1..=la {
+        curr[0] = i;
+        let mut row_min = curr[0];
+        for j in 1..=lb {
+            let cost = if a[i - 1] == b[j - 1] { 0 } else { 1 };
+            curr[j] = (prev[j] + 1).min(curr[j - 1] + 1).min(prev[j - 1] + cost);
+            if curr[j] < row_min {
+                row_min = curr[j];
+            }
+        }
+        if row_min > 2 {
+            // Whole row dominated by ≥3 edits — distance can only
+            // grow from here. Short-circuit.
+            return false;
+        }
+        std::mem::swap(&mut prev, &mut curr);
+    }
+    prev[lb] <= 2
+}
+
 fn detect_user_disagreement(joined: &str) -> bool {
     joined.contains("қателесесің")
         || joined.contains("қателесесіз")
@@ -680,6 +935,25 @@ fn detect_user_disagreement(joined: &str) -> bool {
         || joined.contains("бұл қате")
         || joined.contains("сіз қате")
         || joined.contains("сен қате")
+        // **v6.0.0-rc5 voice REPL round 3** — Whisper-turbo
+        // collapses «олай емес» into «олаемис» / «олаемес» when
+        // the speaker chains it onto «Жоқ» without a pause:
+        // «Жоқ, олай емес» → «Жок олаемис». The disagreement
+        // intent now catches the fused surface (and the бұлай
+        // counterpart). Pre-fix the turn fell to corpus-sample
+        // proverb fallback on «жоқ» as the noun_hint.
+        || joined.contains("олаемис")
+        || joined.contains("олаемес")
+        || joined.contains("бұлаемис")
+        || joined.contains("бұлаемес")
+        // Fuzzy: «жок олаемис» / «жок олаемес» — Whisper drops the
+        // final «-қ» on «жоқ» AND fuses «олай емес» into a single
+        // token, so the bare-substring guards above can miss the
+        // fused-and-bare-«жок» combo. The edit-distance fallback
+        // catches «жок» → «жоқ» distance 1 while keeping the
+        // semantic anchor «емес»-like surface on the right.
+        || joined.split_whitespace().any(|t| edit_distance_lte_2(t, "жоқ"))
+            && (joined.contains("емис") || joined.contains("емес"))
 }
 
 fn detect_ask_how_are_you(joined: &str) -> bool {
@@ -1570,6 +1844,21 @@ fn detect_ask_about_system(
         || joined.contains("кім ексің")
         || joined.contains("сіз кімсіз")
         || joined.contains("сен кімсің")
+        // **v6.0** — `өзің кімсің` / `өзіңіз кімсіз` is a natural
+        // and common Kazakh "who are you" phrasing where the
+        // pronoun is replaced by the reflexive «өзі-» («yourself-»)
+        // form. Pre-v6.0 fell through to greedy retrieval and
+        // surfaced an unrelated Abai quote. Real-REPL 2026-05-18.
+        //
+        // **v6.0 update** — Whisper STT regularly renders the
+        // velar nasal `-ң` as plain `-н` in word-final position,
+        // turning «кімсің» into «кімсін» on live voice input.
+        // Accepting both lets the detector survive the STT noise.
+        // Same for «сен кімсің / сіз кімсіз» variants below.
+        || joined.contains("өзің кімсің")
+        || joined.contains("өзіңіз кімсіз")
+        || joined.contains("өзің кімсін")
+        || joined.contains("сен кімсін")
         || joined.contains("өзіңіз туралы")
         || joined.contains("өзің туралы")
         || joined.contains("не екен");
@@ -1678,6 +1967,15 @@ fn detect_ask_about_system(
     // **v4.3.4** — Architecture aspect: "how are you different" /
     // "what's special about you". Pronoun-led; the question targets
     // the system's distinguishing characteristics.
+    //
+    // **v6.0.9 — 2026-05-21 user audit round 4.** Extended with the
+    // four most-common free-form opening questions: "what kind of
+    // model are you?" / "are you an LLM?" / "aren't you an LLM?".
+    // The `architecture_summary` field already says «Мен
+    // қолданыстағы үлкен тілдік модельдерден өзгеше архитектурада…»
+    // — route these surface forms there so the user gets the
+    // canonical "I'm not an LLM; I'm rule-based" answer instead of
+    // a grounded-fact retrieval over the noun «модель» or «LLM».
     if has_addressee
         && (joined.contains("ерекшелігің")
             || joined.contains("ерекшелігіңіз")
@@ -1688,7 +1986,25 @@ fn detect_ask_about_system(
             || joined.contains("неге басқа модельдерден ерекшеленесің")
             || joined.contains("неге басқа модельдерден ерекшеленесіз")
             || joined.contains("қалай ерекшеленесің")
-            || joined.contains("қалай ерекшеленесіз"))
+            || joined.contains("қалай ерекшеленесіз")
+            // **v6.0.9 — 2026-05-21 user audit round 4.**
+            // LLM-specific questions: «Сен LLM-сің бе?» /
+            // «Сіз LLM емессіз бе?». These specifically probe the
+            // architectural distinction (you ARE / ARE NOT an LLM)
+            // and the canonical answer is the architecture_summary
+            // («Мен қолданыстағы үлкен тілдік модельдерден өзгеше
+            // архитектурада...»). Note: bare «Сіз қандай моделсіз?»
+            // stays on the General-aspect path because the existing
+            // template returns the full ARK identity, which is the
+            // expected answer for a generic "what kind of model"
+            // question — see canonical eval scenario
+            // `ask_about_system_general_aspect_surfaces_full_name`.
+            || joined.contains("llm-сің")
+            || joined.contains("llm-сіз")
+            || joined.contains("llm емессің")
+            || joined.contains("llm емессіз")
+            || joined.contains("сен llm")
+            || joined.contains("сіз llm"))
     {
         return Some(SystemAspect::Architecture);
     }
@@ -1721,7 +2037,35 @@ fn detect_ask_about_system(
         || joined.contains("кодыңыз қай тілде")
         || joined.contains("коды қай тілде")
         || joined.contains("қандай тілде жасалғансыз")
-        || joined.contains("қандай тілде жасалғансың");
+        || joined.contains("қандай тілде жасалғансың")
+        // **v6.0.9 — 2026-05-21 user audit round 4.** «How do you
+        // work?» / «Do you work without internet?» / «Do you
+        // connect to the internet?» — implementation-stack
+        // questions the user expects first in a free-form demo.
+        // The `implementation_summary` field already states "Rust,
+        // no internet, deterministic"; route these surface forms
+        // there so the user gets the canonical answer instead of
+        // a physics-of-«жұмыс» retrieval miss.
+        || (has_addressee
+            && (joined.contains("қалай жұмыс істе") || joined.contains("қалай істе")))
+        // **v6.0.14 — 2026-05-21 user audit round 4d follow-up.**
+        // The 2nd-person verb suffix is itself the addressee
+        // marker — «істейсің / істейсіз» CAN ONLY address the
+        // system. The bare «Қалай жұмыс істейсің?» pre-fix tripped
+        // a physics-of-«жұмыс» retrieval miss because the
+        // has_addressee gate required an explicit pronoun. Drop
+        // the gate when the verb stem carries the 2nd-person
+        // ending directly.
+        || joined.contains("қалай жұмыс істейсің")
+        || joined.contains("қалай жұмыс істейсіз")
+        || joined.contains("қалай істейсің")
+        || joined.contains("қалай істейсіз")
+        || joined.contains("қалай жауап бересің")
+        || joined.contains("қалай жауап бересіз")
+        || joined.contains("интернетке қосыл")
+        || joined.contains("интернетсіз жұмыс")
+        || joined.contains("интернетсіз істе")
+        || joined.contains("офлайн жұмыс");
     if implementation_marker {
         return Some(SystemAspect::Implementation);
     }
@@ -1839,7 +2183,18 @@ fn detect_ask_about_system(
         || joined.contains("ережелерің")
         || joined.contains("ережелеріңіз")
         || joined.contains("құндылықтарың")
-        || joined.contains("құндылықтарыңыз");
+        || joined.contains("құндылықтарыңыз")
+        // **v6.0.9 — 2026-05-21 user audit round 4.** Auditability /
+        // verifiability question — «How can your answers be
+        // verified?». The `principles_summary` field already says
+        // «әрбір жауабымды дереккөзіне жалғап аудит ете аламын» so
+        // route the surface form there.
+        || joined.contains("жауаптарыңды қалай тексер")
+        || joined.contains("жауаптарыңызды қалай тексер")
+        || joined.contains("жауабыңды қалай тексер")
+        || joined.contains("жауабыңызды қалай тексер")
+        || joined.contains("қалай аудит")
+        || joined.contains("қалай тексеру");
     if principles_marker {
         return Some(SystemAspect::Principles);
     }
@@ -2033,9 +2388,30 @@ fn detect_ask_about_system(
             || joined.contains("қай тілдерде")
             || joined.contains("қандай тіл")
             || joined.contains("қай тіл"));
+    // **v6.0** — «өзің кімсің» / «өзіңіз кімсіз» as a standalone
+    // identity question. The «өзі-» reflexive form replaces the
+    // pronoun «сен / сіз» in this phrasing, so the pronoun-gated
+    // check below misses it. Real-REPL 2026-05-18 turn 5 surfaced
+    // an Abai quote instead of the canonical self-introduction.
+    let reflexive_pronoun_identity = joined.contains("өзің кімсің")
+        || joined.contains("өзіңіз кімсіз")
+        || joined.contains("өзің кімсін")
+        || joined.contains("сен кімсін")
+        // **v6.0.0-rc5 voice REPL round 3** — Whisper-turbo
+        // dropped articulation on «сен» turns. Live REPL surfaced
+        // «Сіздің кімсің?» (acc-form leak: сізді+ң) and «Сең
+        // кімсің?» (collapsed -н ending). Both ARE asking the
+        // identity question — accept them so the canonical
+        // self-introduction fires instead of the fall-through
+        // «Сұрағыңызды нақтырақ тұжырымдасаңыз — ...».
+        || joined.contains("сіздің кімсің")
+        || joined.contains("сең кімсің")
+        || joined.contains("сең кімсіз")
+        || joined.contains("сең кімсін");
     if pronoun
         && (joined.contains("кімсің")
             || joined.contains("кімсіз")
+            || joined.contains("кімсін")  // v6.0 — Whisper -ң→-н variant
             || joined.contains("қандай моделсің")
             || joined.contains("қандай моделсіз")
             || joined.contains("қандай ботсың")
@@ -2046,6 +2422,7 @@ fn detect_ask_about_system(
             || joined.contains("немен айналысасыз"))
         || self_intro_request
         || reflexive_self_question
+        || reflexive_pronoun_identity
         || asks_system_name
         || asks_speaking_language
     {
@@ -2085,10 +2462,16 @@ fn detect_ask_name(joined: &str) -> bool {
         // routes the 1sg-self-recall question to `Intent::AskName`
         // so it answers from session storage via
         // `ask_name.with_known_user`.
+        // **v6.0.8 — 2026-05-21 user audit round 3 (E5).** «қандай»
+        // added to the self-recall question-word set. Pre-v6.0.8
+        // «менің атым қандай?» fell through to retrieval over
+        // «ат» (horse) and surfaced «Атым — адам». Mirrors the
+        // long-standing «не / қандай» dual-form coverage in
+        // `detect_ask_occupation`.
         || (joined.contains("атым")
-            && (joined.contains("кім") || joined.contains("не")))
+            && (joined.contains("кім") || joined.contains("не") || joined.contains("қандай")))
         || (joined.contains("есімім")
-            && (joined.contains("кім") || joined.contains("не")))
+            && (joined.contains("кім") || joined.contains("не") || joined.contains("қандай")))
         // **v4.54.5** — recall-question variants:
         // «менің атымды есіңізде ме?» / «атымды ұмытпадыңыз ба?» /
         // «есімімді есіңізде ме?». The Acc form «атымды»/«есімімді»
@@ -2239,23 +2622,103 @@ fn detect_statement_of_name(
             "кім" | "кiм" | "не" | "қандай" | "қайсысы" | "ким"
         )
     };
+    // **v6.0.0-rc5 voice REPL round 7** — personal-pronoun guard.
+    // Whisper-turbo noise on «менің атымды есініңізде ме?» / similar
+    // memory-probe forms can produce «менің атым сенің …» fragments
+    // — the bare token «сенің» is the 2sg-genitive pronoun, not a
+    // personal name. Adding it (and the other six standard Kazakh
+    // personal pronouns) to the rejection set so the
+    // pattern-1 «атым X» match doesn't store «Сенің» as a name
+    // and trigger a false-positive name-conflict dialog.
+    let is_personal_pronoun = |t: &str| {
+        let lower = t.to_lowercase();
+        matches!(
+            lower.as_str(),
+            "мен"
+                | "сен"
+                | "сіз"
+                | "ол"
+                | "біз"
+                | "сендер"
+                | "сіздер"
+                | "олар"
+                | "менің"
+                | "сенің"
+                | "сіздің"
+                | "оның"
+                | "біздің"
+                | "сендердің"
+                | "сіздердің"
+                | "олардың"
+                | "мені"
+                | "сені"
+                | "сізді"
+                | "оны"
+                | "бізді"
+                | "сендерді"
+                | "сіздерді"
+                | "оларды"
+        )
+    };
 
-    // Pattern 1: "атым X".
+    // **v6.0.6 — 2026-05-21 user audit.** Multi-token PER fold.
+    // Single-token name extraction misses Kazakh / Russian
+    // patronymics: «Айгерім Сейітжанқызы» was captured as just
+    // «Айгерім», dropping the patronymic. Kazakh patronymics end
+    // in `-қызы` (feminine) / `-ұлы` (masculine); Russian forms
+    // end in `-евич / -ович / -евна / -овна`. If the token
+    // immediately after the captured name has one of these
+    // endings (and is itself a proper-noun shape), fold both
+    // tokens into a single space-joined name. Recursion not
+    // needed — patronymics in Kazakh are always exactly one
+    // additional token.
+    let join_with_patronymic = |first: &str, next: Option<&String>| -> String {
+        const PAT_SUFFIXES: &[&str] = &[
+            "қызы",
+            "ұлы",
+            "евич",
+            "ович",
+            "евна",
+            "овна",
+            "евтич",
+            "ҚЫЗЫ",
+            "ҰЛЫ",
+        ];
+        if let Some(n) = next {
+            let n_lower = n.to_lowercase();
+            // Patronymic candidate: ends in a known suffix, has
+            // at least one preceding stem char, and itself begins
+            // with a Kazakh / Cyrillic letter.
+            let looks_like_patronymic = PAT_SUFFIXES.iter().any(|s| n_lower.ends_with(s))
+                && n_lower.chars().count() >= 5
+                && n.chars().next().map(|c| c.is_alphabetic()).unwrap_or(false);
+            if looks_like_patronymic {
+                return format!(
+                    "{} {}",
+                    normalize_proper_noun(first),
+                    normalize_proper_noun(n)
+                );
+            }
+        }
+        normalize_proper_noun(first)
+    };
+
+    // Pattern 1: "атым X [Y-патроним]?".
     if let Some(i) = tokens.iter().position(|t| t == "атым") {
         if let Some(name) = raw_tokens.get(i + 1) {
-            if is_interrogative_pronoun(name) {
+            if is_interrogative_pronoun(name) || is_personal_pronoun(name) {
                 return None;
             }
-            return Some(normalize_proper_noun(name));
+            return Some(join_with_patronymic(name, raw_tokens.get(i + 2)));
         }
     }
-    // Pattern 3: "есімім X".
+    // Pattern 3: "есімім X [Y-патроним]?".
     if let Some(i) = tokens.iter().position(|t| t == "есімім") {
         if let Some(name) = raw_tokens.get(i + 1) {
-            if is_interrogative_pronoun(name) {
+            if is_interrogative_pronoun(name) || is_personal_pronoun(name) {
                 return None;
             }
-            return Some(normalize_proper_noun(name));
+            return Some(join_with_patronymic(name, raw_tokens.get(i + 2)));
         }
     }
     // Pattern 2: "мені X деп атайды".
@@ -2266,10 +2729,17 @@ fn detect_statement_of_name(
         ) {
             if end > start + 1 {
                 if let Some(name) = raw_tokens.get(start + 1) {
-                    if is_interrogative_pronoun(name) {
+                    if is_interrogative_pronoun(name) || is_personal_pronoun(name) {
                         return None;
                     }
-                    return Some(normalize_proper_noun(name));
+                    // Patronymic only valid if the «деп» comes
+                    // AFTER the optional second name token.
+                    let pat_candidate = if end > start + 2 {
+                        raw_tokens.get(start + 2)
+                    } else {
+                        None
+                    };
+                    return Some(join_with_patronymic(name, pat_candidate));
                 }
             }
         }
@@ -2340,7 +2810,34 @@ fn detect_ask_age(joined: &str) -> bool {
 /// no numeral was found, and `None` when the pattern didn't match at
 /// all (so the caller can continue dispatching).
 fn detect_statement_of_age(tokens: &[String], joined: &str) -> Option<Option<u32>> {
-    let matched = joined.contains("жасым")
+    // **v6.0.6 — 2026-05-21 user audit.** Locative-copula
+    // age form: «N-демін / N-дамын / N-темін / N-тамын» plus
+    // their bare-locative forms «N-да / N-де / N-та / N-те»
+    // (1sg.LOC age, idiomatic «I am at-N years»). Pre-v6.0.6
+    // these fell through — only «жасым / жастамын / жаспын /
+    // маған N жас» were recognised. Surfaced by the NEG-
+    // correction case «мен 25-те емеспін, 31-демін» that
+    // rewrites to «мен 31-демін»; the rewriter does its job
+    // but the receiver matcher must also know this form.
+    const AGE_LOC_SUFFIXES: &[&str] = &[
+        "-демін",
+        "-дамын",
+        "-темін",
+        "-тамын",
+        "-де",
+        "-да",
+        "-те",
+        "-та",
+    ];
+    let has_loc_age = tokens.iter().any(|t| {
+        AGE_LOC_SUFFIXES.iter().any(|suf| {
+            t.ends_with(suf)
+                && t.len() > suf.len()
+                && t[..t.len() - suf.len()].chars().all(|c| c.is_ascii_digit())
+        })
+    });
+    let matched = has_loc_age
+        || joined.contains("жасым")
         || tokens
             .iter()
             .any(|t| t == "жастамын" || t == "жастаймын" || t == "жаспын")
@@ -2363,7 +2860,25 @@ fn detect_statement_of_age(tokens: &[String], joined: &str) -> Option<Option<u32
     if joined.contains("қанша") || joined.contains("неше") {
         return None;
     }
-    Some(parse_kazakh_age(tokens))
+    if let Some(n) = parse_kazakh_age(tokens) {
+        return Some(Some(n));
+    }
+    // Fall back to extracting the digit prefix from a locative
+    // age token when `parse_kazakh_age` missed it (some tokenisers
+    // keep «31-демін» as a single token rather than splitting on
+    // the dash).
+    for t in tokens {
+        for suf in AGE_LOC_SUFFIXES {
+            if let Some(stem) = t.strip_suffix(suf) {
+                if let Ok(n) = stem.parse::<u32>() {
+                    if (1..200).contains(&n) {
+                        return Some(Some(n));
+                    }
+                }
+            }
+        }
+    }
+    Some(None)
 }
 
 /// Parse a Kazakh numeral in the range 1–99 out of a token stream.
@@ -2588,11 +3103,36 @@ fn detect_statement_of_location(
     // (interrogatives, demonstratives, closed-class function words)
     // at the case-scan step. A legitimate city root is never in
     // `NOT_A_TOPIC`; an interrogative is.
+    // **v6.0.5 codex audit 2026-05-21** — emotional-state stopword
+    // gate. «Мен жаман көңіл күйдемін» FST-parses «күйдемін» as
+    // «күй» (mood / melody) + Locative + 1sg-predicate, which then
+    // pollutes the location belief slot as «Мекеніңіз Күй екенін
+    // ұқтым». These abstract-state roots are never legitimate
+    // cities; treat them as non-locations even when the FST returns
+    // a Locative analysis.
+    const NON_LOCATION_ROOTS: &[&str] = &[
+        "күй",    // mood / melody (көңіл күй)
+        "көңіл",  // mood / spirit
+        "жан",    // soul
+        "сезім",  // feeling
+        "сенім",  // belief
+        "ой",     // thought
+        "арман",  // dream / wish
+        "үміт",   // hope
+        "қайғы",  // grief
+        "қуаныш", // joy
+        "ашу",    // anger
+        "мұң",    // sorrow
+        "уайым",  // worry
+    ];
     let mut ablative_root: Option<String> = None;
     let mut locative_root: Option<String> = None;
     for p in parses {
         if let Analysis::Noun { root, features } = p {
             if NOT_A_TOPIC.contains(&root.root.as_str()) {
+                continue;
+            }
+            if NON_LOCATION_ROOTS.contains(&root.root.to_lowercase().as_str()) {
                 continue;
             }
             match features.case {
@@ -2623,6 +3163,9 @@ fn detect_statement_of_location(
     for p in parses {
         if let Analysis::Noun { root, features } = p {
             if NOT_A_TOPIC.contains(&root.root.as_str()) {
+                continue;
+            }
+            if NON_LOCATION_ROOTS.contains(&root.root.to_lowercase().as_str()) {
                 continue;
             }
             if features.case == Some(Case::Locative) && features.predicate == Some(Predicate::P1Sg)
@@ -2837,8 +3380,31 @@ fn detect_statement_of_location_rule_based(
     if let Some(name) = recover_named_place_before_origin_marker(tokens, raw_tokens) {
         return Some(Some(name));
     }
+    // **v6.0.5 codex audit 2026-05-21** — emotional-state stopword
+    // gate (mirror of FST-path block above). Catches the rule-based
+    // fallback for «көңіл күйдемін» / «арманымдамын» style — the
+    // copula-stripped stem can land on an abstract-state noun. We
+    // refuse to commit a location-belief slot in that case.
+    const NON_LOCATION_STEMS: &[&str] = &[
+        "күй",
+        "көңіл",
+        "жан",
+        "сезім",
+        "сенім",
+        "ой",
+        "арман",
+        "үміт",
+        "қайғы",
+        "қуаныш",
+        "ашу",
+        "мұң",
+        "уайым",
+    ];
     for (i, t) in tokens.iter().enumerate() {
         if let Some(root) = strip_locative_copula(t) {
+            if NON_LOCATION_STEMS.contains(&root.to_lowercase().as_str()) {
+                return None;
+            }
             let raw = raw_tokens
                 .get(i)
                 .map(|r| strip_locative_copula_preserving(r).unwrap_or_else(|| root.clone()))
@@ -2846,6 +3412,9 @@ fn detect_statement_of_location_rule_based(
             return Some(Some(normalize_place_name(&raw)));
         }
         if let Some(root) = strip_ablative_copula(t) {
+            if NON_LOCATION_STEMS.contains(&root.to_lowercase().as_str()) {
+                return None;
+            }
             let raw = raw_tokens
                 .get(i)
                 .map(|r| strip_ablative_copula_preserving(r).unwrap_or_else(|| root.clone()))
@@ -3012,6 +3581,22 @@ fn detect_statement_of_occupation(
     parses: &[Analysis],
 ) -> Option<Option<String>> {
     use adam_kernel_fst::morphotactics::Predicate;
+
+    // **v6.0.6** — defer to `detect_ask_occupation` first (mirrors
+    // the v4.93.0 fix in `detect_statement_of_name`). 2026-05-21
+    // user audit found that «менің кәсібім қандай?» — which
+    // `detect_ask_occupation` correctly matches on the
+    // «кәсібім» + «қандай» pattern (line ~3178) — was being
+    // grabbed by the StatementOfOccupation branch first because
+    // it sits earlier in the dispatch table at the call site.
+    // Defer here so any input that LOOKS like an occupation-
+    // question gets routed to the question handler instead of
+    // recording a phantom slot. Belt-and-suspenders to the
+    // dispatch-order fix at the call site, so this function is
+    // safe even if a future caller re-orders.
+    if detect_ask_occupation(joined) {
+        return None;
+    }
 
     // Priority 1 — FST parse with P1Sg predicate. Only accept real
     // nouns (POS-filtered) — the parser also returns adjective
@@ -3385,6 +3970,23 @@ pub(crate) fn detect_occupation_in_compound(
     if tokens.is_empty() {
         return None;
     }
+    // **v6.0.6 — 2026-05-21 user audit.** Defer to
+    // `detect_ask_occupation` first (mirrors the v4.93.0 fix for
+    // `detect_statement_of_name` and this round's fix for
+    // `detect_statement_of_occupation`). Pre-fix, the
+    // possessive-anchor scan below for «кәсібім X» grabbed the
+    // FIRST alpha token after «кәсібім» — for «менің кәсібім
+    // қандай?» that was «қандай», which then surfaced as
+    // `session.occupation = "қандай"`. Returning early on any
+    // input that looks like an occupation-question routes the
+    // turn to `Intent::AskOccupation` without writing a phantom
+    // slot. Belt-and-suspenders to the call-site `intent`
+    // guard in `Conversation::turn` — this function is now safe
+    // to call from any context.
+    let joined = tokens.join(" ");
+    if detect_ask_occupation(&joined) {
+        return None;
+    }
     // **v5.3.5** — possessive-form pattern «мамандығым X» / «кәсібім X»
     // (1sg-poss-marked profession noun + bare-noun complement).
     // Pre-fix the user's compound «Менің атым Дәулет, мамандығым
@@ -3543,8 +4145,19 @@ fn detect_statement_of_family(joined: &str) -> bool {
 }
 
 fn detect_ask_weather(joined: &str) -> bool {
-    (joined.contains("ауа райы") && joined.contains("қалай"))
-        || (joined.contains("бүгін") && joined.contains("ауа райы"))
+    // **v6.0 (live REPL 2026-05-18)** — Whisper renders «ауа райы»
+    // as the joined form «ауырайы» / «ауарайы» / «аұрайы» (Kazakh
+    // у↔ұ vowel confusion in voice transcription).
+    // v6.0.0-rc3 — added «аұрайы» / «ауырай» variants surfaced on
+    // the 2026-05-19 voice probe.
+    let weather_phrase = joined.contains("ауа райы")
+        || joined.contains("ауа-райы")
+        || joined.contains("ауарайы")
+        || joined.contains("ауырайы")
+        || joined.contains("аұрайы")
+        || joined.contains("ауырай");
+    weather_phrase
+        && (joined.contains("қалай") || joined.contains("қандай") || joined.contains("бүгін"))
         || (joined.contains("сыртта") && joined.contains("қалай"))
 }
 
@@ -3567,11 +4180,112 @@ fn detect_statement_of_weather(tokens: &[String], joined: &str) -> bool {
     (weather_token && (joined.contains("бүгін") || joined.contains("қазір"))) || weather_phrase
 }
 
-fn detect_ask_time(joined: &str) -> bool {
-    (joined.contains("сағат") && (joined.contains("неше") || joined.contains("қанша")))
+/// **v6.0** — returns the [`TimeAspect`] the user is asking about,
+/// or `None` if the utterance isn't a time/date question. Detection
+/// is markers-first because Kazakh phonological alternation makes
+/// the same root surface in many forms; we lean on Cyrillic substring
+/// presence rather than tokenised stems.
+///
+/// Aspect priority (first match wins):
+/// 1. Year — «қай жыл», «қазір қай жыл», «қай жылдамыз»
+/// 2. Month — «қай ай», «қандай ай», «қазір қай ай»
+/// 3. Weekday — «аптаның қай күні», «бүгін қай күн» without month-
+///    -date context (calendar-date queries route to Date)
+/// 4. Date — «бүгін айдың нешесі», «бүгін қандай күн», «бүгін қай күн»
+/// 5. Time — «сағат неше / неші / қанша», «қазір уақыт / неші»
+/// 6. DateTime — composite («сағат қанша, бүгін қай күн» — both
+///    markers present)
+fn detect_ask_time(joined: &str) -> Option<crate::intent::TimeAspect> {
+    use crate::intent::TimeAspect;
+    // **v6.0.0-rc4 factual_eval hardening** — block known
+    // mis-routings surfaced by `factual_eval_100`:
+    //   • duration queries («неше сағат тәулікте бар?») contain
+    //     «сағат + неше» but the period container («тәулікте /
+    //     жылда / айда / аптада») signals counting-inside-unit,
+    //     not «what time is it now». Same idea blocks geographic
+    //     «қай аймақта / қай жерде» from accidentally tripping
+    //     `month_marker` via a stray «ай».
+    //   • definitional queries («Қаңтар деген қандай ай?») use
+    //     «деген қандай» — these ask for a definition of a
+    //     calendar unit, not the current month.
+    if joined.contains("тәулікте")
+        || joined.contains("жылда")
+        || joined.contains("айда")
+        || joined.contains("аптада")
+        || joined.contains("минутта")
+        || joined.contains("секундта")
+    {
+        return None;
+    }
+    if joined.contains("деген қандай")
+        || joined.contains("нені білдіреді")
+        || joined.contains("дегеніміз")
+    {
+        return None;
+    }
+    if joined.contains("қай аймақ")
+        || joined.contains("қай елде")
+        || joined.contains("қай жерде")
+        || joined.contains("қай облыс")
+        || joined.contains("қай қалада")
+    {
+        return None;
+    }
+    let year_marker = (joined.contains("қай жыл") || joined.contains("қандай жыл"))
+        && !joined.contains("қай жылы")  // «қай жылы туған»: a different historical question
+        && !joined.contains("қандай жылы");
+    let month_marker = joined.contains("қай ай")
+        || joined.contains("қандай ай")
+        || (joined.contains("ай") && joined.contains("неше") && joined.contains("қазір"));
+    let weekday_marker = joined.contains("аптаның қай күні")
+        || joined.contains("аптаның қандай күні")
+        || joined.contains("апта күні");
+    // **v6.0.0-rc3 (live voice 2026-05-19)** — Whisper systematically
+    // confuses Kazakh `е/і` in the «нешесі ↔ нешісі» pair. Both
+    // forms now route the same way.
+    let date_marker = joined.contains("айдың нешесі")
+        || joined.contains("айдың нешісі")
+        || joined.contains("айдың нешеуінде")
+        || (joined.contains("бүгін")
+            && (joined.contains("қандай күн")
+                || joined.contains("қай күн")
+                || joined.contains("нешесі")
+                || joined.contains("нешісі")));
+    // **v6.0.0-rc5 voice REPL round 4** — Whisper-turbo transcribes
+    // «сағат» as «сақат» (final voiceless drift) and «неше» as
+    // «нишы» / «ниши» on slurred articulation. Accept both surfaces
+    // here so the live-clock branch fires on diction-impaired
+    // speakers / non-broadcast voice input.
+    let time_marker = ((joined.contains("сағат") || joined.contains("сақат"))
+        && (joined.contains("неше")
+            || joined.contains("неші")
+            || joined.contains("нишы")
+            || joined.contains("ниши")
+            || joined.contains("қанша")))
         || joined.contains("қазір уақыт")
-        || joined.contains("қандай күн")
-        || joined.contains("қай күн")
+        || joined.contains("қазір неші")
+        || joined.contains("уақыт неше")
+        || joined.contains("уақыт қанша");
+    // Composite: explicit time-marker AND explicit date-marker.
+    if time_marker && (date_marker || weekday_marker) {
+        return Some(TimeAspect::DateTime);
+    }
+    if year_marker {
+        return Some(TimeAspect::Year);
+    }
+    if month_marker {
+        return Some(TimeAspect::Month);
+    }
+    if weekday_marker {
+        return Some(TimeAspect::Weekday);
+    }
+    if date_marker {
+        return Some(TimeAspect::Date);
+    }
+    if time_marker {
+        return Some(TimeAspect::Time);
+    }
+    None
 }
 
 fn detect_compliment(tokens: &[String], joined: &str) -> bool {

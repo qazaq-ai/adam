@@ -1,5 +1,13 @@
 # adam scaling report
 
+> **v6.0 forward-looking note (2026-05-16).** This is a v3.5.5
+> deterministic-pipeline scaling report. The v6.0 neural-composition
+> layer adds its own bench surface — see
+> [`bench/neural_inference_2026_05_16.md`](bench/neural_inference_2026_05_16.md)
+> for the L5.5 latency baseline on M2. v6.0 scaling work
+> (multi-language, model-size sweep) is tracked under v6.1.x /
+> v6.2.x in [`roadmap_v6_v7.md`](roadmap_v6_v7.md).
+
 Generated from `data/scaling/scaling_report.json` — version 3.5.5, total wall-clock 10793 s, Rayon threads 8.
 
 Corpus loaded: 9 committed pack(s) + 27 shard pack(s) = **4376521 samples / 54270582 words available**.
