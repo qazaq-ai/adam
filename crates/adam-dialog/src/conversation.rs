@@ -1451,6 +1451,79 @@ impl Conversation {
         // dismissal explicitly rather than fall through to a
         // generic "I don't understand". Mirrors the v4.0.41 short-
         // circuit pattern for resolution turns.
+        // **v6.0.11 — 2026-05-21 user audit round 4b live REPL
+        // follow-up.** Pre-action-plan curated definition probe.
+        // The probe-aware overrides further down operate on
+        // `intent_for_render` AFTER `action_plan` is computed —
+        // which means the planner has already chosen
+        // `Action::AskClarification` for any Unknown intent with
+        // no retrieval / reasoning evidence by the time those
+        // overrides mutate `grounded_fact`. The renderer then
+        // dispatches on the action and ignores the late-added
+        // ground.
+        //
+        // For curated world_core compounds added after the pre-
+        // built morpheme-index was generated (KRU / Baitursynuly
+        // / AI-Law in v6.0.9), retrieval returns nothing and the
+        // planner reaches AskClarification — at which point a
+        // late grounded_fact is useless.
+        //
+        // Fix: run the curated-subject definition probe HERE,
+        // BEFORE the action planner, so `grounded_fact` is set
+        // on `intent` and the planner routes to
+        // `Action::RetrieveEvidence` (or equivalent) and the
+        // grounded-fact template family.
+        //
+        // Same guard set as the post-action-plan variant below:
+        //   - only fires for definition-shaped probes (bare
+        //     «кім / не / қашан», or «деген не / дегеніміз не»);
+        //   - skips genitive-possessive shapes («X-ның Y-сі»);
+        //   - skips when grounded_fact already set;
+        //   - source restricted to `extracted_facts` (curated
+        //     HumanApproved world_core).
+        if let Intent::Unknown {
+            noun_hint: Some(noun),
+            grounded_fact,
+            example,
+            reasoning_chain,
+            ..
+        } = &mut intent
+        {
+            const DEFINITION_PROBES_PRE: &[&str] = &[
+                "деген не",
+                "дегеніміз не",
+                "дегенің не",
+                "кім екен",
+                "не екен",
+                "туралы не білесің",
+                "туралы не білесіз",
+            ];
+            let lower_input = input.to_lowercase();
+            let noun_lower = noun.to_lowercase();
+            let definition_probe_pre = DEFINITION_PROBES_PRE
+                .iter()
+                .any(|kw| lower_input.contains(*kw))
+                || lower_input
+                    .split_whitespace()
+                    .any(|tok| matches!(tok, "кім?" | "кім" | "не?" | "не" | "қашан?" | "қашан"));
+            let has_genitive_possessive = lower_input.contains("ның ")
+                || lower_input.contains("нің ")
+                || lower_input.contains("дың ")
+                || lower_input.contains("дің ")
+                || lower_input.contains("тың ")
+                || lower_input.contains("тің ");
+            if definition_probe_pre && grounded_fact.is_none() && !has_genitive_possessive {
+                if let Some(fact) = self
+                    .extracted_facts
+                    .iter()
+                    .find(|f| f.subject.root.to_lowercase() == noun_lower)
+                {
+                    *grounded_fact = Some(fact.raw_text.clone());
+                    *example = None;
+                    *reasoning_chain = None;
+                }
+            }
+        }
         let action_plan = if dismissed_contradiction {
             crate::action::ActionPlan::new(
                 crate::action::Action::DismissContradiction,
@@ -1694,36 +1767,47 @@ impl Conversation {
                         "кім?" | "кім" | "не?" | "не" | "қашан?" | "қашан"
                     )
                 });
-            // **v6.0.10 — 2026-05-21 user audit round 4 follow-up.**
-            // Definition probe is a FALLBACK — only fire when:
-            //   - `grounded_fact` was NOT set by an earlier path
-            //     (e.g. morpheme-index retrieval), AND
-            //   - no `example` was set by earlier retrieval, AND
-            //   - the input doesn't carry a genitive-possessive
-            //     («-ның X-сі / -нің X-і»), which asks about a
-            //     property OF the subject, not the subject itself.
-            //     For those the topic-specific graph lookup is
-            //     authoritative; a bare definition fact about X
-            //     would be a hallucination
+            // **v6.0.11 — 2026-05-21 user audit round 4b live REPL
+            // follow-up.** Definition probe runs WITH `example`
+            // override (matches the surrounding PROBE_KEYWORDS
+            // semantics at the same call site): when a definition-
+            // shaped query has a curated world_core fact whose
+            // subject matches the noun_hint, the curated fact
+            // wins over a morpheme-index retrieval `example` —
+            // because retrieval routinely returns an off-topic
+            // quote when the new compound subject isn't in the
+            // pre-built index. v6.0.10 (with `example.is_none()`
+            // guard) passed unit tests but failed in live REPL:
+            // KRU / Baitursynuly queries triggered retrieval that
+            // returned irrelevant other-university examples, which
+            // blocked the fallback from firing.
+            //
+            // Safety net preserved:
+            //   - `grounded_fact.is_none()` — don't overwrite a
+            //     more specific grounded_fact set earlier (PROBE_
+            //     KEYWORDS branch above).
+            //   - `has_genitive_possessive` skip — «X-нің Y-сі»
+            //     asks about a property of X, not X itself;
+            //     bare-IsA fact about X would be a hallucination
             //     («Абайдың әкесі кім?» → fact about Абай).
-            // Pinned by `factual_eval_100` (104-case benchmark).
+            //   - `extracted_facts` source restriction: only the
+            //     HumanApproved curated world_core entries are
+            //     candidates; retrieval-found examples already
+            //     went through their own ranking.
             let has_genitive_possessive = lower_input.contains("ның ")
                 || lower_input.contains("нің ")
                 || lower_input.contains("дың ")
                 || lower_input.contains("дің ")
                 || lower_input.contains("тың ")
                 || lower_input.contains("тің ");
-            if definition_probe
-                && grounded_fact.is_none()
-                && example.is_none()
-                && !has_genitive_possessive
-            {
+            if definition_probe && grounded_fact.is_none() && !has_genitive_possessive {
                 if let Some(fact) = self
                     .extracted_facts
                     .iter()
                     .find(|f| f.subject.root.to_lowercase() == noun_lower)
                 {
                     *grounded_fact = Some(fact.raw_text.clone());
+                    *example = None;
                     *reasoning_chain = None;
                 }
             }
