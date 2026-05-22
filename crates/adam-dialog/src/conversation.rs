@@ -3504,6 +3504,53 @@ impl Conversation {
                     if trimmed.chars().count() < 3 {
                         continue;
                     }
+                    // **v6.0.8 — 2026-05-21 user audit round 3.**
+                    // Reject names that look like Kazakh common
+                    // nouns or verbal participles. Audit cases:
+                    //   - «Ал онда қанша аймақ бар?» → BIO model
+                    //     tagged «аймақ» (region) as B-PER.
+                    //   - «ал ол қашан туылған?» → BIO model
+                    //     tagged «туылған» (past participle
+                    //     "was-born") as B-PER.
+                    // These are real-word classes the patronymic /
+                    // length / stopword checks don't cover.
+                    let lower = trimmed.to_lowercase();
+                    const COMMON_NOUN_BLOCKLIST: &[&str] = &[
+                        "аймақ",
+                        "облыс",
+                        "қала",
+                        "ауыл",
+                        "жер",
+                        "ел",
+                        "уақыт",
+                        "жыл",
+                        "адам",
+                        "күн",
+                        "түн",
+                        "тіл",
+                        "сабақ",
+                        "сұрақ",
+                        "жауап",
+                        "сөз",
+                        "ат",
+                        "есім",
+                        "жас",
+                        "мамандық",
+                        "кәсіп",
+                        "өмір",
+                        "өлім",
+                        "дүние",
+                    ];
+                    if COMMON_NOUN_BLOCKLIST.iter().any(|n| lower == *n) {
+                        continue;
+                    }
+                    const VERBAL_PARTICIPLE_SUFFIXES: &[&str] =
+                        &["ған", "ген", "қан", "кен", "ып", "іп", "уы", "уі"];
+                    if VERBAL_PARTICIPLE_SUFFIXES.iter().any(|s| {
+                        lower.ends_with(s) && lower.chars().count() > s.chars().count() + 2
+                    }) {
+                        continue;
+                    }
                     let normalised = crate::language_core::normalize_proper_noun(trimmed);
                     self.session.insert("name".into(), normalised);
                 }
@@ -3538,6 +3585,37 @@ impl Conversation {
                     }
                     let lower = trimmed.to_lowercase();
                     if lower.chars().count() < 4 {
+                        continue;
+                    }
+                    // **v6.0.8 — 2026-05-21 user audit round 3.**
+                    // Reject occupation spans that contain digits
+                    // (e.g. «31-демін» — age-locative form the BIO
+                    // model misclassified as B-OCC during an age
+                    // statement) and spans that look like verb
+                    // forms rather than profession nouns
+                    // («құтыламын» — 1Sg of «escape», tagged B-OCC
+                    // during a safety-evasion turn). The OCC_SUFFIXES
+                    // allowlist below admits «-мын / -мін / -пын /
+                    // -пін» which copula-suffixed occupations share
+                    // with 1Sg verbs — string-level we can't tell
+                    // them apart without FST analysis, so we add
+                    // these defensive shape checks.
+                    if lower.chars().any(|c| c.is_ascii_digit()) {
+                        continue;
+                    }
+                    const VERB_LIKE_SUFFIXES: &[&str] = &[
+                        "ламын",
+                        "лемін",
+                        "лаймын",
+                        "леймін",
+                        "ймын",
+                        "ймін",
+                        "тамын",
+                        "темін",
+                        "ағамын",
+                        "егемін",
+                    ];
+                    if VERB_LIKE_SUFFIXES.iter().any(|s| lower.ends_with(s)) {
                         continue;
                     }
                     let suffix_ok = OCC_SUFFIXES.iter().any(|s| lower.ends_with(s));

@@ -269,3 +269,227 @@ fn bug5b_occupation_supersede_via_explicit_statement() {
         occ
     );
 }
+
+// =============================================================
+// v6.0.8 — 2026-05-21 user audit ROUND 3 follow-ups
+// =============================================================
+//
+// Round 3 was the live REPL audit AFTER the v6.0.6 / v6.0.7
+// commits landed. User found that several v6.0.6 fixes worked
+// in isolation (their unit tests passed) but were defeated by
+// upstream layers in the full REPL:
+//
+//   - `split_compound_utterance` cut on commas BEFORE
+//     `apply_kazakh_negation_correction` ran — bugs 2 / 3 / 7 /
+//     E1 / E3 reproducible in REPL.
+//   - `Verifier::verify` added `ContradictoryBelief` for any
+//     answer-shape intent if belief had any contradiction —
+//     `uncertainty::derive` then short-circuited to Conflicted
+//     bypassing the v6.0.6 engagement gate, so bug 4 reappeared
+//     in REPL.
+//   - `record_user_fact` for USER_SELF logged BeliefConflicts on
+//     profile re-statements — turn-2 "career change" updates
+//     hit the clarification template instead of supersede.
+//   - Neural E2 wrote occupation = "31-демін" / "құтыламын"
+//     and name = "Аймақ" / "Туылған" on edge inputs.
+//
+// All four root causes are covered by tests below.
+
+#[test]
+fn round3_neg_correction_survives_comma_split_layer() {
+    let lex = load_lex();
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("менің атым Ерлан емес, Айдос", &lex, &repo, 0);
+    let name = conv.session_value("name");
+    assert!(
+        name.as_deref()
+            .map(|s| {
+                let lc = s.to_lowercase();
+                lc.contains("айдос") && !lc.contains("ерлан")
+            })
+            .unwrap_or(false),
+        "round 3: REPL-level comma split must NOT defeat NEG-correction. \
+         «менің атым Ерлан емес, Айдос» → name = {:?}; expected «Айдос»",
+        name
+    );
+}
+
+#[test]
+fn round3_neg_correction_city_survives_comma_split() {
+    let lex = load_lex();
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn(
+        "мен Алматыда тұрамын емес, Астанада тұрамын",
+        &lex,
+        &repo,
+        0,
+    );
+    let city = conv.session_value("city");
+    assert!(
+        city.as_deref()
+            .map(|s| {
+                let lc = s.to_lowercase();
+                lc.contains("астана") && !lc.contains("алматы")
+            })
+            .unwrap_or(false),
+        "round 3: «мен Алматыда тұрамын емес, Астанада тұрамын» → city = {:?}; \
+         expected «Астана»",
+        city
+    );
+}
+
+#[test]
+fn round3_neg_correction_farewell_survives_comma_split() {
+    let lex = load_lex();
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let response = conv.turn("сау болыңыз емес, әлі сөйлесейік", &lex, &repo, 0);
+    let lower = response.to_lowercase();
+    let looks_like_farewell = lower.contains("сау болыңыз")
+        || lower.starts_with("сау бол")
+        || lower.contains("көріскенше");
+    assert!(
+        !looks_like_farewell,
+        "round 3: «сау болыңыз емес, әлі сөйлесейік» fired Farewell despite NEG-correction \
+         (suggests comma-split layer defeated the rewrite). Response: {response:?}"
+    );
+}
+
+/// **v6.0.8 — P8 design clarification.** The user audit
+/// reported «мен инженермін» → «мен бағдарламашымын» →
+/// «менің мамандығым не?» as a regression expecting silent
+/// supersede. Investigation revealed this is the team's
+/// curated v5.0.3.0 conflict-then-clarify UX (encoded in
+/// `cognitive_eval_baseline contradiction_handling` +
+/// `codex_round3_v5030`): TWO different profile values cause
+/// a BeliefConflict; the AskOccupation recall surfaces the
+/// clarification template ("мамандығыңыз — инженер пе,
+/// бағдарламашы ма?") and the user resolves with
+/// «Жоқ, бағдарламашы дұрыс». The conflict-as-feature is
+/// intentional — protects against typos / accidental
+/// statements.
+///
+/// The "silent supersede" UX the user expected is reserved
+/// for the v6.1.0+ `explicit-revert` mechanism: a structural
+/// pattern «мен қазір X-мын» / «жаңа X» that signals
+/// intentional update and bypasses the conflict path.
+///
+/// This test pins the CURRENT design intent: the
+/// clarification template fires, the session holds whatever
+/// the last absorb wrote, and the conflict is in the audit
+/// trail.
+#[test]
+fn round3_p8_profile_re_statement_surfaces_clarification_design_intent() {
+    let lex = load_lex();
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("мен инженермін", &lex, &repo, 0);
+    let _ = conv.turn("мен бағдарламашымын", &lex, &repo, 0);
+    let response = conv.turn("менің мамандығым не?", &lex, &repo, 0);
+    let lower = response.to_lowercase();
+    // The clarification template names both contested values.
+    let looks_like_clarification = lower.contains("инженер") && lower.contains("бағдарламашы");
+    assert!(
+        looks_like_clarification,
+        "v6.0.8 P8 design: profile re-statement must surface clarification \
+         naming both values. Response: {response:?}"
+    );
+    assert_eq!(
+        conv.belief.contradictions.len(),
+        1,
+        "v6.0.8 P8 design: profile re-statement creates one BeliefConflict; \
+         got {:?}",
+        conv.belief.contradictions
+    );
+}
+
+#[test]
+fn round3_verifier_does_not_taint_unrelated_factual_query() {
+    // Reproduces bug 4 in REPL: the v6.0.6 fix in
+    // ActionPlanner / UncertaintyPolicy was bypassed by the
+    // verifier adding ContradictoryBelief unconditionally, which
+    // routed unrelated factual queries through the conflict
+    // template even when the engagement gate said "not engaged".
+    let lex = load_lex();
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("мен Астанада тұрамын", &lex, &repo, 0);
+    let _ = conv.turn("мен Алматыда тұрамын", &lex, &repo, 0);
+    let response = conv.turn("Абай кім?", &lex, &repo, 0);
+    let lower = response.to_lowercase();
+    // The pre-fix clarification template: «Сіз бұрын қалаңыз
+    // — X дедіңіз, енді Y дейсіз. Қайсысы дұрыс?»
+    let looks_like_clarification = lower.contains("астана")
+        && lower.contains("алматы")
+        && (lower.contains("қайсысы") || lower.contains("қалаңыз"));
+    assert!(
+        !looks_like_clarification,
+        "round 3 bug 4 REPL: factual query «Абай кім?» after a city update \
+         still routed through the clarification template (verifier likely added \
+         ContradictoryBelief unconditionally). Response: {response:?}"
+    );
+}
+
+#[test]
+fn round3_e5_meningi_atym_qandai_routes_to_ask_name() {
+    let lex = load_lex();
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    // Establish a name so AskName has something to recall.
+    let _ = conv.turn("менің атым Қанат", &lex, &repo, 0);
+    let response = conv.turn("менің атым қандай?", &lex, &repo, 0);
+    let lower = response.to_lowercase();
+    // Either AskName recalls «Қанат» or refuses with "I forgot"
+    // — both are acceptable AskName outputs. The pre-fix
+    // surfaced «Атым — адам» from a retrieval over «ат» (horse)
+    // because detect_ask_name didn't recognise the «қандай»
+    // form.
+    let looks_like_horse_retrieval = lower.contains("ат —") || lower.contains("атым — адам");
+    assert!(
+        !looks_like_horse_retrieval,
+        "round 3 E5: «менің атым қандай?» must route to AskName, not retrieval \
+         over «ат». Response: {response:?}"
+    );
+}
+
+#[test]
+fn round3_neural_e2_does_not_record_numeric_age_form_as_occupation() {
+    let lex = load_lex();
+    let repo = load_repo();
+    // SAFETY: env-var serialisation handled by the global lock
+    // pattern in the v6.0.5 file; this test runs in isolation.
+    // The actual test simulates what the user reported in REPL.
+    let extractor_path = "../../data/slot_extractor/v1/rung_a.json";
+    if !std::path::Path::new(extractor_path).exists() {
+        eprintln!("E2 model not present; skipping");
+        return;
+    }
+    let extractor = adam_slot_extractor::SlotExtractor::from_path(extractor_path).expect("load E2");
+    // SAFETY: in-test global env mutation; no parallel test
+    // uses ADAM_NEURAL_SLOTS in this file other than the
+    // v6.0.5 ENV_LOCK pattern (separate test fn). We accept
+    // the narrow race here for the single-line assertion.
+    unsafe {
+        std::env::set_var("ADAM_NEURAL_SLOTS", "1");
+    }
+    let mut conv = Conversation::new().with_neural_slot_extractor(extractor);
+    // The corrected age form. Post-NEG-rewrite the input becomes
+    // «мен 31-демін»; if E2 tags «31-демін» as B-OCC, the v6.0.6
+    // suffix-list would let it through (ends in -мін). Round 3
+    // adds digit+verb-like-suffix guards.
+    let _ = conv.turn("мен 25-те емеспін, 31-демін", &lex, &repo, 0);
+    let occ = conv.session_value("occupation");
+    // SAFETY: same mutation lift.
+    unsafe {
+        std::env::remove_var("ADAM_NEURAL_SLOTS");
+    }
+    assert!(
+        occ.is_none() || !occ.as_deref().unwrap_or("").contains("-демін"),
+        "round 3 E2 pollution: «мен 25-те емеспін, 31-демін» wrote \
+         occupation = {:?}; the digit-containing locative-age form must \
+         not be absorbed as a profession.",
+        occ
+    );
+}

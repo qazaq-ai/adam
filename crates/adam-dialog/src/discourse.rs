@@ -1529,6 +1529,21 @@ pub fn split_compound_utterance(input: &str) -> Vec<String> {
     if input_is_math_expression(trimmed) {
         return vec![trimmed.to_string()];
     }
+    // **v6.0.8 — 2026-05-21 user audit round 3.** Kazakh contrastive-
+    // negation correction shape «PREFIX X емес[+copula], Y» must reach
+    // `Conversation::turn` as ONE string so
+    // `crate::semantics::apply_kazakh_negation_correction` can rewrite
+    // it to «PREFIX Y». Pre-v6.0.8 the comma split here cut the input
+    // into «PREFIX X емес» (which `detect_statement_of_X` happily
+    // absorbed as «X is the slot value») and a bare «Y» (which fell
+    // through). All NEG-correction code in `semantics.rs` was
+    // architecturally correct but never saw the full utterance, so
+    // audit bugs 2 / 3 / 7 / E1 / E3 remained reproducible in REPL
+    // despite green unit tests on the helper itself. Bail out here so
+    // the rewriter sees the comma.
+    if crate::semantics::apply_kazakh_negation_correction(trimmed).is_some() {
+        return vec![trimmed.to_string()];
+    }
     let mut parts: Vec<String> = Vec::new();
     let mut buf = String::new();
     let mut in_quote = false;

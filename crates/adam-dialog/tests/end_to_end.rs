@@ -1525,8 +1525,17 @@ fn graph_admissibility_flags_support_pattern_mismatch() {
     );
 }
 
+/// **v6.0.8 (replaces v4.0.32 leak-detection test).** The
+/// 2026-05-21 user audit narrowed the verifier's contradiction
+/// gate to engagement-aware — unrelated factual queries no
+/// longer trigger verification failure under a self-profile
+/// conflict. The original test asserted EvidenceLeakAfter
+/// VerificationFailure fires; under the new policy
+/// verification.supported = true, no leak. This test now pins
+/// the inverse: the leak issue must NOT be flagged when the
+/// query is genuinely unrelated.
 #[test]
-fn trace_faithfulness_flags_reasoning_leak_after_verification_failure() {
+fn trace_faithfulness_no_leak_for_unrelated_chain_under_self_conflict() {
     use adam_reasoning::reasoner::DerivedFact;
     use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
 
@@ -1568,10 +1577,11 @@ fn trace_faithfulness_flags_reasoning_leak_after_verification_failure() {
     };
     let faithfulness = audit_trace_faithfulness(&leaked, &trace);
     assert!(
-        faithfulness
+        !faithfulness
             .issues
             .contains(&TraceFaithfulnessIssue::EvidenceLeakAfterVerificationFailure),
-        "expected evidence leak issue, got {:?}",
+        "v6.0.8: verification passes for unrelated query under self-conflict, \
+         so no evidence-leak issue should fire; got {:?}",
         faithfulness.issues
     );
 }
@@ -2732,20 +2742,30 @@ fn epistemic_status_classifies_kinds_of_turn() {
     let (_, t2) = conv.turn_with_trace("рахмет", &lex, &repo, 1);
     assert_eq!(t2.epistemic_status, EpistemicStatus::Certain);
 
-    // Contradiction → Conflicted.
+    // **v6.0.8 — 2026-05-21 user audit round 3.** City conflict
+    // alone does NOT route an unrelated «жер» query to
+    // Conflicted — the v6.0.8 narrowing makes the contradiction
+    // dominance gate engagement-aware. The third turn is
+    // Intent::Unknown(жер), unrelated to city; status falls
+    // through to action-based (Derived from RunReasoner).
     conv.turn("мен алматыда тұрамын", &lex, &repo, 2);
     conv.turn("мен астанада тұрамын", &lex, &repo, 3);
     let (_, t4) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 4);
-    assert_eq!(t4.epistemic_status, EpistemicStatus::Conflicted);
+    assert_eq!(t4.epistemic_status, EpistemicStatus::Derived);
 }
 
-/// v4.0.32 Phase 4 — Verifier gates evidence rendering when a belief
-/// contradiction exists. Pre-v4.0.32 the dialog would happily surface
-/// a reasoning chain about «жер» even while the user's own city was
-/// contested. Post-v4.0.32 the gate strips the chain before template
-/// rendering, so the reply falls back to the safe noun-echo.
+/// **v6.0.8 (replaces v4.0.32 Phase 4 design).** Verifier no
+/// longer gates evidence rendering for UNRELATED factual
+/// queries when a user-self belief contradiction exists. Per
+/// the 2026-05-21 user audit round 3, the broad gate caused
+/// "city conflict bricks every subsequent factual query" — a
+/// reasoning chain about «жер» (Earth) should render normally
+/// regardless of whether the user has an outstanding choice
+/// between two cities. The contradiction stays in
+/// `belief.contradictions` for audit and resurfaces only when
+/// the user touches the contested slot.
 #[test]
-fn verifier_gates_reasoning_chain_under_belief_contradiction() {
+fn verifier_passes_unrelated_reasoning_chain_despite_self_conflict() {
     use adam_reasoning::reasoner::DerivedFact;
     use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
 
@@ -2779,22 +2799,22 @@ fn verifier_gates_reasoning_chain_under_belief_contradiction() {
     let (out, trace) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 2);
 
     assert!(
-        !trace.verification.supported,
-        "verifier must reject under unresolved contradiction, got {:?}",
+        trace.verification.supported,
+        "v6.0.8: verifier passes unrelated reasoning chain even \
+         under a self-profile conflict, got {:?}",
         trace.verification
     );
-    assert!(
-        !out.contains("байланыс"),
-        "gated output must not cite the reasoning chain, got: {out:?}"
-    );
+    // The reasoning chain survives — the output may cite it.
+    let _ = out;
     if let adam_dialog::Intent::Unknown {
-        reasoning_chain,
-        example,
-        ..
+        reasoning_chain, ..
     } = &trace.intent_after_verification
     {
-        assert!(reasoning_chain.is_none());
-        assert!(example.is_none());
+        assert!(
+            reasoning_chain.is_some(),
+            "v6.0.8: reasoning chain about «жер» preserved despite \
+             unrelated city conflict"
+        );
     } else {
         panic!(
             "expected Intent::Unknown, got {:?}",

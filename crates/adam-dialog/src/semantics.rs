@@ -137,6 +137,41 @@ pub fn apply_kazakh_negation_correction(input: &str) -> Option<String> {
     if !input.is_char_boundary(wrong_start) {
         return None;
     }
+    // **v6.0.8 — 2026-05-21 user audit round 3.** When the
+    // rejected token is a verb form (predicate-copula
+    // suffix), walk back ONE more token to include the noun /
+    // locative that's the semantic argument of the verb.
+    // Example: «мен Алматыда тұрамын емес, Астанада тұрамын» —
+    // single-token walkback hits «тұрамын» (verb) and leaves
+    // «мен Алматыда» as prefix, giving the mangled
+    // «мен Алматыда Астанада тұрамын». Two-token walkback
+    // hits «Алматыда тұрамын» and prefix becomes «мен »,
+    // result «мен Астанада тұрамын» — clean.
+    const VERB_PREDICATE_SUFFIXES: &[&str] = &[
+        "мын", "мін", "сың", "сің", "сыз", "сіз", "пыз", "піз", "ды", "ді", "ты", "ті",
+    ];
+    let wrong_token_slice = input[wrong_start..neg_start].trim();
+    let wrong_token_lower = wrong_token_slice.to_lowercase();
+    let looks_like_verb = wrong_token_lower.chars().count() > 3
+        && VERB_PREDICATE_SUFFIXES
+            .iter()
+            .any(|s| wrong_token_lower.ends_with(s));
+    if looks_like_verb {
+        let mut probe = wrong_start;
+        while probe > 0 && bytes[probe - 1] == b' ' {
+            probe -= 1;
+        }
+        while probe > 0 {
+            let prev = bytes[probe - 1];
+            if prev == b' ' || prev == b'\t' {
+                break;
+            }
+            probe -= 1;
+        }
+        if input.is_char_boundary(probe) && probe < wrong_start {
+            wrong_start = probe;
+        }
+    }
     let prefix = &input[..wrong_start];
     let after = &input[post_sep..];
     if after.trim().is_empty() {
@@ -2361,10 +2396,16 @@ fn detect_ask_name(joined: &str) -> bool {
         // routes the 1sg-self-recall question to `Intent::AskName`
         // so it answers from session storage via
         // `ask_name.with_known_user`.
+        // **v6.0.8 — 2026-05-21 user audit round 3 (E5).** «қандай»
+        // added to the self-recall question-word set. Pre-v6.0.8
+        // «менің атым қандай?» fell through to retrieval over
+        // «ат» (horse) and surfaced «Атым — адам». Mirrors the
+        // long-standing «не / қандай» dual-form coverage in
+        // `detect_ask_occupation`.
         || (joined.contains("атым")
-            && (joined.contains("кім") || joined.contains("не")))
+            && (joined.contains("кім") || joined.contains("не") || joined.contains("қандай")))
         || (joined.contains("есімім")
-            && (joined.contains("кім") || joined.contains("не")))
+            && (joined.contains("кім") || joined.contains("не") || joined.contains("қандай")))
         // **v4.54.5** — recall-question variants:
         // «менің атымды есіңізде ме?» / «атымды ұмытпадыңыз ба?» /
         // «есімімді есіңізде ме?». The Acc form «атымды»/«есімімді»
