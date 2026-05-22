@@ -1,7 +1,7 @@
 {
   "version": "6.0.0-rc5",
   "status": "completed",
-  "elapsed_s": 63,
+  "elapsed_s": 61,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 70,
-    "facts_total": 4082,
+    "facts_total": 4088,
     "by_predicate": {
       "after": 8,
       "causes": 29,
@@ -27,10 +27,10 @@
       "has": 85,
       "has_quantity": 78,
       "in_domain": 24,
-      "is_a": 3122,
+      "is_a": 3127,
       "lives_in": 7,
       "part_of": 404,
-      "related_to": 239
+      "related_to": 240
     },
     "by_pack": {
       "abai_wikisource_pack.json": 3,
@@ -66,6 +66,7 @@
       "world_core/informatics_basic.jsonl": 40,
       "world_core/kazakh_cuisine.jsonl": 26,
       "world_core/kinship_extended.jsonl": 20,
+      "world_core/kru_baitursynov.jsonl": 6,
       "world_core/kz_constitution.jsonl": 53,
       "world_core/kz_industry.jsonl": 208,
       "world_core/kz_literature.jsonl": 120,
@@ -28868,6 +28869,126 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Келін — ұлға тиген әйел."
+    },
+    {
+      "subject": {
+        "surface": "ахмет байтұрсынұлы",
+        "root": "ахмет байтұрсынұлы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қазақ ағартушысы",
+        "root": "қазақ ағартушысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ахмет Байтұрсынұлы — қазақ ағартушысы, ғалым, тілтанушы, ақын, журналист, аудармашы және мемлекет қайраткері."
+    },
+    {
+      "subject": {
+        "surface": "ахмет байтұрсынұлы",
+        "root": "ахмет байтұрсынұлы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тілтанушы",
+        "root": "тілтанушы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ахмет Байтұрсынұлы — қазақ ағартушысы, ғалым, тілтанушы, ақын, журналист, аудармашы және мемлекет қайраткері."
+    },
+    {
+      "subject": {
+        "surface": "ахмет байтұрсынұлы атындағы қостанай өңірлік университеті",
+        "root": "ахмет байтұрсынұлы атындағы қостанай өңірлік университеті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жоғары оқу орны",
+        "root": "жоғары оқу орны",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ахмет Байтұрсынұлы атындағы Қостанай өңірлік университеті — Қазақстан Республикасының жоғары оқу орны."
+    },
+    {
+      "subject": {
+        "surface": "кибер-қорғаныс",
+        "root": "кибер-қорғаныс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қорғау шарасы",
+        "root": "қорғау шарасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кибер-қорғаныс — ақпараттық жүйелерді, желілерді және деректерді кибершабуылдардан қорғауға бағытталған шаралар жиынтығы."
+    },
+    {
+      "subject": {
+        "surface": "кибер-қорғаныс",
+        "root": "кибер-қорғаныс",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ақпараттық қауіпсіздік",
+        "root": "ақпараттық қауіпсіздік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кибер-қорғаныс — ақпараттық жүйелерді, желілерді және деректерді кибершабуылдардан қорғауға бағытталған шаралар жиынтығы."
+    },
+    {
+      "subject": {
+        "surface": "кибершабуыл",
+        "root": "кибершабуыл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ақпараттық қылмыс",
+        "root": "ақпараттық қылмыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кибершабуыл — ақпараттық жүйелерге, желілерге немесе пайдаланушы деректеріне заңсыз ену немесе оларды бұзу әрекеті."
     },
     {
       "subject": {

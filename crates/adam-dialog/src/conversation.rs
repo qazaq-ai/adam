@@ -1451,36 +1451,38 @@ impl Conversation {
         // dismissal explicitly rather than fall through to a
         // generic "I don't understand". Mirrors the v4.0.41 short-
         // circuit pattern for resolution turns.
-        // **v6.0.11 — 2026-05-21 user audit round 4b live REPL
-        // follow-up.** Pre-action-plan curated definition probe.
-        // The probe-aware overrides further down operate on
-        // `intent_for_render` AFTER `action_plan` is computed —
-        // which means the planner has already chosen
-        // `Action::AskClarification` for any Unknown intent with
-        // no retrieval / reasoning evidence by the time those
-        // overrides mutate `grounded_fact`. The renderer then
-        // dispatches on the action and ignores the late-added
-        // ground.
+        // **v6.0.13 — 2026-05-21 user audit round 4c.** Pre-action-
+        // plan curated definition probe — NARROWED whitelist
+        // version.
         //
-        // For curated world_core compounds added after the pre-
-        // built morpheme-index was generated (KRU / Baitursynuly
-        // / AI-Law in v6.0.9), retrieval returns nothing and the
-        // planner reaches AskClarification — at which point a
-        // late grounded_fact is useless.
+        // History:
+        //   - v6.0.11 added the broad pre-plan probe so KRU /
+        //     Baitursynuly / AI-Law queries surfaced their
+        //     curated world_core facts (the post-plan probe was
+        //     too late — action was already AskClarification).
+        //   - v6.0.12 user audit found factual_eval_100 jumped
+        //     from 3 → 4 hallucinations. Investigating with
+        //     `factual_eval_100` traces, the broad probe was
+        //     mis-firing on tangentially-shaped questions even
+        //     after the «interrogative-as-tail» tightening,
+        //     because the topic extractor for definitional
+        //     queries OUTSIDE the new KRU domain picked
+        //     pre-existing noun_hints that the probe then
+        //     grabbed an unrelated curated fact for.
         //
-        // Fix: run the curated-subject definition probe HERE,
-        // BEFORE the action planner, so `grounded_fact` is set
-        // on `intent` and the planner routes to
-        // `Action::RetrieveEvidence` (or equivalent) and the
-        // grounded-fact template family.
+        // The narrow fix: only run the pre-plan probe for the
+        // SPECIFIC subjects added in `kru_baitursynov.jsonl`
+        // (audit round 4 directive). For all other subjects,
+        // the existing retrieval / graph pipeline + the post-
+        // plan PROBE_KEYWORDS path stay authoritative — both
+        // had been stable on the factual_eval ceiling for
+        // months. This keeps free-dialog readiness for the new
+        // KRU domain WITHOUT regressing the rest of the
+        // factual surface.
         //
-        // Same guard set as the post-action-plan variant below:
-        //   - only fires for definition-shaped probes (bare
-        //     «кім / не / қашан», or «деген не / дегеніміз не»);
-        //   - skips genitive-possessive shapes («X-ның Y-сі»);
-        //   - skips when grounded_fact already set;
-        //   - source restricted to `extracted_facts` (curated
-        //     HumanApproved world_core).
+        // Future v6.1.0+ will replace this whitelist with a
+        // predicate-aware retrieval planner (the cleaner fix
+        // documented in the round-4 audit report).
         if let Intent::Unknown {
             noun_hint: Some(noun),
             grounded_fact,
@@ -1489,30 +1491,21 @@ impl Conversation {
             ..
         } = &mut intent
         {
-            const DEFINITION_PROBES_PRE: &[&str] = &[
-                "деген не",
-                "дегеніміз не",
-                "дегенің не",
-                "кім екен",
-                "не екен",
-                "туралы не білесің",
-                "туралы не білесіз",
+            const KRU_DOMAIN_SUBJECTS: &[&str] = &[
+                "ахмет байтұрсынұлы",
+                "ахмет байтұрсынұлы атындағы қостанай өңірлік университеті",
+                "қостанай өңірлік университеті",
+                "кру",
+                "жасанды интеллект туралы заң",
+                "қорғаныс саласындағы жасанды интеллект",
+                "кибер-қорғаныс",
+                "кибершабуыл",
+                "төте жазу",
+                "алаш қозғалысы",
             ];
-            let lower_input = input.to_lowercase();
             let noun_lower = noun.to_lowercase();
-            let definition_probe_pre = DEFINITION_PROBES_PRE
-                .iter()
-                .any(|kw| lower_input.contains(*kw))
-                || lower_input
-                    .split_whitespace()
-                    .any(|tok| matches!(tok, "кім?" | "кім" | "не?" | "не" | "қашан?" | "қашан"));
-            let has_genitive_possessive = lower_input.contains("ның ")
-                || lower_input.contains("нің ")
-                || lower_input.contains("дың ")
-                || lower_input.contains("дің ")
-                || lower_input.contains("тың ")
-                || lower_input.contains("тің ");
-            if definition_probe_pre && grounded_fact.is_none() && !has_genitive_possessive {
+            let is_kru_subject = KRU_DOMAIN_SUBJECTS.iter().any(|s| noun_lower == *s);
+            if is_kru_subject && grounded_fact.is_none() {
                 if let Some(fact) = self
                     .extracted_facts
                     .iter()
@@ -1741,32 +1734,23 @@ impl Conversation {
             ];
             let lower_input = input.to_lowercase();
             let noun_lower = noun.to_lowercase();
-            let definition_probe = DEFINITION_PROBES
-                .iter()
-                .any(|kw| lower_input.contains(*kw))
-                // Also fire on bare «X кім?» / «X не?» / «X қашан?»
-                // where the probe word is the only interrogative
-                // token and is a pure DEFINITION probe — asks for an
-                // identity / description / date, answer is a
-                // sentence ABOUT X, not a quantity / property
-                // requiring graph traversal.
-                //
-                // «қанша» (how-many) / «қандай» (which-kind) /
-                // «қалай» (how) intentionally OMITTED — those need
-                // predicate-specific graph lookup (e.g. `HasQuantity`
-                // facts for «қанша») and the existing topic-specific
-                // retrieval picks the right fact. Pre-fix this
-                // branch also fired on «қанша» and pre-empted the
-                // quantity-graph fact with a generic IsA / PartOf
-                // fact about the same subject. Pinned by end-to-end
-                // tests `quantity_question_prefers_has_quantity_graph_fact`
-                // and `border_question_prefers_border_graph_fact`.
-                || lower_input.split_whitespace().any(|tok| {
-                    matches!(
-                        tok,
-                        "кім?" | "кім" | "не?" | "не" | "қашан?" | "қашан"
-                    )
-                });
+            // **v6.0.12 — 2026-05-21 user audit round 4c.** Bare
+            // interrogative must be the TAIL token. See
+            // documentation on the pre-action-plan twin above. The
+            // post-action-plan path mirrors that contract so the
+            // two layers agree on which inputs are definition-
+            // shaped.
+            let stripped_tail: Vec<&str> = lower_input
+                .split_whitespace()
+                .map(|t| t.trim_end_matches('?').trim_end_matches('.'))
+                .filter(|t| !t.is_empty())
+                .collect();
+            let tail_is_interrogative = matches!(
+                stripped_tail.last().copied(),
+                Some("кім") | Some("не") | Some("қашан")
+            );
+            let definition_probe = DEFINITION_PROBES.iter().any(|kw| lower_input.contains(*kw))
+                || tail_is_interrogative;
             // **v6.0.11 — 2026-05-21 user audit round 4b live REPL
             // follow-up.** Definition probe runs WITH `example`
             // override (matches the surrounding PROBE_KEYWORDS
@@ -1800,7 +1784,19 @@ impl Conversation {
                 || lower_input.contains("дің ")
                 || lower_input.contains("тың ")
                 || lower_input.contains("тің ");
-            if definition_probe && grounded_fact.is_none() && !has_genitive_possessive {
+            // **v6.0.13 — 2026-05-21 user audit round 4c.** Restored
+            // the v6.0.10 `example.is_none()` discipline on the
+            // post-action-plan path so a curated definition probe
+            // here doesn't overwrite a retrieval-bound `example`.
+            // The KRU live-retrieval coverage is now handled by
+            // the narrowly-whitelisted PRE-action-plan probe above,
+            // so this branch can stay conservative and avoid
+            // pre-empting the rest of the factual surface.
+            if definition_probe
+                && grounded_fact.is_none()
+                && example.is_none()
+                && !has_genitive_possessive
+            {
                 if let Some(fact) = self
                     .extracted_facts
                     .iter()
