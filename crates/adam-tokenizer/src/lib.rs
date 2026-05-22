@@ -385,7 +385,7 @@ pub fn build_dry_run_report(
         .iter()
         .map(|sample| normalize_text(&sample.text))
         .collect::<Vec<_>>();
-    let total_character_count = normalized_samples
+    let total_character_count: usize = normalized_samples
         .iter()
         .map(|text| text.chars().count())
         .sum();
@@ -394,11 +394,7 @@ pub fn build_dry_run_report(
         .iter()
         .filter(|text| !text.is_empty())
         .count();
-    let average_character_count = if sample_count == 0 {
-        0
-    } else {
-        total_character_count / sample_count
-    };
+    let average_character_count = total_character_count.checked_div(sample_count).unwrap_or(0);
     let mut domains = pack
         .samples
         .iter()

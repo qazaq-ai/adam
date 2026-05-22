@@ -384,25 +384,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             if trimmed.is_empty() || trimmed.starts_with('#') {
                 continue;
             }
-            match serde_json::from_str::<LabelledExample>(trimmed) {
-                Ok(ex) => {
-                    // Per-slot count from tags.
-                    for tag in &ex.tags {
-                        if let Some(slot) = match tag.as_str() {
-                            "B-PER" => Some("person"),
-                            "B-LOC" => Some("location"),
-                            "B-AGE" => Some("age"),
-                            "B-OCC" => Some("occupation"),
-                            "B-FAM" => Some("family"),
-                            _ => None,
-                        } {
-                            *per_slot_count.entry(slot.to_string()).or_default() += 1;
-                        }
+            if let Ok(ex) = serde_json::from_str::<LabelledExample>(trimmed) {
+                // Per-slot count from tags.
+                for tag in &ex.tags {
+                    if let Some(slot) = match tag.as_str() {
+                        "B-PER" => Some("person"),
+                        "B-LOC" => Some("location"),
+                        "B-AGE" => Some("age"),
+                        "B-OCC" => Some("occupation"),
+                        "B-FAM" => Some("family"),
+                        _ => None,
+                    } {
+                        *per_slot_count.entry(slot.to_string()).or_default() += 1;
                     }
-                    emitted.push(ex);
-                    synth_count += 1;
                 }
-                Err(_) => {}
+                emitted.push(ex);
+                synth_count += 1;
             }
         }
     }

@@ -4929,7 +4929,7 @@ pub fn detect_ask_gender_detection_explain(input: &str) -> bool {
     if !has_how_question {
         return false;
     }
-    let has_gender_voice_subject = lower.contains("еркек")
+    lower.contains("еркек")
         || lower.contains("әйел")
         || lower.contains("ер адам")
         || lower.contains("ер кісі")
@@ -4937,8 +4937,7 @@ pub fn detect_ask_gender_detection_explain(input: &str) -> bool {
         || lower.contains("дауысым")
         || lower.contains("дауысын")
         || lower.contains("гендер")
-        || lower.contains("жыныс");
-    has_gender_voice_subject
+        || lower.contains("жыныс")
 }
 
 #[cfg(test)]
