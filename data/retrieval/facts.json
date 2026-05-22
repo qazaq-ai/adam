@@ -1,7 +1,7 @@
 {
   "version": "6.0.0-rc5",
   "status": "completed",
-  "elapsed_s": 61,
+  "elapsed_s": 70,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 70,
-    "facts_total": 4088,
+    "facts_total": 4114,
     "by_predicate": {
       "after": 8,
       "causes": 29,
@@ -27,10 +27,10 @@
       "has": 85,
       "has_quantity": 78,
       "in_domain": 24,
-      "is_a": 3127,
+      "is_a": 3132,
       "lives_in": 7,
-      "part_of": 404,
-      "related_to": 240
+      "part_of": 405,
+      "related_to": 260
     },
     "by_pack": {
       "abai_wikisource_pack.json": 3,
@@ -66,7 +66,7 @@
       "world_core/informatics_basic.jsonl": 40,
       "world_core/kazakh_cuisine.jsonl": 26,
       "world_core/kinship_extended.jsonl": 20,
-      "world_core/kru_baitursynov.jsonl": 6,
+      "world_core/kru_baitursynov.jsonl": 32,
       "world_core/kz_constitution.jsonl": 53,
       "world_core/kz_industry.jsonl": 208,
       "world_core/kz_literature.jsonl": 120,
@@ -28912,6 +28912,226 @@
     },
     {
       "subject": {
+        "surface": "ахмет байтұрсынұлы",
+        "root": "ахмет байтұрсынұлы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "1872 жылы 5 қыркүйек",
+        "root": "1872 жылы 5 қыркүйек",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ахмет Байтұрсынұлы 1872 жылы 5 қыркүйекте Торғай облысы Тосын болысында туылған."
+    },
+    {
+      "subject": {
+        "surface": "ахмет байтұрсынұлы",
+        "root": "ахмет байтұрсынұлы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "торғай облысы",
+        "root": "торғай облысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ахмет Байтұрсынұлы 1872 жылы 5 қыркүйекте Торғай облысы Тосын болысында туылған."
+    },
+    {
+      "subject": {
+        "surface": "ахмет байтұрсынұлы",
+        "root": "ахмет байтұрсынұлы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "1937 жылы 8 желтоқсан",
+        "root": "1937 жылы 8 желтоқсан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ахмет Байтұрсынұлы 1937 жылы 8 желтоқсанда саяси қуғын-сүргін кезінде атылды; 1988 жылы ақталды."
+    },
+    {
+      "subject": {
+        "surface": "ахмет байтұрсынұлы",
+        "root": "ахмет байтұрсынұлы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "1988 жыл",
+        "root": "1988 жыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ахмет Байтұрсынұлы 1937 жылы 8 желтоқсанда саяси қуғын-сүргін кезінде атылды; 1988 жылы ақталды."
+    },
+    {
+      "subject": {
+        "surface": "ахмет байтұрсынұлы",
+        "root": "ахмет байтұрсынұлы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қазақ әліпбиі",
+        "root": "қазақ әліпбиі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ахмет Байтұрсынұлы қазіргі қазақ жазуы мен әліпбиінің негізін салушы, қазақ тілінің реформаторы болып саналады."
+    },
+    {
+      "subject": {
+        "surface": "қазақ әліпбиі",
+        "root": "қазақ әліпбиі",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ахмет байтұрсынұлы",
+        "root": "ахмет байтұрсынұлы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ахмет Байтұрсынұлы қазіргі қазақ жазуы мен әліпбиінің негізін салушы, қазақ тілінің реформаторы болып саналады."
+    },
+    {
+      "subject": {
+        "surface": "төте жазу",
+        "root": "төте жазу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қазақ әліпбиі",
+        "root": "қазақ әліпбиі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ахмет Байтұрсынұлы 1912 жылы «төте жазу» — қазақ тіліне арналған араб графикасы негізіндегі әліпбиді жасады."
+    },
+    {
+      "subject": {
+        "surface": "төте жазу",
+        "root": "төте жазу",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ахмет байтұрсынұлы",
+        "root": "ахмет байтұрсынұлы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ахмет Байтұрсынұлы 1912 жылы «төте жазу» — қазақ тіліне арналған араб графикасы негізіндегі әліпбиді жасады."
+    },
+    {
+      "subject": {
+        "surface": "төте жазу",
+        "root": "төте жазу",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "1912 жыл",
+        "root": "1912 жыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ахмет Байтұрсынұлы 1912 жылы «төте жазу» — қазақ тіліне арналған араб графикасы негізіндегі әліпбиді жасады."
+    },
+    {
+      "subject": {
+        "surface": "ахмет байтұрсынұлы",
+        "root": "ахмет байтұрсынұлы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "алаш қозғалысы",
+        "root": "алаш қозғалысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ахмет Байтұрсынұлы — «Алаш» қозғалысының жетекші тұлғаларының бірі болған."
+    },
+    {
+      "subject": {
+        "surface": "алаш қозғалысы",
+        "root": "алаш қозғалысы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ахмет байтұрсынұлы",
+        "root": "ахмет байтұрсынұлы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ахмет Байтұрсынұлы — «Алаш» қозғалысының жетекші тұлғаларының бірі болған."
+    },
+    {
+      "subject": {
         "surface": "ахмет байтұрсынұлы атындағы қостанай өңірлік университеті",
         "root": "ахмет байтұрсынұлы атындағы қостанай өңірлік университеті",
         "pos": "noun"
@@ -28929,6 +29149,306 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Ахмет Байтұрсынұлы атындағы Қостанай өңірлік университеті — Қазақстан Республикасының жоғары оқу орны."
+    },
+    {
+      "subject": {
+        "surface": "қостанай өңірлік университеті",
+        "root": "қостанай өңірлік университеті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жоғары оқу орны",
+        "root": "жоғары оқу орны",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қостанай өңірлік университеті — Қазақстанның Қостанай қаласындағы жоғары оқу орны."
+    },
+    {
+      "subject": {
+        "surface": "қостанай өңірлік университеті",
+        "root": "қостанай өңірлік университеті",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "қостанай",
+        "root": "қостанай",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қостанай өңірлік университеті — Қазақстанның Қостанай қаласындағы жоғары оқу орны."
+    },
+    {
+      "subject": {
+        "surface": "қостанай өңірлік университеті",
+        "root": "қостанай өңірлік университеті",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "1939 жыл",
+        "root": "1939 жыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қостанай өңірлік университеті 1939 жылы мұғалімдер институты ретінде құрылған."
+    },
+    {
+      "subject": {
+        "surface": "қостанай өңірлік университеті",
+        "root": "қостанай өңірлік университеті",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ахмет байтұрсынұлы",
+        "root": "ахмет байтұрсынұлы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қостанай өңірлік университетіне 2021 жылы Ахмет Байтұрсынұлының есімі берілді."
+    },
+    {
+      "subject": {
+        "surface": "қостанай өңірлік университеті",
+        "root": "қостанай өңірлік университеті",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "2021 жыл",
+        "root": "2021 жыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қостанай өңірлік университетіне 2021 жылы Ахмет Байтұрсынұлының есімі берілді."
+    },
+    {
+      "subject": {
+        "surface": "қостанай өңірлік университеті",
+        "root": "қостанай өңірлік университеті",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "педагогика",
+        "root": "педагогика",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қостанай өңірлік университеті — облыстағы ірі жоғары білім беру орындарының бірі; педагогика, инженерия, ауыл шаруашылығы, заңтану және әлеуметтік-гуманитарлық бағыттарда мамандар даярлайды."
+    },
+    {
+      "subject": {
+        "surface": "қостанай өңірлік университеті",
+        "root": "қостанай өңірлік университеті",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "инженерия",
+        "root": "инженерия",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қостанай өңірлік университеті — облыстағы ірі жоғары білім беру орындарының бірі; педагогика, инженерия, ауыл шаруашылығы, заңтану және әлеуметтік-гуманитарлық бағыттарда мамандар даярлайды."
+    },
+    {
+      "subject": {
+        "surface": "қостанай өңірлік университеті",
+        "root": "қостанай өңірлік университеті",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "заңтану",
+        "root": "заңтану",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қостанай өңірлік университеті — облыстағы ірі жоғары білім беру орындарының бірі; педагогика, инженерия, ауыл шаруашылығы, заңтану және әлеуметтік-гуманитарлық бағыттарда мамандар даярлайды."
+    },
+    {
+      "subject": {
+        "surface": "кру",
+        "root": "кру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қостанай өңірлік университеті",
+        "root": "қостанай өңірлік университеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "КРУ — Қостанай өңірлік университетінің қысқартылған атауы."
+    },
+    {
+      "subject": {
+        "surface": "кру",
+        "root": "кру",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қостанай өңірлік университеті",
+        "root": "қостанай өңірлік университеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "КРУ — Қостанай өңірлік университетінің қысқартылған атауы."
+    },
+    {
+      "subject": {
+        "surface": "жасанды интеллект туралы заң",
+        "root": "жасанды интеллект туралы заң",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қазақстан заңы",
+        "root": "қазақстан заңы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан Республикасының «Жасанды интеллект туралы» заңы 2026 жылы 18 қаңтарда күшіне енді."
+    },
+    {
+      "subject": {
+        "surface": "жасанды интеллект туралы заң",
+        "root": "жасанды интеллект туралы заң",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "2026 жылы 18 қаңтар",
+        "root": "2026 жылы 18 қаңтар",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан Республикасының «Жасанды интеллект туралы» заңы 2026 жылы 18 қаңтарда күшіне енді."
+    },
+    {
+      "subject": {
+        "surface": "жасанды интеллект туралы заң",
+        "root": "жасанды интеллект туралы заң",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "тәуекел деңгейі",
+        "root": "тәуекел деңгейі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанның жасанды интеллект туралы заңы ЖИ жүйелерін тәуекел деңгейіне қарай төмен, орташа және жоғары тәуекелді санаттарға жіктейді."
+    },
+    {
+      "subject": {
+        "surface": "қорғаныс саласындағы жасанды интеллект",
+        "root": "қорғаныс саласындағы жасанды интеллект",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жоғары тәуекелді",
+        "root": "жоғары тәуекелді",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қорғаныс саласындағы жасанды интеллект Қазақстан Республикасының «Жасанды интеллект туралы» заңы бойынша жоғары тәуекелді санатқа жатады."
+    },
+    {
+      "subject": {
+        "surface": "қорғаныс саласындағы жасанды интеллект",
+        "root": "қорғаныс саласындағы жасанды интеллект",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жасанды интеллект туралы заң",
+        "root": "жасанды интеллект туралы заң",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қорғаныс саласындағы жасанды интеллект Қазақстан Республикасының «Жасанды интеллект туралы» заңы бойынша жоғары тәуекелді санатқа жатады."
     },
     {
       "subject": {
