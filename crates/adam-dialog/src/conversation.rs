@@ -1324,11 +1324,22 @@ impl Conversation {
         // also skip absorb_entities — it was a meta-dialog answer,
         // not a fresh claim.
         let dismissed_contradiction = self.try_dismiss_pending_contradiction(input);
-        let resolved_contradiction = if dismissed_contradiction {
-            false
+        // **v6.0.10 — 2026-05-21 user audit round 4 follow-up.**
+        // `try_resolve_pending_contradiction` now returns
+        // `Option<String>` (the predicate that was just resolved)
+        // so the renderer can pick the matching template variant
+        // and inject only the relevant slot. Pre-v6.0.10 it
+        // returned a bool, the caller injected ALL profile slots
+        // from session (any of which may carry stale values from
+        // earlier turns), and the renderer occasionally picked
+        // the «Жарайды, {city} болсын» template after an
+        // occupation resolution — surfacing the wrong slot.
+        let resolved_predicate: Option<String> = if dismissed_contradiction {
+            None
         } else {
             self.try_resolve_pending_contradiction(input, &intent)
         };
+        let resolved_contradiction = resolved_predicate.is_some();
         if !dismissed_contradiction && !resolved_contradiction {
             self.absorb_entities(&intent, turn_id);
             // **v6.0.5 — E2 production wiring.** Neural slot-
@@ -1634,13 +1645,93 @@ impl Conversation {
                 "діні",
                 "тілі",
             ];
+            // **v6.0.10 — 2026-05-21 user audit round 4 follow-up.**
+            // Definition-style probes («кім?» / «не?» / «деген не?»
+            // / «дегеніміз не?») don't expect the probe word in the
+            // FACT body — the answer is a description. The original
+            // probe loop required `raw_text` to contain the
+            // keyword, which works for «туылған / қайтыс / қашан»
+            // (the fact sentence has those tokens) but FAILS for
+            // «X кім?» / «X деген не?» where the fact says «X — Y»
+            // (no «кім» / «не» in the answer). This branch is
+            // checked SEPARATELY: subject-match only, no raw-text
+            // keyword. Closes the KRU / Baitursynuly / AI-Law
+            // retrieval gap reported in audit round 4.
+            const DEFINITION_PROBES: &[&str] = &[
+                "деген не",
+                "дегеніміз не",
+                "дегенің не",
+                "кім екен",
+                "не екен",
+                "туралы не білесің",
+                "туралы не білесіз",
+            ];
             let lower_input = input.to_lowercase();
+            let noun_lower = noun.to_lowercase();
+            let definition_probe = DEFINITION_PROBES
+                .iter()
+                .any(|kw| lower_input.contains(*kw))
+                // Also fire on bare «X кім?» / «X не?» / «X қашан?»
+                // where the probe word is the only interrogative
+                // token and is a pure DEFINITION probe — asks for an
+                // identity / description / date, answer is a
+                // sentence ABOUT X, not a quantity / property
+                // requiring graph traversal.
+                //
+                // «қанша» (how-many) / «қандай» (which-kind) /
+                // «қалай» (how) intentionally OMITTED — those need
+                // predicate-specific graph lookup (e.g. `HasQuantity`
+                // facts for «қанша») and the existing topic-specific
+                // retrieval picks the right fact. Pre-fix this
+                // branch also fired on «қанша» and pre-empted the
+                // quantity-graph fact with a generic IsA / PartOf
+                // fact about the same subject. Pinned by end-to-end
+                // tests `quantity_question_prefers_has_quantity_graph_fact`
+                // and `border_question_prefers_border_graph_fact`.
+                || lower_input.split_whitespace().any(|tok| {
+                    matches!(
+                        tok,
+                        "кім?" | "кім" | "не?" | "не" | "қашан?" | "қашан"
+                    )
+                });
+            // **v6.0.10 — 2026-05-21 user audit round 4 follow-up.**
+            // Definition probe is a FALLBACK — only fire when:
+            //   - `grounded_fact` was NOT set by an earlier path
+            //     (e.g. morpheme-index retrieval), AND
+            //   - no `example` was set by earlier retrieval, AND
+            //   - the input doesn't carry a genitive-possessive
+            //     («-ның X-сі / -нің X-і»), which asks about a
+            //     property OF the subject, not the subject itself.
+            //     For those the topic-specific graph lookup is
+            //     authoritative; a bare definition fact about X
+            //     would be a hallucination
+            //     («Абайдың әкесі кім?» → fact about Абай).
+            // Pinned by `factual_eval_100` (104-case benchmark).
+            let has_genitive_possessive = lower_input.contains("ның ")
+                || lower_input.contains("нің ")
+                || lower_input.contains("дың ")
+                || lower_input.contains("дің ")
+                || lower_input.contains("тың ")
+                || lower_input.contains("тің ");
+            if definition_probe
+                && grounded_fact.is_none()
+                && example.is_none()
+                && !has_genitive_possessive
+            {
+                if let Some(fact) = self
+                    .extracted_facts
+                    .iter()
+                    .find(|f| f.subject.root.to_lowercase() == noun_lower)
+                {
+                    *grounded_fact = Some(fact.raw_text.clone());
+                    *reasoning_chain = None;
+                }
+            }
             let probe_hit = PROBE_KEYWORDS
                 .iter()
                 .find(|kw| lower_input.contains(*kw))
                 .copied();
             if let Some(kw) = probe_hit {
-                let noun_lower = noun.to_lowercase();
                 let kw_first_word = kw.split_whitespace().next().unwrap_or(kw);
                 let direct = self.extracted_facts.iter().find(|f| {
                     f.subject.root.to_lowercase() == noun_lower
@@ -1800,18 +1891,39 @@ impl Conversation {
         // емес.») — wrong response. The marker routes the planner
         // to an explicit resolution-acceptance template that mirrors
         // statement_of_location semantics with the chosen value.
-        if resolved_contradiction {
+        if let Some(predicate) = &resolved_predicate {
             extra_slots.insert("__resolve_contradiction__".into(), "1".into());
-            // Surface the chosen value as a slot so the template can
-            // confirm: «Түсіндім, мекеніңіз — Алматы екен.»
-            if let Some(city) = self.session.get("city").cloned() {
-                extra_slots.insert("city".into(), city);
-            }
-            if let Some(name) = self.session.get("name").cloned() {
-                extra_slots.insert("name".into(), name);
-            }
-            if let Some(occupation) = self.session.get("occupation").cloned() {
-                extra_slots.insert("occupation".into(), occupation);
+            // **v6.0.10 — 2026-05-21 user audit round 4 follow-up.**
+            // Inject ONLY the slot matching the just-resolved
+            // predicate, plus a marker for the slot type so the
+            // template picker can choose the right
+            // `resolve_contradiction.<slot>` variant. Pre-v6.0.10
+            // all three slots were injected and the template
+            // picker sometimes chose «{city}» on an occupation
+            // resolution, surfacing the wrong slot.
+            extra_slots.insert("__resolve_contradiction_slot__".into(), predicate.clone());
+            match predicate.as_str() {
+                "city" => {
+                    if let Some(city) = self.session.get("city").cloned() {
+                        extra_slots.insert("city".into(), city);
+                    }
+                }
+                "name" => {
+                    if let Some(name) = self.session.get("name").cloned() {
+                        extra_slots.insert("name".into(), name);
+                    }
+                }
+                "occupation" => {
+                    if let Some(occupation) = self.session.get("occupation").cloned() {
+                        extra_slots.insert("occupation".into(), occupation);
+                    }
+                }
+                "age" => {
+                    if let Some(age) = self.session.get("age").cloned() {
+                        extra_slots.insert("age".into(), age);
+                    }
+                }
+                _ => {}
             }
         }
         // **v4.4.5** — symmetric marker for `Action::CheckContradiction`
@@ -3161,9 +3273,13 @@ impl Conversation {
     /// chosen value isn't recorded as a duplicate `Active` fact.
     ///
     /// Returns `true` iff at least one contradiction was resolved.
-    fn try_resolve_pending_contradiction(&mut self, input: &str, intent: &Intent) -> bool {
+    fn try_resolve_pending_contradiction(
+        &mut self,
+        input: &str,
+        intent: &Intent,
+    ) -> Option<String> {
         if self.belief.contradictions.is_empty() {
-            return false;
+            return None;
         }
         let input_lc = input.to_lowercase();
         let pending: Vec<(String, String)> = self
@@ -3172,7 +3288,7 @@ impl Conversation {
             .iter()
             .map(|c| (c.subject.clone(), c.predicate.clone()))
             .collect();
-        let mut any_resolved = false;
+        let mut resolved_predicate: Option<String> = None;
         for (subject, predicate) in pending {
             let candidates: Vec<String> = self
                 .belief
@@ -3212,7 +3328,7 @@ impl Conversation {
                     .belief
                     .resolve_contradiction(&subject, &predicate, &value)
                 {
-                    any_resolved = true;
+                    resolved_predicate = Some(predicate.clone());
                     // **v5.3.0** — Codex round-3 audit Bug 2 fix.
                     // Sync session profile slot to the chosen value
                     // so subsequent Ask{Predicate} turns surface it
@@ -3234,7 +3350,7 @@ impl Conversation {
                 }
             }
         }
-        any_resolved
+        resolved_predicate
     }
 
     /// **v4.4.0** — Companion to

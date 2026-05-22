@@ -385,7 +385,21 @@ pub fn plan_response_with_epistemic(
         if !repo.get(key).is_empty() {
             trace.push(format!("planner: resolve_contradiction override → {key}"));
             let applicable_all = repo.get(key);
-            let mut slots = session.clone();
+            // **v6.0.10 — 2026-05-21 user audit round 4 follow-up.**
+            // Build the slot map ONLY from `extra_slots` (the
+            // resolution-aware caller has injected just the one
+            // slot matching the just-resolved predicate). Do NOT
+            // start from `session.clone()` — that pulls in every
+            // stale profile slot (e.g. `city = Алматы` from a
+            // previous turn) and the template-fillable filter
+            // would then accept the {city} variant on an
+            // occupation resolution. The `resolve_contradiction`
+            // template family already has slot-bearing variants
+            // for city / name / occupation plus a topic-less
+            // fallback; restricting `slots` to the resolved
+            // predicate's value (plus any non-sentinel extras)
+            // forces the template picker to the correct variant.
+            let mut slots: HashMap<String, String> = HashMap::new();
             for (k, v) in extra_slots {
                 if !k.starts_with("__") {
                     slots.insert(k.clone(), v.clone());

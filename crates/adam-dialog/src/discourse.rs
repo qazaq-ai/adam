@@ -5627,6 +5627,17 @@ pub fn input_is_self_comparison_question(input: &str) -> bool {
 /// a topical compound (a *kind* of thing) rather than a named
 /// entity.
 const ADJ_NOUN_COMPOUND_HINTS: &[&str] = &[
+    // **v6.0.10 — 2026-05-21 user audit round 4 follow-up.** AI-Law
+    // domain compounds. The longer phrases must precede the
+    // shorter «жасанды интеллект» in length so the longest-match
+    // policy of `find_adj_noun_compound` returns the more
+    // specific topic when input contains the full phrase. The
+    // function picks the longest hint whose lowercased substring
+    // matches — without these entries, every AI-law query was
+    // grounded on the generic «жасанды интеллект» fact and
+    // surfaced an unrelated definition.
+    "қорғаныс саласындағы жасанды интеллект",
+    "жасанды интеллект туралы заң",
     "машиналық оқыту",
     "терең оқыту",
     "жасанды интеллект",

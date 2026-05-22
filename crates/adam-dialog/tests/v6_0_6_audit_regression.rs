@@ -700,3 +700,128 @@ fn round4_neural_e2_does_not_pollute_on_factual_unknown_query() {
         occupation
     );
 }
+
+#[test]
+fn round4b_kru_baitursynuly_definition_question_surfaces_grounded_fact() {
+    let lex = load_lex();
+    let repo = load_repo();
+    let world_core_dir = std::path::Path::new("../../data/world_core");
+    if !world_core_dir.exists() {
+        eprintln!("world_core not present at expected path; skipping");
+        return;
+    }
+    let facts = adam_reasoning::world_core::load_world_core_facts(world_core_dir)
+        .expect("world_core facts must load");
+    if facts.is_empty() {
+        eprintln!("world_core facts empty; skipping");
+        return;
+    }
+    let mut conv = Conversation::new().with_reasoning_chains(facts, Vec::new());
+    let response = conv.turn("Ахмет Байтұрсынұлы кім?", &lex, &repo, 0);
+    let lower = response.to_lowercase();
+    // The KRU world-core entries describe Baitursynuly as an
+    // educator / linguist / Alash member; ANY of those tokens
+    // appearing in the response indicates retrieval succeeded.
+    let surfaced = lower.contains("ағартушы")
+        || lower.contains("тілтанушы")
+        || lower.contains("алаш")
+        || lower.contains("реформатор");
+    assert!(
+        surfaced,
+        "round 4b: «Ахмет Байтұрсынұлы кім?» must surface a KRU-domain \
+         grounded fact (educator / linguist / Alash). Response: {response:?}"
+    );
+}
+
+#[test]
+fn round4b_kru_university_definition_question_surfaces_grounded_fact() {
+    let lex = load_lex();
+    let repo = load_repo();
+    let world_core_dir = std::path::Path::new("../../data/world_core");
+    if !world_core_dir.exists() {
+        eprintln!("world_core not present; skipping");
+        return;
+    }
+    let facts = adam_reasoning::world_core::load_world_core_facts(world_core_dir)
+        .expect("world_core facts must load");
+    if facts.is_empty() {
+        return;
+    }
+    let mut conv = Conversation::new().with_reasoning_chains(facts, Vec::new());
+    let response = conv.turn("Қостанай өңірлік университеті деген не?", &lex, &repo, 0);
+    let lower = response.to_lowercase();
+    let surfaced = lower.contains("жоғары оқу орны")
+        || lower.contains("қостанай")
+        || lower.contains("байтұрсынұлы");
+    assert!(
+        surfaced,
+        "round 4b: «Қостанай өңірлік университеті деген не?» must surface \
+         a grounded KRU fact (high-school / location / Baitursynuly name). \
+         Response: {response:?}"
+    );
+}
+
+#[test]
+fn round4b_ai_law_effective_date_surfaces_grounded_fact() {
+    let lex = load_lex();
+    let repo = load_repo();
+    let world_core_dir = std::path::Path::new("../../data/world_core");
+    if !world_core_dir.exists() {
+        eprintln!("world_core not present; skipping");
+        return;
+    }
+    let facts = adam_reasoning::world_core::load_world_core_facts(world_core_dir)
+        .expect("world_core facts must load");
+    if facts.is_empty() {
+        return;
+    }
+    let mut conv = Conversation::new().with_reasoning_chains(facts, Vec::new());
+    let response = conv.turn(
+        "Жасанды интеллект туралы заң қашан күшіне енді?",
+        &lex,
+        &repo,
+        0,
+    );
+    let lower = response.to_lowercase();
+    // Either the canonical fact text surfaces (mentions 2026 /
+    // 18 қаңтар) or any grounded fact about the AI law.
+    let surfaced = lower.contains("2026")
+        || lower.contains("18 қаңтар")
+        || lower.contains("18.01")
+        || lower.contains("күшіне");
+    assert!(
+        surfaced,
+        "round 4b: «AI Law effective date» query must surface a grounded \
+         fact mentioning 2026 / 18 қаңтар / күшіне. Response: {response:?}"
+    );
+}
+
+#[test]
+fn round4b_occupation_resolution_does_not_mention_city() {
+    // **2026-05-21 user audit round 4 finding.** After resolving
+    // an occupation conflict, the renderer picked the «{city}»
+    // template variant from `resolve_contradiction` because all
+    // three profile slots were injected blindly into extra_slots.
+    // v6.0.10 fix narrows the slot injection to the actually-
+    // resolved predicate only.
+    let lex = load_lex();
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    // Set a city in session FIRST so it's available for the
+    // wrong-template path to use. Then create an occupation
+    // conflict and resolve it.
+    let _ = conv.turn("мен Алматыда тұрамын", &lex, &repo, 0);
+    let _ = conv.turn("мен инженермін", &lex, &repo, 0);
+    let _ = conv.turn("мен бағдарламашымын", &lex, &repo, 0);
+    let response = conv.turn("Жоқ, бағдарламашы дұрыс.", &lex, &repo, 0);
+    let lower = response.to_lowercase();
+    // The fix: resolution response on an occupation conflict
+    // must NOT mention the (stale) city slot value.
+    let mentions_city_template =
+        lower.contains("алматы болсын") || lower.contains("мекеніңіз — алматы");
+    assert!(
+        !mentions_city_template,
+        "round 4 renderer: occupation-conflict resolution surfaced the \
+         city template variant. Response: {response:?}"
+    );
+}
