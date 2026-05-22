@@ -109,15 +109,20 @@ impl Default for MicConfig {
     fn default() -> Self {
         Self {
             max_duration: Duration::from_secs(30),
-            // **v5.27.5** — reduced from 1500 ms to 800 ms. User
-            // feedback (2026-05-14): «после моего диалога он долго
-            // думает». 1500 ms made the system feel laggy after every
-            // utterance because the end-of-turn detector waited a
-            // full 1.5 s of silence before declaring the utterance
-            // complete. 800 ms still covers natural intra-utterance
-            // pauses (Kazakh «Сәлеметсіз бе» has a ~200 ms gap mid-
-            // phrase) but cuts the perceived response delay by ~700 ms.
-            vad_silence_after_speech: Duration::from_millis(800),
+            // **v6.0.9 — 2026-05-21 user audit round 4.** Bumped
+            // 800 ms → 1300 ms (+500 ms) per direct user feedback:
+            // «раньше я замечал, что неуспевал договорить, как он
+            // отключал микрофон и готовил ответ, не выслушав меня до
+            // конца». The 2026-05-14 reduction to 800 ms optimised
+            // perceived latency at the cost of cutting off slower /
+            // multi-clause speakers. 1300 ms is the new compromise —
+            // still well below the original 1500 ms, but enough to
+            // cover the natural pause between clauses in a multi-
+            // clause request («Менің атым Дәулет, мен ... тұрамын»).
+            // If the latency tradeoff hurts, this is the dial to
+            // tune; users with slower deliberate speech may want
+            // 1500 ms.
+            vad_silence_after_speech: Duration::from_millis(1300),
             vad_amplitude_threshold: 0.02 * (i16::MAX as f32),
             vad_min_speech_before_silence: Duration::from_millis(600),
             vad_enabled: true,

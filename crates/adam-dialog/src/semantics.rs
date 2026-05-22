@@ -1967,6 +1967,15 @@ fn detect_ask_about_system(
     // **v4.3.4** — Architecture aspect: "how are you different" /
     // "what's special about you". Pronoun-led; the question targets
     // the system's distinguishing characteristics.
+    //
+    // **v6.0.9 — 2026-05-21 user audit round 4.** Extended with the
+    // four most-common free-form opening questions: "what kind of
+    // model are you?" / "are you an LLM?" / "aren't you an LLM?".
+    // The `architecture_summary` field already says «Мен
+    // қолданыстағы үлкен тілдік модельдерден өзгеше архитектурада…»
+    // — route these surface forms there so the user gets the
+    // canonical "I'm not an LLM; I'm rule-based" answer instead of
+    // a grounded-fact retrieval over the noun «модель» or «LLM».
     if has_addressee
         && (joined.contains("ерекшелігің")
             || joined.contains("ерекшелігіңіз")
@@ -1977,7 +1986,25 @@ fn detect_ask_about_system(
             || joined.contains("неге басқа модельдерден ерекшеленесің")
             || joined.contains("неге басқа модельдерден ерекшеленесіз")
             || joined.contains("қалай ерекшеленесің")
-            || joined.contains("қалай ерекшеленесіз"))
+            || joined.contains("қалай ерекшеленесіз")
+            // **v6.0.9 — 2026-05-21 user audit round 4.**
+            // LLM-specific questions: «Сен LLM-сің бе?» /
+            // «Сіз LLM емессіз бе?». These specifically probe the
+            // architectural distinction (you ARE / ARE NOT an LLM)
+            // and the canonical answer is the architecture_summary
+            // («Мен қолданыстағы үлкен тілдік модельдерден өзгеше
+            // архитектурада...»). Note: bare «Сіз қандай моделсіз?»
+            // stays on the General-aspect path because the existing
+            // template returns the full ARK identity, which is the
+            // expected answer for a generic "what kind of model"
+            // question — see canonical eval scenario
+            // `ask_about_system_general_aspect_surfaces_full_name`.
+            || joined.contains("llm-сің")
+            || joined.contains("llm-сіз")
+            || joined.contains("llm емессің")
+            || joined.contains("llm емессіз")
+            || joined.contains("сен llm")
+            || joined.contains("сіз llm"))
     {
         return Some(SystemAspect::Architecture);
     }
@@ -2010,7 +2037,21 @@ fn detect_ask_about_system(
         || joined.contains("кодыңыз қай тілде")
         || joined.contains("коды қай тілде")
         || joined.contains("қандай тілде жасалғансыз")
-        || joined.contains("қандай тілде жасалғансың");
+        || joined.contains("қандай тілде жасалғансың")
+        // **v6.0.9 — 2026-05-21 user audit round 4.** «How do you
+        // work?» / «Do you work without internet?» / «Do you
+        // connect to the internet?» — implementation-stack
+        // questions the user expects first in a free-form demo.
+        // The `implementation_summary` field already states "Rust,
+        // no internet, deterministic"; route these surface forms
+        // there so the user gets the canonical answer instead of
+        // a physics-of-«жұмыс» retrieval miss.
+        || (has_addressee
+            && (joined.contains("қалай жұмыс істе") || joined.contains("қалай істе")))
+        || joined.contains("интернетке қосыл")
+        || joined.contains("интернетсіз жұмыс")
+        || joined.contains("интернетсіз істе")
+        || joined.contains("офлайн жұмыс");
     if implementation_marker {
         return Some(SystemAspect::Implementation);
     }
@@ -2128,7 +2169,18 @@ fn detect_ask_about_system(
         || joined.contains("ережелерің")
         || joined.contains("ережелеріңіз")
         || joined.contains("құндылықтарың")
-        || joined.contains("құндылықтарыңыз");
+        || joined.contains("құндылықтарыңыз")
+        // **v6.0.9 — 2026-05-21 user audit round 4.** Auditability /
+        // verifiability question — «How can your answers be
+        // verified?». The `principles_summary` field already says
+        // «әрбір жауабымды дереккөзіне жалғап аудит ете аламын» so
+        // route the surface form there.
+        || joined.contains("жауаптарыңды қалай тексер")
+        || joined.contains("жауаптарыңызды қалай тексер")
+        || joined.contains("жауабыңды қалай тексер")
+        || joined.contains("жауабыңызды қалай тексер")
+        || joined.contains("қалай аудит")
+        || joined.contains("қалай тексеру");
     if principles_marker {
         return Some(SystemAspect::Principles);
     }

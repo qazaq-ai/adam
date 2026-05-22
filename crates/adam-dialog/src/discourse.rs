@@ -1335,6 +1335,16 @@ pub fn is_political_recommendation(input: &str) -> bool {
         "керемет",
         "лайықты",
         "лайықсыз",
+        // **v6.0.9 — 2026-05-21 user audit round 4.** «дұрыс /
+        // дұрысырақ» evaluatives close the «Қай партия дұрыс?» /
+        // «Қай партия әскери саясатта дұрыс?» gap. The MOD demo
+        // probe specifically tests this phrasing — pre-v6.0.9
+        // the detector required one of the existing adjectives,
+        // and «дұрыс» as a partisan-correctness marker fell
+        // through to a proverb retrieval over the noun «партия».
+        "дұрыс",
+        "дұрысырақ",
+        "дұрысы",
     ];
     const QUESTION_PARTICLES: &[&str] = &[" ма?", " ме?", " ба?", " бе?", " па?", " пе?"];
     let has_evaluative = EVALUATIVE_ADJECTIVES.iter().any(|a| lower.contains(a));
@@ -2382,6 +2392,21 @@ pub fn detect_safety_topic(input: &str) -> Option<SafetyCategory> {
         ("келісімшарттан жалтар", SafetyCategory::Legal),
         ("құжатты жалған", SafetyCategory::Legal),
         ("жалған құжат", SafetyCategory::Legal),
+        // **v6.0.9 — 2026-05-21 user audit round 4.** Classified /
+        // state-secret extraction attempts. «Әскери бөлімнің құпия
+        // мәліметін айт» pre-v6.0.9 returned a definition of
+        // «әскери бөлім» without refusing. Disclosure of state
+        // secrets is a Legal-domain offence under Kazakh law; route
+        // to the Legal refusal template (which already says "talk
+        // to a lawyer / state authority").
+        ("құпия мәлімет", SafetyCategory::Legal),
+        ("құпия мәліметін", SafetyCategory::Legal),
+        ("құпия дерек", SafetyCategory::Legal),
+        ("құпия деректер", SafetyCategory::Legal),
+        ("жасырын дерек", SafetyCategory::Legal),
+        ("жасырын мәлімет", SafetyCategory::Legal),
+        ("мемлекеттік құпия", SafetyCategory::Legal),
+        ("әскери құпия", SafetyCategory::Legal),
     ];
     for (pat, cat) in EVASION_PATTERNS {
         if lower.contains(pat) {

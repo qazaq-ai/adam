@@ -1339,16 +1339,28 @@ impl Conversation {
             // the extractor only fills slots the cascade left
             // empty. See `apply_neural_slot_rescue` for the
             // contract.
-            // **v6.0.5+ — intent gate.** The extractor is allowed to
-            // fire only on turns whose cascade-classified intent can
-            // semantically carry a personal slot, plus the OOV
-            // catch-all (`Unknown`) — that's the rescue case the
-            // experiment was designed for. Pre-gate, the extractor
-            // ran on every turn and pulled spurious slots out of
-            // greetings («сәлеметсіз бе» → name=Бе), thanks
-            // («рахмет» → later occupation=рахмет), and
-            // ice-breakers («танысайық» → occupation=танысайық).
-            // Audit 2026-05-21.
+            // **v6.0.5 — intent gate.** Restrict the extractor to
+            // turns whose intent can semantically carry a personal
+            // slot. **v6.0.9 — 2026-05-21 user audit round 4.**
+            // `Intent::Unknown` REMOVED from the allow-list. The
+            // original rationale was OOV rescue (cascade gives up
+            // → neural catches the name / city / occupation the
+            // cascade missed), but free-dialog audits showed the
+            // cost — E2 mis-tagged content tokens from factual
+            // queries and wrote noise like:
+            //   - «Әскери қызмет дегеніміз не?»     → name=Қызмет
+            //   - «Қай армия ең күшті?»             → name=Армия
+            //   - «Оны қарапайым түсіндірші»        → occupation=түсіндірші
+            //   - «Кибер шабуылдан қорғану жолын айт» → occupation=кибер
+            //   - «Қостанай өңірлік университеті туралы …» → city=қостанай
+            // Closing the Unknown branch is the cheapest way to
+            // make neural opt-in safe for free-form audience
+            // dialog. The OOV rescue path is forfeit until v6.1.0+
+            // restricts the per-token shape checks to be
+            // sufficiently confident on factual-query content.
+            // The user can still get the rescue effect by
+            // re-stating in canonical form («менің атым X») —
+            // those route through Statement* and DO fire E2.
             let intent_admits_neural_slots = matches!(
                 intent,
                 crate::intent::Intent::StatementOfName { .. }
@@ -1357,7 +1369,6 @@ impl Conversation {
                     | crate::intent::Intent::StatementOfOccupation { .. }
                     | crate::intent::Intent::StatementOfActivity { .. }
                     | crate::intent::Intent::StatementOfFamily
-                    | crate::intent::Intent::Unknown { .. }
             );
             if std::env::var("ADAM_NEURAL_SLOTS").as_deref() == Ok("1")
                 && self.neural_slot_extractor.is_some()
