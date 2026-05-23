@@ -41,8 +41,13 @@ What this document does **not** cover (separate documents):
 - Neural-model training procedure → `docs/research/results_real_mix_2026_05_16.md`
   and the `experimental/agglutinative-neural` branch source.
 - Lexicon V2 schema → see Lexicon V2 RFC (forthcoming).
-- LLM-baseline benchmark methodology → see `docs/bench/llm_baseline.md`
-  (forthcoming).
+- LLM-baseline benchmark methodology → see
+  [`docs/bench/our_numbers_vs_published_llm.md`](bench/our_numbers_vs_published_llm.md)
+  for adam's published numbers vs LLM literature; the formal
+  head-to-head methodology document is still forthcoming (Codex
+  audit 2026-05-22 noted that public comparison figures should be
+  treated as unverified until a fresh independent benchmark
+  lands).
 - The "why" — see [`MANIFESTO.md`](MANIFESTO.md).
 
 ---

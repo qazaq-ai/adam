@@ -1986,26 +1986,50 @@ fn detect_ask_about_system(
             || joined.contains("неге басқа модельдерден ерекшеленесің")
             || joined.contains("неге басқа модельдерден ерекшеленесіз")
             || joined.contains("қалай ерекшеленесің")
-            || joined.contains("қалай ерекшеленесіз")
-            // **v6.0.9 — 2026-05-21 user audit round 4.**
-            // LLM-specific questions: «Сен LLM-сің бе?» /
-            // «Сіз LLM емессіз бе?». These specifically probe the
-            // architectural distinction (you ARE / ARE NOT an LLM)
-            // and the canonical answer is the architecture_summary
-            // («Мен қолданыстағы үлкен тілдік модельдерден өзгеше
-            // архитектурада...»). Note: bare «Сіз қандай моделсіз?»
-            // stays on the General-aspect path because the existing
-            // template returns the full ARK identity, which is the
-            // expected answer for a generic "what kind of model"
-            // question — see canonical eval scenario
-            // `ask_about_system_general_aspect_surfaces_full_name`.
-            || joined.contains("llm-сің")
-            || joined.contains("llm-сіз")
-            || joined.contains("llm емессің")
-            || joined.contains("llm емессіз")
-            || joined.contains("сен llm")
-            || joined.contains("сіз llm"))
+            || joined.contains("қалай ерекшеленесіз"))
     {
+        return Some(SystemAspect::Architecture);
+    }
+
+    // **v6.0.16 — 2026-05-22 codex audit finding 2 + 3.** LLM /
+    // transformer / neural-net architectural-identity probes.
+    // The 2nd-person predicate-copula suffix (-сің / -сіз / -ім /
+    // -мін) IS itself the addressee marker for these forms; an
+    // explicit pronoun gate is wrong because:
+    //   - «Сен LLM-сің бе?» → README claims coverage; the bare
+    //     form pre-fix tripped the `has_addressee` requirement
+    //     (the pronoun WAS «сен», so it passed, but Codex audit
+    //     2026-05-22 showed the lookup still missed because of
+    //     other surface variations).
+    //   - «Сен үлкен тіл моделі емессің бе?» / «Үлкен тілдік
+    //     модельсіз бе?» / «Трансформер архитектурасы ма?» /
+    //     «Нейрожелісің бе?» — none have explicit «сен/сіз»
+    //     pronouns near the architectural noun; the verb form
+    //     IS the addressee marker.
+    // Place this ABOVE the noun-retrieval fallback so the
+    // architecture-summary template («Мен қолданыстағы үлкен
+    // тілдік модельдерден өзгеше архитектурада…») wins over a
+    // generic noun retrieval on «тіл» / «трансформер» / «модель».
+    let architectural_identity_probe = joined.contains("llm-сің")
+        || joined.contains("llm-сіз")
+        || joined.contains("llm емессің")
+        || joined.contains("llm емессіз")
+        || joined.contains("llm емес")
+        || joined.contains("сен llm")
+        || joined.contains("сіз llm")
+        || joined.contains("үлкен тіл моделі")
+        || joined.contains("үлкен тілдік модел")
+        || joined.contains("үлкен тілдік моделі")
+        || joined.contains("тілдік моделсің")
+        || joined.contains("тілдік моделсіз")
+        || joined.contains("тіл моделсің")
+        || joined.contains("тіл моделсіз")
+        || joined.contains("трансформер")
+        || joined.contains("transformer")
+        || joined.contains("нейрожелі")
+        || joined.contains("нейронды желі")
+        || joined.contains("нейрондық желі");
+    if architectural_identity_probe {
         return Some(SystemAspect::Architecture);
     }
 

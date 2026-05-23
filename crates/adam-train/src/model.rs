@@ -208,11 +208,41 @@ fn causal_mask(seq_len: usize, device: &Device) -> Result<Tensor> {
     Tensor::from_slice(&mask, (1, 1, seq_len, seq_len), device)?.to_dtype(DType::F32)
 }
 
+/// **v6.0.1 — 2026-05-22 codex audit finding 1.** CPU is the
+/// default device on every OS. Pre-fix the macOS branch auto-
+/// promoted to Metal when `metal_is_available()` reported true,
+/// which conflicted with the project's «CPU / 0 % GPU by default»
+/// guarantee AND triggered a Candle internal panic on this
+/// machine's Metal stack for certain tensor shapes used inside
+/// `adam-train`. Metal is now opt-in via the `ADAM_USE_METAL=1`
+/// env var, mirroring the existing `ADAM_NEURAL_*` opt-in pattern
+/// in the dialog layer.
+///
+/// If `ADAM_USE_METAL=1` is set but Metal initialisation panics or
+/// errors, we catch and fall back to CPU rather than letting the
+/// panic surface — the user opted into «try Metal», not «kill the
+/// binary if Metal misbehaves».
 pub fn default_device() -> Result<Device> {
     #[cfg(target_os = "macos")]
     {
-        if candle_core::utils::metal_is_available() {
-            return Device::new_metal(0);
+        if std::env::var("ADAM_USE_METAL").as_deref() == Ok("1")
+            && candle_core::utils::metal_is_available()
+        {
+            match std::panic::catch_unwind(|| Device::new_metal(0)) {
+                Ok(Ok(dev)) => return Ok(dev),
+                Ok(Err(e)) => {
+                    eprintln!(
+                        "adam-train: ADAM_USE_METAL=1 set, but Metal init failed ({e}); \
+                         falling back to CPU"
+                    );
+                }
+                Err(_panic) => {
+                    eprintln!(
+                        "adam-train: ADAM_USE_METAL=1 set, but Metal init panicked; \
+                         falling back to CPU"
+                    );
+                }
+            }
         }
     }
     Ok(Device::Cpu)

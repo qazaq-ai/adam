@@ -825,3 +825,83 @@ fn round4b_occupation_resolution_does_not_mention_city() {
          city template variant. Response: {response:?}"
     );
 }
+
+// =============================================================
+// v6.0.16 — 2026-05-22 codex audit follow-ups
+// =============================================================
+//
+// External audit ran on `main` at HEAD `cb385bfc` (v6.0.0 release
+// + clippy/docs polish). Critical findings closed in this batch:
+//
+//   - Finding 2/3: LLM / transformer / neural-net architectural-
+//     identity probes — bare 2nd-person predicate forms route to
+//     the architecture_summary instead of falling to noun
+//     retrieval over «тіл / модель / трансформер».
+//   - Finding 1: ADAM_USE_METAL=1 opt-in for adam-train Device
+//     selection (covered by `model_smoke_test` smoke binary,
+//     not duplicated here).
+//
+// Finding 4 (NEG-correction "continue talking" answer quality)
+// remains deferred to v6.1.0+ — the "not farewell" contract is
+// pinned by `bug7_neg_correction_blocks_farewell_when_user_corrects`
+// above; the response-quality piece needs an answer-planner.
+
+#[test]
+fn codex_2026_05_22_llm_question_does_not_inversion_deny() {
+    let lex = load_lex();
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let response = conv.turn("Сен үлкен тіл моделі емессің бе?", &lex, &repo, 0);
+    let lower = response.to_lowercase();
+    // Pre-fix this answered with «Иә, мүмкін солай шығар — нақты
+    // дерегім жоқ» — wrong polarity (the system IS NOT an LLM).
+    // The fix routes to the architecture_summary which states
+    // «Мен қолданыстағы үлкен тілдік модельдерден өзгеше
+    // архитектурада құрылғанмын — ережелер мен таңбалық
+    // ой-тізбекке негізделген, статистикалық генерацияға
+    // арналмаған».
+    let looks_like_wrong_polarity =
+        lower.contains("иә") && lower.contains("мүмкін") && lower.contains("нақты дерегім жоқ");
+    assert!(
+        !looks_like_wrong_polarity,
+        "codex 2026-05-22 finding 3: «Сен үлкен тіл моделі емессің бе?» \
+         must NOT inversion-deny with 'Иә, мүмкін солай шығар — нақты \
+         дерегім жоқ'. Response: {response:?}"
+    );
+}
+
+#[test]
+fn codex_2026_05_22_transformer_identity_routes_to_architecture() {
+    let lex = load_lex();
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let response = conv.turn("Сен трансформер архитектурасы ма?", &lex, &repo, 0);
+    let lower = response.to_lowercase();
+    // Architecture aspect path produces an answer that mentions
+    // «ереже» (rule) or «архитектура» (architecture) — the
+    // canonical denial framing. Reject a generic noun-retrieval
+    // miss («трансформер — ...»).
+    let looks_like_retrieval_miss = lower.starts_with("трансформер —");
+    assert!(
+        !looks_like_retrieval_miss,
+        "codex 2026-05-22 finding 2: «Сен трансформер архитектурасы ма?» \
+         must route to system architecture, not retrieval over «трансформер». \
+         Response: {response:?}"
+    );
+}
+
+#[test]
+fn codex_2026_05_22_neural_net_identity_routes_to_architecture() {
+    let lex = load_lex();
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let response = conv.turn("Сен нейрожелісің бе?", &lex, &repo, 0);
+    let lower = response.to_lowercase();
+    let looks_like_retrieval_miss = lower.starts_with("нейрожелі") && !lower.contains("ереже");
+    assert!(
+        !looks_like_retrieval_miss,
+        "codex 2026-05-22 finding 2: «Сен нейрожелісің бе?» must route \
+         to system architecture, not retrieval over «нейрожелі». \
+         Response: {response:?}"
+    );
+}

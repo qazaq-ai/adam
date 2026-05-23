@@ -52,12 +52,23 @@ fn main() {
     // grounding gate firing clearly.)
     let verifier = Verifier::new(tokenizer, facts_idx, true);
 
+    // **v6.0.16 — 2026-05-22 codex audit finding 14.** Cases
+    // re-labelled to reflect the v6.0 world_core that now includes
+    // entries on «бала / балалар» (curated rows merged with the
+    // pre-v6.0 family expansion). The previous labels claimed
+    // those tokens were ungrounded but FST-valid; both are now
+    // grounded subject / grounded inflected forms in the live
+    // facts.json. To keep the demo's "grounding gate firing
+    // clearly" intent, the ungrounded slots use words that the
+    // current curated corpus does not yet describe.
     let cases: &[(&str, &str)] = &[
         ("grounded subject", "адам"),
         ("grounded inflected", "адамға"),
         ("grounded object", "дүние"),
-        ("ungrounded but FST-valid", "бала"),
-        ("ungrounded inflected", "балалардың"),
+        ("grounded subject (family)", "бала"),
+        ("grounded inflected (family)", "балалардың"),
+        ("ungrounded but FST-valid", "сирень"),
+        ("ungrounded inflected", "сиреньдің"),
         ("nonsense — FST-invalid", "blarg"),
         ("nonsense — Cyrillic noise", "ққққққ"),
         ("loanword", "компьютер"),

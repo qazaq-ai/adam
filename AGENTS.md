@@ -35,13 +35,17 @@ adam is the applied demonstrator of **Qazaq IR (ARK = Agglutinative
 Reasoning Kernel)**, an alternative architecture to probabilistic
 large language models (LLMs) built on the **agglutinative morphology
 of the Kazakh language** as the substrate for rule-bound,
-mathematically traceable AI inference. The v5.x production line is a
+mathematically traceable AI inference. The v5.x production line was a
 fully deterministic retrieval-and-reasoning kernel; the v6.0 line
-(in development, branch `experimental/agglutinative-neural`, results
-note 2026-05-16) adds an **algebra-anchored neural composition
-layer** between the deterministic template (L5) and the verifier
-(L6) — neural training inside an FST-validity envelope inside a
-factual-groundedness verifier. Unlike LLMs, adam has zero GPU
+(merged to `main` on 2026-05-22; see
+[`RESEARCH.md`](RESEARCH.md) §«Completed research arc — Agglutinative-Neural»)
+adds an **algebra-anchored neural composition layer** between the
+deterministic template (L5) and the verifier (L6) — neural training
+inside an FST-validity envelope inside a factual-groundedness
+verifier. The default cascade behaviour on `main` is bit-identical
+to v5.32.0; the v6.0 neural transducers (E1 intent rescue / E2 slot
+rescue / L5.5 TinyAgt composer) are opt-in behind `ADAM_NEURAL_*=1`
+and `--features neural` flags. Unlike LLMs, adam has zero GPU
 dependency, runs as a single binary on consumer hardware (M2 8 GB),
 produces output that is fully **reproducible** from `(input, seed,
 facts)`, **traceable** to a curated knowledge graph, and **emits no

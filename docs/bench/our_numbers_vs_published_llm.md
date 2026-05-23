@@ -1,7 +1,12 @@
 # adam v6.0 vs published LLM numbers — characteristics comparison
 
-**Status:** v0 draft, 2026-05-17.
-**Branch:** `experimental/agglutinative-neural`.
+**Status:** v0 draft, 2026-05-17; refreshed for the v6.0.0 GA
+merge on 2026-05-22 — header redirected from the (now-merged)
+`experimental/agglutinative-neural` branch to `main`. The numbers
+in the body are still v0 draft and **NOT** an independent fresh
+head-to-head benchmark; see the Codex audit 2026-05-22 caveat in
+[`docs/resource_bench.md`](../resource_bench.md).
+**Source branch:** `main` (v6.0.0).
 **Scope:** characteristics comparison only — adam's measured numbers
 on the left, well-attested numbers from public LLM literature on
 the right. **Not** a head-to-head benchmark (deferred to when grant
