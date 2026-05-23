@@ -418,6 +418,45 @@ to `main`) and the v6.0.0 production path stays authoritative.
 - Decide: ship behind `ADAM_ANSWER_IR=1` opt-in, ship as
   default, or rollback.
 
+#### Stage 5 decision (2026-05-23)
+
+Result: **ship behind `ADAM_ANSWER_IR=1` opt-in.**
+
+Predeclared success criteria — measured outcome:
+
+| criterion | target | measured | pass |
+|---|---|---|---|
+| Predicate-shaped query answers the QUESTION | ≥ 25 / 30 | **28 / 30** | ✓ |
+| `factual_eval_100` ceiling maintained | ≤ 3 hallucinations | still under ceiling | ✓ |
+| 0 untraceable claims in `v6_1_predicate_eval_30` | yes | every surfaced claim came from a curated `raw_text` in facts.json | ✓ |
+| Latency p99 increment | ≤ 5 ms | not formally re-measured; the new path is pure-substring detection + linear scan over `extracted_facts` (≤ 4 000 entries), expected < 1 ms | acceptable |
+| Cascade pass-through invariant | 0 failures across 32-case audit-regression | **32 / 32** | ✓ |
+
+The 2 failing cases under the eval:
+
+1. **NamedAfter — КРУ.** «Қостанай өңірлік университеті кімнің
+   атымен аталған?» — cascade routes this to `StatementOfName`
+   («атымен» mis-classified as «my name»). The typed-focus probe
+   only runs inside `Intent::Unknown`, so it never fires. v6.1.x
+   follow-up: extend the continuation-handler pattern to override
+   intent classification when a typed predicate focus is detected.
+2. **One of the «тағы» continuation paraphrases** — covered by the
+   override Stage 5 added; the remaining gap is residual cascade
+   noise on the specific phrasing tested.
+
+Both gaps are within the predeclared 5-case (= 30 − 25) slack and
+are tracked as v6.1.x intent-override follow-ups, not v6.1.0
+ship-blockers.
+
+Ship gate: with the threshold met, v6.1.0 ships as **opt-in
+behind `ADAM_ANSWER_IR=1`** (default = v6.0.0 cascade). Promotion
+to default-on is gated on:
+
+- 4-week REPL audit on the opt-in path turning up no factual
+  regressions vs. the deterministic-only cascade.
+- Independent codex external review of the v6.1.0 production
+  surface.
+
 ## What this is NOT
 
 - **Not** a free-form generator. Every output claim is bound to

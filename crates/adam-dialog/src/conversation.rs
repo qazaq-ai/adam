@@ -1509,26 +1509,31 @@ impl Conversation {
                     self.dialog_context.broad_topic_seen.extend(newly_seen);
                     // Rewrite intent so the planner / realiser
                     // surfaces the multi-claim text as a grounded
-                    // fact. Continuation requests almost always
-                    // classify as Intent::Unknown already (no fresh
-                    // topic noun to seize); if for some reason the
-                    // cascade emitted a non-Unknown variant we leave
-                    // it alone and skip the rewrite — the multi-claim
-                    // composer surfaces nothing this turn, the user
-                    // can retry on the next turn.
-                    if let Intent::Unknown {
-                        noun_hint,
-                        grounded_fact,
-                        example,
-                        reasoning_chain,
-                        ..
-                    } = &mut intent
-                    {
-                        *noun_hint = Some(subject.clone());
-                        *grounded_fact = Some(composed);
-                        *example = None;
-                        *reasoning_chain = None;
-                    }
+                    // fact. Continuation requests sometimes classify
+                    // as Intent::Unknown (free-form follow-up), other
+                    // times the cascade routes them to a self-
+                    // knowledge / capability intent («тағы не
+                    // білесіз?»). In both cases the v6.1.0 contract
+                    // is: when broad_topic_subject is held, the user
+                    // wants MORE of that subject — override the
+                    // intent shell with a fresh Unknown carrying our
+                    // multi-claim grounded_fact.
+                    intent = Intent::Unknown {
+                        raw_tokens: Vec::new(),
+                        noun_hint: Some(subject.clone()),
+                        example: None,
+                        grounded_fact: Some(composed),
+                        example_adapted: false,
+                        reasoning_chain: None,
+                        question_shape: None,
+                        temporal_scope: false,
+                        compositional_function: false,
+                        noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
+                        input_modality: None,
+                        input_evidence: None,
+                        input_is_inversion_question: false,
+                        noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
+                    };
                 }
             }
         }

@@ -54,6 +54,8 @@ pub enum PredicateFocus {
     DiedIn,
     /// «X қашан құрылған?» — institution / event founding date.
     FoundedIn,
+    /// «X қашан атауы өзгерген?» — rename event date.
+    RenamedIn,
     /// «X қашан қабылданды?» / «X қашан күшіне енді?» — law /
     /// agreement effective date.
     EffectiveFrom,
@@ -87,6 +89,7 @@ impl PredicateFocus {
             Self::BornIn => "born_in",
             Self::DiedIn => "died_in",
             Self::FoundedIn => "founded_in",
+            Self::RenamedIn => "renamed_in",
             Self::EffectiveFrom => "effective_from",
             Self::Classifies => "classifies",
             Self::RiskLevel => "risk_level",
@@ -110,6 +113,7 @@ impl PredicateFocus {
             Self::BornIn => BornIn,
             Self::DiedIn => DiedIn,
             Self::FoundedIn => FoundedIn,
+            Self::RenamedIn => RenamedIn,
             Self::EffectiveFrom => EffectiveFrom,
             Self::Classifies => Classifies,
             Self::RiskLevel => RiskLevel,
@@ -148,6 +152,9 @@ pub fn detect(input: &str, _shape: Option<QuestionShape>) -> Option<PredicateFoc
     }
     if is_died_in(&lower) {
         return Some(PredicateFocus::DiedIn);
+    }
+    if is_renamed_in(&lower) {
+        return Some(PredicateFocus::RenamedIn);
     }
     if is_effective_from(&lower) {
         return Some(PredicateFocus::EffectiveFrom);
@@ -219,6 +226,14 @@ fn is_founded_in(lower: &str) -> bool {
         || lower.contains("қашан ашылды")
         || lower.contains("құрылған жылы")
         || lower.contains("ашылған жылы")
+}
+
+fn is_renamed_in(lower: &str) -> bool {
+    lower.contains("қашан атауы өзгерген")
+        || lower.contains("қашан атауы өзгерді")
+        || lower.contains("қашан есімі берілді")
+        || lower.contains("қашан атандыр")
+        || lower.contains("атауы өзгерген жылы")
 }
 
 fn is_classifies(lower: &str) -> bool {
@@ -478,6 +493,21 @@ mod tests {
     }
 
     #[test]
+    fn renamed_in() {
+        assert_eq!(
+            detect("КРУ қашан атауы өзгерген?", shape()),
+            Some(PredicateFocus::RenamedIn)
+        );
+        assert_eq!(
+            detect(
+                "Қостанай өңірлік университеті қашан атауы өзгерді?",
+                shape()
+            ),
+            Some(PredicateFocus::RenamedIn)
+        );
+    }
+
+    #[test]
     fn ordering_effective_before_founded() {
         // «қашан қабылданды» must bind to EffectiveFrom, not
         // FoundedIn (which uses «құрылды»).
@@ -494,6 +524,7 @@ mod tests {
             PredicateFocus::BornIn,
             PredicateFocus::DiedIn,
             PredicateFocus::FoundedIn,
+            PredicateFocus::RenamedIn,
             PredicateFocus::EffectiveFrom,
             PredicateFocus::Classifies,
             PredicateFocus::RiskLevel,
