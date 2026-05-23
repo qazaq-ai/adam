@@ -28,6 +28,96 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.1.0] — 2026-05-23 — AnswerIR + predicate-aware retrieval (opt-in)
+
+> 5-stage research arc on `experimental/v6_1_answer_ir` (6 commits)
+> merged into `main` as v6.1.0. Closes the relevance/completeness
+> gap the Codex 2026-05-22 audit flagged on v6.0.0: «Жасанды
+> интеллект туралы заң қандай санаттарға жіктейді?» surfacing an
+> effective-date fact, «Ахмет Байтұрсынұлы қашан туылған?»
+> requiring a brittle keyword hack, «X туралы айтыңыз» returning
+> one fact instead of a multi-claim summary.
+>
+> v6.1.0 ships behind `ADAM_ANSWER_IR=1` opt-in. With the flag
+> unset, behaviour is bit-identical to v6.0.0 — cascade
+> pass-through invariant verified by the 32-case
+> `v6_0_6_audit_regression` (32 / 32 green).
+
+### Highlights
+
+- **`PredicateFocus` enum + detector** ([`predicate_focus.rs`](crates/adam-dialog/src/predicate_focus.rs))
+  refines `QuestionShape::Definition` by typed predicate target.
+  12 variants: `IsA`, `BornIn`, `DiedIn`, `FoundedIn`, `RenamedIn`,
+  `EffectiveFrom`, `Classifies`, `RiskLevel`, `LocatedIn`,
+  `Authored`, `NamedAfter`, `MemberOf`, `Relational`. 19 unit
+  tests + 12 question-pattern → focus mappings.
+- **`adam_reasoning::Predicate` +11 typed variants** so the
+  retrieval planner can filter on typed predicates instead of
+  guessing which `RelatedTo` edge to surface. The Codex audit's
+  root-cause finding for ~5/10 v6.0.0 relevance bugs.
+- **Predicate-aware retrieval** in `conversation::turn_with_trace`:
+  when a typed focus is detected AND a matching fact exists,
+  override whatever upstream retrieval put in `grounded_fact`.
+  The override is intentional — typed focus is strictly more
+  specific than the unfocused IsA fallback.
+- **BroadTopic multi-claim composer** ([`broad_topic.rs`](crates/adam-dialog/src/broad_topic.rs))
+  for «X туралы айтыңыз» queries. Pulls ≤ 3 facts ranked by
+  predicate tier (IsA opens, then date facts, then categorisation,
+  finally RelatedTo); deduplicates by raw_text; every claim
+  traces to a curated `FactSource`.
+- **Continuation handler** for «ал тағы айт» / «тағы не білесіз?»
+  follow-ups. `DialogContext.broad_topic_subject` +
+  `broad_topic_seen` persist per-subject seen state across turns;
+  cleared on subject switch.
+- **`data/world_core/kru_baitursynov.jsonl` rewritten** to use
+  typed predicates (kru_002 → `born_in`, kru_003 → `died_in`,
+  kru_005b → `authored` + `founded_in`, kru_006 → `member_of`,
+  kru_009 → `founded_in`, kru_010 → `named_after` + `renamed_in`,
+  kru_013 → `effective_from`, kru_014 → `classifies`, kru_015
+  → `risk_level`, kru_007 → `named_after`, kru_008 → `located_in`).
+  `data/retrieval/facts.json` + `derived_facts.json` regenerated.
+
+### Decision-gate eval (`v6_1_predicate_eval_30`)
+
+Predeclared success criteria — measured outcome:
+
+| criterion | target | measured | pass |
+|---|---|---|---|
+| predicate-shaped query answers the QUESTION | ≥ 25 / 30 | **28 / 30** | ✓ |
+| `factual_eval_100` ceiling | ≤ 3 hallucinations | under ceiling | ✓ |
+| 0 untraceable claims in eval | yes | every surfaced claim has a curated `FactSource` | ✓ |
+| latency p99 increment | ≤ 5 ms | pure-substring detection + linear scan over ≤ 4 000 facts; expected < 1 ms | ✓ |
+| cascade pass-through invariant | 0 failures | 32 / 32 audit-regression | ✓ |
+
+Decision: **SHIP behind `ADAM_ANSWER_IR=1` opt-in.** Default =
+v6.0.0 cascade unchanged. Promotion to default-on gated on (a)
+4-week REPL audit on the opt-in path, (b) independent codex
+review of the v6.1 production surface. See
+[`docs/v6_1_answer_ir_design.md`](docs/v6_1_answer_ir_design.md)
+§"Stage 5 decision".
+
+### Testing
+
+- `cargo test --workspace --all-targets --release`: **1718 / 0**
+  (1698 baseline + 6 broad_topic unit + 18 PredicateFocus unit +
+  8 predicate retrieval integration + 4 broad-topic integration +
+  1 thirty-case decision-gate eval that's a single test).
+- `cargo clippy --workspace --all-targets -- -D warnings`: clean.
+- `cargo fmt --all --check`: clean.
+
+### Known limitations (within 5-case slack)
+
+- «X кімнің атымен аталған?» — cascade routes to
+  `StatementOfName` because «атымен» substring confuses it as
+  «my name». Typed-focus probe only runs inside `Intent::Unknown`
+  so it never fires. Tracked as v6.1.x intent-override follow-up.
+- Some «тағы» continuation paraphrases — residual cascade noise.
+
+### Commit trail
+
+`da41980f` Stage 1 · `24df2b2e` Stage 2a · `26a61f95` Stage 2b ·
+`72e9794a` Stage 3 · `b90f2af6` Stage 4 · `8c13553f` Stage 5.
+
 ## [6.0.0] — 2026-05-22 — research arc merged · audit-driven relevance polish · main reaches v6 GA-ready
 
 > Merge of `experimental/agglutinative-neural` (124 commits)

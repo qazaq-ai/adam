@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.0.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.1.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -25,7 +25,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/tests-1563%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-1718%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/p50%20turn%20latency-21%20ms-2EA44F?style=flat-square" alt="latency">
   <img src="https://img.shields.io/badge/RSS-~160%20MB-2EA44F?style=flat-square" alt="rss">
   <img src="https://img.shields.io/badge/GPU-0%25-2EA44F?style=flat-square" alt="gpu">
@@ -35,6 +35,58 @@
   <img src="https://img.shields.io/badge/intents-41-2EA44F?style=flat-square" alt="intents">
   <img src="https://img.shields.io/badge/factual_eval_100-0%20hallucinations%20%2F%20100%25%20grounded-2EA44F?style=flat-square" alt="factual eval">
 </p>
+
+---
+
+## What's new in v6.1.0
+
+**AnswerIR + predicate-aware retrieval (opt-in).** Closes the
+relevance/completeness gap the Codex 2026-05-22 audit flagged on
+v6.0.0: questions of the form «X қашан туылған?» / «қашан күшіне
+енді?» / «қандай санаттарға жіктейді?» / «X туралы айтыңыз»
+previously routed through the v6.0.13 keyword-grep hack that
+mis-fired on edge cases. v6.1.0 replaces that with a typed
+predicate enum + question-shape detector + multi-claim composer.
+
+Behind `ADAM_ANSWER_IR=1`. With the flag unset, behaviour is
+bit-identical to v6.0.0 — the 32-case audit-regression suite
+verifies the cascade pass-through invariant (32 / 32 green).
+
+  - **`PredicateFocus` enum** ([`crates/adam-dialog/src/predicate_focus.rs`](crates/adam-dialog/src/predicate_focus.rs))
+    refines `QuestionShape::Definition` by typed predicate target
+    — `BornIn`, `DiedIn`, `FoundedIn`, `RenamedIn`,
+    `EffectiveFrom`, `Classifies`, `RiskLevel`, `LocatedIn`,
+    `Authored`, `NamedAfter`, `MemberOf`, plus IsA and Relational.
+    Pure-surface detector in the discipline of
+    [`question_shape.rs`](crates/adam-dialog/src/question_shape.rs).
+  - **`adam_reasoning::Predicate` +11 typed variants** — the
+    overloaded `RelatedTo` no longer hides the predicate the user
+    is asking about. `data/world_core/kru_baitursynov.jsonl`
+    rewritten to use the typed predicates; `facts.json` +
+    `derived_facts.json` regenerated.
+  - **Predicate-aware retrieval** in [`conversation::turn_with_trace`](crates/adam-dialog/src/conversation.rs)
+    overrides upstream IsA-preference fallback when a typed focus
+    matches a curated fact. Typed focus is strictly more specific
+    than the unfocused fallback, so it wins.
+  - **BroadTopic multi-claim composer** ([`broad_topic.rs`](crates/adam-dialog/src/broad_topic.rs))
+    for «X туралы айтыңыз» queries — up to 3 facts ranked by
+    predicate tier, deduplicated by raw_text, every claim
+    traceable to a curated `FactSource`. The realiser doesn't
+    generate prose — it concatenates curated raw_texts.
+  - **Continuation handler** for «ал тағы айт» /
+    «тағы не білесіз?» — `DialogContext.broad_topic_subject` +
+    `broad_topic_seen` persist per-subject seen state, cleared on
+    subject switch.
+  - **`v6_1_predicate_eval_30` decision-gate battery** — 30 held-
+    out cases across the 11 typed predicates + 7 IsA + 8 broad-
+    topic + 4 continuation shapes. **28 / 30 pass** (above the
+    predeclared ≥ 25 / 30 threshold). 2 fails inside the 5-case
+    slack are tracked as v6.1.x intent-override follow-ups (the
+    cascade mis-routes «X кімнің атымен аталған?» to
+    `StatementOfName` because «атымен» substring collides with
+    «my name»).
+
+Design + decision: [`docs/v6_1_answer_ir_design.md`](docs/v6_1_answer_ir_design.md).
 
 ---
 
@@ -224,7 +276,7 @@ For a full evidence dump on any Kazakh root, run [`adam_inspect`](crates/adam-di
 
 | Metric | Value | Notes |
 |---|---|---|
-| Workspace tests | **1 556 passing** | default + `--features neural` builds both green; 5 new crates (`adam-agg-tokenizer` / `adam-agg-synth` / `adam-agg-model` / `adam-curriculum` + neural-preview module in `adam-dialog`); v5.x release-blocker invariants preserved |
+| Workspace tests | **1 718 passing** | default + `--features neural` builds both green; v6.1.0 adds the AnswerIR opt-in path + decision-gate battery; v5.x release-blocker invariants preserved |
 | Release cadence | **487+ versioned releases in 5 weeks** | every release CI-verified |
 | p50 turn latency | **21 ms** | vs Llama-3 8B fp16 800–1500 ms; vs GPT-4 50–200 ms |
 | Memory footprint | **~300 MB RSS** | vs LLM 16+ GB VRAM |
