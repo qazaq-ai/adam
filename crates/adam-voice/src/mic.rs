@@ -109,20 +109,18 @@ impl Default for MicConfig {
     fn default() -> Self {
         Self {
             max_duration: Duration::from_secs(30),
-            // **v6.0.9 — 2026-05-21 user audit round 4.** Bumped
-            // 800 ms → 1300 ms (+500 ms) per direct user feedback:
-            // «раньше я замечал, что неуспевал договорить, как он
-            // отключал микрофон и готовил ответ, не выслушав меня до
-            // конца». The 2026-05-14 reduction to 800 ms optimised
-            // perceived latency at the cost of cutting off slower /
-            // multi-clause speakers. 1300 ms is the new compromise —
-            // still well below the original 1500 ms, but enough to
-            // cover the natural pause between clauses in a multi-
-            // clause request («Менің атым Дәулет, мен ... тұрамын»).
-            // If the latency tradeoff hurts, this is the dial to
-            // tune; users with slower deliberate speech may want
-            // 1500 ms.
-            vad_silence_after_speech: Duration::from_millis(1300),
+            // **v6.1.20 — 2026-05-23 voice REPL audit fix.** Trimmed
+            // 1300 ms → 1000 ms per the user's «≤2 s end-to-end»
+            // target. The 1300 ms (set at v6.0.9 after a user
+            // complaint about being cut off mid-clause) was tuned
+            // for multi-clause introductions like «Менің атым
+            // Дәулет, мен Алматыда тұрамын» — those are rare in
+            // dialog turns; single-question turns dominate. 1000 ms
+            // still well above the natural inter-word pause (200-
+            // 400 ms in Kazakh) so deliberate speech is unaffected;
+            // users with very slow speech can dial back via a
+            // future `--vad-silence-ms` flag if needed.
+            vad_silence_after_speech: Duration::from_millis(1000),
             vad_amplitude_threshold: 0.02 * (i16::MAX as f32),
             vad_min_speech_before_silence: Duration::from_millis(600),
             vad_enabled: true,

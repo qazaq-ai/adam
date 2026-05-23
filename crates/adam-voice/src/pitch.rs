@@ -106,10 +106,22 @@ pub fn estimate_pitch_hz(samples: &[i16], sample_rate: u32) -> Option<f32> {
         // prefer the longer lag (= lower F0). This is the standard
         // fix used in YIN / CMNDF; we keep it lightweight by only
         // checking the exact doubled lag, not a search window.
+        //
+        // **v6.1.20** — gate the doubling on `f0 > 175 Hz`. The
+        // anti-octave-error correction is designed for the
+        // 100-160 Hz male/female overlap zone where Whisper-rate
+        // autocorrelation prefers the F0/2 harmonic. For voices
+        // ALREADY in the female-or-child band (> 175 Hz) doubling
+        // the lag pushes the estimate down into the male band
+        // (e.g. a true 300 Hz child voice gets halved to 150 Hz
+        // and classified as Male). Guard removes this regression.
         if best_lag > 0 && 2 * best_lag < max_lag {
-            let doubled = corr_at_lag[2 * best_lag];
-            if doubled >= 0.85 * best_corr {
-                best_lag *= 2;
+            let current_f0 = sample_rate as f32 / best_lag as f32;
+            if current_f0 < 175.0 {
+                let doubled = corr_at_lag[2 * best_lag];
+                if doubled >= 0.85 * best_corr {
+                    best_lag *= 2;
+                }
             }
         }
         if best_lag > 0 {
@@ -132,35 +144,52 @@ pub fn estimate_pitch_hz(samples: &[i16], sample_rate: u32) -> Option<f32> {
 /// Pitch-based gender classification. Mirrors
 /// `adam_dialog::language_core::KazakhNameGender` (Male / Female)
 /// without taking a direct dependency on the dialog crate.
+///
+/// **v6.1.20** — `Child` band added so the dialog layer can warn
+/// on age-inappropriate queries («бұл сұраққа жасың әлі ерте»).
+/// Child F0 lands in 250-400 Hz on average — well above the adult
+/// female band (165-255 Hz), so a clean threshold at 250 Hz
+/// separates the two classes without overlap on the typical speech
+/// distribution.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PitchGender {
     Male,
     Female,
+    Child,
 }
 
-/// Classify a median F0 estimate as Male / Female / ambiguous.
+/// Classify a median F0 estimate as Male / Female / Child /
+/// ambiguous.
 ///
-/// **Thresholds (v6.0.5 update).** Round-8 voice REPL feedback
-/// surfaced false-negatives on real adult-male voices that landed
-/// in the original 140–180 Hz dead-band (high tenor speakers).
-/// The band is tightened to 155–175 Hz and the anti-octave-error
-/// pass in [`estimate_pitch_hz`] now handles the cases where
-/// autocorrelation locks onto the first harmonic instead of the
-/// fundamental. Combined, real-mic male voices now classify
-/// reliably as `Male` instead of `None` or `Female`.
+/// **Thresholds.**
+/// - **Male:** F0 < 155 Hz (tightened from the original 140 Hz at
+///   v6.0.5 after tenor-speaker false-negatives).
+/// - **Female:** 175 < F0 ≤ 250 Hz.
+/// - **Child:** F0 > 250 Hz. Child voices typically land in 250-
+///   400 Hz; above 400 Hz the autocorrelation estimator gets noisy
+///   so we treat any value > 250 Hz as a child-band candidate.
+/// - **Ambiguous (155-175 Hz):** the Male/Female dead-band, kept
+///   to avoid mislabelling tenor men as women.
 ///
 /// `None` remains the safer default for ambiguous-band F0 — dialog
-/// then falls back to the gender-neutral honorific.
+/// then falls back to the gender-neutral honorific. v6.1.20 child
+/// detection enables age-aware guards but the band IS reachable by
+/// some high-pitched adult speakers; the dialog layer should treat
+/// `Child` as a hint, not a hard verdict (e.g. trigger a softer
+/// «бұл сұрақ үлкендерге арналған тақырып» response on sensitive
+/// queries, not a hard refusal).
 pub fn classify_gender(median_hz: f32) -> Option<PitchGender> {
     if !median_hz.is_finite() || median_hz <= 0.0 {
         return None;
     }
     if median_hz < 155.0 {
         Some(PitchGender::Male)
-    } else if median_hz > 175.0 {
+    } else if median_hz <= 175.0 {
+        None
+    } else if median_hz <= 250.0 {
         Some(PitchGender::Female)
     } else {
-        None
+        Some(PitchGender::Child)
     }
 }
 
@@ -227,6 +256,29 @@ mod tests {
         let samples = sine_wave(180.0, 1.0, 16_000, 5000);
         let f0 = estimate_pitch_hz(&samples, 16_000).expect("f0");
         assert!((f0 - 180.0).abs() < 8.0);
+        assert_eq!(classify_gender(f0), Some(PitchGender::Female));
+    }
+
+    #[test]
+    fn child_voice_300hz_classifies_child_v6_1_20() {
+        // Typical child F0 (300 Hz) lands above the Female band's
+        // 250 Hz cap. v6.1.20 introduces the Child class so the
+        // dialog layer can soften responses to age-inappropriate
+        // queries.
+        let samples = sine_wave(300.0, 1.0, 16_000, 5000);
+        let f0 = estimate_pitch_hz(&samples, 16_000).expect("f0");
+        assert!((f0 - 300.0).abs() < 10.0);
+        assert_eq!(classify_gender(f0), Some(PitchGender::Child));
+    }
+
+    #[test]
+    fn female_248hz_still_classifies_female_v6_1_20() {
+        // Edge: 250 Hz is the upper bound of the Female band.
+        // 248 Hz stays Female — high-pitched adult women must
+        // NOT be mis-classified as children.
+        let samples = sine_wave(248.0, 1.0, 16_000, 5000);
+        let f0 = estimate_pitch_hz(&samples, 16_000).expect("f0");
+        assert!((f0 - 248.0).abs() < 8.0);
         assert_eq!(classify_gender(f0), Some(PitchGender::Female));
     }
 

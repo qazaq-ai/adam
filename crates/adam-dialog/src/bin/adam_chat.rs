@@ -1049,6 +1049,10 @@ fn run_voice_repl(
             let label = match g {
                 adam_voice::pitch::PitchGender::Male => "male",
                 adam_voice::pitch::PitchGender::Female => "female",
+                // **v6.1.20** — child-voice band. The dialog layer
+                // can guard age-inappropriate queries by checking
+                // `voice_gender_hint == "child"` in session.
+                adam_voice::pitch::PitchGender::Child => "child",
             };
             // **v6.0.5** — session-persistent voice profile. Per-
             // turn F0 estimation is noisy (room acoustics, segment

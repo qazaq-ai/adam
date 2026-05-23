@@ -270,7 +270,23 @@ pub fn compose_introducer(
         Introducer::Direct => body.to_string(),
         Introducer::BrieflyAbout => body.to_string(),
         Introducer::OnTheSubjectMain => body.to_string(),
-        Introducer::AboutTopicFirst => format!("Қысқаша айтсам, {body}"),
+        // **v6.1.20 — 2026-05-23 voice REPL audit fix.** «Қысқаша
+        // айтсам, …» = "to put it briefly, …" makes sense only
+        // before LONG / multi-clause bodies (definitions,
+        // summaries). Prefixing a short factual answer like
+        // «Қостанай — қала.» with «Қысқаша айтсам, …» reads as
+        // robotic filler. Length gate: use the «brief» frame only
+        // when body has > 60 characters (~ 1 full clause); fall
+        // back to direct rendering otherwise. Threshold chosen
+        // from the audit transcript — every misfire in the 30-turn
+        // session was on a <60-char body.
+        Introducer::AboutTopicFirst => {
+            if body.chars().count() > 60 {
+                format!("Қысқаша айтсам, {body}")
+            } else {
+                body.to_string()
+            }
+        }
         Introducer::NameRespectAnswer => match name_respect {
             Some(name) => format!("{name}, {body}"),
             None => body.to_string(),
@@ -387,10 +403,11 @@ mod tests {
             name_respect: None,
         };
         let out = render_sentence(&frame).expect("rule should match");
-        // v5.23.0 — AboutTopicFirst now emits a light «Қысқаша
-        // айтсам, …» frame; the older «X туралы ең әуелі мынаны
-        // айтуға болады:» phrasing dropped per anti-meta-opener pass.
-        assert_eq!(out, "Қысқаша айтсам, Қазақстан — мемлекет.");
+        // **v6.1.20** — length-gated «Қысқаша айтсам, …». «Қазақстан
+        // — мемлекет.» is < 60 chars so the frame is now suppressed.
+        // The body is delivered directly, no robotic «to put it
+        // briefly, …» on already-short factual answers.
+        assert_eq!(out, "Қазақстан — мемлекет.");
     }
 
     #[test]
@@ -662,15 +679,21 @@ mod tests {
 
     #[test]
     fn compose_introducer_about_topic_first() {
-        let out = compose_introducer(
+        // **v6.1.20** — length-gated «Қысқаша айтсам, …». Short
+        // bodies (≤ 60 chars) drop the frame to avoid robotic
+        // "briefly, X is Y" prefixes on already-short factual
+        // answers. Long bodies keep the frame.
+        let short = compose_introducer(
             Introducer::AboutTopicFirst,
             "алгоритм",
             None,
             "Алгоритм — ереже.",
         );
-        // v5.23.0 — light «Қысқаша айтсам,» frame; the older «X
-        // туралы ең әуелі мынаны айтуға болады:» phrasing dropped.
-        assert_eq!(out, "Қысқаша айтсам, Алгоритм — ереже.");
+        assert_eq!(short, "Алгоритм — ереже.");
+
+        let long_body = "Алгоритм — анық қадамдар тізбегі. Әр қадам бір ғана амалды орындайды; нәтиже алдын ала белгілі шартпен анықталады.";
+        let long = compose_introducer(Introducer::AboutTopicFirst, "алгоритм", None, long_body);
+        assert_eq!(long, format!("Қысқаша айтсам, {long_body}"));
     }
 
     #[test]

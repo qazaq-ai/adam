@@ -183,6 +183,16 @@ impl WhisperCli {
             "1".to_string(),
             "--beam-size".to_string(),
             "1".to_string(),
+            // **v6.1.20 — 2026-05-23 voice REPL audit fix.**
+            // `--no-fallback` skips whisper.cpp's temperature
+            // fallback retry on low-confidence segments. With
+            // greedy decode (--best-of 1 --beam-size 1) the
+            // fallback adds 200-400 ms per low-confidence
+            // utterance with marginal accuracy gain. Combined
+            // with the v6.1.20 VAD-silence trim (1300 ms → 1000 ms)
+            // this brings end-to-end conversational latency closer
+            // to the user's ≤2 s target on the M2 8-core baseline.
+            "--no-fallback".to_string(),
         ];
         if self.json_mode {
             argv.push("--output-json".to_string());
@@ -363,6 +373,7 @@ mod tests {
                 "1",
                 "--beam-size",
                 "1",
+                "--no-fallback",
                 "--output-json",
                 "--prompt",
                 KAZAKH_PRIMING_PROMPT,

@@ -461,6 +461,52 @@ impl Conversation {
     /// Performance: O(N tokens × HashMap lookup) per turn —
     /// negligible against the ~20 ms turn latency.
     fn phonetic_normalize(&mut self, input: &str, lexicon: &LexiconV1) -> String {
+        // **v6.1.20 — 2026-05-23 voice REPL audit fix.** Multi-token
+        // canonical-name alias pass. Whisper-large-v3 reliably
+        // mis-transcribes a small set of Kazakh proper nouns into
+        // segmentations the per-word phonetic_normalize can't fix
+        // (because the misrecognition splits one canonical token
+        // across two — e.g. «Байторсынық» / «Байтуыр сүрініп» for
+        // «Байтұрсынұлы»). Apply this small curated alias map
+        // ON THE WHOLE INPUT before per-word processing.
+        //
+        // Discipline: only add aliases observed in real REPL audits.
+        // Each entry has a comment naming the audit turn where the
+        // misrecognition surfaced.
+        const VOICE_ALIASES: &[(&str, &str)] = &[
+            // 2026-05-23 v6.1.10 audit turns 13-14 + v6.1.15 audit
+            // turns 21, 23-25: Whisper consistently mangles
+            // «Байтұрсынұлы».
+            ("Байторсынық", "Байтұрсынұлы"),
+            ("Байтуыр сүрініп", "Байтұрсынұлы"),
+            ("Байтурсының ұлы", "Байтұрсынұлы"),
+            ("Байтурсының тұралы", "Байтұрсынұлы туралы"),
+            // 2026-05-23 v6.1.15 audit turn 22: «Хемия» (Russian-
+            // style) → canonical «химия».
+            ("Хемия", "химия"),
+            // 2026-05-23 v6.1.15 audit turn 17: «кубет» (Whisper
+            // noise) → «көбейт» (multiply). The 5-gate per-word
+            // normaliser catches single «кубейт» but not the
+            // composite phrase «кубет екіге».
+            ("кубет екіге", "көбейт екіге"),
+            // 2026-05-23 v6.1.15 audit turn 28: «герц» → «керсі».
+            ("керсі", "герц"),
+            // 2026-05-23 v6.1.15 audit turn 27: «жасанды интеллект
+            // моделісің бі» (correct) — no alias needed; kept here
+            // as a near-miss example.
+            // 2026-05-23 v6.1.15 audit turn 30: «Қорғаныз ийі» →
+            // «Қорғаныс ИИ»; Whisper drops the «с» and re-syllabifies.
+            ("Қорғаныз ий", "Қорғаныс ИИ"),
+            ("Қорғаныз ИИ", "Қорғаныс ИИ"),
+        ];
+        let mut rewritten = input.to_string();
+        for (whisper_noise, canonical) in VOICE_ALIASES {
+            if rewritten.contains(whisper_noise) {
+                rewritten = rewritten.replace(whisper_noise, canonical);
+            }
+        }
+        let input = rewritten.as_str();
+
         // Build or reuse the phonetic index + root-prefix set.
         // Both are keyed by the lexicon identity (entries pointer +
         // len) and invalidated on lexicon swap. For the common case
@@ -834,15 +880,17 @@ impl Conversation {
             if crate::discourse::detect_ask_gender_detection_explain(&rejoined) {
                 let hint = self.session.get("voice_gender_hint").cloned();
                 let detail = match hint.as_deref() {
-                    Some("male") => "Сіздің даусыңыз 140 Гц-тен төмен жиілікте — еркектің дауысы.",
-                    Some("female") => {
-                        "Сіздің даусыңыз 180 Гц-тен жоғары жиілікте — әйелдің дауысы."
+                    Some("male") => "Сіздің даусыңыз 155 Гц-тен төмен жиілікте — еркектің дауысы.",
+                    Some("female") => "Сіздің даусыңыз 175–250 Гц аралығында — әйелдің дауысы.",
+                    // **v6.1.20** — child band (F0 > 250 Hz).
+                    Some("child") => {
+                        "Сіздің даусыңыз 250 Гц-тен жоғары жиілікте — баланың дауысына ұқсас."
                     }
                     _ => "Сіздің даусыңыздың жиілігін дөп басу мүмкін болмады.",
                 };
                 Some(format!(
                     "Сіздің даусыңыздың негізгі жиілігін (F0) талдадым. \
-                    Еркектің дауысы әдетте 85–180 Гц аралығында, ал әйелдің дауысы — 165–255 Гц. \
+                    Еркектің дауысы әдетте 85–155 Гц, әйелдің дауысы — 175–250 Гц, ал баланың дауысы — 250 Гц-тен жоғары. \
                     Менің бағалауымша {detail} Бұл деректер сақталмайды — тек ағымдағы сөйлесу барысында пайдаланылады."
                 ))
             } else {
@@ -864,6 +912,11 @@ impl Conversation {
                 let vocative = match hint.as_str() {
                     "male" => Some("Ағай"),
                     "female" => Some("Апай"),
+                    // **v6.1.20** — child-band speakers get the
+                    // neutral diminutive «балам» («my child»). Used
+                    // when no name is captured but pitch lands in
+                    // the 250+ Hz Child band.
+                    "child" => Some("Балам"),
                     _ => None,
                 };
                 if let Some(v) = vocative {

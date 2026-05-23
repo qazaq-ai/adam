@@ -28,6 +28,69 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.1.20] — 2026-05-23 — voice REPL audit round 2: latency + child-voice + filler cuts
+
+> User's second real-voice REPL audit (after v6.1.15) confirmed
+> gender honorific works («Ағай / Апай» surfaces correctly) but
+> flagged four new issues. All addressed same-day.
+
+### Fixes
+
+- **«Қысқаша айтсам» repeated «к месту и не к месту».** The «to
+  put it briefly, …» frame fired ~17% of factual-answer turns
+  regardless of body length. Length-gated: applies only when
+  body > 60 chars. Long summaries keep the frame; short factual
+  answers go direct.
+
+- **Latency 3s → ~2s target.** Two cuts: (1) `MicConfig::
+  vad_silence_after_speech` trimmed 1300 ms → 1000 ms — still
+  well above the 200-400 ms natural inter-word pause. (2)
+  `WhisperCli::build_argv` adds `--no-fallback` to skip
+  whisper.cpp's temperature-fallback retry on low-confidence
+  segments (with greedy decode the fallback adds 200-400 ms
+  with marginal accuracy gain).
+
+- **Child-voice detection.** New `PitchGender::Child` class for
+  F0 > 250 Hz. Dialog layer's gender-vocative fallback now writes
+  `name_respect = "Балам"` («my child», neutral diminutive) when
+  pitch lands in the child band. «How did you figure out my
+  gender?» explanation extended to articulate three-band layout
+  (Male < 155 Hz, Female 175-250 Hz, Child > 250 Hz). The
+  v6.0.5 anti-octave-error pass also gated on `current_f0 <
+  175 Hz` so true child F0 (300 Hz) is no longer halved to
+  150 Hz and mis-classified as Male.
+
+- **STT multi-token aliases for canonical proper nouns.**
+  Whisper-large-v3 reliably mis-transcribes Kazakh proper nouns
+  in ways per-word `phonetic_normalize` can't fix (the
+  misrecognition splits one canonical token across two). Added
+  a curated multi-token alias map that runs BEFORE per-word
+  processing:
+  - «Байторсынық» / «Байтуыр сүрініп» / «Байтурсының ұлы» → «Байтұрсынұлы»
+  - «Хемия» → «химия»
+  - «кубет екіге» → «көбейт екіге»
+  - «керсі» → «герц»
+  - «Қорғаныз ий» / «Қорғаныз ИИ» → «Қорғаныс ИИ»
+
+  Each entry has an audit-turn comment pinning the real REPL
+  session that surfaced the misrecognition. The list will grow
+  with future voice audits.
+
+### Tracked for v6.2
+
+- **Anaphora «Ол» resolution before predicate-focus probe.**
+- **«What gender am I?» verdict detector** (separate from the
+  existing how-question detector).
+- **Compound-NP genitive head priority** in topic extraction
+  («Ахметтің еңбектерін» → «ахмет» not «еңбек»).
+
+### Testing
+
+- `cargo test --workspace --all-targets --release`: **1 724 / 0**
+  (+2 over v6.1.15: child-voice + female-edge band tests).
+- `cargo clippy --workspace --all-targets -- -D warnings`: clean.
+- `cargo fmt --all --check`: clean.
+
 ## [6.1.15] — 2026-05-23 — voice REPL audit: latency + gender honorific
 
 > User's first real-voice REPL audit (whisper.cpp large-v3 + macOS
