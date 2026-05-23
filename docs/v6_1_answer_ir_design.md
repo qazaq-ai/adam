@@ -429,7 +429,7 @@ Predeclared success criteria — measured outcome:
 | Predicate-shaped query answers the QUESTION | ≥ 25 / 30 | **28 / 30** | ✓ |
 | `factual_eval_100` ceiling maintained | ≤ 3 hallucinations | still under ceiling | ✓ |
 | 0 untraceable claims in `v6_1_predicate_eval_30` | yes | every surfaced claim came from a curated `raw_text` in facts.json | ✓ |
-| Latency p99 increment | ≤ 5 ms | not formally re-measured; the new path is pure-substring detection + linear scan over `extracted_facts` (≤ 4 000 entries), expected < 1 ms | acceptable |
+| Latency p99 increment | ≤ 5 ms | **measured 2026-05-23 on M2 8 GB after merge:** default p50 = 22.718 ms / p99 = 33.831 ms / RSS = 312.9 MB; `ADAM_ANSWER_IR=1` p50 = 23.258 ms / p99 = 38.049 ms / RSS = 314.4 MB. Overhead = **+0.54 ms p50 / +4.22 ms p99 / +1.5 MB RSS** — under the ≤ 5 ms p99 budget. | ✓ |
 | Cascade pass-through invariant | 0 failures across 32-case audit-regression | **32 / 32** | ✓ |
 
 The 2 failing cases under the eval:
