@@ -138,6 +138,21 @@ mod predicate_serde {
             "has_quantity" => Ok(Predicate::HasQuantity),
             "does_to" => Ok(Predicate::DoesTo),
             "in_domain" => Ok(Predicate::InDomain),
+            // v6.1.0 typed-predicate extension. Adding a new variant
+            // here REQUIRES adding the matching `Predicate::as_str()`
+            // mapping in `adam-reasoning/src/lib.rs` AND the
+            // `graph.rs` build-time string→Predicate mapping.
+            "born_in" => Ok(Predicate::BornIn),
+            "died_in" => Ok(Predicate::DiedIn),
+            "founded_in" => Ok(Predicate::FoundedIn),
+            "renamed_in" => Ok(Predicate::RenamedIn),
+            "effective_from" => Ok(Predicate::EffectiveFrom),
+            "classifies" => Ok(Predicate::Classifies),
+            "risk_level" => Ok(Predicate::RiskLevel),
+            "located_in" => Ok(Predicate::LocatedIn),
+            "named_after" => Ok(Predicate::NamedAfter),
+            "member_of" => Ok(Predicate::MemberOf),
+            "authored" => Ok(Predicate::Authored),
             other => Err(D::Error::custom(format!("unknown predicate: {other}"))),
         }
     }

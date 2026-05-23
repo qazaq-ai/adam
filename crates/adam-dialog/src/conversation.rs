@@ -4835,6 +4835,26 @@ pub(crate) fn render_derivation_as_kazakh(d: &DerivedFact) -> String {
         ReasPredicate::InDomain => {
             format!("{} {} саласына жатады", d.subject.root, d.object.root)
         }
+        // **v6.1.0 typed-predicate extension.** Stage 2a ships
+        // baseline Kazakh phrasings; Stage 4 (multi-claim composer)
+        // refines them via `multi_claim.broad_topic.kk.toml`.
+        ReasPredicate::BornIn => format!("{} {} туылған", d.subject.root, d.object.root),
+        ReasPredicate::DiedIn => format!("{} {} қайтыс болған", d.subject.root, d.object.root),
+        ReasPredicate::FoundedIn => {
+            format!("{} {} жылы құрылған", d.subject.root, d.object.root)
+        }
+        ReasPredicate::RenamedIn => {
+            format!("{} {} жылы атауы өзгерген", d.subject.root, d.object.root)
+        }
+        ReasPredicate::EffectiveFrom => {
+            format!("{} {}-нан күшіне енген", d.subject.root, d.object.root)
+        }
+        ReasPredicate::Classifies => format!("{} {}-ды жіктейді", d.subject.root, d.object.root),
+        ReasPredicate::RiskLevel => format!("{} тәуекелі — {}", d.subject.root, d.object.root),
+        ReasPredicate::LocatedIn => format!("{} {} орналасқан", d.subject.root, d.object.root),
+        ReasPredicate::NamedAfter => format!("{} {} атымен аталған", d.subject.root, d.object.root),
+        ReasPredicate::MemberOf => format!("{} {}-нің мүшесі", d.subject.root, d.object.root),
+        ReasPredicate::Authored => format!("{} {}-ды жасаған", d.subject.root, d.object.root),
     };
     format!("байланыс бойынша, {clause}")
 }
