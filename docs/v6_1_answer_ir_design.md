@@ -46,6 +46,50 @@ This document is the **predeclared design + success criteria**
 for the experiment, in the discipline of the third-path arc
 (E1 / E2 / E3) it follows.
 
+### Pre-existing substrate (revised 2026-05-23)
+
+Initial-draft framing called `AnswerIR` and `QuestionShape` new.
+Audit of the v6.0.0 source tree shows both already exist:
+
+- [`crates/adam-dialog/src/answer_ir.rs`](../crates/adam-dialog/src/answer_ir.rs)
+  (675 lines, shipped v5.9.0 / G3.0 of the proof-carrying arc) —
+  defines `AnswerIR`, `AnswerNode`, `AnswerShape` covering
+  `YesNoConfirm` / `YesNoDeny` / `YesNoUnknown` / `SafetyRefusal` /
+  `IsAProofChain`. Proof-driven composition, not retrieval-driven.
+- [`crates/adam-dialog/src/question_shape.rs`](../crates/adam-dialog/src/question_shape.rs)
+  (526 lines, shipped v4.12.0) — `QuestionShape` enum covering
+  `Definition` / `Causal` / `YesNoCheck` / `Listing` / `Comparison`,
+  orthogonal to `Intent`.
+- `adam_reasoning::Predicate` — typed predicate enum already
+  carrying `IsA`, `RelatedTo`, `PartOf`, `GoesTo`, `HasQuantity`,
+  `Causes`, `After`, `LivesIn`, `Has`, `Does`.
+
+v6.1.0 is therefore **extension**, not green-field:
+
+1. Extend `AnswerShape` with `Definition`, `DatedFact`,
+   `Classification`, `List`, `BroadTopic` (retrieval-driven shapes
+   the v5.9.0 substrate does not yet cover).
+2. Extend `AnswerNode` with the corresponding leaves
+   (`DefinitionFact`, `DatedFact`, `Classification`, `MultiClaim`).
+3. Add a NEW `PredicateFocus` enum (refines `QuestionShape`
+   downstream — the question-shape detector says «this is a
+   Definition», the predicate-focus detector says «...and the
+   predicate target is `BornIn`»). Lives in a sibling module
+   `crates/adam-dialog/src/predicate_focus.rs`.
+4. Extend `adam_reasoning::Predicate` with the 11 new typed
+   variants (`BornIn`, `EffectiveFrom`, `Classifies`, …) so the
+   retrieval planner has typed targets instead of overloaded
+   `RelatedTo`.
+5. Add `build_answer_ir(ProofObject | RetrievalResult,
+   PredicateFocus, DialogContext) -> AnswerIR` as the new entry
+   path next to the existing `compose(proof, shape, rng_seed)`.
+
+The proof-carrying composition path (`YesNo*` + `SafetyRefusal` +
+`IsAProofChain`) is unchanged. v6.1.0 is the retrieval-driven
+sibling: same `AnswerIR` substrate, different source of claims
+(curated facts.json + reasoner derivations instead of proof
+objects built from beliefs).
+
 ## The thesis under test
 
 > A typed, claim-level intermediate representation (`AnswerIR`)
@@ -113,25 +157,58 @@ typed predicates (see Stage 2 below) is also rolled back.
 
 ## The Rust types (sketch)
 
+**Reconciliation with v5.9.0 substrate.** The existing
+`AnswerIR { shape, root: AnswerNode, source_proof: ProofObject }`
+keeps its tree-walking realiser contract. v6.1.0 extends it as
+follows (the diff is purely additive on `AnswerShape` /
+`AnswerNode` and replaces `source_proof` with a sum so the
+retrieval path can carry curated fact ids instead of synthesising
+a proof object):
+
 ```rust
-/// **v6.1.0** — typed intermediate representation between intent
-/// classification and surface realisation. Every output claim
-/// the realiser surfaces must trace to a source_fact_id; the
-/// realiser CANNOT invent facts because the interface doesn't
-/// expose a free-text channel.
+// EXTEND in crates/adam-dialog/src/answer_ir.rs:
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum AnswerSource {
+    /// v5.9.0 proof-carrying path.
+    Proof(ProofObject),
+    /// v6.1.0 retrieval-driven path.
+    Retrieval {
+        fact_ids: Vec<FactSource>,
+        predicate_focus: PredicateFocus,
+    },
+}
+
 pub struct AnswerIR {
-    /// Closed-list ordered claims. Empty = honest fallback.
-    pub claims: Vec<Claim>,
-    /// What kind of question the user asked. Drives realiser
-    /// template selection.
-    pub predicate_focus: Option<PredicateFocus>,
-    /// Safety routing the safety detector already chose.
-    pub safety: SafetyMode,
-    /// Discourse hints (anaphora / continuation / clarification).
-    pub discourse: DiscourseHint,
-    /// Style target (definition / list / date / classification /
-    /// refusal / acknowledgement).
-    pub style: StyleTarget,
+    pub shape: AnswerShape,
+    pub root: AnswerNode,
+    pub source: AnswerSource,  // was: source_proof: ProofObject
+}
+
+pub enum AnswerShape {
+    // existing v5.9.0:
+    YesNoConfirm, YesNoDeny, YesNoUnknown,
+    SafetyRefusal, IsAProofChain,
+    // v6.1.0 retrieval-driven additions:
+    Definition,      // «X — Y.»
+    DatedFact,       // «X 1872 жылы туылған.»
+    Classification,  // «X жоғары тәуекелді санатқа жатады.»
+    List,            // «X-нің Y-лары: A, B, C.»
+    BroadTopic,      // ≤ 3 claims for «X туралы айтыңыз»
+}
+
+pub enum AnswerNode {
+    // existing v5.9.0:
+    ConfirmVerdict { .. }, DenyVerdict { .. },
+    Subject { .. }, Predicate { .. },
+    Punctuation { .. }, ChainCitation { .. },
+    Hedge { .. }, RefusalBody { .. },
+    ProofPrologue { .. }, ProofChainSteps { .. },
+    ProofConclusion { .. }, Sequence { .. },
+    // v6.1.0 retrieval-leaf additions:
+    DatedFactBody { subject: String, date: String, predicate_verb: String },
+    ClassificationBody { subject: String, category: String },
+    MultiClaimItem { claim: Claim, index: usize },
 }
 
 pub struct Claim {
@@ -285,16 +362,20 @@ to `main`) and the v6.0.0 production path stays authoritative.
 
 ## Stages
 
-### Stage 1 — Types + question-shape planner (2 days)
+### Stage 1 — `PredicateFocus` + detector (1-2 days)
 
-- Define the Rust types above in
-  `crates/adam-dialog/src/answer_ir/mod.rs`.
-- Implement `detect_predicate_focus(input, parses, intent) ->
-  Option<PredicateFocus>` covering the ~12 question patterns
-  catalogued above.
+- Add `crates/adam-dialog/src/predicate_focus.rs` (new
+  sibling module, not folded into `answer_ir.rs` until the type
+  reconciliation lands in Stage 3).
+- Define `PredicateFocus` enum + `Option<PredicateFocus>
+  detect(input: &str, shape: Option<QuestionShape>, parses:
+  &[Analysis]) -> Option<PredicateFocus>` covering the ~12
+  question patterns catalogued above.
 - Unit tests in the same module — every pattern → expected
   focus mapping.
-- No production wiring yet.
+- No production wiring yet. `lib.rs` exposes the new module but
+  nothing on the runtime hot path calls it; v6.0.0 cascade
+  remains unchanged.
 
 ### Stage 2 — Predicate enum extension + world_core re-promotion (2 days)
 

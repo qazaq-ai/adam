@@ -61,6 +61,7 @@ pub mod nlg;
 pub mod pedagogical;
 pub mod phoneme;
 pub mod planner;
+pub mod predicate_focus;
 pub mod proof_object;
 pub mod quality;
 pub mod question_shape;
@@ -108,6 +109,7 @@ pub use planner::{
     ResponsePlan, intent_key, plan_response, plan_response_with_epistemic, plan_response_with_repo,
     plan_response_with_session,
 };
+pub use predicate_focus::{PredicateFocus, detect as detect_predicate_focus};
 pub use quality::{
     GraphAdmissibilityIssue, GraphAdmissibilityReport, ResponseQualityIssue, ResponseQualityReport,
     TraceFaithfulnessIssue, TraceFaithfulnessReport, TypedFaithfulnessIssue,
