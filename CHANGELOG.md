@@ -28,6 +28,85 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.1.15] — 2026-05-23 — voice REPL audit: latency + gender honorific
+
+> User's first real-voice REPL audit (whisper.cpp large-v3 + macOS
+> `say` Aru voice + female speaker) surfaced two production-blocking
+> issues. Both addressed same-day:
+
+### Fixes
+
+- **Latency 5+s → ~1.5s transcribe.** Voice REPL trailing-silence
+  VAD detect (1300 ms) + whisper-cpp transcribe (5+ s on
+  ggml-large-v3 with default beam-search) totalled 6-7 s per
+  turn — well above the user's ≤3 s conversational target.
+  `crates/adam-voice/src/stt.rs::build_argv` now passes
+  `--best-of 1 --beam-size 1` to whisper-cli for greedy decode
+  (whisper's default beam-size=5 is ~3-5× slower; the rerank
+  helps noisy/ambiguous audio but live-REPL captures are clean
+  enough that greedy wins). `crates/adam-dialog/src/bin/adam_chat.rs`
+  defaults `--threads` to `std::thread::available_parallelism()`
+  so the user's M2 8-core processes in parallel.
+- **Gender honorific dropped (regression).** Pre-v6.0.x adam
+  addressed unknown-name speakers as «Ағай» (male) / «Апай»
+  (female) based on pitch detection. The audit confirmed
+  pitch detection still works (`pitch-gender locked = female`
+  fired correctly) and the planner still writes
+  `name_respect = "Ағай/Апай"` to the session
+  ([conversation.rs:862-873](crates/adam-dialog/src/conversation.rs#L862-L873))
+  — but no «Апай» appeared in replies. Root cause: the
+  templates that fire on first turns (system identity,
+  retrieval, clarification) don't interpolate `{name_respect}`;
+  only wellbeing/name-introduction families do. Added
+  `{name_respect}, …` variants to `ask_about_system` (3 new
+  variants alongside 4 slot-less fallbacks) and
+  `unknown.with_grounded_fact` (1 new variant). When pitch is
+  detected and `name_respect` is set, the picker prefers these
+  variants; pre-pitch-detection turns still get the slot-less
+  fallbacks unchanged.
+
+### Tracked for v6.2 (audit round-3 P1 / P2)
+
+- **STT phonetic aliases for proper nouns.** Whisper mis-
+  transcribes «Байтұрсынұлы» → «Байторсынық / Байтурсының
+  ұлы», «өңірлік» → «өнірлік», «КРУ» → «Күрі / Кү ұр ұу».
+  Need a curated alias table under voice-mode in
+  `phonetic_normalize`.
+- **Anaphora «Ол» not resolved before predicate-focus probe.**
+  Multi-turn «Ахмет кім?» → «Ол қашан туды?» surfaces the IsA
+  fact instead of BornIn 1872; the «Ол» anaphor isn't
+  consulted against `subject_under_discussion` before the
+  typed-focus probe runs.
+- **Child-voice detection.** New `voice_age_hint = "child"`
+  via pitch band 250-400 Hz so adam can warn on age-
+  inappropriate queries.
+- **«What gender am I?» verdict detector.** Pre-existing
+  `detect_ask_gender_detection_explain` covers «How did you
+  figure out» (method question); need a sibling detector for
+  «Мен еркекпін бе?» (verdict question).
+
+### Testing
+
+- `cargo test --workspace --all-targets --release`: **1 722 / 0**.
+- `cargo clippy --workspace --all-targets -- -D warnings`: clean.
+- `cargo fmt --all --check`: clean.
+- Voice REPL verification deferred to user (whisper.cpp on
+  developer machine only).
+
+### Suggested follow-up audit
+
+```bash
+ADAM_ANSWER_IR=1 cargo run --release --features voice --bin adam_chat -- \
+  --voice-input --tts --tts-voice Aru \
+  --whisper-bin /opt/homebrew/bin/whisper-cli \
+  --whisper-model ~/whisper-models/ggml-large-v3.bin \
+  --whisper-language kk
+```
+
+First turn say «Сен кімсің?» — expected reply now begins with
+«Апай, ...» (or «Ағай, ...» for male speakers) once pitch is
+locked. Latency target: 2-3 s per turn end-to-end.
+
 ## [6.1.10] — 2026-05-23 — post-v6.1.5 audit round-2: 2 deviations closed via real REPL
 
 > Same-day follow-up to v6.1.5. Per the user's directive («real

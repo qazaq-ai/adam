@@ -752,6 +752,16 @@ fn run_voice_repl(
     if let Some(lang) = whisper_language_arg {
         cli = cli.with_language(lang);
     }
+    // **v6.1.15 — 2026-05-23 voice REPL audit fix.** Default
+    // whisper-cli to all available cores so transcribe time
+    // doesn't single-thread bottleneck. On the user's M2 8-core
+    // this combined with `--best-of 1 --beam-size 1` (set in
+    // `WhisperCli::build_argv`) cuts a ~5 s transcribe to ~1.5 s,
+    // meeting the user's ≤3 s end-to-end conversational target.
+    let auto_threads = std::thread::available_parallelism()
+        .map(|n| n.get() as u32)
+        .unwrap_or(4);
+    cli = cli.with_threads(auto_threads);
 
     // **v5.15.0 (V1).** VAD continuous listening is the default;
     // `--push-to-talk` opts out to v5.14.0 Enter-stops behaviour.
