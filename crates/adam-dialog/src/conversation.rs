@@ -1483,6 +1483,55 @@ impl Conversation {
         // Future v6.1.0+ will replace this whitelist with a
         // predicate-aware retrieval planner (the cleaner fix
         // documented in the round-4 audit report).
+        //
+        // **v6.1.0 Stage 4 — BroadTopic continuation handler.**
+        // Catches «ал тағы айт» / «әрі қарай» / «басқа не білесіз» —
+        // bare follow-ups with no fresh noun_hint — and routes them
+        // through the multi-claim composer using
+        // `dialog_context.broad_topic_subject` as the implicit
+        // subject. The continuation explicitly skips already-surfaced
+        // facts so each follow-up surfaces NEW content. Must run
+        // BEFORE the `Intent::Unknown { noun_hint: Some(noun) }`
+        // block below because the continuation request has no
+        // detected noun.
+        if std::env::var("ADAM_ANSWER_IR").as_deref() == Ok("1")
+            && crate::broad_topic::is_continuation_request(input)
+        {
+            if let Some(subject) = self.dialog_context.broad_topic_subject.clone() {
+                let already_seen = self.dialog_context.broad_topic_seen.clone();
+                let mut newly_seen = Vec::new();
+                if let Some(composed) = crate::broad_topic::compose_broad_topic(
+                    &subject,
+                    &self.extracted_facts,
+                    &already_seen,
+                    &mut newly_seen,
+                ) {
+                    self.dialog_context.broad_topic_seen.extend(newly_seen);
+                    // Rewrite intent so the planner / realiser
+                    // surfaces the multi-claim text as a grounded
+                    // fact. Continuation requests almost always
+                    // classify as Intent::Unknown already (no fresh
+                    // topic noun to seize); if for some reason the
+                    // cascade emitted a non-Unknown variant we leave
+                    // it alone and skip the rewrite — the multi-claim
+                    // composer surfaces nothing this turn, the user
+                    // can retry on the next turn.
+                    if let Intent::Unknown {
+                        noun_hint,
+                        grounded_fact,
+                        example,
+                        reasoning_chain,
+                        ..
+                    } = &mut intent
+                    {
+                        *noun_hint = Some(subject.clone());
+                        *grounded_fact = Some(composed);
+                        *example = None;
+                        *reasoning_chain = None;
+                    }
+                }
+            }
+        }
         if let Intent::Unknown {
             noun_hint: Some(noun),
             grounded_fact,
@@ -1520,6 +1569,7 @@ impl Conversation {
             // than the unfocused IsA / RelatedTo fallback, so it must
             // win when present.
             if std::env::var("ADAM_ANSWER_IR").as_deref() == Ok("1") {
+                let mut focus_landed = false;
                 if let Some(focus) = crate::predicate_focus::detect(input, None) {
                     if let Some(target_predicate) = focus.matching_predicate() {
                         let noun_lower = noun.to_lowercase();
@@ -1531,7 +1581,44 @@ impl Conversation {
                             *grounded_fact = Some(fact.raw_text.clone());
                             *example = None;
                             *reasoning_chain = None;
+                            focus_landed = true;
                         }
+                    }
+                }
+                // **v6.1.0 Stage 4 — BroadTopic multi-claim composer.**
+                // When the typed-focus probe above didn't land a
+                // specific fact, AND the input is a broad-topic
+                // enumeration request («X туралы айтыңыз»), compose
+                // up to MAX_CLAIMS_PER_TURN facts joined with spaces.
+                // `broad_topic_subject` + `broad_topic_seen` on
+                // DialogContext let «ал тағы айт» continue without
+                // repeating already-surfaced facts.
+                if !focus_landed && crate::broad_topic::is_broad_topic_query(input) {
+                    let noun_lower = noun.to_lowercase();
+                    // Subject switch → clear seen list. The composer
+                    // is per-subject, not session-wide.
+                    let same_subject = self
+                        .dialog_context
+                        .broad_topic_subject
+                        .as_deref()
+                        .map(|s| s == noun_lower)
+                        .unwrap_or(false);
+                    if !same_subject {
+                        self.dialog_context.broad_topic_subject = Some(noun_lower.clone());
+                        self.dialog_context.broad_topic_seen.clear();
+                    }
+                    let already_seen = self.dialog_context.broad_topic_seen.clone();
+                    let mut newly_seen = Vec::new();
+                    if let Some(composed) = crate::broad_topic::compose_broad_topic(
+                        &noun_lower,
+                        &self.extracted_facts,
+                        &already_seen,
+                        &mut newly_seen,
+                    ) {
+                        *grounded_fact = Some(composed);
+                        *example = None;
+                        *reasoning_chain = None;
+                        self.dialog_context.broad_topic_seen.extend(newly_seen);
                     }
                 }
             }

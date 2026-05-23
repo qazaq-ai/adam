@@ -48,6 +48,7 @@
 pub mod action;
 pub mod answer_ir;
 pub mod belief;
+pub mod broad_topic;
 pub mod cargo_verify;
 pub mod conversation;
 pub mod curriculum;
