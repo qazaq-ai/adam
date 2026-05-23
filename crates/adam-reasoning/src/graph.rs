@@ -109,6 +109,18 @@ impl LexicalGraph {
                         "has_quantity" => Predicate::HasQuantity,
                         "does_to" => Predicate::DoesTo,
                         "in_domain" => Predicate::InDomain,
+                        // v6.1.0 typed-predicate extension.
+                        "born_in" => Predicate::BornIn,
+                        "died_in" => Predicate::DiedIn,
+                        "founded_in" => Predicate::FoundedIn,
+                        "renamed_in" => Predicate::RenamedIn,
+                        "effective_from" => Predicate::EffectiveFrom,
+                        "classifies" => Predicate::Classifies,
+                        "risk_level" => Predicate::RiskLevel,
+                        "located_in" => Predicate::LocatedIn,
+                        "named_after" => Predicate::NamedAfter,
+                        "member_of" => Predicate::MemberOf,
+                        "authored" => Predicate::Authored,
                         // Unreachable by construction: `pred_str` is
                         // derived from `Predicate::as_str()` on an
                         // existing `Fact::predicate`, so every live

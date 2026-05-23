@@ -125,6 +125,61 @@ pub enum Predicate {
     /// `X Y ғылымына жатады` ("X belongs to Y science").
     /// Example: (алгебра, InDomain, математика).
     InDomain,
+
+    // -- v6.1.0 typed-predicate extension. ----------------------------
+    //
+    // Pre-v6.1.0 these relations were all encoded as `RelatedTo` in
+    // the world_core JSONL — the retrieval planner then used the
+    // predicate-keyword pre-action-plan probe to guess which RelatedTo
+    // edge to surface. The Codex 2026-05-22 audit identified this as
+    // the root cause of «Жасанды интеллект туралы заң қандай
+    // санаттарға жіктейді?» surfacing an effective-date fact instead
+    // of the classification fact. The typed variants let the
+    // retrieval planner filter exactly on the asked-about predicate.
+    //
+    // See [`docs/v6_1_answer_ir_design.md`](../../../docs/v6_1_answer_ir_design.md)
+    // §"Scope" for the full motivation.
+    /// Subject was born in object (date or place). v6.1.0.
+    /// `(ахмет, BornIn, "1872-09-05")` from «Ахмет 1872 жылы 5
+    /// қыркүйекте туылған».
+    BornIn,
+    /// Subject died in object (date or place). v6.1.0.
+    DiedIn,
+    /// Subject (institution / event) was founded in object (date or
+    /// year). v6.1.0. `(кру, FoundedIn, "1937")` from «КРУ 1937 жылы
+    /// құрылған».
+    FoundedIn,
+    /// Subject (institution) was renamed in object (date or year).
+    /// v6.1.0.
+    RenamedIn,
+    /// Subject (law / agreement) became effective in object (date).
+    /// v6.1.0. `(ai_law, EffectiveFrom, "2026-01-18")` from «ЖИ
+    /// туралы заң 2026 жылдың 18 қаңтарынан күшіне енді».
+    EffectiveFrom,
+    /// Subject (law / classifier) classifies things into object
+    /// (category set). v6.1.0. `(ai_law, Classifies,
+    /// "тәуекел_санаттары")` from «ЖИ туралы заң қолданбаларды
+    /// тәуекел санаттарына жіктейді».
+    Classifies,
+    /// Subject has the risk level given by object. v6.1.0.
+    /// `(defense_ai, RiskLevel, "жоғары")`.
+    RiskLevel,
+    /// Subject is located in object (spatial). v6.1.0. Distinct
+    /// from `LivesIn` (animate residence): `LocatedIn` is for
+    /// institutions, structures, monuments, geographic features.
+    /// `(it_park, LocatedIn, "астана")`.
+    LocatedIn,
+    /// Subject is named after object (person, event, place).
+    /// v6.1.0. `(кру, NamedAfter, "байтұрсынұлы")`.
+    NamedAfter,
+    /// Subject is a member of object (organisation, alliance).
+    /// v6.1.0. `(қазақстан, MemberOf, "ОДКБ")`.
+    MemberOf,
+    /// Subject was authored / created by object (agent). v6.1.0.
+    /// Distinct from `DoesTo` (general agent-verb action):
+    /// `Authored` is for creator-of-work relations.
+    /// `(төте_жазу, Authored, "байтұрсынұлы")`.
+    Authored,
 }
 
 impl Predicate {
@@ -142,6 +197,18 @@ impl Predicate {
             Self::HasQuantity => "has_quantity",
             Self::DoesTo => "does_to",
             Self::InDomain => "in_domain",
+            // v6.1.0 typed-predicate extension.
+            Self::BornIn => "born_in",
+            Self::DiedIn => "died_in",
+            Self::FoundedIn => "founded_in",
+            Self::RenamedIn => "renamed_in",
+            Self::EffectiveFrom => "effective_from",
+            Self::Classifies => "classifies",
+            Self::RiskLevel => "risk_level",
+            Self::LocatedIn => "located_in",
+            Self::NamedAfter => "named_after",
+            Self::MemberOf => "member_of",
+            Self::Authored => "authored",
         }
     }
 }

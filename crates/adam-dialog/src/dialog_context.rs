@@ -84,6 +84,18 @@ pub struct DialogContext {
     /// scope retrieval / honest-fallback templates («programming
     /// domain» vs «history domain»).
     pub current_domain: Option<String>,
+    /// **v6.1.0 Stage 4.** Subject currently held under the
+    /// BroadTopic multi-claim composer. Set when a «X туралы
+    /// айтыңыз» query first lands; reset when the active subject
+    /// switches. Continuation requests («ал тағы айт») use this to
+    /// know which subject to keep enumerating facts about.
+    pub broad_topic_subject: Option<String>,
+    /// **v6.1.0 Stage 4.** Fact sources already surfaced by the
+    /// BroadTopic composer for `broad_topic_subject`. The composer
+    /// skips these on follow-up turns so «ал тағы айт» yields a
+    /// distinct fact instead of repeating. Cleared when
+    /// `broad_topic_subject` switches.
+    pub broad_topic_seen: Vec<adam_reasoning::FactSource>,
 }
 
 /// Window over which `subject_under_discussion` is computed.

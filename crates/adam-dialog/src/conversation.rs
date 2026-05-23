@@ -1483,6 +1483,60 @@ impl Conversation {
         // Future v6.1.0+ will replace this whitelist with a
         // predicate-aware retrieval planner (the cleaner fix
         // documented in the round-4 audit report).
+        //
+        // **v6.1.0 Stage 4 — BroadTopic continuation handler.**
+        // Catches «ал тағы айт» / «әрі қарай» / «басқа не білесіз» —
+        // bare follow-ups with no fresh noun_hint — and routes them
+        // through the multi-claim composer using
+        // `dialog_context.broad_topic_subject` as the implicit
+        // subject. The continuation explicitly skips already-surfaced
+        // facts so each follow-up surfaces NEW content. Must run
+        // BEFORE the `Intent::Unknown { noun_hint: Some(noun) }`
+        // block below because the continuation request has no
+        // detected noun.
+        if std::env::var("ADAM_ANSWER_IR").as_deref() == Ok("1")
+            && crate::broad_topic::is_continuation_request(input)
+        {
+            if let Some(subject) = self.dialog_context.broad_topic_subject.clone() {
+                let already_seen = self.dialog_context.broad_topic_seen.clone();
+                let mut newly_seen = Vec::new();
+                if let Some(composed) = crate::broad_topic::compose_broad_topic(
+                    &subject,
+                    &self.extracted_facts,
+                    &already_seen,
+                    &mut newly_seen,
+                ) {
+                    self.dialog_context.broad_topic_seen.extend(newly_seen);
+                    // Rewrite intent so the planner / realiser
+                    // surfaces the multi-claim text as a grounded
+                    // fact. Continuation requests sometimes classify
+                    // as Intent::Unknown (free-form follow-up), other
+                    // times the cascade routes them to a self-
+                    // knowledge / capability intent («тағы не
+                    // білесіз?»). In both cases the v6.1.0 contract
+                    // is: when broad_topic_subject is held, the user
+                    // wants MORE of that subject — override the
+                    // intent shell with a fresh Unknown carrying our
+                    // multi-claim grounded_fact.
+                    intent = Intent::Unknown {
+                        raw_tokens: Vec::new(),
+                        noun_hint: Some(subject.clone()),
+                        example: None,
+                        grounded_fact: Some(composed),
+                        example_adapted: false,
+                        reasoning_chain: None,
+                        question_shape: None,
+                        temporal_scope: false,
+                        compositional_function: false,
+                        noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
+                        input_modality: None,
+                        input_evidence: None,
+                        input_is_inversion_question: false,
+                        noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
+                    };
+                }
+            }
+        }
         if let Intent::Unknown {
             noun_hint: Some(noun),
             grounded_fact,
@@ -1491,6 +1545,89 @@ impl Conversation {
             ..
         } = &mut intent
         {
+            // **v6.1.0 Stage 3 — typed-focus predicate-aware
+            // retrieval (opt-in).** Behind `ADAM_ANSWER_IR=1`. When
+            // the input carries a typed predicate focus («қашан
+            // туылған», «қандай санатқа», …), pick the fact whose
+            // predicate matches the focus AND whose subject matches
+            // the noun hint. This is the design-doc cleaner
+            // replacement for the v6.0.13 PREDICATE_KEYWORDS keyword-
+            // in-raw_text hack: instead of grepping fact bodies for
+            // keyword shadows, we look up by typed predicate.
+            //
+            // When the flag is off (default), or no focus is
+            // detected, this block is a no-op and the v6.0.13 path
+            // below stays authoritative. Cascade pass-through
+            // invariant: `ADAM_ANSWER_IR=0` → behaviour is
+            // bit-identical to v6.0.0.
+            //
+            // See [`crates/adam-dialog/src/predicate_focus.rs`] for
+            // the focus enum + detector, and
+            // [`docs/v6_1_answer_ir_design.md`] §Stage 3 for the
+            // wiring plan.
+            // The contract: if a typed predicate focus is detected
+            // AND a fact exists matching `(subject = noun, predicate
+            // = focus.matching_predicate())`, OVERRIDE whatever
+            // upstream retrieval (graph probe, search-graph fallback,
+            // IsA preference) already put in `grounded_fact`. This is
+            // intentional — the typed focus is strictly more specific
+            // than the unfocused IsA / RelatedTo fallback, so it must
+            // win when present.
+            if std::env::var("ADAM_ANSWER_IR").as_deref() == Ok("1") {
+                let mut focus_landed = false;
+                if let Some(focus) = crate::predicate_focus::detect(input, None) {
+                    if let Some(target_predicate) = focus.matching_predicate() {
+                        let noun_lower = noun.to_lowercase();
+                        let typed_fact = self.extracted_facts.iter().find(|f| {
+                            f.predicate == target_predicate
+                                && f.subject.root.to_lowercase() == noun_lower
+                        });
+                        if let Some(fact) = typed_fact {
+                            *grounded_fact = Some(fact.raw_text.clone());
+                            *example = None;
+                            *reasoning_chain = None;
+                            focus_landed = true;
+                        }
+                    }
+                }
+                // **v6.1.0 Stage 4 — BroadTopic multi-claim composer.**
+                // When the typed-focus probe above didn't land a
+                // specific fact, AND the input is a broad-topic
+                // enumeration request («X туралы айтыңыз»), compose
+                // up to MAX_CLAIMS_PER_TURN facts joined with spaces.
+                // `broad_topic_subject` + `broad_topic_seen` on
+                // DialogContext let «ал тағы айт» continue without
+                // repeating already-surfaced facts.
+                if !focus_landed && crate::broad_topic::is_broad_topic_query(input) {
+                    let noun_lower = noun.to_lowercase();
+                    // Subject switch → clear seen list. The composer
+                    // is per-subject, not session-wide.
+                    let same_subject = self
+                        .dialog_context
+                        .broad_topic_subject
+                        .as_deref()
+                        .map(|s| s == noun_lower)
+                        .unwrap_or(false);
+                    if !same_subject {
+                        self.dialog_context.broad_topic_subject = Some(noun_lower.clone());
+                        self.dialog_context.broad_topic_seen.clear();
+                    }
+                    let already_seen = self.dialog_context.broad_topic_seen.clone();
+                    let mut newly_seen = Vec::new();
+                    if let Some(composed) = crate::broad_topic::compose_broad_topic(
+                        &noun_lower,
+                        &self.extracted_facts,
+                        &already_seen,
+                        &mut newly_seen,
+                    ) {
+                        *grounded_fact = Some(composed);
+                        *example = None;
+                        *reasoning_chain = None;
+                        self.dialog_context.broad_topic_seen.extend(newly_seen);
+                    }
+                }
+            }
+
             const KRU_DOMAIN_SUBJECTS: &[&str] = &[
                 "ахмет байтұрсынұлы",
                 "ахмет байтұрсынұлы атындағы қостанай өңірлік университеті",
@@ -4835,6 +4972,26 @@ pub(crate) fn render_derivation_as_kazakh(d: &DerivedFact) -> String {
         ReasPredicate::InDomain => {
             format!("{} {} саласына жатады", d.subject.root, d.object.root)
         }
+        // **v6.1.0 typed-predicate extension.** Stage 2a ships
+        // baseline Kazakh phrasings; Stage 4 (multi-claim composer)
+        // refines them via `multi_claim.broad_topic.kk.toml`.
+        ReasPredicate::BornIn => format!("{} {} туылған", d.subject.root, d.object.root),
+        ReasPredicate::DiedIn => format!("{} {} қайтыс болған", d.subject.root, d.object.root),
+        ReasPredicate::FoundedIn => {
+            format!("{} {} жылы құрылған", d.subject.root, d.object.root)
+        }
+        ReasPredicate::RenamedIn => {
+            format!("{} {} жылы атауы өзгерген", d.subject.root, d.object.root)
+        }
+        ReasPredicate::EffectiveFrom => {
+            format!("{} {}-нан күшіне енген", d.subject.root, d.object.root)
+        }
+        ReasPredicate::Classifies => format!("{} {}-ды жіктейді", d.subject.root, d.object.root),
+        ReasPredicate::RiskLevel => format!("{} тәуекелі — {}", d.subject.root, d.object.root),
+        ReasPredicate::LocatedIn => format!("{} {} орналасқан", d.subject.root, d.object.root),
+        ReasPredicate::NamedAfter => format!("{} {} атымен аталған", d.subject.root, d.object.root),
+        ReasPredicate::MemberOf => format!("{} {}-нің мүшесі", d.subject.root, d.object.root),
+        ReasPredicate::Authored => format!("{} {}-ды жасаған", d.subject.root, d.object.root),
     };
     format!("байланыс бойынша, {clause}")
 }

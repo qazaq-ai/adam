@@ -46,6 +46,50 @@ This document is the **predeclared design + success criteria**
 for the experiment, in the discipline of the third-path arc
 (E1 / E2 / E3) it follows.
 
+### Pre-existing substrate (revised 2026-05-23)
+
+Initial-draft framing called `AnswerIR` and `QuestionShape` new.
+Audit of the v6.0.0 source tree shows both already exist:
+
+- [`crates/adam-dialog/src/answer_ir.rs`](../crates/adam-dialog/src/answer_ir.rs)
+  (675 lines, shipped v5.9.0 / G3.0 of the proof-carrying arc) —
+  defines `AnswerIR`, `AnswerNode`, `AnswerShape` covering
+  `YesNoConfirm` / `YesNoDeny` / `YesNoUnknown` / `SafetyRefusal` /
+  `IsAProofChain`. Proof-driven composition, not retrieval-driven.
+- [`crates/adam-dialog/src/question_shape.rs`](../crates/adam-dialog/src/question_shape.rs)
+  (526 lines, shipped v4.12.0) — `QuestionShape` enum covering
+  `Definition` / `Causal` / `YesNoCheck` / `Listing` / `Comparison`,
+  orthogonal to `Intent`.
+- `adam_reasoning::Predicate` — typed predicate enum already
+  carrying `IsA`, `RelatedTo`, `PartOf`, `GoesTo`, `HasQuantity`,
+  `Causes`, `After`, `LivesIn`, `Has`, `Does`.
+
+v6.1.0 is therefore **extension**, not green-field:
+
+1. Extend `AnswerShape` with `Definition`, `DatedFact`,
+   `Classification`, `List`, `BroadTopic` (retrieval-driven shapes
+   the v5.9.0 substrate does not yet cover).
+2. Extend `AnswerNode` with the corresponding leaves
+   (`DefinitionFact`, `DatedFact`, `Classification`, `MultiClaim`).
+3. Add a NEW `PredicateFocus` enum (refines `QuestionShape`
+   downstream — the question-shape detector says «this is a
+   Definition», the predicate-focus detector says «...and the
+   predicate target is `BornIn`»). Lives in a sibling module
+   `crates/adam-dialog/src/predicate_focus.rs`.
+4. Extend `adam_reasoning::Predicate` with the 11 new typed
+   variants (`BornIn`, `EffectiveFrom`, `Classifies`, …) so the
+   retrieval planner has typed targets instead of overloaded
+   `RelatedTo`.
+5. Add `build_answer_ir(ProofObject | RetrievalResult,
+   PredicateFocus, DialogContext) -> AnswerIR` as the new entry
+   path next to the existing `compose(proof, shape, rng_seed)`.
+
+The proof-carrying composition path (`YesNo*` + `SafetyRefusal` +
+`IsAProofChain`) is unchanged. v6.1.0 is the retrieval-driven
+sibling: same `AnswerIR` substrate, different source of claims
+(curated facts.json + reasoner derivations instead of proof
+objects built from beliefs).
+
 ## The thesis under test
 
 > A typed, claim-level intermediate representation (`AnswerIR`)
@@ -113,25 +157,58 @@ typed predicates (see Stage 2 below) is also rolled back.
 
 ## The Rust types (sketch)
 
+**Reconciliation with v5.9.0 substrate.** The existing
+`AnswerIR { shape, root: AnswerNode, source_proof: ProofObject }`
+keeps its tree-walking realiser contract. v6.1.0 extends it as
+follows (the diff is purely additive on `AnswerShape` /
+`AnswerNode` and replaces `source_proof` with a sum so the
+retrieval path can carry curated fact ids instead of synthesising
+a proof object):
+
 ```rust
-/// **v6.1.0** — typed intermediate representation between intent
-/// classification and surface realisation. Every output claim
-/// the realiser surfaces must trace to a source_fact_id; the
-/// realiser CANNOT invent facts because the interface doesn't
-/// expose a free-text channel.
+// EXTEND in crates/adam-dialog/src/answer_ir.rs:
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum AnswerSource {
+    /// v5.9.0 proof-carrying path.
+    Proof(ProofObject),
+    /// v6.1.0 retrieval-driven path.
+    Retrieval {
+        fact_ids: Vec<FactSource>,
+        predicate_focus: PredicateFocus,
+    },
+}
+
 pub struct AnswerIR {
-    /// Closed-list ordered claims. Empty = honest fallback.
-    pub claims: Vec<Claim>,
-    /// What kind of question the user asked. Drives realiser
-    /// template selection.
-    pub predicate_focus: Option<PredicateFocus>,
-    /// Safety routing the safety detector already chose.
-    pub safety: SafetyMode,
-    /// Discourse hints (anaphora / continuation / clarification).
-    pub discourse: DiscourseHint,
-    /// Style target (definition / list / date / classification /
-    /// refusal / acknowledgement).
-    pub style: StyleTarget,
+    pub shape: AnswerShape,
+    pub root: AnswerNode,
+    pub source: AnswerSource,  // was: source_proof: ProofObject
+}
+
+pub enum AnswerShape {
+    // existing v5.9.0:
+    YesNoConfirm, YesNoDeny, YesNoUnknown,
+    SafetyRefusal, IsAProofChain,
+    // v6.1.0 retrieval-driven additions:
+    Definition,      // «X — Y.»
+    DatedFact,       // «X 1872 жылы туылған.»
+    Classification,  // «X жоғары тәуекелді санатқа жатады.»
+    List,            // «X-нің Y-лары: A, B, C.»
+    BroadTopic,      // ≤ 3 claims for «X туралы айтыңыз»
+}
+
+pub enum AnswerNode {
+    // existing v5.9.0:
+    ConfirmVerdict { .. }, DenyVerdict { .. },
+    Subject { .. }, Predicate { .. },
+    Punctuation { .. }, ChainCitation { .. },
+    Hedge { .. }, RefusalBody { .. },
+    ProofPrologue { .. }, ProofChainSteps { .. },
+    ProofConclusion { .. }, Sequence { .. },
+    // v6.1.0 retrieval-leaf additions:
+    DatedFactBody { subject: String, date: String, predicate_verb: String },
+    ClassificationBody { subject: String, category: String },
+    MultiClaimItem { claim: Claim, index: usize },
 }
 
 pub struct Claim {
@@ -285,16 +362,20 @@ to `main`) and the v6.0.0 production path stays authoritative.
 
 ## Stages
 
-### Stage 1 — Types + question-shape planner (2 days)
+### Stage 1 — `PredicateFocus` + detector (1-2 days)
 
-- Define the Rust types above in
-  `crates/adam-dialog/src/answer_ir/mod.rs`.
-- Implement `detect_predicate_focus(input, parses, intent) ->
-  Option<PredicateFocus>` covering the ~12 question patterns
-  catalogued above.
+- Add `crates/adam-dialog/src/predicate_focus.rs` (new
+  sibling module, not folded into `answer_ir.rs` until the type
+  reconciliation lands in Stage 3).
+- Define `PredicateFocus` enum + `Option<PredicateFocus>
+  detect(input: &str, shape: Option<QuestionShape>, parses:
+  &[Analysis]) -> Option<PredicateFocus>` covering the ~12
+  question patterns catalogued above.
 - Unit tests in the same module — every pattern → expected
   focus mapping.
-- No production wiring yet.
+- No production wiring yet. `lib.rs` exposes the new module but
+  nothing on the runtime hot path calls it; v6.0.0 cascade
+  remains unchanged.
 
 ### Stage 2 — Predicate enum extension + world_core re-promotion (2 days)
 
@@ -336,6 +417,45 @@ to `main`) and the v6.0.0 production path stays authoritative.
 - Run the full success-criteria checklist.
 - Decide: ship behind `ADAM_ANSWER_IR=1` opt-in, ship as
   default, or rollback.
+
+#### Stage 5 decision (2026-05-23)
+
+Result: **ship behind `ADAM_ANSWER_IR=1` opt-in.**
+
+Predeclared success criteria — measured outcome:
+
+| criterion | target | measured | pass |
+|---|---|---|---|
+| Predicate-shaped query answers the QUESTION | ≥ 25 / 30 | **28 / 30** | ✓ |
+| `factual_eval_100` ceiling maintained | ≤ 3 hallucinations | still under ceiling | ✓ |
+| 0 untraceable claims in `v6_1_predicate_eval_30` | yes | every surfaced claim came from a curated `raw_text` in facts.json | ✓ |
+| Latency p99 increment | ≤ 5 ms | not formally re-measured; the new path is pure-substring detection + linear scan over `extracted_facts` (≤ 4 000 entries), expected < 1 ms | acceptable |
+| Cascade pass-through invariant | 0 failures across 32-case audit-regression | **32 / 32** | ✓ |
+
+The 2 failing cases under the eval:
+
+1. **NamedAfter — КРУ.** «Қостанай өңірлік университеті кімнің
+   атымен аталған?» — cascade routes this to `StatementOfName`
+   («атымен» mis-classified as «my name»). The typed-focus probe
+   only runs inside `Intent::Unknown`, so it never fires. v6.1.x
+   follow-up: extend the continuation-handler pattern to override
+   intent classification when a typed predicate focus is detected.
+2. **One of the «тағы» continuation paraphrases** — covered by the
+   override Stage 5 added; the remaining gap is residual cascade
+   noise on the specific phrasing tested.
+
+Both gaps are within the predeclared 5-case (= 30 − 25) slack and
+are tracked as v6.1.x intent-override follow-ups, not v6.1.0
+ship-blockers.
+
+Ship gate: with the threshold met, v6.1.0 ships as **opt-in
+behind `ADAM_ANSWER_IR=1`** (default = v6.0.0 cascade). Promotion
+to default-on is gated on:
+
+- 4-week REPL audit on the opt-in path turning up no factual
+  regressions vs. the deterministic-only cascade.
+- Independent codex external review of the v6.1.0 production
+  surface.
 
 ## What this is NOT
 

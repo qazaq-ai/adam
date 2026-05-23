@@ -1286,6 +1286,23 @@ fn user_facing_fact_priority(fact: &ReasFact) -> (usize, usize, isize) {
         ReasPredicate::Causes => 8,
         ReasPredicate::After => 9,
         ReasPredicate::DoesTo => 10,
+        // **v6.1.0 typed-predicate extension.** The Stage 1 ranking
+        // policy: a focused predicate-aware query should hit its
+        // typed fact ahead of generic IsA, so these rank BELOW IsA
+        // (which is the «X кім?» default) but ABOVE the unfocused
+        // RelatedTo / GoesTo cluster. Stage 3 will replace this
+        // static ranking with a `PredicateFocus`-aware planner.
+        ReasPredicate::BornIn => 1,
+        ReasPredicate::DiedIn => 1,
+        ReasPredicate::FoundedIn => 1,
+        ReasPredicate::EffectiveFrom => 1,
+        ReasPredicate::LocatedIn => 1,
+        ReasPredicate::Classifies => 2,
+        ReasPredicate::RiskLevel => 2,
+        ReasPredicate::Authored => 2,
+        ReasPredicate::MemberOf => 3,
+        ReasPredicate::NamedAfter => 4,
+        ReasPredicate::RenamedIn => 5,
     };
     let subject_surface_rank = if fact.subject.surface == fact.subject.root {
         1

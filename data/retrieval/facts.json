@@ -1,7 +1,7 @@
 {
-  "version": "6.0.0-rc5",
+  "version": "6.0.0",
   "status": "completed",
-  "elapsed_s": 63,
+  "elapsed_s": 29,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,19 +18,30 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 70,
-    "facts_total": 4114,
+    "facts_total": 4116,
     "by_predicate": {
       "after": 8,
+      "authored": 2,
+      "born_in": 2,
       "causes": 29,
+      "classifies": 1,
+      "died_in": 1,
       "does_to": 65,
+      "effective_from": 1,
+      "founded_in": 2,
       "goes_to": 21,
       "has": 85,
       "has_quantity": 78,
       "in_domain": 24,
       "is_a": 3132,
       "lives_in": 7,
-      "part_of": 405,
-      "related_to": 260
+      "located_in": 1,
+      "member_of": 1,
+      "named_after": 2,
+      "part_of": 404,
+      "related_to": 248,
+      "renamed_in": 1,
+      "risk_level": 1
     },
     "by_pack": {
       "abai_wikisource_pack.json": 3,
@@ -66,7 +77,7 @@
       "world_core/informatics_basic.jsonl": 40,
       "world_core/kazakh_cuisine.jsonl": 26,
       "world_core/kinship_extended.jsonl": 20,
-      "world_core/kru_baitursynov.jsonl": 32,
+      "world_core/kru_baitursynov.jsonl": 34,
       "world_core/kz_constitution.jsonl": 53,
       "world_core/kz_industry.jsonl": 208,
       "world_core/kz_literature.jsonl": 120,
@@ -28916,7 +28927,7 @@
         "root": "ахмет байтұрсынұлы",
         "pos": "noun"
       },
-      "predicate": "RelatedTo",
+      "predicate": "BornIn",
       "object": {
         "surface": "1872 жылы 5 қыркүйек",
         "root": "1872 жылы 5 қыркүйек",
@@ -28936,7 +28947,7 @@
         "root": "ахмет байтұрсынұлы",
         "pos": "noun"
       },
-      "predicate": "RelatedTo",
+      "predicate": "BornIn",
       "object": {
         "surface": "торғай облысы",
         "root": "торғай облысы",
@@ -28956,7 +28967,7 @@
         "root": "ахмет байтұрсынұлы",
         "pos": "noun"
       },
-      "predicate": "RelatedTo",
+      "predicate": "DiedIn",
       "object": {
         "surface": "1937 жылы 8 желтоқсан",
         "root": "1937 жылы 8 желтоқсан",
@@ -28992,14 +29003,14 @@
     },
     {
       "subject": {
-        "surface": "ахмет байтұрсынұлы",
-        "root": "ахмет байтұрсынұлы",
-        "pos": "noun"
-      },
-      "predicate": "RelatedTo",
-      "object": {
         "surface": "қазақ әліпбиі",
         "root": "қазақ әліпбиі",
+        "pos": "noun"
+      },
+      "predicate": "Authored",
+      "object": {
+        "surface": "ахмет байтұрсынұлы",
+        "root": "ахмет байтұрсынұлы",
         "pos": "noun"
       },
       "pattern": "world_core/kru_baitursynov",
@@ -29012,14 +29023,14 @@
     },
     {
       "subject": {
-        "surface": "қазақ әліпбиі",
-        "root": "қазақ әліпбиі",
+        "surface": "ахмет байтұрсынұлы",
+        "root": "ахмет байтұрсынұлы",
         "pos": "noun"
       },
       "predicate": "RelatedTo",
       "object": {
-        "surface": "ахмет байтұрсынұлы",
-        "root": "ахмет байтұрсынұлы",
+        "surface": "қазақ әліпбиі",
+        "root": "қазақ әліпбиі",
         "pos": "noun"
       },
       "pattern": "world_core/kru_baitursynov",
@@ -29056,7 +29067,7 @@
         "root": "төте жазу",
         "pos": "noun"
       },
-      "predicate": "RelatedTo",
+      "predicate": "Authored",
       "object": {
         "surface": "ахмет байтұрсынұлы",
         "root": "ахмет байтұрсынұлы",
@@ -29076,7 +29087,7 @@
         "root": "төте жазу",
         "pos": "noun"
       },
-      "predicate": "RelatedTo",
+      "predicate": "FoundedIn",
       "object": {
         "surface": "1912 жыл",
         "root": "1912 жыл",
@@ -29096,7 +29107,7 @@
         "root": "ахмет байтұрсынұлы",
         "pos": "noun"
       },
-      "predicate": "RelatedTo",
+      "predicate": "MemberOf",
       "object": {
         "surface": "алаш қозғалысы",
         "root": "алаш қозғалысы",
@@ -29152,6 +29163,26 @@
     },
     {
       "subject": {
+        "surface": "ахмет байтұрсынұлы атындағы қостанай өңірлік университеті",
+        "root": "ахмет байтұрсынұлы атындағы қостанай өңірлік университеті",
+        "pos": "noun"
+      },
+      "predicate": "NamedAfter",
+      "object": {
+        "surface": "ахмет байтұрсынұлы",
+        "root": "ахмет байтұрсынұлы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ахмет Байтұрсынұлы атындағы Қостанай өңірлік университеті — Қазақстан Республикасының жоғары оқу орны."
+    },
+    {
+      "subject": {
         "surface": "қостанай өңірлік университеті",
         "root": "қостанай өңірлік университеті",
         "pos": "noun"
@@ -29176,7 +29207,7 @@
         "root": "қостанай өңірлік университеті",
         "pos": "noun"
       },
-      "predicate": "PartOf",
+      "predicate": "LocatedIn",
       "object": {
         "surface": "қостанай",
         "root": "қостанай",
@@ -29196,7 +29227,7 @@
         "root": "қостанай өңірлік университеті",
         "pos": "noun"
       },
-      "predicate": "RelatedTo",
+      "predicate": "FoundedIn",
       "object": {
         "surface": "1939 жыл",
         "root": "1939 жыл",
@@ -29216,7 +29247,7 @@
         "root": "қостанай өңірлік университеті",
         "pos": "noun"
       },
-      "predicate": "RelatedTo",
+      "predicate": "NamedAfter",
       "object": {
         "surface": "ахмет байтұрсынұлы",
         "root": "ахмет байтұрсынұлы",
@@ -29236,7 +29267,7 @@
         "root": "қостанай өңірлік университеті",
         "pos": "noun"
       },
-      "predicate": "RelatedTo",
+      "predicate": "RenamedIn",
       "object": {
         "surface": "2021 жыл",
         "root": "2021 жыл",
@@ -29376,7 +29407,7 @@
         "root": "жасанды интеллект туралы заң",
         "pos": "noun"
       },
-      "predicate": "RelatedTo",
+      "predicate": "EffectiveFrom",
       "object": {
         "surface": "2026 жылы 18 қаңтар",
         "root": "2026 жылы 18 қаңтар",
@@ -29396,7 +29427,7 @@
         "root": "жасанды интеллект туралы заң",
         "pos": "noun"
       },
-      "predicate": "RelatedTo",
+      "predicate": "Classifies",
       "object": {
         "surface": "тәуекел деңгейі",
         "root": "тәуекел деңгейі",
@@ -29420,6 +29451,26 @@
       "object": {
         "surface": "жоғары тәуекелді",
         "root": "жоғары тәуекелді",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kru_baitursynov",
+      "source": {
+        "pack": "world_core/kru_baitursynov.jsonl",
+        "sample_id": "kru_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қорғаныс саласындағы жасанды интеллект Қазақстан Республикасының «Жасанды интеллект туралы» заңы бойынша жоғары тәуекелді санатқа жатады."
+    },
+    {
+      "subject": {
+        "surface": "қорғаныс саласындағы жасанды интеллект",
+        "root": "қорғаныс саласындағы жасанды интеллект",
+        "pos": "noun"
+      },
+      "predicate": "RiskLevel",
+      "object": {
+        "surface": "жоғары",
+        "root": "жоғары",
         "pos": "noun"
       },
       "pattern": "world_core/kru_baitursynov",

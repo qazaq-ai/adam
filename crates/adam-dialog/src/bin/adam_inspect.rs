@@ -454,6 +454,25 @@ fn render_kazakh_with_marker(d: &DerivedFact) -> String {
         ),
         Predicate::DoesTo => format!("{} {} үстінде әрекет етеді", d.subject.root, d.object.root),
         Predicate::InDomain => format!("{} {} саласына жатады", d.subject.root, d.object.root),
+        // **v6.1.0 typed-predicate extension.** Kept in lock-step with
+        // `conversation::render_derivation_as_kazakh`.
+        Predicate::BornIn => format!("{} {} туылған", d.subject.root, d.object.root),
+        Predicate::DiedIn => format!("{} {} қайтыс болған", d.subject.root, d.object.root),
+        Predicate::FoundedIn => {
+            format!("{} {} жылы құрылған", d.subject.root, d.object.root)
+        }
+        Predicate::RenamedIn => {
+            format!("{} {} жылы атауы өзгерген", d.subject.root, d.object.root)
+        }
+        Predicate::EffectiveFrom => {
+            format!("{} {}-нан күшіне енген", d.subject.root, d.object.root)
+        }
+        Predicate::Classifies => format!("{} {}-ды жіктейді", d.subject.root, d.object.root),
+        Predicate::RiskLevel => format!("{} тәуекелі — {}", d.subject.root, d.object.root),
+        Predicate::LocatedIn => format!("{} {} орналасқан", d.subject.root, d.object.root),
+        Predicate::NamedAfter => format!("{} {} атымен аталған", d.subject.root, d.object.root),
+        Predicate::MemberOf => format!("{} {}-нің мүшесі", d.subject.root, d.object.root),
+        Predicate::Authored => format!("{} {}-ды жасаған", d.subject.root, d.object.root),
     };
     format!("байланыс бойынша, {clause}")
 }
