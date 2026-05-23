@@ -167,6 +167,79 @@ fn member_of_lands_alash_for_baitursynov() {
     );
 }
 
+/// **v6.1.5 — 2026-05-23 audit fix P0 #1.** Pins the named-after
+/// regression. Pre-fix `detect_ask_name` substring-matched «атым»
+/// and fired on «атымен» (instrumental — «with [the] name [of]»),
+/// routing «X кімнің атымен аталған?» to `Intent::AskName` and
+/// emitting the persona reply «Атым — адам.» BEFORE the
+/// `PredicateFocus::NamedAfter` retrieval probe got the turn.
+/// `contains_word` fix in semantics.rs scopes the match to word
+/// boundaries.
+#[test]
+fn named_after_does_not_collide_with_ask_name() {
+    let reply = run("Қостанай өңірлік университеті кімнің атымен аталған?");
+    let lc = reply.to_lowercase();
+    assert!(
+        lc.contains("ахмет байтұрсынұлы"),
+        "P0 #1 regression: reply did not surface named_after fact — got: {reply}"
+    );
+    assert!(
+        !lc.contains("атым — адам"),
+        "P0 #1 regression: reply mis-fired AskName persona path — got: {reply}"
+    );
+}
+
+/// **v6.1.5 P0 #1 guard.** Ensure the word-boundary tightening
+/// did not regress the legitimate self-recall AskName path.
+#[test]
+fn ask_name_self_recall_still_works() {
+    let _guard = AnswerIrEnvGuard::enable();
+    let lex = load_lex();
+    let repo = load_repo();
+    let facts = load_world_core_facts();
+    if facts.is_empty() {
+        return;
+    }
+    let mut conv = Conversation::new().with_reasoning_chains(facts, Vec::new());
+    let _ = conv.turn("Менің атым Дәулет.", &lex, &repo, 0);
+    let reply = conv.turn("Менің атым кім?", &lex, &repo, 1);
+    let lc = reply.to_lowercase();
+    assert!(
+        lc.contains("дәулет"),
+        "AskName self-recall regression after P0 #1 fix — got: {reply}"
+    );
+}
+
+/// **v6.1.5 P0 #2.** Pin the contrastive-farewell-rejection
+/// shape: «Сау болыңыз емес, әлі сөйлесейік» (= "not goodbye,
+/// let's keep talking") must NOT emit a Farewell reply. Pre-fix
+/// real REPL produced «Аман бол» because
+/// `split_compound_utterance` comma-cut the input before
+/// `detect_farewell`'s «емес»-token guard could see the
+/// continuation. v6.1.5 adds a contrastive-farewell-rejection
+/// detector that both bails the splitter AND rewrites `input`
+/// at the top of `turn_with_trace` to just the continuation.
+#[test]
+fn contrastive_farewell_rejection_does_not_fire_farewell() {
+    let _guard = AnswerIrEnvGuard::enable();
+    let lex = load_lex();
+    let repo = load_repo();
+    let facts = load_world_core_facts();
+    if facts.is_empty() {
+        return;
+    }
+    let mut conv = Conversation::new().with_reasoning_chains(facts, Vec::new());
+    let reply = conv.turn("Сау болыңыз емес, әлі сөйлесейік.", &lex, &repo, 0);
+    let lc = reply.to_lowercase();
+    assert!(
+        !lc.contains("аман бол")
+            && !lc.contains("сау бол")
+            && !lc.contains("қош бол")
+            && !lc.contains("кездескенше"),
+        "P0 #2 regression: contrastive-farewell-rejection emitted a Farewell — got: {reply}"
+    );
+}
+
 #[test]
 fn flag_off_does_not_change_default_behaviour() {
     // Sanity check: without the flag, the v6.0.13 keyword fallback

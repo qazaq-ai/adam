@@ -28,6 +28,70 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.1.5] — 2026-05-23 — post-merge audit fixes: 2 P0 + 1 P1 dialog regressions
+
+> Three bug fixes surfaced by the user's 2026-05-23 real-REPL
+> audit of v6.1.0. Same-day patch release closing the
+> default-on blockers identified in
+> [`docs/v6_1_answer_ir_design.md`](docs/v6_1_answer_ir_design.md)
+> §"Stage 5 decision".
+
+### Fixes
+
+- **P0 #1 — `NamedAfter` collides with `AskName`.** «Қостанай
+  өңірлік университеті кімнің атымен аталған?» replied «Атым —
+  адам.» because `detect_ask_name` in
+  [`crates/adam-dialog/src/semantics.rs`](crates/adam-dialog/src/semantics.rs)
+  used `joined.contains("атым")` substring match, which fires on
+  the «атым» prefix of «атымен» (instrumental of «атым»). New
+  `contains_word` helper does word-boundary substring matching;
+  the three affected `"атым"` / `"есімім"` checks now use it.
+  The legitimate self-recall path («Менің атым кім?») still
+  works — verified by a new regression test.
+- **P0 #2 — Contrastive-farewell REPL split.** «Сау болыңыз
+  емес, әлі сөйлесейік» emitted «Аман бол» (Farewell) followed
+  by a clarification turn because
+  [`split_compound_utterance`](crates/adam-dialog/src/discourse.rs)
+  comma-cut the input BEFORE `detect_farewell`'s «емес» token
+  guard could see the continuation token. New
+  `is_contrastive_farewell_rejection` /
+  `apply_contrastive_farewell_rejection` pair in `semantics.rs`
+  (a) bails the splitter on this shape, and (b) gets called at
+  the top of `turn_with_trace` to rewrite the input to just the
+  continuation BEFORE intent classification.
+- **P1 — Continuation handler drifted to generic capabilities
+  listing on seen-list exhaustion.** «Ал тағы айт» / «Тағы не
+  білесіз?» after a broad-topic seed turn surfaced
+  `AskAboutSystem { Knowledge }`'s capability listing once the
+  per-subject `broad_topic_seen` was drained. The handler in
+  [`conversation.rs`](crates/adam-dialog/src/conversation.rs)
+  now ALWAYS takes over the turn when
+  `broad_topic_subject` is held + `is_continuation_request`
+  fires — when `compose_broad_topic` returns None, it emits a
+  deterministic «{subject} бойынша білетін деректерім таусылды.
+  Басқа қырын сұрасаңыз — нақтырақ қарап шығайын.» fallback
+  via grounded_fact.
+
+### Testing
+
+- 3 new regression tests pinning each fix via the REAL
+  `Conversation::turn` flow (not paraphrased unit shells):
+  - `named_after_does_not_collide_with_ask_name`
+  - `ask_name_self_recall_still_works` (guard against P0 #1 fix
+    regressing the legitimate path)
+  - `contrastive_farewell_rejection_does_not_fire_farewell`
+  - `continuation_exhausted_emits_honest_no_more_message`
+- `cargo test --workspace --all-targets --release`: **1 722 / 0**
+  (+4 over v6.1.0).
+- `cargo clippy --workspace --all-targets -- -D warnings`: clean.
+
+### Default-on status
+
+v6.1.5 closes the two P0 dialog regressions that blocked default-
+on per the user's post-merge audit. The flag stays opt-in until
+the 4-week REPL audit window completes; v6.1.5 is the
+deterministic foundation that audit will run against.
+
 ## [6.1.0] — 2026-05-23 — AnswerIR + predicate-aware retrieval (opt-in)
 
 > 5-stage research arc on `experimental/v6_1_answer_ir` (6 commits)

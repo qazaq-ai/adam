@@ -774,6 +774,25 @@ impl Conversation {
         repo: &TemplateRepository,
         rng_seed: u64,
     ) -> (String, TurnTrace) {
+        // **v6.1.5 — 2026-05-23 audit fix P0 #2.** Contrastive-
+        // farewell rejection: «Сау болыңыз емес, әлі сөйлесейік»
+        // (= "not goodbye, let's keep talking") should classify
+        // the CONTINUATION, not the rejected farewell. Rewriting
+        // `input` here ensures every downstream layer (intent
+        // detector, slot extractor, AnswerIR probe, planner)
+        // sees just «Әлі сөйлесейік.» instead of the full
+        // rejection string. `split_compound_utterance` already
+        // bails on this shape so the whole string reaches us as
+        // one clause; the rewrite turns it into clean dialog.
+        let rewritten_input;
+        let input: &str = if let Some(continuation) =
+            crate::semantics::apply_contrastive_farewell_rejection(input)
+        {
+            rewritten_input = continuation;
+            &rewritten_input
+        } else {
+            input
+        };
         // **v4.6.20** — preamble stripper. Real-REPL surfaced
         // sentences like «Айтайын дегенім, қолданыстағы жасанды
         // интеллект модельдерінен қалай жақсырақ бола аласыз?» —
@@ -1500,41 +1519,47 @@ impl Conversation {
             if let Some(subject) = self.dialog_context.broad_topic_subject.clone() {
                 let already_seen = self.dialog_context.broad_topic_seen.clone();
                 let mut newly_seen = Vec::new();
-                if let Some(composed) = crate::broad_topic::compose_broad_topic(
+                let composed = crate::broad_topic::compose_broad_topic(
                     &subject,
                     &self.extracted_facts,
                     &already_seen,
                     &mut newly_seen,
-                ) {
+                );
+                // **v6.1.5 — 2026-05-23 audit fix P1.** ALWAYS take
+                // over the turn when `broad_topic_subject` is held +
+                // continuation request fires. If `compose_broad_topic`
+                // returned new facts, surface them; if the seen list
+                // is exhausted, surface an honest deterministic
+                // «no more on this topic» message instead of letting
+                // the cascade drift into a generic capabilities
+                // listing (the v6.1.0 Stage 4 bug surfaced by the
+                // 2026-05-23 audit on a 4-turn «ал тағы / тағы не
+                // білесіз» loop).
+                let body = if let Some(text) = composed {
                     self.dialog_context.broad_topic_seen.extend(newly_seen);
-                    // Rewrite intent so the planner / realiser
-                    // surfaces the multi-claim text as a grounded
-                    // fact. Continuation requests sometimes classify
-                    // as Intent::Unknown (free-form follow-up), other
-                    // times the cascade routes them to a self-
-                    // knowledge / capability intent («тағы не
-                    // білесіз?»). In both cases the v6.1.0 contract
-                    // is: when broad_topic_subject is held, the user
-                    // wants MORE of that subject — override the
-                    // intent shell with a fresh Unknown carrying our
-                    // multi-claim grounded_fact.
-                    intent = Intent::Unknown {
-                        raw_tokens: Vec::new(),
-                        noun_hint: Some(subject.clone()),
-                        example: None,
-                        grounded_fact: Some(composed),
-                        example_adapted: false,
-                        reasoning_chain: None,
-                        question_shape: None,
-                        temporal_scope: false,
-                        compositional_function: false,
-                        noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
-                        input_modality: None,
-                        input_evidence: None,
-                        input_is_inversion_question: false,
-                        noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
-                    };
-                }
+                    text
+                } else {
+                    format!(
+                        "{} бойынша білетін деректерім таусылды. Басқа қырын сұрасаңыз — нақтырақ қарап шығайын.",
+                        capitalise_first_char(&subject)
+                    )
+                };
+                intent = Intent::Unknown {
+                    raw_tokens: Vec::new(),
+                    noun_hint: Some(subject.clone()),
+                    example: None,
+                    grounded_fact: Some(body),
+                    example_adapted: false,
+                    reasoning_chain: None,
+                    question_shape: None,
+                    temporal_scope: false,
+                    compositional_function: false,
+                    noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
+                    input_modality: None,
+                    input_evidence: None,
+                    input_is_inversion_question: false,
+                    noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
+                };
             }
         }
         if let Intent::Unknown {
@@ -5004,6 +5029,19 @@ fn inflect(root: &str, case: Case) -> String {
     let mut features = NounFeatures::default();
     features.case = Some(case);
     synthesise_noun(root, features)
+}
+
+/// **v6.1.5.** Capitalise the first character of a string in
+/// place (Kazakh / Cyrillic / Latin all handled via Unicode
+/// `to_uppercase`). Used by the BroadTopic continuation handler
+/// when emitting the deterministic "no more on this topic"
+/// fallback so the reply starts with a capital.
+fn capitalise_first_char(s: &str) -> String {
+    let mut chars = s.chars();
+    match chars.next() {
+        Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
+        None => String::new(),
+    }
 }
 
 /// **v6.0.5 — E1 production wiring.** Confidence-rescue override

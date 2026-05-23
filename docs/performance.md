@@ -1,12 +1,12 @@
-# Performance — adam v6.1.0 (deterministic path; neural preview + AnswerIR are opt-in)
+# Performance — adam v6.1.5 (deterministic path; neural preview + AnswerIR are opt-in)
 
-> **v6.1.0 note (originally drafted 2026-05-18 for rc1; the
-> 2026-05-22 GA merge held the numbers; v6.1.0 on 2026-05-23 adds
+> **v6.1.5 note (originally drafted 2026-05-18 for rc1; the
+> 2026-05-22 GA merge held the numbers; v6.1.5 on 2026-05-23 adds
 > the opt-in `ADAM_ANSWER_IR=1` path on top of the same
 > deterministic baseline).** The numbers below cover the
 > **deterministic kernel path** which remains the default in
-> v6.1.0 (identical behaviour to v6.0.0 / v5.32.0 — opt-in neural
-> transducers and the v6.1.0 AnswerIR composer do not change the
+> v6.1.5 (identical behaviour to v6.0.0 / v5.32.0 — opt-in neural
+> transducers and the v6.1.5 AnswerIR composer do not change the
 > default path). For the opt-in L5.5 neural-composer latency see
 > [`bench/neural_inference_2026_05_16.md`](bench/neural_inference_2026_05_16.md)
 > (M2 8 GB baseline; 88× headroom over the v6.0 target). The v6.0

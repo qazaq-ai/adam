@@ -1554,6 +1554,19 @@ pub fn split_compound_utterance(input: &str) -> Vec<String> {
     if crate::semantics::apply_kazakh_negation_correction(trimmed).is_some() {
         return vec![trimmed.to_string()];
     }
+    // **v6.1.5 — 2026-05-23 audit fix P0 #2.** The
+    // `apply_kazakh_negation_correction` bail above explicitly
+    // returns None for farewell heads («сау / қош / аман /
+    // кездескенше») so it doesn't produce degenerate residues
+    // like «сау әлі сөйлесейік». That left this splitter free
+    // to comma-cut «Сау болыңыз емес, әлі сөйлесейік», which
+    // sent «Сау болыңыз емес» to detect_farewell as a standalone
+    // clause and defeated its own token-level «емес» guard.
+    // Bail explicitly on contrastive-farewell-rejection shapes
+    // so the whole input flows to detect_farewell as one clause.
+    if crate::semantics::is_contrastive_farewell_rejection(trimmed) {
+        return vec![trimmed.to_string()];
+    }
     let mut parts: Vec<String> = Vec::new();
     let mut buf = String::new();
     let mut in_quote = false;

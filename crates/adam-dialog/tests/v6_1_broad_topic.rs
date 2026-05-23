@@ -151,6 +151,40 @@ fn subject_switch_resets_seen_state() {
     );
 }
 
+/// **v6.1.5 P1.** When continuation exhausts the seen list, the
+/// kernel must emit a honest deterministic "no more on this
+/// topic" message — NOT fall back to the generic system-
+/// knowledge / capabilities listing the v6.0.0 cascade picks up
+/// for «тағы не білесіз?». Pre-v6.1.5 the continuation handler
+/// only rewrote intent on `Some(composed)`, leaving exhausted
+/// runs to drift into AskAboutSystem{Knowledge}.
+#[test]
+fn continuation_exhausted_emits_honest_no_more_message() {
+    let _g = AnswerIrEnvGuard::enable();
+    let Some((mut conv, lex, repo)) = fresh_conv() else {
+        return;
+    };
+    // Run the broad-topic seed + enough continuations to drain
+    // the curated facts on Ахмет Байтұрсынұлы (~5-6 facts).
+    let _ = conv.turn("Ахмет Байтұрсынұлы туралы айтыңыз.", &lex, &repo, 0);
+    let _ = conv.turn("Ал тағы айт.", &lex, &repo, 1);
+    let _ = conv.turn("Тағы не білесіз?", &lex, &repo, 2);
+    // By turn 4 the seen list is drained on every realistic
+    // curated subject; the reply MUST be the deterministic
+    // exhausted-fallback, not a generic system-knowledge dump.
+    let r4 = conv.turn("Тағы не білесіз?", &lex, &repo, 3);
+    let lc4 = r4.to_lowercase();
+    assert!(
+        lc4.contains("деректерім таусылды") || lc4.contains("ахмет байтұрсынұлы"),
+        "P1 regression: exhausted-continuation reply did not emit the no-more-facts fallback — got: {r4}"
+    );
+    assert!(
+        !lc4.contains("мынадай тақырыптар жайлы білемін")
+            && !lc4.contains("қазіргі білімімнің ауқымы"),
+        "P1 regression: exhausted continuation drifted into generic capabilities listing — got: {r4}"
+    );
+}
+
 #[test]
 fn flag_off_does_not_change_broad_topic_behaviour() {
     let _guard = ENV_LOCK.lock().expect("env lock poisoned");

@@ -208,6 +208,87 @@ pub fn apply_kazakh_negation_correction(input: &str) -> Option<String> {
     Some(result)
 }
 
+/// **v6.1.5 — 2026-05-23 audit fix P0 #2.** Recognise the
+/// contrastive-farewell-rejection shape «{farewell head + verb}
+/// емес, {continuation}» («Сау болыңыз емес, әлі сөйлесейік»).
+/// Returns `true` when the input matches this shape so callers
+/// can short-circuit downstream paths that would otherwise split
+/// the input on the comma.
+///
+/// **Why this isn't `apply_kazakh_negation_correction`.** That
+/// helper would happily produce «Сау әлі сөйлесейік» by
+/// concatenating prefix + continuation, but the prefix is a
+/// truncated farewell verb phrase, not a slot value to keep —
+/// the v6.0.6 fix bails on farewell heads for exactly this
+/// reason (`prefix_ends_with_farewell_head`). The bail leaves
+/// `split_compound_utterance` free to comma-split, which gives
+/// the first clause «Сау болыңыз емес» to `detect_farewell`
+/// without the continuation token, defeating its own «емес»
+/// token guard. This helper is the split-level gate that keeps
+/// the WHOLE input flowing to `detect_farewell` as a single
+/// clause so its guard sees both `емес` AND the continuation.
+pub fn is_contrastive_farewell_rejection(input: &str) -> bool {
+    apply_contrastive_farewell_rejection(input).is_some()
+}
+
+/// **v6.1.5 — 2026-05-23 audit fix P0 #2.** Companion of
+/// [`is_contrastive_farewell_rejection`]. Returns the
+/// continuation clause stripped of the contrastive farewell head
+/// + «емес[+copula],» — i.e. for «Сау болыңыз емес, әлі
+/// сөйлесейік» returns `Some("Әлі сөйлесейік.")`.
+///
+/// Called by `Conversation::turn_with_trace` before intent
+/// classification: when the user is rejecting a farewell, the
+/// cascade should classify the CONTINUATION (the user's actual
+/// invitation to keep talking), not the rejected farewell.
+pub fn apply_contrastive_farewell_rejection(input: &str) -> Option<String> {
+    let lower = input.to_lowercase();
+    const FAREWELL_HEADS: &[&str] = &["сау бол", "қош бол", "аман бол", "кездескенше"];
+    let has_farewell_head = FAREWELL_HEADS.iter().any(|h| lower.contains(h));
+    if !has_farewell_head {
+        return None;
+    }
+    // Require «емес» AS A WORD (or inflected predicate copula
+    // form) followed by comma + non-empty continuation. The
+    // comma is what makes this a "X емес, Y" correction shape;
+    // a bare «X емес.» is a flat NEG, not a correction.
+    const NEG_FORMS: &[&str] = &["емеспіз", "емессіз", "емеспін", "емессің", "емес"];
+    let mut best_post_sep: Option<usize> = None;
+    let mut best_neg_start: usize = 0;
+    for neg in NEG_FORMS {
+        for sep in [", ", " , ", ","] {
+            let needle = format!("{neg}{sep}");
+            if let Some(idx) = lower.find(&needle) {
+                let before_ok = idx == 0
+                    || lower.as_bytes()[idx - 1].is_ascii_whitespace()
+                    || lower.as_bytes()[idx - 1] == b'-';
+                if !before_ok {
+                    continue;
+                }
+                let post_sep = idx + needle.len();
+                if best_post_sep.map(|b| post_sep < b).unwrap_or(true) {
+                    best_post_sep = Some(post_sep);
+                    best_neg_start = idx;
+                }
+            }
+        }
+    }
+    let post_sep = best_post_sep?;
+    if !input.is_char_boundary(post_sep) || !input.is_char_boundary(best_neg_start) {
+        return None;
+    }
+    let after = input[post_sep..].trim();
+    if after.is_empty() {
+        return None;
+    }
+    // Capitalise the first character of the continuation so the
+    // user-facing transcript reads as a clean standalone clause.
+    let mut chars = after.chars();
+    let head = chars.next()?;
+    let rest: String = chars.collect();
+    Some(format!("{}{}", head.to_uppercase(), rest))
+}
+
 /// Lexicon-aware variant used by `Conversation::turn` and
 /// `respond_with_repo`. When a lexicon is supplied, the occupation
 /// recogniser does a generic 1sg-copula strip + noun lookup instead
@@ -2456,6 +2537,53 @@ fn detect_ask_about_system(
     None
 }
 
+/// **v6.1.5.** Word-boundary substring check used by intent
+/// detectors that look for short 1sg-possessive markers like
+/// «атым» / «есімім» which are prefixes of longer inflected forms
+/// («атымен» = instrumental of «атым» = "with my name") that
+/// must NOT trigger the marker. Returns true iff `word` appears
+/// in `haystack` with non-alphanumeric (or string-boundary) chars
+/// on both sides.
+///
+/// **Why this exists.** Pre-v6.1.5 `detect_ask_name` used plain
+/// `joined.contains("атым")` substring matching. The 2026-05-23
+/// post-merge audit found that «Қостанай өңірлік университеті
+/// кімнің атымен аталған?» was misclassified as `Intent::AskName`
+/// because `joined.contains("атым")` fired on the «атым» prefix
+/// of «атымен» (instrumental of «атым»). The cascade then
+/// short-circuited to the AskName template («Атым — адам») and
+/// the v6.1.0 AnswerIR `PredicateFocus::NamedAfter` probe — which
+/// runs only inside `Intent::Unknown` — never got the chance to
+/// retrieve the curated `named_after` fact about KRU.
+fn contains_word(haystack: &str, word: &str) -> bool {
+    let mut start = 0;
+    while let Some(idx) = haystack[start..].find(word) {
+        let abs = start + idx;
+        let before_ok = abs == 0
+            || haystack[..abs]
+                .chars()
+                .next_back()
+                .map(|c| !c.is_alphanumeric())
+                .unwrap_or(true);
+        let after_ok = abs + word.len() >= haystack.len()
+            || haystack[abs + word.len()..]
+                .chars()
+                .next()
+                .map(|c| !c.is_alphanumeric())
+                .unwrap_or(true);
+        if before_ok && after_ok {
+            return true;
+        }
+        // Advance by at least one byte beyond the match to avoid
+        // infinite loop on overlapping rejected matches.
+        start = abs + word.len().max(1);
+        if start >= haystack.len() {
+            break;
+        }
+    }
+    false
+}
+
 fn detect_ask_name(joined: &str) -> bool {
     // **v5.4.6** — 2nd-person possessive disambiguation. When the
     // input has «сіздің» / «сенің» (2nd-person possessive) WITHOUT
@@ -2492,9 +2620,14 @@ fn detect_ask_name(joined: &str) -> bool {
         // «ат» (horse) and surfaced «Атым — адам». Mirrors the
         // long-standing «не / қандай» dual-form coverage in
         // `detect_ask_occupation`.
-        || (joined.contains("атым")
+        // **v6.1.5 — 2026-05-23 audit fix.** Word-boundary match
+        // on «атым» / «есімім» so the «атым» prefix of «атымен»
+        // (instrumental — «with my name» / «by the name of») does
+        // NOT fire here. «Қостанай ... кімнің атымен аталған?» is
+        // a NamedAfter retrieval query, not a name self-recall.
+        || (contains_word(joined, "атым")
             && (joined.contains("кім") || joined.contains("не") || joined.contains("қандай")))
-        || (joined.contains("есімім")
+        || (contains_word(joined, "есімім")
             && (joined.contains("кім") || joined.contains("не") || joined.contains("қандай")))
         // **v4.54.5** — recall-question variants:
         // «менің атымды есіңізде ме?» / «атымды ұмытпадыңыз ба?» /
@@ -2507,7 +2640,7 @@ fn detect_ask_name(joined: &str) -> bool {
         // **session 6 transcript fix.**
         // Also covers compound «аты-жөн» (name + family-name)
         // surfaced by autotest B post-v4.54.5.
-        || ((joined.contains("атым")
+        || ((contains_word(joined, "атым")
             || joined.contains("атымды")
             || joined.contains("аты-жөнім")
             || joined.contains("аты-жөнімді"))
@@ -2530,7 +2663,7 @@ fn detect_ask_name(joined: &str) -> bool {
                 || joined.contains("білдің")
                 || joined.contains("естіді")
                 || joined.contains("естіді")))
-        || ((joined.contains("есімім") || joined.contains("есімімді"))
+        || ((contains_word(joined, "есімім") || joined.contains("есімімді"))
             && (joined.contains("есіңізде")
                 || joined.contains("есіңде")
                 || joined.contains("ұмытпа")
