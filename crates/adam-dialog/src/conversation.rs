@@ -1491,6 +1491,51 @@ impl Conversation {
             ..
         } = &mut intent
         {
+            // **v6.1.0 Stage 3 — typed-focus predicate-aware
+            // retrieval (opt-in).** Behind `ADAM_ANSWER_IR=1`. When
+            // the input carries a typed predicate focus («қашан
+            // туылған», «қандай санатқа», …), pick the fact whose
+            // predicate matches the focus AND whose subject matches
+            // the noun hint. This is the design-doc cleaner
+            // replacement for the v6.0.13 PREDICATE_KEYWORDS keyword-
+            // in-raw_text hack: instead of grepping fact bodies for
+            // keyword shadows, we look up by typed predicate.
+            //
+            // When the flag is off (default), or no focus is
+            // detected, this block is a no-op and the v6.0.13 path
+            // below stays authoritative. Cascade pass-through
+            // invariant: `ADAM_ANSWER_IR=0` → behaviour is
+            // bit-identical to v6.0.0.
+            //
+            // See [`crates/adam-dialog/src/predicate_focus.rs`] for
+            // the focus enum + detector, and
+            // [`docs/v6_1_answer_ir_design.md`] §Stage 3 for the
+            // wiring plan.
+            // The contract: if a typed predicate focus is detected
+            // AND a fact exists matching `(subject = noun, predicate
+            // = focus.matching_predicate())`, OVERRIDE whatever
+            // upstream retrieval (graph probe, search-graph fallback,
+            // IsA preference) already put in `grounded_fact`. This is
+            // intentional — the typed focus is strictly more specific
+            // than the unfocused IsA / RelatedTo fallback, so it must
+            // win when present.
+            if std::env::var("ADAM_ANSWER_IR").as_deref() == Ok("1") {
+                if let Some(focus) = crate::predicate_focus::detect(input, None) {
+                    if let Some(target_predicate) = focus.matching_predicate() {
+                        let noun_lower = noun.to_lowercase();
+                        let typed_fact = self.extracted_facts.iter().find(|f| {
+                            f.predicate == target_predicate
+                                && f.subject.root.to_lowercase() == noun_lower
+                        });
+                        if let Some(fact) = typed_fact {
+                            *grounded_fact = Some(fact.raw_text.clone());
+                            *example = None;
+                            *reasoning_chain = None;
+                        }
+                    }
+                }
+            }
+
             const KRU_DOMAIN_SUBJECTS: &[&str] = &[
                 "ахмет байтұрсынұлы",
                 "ахмет байтұрсынұлы атындағы қостанай өңірлік университеті",

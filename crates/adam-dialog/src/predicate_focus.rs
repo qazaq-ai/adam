@@ -97,6 +97,29 @@ impl PredicateFocus {
             Self::Relational => "relational",
         }
     }
+
+    /// Map a `PredicateFocus` to the `adam_reasoning::Predicate` it
+    /// expects to retrieve. `Relational` is the only focus without a
+    /// direct mapping — it represents the genitive-possessive query
+    /// shape («X-нің Y-сі кім?»), which Stage 3 falls back to v6.0.13
+    /// retrieval for and Stage 4+ may decompose into typed sub-queries.
+    pub fn matching_predicate(self) -> Option<adam_reasoning::Predicate> {
+        use adam_reasoning::Predicate::*;
+        Some(match self {
+            Self::IsA => IsA,
+            Self::BornIn => BornIn,
+            Self::DiedIn => DiedIn,
+            Self::FoundedIn => FoundedIn,
+            Self::EffectiveFrom => EffectiveFrom,
+            Self::Classifies => Classifies,
+            Self::RiskLevel => RiskLevel,
+            Self::LocatedIn => LocatedIn,
+            Self::Authored => Authored,
+            Self::NamedAfter => NamedAfter,
+            Self::MemberOf => MemberOf,
+            Self::Relational => return None,
+        })
+    }
 }
 
 /// Detect the predicate focus in a raw user input.
