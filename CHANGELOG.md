@@ -28,6 +28,77 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.1.10] — 2026-05-23 — post-v6.1.5 audit round-2: 2 deviations closed via real REPL
+
+> Same-day follow-up to v6.1.5. Per the user's directive («real
+> human-level dialog testing, fix deviations immediately»), ran
+> a 10-prompt novel-phrasing REPL audit on the v6.1.5 surface
+> and found 4 pre-existing deviations. 2 fixed in v6.1.10; the
+> remaining 2 (compound NP topic extraction + colloquial-alias
+> fuzzy bridge) are deeper architectural work tracked as v6.2
+> candidates.
+
+### Fixes
+
+- **Round-2 #2 — Curated abbreviation falls through.** «КРУ
+  қашан құрылған?» replied with the clarification template
+  because (a) topic extraction dropped the 3-char abbreviation
+  «кру» and (b) even when «кру» reached the Stage 3 typed-focus
+  probe, the FoundedIn fact lives on the canonical full-name
+  subject «қостанай өңірлік университеті», not on «кру». Fixed
+  by (a) registering «кру» in
+  [`crates/adam-dialog/src/topic_extraction.rs::MULTIWORD_ENTITIES`](crates/adam-dialog/src/topic_extraction.rs),
+  and (b) adding an IsA-alias bridge to the Stage 3 probe in
+  [`crates/adam-dialog/src/conversation.rs`](crates/adam-dialog/src/conversation.rs):
+  when no direct typed fact matches the noun_hint, follow the
+  noun's outgoing IsA edges and re-probe under each canonical
+  alias. First hit wins.
+- **Round-2 #4 — 1sg-self-reflective name recall.** «Есімде ме,
+  менің атым?» replied «Ат бағасы иеленеді» (horse statement)
+  because (a) `split_compound_utterance` comma-cut the input
+  into «Есімде ме» + «менің атым» before `detect_ask_name`
+  could see both halves together, and (b) the 1sg-poss-loc
+  memory verbs («есімде» / «есімімде») weren't in the existing
+  2sg memory-probe list. Fixed by (a) adding
+  `looks_like_name_recall` bail to `split_compound_utterance`
+  so the WHOLE comma-bearing input reaches the cascade, and (b)
+  adding the 1sg-poss-loc forms to the memory-probe alternation
+  in `detect_ask_name`.
+
+### Audit baseline
+
+The 10-prompt novel-phrasing battery now passes 8/10 (up from
+6/10 on v6.1.5). The 2 remaining fails are tracked for v6.2:
+
+- «Ахметтің еңбектерін атаңыз.» → topic extractor binds «еңбек»
+  instead of «ахмет байтұрсынұлы» (genitive possessor should win
+  for list-style queries against Authored).
+- «Қорғаныс ИИ-нің тәуекел деңгейі қандай?» — colloquial alias
+  «Қорғаныс ИИ» doesn't link to curated «қорғаныс саласындағы
+  жасанды интеллект». Same shape as #2 (round-2) but at the
+  multi-word-entity level rather than the abbreviation level;
+  needs a fuzzy alias table.
+
+### Testing
+
+- `cargo test --workspace --all-targets --release`: **1 722 / 0**.
+- `cargo clippy --workspace --all-targets -- -D warnings`: clean.
+- `cargo fmt --all --check`: clean.
+- 4 v6.1.5 audit regressions still pinned and green
+  (`named_after_does_not_collide_with_ask_name`,
+   `ask_name_self_recall_still_works`,
+   `contrastive_farewell_rejection_does_not_fire_farewell`,
+   `continuation_exhausted_emits_honest_no_more_message`).
+- v6.1.5's 28/30 `v6_1_predicate_eval_30` still passes.
+
+### Default-on status
+
+Still opt-in. v6.1.5's two P0 closures and v6.1.10's two more
+deviations close the audit-blockers in
+[[project_v6_1_x_audit_backlog]] +
+[[project_v6_1_x_audit_round2]]. The 4-week REPL audit window
+runs against v6.1.10.
+
 ## [6.1.5] — 2026-05-23 — post-merge audit fixes: 2 P0 + 1 P1 dialog regressions
 
 > Three bug fixes surfaced by the user's 2026-05-23 real-REPL

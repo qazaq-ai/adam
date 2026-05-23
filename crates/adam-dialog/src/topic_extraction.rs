@@ -532,6 +532,17 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "ақпараттық қылмыс",
     "қазақстан заңы",
     "қорғау шарасы",
+    // **v6.1.10 — 2026-05-23 audit round-2 #2.** The 3-letter
+    // abbreviation «кру» is in `kru_012` as a curated subject
+    // IsA'd to «қостанай өңірлік университеті», but pre-v6.1.10
+    // the topic extractor dropped it (3-char tokens land below
+    // most stop-word heuristics). The Stage 3 typed-focus probe
+    // now follows IsA aliases (see conversation.rs), but it
+    // can't fire unless noun_hint extraction surfaces «кру»
+    // first. Registering as a multiword entity (single token —
+    // length-1 entries are fine in MULTIWORD_ENTITIES, the
+    // longest-match scan handles them).
+    "кру",
     "1872 жылы 5 қыркүйек",
     "1937 жылы 8 желтоқсан",
     "2026 жылы 18 қаңтар",

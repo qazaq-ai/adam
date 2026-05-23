@@ -2584,6 +2584,27 @@ fn contains_word(haystack: &str, word: &str) -> bool {
     false
 }
 
+/// Public so [`crate::discourse::split_compound_utterance`] can
+/// bail when the WHOLE comma-bearing input matches the recall
+/// pattern, preventing the comma split from separating the
+/// memory-probe verb from its 1sg-possessive noun across clauses.
+pub fn looks_like_name_recall(input: &str) -> bool {
+    // Mirrors the lowering done inside interpret_text_with_lexicon
+    // before detect_ask_name is consulted.
+    let lower: String = input
+        .split_whitespace()
+        .map(|t| {
+            t.chars()
+                .filter(|c| c.is_alphabetic() || c.is_ascii_digit() || *c == '-')
+                .collect::<String>()
+                .to_lowercase()
+        })
+        .filter(|t| !t.is_empty())
+        .collect::<Vec<_>>()
+        .join(" ");
+    detect_ask_name(&lower)
+}
+
 fn detect_ask_name(joined: &str) -> bool {
     // **v5.4.6** — 2nd-person possessive disambiguation. When the
     // input has «сіздің» / «сенің» (2nd-person possessive) WITHOUT
@@ -2646,6 +2667,18 @@ fn detect_ask_name(joined: &str) -> bool {
             || joined.contains("аты-жөнімді"))
             && (joined.contains("есіңізде")
                 || joined.contains("есіңде")
+                // **v6.1.5 round-2.** 1sg-self-reflective memory
+                // probe: «Есімде ме, менің атым?» (= "is [it] in
+                // my memory, my name?"). Pre-fix the cascade
+                // mis-routed this to topic extraction on «ат»
+                // (horse) and surfaced «Ат бағасы иеленеді».
+                // Both «есімде» (1sg-poss-loc of «ес» = memory)
+                // and «есімімде» (1sg-poss-loc of «есім» = name
+                // — the alternative parse) trigger the memory-
+                // probe path so the user gets their stored name
+                // back regardless of which idiom they used.
+                || joined.contains("есімде")
+                || joined.contains("есімімде")
                 || joined.contains("ұмытпа")
                 // **v4.93.0** — Codex 2026-05-07 audit: extend
                 // recall-question markers to forgetting-verbs and
@@ -2666,6 +2699,8 @@ fn detect_ask_name(joined: &str) -> bool {
         || ((contains_word(joined, "есімім") || joined.contains("есімімді"))
             && (joined.contains("есіңізде")
                 || joined.contains("есіңде")
+                || joined.contains("есімде")
+                || joined.contains("есімімде")
                 || joined.contains("ұмытпа")
                 || joined.contains("ұмытты")
                 || joined.contains("білесіз")

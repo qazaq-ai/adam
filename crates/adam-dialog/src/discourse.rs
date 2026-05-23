@@ -1567,6 +1567,17 @@ pub fn split_compound_utterance(input: &str) -> Vec<String> {
     if crate::semantics::is_contrastive_farewell_rejection(trimmed) {
         return vec![trimmed.to_string()];
     }
+    // **v6.1.10 — 2026-05-23 audit round-2 #4.** Name-recall
+    // patterns like «Есімде ме, менің атым?» split here pre-
+    // v6.1.10 because the comma separator cleaved the memory-
+    // probe verb from its 1sg-poss noun. Each half then failed
+    // `detect_ask_name` on its own (the AND-shape needs BOTH
+    // halves in the same `joined`) and the kernel fell through
+    // to retrieval on «есім» (surfacing a proverb) and «ат»
+    // (horse). Bail so the WHOLE input reaches detect_ask_name.
+    if crate::semantics::looks_like_name_recall(trimmed) {
+        return vec![trimmed.to_string()];
+    }
     let mut parts: Vec<String> = Vec::new();
     let mut buf = String::new();
     let mut in_quote = false;

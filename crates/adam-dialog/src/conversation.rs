@@ -1603,10 +1603,37 @@ impl Conversation {
                 if let Some(focus) = crate::predicate_focus::detect(input, None) {
                     if let Some(target_predicate) = focus.matching_predicate() {
                         let noun_lower = noun.to_lowercase();
-                        let typed_fact = self.extracted_facts.iter().find(|f| {
+                        let mut typed_fact = self.extracted_facts.iter().find(|f| {
                             f.predicate == target_predicate
                                 && f.subject.root.to_lowercase() == noun_lower
                         });
+                        // **v6.1.10 — 2026-05-23 audit round-2 #2.**
+                        // IsA-alias bridge. When no direct typed fact
+                        // matches the noun_hint, follow the noun's
+                        // outgoing IsA edges (curated abbreviations
+                        // like «кру» IsA «қостанай өңірлік
+                        // университеті») and re-probe under each
+                        // canonical alias. The first hit wins.
+                        if typed_fact.is_none() {
+                            let aliases: Vec<String> = self
+                                .extracted_facts
+                                .iter()
+                                .filter(|f| {
+                                    f.predicate == adam_reasoning::Predicate::IsA
+                                        && f.subject.root.to_lowercase() == noun_lower
+                                })
+                                .map(|f| f.object.root.to_lowercase())
+                                .collect();
+                            for alias in aliases.iter() {
+                                if let Some(hit) = self.extracted_facts.iter().find(|f| {
+                                    f.predicate == target_predicate
+                                        && f.subject.root.to_lowercase() == *alias
+                                }) {
+                                    typed_fact = Some(hit);
+                                    break;
+                                }
+                            }
+                        }
                         if let Some(fact) = typed_fact {
                             *grounded_fact = Some(fact.raw_text.clone());
                             *example = None;
