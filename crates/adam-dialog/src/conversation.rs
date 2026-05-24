@@ -820,6 +820,32 @@ impl Conversation {
         repo: &TemplateRepository,
         rng_seed: u64,
     ) -> (String, TurnTrace) {
+        // **v6.1.40 — 2026-05-24 voice audit round 2.** Smart
+        // consecutive-turn honorific dedup. If the PREVIOUS turn
+        // emitted the diminutive («Дәке»), set a session flag the
+        // planner consults to suppress on THIS turn — preventing
+        // the «Дәке, X. Дәке, Y.» robotic doubling on multi-clause
+        // utterances split by `split_compound_utterance` into
+        // sequential `turn()` calls. The flag is regenerated each
+        // turn from `last_honorific_turn_counter`; after the
+        // honorific re-emits, the flag clears and honorific is
+        // welcome again on the next non-consecutive turn.
+        {
+            let last: usize = self
+                .session
+                .get("last_honorific_turn_counter")
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(usize::MAX);
+            let cur = self.turn_counter;
+            // Suppress when the diminutive fired on the IMMEDIATELY
+            // preceding turn. `usize::MAX` sentinel = never fired,
+            // never suppress.
+            let suppress = last != usize::MAX && cur.saturating_sub(last) <= 1;
+            self.session.insert(
+                "honorific_suppress_this_turn".into(),
+                if suppress { "true" } else { "false" }.into(),
+            );
+        }
         // **v6.1.5 — 2026-05-23 audit fix P0 #2.** Contrastive-
         // farewell rejection: «Сау болыңыз емес, әлі сөйлесейік»
         // (= "not goodbye, let's keep talking") should classify
@@ -3473,6 +3499,23 @@ impl Conversation {
                 let canonical = russian_to_kazakh_canonical(noun).unwrap_or_else(|| noun.clone());
                 self.session
                     .insert("pending_clarification_noun".into(), canonical);
+            }
+        }
+        // **v6.1.40 — 2026-05-24 voice audit round 2.** Record whether
+        // THIS turn emitted the name-derived diminutive («Дәке») so
+        // the NEXT turn's `honorific_suppress_this_turn` flag fires
+        // and the planner uses the literal name on the consecutive
+        // clause. Detection is purely text-based: if the stored
+        // `name`'s diminutive form actually appears in the realised
+        // reply, this turn used it.
+        if let Some(name) = self.session.get("name").cloned() {
+            if let Some(diminutive) = crate::language_core::kazakh_respectful_address(&name) {
+                if diminutive != name && final_output.contains(&diminutive) {
+                    self.session.insert(
+                        "last_honorific_turn_counter".into(),
+                        self.turn_counter.to_string(),
+                    );
+                }
             }
         }
         (final_output, trace)

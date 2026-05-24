@@ -1590,22 +1590,26 @@ fn ensure_geo_kind_slot(slots: &mut HashMap<String, String>) {
 fn ensure_name_respect_slot(slots: &mut HashMap<String, String>) {
     if !slots.contains_key("name_respect") {
         if let Some(name) = slots.get("name").cloned() {
-            // **v6.1.35 — 2026-05-24 human-dialog audit finding #9.**
-            // User reported «Айдос → Айәке» honorific spam: every
-            // factual turn started with the auto-derived diminutive,
-            // making the dialog feel artificial. Disabled by default
-            // until native-speaker review confirms the form / register
-            // is appropriate for the v6 audience. The
-            // `kazakh_respectful_address` helper stays in the public
-            // surface for future explicit opt-in via
-            // `ADAM_HONORIFIC=1`; default auto-derivation now uses
-            // the literal name.
-            let opt_in_honorific = std::env::var("ADAM_HONORIFIC").as_deref() == Ok("1");
-            let respect = if opt_in_honorific {
+            // **v6.1.40 — 2026-05-24 voice audit round 2.** Smart
+            // consecutive-turn dedup. User clarified the v6.1.35
+            // finding: honorific itself IS welcome, but repeating
+            // it on the second clause of a multi-clause utterance
+            // is robotic («Дәке, X. Дәке, Y.»). When the previous
+            // turn already emitted the honorific, `conversation::
+            // turn_with_trace` writes a session slot
+            // `honorific_suppress_this_turn = "true"` at the top
+            // of the current turn; we read it here. `ADAM_HONORIFIC
+            // =0` env still hard-disables for tests / debug.
+            let consecutive_suppress = slots
+                .get("honorific_suppress_this_turn")
+                .map(|v| v == "true")
+                .unwrap_or(false);
+            let hard_disable = std::env::var("ADAM_HONORIFIC").as_deref() == Ok("0");
+            let respect = if consecutive_suppress || hard_disable {
+                name.clone()
+            } else {
                 crate::language_core::kazakh_respectful_address(&name)
                     .unwrap_or_else(|| name.clone())
-            } else {
-                name.clone()
             };
             slots.insert("name_respect".into(), respect);
         }
@@ -1704,20 +1708,23 @@ fn extract_slots_with_session(
     match intent {
         Intent::StatementOfName { name } => {
             slots.insert("name".into(), name.clone());
-            // **v6.1.35 — 2026-05-24 human-dialog audit finding #9.**
-            // Name-derived honorific («Дәулет → Дәке», «Айдос →
-            // Айәке») is now opt-in via `ADAM_HONORIFIC=1`. Default
-            // uses the literal name. Reason: 2026-05-24 audit
-            // reported every factual turn started with the auto-
-            // derived diminutive, feeling artificial / robotic.
-            // Native-speaker review is needed before re-enabling
-            // the form by default. The gender-pitch vocative path
-            // («Ағай / Апай / Балам» when no name is known) is a
-            // SEPARATE mechanism in `conversation.rs` and stays
-            // on — that one was explicitly user-approved at
-            // v6.1.15.
-            let opt_in_honorific = std::env::var("ADAM_HONORIFIC").as_deref() == Ok("1");
-            if opt_in_honorific {
+            // **v6.1.40 — 2026-05-24 voice audit round 2.** Smart
+            // consecutive-turn dedup (mirror of the policy in
+            // `ensure_name_respect_slot`). On the FIRST clause of a
+            // name introduction the honorific reads naturally
+            // («Дәке, танысқаныма қуаныштымын.»); on a SECOND
+            // clause of the same compound utterance («Мен
+            // бағдарламашы.») repeating «Дәке, бағдарламашы — …»
+            // is robotic. We respect the session-set
+            // `honorific_suppress_this_turn` flag written by
+            // `conversation::turn_with_trace` when the previous
+            // turn already emitted the diminutive.
+            let consecutive_suppress = slots
+                .get("honorific_suppress_this_turn")
+                .map(|v| v == "true")
+                .unwrap_or(false);
+            let hard_disable = std::env::var("ADAM_HONORIFIC").as_deref() == Ok("0");
+            if !consecutive_suppress && !hard_disable {
                 if let Some(respect) = crate::language_core::kazakh_respectful_address(name) {
                     slots.insert("name_respect".into(), respect.clone());
                     slots.insert("name_respect_distinct".into(), respect);
@@ -1728,8 +1735,9 @@ fn extract_slots_with_session(
                 slots.insert("name_respect".into(), name.clone());
                 // No `name_respect_distinct` — warmth templates
                 // («Сізді {name_respect_distinct} деп атаймын»)
-                // won't fire when honorific is off, which is
-                // exactly what we want.
+                // are suppressed on the consecutive-clause turn,
+                // letting the second clause render cleanly without
+                // the doubled honorific.
             }
         }
         Intent::StatementOfAge { years: Some(years) } => {

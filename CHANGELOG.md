@@ -28,6 +28,56 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.1.40] — 2026-05-24 — smart honorific dedup (round 2 voice audit)
+
+> User's v6.1.35 voice REPL audit clarified the v6.1.30 honorific
+> finding: the issue is NOT «honorific used by default» — it's
+> «honorific repeated к месту и не к месту». Rolling back the
+> v6.1.35 env-gate (default off) and replacing with smart
+> consecutive-turn dedup.
+
+### Fixes
+
+- **v6.1.35 honorific env-gate ROLLED BACK.** v6.1.35 disabled the
+  diminutive («Дәке / Айәке») by default, requiring
+  `ADAM_HONORIFIC=1` to enable. User clarified this was over-
+  correction: the diminutive itself is welcome — just not
+  repeated robotically. v6.1.40 brings the diminutive back ON by
+  default, with `ADAM_HONORIFIC=0` as the new hard-disable
+  escape hatch.
+- **Smart consecutive-turn dedup.** When `split_compound_utterance`
+  cuts a multi-clause user utterance («Менің атым Дәулет. Мен
+  бағдарламашы.») into sequential `turn()` calls, pre-v6.1.40 BOTH
+  replies prefixed with «Дәке, …». Now `conversation::turn_with_trace`
+  tracks `session["last_honorific_turn_counter"]` whenever the
+  realised reply contains the diminutive; the NEXT turn's
+  planner reads `session["honorific_suppress_this_turn"]` and
+  suppresses the diminutive on the consecutive clause. After
+  one non-honorific gap turn, the diminutive is welcome again.
+
+### Tracked for v6.2.0 (this round's audit additions)
+
+Both saved to [[project_v6_1_35_audit_round_2]]:
+
+- **Kazakh-word number parsing in math expressions.** User
+  trace: «Жеті көбейт 5-ге» ✓ vs. «25 беске кубейт» ✗. The
+  parser handles digit+dative but fails on word-number+dative.
+  Need to extend the closed cardinal-number set with their
+  dative forms (бір→бірге, бес→беске, он→онға, жиырма→жиырмаға,
+  …).
+- **Cities curation gap (re-confirmed).** «Қарағанды туралы
+  айтшы» → clarification; «Қала — елді мекен» tautology on
+  «Қарағанды қалада не бар?»; Rudnyy / AlumKaz plant unknown.
+  Already tracked in [[project_v6_2_cities_and_hot_cache]];
+  curation priority: 17 oblast centres + top-3 industrial sites
+  + main districts per oblast.
+
+### Testing
+
+- `cargo test --workspace --all-targets --release`: **1 724 / 0**.
+- `cargo clippy --workspace --all-targets -- -D warnings`: clean.
+- `cargo fmt --all --check`: clean.
+
 ## [6.1.35] — 2026-05-24 — deep human-dialog audit: 3 P0 closures from 10 findings
 
 > User's 2026-05-24 deep audit (76 single-prompt human-style
