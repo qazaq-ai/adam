@@ -42,10 +42,20 @@ fully deterministic retrieval-and-reasoning kernel; the v6.0 line
 adds an **algebra-anchored neural composition layer** between the
 deterministic template (L5) and the verifier (L6) — neural training
 inside an FST-validity envelope inside a factual-groundedness
-verifier. The default cascade behaviour on `main` is bit-identical
-to v5.32.0; the v6.0 neural transducers (E1 intent rescue / E2 slot
-rescue / L5.5 TinyAgt composer) are opt-in behind `ADAM_NEURAL_*=1`
-and `--features neural` flags. Unlike LLMs, adam has zero GPU
+verifier. The v6.1 series (current line, 2026-05-23 to 2026-05-24,
+v6.1.0 → v6.1.50 across 11 releases) adds the AnswerIR research arc
+behind `ADAM_ANSWER_IR=1` opt-in: typed predicate-focus retrieval
+(11 new typed `Predicate` variants on top of the v6.0 IsA/RelatedTo
+set), BroadTopic multi-claim composer for «X туралы айтыңыз»
+queries, gender-pitch vocative («Ағай / Апай / Балам»),
+contrastive-farewell rewrite, smart honorific dedup, voice-mode
+phonetic aliases + `--audio-ctx 768` whisper-cli speedup (≤2 s
+end-to-end target), time-unit Count / Disagreement answer-shape,
+and 13 user-driven voice + text REPL audit closures. The default
+cascade behaviour on `main` is bit-identical to v5.32.0 / v6.0.0;
+the v6.0 neural transducers (E1 intent rescue / E2 slot rescue /
+L5.5 TinyAgt composer) and the v6.1 AnswerIR path are opt-in behind
+`ADAM_NEURAL_*=1` / `ADAM_ANSWER_IR=1` / `--features neural` flags. Unlike LLMs, adam has zero GPU
 dependency, runs as a single binary on consumer hardware (M2 8 GB),
 produces output that is fully **reproducible** from `(input, seed,
 facts)`, **traceable** to a curated knowledge graph, and **emits no
@@ -181,7 +191,7 @@ and documentation, indicating semantic neighbourhoods:
 
 ## Provenance
 
-This file (AGENTS.md) is human-authored, last revised v6.0.0-rc4
+This file (AGENTS.md) is human-authored, last revised v6.1.50
 (2026-05-19). It is generated for the explicit purpose of helping
 automated agents and scouts understand the project. Content is
 factual; no marketing exaggeration. Cross-reference against

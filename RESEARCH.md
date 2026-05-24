@@ -231,6 +231,90 @@ next research arc (v6.1.0+):
 - **3-token patronymic NEG correction** + multi-token occupation
   segmentation (`дата инженер`) + multi-step math chaining.
 
+## v6.1 arc — AnswerIR + voice REPL audit (2026-05-23 → 2026-05-24)
+
+Status: **shipped** as 11 releases (v6.1.0 → v6.1.50). Behind
+`ADAM_ANSWER_IR=1` opt-in flag; default cascade bit-identical to
+v6.0.0.
+
+**Predicate-aware retrieval (Stage 1-3, v6.1.0).** `PredicateFocus`
+enum with 12 typed shapes (BornIn / DiedIn / FoundedIn / RenamedIn
+/ EffectiveFrom / Classifies / RiskLevel / LocatedIn / Authored /
+NamedAfter / MemberOf / Relational + IsA). 11 new typed `Predicate`
+variants in `adam_reasoning`. KRU world_core rewritten to use the
+typed predicates. Stage 3 typed-focus probe overrides upstream
+IsA-preference fallback when a typed fact matches. Decision gate:
+`v6_1_predicate_eval_30` 28 / 30 pass — above predeclared
+threshold ≥ 25 / 30.
+
+**BroadTopic multi-claim composer (Stage 4, v6.1.0).** «X туралы
+айтыңыз» queries surface ≤ 3 facts ranked by predicate tier
+(IsA → date facts → categorisation → membership → relational).
+`DialogContext.broad_topic_subject` + `broad_topic_seen` persist
+per-subject seen state; «ал тағы айт» surfaces unseen claims,
+clears on subject switch.
+
+**v6.1.5 → v6.1.50 — 11 user-driven REPL audit closures.** Text
+(2026-05-23) + voice (2026-05-23 → 2026-05-24) audits surfaced
+and closed: NamedAfter / contrastive-farewell / continuation-
+exhausted (v6.1.5); IsA-alias bridge for КРУ + 1sg-self-recall
+split-bail (v6.1.10); gender-pitch vocative wiring («Ағай / Апай»)
++ whisper greedy decode + thread auto-detect (v6.1.15); Қысқаша
+айтсам length-gating + VAD 1300→1000ms + `--no-fallback` +
+child-voice F0 band + multi-token canonical-name aliases (v6.1.20);
+«атаңыз/тізімдеңіз» enumerative verbs + «моделісің бі?»
+architectural-identity probe (v6.1.25); Muslim greeting protocol
++ affirmation-after-clarification (v6.1.30); honorific opt-in →
+v6.1.35 → smart consecutive-turn dedup v6.1.40; whisper
+`--audio-ctx 768` + Russian-style city spellings + облыс
+mishearings (v6.1.45); time-unit Count / Disagreement answer-
+shape + Кәзір/нише/Мүгін voice aliases (v6.1.50).
+
+**v6.1.50 = freeze point.** The patch-by-patch strategy reached
+its ceiling. Every new audit surfaces new mis-recognitions, new
+wrong-sense retrievals, new semantic mismatches — they don't
+compose into a smarter model.
+
+## v6.2 arc — architectural redesign (planned, design doc next)
+
+User signal 2026-05-24 (after 11 voice REPL audits): «с такой
+архитектурой мы никогда не сможем все исправить». v6.2.0 is the
+architectural pivot: ONE arc addressing five root causes, NOT
+five separate features.
+
+**The five root causes** (memory:
+[[project_v6_2_architectural_pivot]]):
+
+1. **Context-aware STT correction.** Whisper emits «Мен
+   Бағдарламасы» (suffix mismatch with expected «-мын» 1sg
+   copula). N-best lattice + phonetic-bounded fuzzy + FST
+   round-trip + grammatical-expectation bias.
+2. **Answer-shape detection.** «Жылда неше ай?» (= "how many
+   months in a year?") routes to topic extraction over «жыл»,
+   retrieves «тоқсан» (quarter) fact — semantically adjacent
+   but wrong concept. Need explicit Count / TimeWhen / Function
+   / Procedure / Disagreement / ListExamples / SenseDisambiguation
+   AnswerIR shapes. (v6.1.50 ships a closed-set Count /
+   Disagreement table as a patch; v6.2.0 generalises.)
+3. **Sense disambiguation.** «Ай» = moon / month / howl;
+   «Күн» = sun / day. `SenseKey` per fact + domain filter at
+   retrieval.
+4. **Structured indexing.** Every detector / lookup scans the
+   same data. Hash / trie / Aho-Corasick indexes by POS,
+   predicate, sentence-type, domain, sense.
+5. **HumanDialogEval gate.** Until 100-150-prompt 7-axis eval
+   is the CI gate, releases ship with relevance regressions
+   invisible to `factual_eval_100` / `v6_1_predicate_eval_30`.
+
+Design doc: `docs/v6_2_architectural_redesign.md` (to be written
+next session). Predeclared structure: thesis → 5 root-cause
+problems with audit evidence → unified `QueryContext`
+abstraction → indexing infra → STT correction pipeline →
+HumanDialogEval v1 → 5 implementation stages with predeclared
+success + anti-success per stage → default-on promotion gate
+(0 P0 + ≥ 90 % relevance + ≥ 85 % naturalness + 0 wrong-sense)
+→ rollback path to v6.1.50.
+
 ### Memory-directive lineage
 
 For continuity, the directives that gated this arc:

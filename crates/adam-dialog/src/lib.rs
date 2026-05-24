@@ -76,6 +76,7 @@ pub mod system_clock;
 pub mod system_identity;
 pub mod task;
 pub mod templates;
+pub mod time_units;
 pub mod tool;
 pub mod topic_extraction;
 pub mod tts;

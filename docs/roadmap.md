@@ -2,19 +2,36 @@
 
 Version-by-version history of `adam`, grouped into architectural eras.
 
-> **Forward-looking note 2026-05-16.** v6.0.0 is a planned major
-> release that introduces an **algebra-anchored neural composition
-> layer** (L5.5) without breaking any v5.x deterministic guarantee.
-> The architecture is specified in
-> [`architecture_neural_v6.md`](architecture_neural_v6.md). The
-> research arc that proved the underlying hypothesis is on branch
-> `experimental/agglutinative-neural` and documented in
-> [`research/results_real_mix_2026_05_16.md`](research/results_real_mix_2026_05_16.md).
-> The full nine-item acceptance checklist for v6.0.0 GA is in
-> Section 9 of the architecture spec. v6.0 ship target: **+10–16
-> weeks from 2026-05-16** (i.e. late July → early September 2026),
-> contingent on Lexicon V2 + verifier integration + LLM-baseline
-> benchmark.
+> **Status 2026-05-24.** v6.0.0 shipped 2026-05-22 with the
+> algebra-anchored neural composition layer (L5.5) plus seven
+> rounds of audit-driven cascade fixes. The v6.1 series (v6.1.0 →
+> v6.1.50, 11 releases across 2026-05-23 and 2026-05-24) added
+> the AnswerIR research arc behind `ADAM_ANSWER_IR=1` opt-in:
+> typed predicate-aware retrieval, BroadTopic multi-claim composer,
+> gender-pitch vocative, contrastive-farewell rewrite, smart
+> honorific dedup, voice-mode phonetic aliases + `--audio-ctx 768`
+> whisper-cli speedup (≤2 s end-to-end target), time-unit Count
+> / Disagreement answer-shape. 13 user-driven voice + text REPL
+> audit closures. The default cascade remains bit-identical to
+> v5.32.0 / v6.0.0; v6.1 paths are opt-in.
+>
+> Architecture specs:
+> [`architecture_neural_v6.md`](architecture_neural_v6.md) — v6.0
+> base layer; [`v6_1_answer_ir_design.md`](v6_1_answer_ir_design.md)
+> — v6.1 AnswerIR design + decision gate.
+>
+> **Next arc — v6.2.0.** Architectural redesign. The 11-release
+> v6.1 patch cycle revealed that pattern-matching cascades hit a
+> ceiling on natural speech. v6.2.0 addresses five root causes as
+> ONE arc, NOT five separate features: context-aware STT
+> correction (N-best lattice + phonetic-bounded + FST round-trip
+> + grammatical expectation), answer-shape detection (Count /
+> TimeWhen / Function / Procedure / Disagreement / ListExamples /
+> SenseDisambiguation), sense disambiguation, structured indexing
+> (POS / predicate / sentence-type / domain), HumanDialogEval as
+> the default-on promotion gate. Design doc planned for next
+> session — `docs/v6_2_architectural_redesign.md`. v6.1.50 is the
+> v6.1 freeze point.
 
 ## Lifecycle view
 

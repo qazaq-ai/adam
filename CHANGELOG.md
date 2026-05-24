@@ -28,6 +28,74 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.1.50] — 2026-05-24 — time-unit Count + Disagreement answer-shape + voice aliases + doc refresh
+
+> v6.1.50 is the **v6.1-series freeze point**. After 11 releases
+> across two days, the patch strategy has reached its ceiling.
+> v6.2.0 will be the architectural redesign (see
+> [`project_v6_2_architectural_pivot`] in memory + `RESEARCH.md`
+> §v6.2 arc).
+
+### Fixes
+
+- **Time-unit Count answer-shape.** «Жылда неше ай?» (= how many
+  months in a year?) pre-v6.1.50 routed to topic extraction over
+  «жыл» and surfaced a semantically-adjacent but wrong-concept
+  fact («Бір жылда төрт тоқсан болады» — quarters, not months).
+  New `time_units` module ships a closed-set canonical table
+  (year-month, year-quarter, year-week, year-day, quarter-month,
+  month-day, month-week, week-day, day-hour, hour-minute,
+  minute-second) and a detector for «X-та/-те/-да/-де неше Y?»
+  patterns. Matching question → direct count answer («Бір жылда
+  12 ай болады.»). Approximations get a «шамамен» prefix.
+- **Time-unit Disagreement answer-shape.** «Бір сағатта 20 минут
+  бар.» pre-v6.1.50 surfaced a definition of «минут». Now: the
+  detector pairs the asserted number with the canonical count and
+  emits a correction («Кешіріңіз, дәл емес — бір сағатта 60
+  минут болады, 20 емес.») when they differ, or confirmation
+  when they match. Handles digit forms (20) and Kazakh cardinals
+  (жиырма) up to 100, with prefix-adjacency matching so «Бір
+  сағатта» (where «бір» modifies the outer unit) doesn't get
+  mistaken for the asserted value.
+- **Voice aliases.** Added «Кәзір → Қазір» (Russian-influenced
+  spelling for "now"), «нише → неше» (Whisper-noise for «how
+  many»), «Мүгін → Бүгін» (Whisper-noise for «today»; pre-fix
+  cascade picked «мүк» = moss from topic_extraction and answered
+  with botany), «Мен Бағдарламасы → Мен бағдарламашы» (occupation
+  introduction with mishearing of the «-шы» occupation suffix).
+- **Documentation refresh.** `AGENTS.md`, `RESEARCH.md`,
+  `docs/roadmap.md` updated to reflect v6.1 series shipped state
+  + v6.2 architectural pivot as the next arc. Removed outdated
+  «v6.0 in 10-16 weeks» language; replaced with current
+  v6.0 / v6.1 shipped narrative + v6.2 design-doc-next status.
+
+### Tracked for v6.2.0 (research arc)
+
+The v6.2.0 architectural redesign addresses five root causes as
+ONE arc (no more per-symptom patches):
+
+1. **Context-aware STT correction** — N-best lattice + phonetic-
+   bounded + FST round-trip + grammatical expectation.
+   v6.1.x voice aliases were band-aids; v6.2 generalises.
+2. **Answer-shape detection** — Count / TimeWhen / Function /
+   Procedure / Disagreement / ListExamples / SenseDisambiguation
+   AnswerIR shapes. v6.1.50 ships a closed-set Count / Disagreement
+   table; v6.2 generalises.
+3. **Sense disambiguation** — «Ай» / «Күн» / «Ағаш» per-domain
+   `SenseKey`.
+4. **Structured indexing** — POS / predicate / sentence-type /
+   domain hash / trie / Aho-Corasick indices replacing the linear
+   scan + 41-detector cascade per turn.
+5. **HumanDialogEval gate** — 100-150-prompt 7-axis CI gate that
+   gates default-on promotion.
+
+### Testing
+
+- `cargo test --workspace --all-targets --release`: **1 735 / 0**
+  (+11 time_units unit tests).
+- `cargo clippy --workspace --all-targets -- -D warnings`: clean.
+- `cargo fmt --all --check`: clean.
+
 ## [6.1.45] — 2026-05-24 — whisper speed (≤2 s target) + облыс/city aliases
 
 > User's v6.1.40 voice REPL audit asked for two things: cut

@@ -521,6 +521,34 @@ impl Conversation {
             ("Туркестан", "Түркістан"),
             ("Актобе", "Ақтөбе"),
             ("Алюр зауыты", "АлюмКаз зауыты"),
+            // 2026-05-24 v6.1.45 audit:
+            //   - «Кәзір» (Russian-influenced spelling/Whisper noise)
+            //     for canonical «Қазір» (= "now"). Lost in cascade
+            //     because pronunciation drifts the leading vowel.
+            //   - «нише» (Whisper noise) for canonical «неше»
+            //     (= "how many?") — both surface forms.
+            //   - «Мүгін» (Whisper noise) for «Бүгін» (= "today").
+            //     Pre-fix cascade picked «мүк» (moss) from
+            //     topic_extraction and answered with botany.
+            ("Кәзір", "Қазір"),
+            ("кәзір", "қазір"),
+            ("нише", "неше"),
+            ("Мүгін", "Бүгін"),
+            ("мүгін", "бүгін"),
+            // 2026-05-24 v6.1.45 audit: «Мен Бағдарламасы» (=
+            // Whisper-mangled «Мен бағдарламашымын» / «Мен
+            // бағдарламашы») is a profession-introduction
+            // utterance. The «-сы» suffix on a job noun is a
+            // common Whisper mishearing for «-шы» (occupation-
+            // forming suffix). v6.2 should generalise this via
+            // grammatical-context STT correction
+            // ([[project_context_aware_stt_directive]]); v6.1.50
+            // adds the curated alias for the canonical Kazakh
+            // occupations user commonly says.
+            ("Мен Бағдарламасы", "Мен бағдарламашы"),
+            ("мен бағдарламасы", "мен бағдарламашы"),
+            ("Мен Дәрігер", "Мен дәрігермін"),
+            ("Мен Мұғалім", "Мен мұғаліммін"),
         ];
         let mut rewritten = input.to_string();
         for (whisper_noise, canonical) in VOICE_ALIASES {
@@ -3486,7 +3514,36 @@ impl Conversation {
         // of the turn (from `rejoined`), applied here so the trace
         // remains authoritative for any consumer that inspects what
         // the pipeline would have said.
-        let final_output = gender_explain_override.unwrap_or(output);
+        // **v6.1.50 — 2026-05-24 voice REPL audit fix.** Time-unit
+        // Count / Disagreement answer-shape override. Pre-v6.1.50
+        // queries like «Жылда неше ай?» routed to retrieval over
+        // «жыл» and surfaced a semantically-adjacent but wrong-
+        // concept fact («Бір жылда төрт тоқсан болады» instead of
+        // «12 ай»). False statements like «Бір сағатта 20 минут
+        // бар» got a definition of «минут» instead of a correction.
+        // Both shapes are now detected from the input by
+        // `time_units::detect_time_unit_count_question` /
+        // `detect_time_unit_statement` and rendered with the
+        // canonical closed-set table. v6.2.0 will generalise this
+        // via Count / Disagreement AnswerIR shapes.
+        let time_unit_override: Option<String> = if let Some((outer, inner, count, approx)) =
+            crate::time_units::detect_time_unit_count_question(input)
+        {
+            Some(crate::time_units::render_time_unit_count_answer(
+                outer, inner, count, approx,
+            ))
+        } else if let Some((outer, inner, asserted, canonical, approx)) =
+            crate::time_units::detect_time_unit_statement(input)
+        {
+            Some(crate::time_units::render_time_unit_statement_reply(
+                outer, inner, asserted, canonical, approx,
+            ))
+        } else {
+            None
+        };
+        let final_output = time_unit_override
+            .or(gender_explain_override)
+            .unwrap_or(output);
         // **v6.1.30 — 2026-05-23 voice REPL audit round 4.** When the
         // realised output is a clarification of the form «Бәлкім, X
         // туралы айтасыз ба», store X under
