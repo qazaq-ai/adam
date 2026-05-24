@@ -1,5 +1,6 @@
 [workspace]
 members = [
+  "crates/adam-algebra",
   "crates/adam-kernel",
   "crates/adam-kernel-fst",
   "crates/adam-dialog",

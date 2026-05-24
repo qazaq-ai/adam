@@ -1,0 +1,68 @@
+// SPDX-License-Identifier: BUSL-1.1
+// Part of: adam · ARK (Agglutinative Reasoning Kernel) · github.com/qazaq-ai/adam
+//! `adam-algebra` — **Stage 1 of v6.2.0 neurosymbolic redesign**.
+//!
+//! Lifts the typed morphology of [`adam_kernel_fst::morphotactics`]
+//! ([`Case`], [`Number`], [`Possessive`], [`Predicate`], [`Tense`],
+//! [`Voice`], [`Person`], [`Derivation`]) into a uniform algebraic
+//! surface: a single [`SuffixOp`] enum carrying every operator the
+//! FST can apply, and a [`Composition`] type that lifts a
+//! [`adam_kernel_fst::parser::Analysis`] into an ordered, slot-typed
+//! sequence of operators with documented algebra rules.
+//!
+//! ## Why this layer exists (v6.2 thesis)
+//!
+//! Per [`docs/v6_2_architectural_redesign.md`](../../../docs/v6_2_architectural_redesign.md)
+//! §"The unified abstraction — Agglutinative Algebra": Kazakh's
+//! agglutinative morphology is **already** a typed algebra at the
+//! FST level (illegal compositions are FST-rejected). What's missing
+//! is a uniform Rust surface where every operator carries the same
+//! type signature, so downstream layers (FrameLayer, QueryIRLayer,
+//! the v6.2 learned semantic parser) can reason about composition,
+//! idempotence, and inverse algebraically — not via scattered field
+//! accesses on `NounFeatures` / `VerbFeatures`.
+//!
+//! ## Scope
+//!
+//! Stage 1 ships:
+//!
+//! - [`Root`] — typed root wrapper with part-of-speech tag.
+//! - [`SuffixOp`] — uniform enum subsuming every FST-known operator.
+//! - [`SlotKind`] — the typed slot each operator occupies.
+//! - [`Composition`] — ordered, validity-checked sequence of
+//!   operators bound to a root, derived from
+//!   [`Analysis::Noun`](adam_kernel_fst::parser::Analysis::Noun) /
+//!   [`Analysis::Verb`](adam_kernel_fst::parser::Analysis::Verb).
+//! - Algebra rules:
+//!   - [`Composition::is_well_formed`] — composition validity.
+//!   - [`SuffixOp::is_idempotent`] — identifies idempotent operators.
+//!   - [`SuffixOp::inverse`] — operators with inverses.
+//! - Round-trip: [`Composition::from_analysis`] →
+//!   [`Composition::to_analysis`] is identity-preserving.
+//!
+//! NOT in Stage 1 (deferred to later v6.2 stages):
+//!
+//! - Frame layer (Stage 2 — `Frame { agent, predicate, …}`).
+//! - QueryIR (Stage 3 — central typed query contract).
+//! - Indexed retrieval (Stage 4).
+//! - Sense disambiguation (Stage 5).
+//! - Learned components (Stage 6 — closed-set neural).
+//! - Natural realiser (Stage 7).
+//! - HumanDialogEval (Stage 8).
+//! - ARM PoC (Stage 9).
+//!
+//! ## Determinism contract
+//!
+//! Every type in this crate is **pure-deterministic and
+//! finite-set**. No probability, no learned weights, no RNG. Round-
+//! trip equivalence with `adam_kernel_fst::parser::Analysis` is the
+//! load-bearing invariant — broken round-trip is a unit-test
+//! failure, not a warning.
+
+pub mod composition;
+pub mod operator;
+pub mod root;
+
+pub use composition::{Composition, CompositionError};
+pub use operator::{SlotKind, SuffixOp};
+pub use root::{PartOfSpeech, Root};

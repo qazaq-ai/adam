@@ -45,6 +45,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "adam-algebra"
+version = "6.1.50"
+dependencies = [
+ "adam-kernel-fst",
+ "serde",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "adam-corpus"
 version = "6.1.50"
 dependencies = [
