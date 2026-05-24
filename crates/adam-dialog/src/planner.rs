@@ -1590,8 +1590,23 @@ fn ensure_geo_kind_slot(slots: &mut HashMap<String, String>) {
 fn ensure_name_respect_slot(slots: &mut HashMap<String, String>) {
     if !slots.contains_key("name_respect") {
         if let Some(name) = slots.get("name").cloned() {
-            let respect = crate::language_core::kazakh_respectful_address(&name)
-                .unwrap_or_else(|| name.clone());
+            // **v6.1.35 — 2026-05-24 human-dialog audit finding #9.**
+            // User reported «Айдос → Айәке» honorific spam: every
+            // factual turn started with the auto-derived diminutive,
+            // making the dialog feel artificial. Disabled by default
+            // until native-speaker review confirms the form / register
+            // is appropriate for the v6 audience. The
+            // `kazakh_respectful_address` helper stays in the public
+            // surface for future explicit opt-in via
+            // `ADAM_HONORIFIC=1`; default auto-derivation now uses
+            // the literal name.
+            let opt_in_honorific = std::env::var("ADAM_HONORIFIC").as_deref() == Ok("1");
+            let respect = if opt_in_honorific {
+                crate::language_core::kazakh_respectful_address(&name)
+                    .unwrap_or_else(|| name.clone())
+            } else {
+                name.clone()
+            };
             slots.insert("name_respect".into(), respect);
         }
     }
@@ -1689,24 +1704,32 @@ fn extract_slots_with_session(
     match intent {
         Intent::StatementOfName { name } => {
             slots.insert("name".into(), name.clone());
-            // **v4.18.0** — respectful Kazakh address form. Adam
-            // is a young system; per Kazakh tradition it addresses
-            // older / honoured speakers as «<first-consonant>әке»
-            // (Дәулет → Дәке, Марат → Мәке) instead of by full
-            // name. Vowel-initial names (Абай, Алия) fall back to
-            // the literal name. Templates use `{name_respect}`
-            // when set, otherwise `{name}` — see
-            // `kazakh_respectful_address` for the rule.
-            if let Some(respect) = crate::language_core::kazakh_respectful_address(name) {
-                slots.insert("name_respect".into(), respect.clone());
-                // **v4.18.5** — distinct slot only set when respect
-                // form differs from literal. Used by warmth templates
-                // that introduce both forms.
-                slots.insert("name_respect_distinct".into(), respect);
+            // **v6.1.35 — 2026-05-24 human-dialog audit finding #9.**
+            // Name-derived honorific («Дәулет → Дәке», «Айдос →
+            // Айәке») is now opt-in via `ADAM_HONORIFIC=1`. Default
+            // uses the literal name. Reason: 2026-05-24 audit
+            // reported every factual turn started with the auto-
+            // derived diminutive, feeling artificial / robotic.
+            // Native-speaker review is needed before re-enabling
+            // the form by default. The gender-pitch vocative path
+            // («Ағай / Апай / Балам» when no name is known) is a
+            // SEPARATE mechanism in `conversation.rs` and stays
+            // on — that one was explicitly user-approved at
+            // v6.1.15.
+            let opt_in_honorific = std::env::var("ADAM_HONORIFIC").as_deref() == Ok("1");
+            if opt_in_honorific {
+                if let Some(respect) = crate::language_core::kazakh_respectful_address(name) {
+                    slots.insert("name_respect".into(), respect.clone());
+                    slots.insert("name_respect_distinct".into(), respect);
+                } else {
+                    slots.insert("name_respect".into(), name.clone());
+                }
             } else {
                 slots.insert("name_respect".into(), name.clone());
-                // No distinct slot for vowel-initial names — warmth
-                // templates won't fire (template_is_fillable filters).
+                // No `name_respect_distinct` — warmth templates
+                // («Сізді {name_respect_distinct} деп атаймын»)
+                // won't fire when honorific is off, which is
+                // exactly what we want.
             }
         }
         Intent::StatementOfAge { years: Some(years) } => {
@@ -2535,10 +2558,22 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             //                   clarify, echoes «тұлға» (deeper noun
             //                   from the parse stream as fallback) or
             //                   «шыққан» if тұлға wasn't reached.
+            // **v6.1.35 — 2026-05-24 human-dialog audit finding #5.**
+            // Grounded-fact suppression guard. Pre-v6.1.35 the Low-
+            // confidence noun_hint forked to
+            // `unknown.clarify_low_confidence` UNCONDITIONALLY,
+            // hiding even an EXACT curated IsA fact. User trace:
+            // `Қызыл қандай түс?` → `grounded_fact = "Қызыл — түс"`
+            // → output was «сұрағыңызды түсінбедім». A curated
+            // grounded_fact is the most-confident signal we have
+            // about the noun's identity; if it's present, route
+            // to `with_grounded_fact` regardless of confidence —
+            // the fact already validates the noun_hint.
             if matches!(
                 noun_hint_confidence,
                 crate::topic_extraction::TopicConfidence::Low
-            ) {
+            ) && grounded_fact.is_none()
+            {
                 return "unknown.clarify_low_confidence";
             }
             let no_evidence =

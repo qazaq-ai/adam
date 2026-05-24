@@ -3450,10 +3450,29 @@ impl Conversation {
             ..
         } = &intent_for_render
         {
-            if final_output.contains("туралы айтасыз ба") || final_output.contains("Бәлкім")
-            {
+            // **v6.1.35 — 2026-05-24 human-dialog audit finding #1.**
+            // Pre-v6.1.35 detection caught only «Бәлкім / туралы
+            // айтасыз ба» templates. Real REPL surfaces several more
+            // clarification shapes from `unknown.with_noun` family.
+            // Any template that asks the user to elaborate on
+            // noun_hint counts as a clarification — the deferred
+            // broad-topic query SHOULD fire on next-turn affirmation.
+            let is_clarification_output = final_output.contains("Бәлкім")
+                || final_output.contains("туралы айтасыз ба")
+                || final_output.contains("туралы нақтырақ")
+                || final_output.contains("туралы не білгіңіз")
+                || final_output.contains("жайында көбірек")
+                || final_output.contains("жайында не ойлайсыз")
+                || final_output.contains("жайында ойланып");
+            if is_clarification_output {
+                // Normalize noun to its Kazakh canonical form. Voice
+                // input + Russian-style spelling («Костанай») surfaced
+                // as noun_hint but world_core uses «қостанай»;
+                // mapping here lets the next-turn affirmation rewrite
+                // hit the curated facts.
+                let canonical = russian_to_kazakh_canonical(noun).unwrap_or_else(|| noun.clone());
                 self.session
-                    .insert("pending_clarification_noun".into(), noun.clone());
+                    .insert("pending_clarification_noun".into(), canonical);
             }
         }
         (final_output, trace)
@@ -5184,6 +5203,56 @@ fn capitalise_first_char(s: &str) -> String {
         Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
         None => String::new(),
     }
+}
+
+/// **v6.1.35 — 2026-05-24 human-dialog audit finding #1.** Map
+/// Russian-style city / proper-noun spellings to their canonical
+/// Kazakh forms used by `data/world_core/*.jsonl`. Whisper plus
+/// bilingual speakers often emit Russian spellings («Костанай»,
+/// «Алматы» — the latter is identical in Russian) for Kazakh
+/// place names; the cascade picks them up as `noun_hint` but the
+/// subject-equality lookup in `compose_broad_topic` then fails
+/// because world_core uses the Kazakh spelling («қостанай»).
+///
+/// Returns `Some(canonical)` when a substitution applies,
+/// `None` otherwise (caller uses the original noun unchanged).
+///
+/// **Scope discipline.** Only entries observed in real REPL
+/// audits — no speculative aliases. Grows as the voice + text
+/// audits surface new pairs.
+fn russian_to_kazakh_canonical(noun: &str) -> Option<String> {
+    let lower = noun.to_lowercase();
+    const ALIASES: &[(&str, &str)] = &[
+        // 2026-05-24 audit finding #1: «Костанай туралы не айтасын?»
+        // stored noun «костанай», broad-topic composer missed
+        // «қостанай» KRU facts.
+        ("костанай", "қостанай"),
+        // Pre-emptive entries for other common Russian-style
+        // spellings of Kazakhstan cities + AI Law domain.
+        ("шымкент", "шымкент"),
+        ("астана", "астана"),
+        ("алматы", "алматы"),
+        ("караганда", "қарағанды"),
+        ("павлодар", "павлодар"),
+        ("кызылорда", "қызылорда"),
+        ("кокшетау", "көкшетау"),
+        ("семей", "семей"),
+        ("тараз", "тараз"),
+        ("туркестан", "түркістан"),
+        ("атырау", "атырау"),
+        ("актобе", "ақтөбе"),
+        ("уральск", "орал"),
+        ("петропавловск", "петропавл"),
+    ];
+    for (russian, kazakh) in ALIASES {
+        if lower == *russian {
+            if lower == *kazakh {
+                return None;
+            }
+            return Some((*kazakh).to_string());
+        }
+    }
+    None
 }
 
 /// **v6.0.5 — E1 production wiring.** Confidence-rescue override

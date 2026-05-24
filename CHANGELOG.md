@@ -28,6 +28,90 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.1.35] — 2026-05-24 — deep human-dialog audit: 3 P0 closures from 10 findings
+
+> User's 2026-05-24 deep audit (76 single-prompt human-style
+> questions + 21-turn live REPL on v6.1.30) surfaced 10 findings.
+> 3 P0 closed in v6.1.35; remaining 7 + 6 architectural
+> recommendations go to v6.2.0 ([[project_v6_1_30_human_dialog_audit]]).
+
+### Fixes
+
+- **#9 honorific overuse → opt-in via `ADAM_HONORIFIC=1`.** Pre-
+  v6.1.35 every factual reply after a name-introduction prefixed
+  with the auto-derived diminutive («Айдос → Айәке», «Дәулет →
+  Дәке»). User reported this felt artificial / robotic — same
+  honorific spammed on every reply. Both `ensure_name_respect_slot`
+  and the `Intent::StatementOfName` arm in `planner.rs` now gate
+  the diminutive on env `ADAM_HONORIFIC=1`. Default uses the
+  literal name. The gender-pitch vocative («Ағай / Апай / Балам»
+  when no name is captured) is a SEPARATE mechanism in
+  `conversation.rs` and stays on — that was explicitly user-
+  approved at v6.1.15.
+- **#5 grounded-fact suppression by low-confidence override.**
+  User trace: `Қызыл қандай түс?` had `grounded_fact: "Қызыл —
+  түс"` but output was «сұрағыңызды түсінбедім». Pre-v6.1.35 the
+  Low-confidence noun_hint forked UNCONDITIONALLY to
+  `unknown.clarify_low_confidence`, hiding even an EXACT curated
+  IsA fact. Now: clarification fork only runs when
+  `grounded_fact.is_none()`. A curated grounded_fact is the most-
+  confident validator of the noun — when it's present, it
+  dominates the routing.
+- **#1 affirmation-after-clarification fix v2.** v6.1.30 caught
+  only «Бәлкім / туралы айтасыз ба» templates and stored the raw
+  noun. Two reproducible misses: (a) the audit surfaced more
+  clarification template variants («туралы нақтырақ не білгіңіз»,
+  «жайында көбірек»); detector broadened to all of them.
+  (b) Russian-style noun spelling «Костанай» stored as
+  `pending_clarification_noun` but world_core uses «қостанай» so
+  the next-turn rewrite missed the KRU facts. New
+  `russian_to_kazakh_canonical` helper maps 15 common Kazakhstan
+  city spellings to their Kazakh forms before storing.
+
+### Tracked for v6.2.0 (research arc)
+
+Remaining 7 findings + 6 recommendations from the deep audit go
+into v6.2.0:
+
+- #2 Konstitusiya routes to unrelated corpus quote (exact-entity
+  alias for «қазақстан конституциясы»).
+- #3 Wrong-sense retrieval («Ағаш» = tree-as-data vs. material;
+  «Ай» = moon vs. month) — needs `SenseKey` / domain-focus.
+- #4 Listing / multi-subject definition shapes missing
+  (`ListExamples`, `MultiSubjectDefinition` AnswerIR shapes).
+- #6 Alias gaps in mixed-Kazakh queries (`Borrowing деген не?`,
+  `Спорт`, `Футбол`).
+- #7 Legal safety tone too blunt (criminal-emergency template on
+  contract-signing question).
+- #8 ContinueConversation intent for «әлі сөйлесейік».
+- #10 System-identity wording: «ережелік диалогтық жүйе» / ARK
+  kernel, not «тілдік модель».
+
+Plus the 6 architectural recommendations:
+1. HumanDialogEval v1 (100-150 live prompts, 7-axis scoring).
+2. Hard-fail bans (tautology, wrong-sense, unrelated quote,
+   «түсінбедім» when exact fact exists, emergency template on
+   neutral legal query).
+3. AnswerIR shape expansion (`Definition`, `ListExamples`,
+   `Function`, `TimeWhen`, `Procedure`, `MultiSubject`,
+   `SenseDisambiguation`, `ContinuationExhausted`).
+4. Fact-selection salience + answer-role, not just predicate tier.
+5. Real-REPL multi-turn CI gate.
+6. Default-on promotion gate: 0 P0 dialog bugs +
+   HumanDialogEval ≥ 90 % relevance + ≥ 85 % naturalness + 0
+   wrong-sense on curated exact facts.
+
+### Testing
+
+- `cargo test --workspace --all-targets --release`: **1 724 / 0**.
+- `cargo clippy --workspace --all-targets -- -D warnings`: clean.
+- `cargo fmt --all --check`: clean.
+
+### Bench (v6.1.30 baseline)
+
+- p50 latency: 23.389 ms · p99: 34.478 ms · RSS: 303.8 MB · GPU 0%.
+- `v6_1_predicate_eval_30`: **29 / 30 pass** (up from 28/30 at v6.1.0 ship).
+
 ## [6.1.30] — 2026-05-23 — voice REPL audit round 4: greeting protocol + affirmation-after-clarification
 
 > Two cultural-protocol fixes from the user's fourth voice REPL
