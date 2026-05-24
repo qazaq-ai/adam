@@ -486,6 +486,13 @@ pub enum GreetingKind {
     Casual,
     /// Polite "сәлеметсіз бе".
     Polite,
+    /// **v6.1.30 — 2026-05-23 voice REPL audit round 4.** Islamic
+    /// greeting «Ассаламу алейкум» (and its Whisper-noise variants).
+    /// Pre-v6.1.30 routed to `GreetingKind::Polite` and replied
+    /// «Сәлеметсіз бе, Ағай.» — culturally wrong: the Islamic
+    /// greeting expects the canonical reciprocal reply
+    /// «Уағалайкум-ас-салам», not a secular Kazakh polite form.
+    Muslim,
     /// Time-specific "қайырлы таң" / "қайырлы күн" / "қайырлы кеш".
     TimeOfDay(TimeOfDay),
     /// **v4.4.10** — introduction-proposal opener: «танысайық» /

@@ -791,8 +791,12 @@ fn detect_greeting(tokens: &[String], joined: &str) -> Option<Intent> {
         || joined.contains("уағалейкум")
         || joined.contains("уалейкум")
     {
+        // **v6.1.30 — 2026-05-23 voice REPL audit.** Route to the
+        // dedicated `Muslim` kind so the realiser picks
+        // `greeting.muslim` («Уағалайкум-ас-салам»), not the
+        // secular `greeting.polite` («Сәлеметсіз бе»).
         return Some(Intent::Greeting {
-            kind: GreetingKind::Polite,
+            kind: GreetingKind::Muslim,
         });
     }
     // Polite: "сәлеметсіз бе" / "сәлеметсің бе".
@@ -861,8 +865,11 @@ fn detect_greeting(tokens: &[String], joined: &str) -> Option<Intent> {
             ("сәлеметсіз", GreetingKind::Polite),
             ("сәлеметсің", GreetingKind::Polite),
             ("салеметсіз", GreetingKind::Polite),
-            ("ассалам", GreetingKind::Polite),
-            ("ассалаумағалейкум", GreetingKind::Polite),
+            // **v6.1.30** — Islamic greeting variants route to the
+            // dedicated Muslim kind so the realiser picks the
+            // reciprocal «Уағалайкум-ас-салам» reply.
+            ("ассалам", GreetingKind::Muslim),
+            ("ассалаумағалейкум", GreetingKind::Muslim),
         ];
         for (canon, kind) in CANON_GREETINGS {
             if first.chars().count() >= 4 && edit_distance_lte_2(first, canon) {
@@ -914,10 +921,25 @@ fn detect_affirmation(tokens: &[String], joined: &str) -> bool {
         let w = &tokens[0];
         return matches!(
             w.as_str(),
-            "иә" | "ия" | "дұрыс" | "рас" | "мақұл" | "әрине"
+            // **v6.1.30 — 2026-05-23 voice REPL audit round 4.**
+            // Whisper transcribes short «Иә» as a single «Е»
+            // (lost the «-я» tail). Adding «е» / «ие» / «иә-иә»
+            // / «иә иә» fused forms so voice-mode affirmation
+            // is captured. Risk: «е» as a freestanding token is
+            // rare in real Kazakh — usually it's «и» / «а» /
+            // exclamation; treating bare «е» as affirmation
+            // accepts the Whisper artifact gracefully.
+            "иә" | "ия" | "дұрыс" | "рас" | "мақұл" | "әрине" | "е" | "ие" | "ооа"
         );
     }
-    joined.contains("дұрыс айтасыз") || joined == "иә дұрыс"
+    joined.contains("дұрыс айтасыз")
+        || joined == "иә дұрыс"
+        // **v6.1.30** — repeated affirmation «иә иә» / «иә, иә» /
+        // «дұрыс, иә» often surface in voice mode as user
+        // emphasises the confirmation.
+        || joined == "иә иә"
+        || joined == "ия ия"
+        || joined == "дұрыс иә"
 }
 
 fn detect_negation(tokens: &[String], joined: &str) -> bool {
@@ -4562,12 +4584,15 @@ fn detect_insult(tokens: &[String], joined: &str) -> bool {
 mod tests {
     use super::*;
 
-    /// **v5.14.6** — extended greeting surfaces (Codex live-test
-    /// follow-up). Whisper-medium's Kazakh transcription is noisy
-    /// (the «-сіз бе» tail fuses into one token, «сәлем» often comes
-    /// back as «салем»), and Muslim Arabic surfaces «ассалаумағалейкум»
-    /// were missing entirely. v5.14.6 widens the detector for both
-    /// families and accepts mis-tokenised variants.
+    /// **v5.14.6 / v6.1.30** — extended greeting surfaces (Codex
+    /// live-test follow-up) + dedicated Muslim kind. Whisper-medium's
+    /// Kazakh transcription is noisy (the «-сіз бе» tail fuses into
+    /// one token, «сәлем» often comes back as «салем»), and Muslim
+    /// Arabic surfaces «ассалаумағалейкум» were missing entirely. The
+    /// v6.1.30 voice REPL audit found the v5.14.6 routing to
+    /// `Polite` was culturally wrong — Islamic greeting expects the
+    /// reciprocal «Уағалайкум-ас-салам», not the secular Kazakh
+    /// «Сәлеметсіз бе». Now routes to `GreetingKind::Muslim`.
     #[test]
     fn detect_greeting_recognises_muslim_arabic_v5146() {
         for surface in [
@@ -4584,10 +4609,10 @@ mod tests {
                 matches!(
                     got,
                     Some(Intent::Greeting {
-                        kind: GreetingKind::Polite
+                        kind: GreetingKind::Muslim
                     })
                 ),
-                "expected Polite Greeting for {surface:?}, got {got:?}"
+                "expected Muslim Greeting for {surface:?}, got {got:?}"
             );
         }
     }

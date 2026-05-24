@@ -28,6 +28,53 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.1.30] — 2026-05-23 — voice REPL audit round 4: greeting protocol + affirmation-after-clarification
+
+> Two cultural-protocol fixes from the user's fourth voice REPL
+> audit (post-v6.1.25). Both close real conversational deviations
+> the user reproduced live.
+
+### Fixes
+
+- **Greeting protocol mirror.** Pre-v6.1.30 «Ассаламу алейкум»
+  replied «Сәлеметсіз бе, Ағай.» — culturally wrong: the Islamic
+  greeting expects the reciprocal «Уағалайкум-ас-салам», not a
+  secular Kazakh polite form. Added new `GreetingKind::Muslim`
+  variant + dedicated `greeting.muslim` template family («уағалайкум-
+  ас-салам [, {name_respect}[, қалыңыз қалай]]»). «Сәлеметсіз бе»
+  / «Сәлем» protocols are unchanged (they were already reciprocal).
+- **Affirmation after clarification fulfils deferred query.**
+  Pre-v6.1.30 sequence «Костанай туралы не айтасын?» → «Бәлкім,
+  Костанай туралы айтасыз ба.» → user «Иә» / «Е» → adam asked
+  for clarification AGAIN. Two-part fix:
+  (a) `detect_affirmation` recognises bare «е» / «ие» / «иә иә»
+      (Whisper noise variants surfaced in voice-mode);
+  (b) at turn-finalise, if the rendered output contains «туралы
+      айтасыз ба», store `session["pending_clarification_noun"]`
+      = noun_hint; at next turn-entry, if input is bare
+      affirmation AND the slot is set, rewrite input to
+      «{noun} туралы айтыңыз» so the cascade fulfils the
+      deferred broad-topic query. Slot is cleared one-shot.
+
+### Tracked for v6.2.0
+
+- **Kazakhstan cities world_core pack** ([[project_v6_2_cities_and_hot_cache]])
+  — 17 oblast centres × ~15 anchor facts (institutions, theatres,
+  museums, factories). Closes the «Костанай қалада не бар?» →
+  «Қала — елді мекен» gap the user flagged this round.
+- **Zipf hot-cache (top 300-500 words)** — pre-computed Analysis
+  + bare-intent map for the 90% most-frequent surface forms. One
+  HashMap lookup instead of the 5-gate phonetic normaliser + 41-
+  detector cascade for the common case. Fits the structured-
+  indexing principle from
+  [[project_structured_knowledge_indexing]].
+
+### Testing
+
+- `cargo test --workspace --all-targets --release`: **1 724 / 0**.
+- `cargo clippy --workspace --all-targets -- -D warnings`: clean.
+- `cargo fmt --all --check`: clean.
+
 ## [6.1.25] — 2026-05-23 — voice REPL audit round 3: enumerative verbs + identity-inversion routing
 
 > Two surgical fixes from the user's third voice REPL audit (post-

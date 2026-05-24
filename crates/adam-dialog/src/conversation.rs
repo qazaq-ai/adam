@@ -839,6 +839,50 @@ impl Conversation {
         } else {
             input
         };
+        // **v6.1.30 — 2026-05-23 voice REPL audit round 4.**
+        // Affirmation-after-clarification: when the previous turn
+        // emitted a «Бәлкім, X туралы айтасыз ба?» clarification
+        // template AND the current input is a bare affirmation
+        // («Иә» / «Е» / «Дұрыс»), the user is confirming the
+        // clarification — fulfill the deferred broad-topic query.
+        // Rewrites `input` to «{noun} туралы айтыңыз» so the
+        // cascade re-runs with explicit topic, then clears the
+        // pending state so subsequent turns don't keep firing on
+        // any «Иә» mid-conversation.
+        let pending_input;
+        let input: &str = {
+            let lower_trimmed = input.trim().to_lowercase();
+            let is_bare_affirmation = matches!(
+                lower_trimmed.as_str(),
+                "иә" | "иә."
+                    | "ия"
+                    | "ия."
+                    | "е"
+                    | "е."
+                    | "ие"
+                    | "ие."
+                    | "дұрыс"
+                    | "дұрыс."
+                    | "рас"
+                    | "рас."
+                    | "мақұл"
+                    | "мақұл."
+                    | "әрине"
+                    | "әрине."
+                    | "иә, дұрыс"
+                    | "иә дұрыс"
+            );
+            if is_bare_affirmation {
+                if let Some(noun) = self.session.remove("pending_clarification_noun") {
+                    pending_input = format!("{noun} туралы айтыңыз");
+                    &pending_input
+                } else {
+                    input
+                }
+            } else {
+                input
+            }
+        };
         // **v4.6.20** — preamble stripper. Real-REPL surfaced
         // sentences like «Айтайын дегенім, қолданыстағы жасанды
         // интеллект модельдерінен қалай жақсырақ бола аласыз?» —
@@ -3373,7 +3417,7 @@ impl Conversation {
             parses,
             sem_frames,
             intent_after_injection: intent,
-            intent_after_verification: intent_for_render,
+            intent_after_verification: intent_for_render.clone(),
             session_snapshot: self.session.clone(),
             belief_digest: self.belief.digest(),
             belief_snapshot: self.belief.clone(),
@@ -3394,6 +3438,24 @@ impl Conversation {
         // remains authoritative for any consumer that inspects what
         // the pipeline would have said.
         let final_output = gender_explain_override.unwrap_or(output);
+        // **v6.1.30 — 2026-05-23 voice REPL audit round 4.** When the
+        // realised output is a clarification of the form «Бәлкім, X
+        // туралы айтасыз ба», store X under
+        // `session["pending_clarification_noun"]` so the NEXT turn's
+        // bare affirmation («Иә» / «Е» / «Дұрыс») can fulfil the
+        // deferred broad-topic query. The companion input-rewrite at
+        // the top of `turn_with_trace` reads + clears this slot.
+        if let Intent::Unknown {
+            noun_hint: Some(noun),
+            ..
+        } = &intent_for_render
+        {
+            if final_output.contains("туралы айтасыз ба") || final_output.contains("Бәлкім")
+            {
+                self.session
+                    .insert("pending_clarification_noun".into(), noun.clone());
+            }
+        }
         (final_output, trace)
     }
 

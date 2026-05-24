@@ -35,6 +35,19 @@ templates = [
     "сәлеметсіз бе, {name_respect}, {city|ablative} бәрі аман ба",
 ]
 
+# **v6.1.30 — 2026-05-23 voice REPL audit round 4.** Islamic
+# reciprocal greeting. The user's «Ассаламу алейкум» pre-v6.1.30
+# fell to `greeting.polite` and replied «Сәлеметсіз бе, Ағай.» —
+# culturally wrong: the Islamic greeting expects «Уағалайкум-ас-
+# салам», not a secular Kazakh polite form.
+[[families]]
+key = "greeting.muslim"
+templates = [
+    "уағалайкум-ас-салам",
+    "уағалайкум-ас-салам, {name_respect}",
+    "уағалайкум-ас-салам, {name_respect}, қалыңыз қалай",
+]
+
 [[families]]
 key = "greeting.morning"
 templates = [

@@ -2174,6 +2174,9 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::Greeting { kind } => match kind {
             GreetingKind::Casual => "greeting.casual",
             GreetingKind::Polite => "greeting.polite",
+            // **v6.1.30** — dedicated family for the Islamic reciprocal
+            // greeting «Уағалайкум-ас-салам».
+            GreetingKind::Muslim => "greeting.muslim",
             GreetingKind::TimeOfDay(TimeOfDay::Morning) => "greeting.morning",
             GreetingKind::TimeOfDay(TimeOfDay::Day) => "greeting.day",
             GreetingKind::TimeOfDay(TimeOfDay::Evening) => "greeting.evening",
