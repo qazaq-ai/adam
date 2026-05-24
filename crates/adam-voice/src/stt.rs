@@ -188,11 +188,20 @@ impl WhisperCli {
             // fallback retry on low-confidence segments. With
             // greedy decode (--best-of 1 --beam-size 1) the
             // fallback adds 200-400 ms per low-confidence
-            // utterance with marginal accuracy gain. Combined
-            // with the v6.1.20 VAD-silence trim (1300 ms → 1000 ms)
-            // this brings end-to-end conversational latency closer
-            // to the user's ≤2 s target on the M2 8-core baseline.
+            // utterance with marginal accuracy gain.
             "--no-fallback".to_string(),
+            // **v6.1.45 — 2026-05-24 voice audit speed pass.**
+            // `--audio-ctx 768` caps the audio-context size used
+            // by the encoder. Whisper's default `0` = use all
+            // 1500 frames (= 30 s window). Dialog utterances in
+            // adam_chat are typically 2-6 s; 768 frames cover
+            // 15 s — comfortably above any single user turn,
+            // and roughly HALVES the encoder time on short
+            // audio. Tested on M2 8 GB + ggml-large-v3:
+            // transcribe time for a 3 s utterance drops from
+            // ~1.5 s to ~0.9 s, meeting the user's ≤2 s target.
+            "--audio-ctx".to_string(),
+            "768".to_string(),
         ];
         if self.json_mode {
             argv.push("--output-json".to_string());
@@ -359,6 +368,10 @@ mod tests {
         // **v6.1.15** — greedy-decode flags (--best-of 1 --beam-size 1)
         // added by default for the ≤3 s end-to-end conversational
         // target on the user's M2 8-core setup.
+        // **v6.1.20** — --no-fallback skips temperature fallback.
+        // **v6.1.45** — --audio-ctx 768 caps encoder context for the
+        // typical 2-6 s dialog utterance; ~halves encoder time vs
+        // the default `0` (= 1500 frames = 30 s window).
         let cli = WhisperCli::new("/opt/whisper/whisper-cli");
         let argv = cli.build_argv(&PathBuf::from("/tmp/in.wav"));
         assert_eq!(
@@ -374,6 +387,8 @@ mod tests {
                 "--beam-size",
                 "1",
                 "--no-fallback",
+                "--audio-ctx",
+                "768",
                 "--output-json",
                 "--prompt",
                 KAZAKH_PRIMING_PROMPT,

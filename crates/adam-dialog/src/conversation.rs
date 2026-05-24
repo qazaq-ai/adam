@@ -498,6 +498,29 @@ impl Conversation {
             // «Қорғаныс ИИ»; Whisper drops the «с» and re-syllabifies.
             ("Қорғаныз ий", "Қорғаныс ИИ"),
             ("Қорғаныз ИИ", "Қорғаныс ИИ"),
+            // 2026-05-24 v6.1.40 audit: «облыстар» (regions) Whisper-
+            // splits into noisy tokens. «оғылстар» and «ол бұлыстар»
+            // both fall to clarification before the cascade resolves
+            // the topic. Normalize at the input-rewrite stage.
+            ("оғылстар", "облыстар"),
+            ("оғылыстар", "облыстар"),
+            ("ол бұлыстар", "облыстар"),
+            ("обылыс", "облыс"),
+            ("оболыс", "облыс"),
+            // Russian-style city spellings → canonical Kazakh
+            // («Костанай» → «Қостанай»). These are the same entries
+            // as the `russian_to_kazakh_canonical` helper but applied
+            // at the WHOLE-INPUT rewrite stage so the cascade sees
+            // the canonical form on the FIRST turn, not only on the
+            // pending-clarification fulfilment turn.
+            ("Костанай", "Қостанай"),
+            ("Костанае", "Қостанай"),
+            ("Караганды", "Қарағанды"),
+            ("Караганда", "Қарағанды"),
+            ("Кызылорда", "Қызылорда"),
+            ("Туркестан", "Түркістан"),
+            ("Актобе", "Ақтөбе"),
+            ("Алюр зауыты", "АлюмКаз зауыты"),
         ];
         let mut rewritten = input.to_string();
         for (whisper_noise, canonical) in VOICE_ALIASES {

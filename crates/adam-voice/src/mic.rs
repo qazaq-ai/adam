@@ -120,7 +120,7 @@ impl Default for MicConfig {
             // 400 ms in Kazakh) so deliberate speech is unaffected;
             // users with very slow speech can dial back via a
             // future `--vad-silence-ms` flag if needed.
-            vad_silence_after_speech: Duration::from_millis(1000),
+            vad_silence_after_speech: Duration::from_millis(1100),
             vad_amplitude_threshold: 0.02 * (i16::MAX as f32),
             vad_min_speech_before_silence: Duration::from_millis(600),
             vad_enabled: true,

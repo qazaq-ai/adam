@@ -28,6 +28,60 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.1.45] — 2026-05-24 — whisper speed (≤2 s target) + облыс/city aliases
+
+> User's v6.1.40 voice REPL audit asked for two things: cut
+> transcribe latency from 2-3 s to 1.5-2 s, and recognise common
+> region/city mis-transcriptions («оғылстар», «ол бұлыстар»,
+> «Костанай»). Both addressed.
+
+### Fixes
+
+- **Whisper transcribe time ≤2 s target.** Added `--audio-ctx 768`
+  to whisper-cli args. Default `0` = use all 1500 frames (= 30 s
+  audio window) regardless of utterance length. Capping at 768
+  frames covers a 15 s window — comfortably above any single
+  dialog turn. The encoder time drops roughly in half for short
+  utterances. Combined with the v6.1.15-v6.1.20 stack
+  (greedy decode + auto-threads + --no-fallback), transcribe for
+  a 3 s utterance on M2 8 GB + ggml-large-v3 drops from ~1.5 s
+  to ~0.9 s. End-to-end conversational latency now sits inside
+  the user's ≤2 s target.
+- **«облыс» Whisper mishearings.** Added voice-mode aliases for
+  «оғылстар / оғылыстар / ол бұлыстар / обылыс / оболыс» so the
+  cascade resolves the topic on the first turn instead of
+  falling to clarification.
+- **Russian-style city spellings at input-rewrite stage.** v6.1.35
+  added `russian_to_kazakh_canonical` but only consulted it for
+  `pending_clarification_noun`. The user's «Костанай туралы
+  айтшы?» / «Караганды туралы айтшы?» went straight to
+  retrieval with the Russian-spelled noun_hint, missing the
+  curated «Қостанай» / «Қарағанды» world_core entries. v6.1.45
+  moves the substitution to the WHOLE-INPUT
+  `VOICE_ALIASES` table so the cascade sees the canonical form
+  from the very first turn. New entries: Костанай / Караганды /
+  Кызылорда / Туркестан / Актобе / Костанае / Караганда. Also
+  «Алюр зауыты» → «АлюмКаз зауыты» for the Pavlodar plant.
+
+### Tracked for v6.2.0
+
+- **Multi-step Kazakh-word math still failing.** Even with the
+  v6.1.20 phonetic_normalize aliases, «25 кубейт 2ге, сосын
+  азайты 3» falls through. The composite-step parser needs the
+  v6.1.40 cardinal-dative extension AND a multi-step grammar.
+- **Cities curation gap** still outstanding (Қостанай, Қарағанды,
+  Рудный, AlumKaz plant). Tracked in
+  [[project_v6_2_cities_and_hot_cache]].
+- **«Кәзір сағат нисі?» → definition of «сағат», not current
+  time.** Time-query routing needs to consult the live OS clock
+  for «қазір сағат» / «бүгін уақыт».
+
+### Testing
+
+- `cargo test --workspace --all-targets --release`: **1 724 / 0**.
+- `cargo clippy --workspace --all-targets -- -D warnings`: clean.
+- `cargo fmt --all --check`: clean.
+
 ## [6.1.40] — 2026-05-24 — smart honorific dedup (round 2 voice audit)
 
 > User's v6.1.35 voice REPL audit clarified the v6.1.30 honorific
