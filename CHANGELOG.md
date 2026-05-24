@@ -28,6 +28,67 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.1.25] — 2026-05-23 — voice REPL audit round 3: enumerative verbs + identity-inversion routing
+
+> Two surgical fixes from the user's third voice REPL audit (post-
+> v6.1.20). Architectural directives for structured knowledge
+> indexing ([[project_structured_knowledge_indexing]]) and
+> context-aware STT correction
+> ([[project_context_aware_stt_directive]]) saved to memory as
+> v6.2.0 research-arc scope.
+
+### Fixes
+
+- **«Ахметтің еңбектерін атаңыз» now triggers broad-topic
+  composer.** Pre-v6.1.25 the `is_broad_topic_query` enumerative-
+  verb list missed «атаңыз / тізімдеңіз / санап беріңіз /
+  көрсетіңіз / айтып беріңіз» — list/enumerate imperatives that
+  natural Kazakh speakers use interchangeably with the «айтыңыз»
+  family. Added them to the verb table.
+
+- **«Сен жасанды интеллект моделісің бі?» routes to identity
+  answer, not LLM-weakness retrieval.** Pre-v6.1.25 the
+  architectural-identity probe in `detect_ask_about_system`
+  matched «моделсің / моделсіз» (no `-і-` linker) but missed the
+  full Kazakh form «моделісің / моделісіз» (`-і-` between the
+  Russian-loan stem «модель» and the 2sg/2pl predicate copula).
+  The cascade then fell through to noun retrieval over «жасанды
+  интеллект» and surfaced the curated «жасанды интеллект
+  кемшіліктері» weakness list instead of the direct identity
+  reply. Added «моделісің / моделісіз / моделі емессің /
+  моделі емессіз / жасанды интеллект моделі» to the marker set
+  so all variants route to `SystemAspect::Architecture`.
+
+### Tracked for v6.2.0 (research arc)
+
+Two foundational architectural directives saved to memory as
+v6.2.0 scope:
+
+- **Structured knowledge indexing** —
+  [[project_structured_knowledge_indexing]]. Hash / trie /
+  Aho-Corasick indexes by POS, predicate, sentence-type, domain
+  so retrieval is O(1) / O(log n), never linear scan. Replaces
+  the current MULTIWORD_ENTITIES linear scan, VOICE_ALIASES
+  linear scan, `extracted_facts.iter().find()` linear scan,
+  and the 41-detector cascade's per-turn substring sweep.
+- **Context-aware STT correction** —
+  [[project_context_aware_stt_directive]]. Deterministic
+  N-best lattice rescoring + phonetic-bounded fuzzy search
+  with FST round-trip + context biasing (boost candidates from
+  `subject_under_discussion`'s domain vocabulary) +
+  confusion-matrix auto-extraction from voice-audit logs.
+  Goal: «understand speech defects via context+logic like
+  humans do; refuse only when info is genuinely absent».
+
+Both directives are foundational — every new knowledge module
+PR after v6.2.0 must answer «how is this indexed?».
+
+### Testing
+
+- `cargo test --workspace --all-targets --release`: **1 724 / 0**.
+- `cargo clippy --workspace --all-targets -- -D warnings`: clean.
+- `cargo fmt --all --check`: clean.
+
 ## [6.1.20] — 2026-05-23 — voice REPL audit round 2: latency + child-voice + filler cuts
 
 > User's second real-voice REPL audit (after v6.1.15) confirmed

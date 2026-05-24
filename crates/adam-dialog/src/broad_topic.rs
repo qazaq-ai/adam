@@ -60,6 +60,20 @@ pub fn is_broad_topic_query(input: &str) -> bool {
         "білесің",
         "білемін бе",
         "білесіз бе",
+        // **v6.1.25 — 2026-05-23 voice REPL audit.** «Ахметтің
+        // еңбектерін атаңыз / тізімдеңіз / санап беріңіз / көрсетіңіз»
+        // — list/enumerate imperative variants the user actually
+        // uses but the v6.1.20 verb list missed. Adding here so
+        // broad-topic composer handles list-of-works style queries.
+        "атаңыз",
+        "тізімдеңіз",
+        "тізімдеп",
+        "санап беріңіз",
+        "санап",
+        "көрсетіңіз",
+        "көрсетіп",
+        "айтып беріңіз",
+        "айтып бер",
     ];
     ENUMERATIVE_VERBS.iter().any(|v| lower.contains(v))
 }

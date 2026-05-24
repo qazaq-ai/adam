@@ -2105,6 +2105,20 @@ fn detect_ask_about_system(
         || joined.contains("тілдік моделсіз")
         || joined.contains("тіл моделсің")
         || joined.contains("тіл моделсіз")
+        // **v6.1.25 — 2026-05-23 voice REPL audit.** Full Kazakh
+        // form with `-і-` linker between «модель» (loan-stem) and
+        // «-сің / -сіз» (2sg / 2pl predicate copula): «жасанды
+        // интеллект моделісің бі?» / «модель емессің бе?». Pre-
+        // v6.1.25 the cascade missed these forms entirely and
+        // fell into noun-retrieval over «жасанды интеллект»,
+        // surfacing the curated «жасанды интеллект кемшіліктері»
+        // weakness list instead of a direct yes/no «Иә, мен —
+        // Agglutinative Reasoning Kernel...» identity answer.
+        || joined.contains("моделісің")
+        || joined.contains("моделісіз")
+        || joined.contains("моделі емессің")
+        || joined.contains("моделі емессіз")
+        || joined.contains("жасанды интеллект моделі")
         || joined.contains("трансформер")
         || joined.contains("transformer")
         || joined.contains("нейрожелі")
