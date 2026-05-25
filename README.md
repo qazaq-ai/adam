@@ -34,7 +34,7 @@
   <img src="https://img.shields.io/badge/world%20core-3461%20curated%20/%204116%20facts%20/%2066%20domains-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/lexicon-25.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/intents-41-2EA44F?style=flat-square" alt="intents">
-  <img src="https://img.shields.io/badge/hallucinations-0-2EA44F?style=flat-square" alt="hallucinations">
+  <img src="https://img.shields.io/badge/hallucinations%20within%20curated%20domains-0-2EA44F?style=flat-square" alt="hallucinations within curated domains">
 </p>
 
 ---
@@ -165,10 +165,14 @@ for the design doc that preceded the work.
 > 2. **Cheapness** — single Rust binary, **0 MB model**, **0 %
 >    GPU**, **791 ns warm median latency** on one M2 core
 >    (~1.26M qps). Watch-class deployable.
-> 3. **Architectural hallucination-freedom** — every fact-bearing
->    reply emits from a `FrameIndex` hit + Stage 7 realiser, or
->    refuses honestly. No probabilistic free generation in the
->    answer path.
+> 3. **Architectural hallucination-freedom within curated domains** —
+>    every fact-bearing reply emits from a `FrameIndex` hit + Stage 7
+>    realiser, or falls through to v6.1 cascade / honest refusal. No
+>    probabilistic free generation anywhere in the answer path.
+>    *Scope caveat:* «0 hallucinations» holds for queries the
+>    curated corpus covers; off-corpus queries route to v6.1
+>    fallback (which can still misroute on edge cases — see the
+>    open Stage 8 backlog) or to «нет данных».
 >
 > Designed to extend across ~30 catalogued agglutinative
 > languages — currently demonstrated on Kazakh; cross-language
@@ -329,7 +333,7 @@ For a full evidence dump on any Kazakh root, run [`adam_inspect`](crates/adam-di
 | v6.1 cascade p50 turn latency | **~21 ms** | vs Llama-3 8B fp16 800–1500 ms; vs GPT-4 50–200 ms |
 | Memory footprint | **~300 MB RSS** | both cascades; vs LLM 16+ GB VRAM |
 | GPU usage | **0 %** | vs LLM dedicated GPU |
-| Hallucination rate | **0 %** (architectural) | verified by graph admissibility tests + Stage 4 quality gate |
+| Hallucination rate (curated-domain coverage) | **0 %** architectural | verified by graph admissibility tests + Stage 4 quality gate. Off-corpus queries fall through to v6.1 cascade or honest «нет данных» — they cannot invent facts, but they can misroute. Stage 8 (HumanDialogEval) measures the off-corpus surface |
 | Lexicon roots | **25.5 k** | 13.6 k pure Kazakh + 11.9 k Apertium imports |
 | Curated entries (`world_core/`) | **3 461 entries / 4 044 frames** | across 66 domains; `validate_world_core` enforced in CI |
 | Curated facts total (incl. v6.1 augmentation) | **4 116** | `world_core` + bilingual aliases + МО РК + historical |

@@ -1,10 +1,30 @@
 # v6.2.0 — Neurosymbolic Agglutinative Algebra (design)
 
-**Status.** Design draft. To be implemented on
-`experimental/v6_2_agglutinative_algebra`, forked from `main` at
-v6.1.50 (commit `44ff444c`) on 2026-05-24. **No code until this
-doc is signed off** — same discipline as v6.1.0
-(`v6_1_answer_ir_design.md`).
+**Status.** ✅ **Signed off 2026-05-24, shipped 2026-05-25.**
+Branch `experimental/v6_2_agglutinative_algebra` (forked from
+`main` at v6.1.50, commit `44ff444c`) merged into `main` via
+commit `a4b64a76` and tagged `v6.2.0`. Implementation inventory:
+
+- `adam-algebra` crate (8 modules, 195 lib tests).
+- `adam-dialog::v6_2_router` integration bridge gated by
+  `ADAM_V6_2=1`.
+- `Conversation::turn` calls the router as an output override
+  when the env-gate is on; v6.1 cascade still mutates session
+  state (honest fallback when the router can't answer).
+- Real-Kazakh dialog battery: **79/79 must-pass, 0 known gaps,
+  0 regressions**.
+- Workspace tests: 1735 → 1904. clippy `-D warnings` green.
+- Median warm latency (release, M2 single core): **791 ns**
+  full dialog battery; **274 ns** Stage 3 pipeline.
+
+This document remains as the **signed-off design contract** the
+implementation was held to. Read it for the architectural intent
+behind the typed pipeline; read [CHANGELOG.md § 6.2.0](../CHANGELOG.md)
+for the as-shipped inventory. Discrepancies between the two are
+either (a) features deferred to Stage 8+ (HumanDialogEval gate,
+ARM PoC, learned components, full v6.1 call-site rewire) — these
+remain as design-only — or (b) bugs in the as-shipped code,
+which take precedence and trigger follow-up commits on `main`.
 
 **Origin.** 11 voice + text REPL audits across 2026-05-23 and
 2026-05-24 produced 22 fixes in 11 releases (v6.1.0 → v6.1.50).

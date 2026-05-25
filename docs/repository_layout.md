@@ -1,6 +1,19 @@
 # Repository Layout
 
-## Crates (10 total — workspace at v4.4.7)
+> **v6.2.0 update (2026-05-25).** Workspace now has 20 crates
+> across L0–L1, plus `tools/intent_dataset`. v6.2.0 added
+> `adam-algebra` (typed neurosymbolic stack — Composition / Frame
+> / QueryIR / FrameIndex / realiser / math_solver / system_clock /
+> corpus_loader), 8 modules / 195 lib tests; plus
+> `adam-dialog::v6_2_router` integration bridge gated by
+> `ADAM_V6_2=1`. v6.1.x added the `adam-curriculum` / `adam-intent-classifier`
+> / `adam-slot-extractor` / `adam-retrieval-ranker` / `adam-agg-*`
+> crates. The crate descriptions below were last edited at v4.4.7
+> (2026-04 era) and reflect the partial scope at that time — see
+> the workspace `Cargo.toml` `[workspace] members = […]` list for
+> the authoritative crate set.
+
+## Crates (10 total — workspace at v4.4.7, partially stale; see note above for v6.2.0 inventory)
 
 - `adam-kernel`
   shared identity, versioning, and foundation contracts (L0)

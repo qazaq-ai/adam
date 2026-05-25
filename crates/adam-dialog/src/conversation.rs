@@ -3598,6 +3598,20 @@ impl Conversation {
                 }
             }
         }
+        // **v6.2.0 router override.** When `ADAM_V6_2=1` is set, give
+        // the typed neurosymbolic stack (math_solver / system_clock /
+        // FrameIndex+realiser) first crack at the input AFTER the
+        // v6.1 cascade has computed its own answer + mutated session
+        // state. If the v6.2 router returns an answer, it overrides
+        // the v6.1 output; otherwise the v6.1 answer is preserved as
+        // the honest fallback. Running both paths keeps session
+        // belief / honorific / topic tracking unbroken — Stage 8 will
+        // fold those into a typed conversation state.
+        let final_output = if crate::v6_2_router::is_v6_2_active() {
+            crate::v6_2_router::answer(input).unwrap_or(final_output)
+        } else {
+            final_output
+        };
         (final_output, trace)
     }
 

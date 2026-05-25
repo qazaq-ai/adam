@@ -96,7 +96,7 @@ Korean) — giving the research a global frontier.
 |---|---|---|
 | **Predictability** | Reproducibility of every response from (input, seed, facts) | 100% deterministic — Stage 4 FrameIndex query + Stage 7 realiser are pure functions; v6.1 cascade preserved as fallback |
 | **Cheapness** | Memory + CPU + GPU per query | **0 MB model**, **0% GPU**, **791 ns** warm median (release, M2 single core) — Stage 3 pipeline ~274 ns, full dialog battery ~791 ns, v6.1 cascade ~21 ms |
-| **Safety** | Hallucination rate (claims without source attribution) | 0% architectural — every Frame in `FrameIndex` traces to a `FrameId` provenance; CI quality gate `dialog_battery_meets_quality_gate` enforces 79/79 real-Kazakh cases must-pass + 0 regressions |
+| **Safety** | Hallucination rate (claims without source attribution) | **0% architectural within curated-domain coverage** — every Frame in `FrameIndex` traces to a `FrameId` provenance; CI quality gate `dialog_battery_meets_quality_gate` enforces 79/79 real-Kazakh cases must-pass + 0 regressions. Off-corpus queries fall through to v6.1 cascade or honest «нет данных»; they cannot invent facts but can misroute on edge cases. Stage 8 (HumanDialogEval) measures the off-corpus surface separately. |
 
 For comparison: Llama-3 8B fp16 inference uses 800–1500 ms per query
 with 16 GB VRAM; GPT-4 uses 50–200 ms with hidden datacentre GPU.
