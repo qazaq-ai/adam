@@ -81,6 +81,11 @@ pub mod tool;
 pub mod topic_extraction;
 pub mod tts;
 pub mod uncertainty;
+/// **v6.2 — neurosymbolic agglutinative stack integration bridge.**
+/// Routes user input through `adam-algebra` (Frame / QueryIR /
+/// FrameIndex / realiser / math_solver / system_clock) when the
+/// `ADAM_V6_2` env var is set. v6.1 cascade unchanged when off.
+pub mod v6_2_router;
 pub mod verifier;
 pub mod weather;
 

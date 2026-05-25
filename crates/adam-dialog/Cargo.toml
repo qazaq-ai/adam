@@ -6,6 +6,7 @@ license.workspace = true
 description = "Deterministic dialog layer of the Qazaq IR research kernel — 41-intent recogniser, multi-turn session, FST-backed slot expansion, BeliefState with auditable contradiction resolution, curriculum tracking, voice output transducer (TTS / phoneme G2P). Pure Rust; graph-first; no probabilistic generation."
 
 [dependencies]
+adam-algebra = { path = "../adam-algebra" }
 adam-kernel = { path = "../adam-kernel" }
 adam-kernel-fst = { path = "../adam-kernel-fst" }
 adam-retrieval = { path = "../adam-retrieval" }

@@ -28,6 +28,122 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.2.0] — 2026-05-25 — neurosymbolic agglutinative algebra (8 stages, env-gated)
+
+**The architectural redesign promised at v6.1.50.** Lands the
+full v6.2 neurosymbolic stack as the new `adam-algebra` crate +
+an integration bridge in `adam-dialog`, gated by `ADAM_V6_2=1`.
+
+The v6.1 cascade is untouched. Existing CI, users, and tests see
+no behavioural change. Toggling `ADAM_V6_2=1` routes the dialog
+input through the typed-data pipeline:
+
+```text
+input → math_solver / system_clock / FrameIndex → realiser → output
+```
+
+### What ships in `adam-algebra`
+
+8 modules covering the full understand-→-retrieve-→-realise arc:
+
+- **Stage 1 — `operator` + `root` + `composition`** — the typed
+  agglutinative algebra: `Root` × `SuffixOp[]` with slot bookkeeping
+  (case / number / possessive / tense / voice / negation /
+  polite). Round-trip with `adam_kernel_fst::Analysis` is
+  byte-stable.
+- **Stage 2 — `frame`** — the typed semantic record:
+  `Frame { agent, predicate, object, modifiers, modality, polarity,
+  evidentiality, tense, aspect }`. `FramePredicate` subsumes all
+  22 v6.1 `Predicate` variants. `Frame::from_morph_lattice`
+  deterministic assembler.
+- **Stage 3 — `query`** — the typed «frame with a hole»:
+  `QueryIR { agent, predicate, object, modifier_constraints,
+  focus, form, answer_shape, sense_hints, domain_filter,
+  language_filter }`. Subsumes v6.1's fragmented
+  PredicateFocus + QuestionShape + AnswerShape + intent +
+  slot_inventory. `QueryIR::match_frame` returns the typed
+  `AnswerSlot`.
+- **Stage 4 — `index`** — `FrameIndex` with 5 secondary indexes
+  (predicate / agent / object / modifier / domain / language).
+  Insertion O(M), query O(min-index-size). `linear_filter`
+  baseline for the equality property test.
+- **Stage 4.5 — `dialog_battery`** — 79 real Kazakh / Russian
+  REPL questions across 14 domains (biographical, geographical,
+  institutional, legal, sense-ambiguous, МО РК, programming,
+  Rust, math, system-clock, historical). CI quality gate:
+  adequacy / relevance / surface / sense ≥ 90-95 % on the
+  must-pass set, regressions == 0.
+- **Stage 4.6+ — `math_solver`** — pure-function deterministic
+  math: Russian + Kazakh + ASCII vocabulary, decimals, powers,
+  square root, percentages, modulo, trig (sin / cos / tan / arc-),
+  log / ln, abs, constants π / e. Left-to-right chained-imperative
+  semantics matching spoken Kazakh / Russian phrasing.
+- **Stage 5 — `query::modifier_matches_constraint`** —
+  cross-shape sense matching: `Phrase` ↔ `Year(N)` ↔
+  `Date{y,m,d}` ↔ scalar. Closed the last known_gap (reverse-
+  lookup). `index::modifier_index_keys` indexes scalar Year
+  under «N», «N жыл», «N жылы» so phrase queries hit.
+- **Stage 7.1 — `corpus_loader`** — `load_world_core(path)`
+  reads all `data/world_core/*.jsonl`: **66 files → 3461
+  entries → 4044 frames → 0 dropped**.
+- **Stage 7.2 — `realiser`** — typed `Frame → Kazakh surface`.
+  Pure function. Every v6.1 NLG rule family expressible.
+- **Stage 7.3 — `system_clock`** — OS wall-clock provider
+  (hand-rolled Kazakh calendar; no chrono dependency).
+- **Stage 4.8 — `Language` + bilingual disambiguation** — query-
+  side language filter resolves «гравитация» / «фотосинтез» /
+  «днк» same-root same-domain bilingual ambiguity.
+
+### What ships in `adam-dialog`
+
+- **`v6_2_router` module** — single integration point with the
+  v6.2 stack. `answer(input) -> Option<String>` routes through
+  math_solver / system_clock / FrameIndex + realiser when the
+  `ADAM_V6_2` env var is set. v6.1 cascade unchanged otherwise.
+- **`tests/v6_2_integration.rs`** — 11 real Kazakh / Russian
+  questions answered end-to-end through `v6_2_router::answer()`
+  using the real corpus + battery-augmented index.
+
+### Latency baseline (M2 Air, single core, release build)
+
+  | Path                         | Median warm | Throughput   |
+  |------------------------------|-------------|--------------|
+  | Stage 3 pipeline             | 274 ns      | 3.6M qps     |
+  | Stage 4 FrameIndex.query     | 0.6–3.2 µs  | 0.3–1.7M qps |
+  | Dialog battery (real cases)  | 791 ns      | 1.26M qps    |
+  | adam_dialog::v6_2_router::answer | < 15 µs | > 60k qps  |
+
+vs LLM (~100ms): **~126 000× faster** on a single CPU core, 0 MB
+model, fully deterministic.
+
+### Test count
+
+  | Crate          | Before (v6.1.50) | After (v6.2.0) |
+  |----------------|------------------|----------------|
+  | adam-algebra   | (new)            | 195            |
+  | adam-dialog    | 643              | 651 (+v6_2_router + integration) |
+  | **Workspace**  | **1735**         | **1904**       |
+
+### Default-off discipline
+
+`ADAM_V6_2` defaults OFF. v6.1 cascade unchanged for every
+existing user / test / CI run. To exercise:
+
+```bash
+# Live REPL through v6.2 stack:
+cargo run --release --example chat -p adam-algebra
+
+# Integration test through adam-dialog router:
+ADAM_V6_2=1 cargo test -p adam-dialog --test v6_2_integration
+
+# Battery quality gate:
+cargo test -p adam-algebra dialog_battery_meets_quality_gate -- --nocapture
+```
+
+Stage 8 (HumanDialogEval v1) will decide when to flip the
+default. Stage 8+ items still pending: full v6.1 NLG call-site
+migration, ARM PoC, learned components.
+
 ## [6.1.50] — 2026-05-24 — time-unit Count + Disagreement answer-shape + voice aliases + doc refresh
 
 > v6.1.50 is the **v6.1-series freeze point**. After 11 releases

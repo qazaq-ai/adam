@@ -1,4 +1,4 @@
-# Performance — adam v6.1.50 (deterministic path; neural preview + AnswerIR are opt-in)
+# Performance — adam v6.2.0 (v6.1 cascade unchanged; v6.2 neurosymbolic stack opt-in via `ADAM_V6_2=1`)
 
 > **v6.1.50 note (originally drafted 2026-05-18 for rc1; the
 > 2026-05-22 GA merge held the numbers; v6.1.50 on 2026-05-23 adds
