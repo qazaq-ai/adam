@@ -101,11 +101,64 @@ pub fn answer(input: &str) -> Option<String> {
 /// Variant that lets callers supply their own [`FrameIndex`] (used
 /// in integration tests + the live REPL).
 pub fn answer_with_corpus(input: &str, idx: &FrameIndex) -> Option<String> {
+    // 0a. STT-loop dedupe. Whisper sometimes gets stuck in a
+    // repeat-loop and emits «Сәлем. Сәлем. Сәлем.» × 30+. Collapse
+    // to the first meaningful clause so adam answers ONCE, not 30×.
+    // Codex 2026-05-25 voice REPL session 3 caught this producing
+    // 6-line cascade misfires per loop input.
+    let dedup_owned;
+    let input: &str = if let Some(dedup) = dedupe_stt_loop(input) {
+        dedup_owned = dedup;
+        &dedup_owned
+    } else {
+        input
+    };
+
+    // 0b. STT-fold — normalize Whisper mishears («оналты» → «он алты»,
+    // «жел тұқтықстан» → «желтоқсан», «энштейн» → «эйнштейн»)
+    // ONCE at the top so every downstream path (math_solver,
+    // canonical_agent_for, broad-topic detector) sees the folded
+    // form. Without this, math_solver missed «он алты түбірі»
+    // because it received raw «оналты түбірі» (codex 2026-05-25
+    // session-3 audit).
+    let folded = stt_fold(&input.to_lowercase());
+    let input: &str = &folded;
+
     // 1. Math first — procedural computation.
     if looks_like_math(input)
         && let Some(r) = math_solver::solve(input)
     {
         return Some(r.render());
+    }
+
+    // 1a. Occupation acknowledgement. «Мен X» / «Мен X-мын» —
+    // user stating profession / role. The v6.1 cascade interpreted
+    // this as a definition request («Бағдарламашы — кәсіп иесі.»),
+    // not a personal statement. Catch the most common shapes.
+    if let Some(ack) = recognize_occupation_statement(input) {
+        return Some(ack);
+    }
+
+    // 1b. Capabilities query. «Сен не білесің?» / «Не істей
+    // аласың?» — user wants a self-description of what adam can
+    // answer. Distinct from self-identity («Сен кімсің?»).
+    if is_capabilities_query(input) {
+        return Some(capabilities_response());
+    }
+
+    // 1c. Pitch-gender explanation. «Сен мені ағай дедің. Қалай
+    // түсіндің?» — user asks how adam detected gender. Honest
+    // explanation: pitch analysis on voice input.
+    if is_pitch_detection_query(input) {
+        return Some(
+            "Сіздің даусыңыздың жиілігі (pitch) бойынша анықтадым. \
+             Voice-input режимінде whisper.cpp дауысты транскрипциялаған \
+             соң, мен оның негізгі жиілігін («male» болса ~ 85–155 Гц, \
+             «female» болса ~ 165–255 Гц) есептеймін де, соған сай \
+             қазақша құрметтеу формасын — «Ағай» немесе «Апай» — \
+             таңдаймын. Бұл — детерминирленген эвристика, нейрожүйе емес."
+                .to_string(),
+        );
     }
 
     // 2. Self-identity short-circuit. «Сен кімсің?» / «Сен өзің
@@ -142,6 +195,26 @@ pub fn answer_with_corpus(input: &str, idx: &FrameIndex) -> Option<String> {
     //    calendar / clock, NOT about year-anchored facts.
     if looks_like_time_query(input) {
         return Some(emit_clock_answer(input));
+    }
+
+    // 4a. Broad-topic «X туралы айтшы» — return a multi-fact
+    // paragraph instead of a single object word. Codex 2026-05-25
+    // voice REPL caught «Қазақстан туралы айтшы» → «Мемлекет»
+    // (one-word IsA hit). Now emits a curated paragraph.
+    if let Some(topic) = detect_broad_topic_query(input)
+        && let Some(paragraph) = render_broad_topic(&topic, idx)
+    {
+        return Some(paragraph);
+    }
+
+    // 4b. Curated enumeration shortcuts. «Қазақстанның облыстарын
+    // айтшы» / «Қазақстанның көршілері кім?» — these need a list,
+    // not a single-fact answer. The world_core has curated list
+    // strings (geo_kz_104 has all 17 oblasts comma-separated).
+    // Stage 8 will lift this with proper Enumeration retrieval;
+    // tonight we hand-wire the most common queries.
+    if let Some(list_answer) = handle_listing_query(input) {
+        return Some(list_answer);
     }
 
     // 3. Retrieval — typed QueryIR → FrameIndex → realiser.
@@ -267,6 +340,274 @@ fn looks_like_math(s: &str) -> bool {
     }
     s.chars()
         .any(|c| matches!(c, '+' | '*' | '/' | '%' | '^' | '√' | '×' | '÷'))
+}
+
+/// Detect «X туралы айтшы» / «X жайында айтшы» / «расскажи о X»
+/// broad-topic queries. Returns the canonical agent surface when
+/// the query matches; `None` otherwise.
+fn detect_broad_topic_query(input: &str) -> Option<String> {
+    let lower = input.to_lowercase();
+    let broad_markers = [
+        "туралы айтшы",
+        "туралы айт",
+        "туралы айтыңыз",
+        "жайында айт",
+        "жайында айтшы",
+        "туралы не білесің",
+        "расскажи о",
+        "расскажи про",
+    ];
+    let has_marker = broad_markers.iter().any(|m| lower.contains(m));
+    if !has_marker {
+        return None;
+    }
+    canonical_agent_for(&lower)
+}
+
+/// Render a curated multi-fact paragraph about a topic. Pulls
+/// 2–4 distinct IsA / PartOf / HasQuantity / LocatedIn facts
+/// from the index for the agent and joins them into one
+/// sentence. Returns `None` if no facts found.
+fn render_broad_topic(topic: &str, idx: &FrameIndex) -> Option<String> {
+    // Try a few predicate-focused queries and harvest distinct
+    // object surfaces.
+    let preds = [
+        FramePredicate::IsA,
+        FramePredicate::PartOf,
+        FramePredicate::HasQuantity,
+        FramePredicate::LocatedIn,
+        FramePredicate::Authored,
+        FramePredicate::FoundedIn,
+    ];
+    let mut facts: Vec<String> = Vec::new();
+    let mut seen: std::collections::HashSet<String> = std::collections::HashSet::new();
+    for p in preds {
+        let q = QueryIR::new(
+            QueryFocus::Object,
+            QuestionForm::Definition,
+            AnswerShape::DefinitionalNP,
+        )
+        .with_agent(noun(topic))
+        .with_predicate(p.clone());
+        // Pull up to 3 hits per predicate.
+        for h in idx.query(&q).into_iter().take(3) {
+            if let Some(obj) = h.frame.object.as_ref() {
+                let surface = obj.root.surface.clone();
+                if seen.insert(surface.clone()) {
+                    facts.push(match p {
+                        FramePredicate::IsA => format!("{topic} — {surface}"),
+                        FramePredicate::PartOf => format!("{topic} {surface} құрамында"),
+                        FramePredicate::HasQuantity => {
+                            format!("{topic}-да {surface} бар")
+                        }
+                        FramePredicate::LocatedIn => format!("{topic} {surface}-да орналасқан"),
+                        FramePredicate::Authored => format!("{topic} {surface}-ні жазған"),
+                        FramePredicate::FoundedIn => format!("{topic} {surface} жылы құрылған"),
+                        _ => continue,
+                    });
+                }
+            }
+            if facts.len() >= 4 {
+                break;
+            }
+        }
+        if facts.len() >= 4 {
+            break;
+        }
+    }
+    if facts.is_empty() {
+        return None;
+    }
+    Some(format!(
+        "{}.",
+        facts
+            .into_iter()
+            .map(|s| capitalize_first(&s))
+            .collect::<Vec<_>>()
+            .join("; ")
+    ))
+}
+
+fn capitalize_first(s: &str) -> String {
+    let mut chars = s.chars();
+    match chars.next() {
+        Some(c) => c.to_uppercase().chain(chars).collect(),
+        None => String::new(),
+    }
+}
+
+/// Hand-curated listing answers for the most common
+/// «X-нің Y-лары» / «X-ның Y-лары қайсы?» queries that v6.2's
+/// single-frame retrieval can't compose. Stage 8 lifts this via
+/// typed Enumeration retrieval; tonight this closes the
+/// «Мемлекет» misfire for these specific surfaces.
+fn handle_listing_query(input: &str) -> Option<String> {
+    let lower = input.to_lowercase();
+    // Kazakhstan's 17 oblasts.
+    if (lower.contains("облыстар") || lower.contains("обылыстар"))
+        && (lower.contains("қазақстан") || lower.contains("казахстан"))
+    {
+        return Some(
+            "Қазақстанның 17 облысы: Абай, Ақмола, Ақтөбе, Алматы, \
+             Атырау, Батыс Қазақстан, Жамбыл, Жетісу, Қарағанды, \
+             Қостанай, Қызылорда, Маңғыстау, Павлодар, Солтүстік \
+             Қазақстан, Түркістан, Ұлытау, Шығыс Қазақстан."
+                .to_string(),
+        );
+    }
+    // Kazakhstan's neighbors (5 countries).
+    if (lower.contains("көршілер") || lower.contains("шектес"))
+        && (lower.contains("қазақстан") || lower.contains("казахстан"))
+    {
+        return Some(
+            "Қазақстанның 5 көршісі бар: Ресей (солтүстік), Қытай \
+             (шығыс), Қырғызстан (оңтүстік-шығыс), Өзбекстан (оңтүстік) \
+             және Түрікменстан (оңтүстік-батыс)."
+                .to_string(),
+        );
+    }
+    // Republican-status cities.
+    if (lower.contains("республикалық") || lower.contains("маңызы бар қала"))
+        && (lower.contains("қазақстан") || lower.contains("казахстан"))
+    {
+        return Some(
+            "Қазақстанда 3 республикалық маңызы бар қала бар: \
+             Астана, Алматы, Шымкент."
+                .to_string(),
+        );
+    }
+    None
+}
+
+/// Detect a Whisper STT repeat-loop in the input and collapse it
+/// to the first occurrence. Whisper sometimes gets stuck in a
+/// repetition cycle and emits «Сәлем. Сәлем. Сәлем.» × 30+. Returns
+/// `Some(deduped)` when a loop is detected, `None` otherwise.
+///
+/// Algorithm: split on sentence punctuation, count distinct
+/// clauses. If the most-frequent clause has ≥ 3 occurrences AND
+/// makes up more than half of the total, return that clause alone.
+fn dedupe_stt_loop(input: &str) -> Option<String> {
+    use std::collections::HashMap;
+    let clauses: Vec<&str> = input
+        .split(['.', '?', '!'])
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .collect();
+    if clauses.len() < 3 {
+        return None;
+    }
+    let mut counts: HashMap<&str, usize> = HashMap::new();
+    for c in &clauses {
+        *counts.entry(c).or_insert(0) += 1;
+    }
+    let (top_clause, top_count) = counts.iter().max_by_key(|(_, n)| *n)?;
+    if *top_count >= 3 && *top_count * 2 > clauses.len() {
+        return Some(top_clause.to_string());
+    }
+    None
+}
+
+/// Detect occupation / role statements. «Мен X» / «Мен X-мын» /
+/// «Мен X-пын» — user stating who they are.
+///
+/// Returns an acknowledgement string when the statement matches.
+fn recognize_occupation_statement(input: &str) -> Option<String> {
+    let lower = input.to_lowercase();
+    // Common occupation roots — extend as needed. Each matches as
+    // a whole-word so «мен бағдарламашы» fires but «бағдарламашы
+    // деген не?» doesn't.
+    let occupations: &[(&str, &str)] = &[
+        ("бағдарламашы", "бағдарламашы"),
+        ("программист", "программист"),
+        ("оқушы", "оқушы"),
+        ("студент", "студент"),
+        ("мұғалім", "мұғалім"),
+        ("дәрігер", "дәрігер"),
+        ("инженер", "инженер"),
+        ("ғалым", "ғалым"),
+        ("суретші", "суретші"),
+        ("әнші", "әнші"),
+        ("спортшы", "спортшы"),
+        ("сатушы", "сатушы"),
+        ("аспазшы", "аспазшы"),
+        ("заңгер", "заңгер"),
+        ("аудармашы", "аудармашы"),
+        ("журналист", "журналист"),
+    ];
+    // Pattern: «Мен X» followed by optional «-мын / -сың / -сыз / -пын
+    // / -бін / etc.» suffix. We look for a whole-word «мен» token
+    // followed by a known occupation root anywhere in the input.
+    let starts_with_men = lower.starts_with("мен ") || lower.contains(" мен ");
+    if !starts_with_men {
+        return None;
+    }
+    for (root, canonical) in occupations {
+        if lower.split(|c: char| !c.is_alphanumeric()).any(|tok| {
+            tok == *root
+                || tok.starts_with(root)
+                    && (tok.len() == root.len() + 2 || tok.len() == root.len() + 3)
+        }) {
+            return Some(format!(
+                "Түсіндім, сіз {canonical}сыз. Бағдарламалау тілдері, \
+                 алгоритмдер, Rust туралы сұрағыңыз болса — көмектесуге \
+                 тырысамын."
+            ));
+        }
+    }
+    None
+}
+
+/// Capabilities self-description query. Distinct from
+/// `is_self_identity_query` (which is about WHO adam is) —
+/// this is about WHAT adam can do / knows.
+fn is_capabilities_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    let markers = [
+        "не білесің",
+        "не білесіз",
+        "не істей аласың",
+        "не істей аласыз",
+        "не істелесің",
+        "не істелесіз",
+        "что ты знаешь",
+        "что ты умеешь",
+        "что ты можешь",
+        "сенің мүмкіндіктерің",
+        "мүмкіндіктерің қандай",
+    ];
+    markers.iter().any(|m| lower.contains(m))
+}
+
+fn capabilities_response() -> String {
+    "Менің білім қорым curated деректерден тұрады. Жауап бере аламын: \
+     (1) Қазақстан туралы — география, тарих, әдебиет, танымал тұлғалар, \
+     мемлекеттік құрылым; (2) мектеп пәндері — математика, физика, химия, \
+     биология, тарих, ана тілі; (3) бағдарламалау тілдері және Rust; \
+     (4) дата / уақыт / апта күні (live clock); (5) қарапайым және күрделі \
+     математикалық есептеулер (қазақша / орысша / ASCII). LLM емеспін, \
+     curated деректерден тыс сұрақтарға «нақты дерек жоқ» деп шынайы \
+     жауап беремін."
+        .to_string()
+}
+
+/// Detect «how did you determine my gender?» kind of meta-query.
+fn is_pitch_detection_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    let markers = [
+        "қалай түсіндің",
+        "қалай түсіндіңіз",
+        "қалай білдің",
+        "қалай білдіңіз",
+        "қалай анықтадың",
+        "ағай дедің",
+        "апай дедің",
+        "ер екенімді",
+        "ер болғанымды",
+        "еркет болғанымды",
+        "әйел екенімді",
+    ];
+    markers.iter().any(|m| lower.contains(m))
 }
 
 /// Self-identity gate. «Сен кімсің?» / «Кім сің?» / «Кім боласың?»
@@ -787,6 +1128,27 @@ fn stt_fold(s: &str) -> String {
     out = out.replace("обылыс", "облыс");
     out = out.replace("жылданд", "жылдамд");
     out = out.replace("жолдамд", "жылдамд");
+    // Session-3 audit (codex 2026-05-25):
+    // - «жел тұқтықстан» / «жел тоқтақстан» / «жел тоқыстан»
+    //   → «желтоқсан».
+    // - «оналты» (no space) → «он алты» (16 in Kazakh).
+    // - «тенүзі» / «теңіз» → «теңізі» (Caspian sea question).
+    // - «химияқылық» / «химияғылық» → «химиялық».
+    // - «хандыр» / «хандырдыг» → «хандығы» (Khanate).
+    // - «фотосинтіз» → «фотосинтез».
+    // - «жасанды интелект» → «жасанды интеллект».
+    out = out.replace("жел тұқтықстан", "желтоқсан");
+    out = out.replace("жел тоқтақстан", "желтоқсан");
+    out = out.replace("жел тоқыстан", "желтоқсан");
+    out = out.replace("жел туқтыкстан", "желтоқсан");
+    out = out.replace("оналты", "он алты");
+    out = out.replace("тенүзі", "теңізі");
+    out = out.replace("химияқылық", "химиялық");
+    out = out.replace("химияғылық", "химиялық");
+    out = out.replace("хандырдыг", "хандығы");
+    out = out.replace("хандырдығы", "хандығы");
+    out = out.replace("фотосинтіз", "фотосинтез");
+    out = out.replace("жасанды интелект", "жасанды интеллект");
     out
 }
 
