@@ -167,13 +167,20 @@ fn tokenize(input: &str) -> Vec<Token> {
     // `-` as-is so decimals («3.14») and negative numbers («-7»)
     // survive the splitter; we strip any trailing «.»/«,» from
     // individual words below.
+    //
+    // **Voice-REPL audit 2026-05-25 fix:** the `%` character is a
+    // valid percent operator but `100%` (no space) tokenises as
+    // one word and fails to parse. Insert a space before `%` so
+    // it surfaces as its own operator token.
     let cleaned: String = lower
         .chars()
-        .map(|c| {
+        .flat_map(|c| {
             if matches!(c, ';' | '!' | '?' | '(' | ')') {
-                ' '
+                vec![' ']
+            } else if c == '%' {
+                vec![' ', '%', ' ']
             } else {
-                c
+                vec![c]
             }
         })
         .collect();
@@ -329,10 +336,15 @@ fn parse_op(w: &str) -> Option<Op> {
         // = `(acc * rhs) / 100` (i.e. rhs percent of acc).
         "процент" | "процентов" | "процента" | "%" => Op::Percent,
         // Kazakh — verb stems (imperative).
-        "қос" | "қосу" | "жұп" => Op::Add,
+        // Includes common Whisper-STT mishears (codex 2026-05-25):
+        // «жұп» (heard for «қос»), «кубейт» / «кобейт» (heard for
+        // «көбейт»).
+        "қос" | "қосу" | "жұп" | "зұп" => Op::Add,
         "азайт" | "азайту" | "алып_таста" | "алу" => Op::Sub,
-        "көбейт" | "көбейту" => Op::Mul,
-        "бөл" | "бөлу" => Op::Div,
+        "көбейт" | "көбейту" | "кубейт" | "кобейт" | "көбойт" => {
+            Op::Mul
+        }
+        "бөл" | "бөлу" | "боль" => Op::Div,
         "дәрежесі" | "дәреже" | "дәрежеге" => Op::Pow,
         "пайыз" | "пайызы" => Op::Percent,
         // Modulo.

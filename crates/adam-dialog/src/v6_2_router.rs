@@ -115,18 +115,86 @@ pub fn answer_with_corpus(input: &str, idx: &FrameIndex) -> Option<String> {
 
     // 3. Retrieval — typed QueryIR → FrameIndex → realiser.
     let q = build_query_heuristic(input)?;
-    let hit = idx.best_match(&q)?;
+    let (hit, used_focus) = pick_best_variant(&q, idx)?;
+    // Opt-in trace via ADAM_V6_2_TRACE=1 for live audit / debugging.
+    if std::env::var("ADAM_V6_2_TRACE").is_ok() {
+        eprintln!(
+            "[v6.2] input={input:?} agent={:?} predicate={:?} \
+             focus={:?} used_focus={:?} slot={:?} object={:?}",
+            q.agent.as_ref().map(|c| c.root.surface.as_str()),
+            q.predicate.as_ref().map(|p| p.as_str()),
+            q.focus,
+            used_focus,
+            hit.match_result.answer_slot,
+            hit.frame.object.as_ref().map(|c| c.root.surface.as_str()),
+        );
+    }
     Some(realiser::realise(
         hit.frame,
-        &q.focus,
+        &used_focus,
         hit.match_result.answer_slot,
     ))
     .filter(|s| !s.trim().is_empty())
 }
 
+/// Multi-variant retrieval: try original query, then predicate=None,
+/// then Object-focus (when original was Modifier-focus). Returns the
+/// best-scoring variant. **Score-100 result wins over score-50
+/// partial match from a different focus**, so we don't return
+/// «(нақты дерек жоқ)» when the answer lives in the Object slot.
+///
+/// Codex 2026-05-25 audit: «Абай қайда өмір сүрді?» missed the
+/// LivesIn fact because world_core encodes location as object,
+/// but the router built a Modifier(Location)-focus query — which
+/// returned a partial (Whole, 50) match instead of the better
+/// Object-focus answer «семей облысы».
+fn pick_best_variant<'a>(
+    q: &QueryIR,
+    idx: &'a FrameIndex,
+) -> Option<(adam_algebra::RankedFrame<'a>, QueryFocus)> {
+    // Build the candidate list of (query, focus_used) pairs in
+    // priority order. Each returns its best hit; we keep the
+    // highest-score result.
+    let mut candidates: Vec<(QueryIR, QueryFocus)> = vec![(q.clone(), q.focus.clone())];
+
+    // Variant A: predicate=None fallback (heuristic may have
+    // mis-picked predicate, e.g. «қанша» → HasQuantity but curated
+    // fact is IsA).
+    let mut q2 = q.clone();
+    q2.predicate = None;
+    candidates.push((q2, q.focus.clone()));
+
+    // Variant B: Object focus retry (world_core encodes LivesIn /
+    // LocatedIn answers in the object slot).
+    if matches!(&q.focus, QueryFocus::Modifier(_)) {
+        let mut q3 = q.clone();
+        q3.focus = QueryFocus::Object;
+        candidates.push((q3, QueryFocus::Object));
+    }
+
+    // Score each variant, keep the highest. Among score-tied
+    // variants, earlier-in-list (i.e. closer to original intent)
+    // wins.
+    let mut best: Option<(adam_algebra::RankedFrame<'a>, QueryFocus, u8)> = None;
+    for (cq, focus_used) in candidates {
+        if let Some(h) = idx.best_match(&cq) {
+            let score = h.match_result.score;
+            let better = match &best {
+                None => true,
+                Some((_, _, prev_score)) => score > *prev_score,
+            };
+            if better {
+                best = Some((h, focus_used, score));
+            }
+        }
+    }
+    best.map(|(h, f, _)| (h, f))
+}
+
 fn looks_like_math(s: &str) -> bool {
     let lower = s.to_lowercase();
     let markers = [
+        // Russian.
         "плюс",
         "минус",
         "умнож",
@@ -136,13 +204,25 @@ fn looks_like_math(s: &str) -> bool {
         "степени",
         "корень",
         "процент",
-        "пайыз",
+        "остаток",
+        // Kazakh (core verbs).
         "көбейт",
         "бөл",
         "қос",
         "азайт",
         "дәреже",
         "түбірі",
+        "пайыз",
+        "қалдық",
+        // Voice-REPL STT variants (codex 2026-05-25 audit):
+        // «жұп» / «зұп» (heard for «қос»),
+        // «кубейт» / «кобейт» / «көбойт» (heard for «көбейт»).
+        "жұп",
+        "зұп",
+        "кубейт",
+        "кобейт",
+        "көбойт",
+        // English / functional.
         "sin",
         "cos",
         "tan",
@@ -150,8 +230,6 @@ fn looks_like_math(s: &str) -> bool {
         "ln",
         "abs",
         "mod",
-        "остаток",
-        "қалдық",
     ];
     if markers.iter().any(|m| lower.contains(m)) {
         return true;
@@ -215,6 +293,27 @@ fn build_query_heuristic(input: &str) -> Option<QueryIR> {
     } else {
         Language::Kazakh
     };
+
+    // Subject-focus reverse lookup path: «1872 жылы кім туылған?» —
+    // user asks WHO was born/died/founded in a given year. The
+    // canonical agent is unknown (that's what they're asking),
+    // so we build a Subject-focus query with a Time
+    // modifier_constraint instead.
+    if let Some(year_phrase) = extract_year_phrase(&lower)
+        && (lower.contains("кім") || lower.contains("кто"))
+    {
+        let pred = predicate_for_reverse(&lower).unwrap_or(FramePredicate::BornIn);
+        let q = QueryIR::new(
+            QueryFocus::Subject,
+            QuestionForm::Definition,
+            AnswerShape::BareNoun,
+        )
+        .with_predicate(pred)
+        .with_modifier_constraint(ModifierRole::Time, noun(&year_phrase))
+        .with_language_filter(language);
+        return Some(q);
+    }
+
     let agent = canonical_agent_for(&lower)?;
     let focus_kind = detect_focus(&lower);
     let predicate = predicate_for(&lower);
@@ -242,6 +341,52 @@ fn build_query_heuristic(input: &str) -> Option<QueryIR> {
     Some(q)
 }
 
+/// Pull a year-phrase «NNNN жылы» / «NNNN жыл» / bare year from
+/// the input for the reverse-lookup path.
+fn extract_year_phrase(lower: &str) -> Option<String> {
+    // Match 3-4 digit year followed by «жыл» / «жылы» / nothing.
+    let mut digits = String::new();
+    let mut last_year: Option<String> = None;
+    for c in lower.chars() {
+        if c.is_ascii_digit() {
+            digits.push(c);
+        } else {
+            if (3..=4).contains(&digits.len())
+                && let Ok(y) = digits.parse::<u32>()
+                && (1000..3000).contains(&y)
+            {
+                last_year = Some(format!("{y} жыл"));
+            }
+            digits.clear();
+        }
+    }
+    if (3..=4).contains(&digits.len())
+        && let Ok(y) = digits.parse::<u32>()
+        && (1000..3000).contains(&y)
+    {
+        last_year = Some(format!("{y} жыл"));
+    }
+    last_year
+}
+
+/// Pick the predicate for reverse-lookup based on the verb used.
+fn predicate_for_reverse(lower: &str) -> Option<FramePredicate> {
+    if lower.contains("туыл") || lower.contains("туған") || lower.contains("родился")
+    {
+        Some(FramePredicate::BornIn)
+    } else if lower.contains("қайтыс") || lower.contains("өл") || lower.contains("умер")
+    {
+        Some(FramePredicate::DiedIn)
+    } else if lower.contains("құрыл") || lower.contains("ашыл") || lower.contains("основан")
+    {
+        Some(FramePredicate::FoundedIn)
+    } else if lower.contains("жаз") || lower.contains("автор") {
+        Some(FramePredicate::Authored)
+    } else {
+        None
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 enum FocusKind {
     Time,
@@ -260,9 +405,18 @@ fn detect_focus(lower: &str) -> FocusKind {
         || lower.contains("какая столица")
     {
         FocusKind::Place
-    } else if lower.contains("кім?") || lower.contains("кто?") || lower.contains("кім бұл")
+    } else if lower.contains("кім бұл") || lower.starts_with("кім ") || lower.starts_with("кто ")
     {
+        // Subject focus: «Кім туылды?» / «Кто пришёл?» — interrogative
+        // appears at the START. The agent is what we're looking for.
         FocusKind::Subject
+    } else if lower.contains("кім?") || lower.contains("кто?") {
+        // «X кім?» / «X кто?» — interrogative at the END, after the
+        // agent. This is a DEFINITIONAL question («Ахмет Байтұрсынұлы
+        // кім?» = "what is Ahmet?", asking for his profession/IsA).
+        // Codex 2026-05-25 audit caught this misclassifying as
+        // Subject focus and returning the agent name as the answer.
+        FocusKind::Definition
     } else if lower.contains("деген не")
         || lower.contains("что такое")
         || lower.contains("деген кім")
@@ -295,12 +449,21 @@ fn predicate_for(lower: &str) -> Option<FramePredicate> {
     if lower.contains("атымен") || lower.contains("честь") {
         return Some(FramePredicate::NamedAfter);
     }
+    // LivesIn — animate "где живёт" — wins over generic LocatedIn.
+    // Codex 2026-05-25 audit caught «Абай қайда өмір сүрді?»
+    // misrouting to LocatedIn (because of «қайда») instead of
+    // LivesIn (because of «өмір сүр»). Order matters.
+    if lower.contains("өмір сүр")
+        || lower.contains("тұрды")
+        || lower.contains("тұрған")
+        || lower.contains("жил")
+    {
+        return Some(FramePredicate::LivesIn);
+    }
+    // LocatedIn — inanimate "где находится".
     if lower.contains("орналас") || lower.contains("находится") || lower.contains("қайда")
     {
         return Some(FramePredicate::LocatedIn);
-    }
-    if lower.contains("өмір сүр") || lower.contains("жил") {
-        return Some(FramePredicate::LivesIn);
     }
     if lower.contains("қанша") || lower.contains("сколько") {
         return Some(FramePredicate::HasQuantity);
@@ -318,6 +481,107 @@ fn predicate_for(lower: &str) -> Option<FramePredicate> {
 /// surface from the curated corpus wins. Stage 8 replaces this
 /// with a typed Stage-2 morpho-lattice → Frame::from_morph_lattice
 /// pipeline.
+/// Strip the most common Kazakh case suffixes from each word of
+/// the input so the canonical-agent substring search matches
+/// «ньютонның» against canonical «ньютон» etc. Heuristic — may
+/// over-strip; safe because we only use it as an ADDITIONAL match
+/// path beside the raw lowered input.
+///
+/// Codex 2026-05-25 voice REPL audit observed «Ньютонның екінші
+/// заңы», «Эйнштейн формуласын», «Қазақстанда» etc. fail to match
+/// canonical bare-stem surfaces; this strips their case suffixes.
+fn strip_kazakh_case_suffixes(s: &str) -> String {
+    // Longest suffix first so «ның» is stripped before «ы».
+    // Limited to common nominal cases; verb endings are not stripped
+    // because they can collide with the stem (e.g. «жаз» = "write"
+    // is also the root, not a case suffix).
+    // **Conservative suffix list (v6.2.0 codex 2026-05-25 fix).**
+    // Original list also stripped possessive «-ы» / «-і» / «-сы» /
+    // «-сі», which over-strips canonical noun phrases that legitimately
+    // end in those (e.g. «ньютон екінші заңы», «эйнштейн формуласы»).
+    // The new list strips only **case markers that follow noun stems**
+    // (genitive / locative / dative / ablative / accusative); possessive
+    // suffixes are left intact so canonical surfaces match.
+    let suffixes: &[&str] = &[
+        // Genitive (longest first).
+        "ның",
+        "нің",
+        "дың",
+        "дің",
+        "тың",
+        "тің",
+        // Locative attribute.
+        "дағы",
+        "дегі",
+        "тағы",
+        "тегі",
+        "нда",
+        "нде",
+        // Ablative.
+        "дан",
+        "ден",
+        "тан",
+        "тен",
+        "нан",
+        "нен",
+        "сынан",
+        "сінен",
+        // Dative.
+        "сына",
+        "сіне",
+        "ына",
+        "іне",
+        "ға",
+        "ге",
+        "қа",
+        "ке",
+        "на",
+        "не",
+        // Locative.
+        "да",
+        "де",
+        "та",
+        "те",
+        // Instrumental (multi-char).
+        "мен",
+        "пен",
+        "бен",
+        // Note: accusative-on-possessive («-сын / -сін / -ын /
+        // «-ін») is handled separately above via REPLACEMENT
+        // («формуласын» → «формуласы») so the possessive suffix
+        // is preserved for the canonical-surface match.
+    ];
+    // Replacement-style strips for accusative-on-possessive
+    // («формуласын» → «формуласы», «жауабын» → «жауабы»). These
+    // strip only the trailing «н», leaving the possessive suffix
+    // intact so the canonical-surface match («эйнштейн формуласы»)
+    // still aligns.
+    let replace_n: &[(&str, &str)] = &[("сын", "сы"), ("сін", "сі"), ("ын", "ы"), ("ін", "і")];
+    s.split_whitespace()
+        .map(|w| {
+            let mut stem = w.to_string();
+            // Try replacement strips first (less aggressive).
+            for (suf, repl) in replace_n {
+                if stem.chars().count() > suf.chars().count() + 1 && stem.ends_with(suf) {
+                    let new_len = stem.len() - suf.len();
+                    stem.truncate(new_len);
+                    stem.push_str(repl);
+                    return stem;
+                }
+            }
+            for suf in suffixes {
+                if stem.chars().count() > suf.chars().count() + 1 && stem.ends_with(suf) {
+                    let new_len = stem.len() - suf.len();
+                    stem.truncate(new_len);
+                    break;
+                }
+            }
+            stem
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
 fn canonical_agent_for(lower: &str) -> Option<String> {
     let candidates: &[&str] = &[
         // Battery-specific multi-word entities (longest first).
@@ -368,9 +632,10 @@ fn canonical_agent_for(lower: &str) -> Option<String> {
         "сел",
         "семей",
     ];
+    let stripped = strip_kazakh_case_suffixes(lower);
     let mut best: Option<(&str, usize)> = None;
     for c in candidates {
-        if lower.contains(c) {
+        if lower.contains(c) || stripped.contains(c) {
             let len = c.chars().count();
             if best.is_none_or(|(_, l)| len > l) {
                 best = Some((c, len));

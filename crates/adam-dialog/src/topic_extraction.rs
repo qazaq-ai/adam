@@ -506,6 +506,17 @@ fn is_deverbal_participle_root(root: &str) -> bool {
 ///
 /// Codex v4.0.19 review #2 — direct implementation.
 pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
+    // **v6.2.0 — 2026-05-25 codex voice-REPL audit follow-up.**
+    // World_core data fixes added these multi-word entities:
+    // - «17 облыс» / «299792458 м/с» — specificity bumps (quantity /
+    //   speed-of-light surfacing the literal number).
+    // - «ай (аспан денесі)» / «жер серігі» — astro_003 disambiguation
+    //   so the bare «ай» morpheme no longer routes random «-ай»
+    //   substring queries to «серік» (the «Серік» bug).
+    "17 облыс",
+    "299792458 м/с",
+    "ай (аспан денесі)",
+    "жер серігі",
     // **v6.0.9 — 2026-05-21 user audit round 4.** KRU /
     // Baitursynuly / AI-Law domain compounds — added with
     // `data/world_core/kru_baitursynov.jsonl`.
