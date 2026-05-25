@@ -40,7 +40,7 @@
 //! - Round-trip: [`Composition::from_analysis`] →
 //!   [`Composition::to_analysis`] is identity-preserving.
 //!
-//! Stage 2 (this commit):
+//! Stage 2 (shipped bc5e0b79):
 //!
 //! - [`Frame`] — typed semantic record `(agent, predicate, object,
 //!   modifiers, modality, polarity, evidentiality, tense, aspect)`.
@@ -51,14 +51,28 @@
 //! - [`Frame::from_morph_lattice`] — deterministic assembler from
 //!   a per-word [`Composition`] lattice.
 //!
-//! NOT in Stage 2 (deferred to later v6.2 stages):
+//! Stage 3 (this commit):
 //!
-//! - QueryIR (Stage 3 — central typed query contract).
-//! - Indexed retrieval (Stage 4).
-//! - Sense disambiguation (Stage 5).
+//! - [`QueryIR`] — typed query record `(agent, predicate, object,
+//!   modifier_constraints, focus, form, answer_shape, sense_hints,
+//!   domain_filter)`. Frame with a hole.
+//! - [`QueryFocus`] / [`ModifierRole`] / [`QuestionForm`] /
+//!   [`AnswerShape`] / [`ModifierConstraint`] / [`SenseHint`] /
+//!   [`Domain`] — typed dimensions of the query.
+//! - [`QueryIR::from_question_frame`] / [`QueryIR::from_assertion`] —
+//!   bridges from a [`Frame`].
+//! - [`QueryIR::match_frame`] — given a retrieved candidate
+//!   [`Frame`], does it answer this query? Returns [`AnswerSlot`].
+//!
+//! NOT in Stage 3 (deferred to later v6.2 stages):
+//!
+//! - Indexed retrieval (Stage 4) — builds the index that consumes a
+//!   `QueryIR` to produce candidate frames.
+//! - Sense disambiguation policy (Stage 5) — resolves competing
+//!   `SenseHint`s.
 //! - Learned components (Stage 6 — closed-set neural).
 //! - Natural realiser (Stage 7) — owns the Frame ↔ surface mapping
-//!   and the rewire of v6.1 NLG rule callers.
+//!   and the rewire of v6.1 NLG rule + question-routing callers.
 //! - HumanDialogEval (Stage 8).
 //! - ARM PoC (Stage 9).
 //!
@@ -73,6 +87,7 @@
 pub mod composition;
 pub mod frame;
 pub mod operator;
+pub mod query;
 pub mod root;
 
 pub use composition::{Composition, CompositionError};
@@ -81,4 +96,8 @@ pub use frame::{
     Polarity, QuestionFocus, SentenceContext, TimeAnchor,
 };
 pub use operator::{SlotKind, SuffixOp};
+pub use query::{
+    AnswerShape, AnswerSlot, Domain, FrameMatch, ModifierConstraint, ModifierRole, QueryFocus,
+    QueryIR, QuestionForm, SenseHint,
+};
 pub use root::{PartOfSpeech, Root};

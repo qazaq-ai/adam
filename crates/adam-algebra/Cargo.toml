@@ -3,7 +3,7 @@ name = "adam-algebra"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Agglutinative algebra — Stages 1+2 of v6.2.0 neurosymbolic redesign. Lifts adam_kernel_fst's typed morphology into a uniform `SuffixOp` / `Composition` algebra (Stage 1), plus the `Frame` semantic record `(agent, predicate, object, modifiers, modality, polarity, evidentiality, tense, aspect)` and its deterministic morph-lattice assembler (Stage 2)."
+description = "Agglutinative algebra — Stages 1+2+3 of v6.2.0 neurosymbolic redesign. Lifts adam_kernel_fst's typed morphology into a uniform `SuffixOp` / `Composition` algebra (Stage 1), plus the `Frame` semantic record (Stage 2), plus `QueryIR` — the typed `frame with a hole` contract that subsumes v6.1's fragmented PredicateFocus + QuestionShape + AnswerShape + intent + slot_inventory question-routing surface (Stage 3)."
 
 [dependencies]
 adam-kernel-fst = { path = "../adam-kernel-fst" }
