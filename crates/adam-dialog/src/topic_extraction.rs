@@ -513,10 +513,27 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     // - «ай (аспан денесі)» / «жер серігі» — astro_003 disambiguation
     //   so the bare «ай» morpheme no longer routes random «-ай»
     //   substring queries to «серік» (the «Серік» bug).
+    // - properties.jsonl + time.jsonl short-stem disambiguation
+    //   suffixes («(пішін)» / «(зат)» / «(уақыт)» / «(жануар)») —
+    //   prevents the «Дөңгелек» and «Уақыт» substring-match bugs
+    //   on words like «қалайсың» / «айтыңыз» that contain «ай».
     "17 облыс",
     "299792458 м/с",
     "ай (аспан денесі)",
     "жер серігі",
+    "ай (пішін)",
+    "ай (уақыт)",
+    "бал (зат)",
+    "жер (пішін)",
+    "ит (жануар)",
+    "күн (пішін)",
+    "күн (уақыт)",
+    "от (зат)",
+    "су (зат)",
+    "тас (зат)",
+    "таң (уақыт)",
+    "түс (уақыт)",
+    "қар (зат)",
     // **v6.0.9 — 2026-05-21 user audit round 4.** KRU /
     // Baitursynuly / AI-Law domain compounds — added with
     // `data/world_core/kru_baitursynov.jsonl`.

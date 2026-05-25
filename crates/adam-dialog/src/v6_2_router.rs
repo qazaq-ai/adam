@@ -108,7 +108,38 @@ pub fn answer_with_corpus(input: &str, idx: &FrameIndex) -> Option<String> {
         return Some(r.render());
     }
 
-    // 2. System clock — live state.
+    // 2. Self-identity short-circuit. «Сен кімсің?» / «Сен өзің
+    // кімсің?» — these are dialog-self questions, not factoid
+    // queries. Without this gate the cascade matches morpheme
+    // «сен» / «өзің» and emits Abai poetry quotes (codex
+    // 2026-05-25 audit caught this).
+    if is_self_identity_query(input) {
+        return Some(
+            "Мен — адам, толық атауым Agglutinative Reasoning Kernel \
+             (ARK). Қазақ тіліне арналған детерминирленген тілдік \
+             модель. Тілдік модельмін, бірақ LLM емес — мен \
+             curated фактілер арқылы жауап беремін."
+                .to_string(),
+        );
+    }
+
+    // 3. Honest «no live data» refusals — weather, currency,
+    // stock prices, current-data queries the kernel has no feed
+    // for. **Runs BEFORE the system clock gate** so «Бүгін
+    // Алматыда қандай ауа райы?» (which has «бүгін» trigger for
+    // clock) routes correctly to the weather-refusal path.
+    if needs_live_data_refusal(input) {
+        return Some(
+            "Бұл сұраққа жауап беру үшін менде нақты дерек жоқ. \
+             Менің білім қорым curated фактілерден тұрады, тікелей \
+             интернет немесе live-feed қосылған емес."
+                .to_string(),
+        );
+    }
+
+    // 4. System clock — live state (date / month / weekday /
+    //    time-of-day). Only matches queries that are about today's
+    //    calendar / clock, NOT about year-anchored facts.
     if looks_like_time_query(input) {
         return Some(emit_clock_answer(input));
     }
@@ -236,6 +267,58 @@ fn looks_like_math(s: &str) -> bool {
     }
     s.chars()
         .any(|c| matches!(c, '+' | '*' | '/' | '%' | '^' | '√' | '×' | '÷'))
+}
+
+/// Self-identity gate. «Сен кімсің?» / «Кім сің?» / «Кім боласың?»
+/// / «Сен өзің кімсің?» — all questions about adam's own identity.
+fn is_self_identity_query(s: &str) -> bool {
+    let lower = s.to_lowercase();
+    let markers = [
+        "сен кімсің",
+        "кім сің",
+        "кімсің",
+        "сен кім боласың",
+        "кім боласың",
+        "сен өзің кім",
+        "өзің кімсің",
+        "ты кто",
+        "вы кто",
+        "кто ты",
+        "представься",
+    ];
+    markers.iter().any(|m| lower.contains(m))
+}
+
+/// Honest «no live data» gate. Returns true for queries about
+/// weather, currency rates, stock prices, news, sports scores —
+/// information the kernel has no live feed for. Without this gate,
+/// the cascade picks the nearest morpheme fact and emits nonsense
+/// («Дөңгелек» for «Биткоин барамы қандай?»).
+fn needs_live_data_refusal(s: &str) -> bool {
+    let lower = s.to_lowercase();
+    let markers = [
+        // Weather.
+        "ауа райы",
+        "погода",
+        "температура бүгін",
+        "температура сегодня",
+        // Currency / crypto / stock.
+        "биткоин",
+        "bitcoin",
+        "доллар",
+        "теңге бағамы",
+        "евро",
+        "акция",
+        "курс",
+        "бағамы",
+        "барамы",
+        // News / sports.
+        "жаңалықтар",
+        "новости",
+        "матч",
+        "ойын нәтижесі",
+    ];
+    markers.iter().any(|m| lower.contains(m))
 }
 
 fn looks_like_time_query(s: &str) -> bool {
@@ -633,16 +716,78 @@ fn canonical_agent_for(lower: &str) -> Option<String> {
         "семей",
     ];
     let stripped = strip_kazakh_case_suffixes(lower);
+    let folded = stt_fold(lower);
+    let folded_stripped = strip_kazakh_case_suffixes(&folded);
     let mut best: Option<(&str, usize)> = None;
     for c in candidates {
-        if lower.contains(c) || stripped.contains(c) {
-            let len = c.chars().count();
-            if best.is_none_or(|(_, l)| len > l) {
-                best = Some((c, len));
-            }
+        let len = c.chars().count();
+        // **Word-boundary required for short agents.** Codex
+        // 2026-05-25 voice REPL audit caught «ай» / «су» / «жер»
+        // matching as substrings of «қалайсың», «суық», «жерде» —
+        // producing wrong sense answers. Agents ≤ 3 chars must
+        // appear as a whole word.
+        let hit = if len <= 3 {
+            contains_word(lower, c)
+                || contains_word(&stripped, c)
+                || contains_word(&folded, c)
+                || contains_word(&folded_stripped, c)
+        } else {
+            lower.contains(c)
+                || stripped.contains(c)
+                || folded.contains(c)
+                || folded_stripped.contains(c)
+        };
+        if hit && best.is_none_or(|(_, l)| len > l) {
+            best = Some((c, len));
         }
     }
     best.map(|(s, _)| s.to_string())
+}
+
+/// Whole-word substring check — `haystack` contains `needle` as a
+/// space-separated token (or at the start / end). Used for short
+/// canonical agents («ай», «су», «жер») where a plain `contains`
+/// would false-positive on «қалайсың» / «суық» / «жерде».
+fn contains_word(haystack: &str, needle: &str) -> bool {
+    haystack
+        .split(|c: char| !c.is_alphanumeric() && c != '-')
+        .any(|tok| tok == needle)
+}
+
+/// **STT fold** — normalize common Whisper-STT mishears to their
+/// canonical Kazakh spelling so canonical-agent matching finds them.
+///
+/// Voice-REPL audit 2026-05-25 cases:
+/// - «костанай» (Cyrillic к) → «қостанай» (Kazakh қ).
+/// - «обылыс» / «облыс» / «болыс» → «облыс».
+/// - «тауке хан» → «тәуке хан».
+/// - «энштейн» / «әнштейн» → «эйнштейн».
+/// - «жылдандығы» / «жолдамдығы» → «жылдамдығы».
+/// - «зан» / «зең» → «заң».
+/// - «костанайда» / «қостанайдан» — handled by case-stripper.
+///
+/// Conservative — only changes letters known to mishear; doesn't
+/// touch words that already start with Kazakh diacritics.
+fn stt_fold(s: &str) -> String {
+    let mut out = s.to_string();
+    // Common STT loanword mishears.
+    out = out.replace("әнштейн", "эйнштейн");
+    out = out.replace("энштейн", "эйнштейн");
+    out = out.replace("ейнштейн", "эйнштейн");
+    out = out.replace("анштейн", "эйнштейн");
+    // Place names — Cyrillic к → Kazakh қ for the canonical Kazakh
+    // city / oblast names we curate. Limited to known patterns to
+    // avoid false rewrites of Russian loans.
+    out = out.replace("костанай", "қостанай");
+    out = out.replace("казахстан", "қазақстан");
+    out = out.replace("қазахстан", "қазақстан");
+    // Kazakh diacritic recovery.
+    out = out.replace("тауке хан", "тәуке хан");
+    // Misheard nouns.
+    out = out.replace("обылыс", "облыс");
+    out = out.replace("жылданд", "жылдамд");
+    out = out.replace("жолдамд", "жылдамд");
+    out
 }
 
 fn has_russian_marker(lower: &str) -> bool {
