@@ -28,8 +28,8 @@
 use std::time::Instant;
 
 use adam_algebra::{
-    Composition, Frame, FramePredicate, Modifier, ModifierRole, PartOfSpeech, QueryIR,
-    QuestionFocus, Root, SuffixOp, TimeAnchor,
+    AnswerShape, Composition, Domain, Frame, FrameIndex, FramePredicate, Modifier, ModifierRole,
+    PartOfSpeech, QueryFocus, QueryIR, QuestionFocus, QuestionForm, Root, SuffixOp, TimeAnchor,
 };
 use adam_kernel_fst::morphotactics::{Case, Tense};
 
@@ -231,7 +231,7 @@ fn main() {
 
     let warm_sum: u128 = overall_warm.iter().sum();
     let warm_avg_ns = warm_sum / overall_warm.len() as u128;
-    println!("=== Summary ===");
+    println!("=== Pipeline Summary ===");
     println!("Scenarios run: {}", scenarios.len());
     println!(
         "Total COLD time across scenarios: {} ns ({:.3} µs)",
@@ -243,6 +243,13 @@ fn main() {
         warm_avg_ns,
         warm_avg_ns as f64 / 1_000.0
     );
+
+    // === Stage 4 indexed retrieval bench ===
+    println!();
+    println!("=== Stage 4: indexed retrieval ===");
+    println!("(deterministic; CPU-only; 0 MB model)");
+    println!();
+    bench_indexed_retrieval();
 
     // Reference point for the user.
     println!();
@@ -258,4 +265,107 @@ fn main() {
         ratio
     );
     println!("  (deterministic, CPU-only, 0 MB model — pure typed-data manipulation)");
+}
+
+/// Stage 4: build a 1k-frame index, run a representative QueryIR
+/// many times, report per-query latency.
+fn bench_indexed_retrieval() {
+    let n = 1_000;
+    let mut idx = FrameIndex::new();
+    let preds = [
+        FramePredicate::IsA,
+        FramePredicate::LivesIn,
+        FramePredicate::Has,
+        FramePredicate::BornIn,
+        FramePredicate::DiedIn,
+        FramePredicate::Authored,
+        FramePredicate::FoundedIn,
+        FramePredicate::LocatedIn,
+        FramePredicate::HasQuantity,
+        FramePredicate::PartOf,
+    ];
+    let domains = [Domain::Person, Domain::Geography, Domain::Institution];
+    for i in 0..n {
+        let p = preds[i % preds.len()].clone();
+        let mut year_phrase = noun(&format!("year_{}", i % 30));
+        year_phrase.operators.push(SuffixOp::Case(Case::Locative));
+        let frame = Frame::assertion(
+            Some(noun(&format!("agent_{}", i % 100))),
+            p,
+            Some(noun(&format!("object_{}", i % 50))),
+        )
+        .with_modifier(Modifier::TimeAnchor(TimeAnchor::Phrase(year_phrase)));
+        idx.insert(frame, Some(domains[i % domains.len()].clone()));
+    }
+    println!("Index populated: {} frames", idx.len());
+
+    // Query 1: predicate-only — wide hit set (every 10th frame).
+    let q_wide = QueryIR::new(
+        QueryFocus::Subject,
+        QuestionForm::Definition,
+        AnswerShape::BareNoun,
+    )
+    .with_predicate(FramePredicate::BornIn);
+
+    // Query 2: predicate + agent — narrow hit set (agent_0 +
+    // IsA both have 10 entries each; intersection = 10).
+    let q_narrow = QueryIR::new(
+        QueryFocus::Modifier(ModifierRole::Time),
+        QuestionForm::Definition,
+        AnswerShape::DateAnchor,
+    )
+    .with_agent(noun("agent_0"))
+    .with_predicate(FramePredicate::IsA);
+
+    // Query 3: agent only — predicate variable.
+    let q_agent_only = QueryIR::new(
+        QueryFocus::Predicate,
+        QuestionForm::Definition,
+        AnswerShape::DefinitionalNP,
+    )
+    .with_agent(noun("agent_42"));
+
+    let cases: &[(&str, &QueryIR)] = &[
+        ("predicate-only  (wide)", &q_wide),
+        ("predicate+agent (narrow)", &q_narrow),
+        ("agent-only      (predicate variable)", &q_agent_only),
+    ];
+
+    for (label, q) in cases {
+        // COLD
+        let cold_start = Instant::now();
+        let cold_hits = idx.query(q);
+        let cold_ns = cold_start.elapsed().as_nanos();
+        let hit_count = cold_hits.len();
+
+        // WARMUP
+        for _ in 0..WARMUP_ITERATIONS {
+            std::hint::black_box(idx.query(q));
+        }
+
+        // WARM
+        let warm_start = Instant::now();
+        for _ in 0..MEASURE_ITERATIONS {
+            std::hint::black_box(idx.query(q));
+        }
+        let warm_total = warm_start.elapsed().as_nanos();
+        let per_iter = warm_total / MEASURE_ITERATIONS as u128;
+        let qps = 1_000_000_000.0 / per_iter as f64;
+
+        println!("Query: {}", label);
+        println!("  Hits:              {}", hit_count);
+        println!(
+            "  COLD (1st call):   {:>9} ns  ({:.3} µs)",
+            cold_ns,
+            cold_ns as f64 / 1_000.0
+        );
+        println!(
+            "  WARM (median of {}): {:>7} ns  ({:.3} µs)",
+            MEASURE_ITERATIONS,
+            per_iter,
+            per_iter as f64 / 1_000.0
+        );
+        println!("  Throughput:        {:>9.0} queries/sec on one core", qps);
+        println!();
+    }
 }

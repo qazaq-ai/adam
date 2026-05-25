@@ -51,7 +51,7 @@
 //! - [`Frame::from_morph_lattice`] — deterministic assembler from
 //!   a per-word [`Composition`] lattice.
 //!
-//! Stage 3 (this commit):
+//! Stage 3 (shipped dfce4c7b):
 //!
 //! - [`QueryIR`] — typed query record `(agent, predicate, object,
 //!   modifier_constraints, focus, form, answer_shape, sense_hints,
@@ -64,12 +64,26 @@
 //! - [`QueryIR::match_frame`] — given a retrieved candidate
 //!   [`Frame`], does it answer this query? Returns [`AnswerSlot`].
 //!
-//! NOT in Stage 3 (deferred to later v6.2 stages):
+//! Stage 4 (this commit):
 //!
-//! - Indexed retrieval (Stage 4) — builds the index that consumes a
-//!   `QueryIR` to produce candidate frames.
+//! - [`FrameIndex`] — typed in-memory index over [`Frame`]s with
+//!   secondary indexes by predicate / agent root / object root /
+//!   modifier (role, value) / domain.
+//! - [`FrameId`] — opaque u32 frame identifier.
+//! - [`IndexedFrame`] / [`RankedFrame`] — index entry + retrieval
+//!   hit types.
+//! - [`FrameIndex::insert`] / [`FrameIndex::query`] /
+//!   [`FrameIndex::best_match`] — insert + retrieve in
+//!   O(min-applicable-index-size), then run Stage 3 `match_frame`
+//!   on the survivor set for scoring.
+//!
+//! NOT in Stage 4 (deferred to later v6.2 stages):
+//!
+//! - Persistence — Stage 4 is in-memory only. Disk-backed indexes
+//!   are a Stage 9 (ARM PoC) concern.
 //! - Sense disambiguation policy (Stage 5) — resolves competing
-//!   `SenseHint`s.
+//!   `SenseHint`s. Stage 4 only mechanically applies
+//!   `domain_filter`.
 //! - Learned components (Stage 6 — closed-set neural).
 //! - Natural realiser (Stage 7) — owns the Frame ↔ surface mapping
 //!   and the rewire of v6.1 NLG rule + question-routing callers.
@@ -86,6 +100,7 @@
 
 pub mod composition;
 pub mod frame;
+pub mod index;
 pub mod operator;
 pub mod query;
 pub mod root;
@@ -95,6 +110,7 @@ pub use frame::{
     Aspect, ContextSentenceType, Evidentiality, Frame, FramePredicate, Modality, Modifier,
     Polarity, QuestionFocus, SentenceContext, TimeAnchor,
 };
+pub use index::{FrameId, FrameIndex, IndexedFrame, RankedFrame};
 pub use operator::{SlotKind, SuffixOp};
 pub use query::{
     AnswerShape, AnswerSlot, Domain, FrameMatch, ModifierConstraint, ModifierRole, QueryFocus,
