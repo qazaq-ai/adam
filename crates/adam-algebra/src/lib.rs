@@ -99,6 +99,7 @@
 //! failure, not a warning.
 
 pub mod composition;
+pub mod dialog_battery;
 pub mod frame;
 pub mod index;
 pub mod operator;

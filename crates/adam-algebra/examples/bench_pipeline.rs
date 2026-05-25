@@ -30,6 +30,7 @@ use std::time::Instant;
 use adam_algebra::{
     AnswerShape, Composition, Domain, Frame, FrameIndex, FramePredicate, Modifier, ModifierRole,
     PartOfSpeech, QueryFocus, QueryIR, QuestionFocus, QuestionForm, Root, SuffixOp, TimeAnchor,
+    dialog_battery,
 };
 use adam_kernel_fst::morphotactics::{Case, Tense};
 
@@ -246,10 +247,18 @@ fn main() {
 
     // === Stage 4 indexed retrieval bench ===
     println!();
-    println!("=== Stage 4: indexed retrieval ===");
+    println!("=== Stage 4: indexed retrieval (synthetic 1k index) ===");
     println!("(deterministic; CPU-only; 0 MB model)");
     println!();
     bench_indexed_retrieval();
+
+    // === Stage 4.5: real-Kazakh dialog battery (THE quality gate) ===
+    println!();
+    println!("=== Stage 4.5: real-Kazakh dialog battery ===");
+    println!("(real biographical / geographical / institutional / law / sense-ambiguous cases)");
+    println!();
+    let report = dialog_battery::run_dialog_battery();
+    report.print();
 
     // Reference point for the user.
     println!();
