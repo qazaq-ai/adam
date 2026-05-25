@@ -8,10 +8,8 @@ description = "Agglutinative algebra — Stages 1+2+3 of v6.2.0 neurosymbolic re
 [dependencies]
 adam-kernel-fst = { path = "../adam-kernel-fst" }
 serde.workspace = true
-thiserror.workspace = true
-
-[dev-dependencies]
 serde_json.workspace = true
+thiserror.workspace = true
 
 [lints]
 workspace = true

@@ -1072,12 +1072,12 @@ pub fn canonical_corpus() -> FrameIndex {
         Some(Domain::Event),
     );
     idx.insert(
-        Frame::assertion(Some(noun("тауке хан")), FramePredicate::BornIn, None)
+        Frame::assertion(Some(noun("тәуке хан")), FramePredicate::BornIn, None)
             .with_modifier(Modifier::TimeAnchor(TimeAnchor::Year(1652))),
         Some(Domain::Person),
     );
     idx.insert(
-        Frame::assertion(Some(noun("тауке хан")), FramePredicate::DiedIn, None)
+        Frame::assertion(Some(noun("тәуке хан")), FramePredicate::DiedIn, None)
             .with_modifier(Modifier::TimeAnchor(TimeAnchor::Year(1715))),
         Some(Domain::Person),
     );
@@ -1472,16 +1472,12 @@ pub fn canonical_cases() -> Vec<DialogCase> {
             .with_predicate(FramePredicate::BornIn)
             .with_modifier_constraint(ModifierRole::Time, year_phrase(1872)),
             expected_slot: AnswerSlot::Agent,
-            // NOTE: the year_phrase value uses surface «1872 жыл» while
-            // the curated frame's modifier carries `TimeAnchor::Year(1872)`.
-            // Stage 4 modifier-constraint matching keys on root.surface;
-            // this is a known mismatch the bench reports as wrong-surface,
-            // motivating Stage 5 scalar-time matching.
+            // Stage 5 wired scalar `TimeAnchor::Year(N)` matching
+            // against phrase «N жыл» via the cross-shape comparator
+            // in `query::modifier_matches_constraint`.
             expected_surface: "ахмет байтұрсынұлы",
             domain: Some(Domain::Person),
-            known_gap: Some(
-                "Stage 5 — scalar TimeAnchor::Year(1872) ↔ phrase «1872 жыл» matching not yet wired",
-            ),
+            known_gap: None,
         },
         // === МО РК (Министерство обороны РК) — institutional ===
         // (2026-05-26 video presentation context.)
@@ -2243,7 +2239,7 @@ pub fn canonical_cases() -> Vec<DialogCase> {
                 QuestionForm::Definition,
                 AnswerShape::DateAnchor,
             )
-            .with_agent(noun("тауке хан"))
+            .with_agent(noun("тәуке хан"))
             .with_predicate(FramePredicate::BornIn),
             expected_slot: AnswerSlot::Modifier(ModifierRole::Time),
             expected_surface: "1652",
@@ -2259,7 +2255,7 @@ pub fn canonical_cases() -> Vec<DialogCase> {
                 QuestionForm::Definition,
                 AnswerShape::DateAnchor,
             )
-            .with_agent(noun("тауке хан"))
+            .with_agent(noun("тәуке хан"))
             .with_predicate(FramePredicate::DiedIn),
             expected_slot: AnswerSlot::Modifier(ModifierRole::Time),
             expected_surface: "1715",

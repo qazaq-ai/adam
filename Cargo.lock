@@ -84,6 +84,7 @@ version = "6.1.50"
 dependencies = [
  "adam-agg-model",
  "adam-agg-tokenizer",
+ "adam-algebra",
  "adam-intent-classifier",
  "adam-kernel",
  "adam-kernel-fst",

@@ -99,12 +99,14 @@
 //! failure, not a warning.
 
 pub mod composition;
+pub mod corpus_loader;
 pub mod dialog_battery;
 pub mod frame;
 pub mod index;
 pub mod math_solver;
 pub mod operator;
 pub mod query;
+pub mod realiser;
 pub mod root;
 pub mod system_clock;
 

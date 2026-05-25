@@ -612,11 +612,7 @@ impl QueryIR {
         for mc in &self.modifier_constraints {
             let role_str = mc.role.as_str();
             let m = candidate.modifier(role_str)?;
-            if let Some(cv) = modifier_value(m) {
-                if cv.root.surface != mc.value.root.surface {
-                    return None;
-                }
-            } else {
+            if !modifier_matches_constraint(m, &mc.value) {
                 return None;
             }
         }
@@ -658,10 +654,9 @@ impl QueryIR {
 }
 
 /// Extract the inner [`Composition`] from a modifier, if any. For
-/// `TimeAnchor::Year` / `Date` the modifier carries a typed scalar
-/// rather than a composition — those are matched at Stage 4 via a
-/// separate scalar-equality path; Stage 3 only handles `Phrase`-
-/// kind time anchors here.
+/// scalar `TimeAnchor::Year` / `Date` the modifier carries a typed
+/// scalar rather than a composition — those are matched via
+/// [`modifier_matches_constraint`] which knows about both shapes.
 fn modifier_value(m: &Modifier) -> Option<Composition> {
     match m {
         Modifier::TimeAnchor(crate::frame::TimeAnchor::Phrase(c)) => Some(c.clone()),
@@ -672,6 +667,48 @@ fn modifier_value(m: &Modifier) -> Option<Composition> {
         | Modifier::Manner(c)
         | Modifier::Recipient(c)
         | Modifier::Possessor(c) => Some(c.clone()),
+    }
+}
+
+/// **Stage 5 sense disambiguation** — does the candidate modifier
+/// satisfy the query constraint?
+///
+/// Compares modifiers across all four representational shapes:
+///
+/// 1. Phrase ↔ Phrase: equal if `root.surface` matches.
+/// 2. Phrase ↔ Year(N): equal if the phrase surface starts with
+///    `N` (e.g. «1872 жыл» matches `Year(1872)`).
+/// 3. Phrase ↔ Date{y,m,d}: equal if the phrase surface contains
+///    `y` AND `m` AND `d` in any order (lenient — Stage 5 takes
+///    the conservative match; Stage 8 may tighten).
+/// 4. Year(N) ↔ Year(M): equal iff N == M.
+/// 5. Date ↔ Date: structural equality.
+/// 6. Other modifiers (Location / Source / ...): root.surface
+///    equality.
+fn modifier_matches_constraint(candidate: &Modifier, constraint: &Composition) -> bool {
+    use crate::frame::TimeAnchor;
+    let constraint_root = &constraint.root.surface;
+    match candidate {
+        Modifier::TimeAnchor(TimeAnchor::Phrase(c)) => &c.root.surface == constraint_root,
+        Modifier::TimeAnchor(TimeAnchor::Year(y)) => {
+            // Phrase «1872 жыл» / scalar matches the year prefix.
+            let year_str = y.to_string();
+            constraint_root.starts_with(&year_str) || constraint_root == &year_str
+        }
+        Modifier::TimeAnchor(TimeAnchor::Date { year, month, day }) => {
+            let iso = format!("{year:04}-{month:02}-{day:02}");
+            let year_str = year.to_string();
+            constraint_root == &iso
+                || constraint_root.starts_with(&year_str)
+                || (constraint_root.contains(&year_str)
+                    && constraint_root.contains(&format!("-{month:02}-")))
+        }
+        Modifier::Location(c)
+        | Modifier::Source(c)
+        | Modifier::Instrument(c)
+        | Modifier::Manner(c)
+        | Modifier::Recipient(c)
+        | Modifier::Possessor(c) => &c.root.surface == constraint_root,
     }
 }
 

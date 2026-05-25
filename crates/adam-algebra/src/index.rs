@@ -203,11 +203,15 @@ impl FrameIndex {
                 .push(id);
         }
 
-        // Modifier index.
+        // Modifier index. Each modifier is keyed under every
+        // surface form a query might use to refer to it: the
+        // canonical root, the year-only stub, and the «N жыл»
+        // phrase — so a scalar `Year(1872)` fact answers both
+        // direct scalar queries and phrase «1872 жыл» queries.
         for m in &frame.modifiers {
-            if let Some(root) = modifier_root_surface(m) {
+            for key in modifier_index_keys(m) {
                 self.by_modifier
-                    .entry((m.role_str().to_string(), root))
+                    .entry((m.role_str().to_string(), key))
                     .or_default()
                     .push(id);
             }
@@ -357,20 +361,32 @@ impl FrameIndex {
     }
 }
 
-/// Return the surface form of the inner composition of a modifier,
-/// if the modifier carries one. Mirrors the helper in
-/// [`crate::query`] but doesn't clone — we only need the surface
-/// string for indexing.
-fn modifier_root_surface(m: &Modifier) -> Option<String> {
+/// Surface keys under which a modifier should appear in the
+/// `by_modifier` index. Stage 5 widens this from a single key to
+/// the set of forms a query might use: scalar Year, year prefix,
+/// year-with-«жыл» phrase, full ISO date, etc. Empty Vec means
+/// the modifier has no surface and won't pre-narrow the index
+/// (the post-filter still validates).
+fn modifier_index_keys(m: &Modifier) -> Vec<String> {
+    use crate::frame::TimeAnchor;
     match m {
-        Modifier::TimeAnchor(crate::frame::TimeAnchor::Phrase(c)) => Some(c.root.surface.clone()),
-        Modifier::TimeAnchor(_) => None,
+        Modifier::TimeAnchor(TimeAnchor::Phrase(c)) => vec![c.root.surface.clone()],
+        Modifier::TimeAnchor(TimeAnchor::Year(y)) => {
+            vec![y.to_string(), format!("{y} жыл"), format!("{y} жылы")]
+        }
+        Modifier::TimeAnchor(TimeAnchor::Date { year, month, day }) => {
+            vec![
+                year.to_string(),
+                format!("{year} жыл"),
+                format!("{year:04}-{month:02}-{day:02}"),
+            ]
+        }
         Modifier::Location(c)
         | Modifier::Source(c)
         | Modifier::Instrument(c)
         | Modifier::Manner(c)
         | Modifier::Recipient(c)
-        | Modifier::Possessor(c) => Some(c.root.surface.clone()),
+        | Modifier::Possessor(c) => vec![c.root.surface.clone()],
     }
 }
 
