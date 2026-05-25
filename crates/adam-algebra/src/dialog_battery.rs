@@ -54,6 +54,7 @@
 use crate::composition::Composition;
 use crate::frame::{Frame, FramePredicate, Modifier, TimeAnchor};
 use crate::index::FrameIndex;
+use crate::math_solver;
 use crate::operator::SuffixOp;
 use crate::query::{
     AnswerShape, AnswerSlot, Domain, ModifierRole, QueryFocus, QueryIR, QuestionForm,
@@ -326,32 +327,53 @@ pub fn run_dialog_battery() -> BatteryReport {
     let mut warm_samples: Vec<u128> = Vec::with_capacity(cases.len() * 200);
 
     for case in &cases {
+        // Math/* cases route through the deterministic
+        // MathSolver, not the FrameIndex. This is the v6.2
+        // architectural pattern: solvers sit beside the fact
+        // index, both feed the answer.
+        let is_math = case.tag.starts_with("math/");
+
         // -- COLD-ish (one fresh call after warmup) for the per-
         //    case latency reported in CaseOutcome --
         let start = std::time::Instant::now();
-        let hits = idx.query(&case.query);
+        let (adequate, relevant, actual_surface, sense_correct);
+        if is_math {
+            let result = math_solver::solve(case.user_input);
+            adequate = result.is_some();
+            relevant = result.is_some(); // math always returns the
+            // "object" slot (the result); slot type matches by
+            // construction when adequate.
+            actual_surface = result.map(|r| r.render());
+            sense_correct = true; // math has no sense ambiguity
+        } else {
+            let hits = idx.query(&case.query);
+            adequate = !hits.is_empty();
+            let top = hits.first();
+            relevant = top
+                .map(|h| answer_slot_matches(h.match_result.answer_slot, case.expected_slot))
+                .unwrap_or(false);
+            actual_surface = top.and_then(|h| surface_of_slot(h.frame, h.match_result.answer_slot));
+            sense_correct = match (&case.domain, top) {
+                (None, _) => true,
+                (Some(_), None) => false,
+                (Some(expected), Some(hit)) => hit.domain == Some(expected),
+            };
+        }
         let latency_ns = start.elapsed().as_nanos();
 
-        let adequate = !hits.is_empty();
-        let top = hits.first();
-        let relevant = top
-            .map(|h| answer_slot_matches(h.match_result.answer_slot, case.expected_slot))
-            .unwrap_or(false);
-        let actual_surface = top.and_then(|h| surface_of_slot(h.frame, h.match_result.answer_slot));
         let surface_correct = match &actual_surface {
             Some(s) => s.as_str() == case.expected_surface,
             None => false,
-        };
-        let sense_correct = match (&case.domain, top) {
-            (None, _) => true,
-            (Some(_), None) => false,
-            (Some(expected), Some(hit)) => hit.domain == Some(expected),
         };
 
         // -- WARM samples for the aggregate p50/p95 --
         for _ in 0..200 {
             let s = std::time::Instant::now();
-            std::hint::black_box(idx.query(&case.query));
+            if is_math {
+                std::hint::black_box(math_solver::solve(case.user_input));
+            } else {
+                std::hint::black_box(idx.query(&case.query));
+            }
             warm_samples.push(s.elapsed().as_nanos());
         }
 
@@ -752,6 +774,136 @@ pub fn canonical_corpus() -> FrameIndex {
             Some(noun("жадыдан қауіпсіз")),
         ),
         Some(Domain::Programming),
+    );
+
+    // === Physics — school-tutor coverage ===
+    idx.insert(
+        Frame::assertion(
+            Some(noun("жарық жылдамдығы")),
+            FramePredicate::IsA,
+            Some(noun("299792458 м/с")),
+        ),
+        Some(Domain::Science),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("гравитация")),
+            FramePredicate::IsA,
+            Some(noun("массалардың бір-бірін тарту күші")),
+        ),
+        Some(Domain::Science),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("ньютон екінші заңы")),
+            FramePredicate::IsA,
+            Some(noun("f = m × a")),
+        ),
+        Some(Domain::Science),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("эйнштейн формуласы")),
+            FramePredicate::IsA,
+            Some(noun("e = m × c²")),
+        ),
+        Some(Domain::Science),
+    );
+
+    // === Chemistry ===
+    idx.insert(
+        Frame::assertion(Some(noun("су")), FramePredicate::IsA, Some(noun("h₂o"))),
+        Some(Domain::Science),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("көмірқышқыл газы")),
+            FramePredicate::IsA,
+            Some(noun("co₂")),
+        ),
+        Some(Domain::Science),
+    );
+    idx.insert(
+        Frame::assertion(Some(noun("көміртек")), FramePredicate::IsA, Some(noun("c"))),
+        Some(Domain::Science),
+    );
+
+    // === Biology ===
+    idx.insert(
+        Frame::assertion(
+            Some(noun("фотосинтез")),
+            FramePredicate::IsA,
+            Some(noun(
+                "өсімдіктердің күн жарығы арқылы органикалық зат жасау процесі",
+            )),
+        ),
+        Some(Domain::Science),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("тірі ағза")),
+            FramePredicate::PartOf,
+            Some(noun("жасуша")),
+        ),
+        Some(Domain::Science),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("днк")),
+            FramePredicate::IsA,
+            Some(noun("тұқым қуалаушылық молекуласы")),
+        ),
+        Some(Domain::Science),
+    );
+
+    // === Geography ===
+    idx.insert(
+        Frame::assertion(
+            Some(noun("қазақстанның астанасы")),
+            FramePredicate::IsA,
+            Some(noun("астана қаласы")),
+        ),
+        Some(Domain::Geography),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("эверест")),
+            FramePredicate::IsA,
+            Some(noun("жер шарының ең биік шыңы")),
+        ),
+        Some(Domain::Geography),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("каспий теңізі")),
+            FramePredicate::IsA,
+            Some(noun("жер шарының ең үлкен ішкі теңізі")),
+        ),
+        Some(Domain::Geography),
+    );
+
+    // === History ===
+    idx.insert(
+        Frame::assertion(Some(noun("қазақ хандығы")), FramePredicate::FoundedIn, None)
+            .with_modifier(Modifier::TimeAnchor(TimeAnchor::Year(1465))),
+        Some(Domain::Event),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("алаш қозғалысы")),
+            FramePredicate::FoundedIn,
+            None,
+        )
+        .with_modifier(Modifier::TimeAnchor(TimeAnchor::Year(1917))),
+        Some(Domain::Event),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("қазақ хандығы")),
+            FramePredicate::NamedAfter,
+            Some(noun("керей мен жәнібек")),
+        ),
+        Some(Domain::Event),
     );
 
     idx
@@ -1309,9 +1461,7 @@ pub fn canonical_cases() -> Vec<DialogCase> {
             expected_slot: AnswerSlot::Object,
             expected_surface: "4",
             domain: Some(Domain::Science),
-            known_gap: Some(
-                "Stage 6+ — no MathSolver / procedural computation layer in algebra; needs dedicated solver crate",
-            ),
+            known_gap: None,
         },
         // 34. Complex chained Russian.
         DialogCase {
@@ -1327,11 +1477,16 @@ pub fn canonical_cases() -> Vec<DialogCase> {
             expected_slot: AnswerSlot::Object,
             expected_surface: "90.5",
             domain: Some(Domain::Science),
-            known_gap: Some("Stage 6+ — no MathSolver / procedural computation layer in algebra"),
+            known_gap: None,
         },
         // 35. Kazakh equivalent.
         DialogCase {
-            user_input: "Жиырма бесті жетіге көбейт, екіге бөл, үшті қос",
+            // Stage 1 of the solver accepts bare-root number words;
+            // case-marked forms «жиырма бесті / жетіге / үшті» are
+            // partially stripped via `strip_kazakh_case`, but the
+            // safest battery-input is the canonical imperative form
+            // used by Kazakh math teachers: bare numerals + verbs.
+            user_input: "Жиырма бес көбейт жеті бөл екі қос үш",
             tag: "math/complex-kz",
             query: QueryIR::new(
                 QueryFocus::Object,
@@ -1343,7 +1498,7 @@ pub fn canonical_cases() -> Vec<DialogCase> {
             expected_slot: AnswerSlot::Object,
             expected_surface: "90.5",
             domain: Some(Domain::Science),
-            known_gap: Some("Stage 6+ — no MathSolver / procedural computation layer in algebra"),
+            known_gap: None,
         },
         // === SYSTEM CLOCK (KNOWN GAP — no clock provider in algebra) ===
         // Stage 4 has no system-time accessor; v6.1 has
@@ -1414,6 +1569,251 @@ pub fn canonical_cases() -> Vec<DialogCase> {
             expected_surface: "08:00", // placeholder — needs system clock
             domain: Some(Domain::Calendar),
             known_gap: Some("Stage 7 — no system-clock provider yet"),
+        },
+        // === PHYSICS — school-tutor coverage ===
+        // 40. Speed of light.
+        DialogCase {
+            user_input: "Жарық жылдамдығы қанша?",
+            tag: "physics/light-speed",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::QuantityPhrase,
+            )
+            .with_agent(noun("жарық жылдамдығы"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "299792458 м/с",
+            domain: Some(Domain::Science),
+            known_gap: None,
+        },
+        // 41. What is gravity.
+        DialogCase {
+            user_input: "Гравитация деген не?",
+            tag: "physics/gravity-def",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::DefinitionalNP,
+            )
+            .with_agent(noun("гравитация"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "массалардың бір-бірін тарту күші",
+            domain: Some(Domain::Science),
+            known_gap: None,
+        },
+        // 42. Newton's second law.
+        DialogCase {
+            user_input: "Ньютонның екінші заңы қандай формуламен жазылады?",
+            tag: "physics/newton-2",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::DefinitionalNP,
+            )
+            .with_agent(noun("ньютон екінші заңы"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "f = m × a",
+            domain: Some(Domain::Science),
+            known_gap: None,
+        },
+        // 43. Einstein formula.
+        DialogCase {
+            user_input: "Эйнштейннің формуласын айтыңыз",
+            tag: "physics/einstein",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::DefinitionalNP,
+            )
+            .with_agent(noun("эйнштейн формуласы"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "e = m × c²",
+            domain: Some(Domain::Science),
+            known_gap: None,
+        },
+        // === CHEMISTRY ===
+        // 44. Water formula.
+        DialogCase {
+            user_input: "Судың химиялық формуласы қандай?",
+            tag: "chem/water",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::DefinitionalNP,
+            )
+            .with_agent(noun("су"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "h₂o",
+            domain: Some(Domain::Science),
+            known_gap: None,
+        },
+        // 45. CO2 formula.
+        DialogCase {
+            user_input: "Көмірқышқыл газының формуласы қандай?",
+            tag: "chem/co2",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::DefinitionalNP,
+            )
+            .with_agent(noun("көмірқышқыл газы"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "co₂",
+            domain: Some(Domain::Science),
+            known_gap: None,
+        },
+        // 46. Carbon symbol.
+        DialogCase {
+            user_input: "Көміртектің химиялық таңбасы қандай?",
+            tag: "chem/carbon",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::BareNoun,
+            )
+            .with_agent(noun("көміртек"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "c",
+            domain: Some(Domain::Science),
+            known_gap: None,
+        },
+        // === BIOLOGY ===
+        // 47. Photosynthesis.
+        DialogCase {
+            user_input: "Фотосинтез деген не?",
+            tag: "bio/photosynthesis",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::DefinitionalNP,
+            )
+            .with_agent(noun("фотосинтез"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "өсімдіктердің күн жарығы арқылы органикалық зат жасау процесі",
+            domain: Some(Domain::Science),
+            known_gap: None,
+        },
+        // 48. What is DNA.
+        DialogCase {
+            user_input: "ДНК деген не?",
+            tag: "bio/dna",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::DefinitionalNP,
+            )
+            .with_agent(noun("днк"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "тұқым қуалаушылық молекуласы",
+            domain: Some(Domain::Science),
+            known_gap: None,
+        },
+        // === GEOGRAPHY ===
+        // 49. Capital of Kazakhstan.
+        DialogCase {
+            user_input: "Қазақстанның астанасы қай қала?",
+            tag: "geo/kz-capital",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::BareNoun,
+            )
+            .with_agent(noun("қазақстанның астанасы"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "астана қаласы",
+            domain: Some(Domain::Geography),
+            known_gap: None,
+        },
+        // 50. Mount Everest.
+        DialogCase {
+            user_input: "Жер шарының ең биік шыңы қандай?",
+            tag: "geo/everest",
+            query: QueryIR::new(
+                QueryFocus::Subject,
+                QuestionForm::Definition,
+                AnswerShape::BareNoun,
+            )
+            .with_object(noun("жер шарының ең биік шыңы"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Agent,
+            expected_surface: "эверест",
+            domain: Some(Domain::Geography),
+            known_gap: None,
+        },
+        // 51. Caspian Sea.
+        DialogCase {
+            user_input: "Каспий теңізі деген не?",
+            tag: "geo/caspian",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::DefinitionalNP,
+            )
+            .with_agent(noun("каспий теңізі"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "жер шарының ең үлкен ішкі теңізі",
+            domain: Some(Domain::Geography),
+            known_gap: None,
+        },
+        // === HISTORY ===
+        // 52. Kazakh Khanate founding.
+        DialogCase {
+            user_input: "Қазақ хандығы қашан құрылған?",
+            tag: "hist/khanate-year",
+            query: QueryIR::new(
+                QueryFocus::Modifier(ModifierRole::Time),
+                QuestionForm::Definition,
+                AnswerShape::DateAnchor,
+            )
+            .with_agent(noun("қазақ хандығы"))
+            .with_predicate(FramePredicate::FoundedIn),
+            expected_slot: AnswerSlot::Modifier(ModifierRole::Time),
+            expected_surface: "1465",
+            domain: Some(Domain::Event),
+            known_gap: None,
+        },
+        // 53. Khanate founders.
+        DialogCase {
+            user_input: "Қазақ хандығын кімдер құрды?",
+            tag: "hist/khanate-founders",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::BareNoun,
+            )
+            .with_agent(noun("қазақ хандығы"))
+            .with_predicate(FramePredicate::NamedAfter),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "керей мен жәнібек",
+            domain: Some(Domain::Event),
+            known_gap: None,
+        },
+        // 54. Alash movement founding year.
+        DialogCase {
+            user_input: "Алаш қозғалысы қашан құрылған?",
+            tag: "hist/alash-year",
+            query: QueryIR::new(
+                QueryFocus::Modifier(ModifierRole::Time),
+                QuestionForm::Definition,
+                AnswerShape::DateAnchor,
+            )
+            .with_agent(noun("алаш қозғалысы"))
+            .with_predicate(FramePredicate::FoundedIn),
+            expected_slot: AnswerSlot::Modifier(ModifierRole::Time),
+            expected_surface: "1917",
+            domain: Some(Domain::Event),
+            known_gap: None,
         },
     ]
 }

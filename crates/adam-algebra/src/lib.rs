@@ -102,6 +102,7 @@ pub mod composition;
 pub mod dialog_battery;
 pub mod frame;
 pub mod index;
+pub mod math_solver;
 pub mod operator;
 pub mod query;
 pub mod root;
