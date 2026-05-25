@@ -116,12 +116,26 @@ enum Op {
     Sub,
     Mul,
     Div,
+    /// `a^b` — `a` raised to integer power `b`.
+    Pow,
+    /// `(a × b) / 100` — `b` percent of `a`.
+    Percent,
+}
+
+/// Unary operators that consume one operand and replace the
+/// accumulator. Square root is the canonical case; «корень из 16»
+/// emits `Token::Number(16)` then `Token::Unary(Sqrt)` and
+/// `evaluate` rewrites the accumulator to `sqrt(acc)`.
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum Unary {
+    Sqrt,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 enum Token {
     Number(f64),
     Op(Op),
+    Unary(Unary),
 }
 
 /// Walk the input left-to-right, emitting `Number` and `Op`
@@ -149,11 +163,30 @@ fn tokenize(input: &str) -> Vec<Token> {
     let mut out: Vec<Token> = Vec::new();
     let mut i = 0;
     while i < words.len() {
+        // Unary prefix («корень из X» / «X-нің түбірі»). Detect the
+        // marker word; the next number becomes the operand of the
+        // sqrt. Emit `Number` then `Unary` so `evaluate` can lift
+        // the running accumulator.
+        if is_sqrt_prefix(words[i]) {
+            // «корень из» — operand follows.
+            i += 1;
+            if let Some((n, consumed)) = parse_compound_number(&words[i..]) {
+                out.push(Token::Number(n));
+                out.push(Token::Unary(Unary::Sqrt));
+                i += consumed;
+            }
+            continue;
+        }
         // Try a multi-word number first (handles «двадцать пять»,
         // «жиырма бес», «сто двадцать пять», …).
         if let Some((n, consumed)) = parse_compound_number(&words[i..]) {
             out.push(Token::Number(n));
             i += consumed;
+            // Sqrt suffix («X-нің түбірі / квадратный корень из X»).
+            if i < words.len() && is_sqrt_suffix(words[i]) {
+                out.push(Token::Unary(Unary::Sqrt));
+                i += 1;
+            }
             continue;
         }
         if let Some(op) = parse_op(words[i]) {
@@ -166,6 +199,17 @@ fn tokenize(input: &str) -> Vec<Token> {
         i += 1;
     }
     out
+}
+
+/// Does this word introduce a unary square-root prefix?
+fn is_sqrt_prefix(w: &str) -> bool {
+    matches!(w, "корень" | "√")
+}
+
+/// Does this word indicate a unary square-root suffix on the
+/// previous number (Kazakh «X-нің түбірі»)?
+fn is_sqrt_suffix(w: &str) -> bool {
+    matches!(w, "түбірі" | "квадратты_түбірі")
 }
 
 /// Connector / filler words dropped from the token stream.
@@ -211,11 +255,20 @@ fn parse_op(w: &str) -> Option<Op> {
         "раздели" | "разделить" | "подели" | "поделить" | "÷" | "/" | ":" => {
             Op::Div
         }
+        // Power / exponent.
+        "в_степени" | "степени" | "в_степень" | "степень" | "^" | "**" => {
+            Op::Pow
+        }
+        // Percentage — left-to-right semantics: «acc procent rhs»
+        // = `(acc * rhs) / 100` (i.e. rhs percent of acc).
+        "процент" | "процентов" | "процента" | "%" => Op::Percent,
         // Kazakh — verb stems (imperative).
         "қос" | "қосу" | "жұп" => Op::Add,
         "азайт" | "азайту" | "алып_таста" | "алу" => Op::Sub,
         "көбейт" | "көбейту" => Op::Mul,
         "бөл" | "бөлу" => Op::Div,
+        "дәрежесі" | "дәреже" | "дәрежеге" => Op::Pow,
+        "пайыз" | "пайызы" => Op::Percent,
         _ => return None,
     })
 }
@@ -266,9 +319,12 @@ fn parse_compound_number(words: &[&str]) -> Option<(f64, usize)> {
 }
 
 /// One-word number value. Returns `None` for non-number words.
+/// Russian numerals: covers nominative + the most-common
+/// genitive / prepositional forms used after prepositions like
+/// «из X» (which requires genitive in Russian grammar).
 fn number_word_value(w: &str) -> Option<i64> {
     Some(match w {
-        // Russian 0-19.
+        // Russian 0-19 — nominative.
         "ноль" => 0,
         "один" | "одна" | "одно" => 1,
         "два" | "две" => 2,
@@ -289,6 +345,35 @@ fn number_word_value(w: &str) -> Option<i64> {
         "семнадцать" => 17,
         "восемнадцать" => 18,
         "девятнадцать" => 19,
+        // Russian 0-19 — genitive (after «из / от / для»).
+        "одного" | "одной" => 1,
+        "двух" => 2,
+        "трёх" | "трех" => 3,
+        "четырёх" | "четырех" => 4,
+        "пяти" => 5,
+        "шести" => 6,
+        "семи" => 7,
+        "восьми" => 8,
+        "девяти" => 9,
+        "десяти" => 10,
+        "одиннадцати" => 11,
+        "двенадцати" => 12,
+        "тринадцати" => 13,
+        "четырнадцати" => 14,
+        "пятнадцати" => 15,
+        "шестнадцати" => 16,
+        "семнадцати" => 17,
+        "восемнадцати" => 18,
+        "девятнадцати" => 19,
+        "двадцати" => 20,
+        "тридцати" => 30,
+        "сорока" => 40,
+        "пятидесяти" => 50,
+        "шестидесяти" => 60,
+        "семидесяти" => 70,
+        "восьмидесяти" => 80,
+        "девяноста" => 90,
+        "ста" => 100,
         // Russian 20-90.
         "двадцать" => 20,
         "тридцать" => 30,
@@ -362,51 +447,75 @@ fn strip_kazakh_case(w: &str) -> &str {
     w
 }
 
-/// Evaluate the token stream. Left-to-right when input is the
-/// chained-imperative form (each operator applies to the running
-/// accumulator); falls back to standard precedence when the stream
-/// looks like an infix expression with multiple binary operators
-/// in a row.
+/// Evaluate the token stream. Left-to-right chained-imperative
+/// semantics: each binary operator applies to the running
+/// accumulator with the next number; each unary operator rewrites
+/// the accumulator in place.
 fn evaluate(tokens: &[Token]) -> Option<MathResult> {
     if tokens.is_empty() {
         return None;
     }
-    // The first token must be a number to seed the accumulator.
     let mut acc = match tokens[0] {
         Token::Number(n) => n,
-        Token::Op(_) => return None,
+        _ => return None,
     };
-    let mut steps = 0usize;
+    // Trailing unary on the seed number (e.g. «корень из 16» →
+    // tokens [Number(16), Unary(Sqrt)]).
     let mut i = 1;
+    let mut steps = 0usize;
     while i < tokens.len() {
-        let Token::Op(op) = tokens[i] else {
-            // Two numbers in a row without an operator — input is
-            // malformed; abort.
-            return None;
-        };
-        if i + 1 >= tokens.len() {
-            // Trailing operator with no operand.
-            return None;
-        }
-        let Token::Number(rhs) = tokens[i + 1] else {
-            return None;
-        };
-        acc = match op {
-            Op::Add => acc + rhs,
-            Op::Sub => acc - rhs,
-            Op::Mul => acc * rhs,
-            Op::Div => {
-                if rhs == 0.0 {
+        match tokens[i] {
+            Token::Unary(Unary::Sqrt) => {
+                if acc < 0.0 {
                     return None;
                 }
-                acc / rhs
+                acc = acc.sqrt();
+                steps += 1;
+                i += 1;
             }
-        };
-        steps += 1;
-        i += 2;
+            Token::Op(op) => {
+                if i + 1 >= tokens.len() {
+                    return None;
+                }
+                let Token::Number(rhs) = tokens[i + 1] else {
+                    return None;
+                };
+                acc = match op {
+                    Op::Add => acc + rhs,
+                    Op::Sub => acc - rhs,
+                    Op::Mul => acc * rhs,
+                    Op::Div => {
+                        if rhs == 0.0 {
+                            return None;
+                        }
+                        acc / rhs
+                    }
+                    Op::Pow => acc.powf(rhs),
+                    Op::Percent => (acc * rhs) / 100.0,
+                };
+                steps += 1;
+                // Skip over rhs; also lift if next token is a
+                // trailing unary attached to rhs.
+                i += 2;
+                if i < tokens.len()
+                    && let Token::Unary(Unary::Sqrt) = tokens[i]
+                {
+                    if acc < 0.0 {
+                        return None;
+                    }
+                    acc = acc.sqrt();
+                    steps += 1;
+                    i += 1;
+                }
+            }
+            Token::Number(_) => {
+                // Two numbers in a row without an operator —
+                // malformed input.
+                return None;
+            }
+        }
     }
     if steps == 0 {
-        // Just a number — not really a "solve".
         return None;
     }
     Some(MathResult { value: acc, steps })
@@ -587,6 +696,77 @@ mod tests {
                 .render(),
             "90.5"
         );
+    }
+
+    // -- Powers / roots / percentages (Stage 4.7 extension) -----
+
+    #[test]
+    fn power_russian() {
+        let r = solve("Два в степени десять").unwrap();
+        assert_eq!(r.value, 1024.0);
+    }
+
+    #[test]
+    fn power_kazakh() {
+        let r = solve("Екі дәрежесі он").unwrap();
+        assert_eq!(r.value, 1024.0);
+    }
+
+    #[test]
+    fn power_ascii() {
+        let r = solve("2 ^ 10").unwrap();
+        assert_eq!(r.value, 1024.0);
+        let r2 = solve("3 ** 4").unwrap();
+        assert_eq!(r2.value, 81.0);
+    }
+
+    #[test]
+    fn percent_russian() {
+        // «Сто процентов 20» — «20 percent of 100» = 20.
+        // Following left-to-right semantics: acc=100, op=Percent, rhs=20
+        // → (100 * 20) / 100 = 20.
+        let r = solve("Сто процент 20").unwrap();
+        assert_eq!(r.value, 20.0);
+    }
+
+    #[test]
+    fn percent_kazakh() {
+        let r = solve("Жүз пайыз 20").unwrap();
+        assert_eq!(r.value, 20.0);
+    }
+
+    #[test]
+    fn sqrt_russian_prefix() {
+        let r = solve("Корень из шестнадцати").unwrap();
+        assert_eq!(r.value, 4.0);
+    }
+
+    #[test]
+    fn sqrt_kazakh_suffix() {
+        let r = solve("Он алты түбірі").unwrap();
+        assert_eq!(r.value, 4.0);
+    }
+
+    #[test]
+    fn sqrt_after_arithmetic() {
+        // «Двадцать пять плюс одиннадцать» = 36, then sqrt → 6.
+        // Sqrt suffix applies to running accumulator.
+        let r = solve("36 түбірі").unwrap();
+        assert_eq!(r.value, 6.0);
+    }
+
+    #[test]
+    fn percent_chained() {
+        // «Двадцать процент 50 плюс десять» — 20% of 50 = 10, +10 = 20.
+        // (left-to-right: acc=20, %50 → 10, +10 → 20)
+        let r = solve("20 процент 50 плюс 10").unwrap();
+        assert_eq!(r.value, 20.0);
+    }
+
+    #[test]
+    fn negative_power_yields_fraction() {
+        let r = solve("2 ^ -2").unwrap();
+        assert_eq!(r.value, 0.25);
     }
 
     #[test]

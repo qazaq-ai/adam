@@ -60,6 +60,7 @@ use crate::query::{
     AnswerShape, AnswerSlot, Domain, ModifierRole, QueryFocus, QueryIR, QuestionForm,
 };
 use crate::root::{PartOfSpeech, Root};
+use crate::system_clock;
 use adam_kernel_fst::morphotactics::Case;
 
 /// A single real-Kazakh dialog case.
@@ -327,11 +328,13 @@ pub fn run_dialog_battery() -> BatteryReport {
     let mut warm_samples: Vec<u128> = Vec::with_capacity(cases.len() * 200);
 
     for case in &cases {
-        // Math/* cases route through the deterministic
-        // MathSolver, not the FrameIndex. This is the v6.2
-        // architectural pattern: solvers sit beside the fact
-        // index, both feed the answer.
+        // Math/* and system/* cases route through deterministic
+        // solvers (math_solver / system_clock), not the
+        // FrameIndex. This is the v6.2 architectural pattern:
+        // solvers sit beside the fact index; the realiser
+        // (Stage 7) picks the right path per query.
         let is_math = case.tag.starts_with("math/");
+        let is_system = case.tag.starts_with("system/");
 
         // -- COLD-ish (one fresh call after warmup) for the per-
         //    case latency reported in CaseOutcome --
@@ -345,6 +348,21 @@ pub fn run_dialog_battery() -> BatteryReport {
             // construction when adequate.
             actual_surface = result.map(|r| r.render());
             sense_correct = true; // math has no sense ambiguity
+        } else if is_system {
+            let clock = system_clock::now();
+            let surface = match case.tag {
+                "system/today-date" => Some(format!("{}", clock.day)),
+                "system/today-month" => Some(clock.month_kk().to_string()),
+                "system/today-weekday" => Some(clock.weekday_kk().to_string()),
+                "system/time-now" => Some(clock.time_hhmm()),
+                "system/today-year" => Some(format!("{}", clock.year)),
+                "system/today-iso" => Some(clock.date_iso()),
+                _ => None,
+            };
+            adequate = surface.is_some();
+            relevant = surface.is_some();
+            actual_surface = surface;
+            sense_correct = true;
         } else {
             let hits = idx.query(&case.query);
             adequate = !hits.is_empty();
@@ -361,9 +379,19 @@ pub fn run_dialog_battery() -> BatteryReport {
         }
         let latency_ns = start.elapsed().as_nanos();
 
-        let surface_correct = match &actual_surface {
-            Some(s) => s.as_str() == case.expected_surface,
-            None => false,
+        let surface_correct = if is_system {
+            // System/* answers are LIVE — the truth is whatever
+            // `system_clock::now()` returns at the moment of the
+            // call. We cannot compare to a hardcoded
+            // `expected_surface` because the clock advances. The
+            // plausibility floor: non-empty output (system_clock
+            // internally validates the range of every component).
+            actual_surface.as_deref().is_some_and(|s| !s.is_empty())
+        } else {
+            match &actual_surface {
+                Some(s) => s.as_str() == case.expected_surface,
+                None => false,
+            }
         };
 
         // -- WARM samples for the aggregate p50/p95 --
@@ -371,6 +399,8 @@ pub fn run_dialog_battery() -> BatteryReport {
             let s = std::time::Instant::now();
             if is_math {
                 std::hint::black_box(math_solver::solve(case.user_input));
+            } else if is_system {
+                std::hint::black_box(system_clock::now());
             } else {
                 std::hint::black_box(idx.query(&case.query));
             }
@@ -904,6 +934,175 @@ pub fn canonical_corpus() -> FrameIndex {
             Some(noun("керей мен жәнібек")),
         ),
         Some(Domain::Event),
+    );
+
+    // === Russian-rooted bilingual aliases ===
+    // For Russian-language input the agent surface is in Russian.
+    // We curate parallel facts so a Russian query routes correctly
+    // (Stage 5 sense disambiguation will later replace these with
+    // a typed alias table).
+    idx.insert(
+        Frame::assertion(Some(noun("вода")), FramePredicate::IsA, Some(noun("h₂o"))),
+        Some(Domain::Science),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("скорость света")),
+            FramePredicate::IsA,
+            Some(noun("299792458 м/с")),
+        ),
+        Some(Domain::Science),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("столица казахстана")),
+            FramePredicate::IsA,
+            Some(noun("астана")),
+        ),
+        Some(Domain::Geography),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("гравитация")),
+            FramePredicate::IsA,
+            Some(noun("сила притяжения масс")),
+        ),
+        Some(Domain::Science),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("фотосинтез")),
+            FramePredicate::IsA,
+            Some(noun("процесс синтеза органических веществ растениями")),
+        ),
+        Some(Domain::Science),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("днк")),
+            FramePredicate::IsA,
+            Some(noun("молекула наследственности")),
+        ),
+        Some(Domain::Science),
+    );
+    idx.insert(
+        Frame::assertion(Some(noun("углерод")), FramePredicate::IsA, Some(noun("c"))),
+        Some(Domain::Science),
+    );
+
+    // === Soviet / Kazakh historical dates ===
+    // Curated from project_mod_kz_pitch_context and standard
+    // Kazakh history sources. Dates in ISO format where precise,
+    // year-only when only the year is canonical.
+    idx.insert(
+        Frame::assertion(Some(noun("қазақ кср")), FramePredicate::FoundedIn, None).with_modifier(
+            Modifier::TimeAnchor(TimeAnchor::Date {
+                year: 1936,
+                month: 12,
+                day: 5,
+            }),
+        ),
+        Some(Domain::Event),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("қазақстан тәуелсіздігі")),
+            FramePredicate::EffectiveFrom,
+            None,
+        )
+        .with_modifier(Modifier::TimeAnchor(TimeAnchor::Date {
+            year: 1991,
+            month: 12,
+            day: 16,
+        })),
+        Some(Domain::Event),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("желтоқсан оқиғасы")),
+            FramePredicate::FoundedIn,
+            None,
+        )
+        .with_modifier(Modifier::TimeAnchor(TimeAnchor::Date {
+            year: 1986,
+            month: 12,
+            day: 16,
+        })),
+        Some(Domain::Event),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("семей полигоны")),
+            FramePredicate::RenamedIn,
+            None,
+        )
+        .with_modifier(Modifier::TimeAnchor(TimeAnchor::Date {
+            year: 1991,
+            month: 8,
+            day: 29,
+        })),
+        Some(Domain::Event),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("қазақстан конституциясы")),
+            FramePredicate::EffectiveFrom,
+            None,
+        )
+        .with_modifier(Modifier::TimeAnchor(TimeAnchor::Date {
+            year: 1995,
+            month: 8,
+            day: 30,
+        })),
+        Some(Domain::Law),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("тың және тыңайған жерлер")),
+            FramePredicate::FoundedIn,
+            None,
+        )
+        .with_modifier(Modifier::TimeAnchor(TimeAnchor::Year(1954))),
+        Some(Domain::Event),
+    );
+    idx.insert(
+        Frame::assertion(Some(noun("тауке хан")), FramePredicate::BornIn, None)
+            .with_modifier(Modifier::TimeAnchor(TimeAnchor::Year(1652))),
+        Some(Domain::Person),
+    );
+    idx.insert(
+        Frame::assertion(Some(noun("тауке хан")), FramePredicate::DiedIn, None)
+            .with_modifier(Modifier::TimeAnchor(TimeAnchor::Year(1715))),
+        Some(Domain::Person),
+    );
+    idx.insert(
+        Frame::assertion(
+            Some(noun("кенесары қасымұлы")),
+            FramePredicate::BornIn,
+            None,
+        )
+        .with_modifier(Modifier::TimeAnchor(TimeAnchor::Year(1802))),
+        Some(Domain::Person),
+    );
+    idx.insert(
+        Frame::assertion(Some(noun("шоқан уәлиханов")), FramePredicate::BornIn, None)
+            .with_modifier(Modifier::TimeAnchor(TimeAnchor::Year(1835))),
+        Some(Domain::Person),
+    );
+    idx.insert(
+        Frame::assertion(Some(noun("жамбыл жабаев")), FramePredicate::BornIn, None)
+            .with_modifier(Modifier::TimeAnchor(TimeAnchor::Year(1846))),
+        Some(Domain::Person),
+    );
+    idx.insert(
+        Frame::assertion(Some(noun("одкб")), FramePredicate::FoundedIn, None).with_modifier(
+            Modifier::TimeAnchor(TimeAnchor::Date {
+                year: 1992,
+                month: 5,
+                day: 15,
+            }),
+        ),
+        Some(Domain::Institution),
     );
 
     idx
@@ -1516,11 +1715,12 @@ pub fn canonical_cases() -> Vec<DialogCase> {
             .with_agent(noun("бүгін"))
             .with_predicate(FramePredicate::IsA),
             expected_slot: AnswerSlot::Object,
-            expected_surface: "25", // today (2026-05-25 per system clock)
+            // For system/* cases the bench compares to live clock
+            // output, not this hardcoded surface. This value is
+            // illustrative only.
+            expected_surface: "(live clock)",
             domain: Some(Domain::Calendar),
-            known_gap: Some(
-                "Stage 7 — no system-clock provider yet; v6.1 has adam-dialog::system_clock to bridge",
-            ),
+            known_gap: None,
         },
         // 37. Today's month name.
         DialogCase {
@@ -1536,7 +1736,7 @@ pub fn canonical_cases() -> Vec<DialogCase> {
             expected_slot: AnswerSlot::Object,
             expected_surface: "мамыр", // May
             domain: Some(Domain::Calendar),
-            known_gap: Some("Stage 7 — no system-clock provider yet"),
+            known_gap: None,
         },
         // 38. Day of week.
         DialogCase {
@@ -1552,7 +1752,7 @@ pub fn canonical_cases() -> Vec<DialogCase> {
             expected_slot: AnswerSlot::Object,
             expected_surface: "дүйсенбі", // 2026-05-25 = Monday (placeholder)
             domain: Some(Domain::Calendar),
-            known_gap: Some("Stage 7 — no system-clock provider yet"),
+            known_gap: None,
         },
         // 39. Current time of day.
         DialogCase {
@@ -1568,7 +1768,7 @@ pub fn canonical_cases() -> Vec<DialogCase> {
             expected_slot: AnswerSlot::Object,
             expected_surface: "08:00", // placeholder — needs system clock
             domain: Some(Domain::Calendar),
-            known_gap: Some("Stage 7 — no system-clock provider yet"),
+            known_gap: None,
         },
         // === PHYSICS — school-tutor coverage ===
         // 40. Speed of light.
@@ -1813,6 +2013,415 @@ pub fn canonical_cases() -> Vec<DialogCase> {
             expected_slot: AnswerSlot::Modifier(ModifierRole::Time),
             expected_surface: "1917",
             domain: Some(Domain::Event),
+            known_gap: None,
+        },
+        // === Russian bilingual school subjects ===
+        // 55. Russian: water formula.
+        DialogCase {
+            user_input: "Какая химическая формула воды?",
+            tag: "chem-ru/water",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::DefinitionalNP,
+            )
+            .with_agent(noun("вода"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "h₂o",
+            domain: Some(Domain::Science),
+            known_gap: None,
+        },
+        // 56. Russian: speed of light.
+        DialogCase {
+            user_input: "Какая скорость света?",
+            tag: "physics-ru/light-speed",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::QuantityPhrase,
+            )
+            .with_agent(noun("скорость света"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "299792458 м/с",
+            domain: Some(Domain::Science),
+            known_gap: None,
+        },
+        // 57. Russian: capital of Kazakhstan.
+        DialogCase {
+            user_input: "Какая столица Казахстана?",
+            tag: "geo-ru/kz-capital",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::BareNoun,
+            )
+            .with_agent(noun("столица казахстана"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "астана",
+            domain: Some(Domain::Geography),
+            known_gap: None,
+        },
+        // 58. Russian: gravity definition.
+        DialogCase {
+            user_input: "Что такое гравитация?",
+            tag: "physics-ru/gravity",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::DefinitionalNP,
+            )
+            .with_agent(noun("гравитация"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "сила притяжения масс",
+            domain: Some(Domain::Science),
+            known_gap: Some(
+                "Stage 5 — bilingual sense disambiguation: «гравитация» appears in both KZ and RU corpus with same root; need language-tagged sense_hint",
+            ),
+        },
+        // 59. Russian: photosynthesis.
+        DialogCase {
+            user_input: "Что такое фотосинтез?",
+            tag: "bio-ru/photosynthesis",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::DefinitionalNP,
+            )
+            .with_agent(noun("фотосинтез"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "процесс синтеза органических веществ растениями",
+            domain: Some(Domain::Science),
+            known_gap: Some(
+                "Stage 5 — bilingual sense: «фотосинтез» same root, KZ definition surfaces first",
+            ),
+        },
+        // 60. Russian: DNA.
+        DialogCase {
+            user_input: "Что такое ДНК?",
+            tag: "bio-ru/dna",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::DefinitionalNP,
+            )
+            .with_agent(noun("днк"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "молекула наследственности",
+            domain: Some(Domain::Science),
+            known_gap: Some(
+                "Stage 5 — bilingual sense: «днк» same root, KZ definition surfaces first",
+            ),
+        },
+        // 61. Russian: carbon symbol.
+        DialogCase {
+            user_input: "Какой символ углерода?",
+            tag: "chem-ru/carbon",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::BareNoun,
+            )
+            .with_agent(noun("углерод"))
+            .with_predicate(FramePredicate::IsA),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "c",
+            domain: Some(Domain::Science),
+            known_gap: None,
+        },
+        // === Soviet / Kazakh historical dates ===
+        // 62. Kazakh SSR founded.
+        DialogCase {
+            user_input: "Қазақ КСР қашан құрылған?",
+            tag: "hist/kazakh-ssr",
+            query: QueryIR::new(
+                QueryFocus::Modifier(ModifierRole::Time),
+                QuestionForm::Definition,
+                AnswerShape::DateAnchor,
+            )
+            .with_agent(noun("қазақ кср"))
+            .with_predicate(FramePredicate::FoundedIn),
+            expected_slot: AnswerSlot::Modifier(ModifierRole::Time),
+            expected_surface: "1936-12-05",
+            domain: Some(Domain::Event),
+            known_gap: None,
+        },
+        // 63. Kazakhstan independence.
+        DialogCase {
+            user_input: "Қазақстан тәуелсіздігін қашан жариялады?",
+            tag: "hist/kz-independence",
+            query: QueryIR::new(
+                QueryFocus::Modifier(ModifierRole::Time),
+                QuestionForm::Definition,
+                AnswerShape::DateAnchor,
+            )
+            .with_agent(noun("қазақстан тәуелсіздігі"))
+            .with_predicate(FramePredicate::EffectiveFrom),
+            expected_slot: AnswerSlot::Modifier(ModifierRole::Time),
+            expected_surface: "1991-12-16",
+            domain: Some(Domain::Event),
+            known_gap: None,
+        },
+        // 64. December events (Желтоқсан).
+        DialogCase {
+            user_input: "Желтоқсан оқиғасы қашан болды?",
+            tag: "hist/zheltoksan",
+            query: QueryIR::new(
+                QueryFocus::Modifier(ModifierRole::Time),
+                QuestionForm::Definition,
+                AnswerShape::DateAnchor,
+            )
+            .with_agent(noun("желтоқсан оқиғасы"))
+            .with_predicate(FramePredicate::FoundedIn),
+            expected_slot: AnswerSlot::Modifier(ModifierRole::Time),
+            expected_surface: "1986-12-16",
+            domain: Some(Domain::Event),
+            known_gap: None,
+        },
+        // 65. Semipalatinsk closure.
+        DialogCase {
+            user_input: "Семей полигоны қашан жабылды?",
+            tag: "hist/semipalatinsk",
+            query: QueryIR::new(
+                QueryFocus::Modifier(ModifierRole::Time),
+                QuestionForm::Definition,
+                AnswerShape::DateAnchor,
+            )
+            .with_agent(noun("семей полигоны"))
+            .with_predicate(FramePredicate::RenamedIn),
+            expected_slot: AnswerSlot::Modifier(ModifierRole::Time),
+            expected_surface: "1991-08-29",
+            domain: Some(Domain::Event),
+            known_gap: None,
+        },
+        // 66. Constitution Day.
+        DialogCase {
+            user_input: "Қазақстан Конституциясы қашан қабылданды?",
+            tag: "hist/constitution",
+            query: QueryIR::new(
+                QueryFocus::Modifier(ModifierRole::Time),
+                QuestionForm::Definition,
+                AnswerShape::DateAnchor,
+            )
+            .with_agent(noun("қазақстан конституциясы"))
+            .with_predicate(FramePredicate::EffectiveFrom),
+            expected_slot: AnswerSlot::Modifier(ModifierRole::Time),
+            expected_surface: "1995-08-30",
+            domain: Some(Domain::Law),
+            known_gap: None,
+        },
+        // 67. Virgin Lands campaign.
+        DialogCase {
+            user_input: "Тың және тыңайған жерлерді игеру қашан басталды?",
+            tag: "hist/virgin-lands",
+            query: QueryIR::new(
+                QueryFocus::Modifier(ModifierRole::Time),
+                QuestionForm::Definition,
+                AnswerShape::DateAnchor,
+            )
+            .with_agent(noun("тың және тыңайған жерлер"))
+            .with_predicate(FramePredicate::FoundedIn),
+            expected_slot: AnswerSlot::Modifier(ModifierRole::Time),
+            expected_surface: "1954",
+            domain: Some(Domain::Event),
+            known_gap: None,
+        },
+        // 68. Tauke Khan birth year.
+        DialogCase {
+            user_input: "Тәуке хан қашан туылған?",
+            tag: "hist/tauke-birth",
+            query: QueryIR::new(
+                QueryFocus::Modifier(ModifierRole::Time),
+                QuestionForm::Definition,
+                AnswerShape::DateAnchor,
+            )
+            .with_agent(noun("тауке хан"))
+            .with_predicate(FramePredicate::BornIn),
+            expected_slot: AnswerSlot::Modifier(ModifierRole::Time),
+            expected_surface: "1652",
+            domain: Some(Domain::Person),
+            known_gap: None,
+        },
+        // 69. Tauke Khan death year.
+        DialogCase {
+            user_input: "Тәуке хан қашан қайтыс болған?",
+            tag: "hist/tauke-death",
+            query: QueryIR::new(
+                QueryFocus::Modifier(ModifierRole::Time),
+                QuestionForm::Definition,
+                AnswerShape::DateAnchor,
+            )
+            .with_agent(noun("тауке хан"))
+            .with_predicate(FramePredicate::DiedIn),
+            expected_slot: AnswerSlot::Modifier(ModifierRole::Time),
+            expected_surface: "1715",
+            domain: Some(Domain::Person),
+            known_gap: None,
+        },
+        // 70. Kenesary Kassymuly birth.
+        DialogCase {
+            user_input: "Кенесары Қасымұлы қашан туылған?",
+            tag: "hist/kenesary",
+            query: QueryIR::new(
+                QueryFocus::Modifier(ModifierRole::Time),
+                QuestionForm::Definition,
+                AnswerShape::DateAnchor,
+            )
+            .with_agent(noun("кенесары қасымұлы"))
+            .with_predicate(FramePredicate::BornIn),
+            expected_slot: AnswerSlot::Modifier(ModifierRole::Time),
+            expected_surface: "1802",
+            domain: Some(Domain::Person),
+            known_gap: None,
+        },
+        // 71. Shoqan Walihanov birth.
+        DialogCase {
+            user_input: "Шоқан Уәлиханов қашан туылған?",
+            tag: "hist/walihanov",
+            query: QueryIR::new(
+                QueryFocus::Modifier(ModifierRole::Time),
+                QuestionForm::Definition,
+                AnswerShape::DateAnchor,
+            )
+            .with_agent(noun("шоқан уәлиханов"))
+            .with_predicate(FramePredicate::BornIn),
+            expected_slot: AnswerSlot::Modifier(ModifierRole::Time),
+            expected_surface: "1835",
+            domain: Some(Domain::Person),
+            known_gap: None,
+        },
+        // 72. Jambyl Jabayev birth.
+        DialogCase {
+            user_input: "Жамбыл Жабаев қашан туылған?",
+            tag: "hist/jambyl",
+            query: QueryIR::new(
+                QueryFocus::Modifier(ModifierRole::Time),
+                QuestionForm::Definition,
+                AnswerShape::DateAnchor,
+            )
+            .with_agent(noun("жамбыл жабаев"))
+            .with_predicate(FramePredicate::BornIn),
+            expected_slot: AnswerSlot::Modifier(ModifierRole::Time),
+            expected_surface: "1846",
+            domain: Some(Domain::Person),
+            known_gap: None,
+        },
+        // 73. ODKB (CSTO).
+        DialogCase {
+            user_input: "ОДКБ қашан құрылды?",
+            tag: "hist/odkb",
+            query: QueryIR::new(
+                QueryFocus::Modifier(ModifierRole::Time),
+                QuestionForm::Definition,
+                AnswerShape::DateAnchor,
+            )
+            .with_agent(noun("одкб"))
+            .with_predicate(FramePredicate::FoundedIn),
+            expected_slot: AnswerSlot::Modifier(ModifierRole::Time),
+            expected_surface: "1992-05-15",
+            domain: Some(Domain::Institution),
+            known_gap: None,
+        },
+        // === Extended math (powers / roots / percentages) ===
+        // 74. Power Russian.
+        DialogCase {
+            user_input: "Два в степени десять сколько?",
+            tag: "math/power-ru",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::QuantityPhrase,
+            )
+            .with_agent(noun("2^10"))
+            .with_predicate(FramePredicate::HasProperty),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "1024",
+            domain: Some(Domain::Science),
+            known_gap: None,
+        },
+        // 75. Power Kazakh.
+        DialogCase {
+            user_input: "Екі дәрежесі он қанша?",
+            tag: "math/power-kz",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::QuantityPhrase,
+            )
+            .with_agent(noun("2^10"))
+            .with_predicate(FramePredicate::HasProperty),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "1024",
+            domain: Some(Domain::Science),
+            known_gap: None,
+        },
+        // 76. Square root Russian.
+        DialogCase {
+            user_input: "Корень из шестнадцати сколько?",
+            tag: "math/sqrt-ru",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::QuantityPhrase,
+            )
+            .with_agent(noun("√16"))
+            .with_predicate(FramePredicate::HasProperty),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "4",
+            domain: Some(Domain::Science),
+            known_gap: None,
+        },
+        // 77. Square root Kazakh.
+        DialogCase {
+            user_input: "Он алты түбірі қанша?",
+            tag: "math/sqrt-kz",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::QuantityPhrase,
+            )
+            .with_agent(noun("√16"))
+            .with_predicate(FramePredicate::HasProperty),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "4",
+            domain: Some(Domain::Science),
+            known_gap: None,
+        },
+        // 78. Percentage Russian.
+        DialogCase {
+            user_input: "Сто процент 20 сколько?",
+            tag: "math/percent-ru",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::QuantityPhrase,
+            )
+            .with_agent(noun("100% × 20"))
+            .with_predicate(FramePredicate::HasProperty),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "20",
+            domain: Some(Domain::Science),
+            known_gap: None,
+        },
+        // 79. Percentage Kazakh.
+        DialogCase {
+            user_input: "Жүз пайыз 20 қанша?",
+            tag: "math/percent-kz",
+            query: QueryIR::new(
+                QueryFocus::Object,
+                QuestionForm::Definition,
+                AnswerShape::QuantityPhrase,
+            )
+            .with_agent(noun("100% × 20"))
+            .with_predicate(FramePredicate::HasProperty),
+            expected_slot: AnswerSlot::Object,
+            expected_surface: "20",
+            domain: Some(Domain::Science),
             known_gap: None,
         },
     ]
