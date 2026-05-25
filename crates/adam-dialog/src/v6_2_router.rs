@@ -597,6 +597,13 @@ fn is_pitch_detection_query(input: &str) -> bool {
     let markers = [
         "қалай түсіндің",
         "қалай түсіндіңіз",
+        // Session-4 audit: user often slips the past-tense
+        // first-person form («түсіндім» = "I understood") when
+        // they actually mean «түсіндің» («how did you know») —
+        // accept both. Same class for «білдім»/«анықтадым».
+        "қалай түсіндім",
+        "қалай білдім",
+        "қалай анықтадым",
         "қалай білдің",
         "қалай білдіңіз",
         "қалай анықтадың",
@@ -605,7 +612,15 @@ fn is_pitch_detection_query(input: &str) -> bool {
         "ер екенімді",
         "ер болғанымды",
         "еркет болғанымды",
+        "еркек болғанымды",
+        "ұл болғанымды",
+        // The user can also self-describe by addressing the
+        // honorific form adam chose: «Мен ағай болғанымды
+        // қалай түсіндім» — that's a pitch-detection query.
+        "ағай болғанымды",
+        "апай болғанымды",
         "әйел екенімді",
+        "әйел болғанымды",
     ];
     markers.iter().any(|m| lower.contains(m))
 }
@@ -1149,6 +1164,36 @@ fn stt_fold(s: &str) -> String {
     out = out.replace("хандырдығы", "хандығы");
     out = out.replace("фотосинтіз", "фотосинтез");
     out = out.replace("жасанды интелект", "жасанды интеллект");
+    // Session-4 audit (codex 2026-05-25 evening voice REPL):
+    // - «мүгін» (Whisper for «бүгін») broke the clock gate so
+    //   «Мүгін қандай ай» fell through to a generic «ай» IsA hit.
+    // - «қобейту» / «кубит» (Whisper for «көбейту») broke math
+    //   so «Екі қобейту екі» / «Екі кубит беске» returned an
+    //   IsA description of «екі» instead of the computed result.
+    // - «дарижысы» / «дарижесі» (Whisper for «дәрежесі») same
+    //   class; folds let math_solver compute the power.
+    // - «пайз» (Whisper for «пайыз») same class; «Жүз пайз бес»
+    //   returned «Жүз — рулық бөлініс» instead of the percent op.
+    // - «толған» / «тұлған» (Whisper for «туылған») — only when
+    //   the question word «қашан» is present, where the context
+    //   forces the «born» reading; preserves the legitimate
+    //   «толған» = «filled» meaning in non-question contexts.
+    // - «байтурсынулы» (Whisper for «байтұрсынұлы») — Cyrillic-у
+    //   substitution for ұ.
+    out = out.replace("мүгін", "бүгін");
+    out = out.replace("қобейту", "көбейту");
+    out = out.replace("қобейт ", "көбейт ");
+    out = out.replace("кубит", "көбейту");
+    out = out.replace("дарижысы", "дәрежесі");
+    out = out.replace("дарижесі", "дәрежесі");
+    out = out.replace("дәрижесі", "дәрежесі");
+    out = out.replace("пайз ", "пайыз ");
+    if out.contains("қашан") {
+        out = out.replace("толған", "туылған");
+        out = out.replace("тұлған", "туылған");
+    }
+    out = out.replace("байтурсынулы", "байтұрсынұлы");
+    out = out.replace("байтұрсын улы", "байтұрсынұлы");
     out
 }
 
@@ -1253,5 +1298,84 @@ mod tests {
         // Math markers absent, clock markers absent, no known agent
         // — the router declines.
         assert!(r.is_none());
+    }
+
+    /// Session-4 audit: «Мүгін қандай ай» (Whisper misheard
+    /// «бүгін» as «мүгін») must reach the clock gate.
+    #[test]
+    fn stt_fold_mugin_routes_to_clock() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Мүгін қандай ай?", &idx);
+        assert!(r.is_some(), "expected clock answer, got None");
+        let s = r.unwrap();
+        assert!(
+            s.contains("ай"),
+            "expected month answer to mention «ай», got: {s}"
+        );
+    }
+
+    /// Session-4 audit: «Екі қобейту екі» (Whisper misheard
+    /// «көбейту» as «қобейту») must compute, not return an IsA
+    /// description of «екі».
+    #[test]
+    fn stt_fold_qobejtu_routes_to_math() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Екі қобейту екі", &idx);
+        assert_eq!(r.as_deref(), Some("4"));
+    }
+
+    /// Session-4 audit: «Екі кубит беске» (Whisper misheard
+    /// «көбейту» as «кубит») — same class.
+    #[test]
+    fn stt_fold_kubit_routes_to_math() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Екі кубит беске", &idx);
+        assert_eq!(r.as_deref(), Some("10"));
+    }
+
+    /// Session-4 audit: «Екі дарижысы он» (Whisper misheard
+    /// «дәрежесі» as «дарижысы») → power.
+    #[test]
+    fn stt_fold_darizysy_routes_to_power() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Екі дарижысы он", &idx);
+        assert_eq!(r.as_deref(), Some("1024"));
+    }
+
+    /// Session-4 audit: «Жүз пайз бес» (Whisper dropped the «ы»
+    /// in «пайыз») → percent.
+    #[test]
+    fn stt_fold_pajz_routes_to_percent() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Жүз пайз бес", &idx);
+        assert_eq!(r.as_deref(), Some("5"));
+    }
+
+    /// Session-4 audit: «Ахмет байтурсынулы қашан толған»
+    /// (Whisper substituted Cyrillic-у for ұ, and «толған» for
+    /// «туылған») — the conditional fold keys on «қашан» to
+    /// rewrite «толған» → «туылған» without breaking the
+    /// legitimate «filled» meaning elsewhere.
+    #[test]
+    fn stt_fold_tolgan_routes_to_birth_year() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Ахмет байтурсынулы қашан толған?", &idx);
+        assert_eq!(r.as_deref(), Some("1872"));
+    }
+
+    /// Session-4 audit: «Мен ағай болғанымды қалай түсіндім»
+    /// — pitch-detection meta-query with first-person past-tense
+    /// slip («түсіндім»). Must route to pitch-explanation, not
+    /// to a generic «ағай» retrieval.
+    #[test]
+    fn pitch_detection_accepts_first_person_slip() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Мен ағай болғанымды қалай түсіндім?", &idx);
+        assert!(r.is_some());
+        let s = r.unwrap();
+        assert!(
+            s.contains("жиілігі") || s.contains("pitch"),
+            "expected pitch explanation, got: {s}"
+        );
     }
 }
