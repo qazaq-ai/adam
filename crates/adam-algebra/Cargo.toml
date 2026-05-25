@@ -3,12 +3,15 @@ name = "adam-algebra"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Agglutinative algebra — Stage 1 of v6.2.0 neurosymbolic redesign. Lifts adam_kernel_fst's typed morphology (Case / Number / Possessive / Predicate / Tense / Voice / Person) into a uniform `SuffixOp` enum + `Composition` type with documented algebra rules (identity, ordered composition, idempotence, inverse, FST round-trip)."
+description = "Agglutinative algebra — Stages 1+2 of v6.2.0 neurosymbolic redesign. Lifts adam_kernel_fst's typed morphology into a uniform `SuffixOp` / `Composition` algebra (Stage 1), plus the `Frame` semantic record `(agent, predicate, object, modifiers, modality, polarity, evidentiality, tense, aspect)` and its deterministic morph-lattice assembler (Stage 2)."
 
 [dependencies]
 adam-kernel-fst = { path = "../adam-kernel-fst" }
 serde.workspace = true
 thiserror.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
 
 [lints]
 workspace = true

@@ -24,7 +24,7 @@
 //!
 //! ## Scope
 //!
-//! Stage 1 ships:
+//! Stage 1 (shipped 4f6f0d5c):
 //!
 //! - [`Root`] — typed root wrapper with part-of-speech tag.
 //! - [`SuffixOp`] — uniform enum subsuming every FST-known operator.
@@ -40,14 +40,25 @@
 //! - Round-trip: [`Composition::from_analysis`] →
 //!   [`Composition::to_analysis`] is identity-preserving.
 //!
-//! NOT in Stage 1 (deferred to later v6.2 stages):
+//! Stage 2 (this commit):
 //!
-//! - Frame layer (Stage 2 — `Frame { agent, predicate, …}`).
+//! - [`Frame`] — typed semantic record `(agent, predicate, object,
+//!   modifiers, modality, polarity, evidentiality, tense, aspect)`.
+//! - [`FramePredicate`] — closed-set predicate enum subsuming every
+//!   v6.1 [`adam_reasoning::Predicate`] variant.
+//! - [`Modality`] / [`Polarity`] / [`Evidentiality`] / [`Aspect`] /
+//!   [`Modifier`] — typed dimensions of the frame.
+//! - [`Frame::from_morph_lattice`] — deterministic assembler from
+//!   a per-word [`Composition`] lattice.
+//!
+//! NOT in Stage 2 (deferred to later v6.2 stages):
+//!
 //! - QueryIR (Stage 3 — central typed query contract).
 //! - Indexed retrieval (Stage 4).
 //! - Sense disambiguation (Stage 5).
 //! - Learned components (Stage 6 — closed-set neural).
-//! - Natural realiser (Stage 7).
+//! - Natural realiser (Stage 7) — owns the Frame ↔ surface mapping
+//!   and the rewire of v6.1 NLG rule callers.
 //! - HumanDialogEval (Stage 8).
 //! - ARM PoC (Stage 9).
 //!
@@ -60,9 +71,14 @@
 //! failure, not a warning.
 
 pub mod composition;
+pub mod frame;
 pub mod operator;
 pub mod root;
 
 pub use composition::{Composition, CompositionError};
+pub use frame::{
+    Aspect, ContextSentenceType, Evidentiality, Frame, FramePredicate, Modality, Modifier,
+    Polarity, QuestionFocus, SentenceContext, TimeAnchor,
+};
 pub use operator::{SlotKind, SuffixOp};
 pub use root::{PartOfSpeech, Root};
