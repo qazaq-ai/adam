@@ -286,6 +286,33 @@ pub struct SenseHint {
     pub domain: Domain,
 }
 
+/// Language tag for sense disambiguation when the same root surface
+/// appears in multiple languages. Stage 4.8 adds this to close the
+/// bilingual gap: «гравитация» / «фотосинтез» / «днк» have
+/// identical roots in Russian and Kazakh but different
+/// definitions. Tagging the curated fact with its source language
+/// and the query with the asker's language disambiguates without
+/// inventing a synthetic per-language root surface.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Language {
+    Kazakh,
+    Russian,
+    /// English — reserved for v6.3+ multimodal extension; not
+    /// curated in v6.2 corpora.
+    English,
+}
+
+impl Language {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Kazakh => "kk",
+            Self::Russian => "ru",
+            Self::English => "en",
+        }
+    }
+}
+
 /// Domain enum for sense disambiguation. Closed-set; extending is
 /// an intentional architectural decision (each domain must have a
 /// curated `data/world_core/<domain>.jsonl` corpus). Stage 3 lists
@@ -367,6 +394,11 @@ pub struct QueryIR {
     /// (which are advisory): `domain_filter` is a hard constraint
     /// the user surfaced explicitly («заң туралы» → `Law`).
     pub domain_filter: Option<Domain>,
+    /// Optional language filter — when set, retrieval must restrict
+    /// candidates to facts tagged with this language. Used to
+    /// disambiguate same-root bilingual terms («гравитация» KZ vs
+    /// RU definition).
+    pub language_filter: Option<Language>,
 }
 
 /// Slot in a candidate `Frame` that answers the query. Returned by
@@ -409,6 +441,7 @@ impl QueryIR {
             answer_shape,
             sense_hints: Vec::new(),
             domain_filter: None,
+            language_filter: None,
         }
     }
 
@@ -443,6 +476,11 @@ impl QueryIR {
 
     pub fn with_domain_filter(mut self, domain: Domain) -> Self {
         self.domain_filter = Some(domain);
+        self
+    }
+
+    pub fn with_language_filter(mut self, language: Language) -> Self {
+        self.language_filter = Some(language);
         self
     }
 

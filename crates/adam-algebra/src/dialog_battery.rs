@@ -57,7 +57,7 @@ use crate::index::FrameIndex;
 use crate::math_solver;
 use crate::operator::SuffixOp;
 use crate::query::{
-    AnswerShape, AnswerSlot, Domain, ModifierRole, QueryFocus, QueryIR, QuestionForm,
+    AnswerShape, AnswerSlot, Domain, Language, ModifierRole, QueryFocus, QueryIR, QuestionForm,
 };
 use crate::root::{PartOfSpeech, Root};
 use crate::system_clock;
@@ -815,13 +815,14 @@ pub fn canonical_corpus() -> FrameIndex {
         ),
         Some(Domain::Science),
     );
-    idx.insert(
+    idx.insert_with_language(
         Frame::assertion(
             Some(noun("гравитация")),
             FramePredicate::IsA,
             Some(noun("массалардың бір-бірін тарту күші")),
         ),
         Some(Domain::Science),
+        Some(Language::Kazakh),
     );
     idx.insert(
         Frame::assertion(
@@ -859,7 +860,7 @@ pub fn canonical_corpus() -> FrameIndex {
     );
 
     // === Biology ===
-    idx.insert(
+    idx.insert_with_language(
         Frame::assertion(
             Some(noun("фотосинтез")),
             FramePredicate::IsA,
@@ -868,6 +869,7 @@ pub fn canonical_corpus() -> FrameIndex {
             )),
         ),
         Some(Domain::Science),
+        Some(Language::Kazakh),
     );
     idx.insert(
         Frame::assertion(
@@ -877,13 +879,14 @@ pub fn canonical_corpus() -> FrameIndex {
         ),
         Some(Domain::Science),
     );
-    idx.insert(
+    idx.insert_with_language(
         Frame::assertion(
             Some(noun("днк")),
             FramePredicate::IsA,
             Some(noun("тұқым қуалаушылық молекуласы")),
         ),
         Some(Domain::Science),
+        Some(Language::Kazakh),
     );
 
     // === Geography ===
@@ -961,29 +964,32 @@ pub fn canonical_corpus() -> FrameIndex {
         ),
         Some(Domain::Geography),
     );
-    idx.insert(
+    idx.insert_with_language(
         Frame::assertion(
             Some(noun("гравитация")),
             FramePredicate::IsA,
             Some(noun("сила притяжения масс")),
         ),
         Some(Domain::Science),
+        Some(Language::Russian),
     );
-    idx.insert(
+    idx.insert_with_language(
         Frame::assertion(
             Some(noun("фотосинтез")),
             FramePredicate::IsA,
             Some(noun("процесс синтеза органических веществ растениями")),
         ),
         Some(Domain::Science),
+        Some(Language::Russian),
     );
-    idx.insert(
+    idx.insert_with_language(
         Frame::assertion(
             Some(noun("днк")),
             FramePredicate::IsA,
             Some(noun("молекула наследственности")),
         ),
         Some(Domain::Science),
+        Some(Language::Russian),
     );
     idx.insert(
         Frame::assertion(Some(noun("углерод")), FramePredicate::IsA, Some(noun("c"))),
@@ -2074,13 +2080,12 @@ pub fn canonical_cases() -> Vec<DialogCase> {
                 AnswerShape::DefinitionalNP,
             )
             .with_agent(noun("гравитация"))
-            .with_predicate(FramePredicate::IsA),
+            .with_predicate(FramePredicate::IsA)
+            .with_language_filter(Language::Russian),
             expected_slot: AnswerSlot::Object,
             expected_surface: "сила притяжения масс",
             domain: Some(Domain::Science),
-            known_gap: Some(
-                "Stage 5 — bilingual sense disambiguation: «гравитация» appears in both KZ and RU corpus with same root; need language-tagged sense_hint",
-            ),
+            known_gap: None,
         },
         // 59. Russian: photosynthesis.
         DialogCase {
@@ -2092,13 +2097,12 @@ pub fn canonical_cases() -> Vec<DialogCase> {
                 AnswerShape::DefinitionalNP,
             )
             .with_agent(noun("фотосинтез"))
-            .with_predicate(FramePredicate::IsA),
+            .with_predicate(FramePredicate::IsA)
+            .with_language_filter(Language::Russian),
             expected_slot: AnswerSlot::Object,
             expected_surface: "процесс синтеза органических веществ растениями",
             domain: Some(Domain::Science),
-            known_gap: Some(
-                "Stage 5 — bilingual sense: «фотосинтез» same root, KZ definition surfaces first",
-            ),
+            known_gap: None,
         },
         // 60. Russian: DNA.
         DialogCase {
@@ -2110,13 +2114,12 @@ pub fn canonical_cases() -> Vec<DialogCase> {
                 AnswerShape::DefinitionalNP,
             )
             .with_agent(noun("днк"))
-            .with_predicate(FramePredicate::IsA),
+            .with_predicate(FramePredicate::IsA)
+            .with_language_filter(Language::Russian),
             expected_slot: AnswerSlot::Object,
             expected_surface: "молекула наследственности",
             domain: Some(Domain::Science),
-            known_gap: Some(
-                "Stage 5 — bilingual sense: «днк» same root, KZ definition surfaces first",
-            ),
+            known_gap: None,
         },
         // 61. Russian: carbon symbol.
         DialogCase {

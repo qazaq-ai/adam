@@ -116,7 +116,7 @@ pub use frame::{
 pub use index::{FrameId, FrameIndex, IndexedFrame, RankedFrame};
 pub use operator::{SlotKind, SuffixOp};
 pub use query::{
-    AnswerShape, AnswerSlot, Domain, FrameMatch, ModifierConstraint, ModifierRole, QueryFocus,
-    QueryIR, QuestionForm, SenseHint,
+    AnswerShape, AnswerSlot, Domain, FrameMatch, Language, ModifierConstraint, ModifierRole,
+    QueryFocus, QueryIR, QuestionForm, SenseHint,
 };
 pub use root::{PartOfSpeech, Root};

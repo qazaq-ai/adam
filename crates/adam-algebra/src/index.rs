@@ -72,7 +72,7 @@ use std::collections::{HashMap, HashSet};
 use serde::{Deserialize, Serialize};
 
 use crate::frame::{Frame, Modifier};
-use crate::query::{AnswerSlot, Domain, FrameMatch, QueryIR};
+use crate::query::{AnswerSlot, Domain, FrameMatch, Language, QueryIR};
 
 /// Opaque identifier for an inserted [`Frame`]. Stable for the
 /// lifetime of the index — frame ids are not re-used on removal
@@ -90,6 +90,13 @@ pub struct IndexedFrame {
     pub id: FrameId,
     pub frame: Frame,
     pub domain: Option<Domain>,
+    /// Source language of the curated fact. When set, the
+    /// `QueryIR::language_filter` (Stage 4.8) restricts retrieval
+    /// to facts matching the asker's language. Facts inserted
+    /// without a language are language-agnostic and visible to
+    /// every query.
+    #[serde(default)]
+    pub language: Option<Language>,
 }
 
 /// A retrieval hit — the frame id, a borrow of the stored frame,
@@ -100,6 +107,7 @@ pub struct RankedFrame<'a> {
     pub id: FrameId,
     pub frame: &'a Frame,
     pub domain: Option<&'a Domain>,
+    pub language: Option<Language>,
     pub match_result: FrameMatch,
 }
 
@@ -153,8 +161,24 @@ impl FrameIndex {
     }
 
     /// Insert a frame. Returns the assigned [`FrameId`] and updates
-    /// every applicable secondary index.
+    /// every applicable secondary index. Language-agnostic by
+    /// default — see [`FrameIndex::insert_with_language`] to tag
+    /// the fact for bilingual sense disambiguation.
     pub fn insert(&mut self, frame: Frame, domain: Option<Domain>) -> FrameId {
+        self.insert_with_language(frame, domain, None)
+    }
+
+    /// Insert a frame tagged with a source language. Stage 4.8
+    /// addition — Russian and Kazakh facts with the same root
+    /// surface («гравитация», «фотосинтез», «днк») disambiguate via
+    /// the language tag instead of inventing synthetic agent
+    /// surfaces.
+    pub fn insert_with_language(
+        &mut self,
+        frame: Frame,
+        domain: Option<Domain>,
+        language: Option<Language>,
+    ) -> FrameId {
         let id = FrameId(self.frames.len() as u32);
 
         // Predicate index.
@@ -197,7 +221,12 @@ impl FrameIndex {
                 .push(id);
         }
 
-        self.frames.push(IndexedFrame { id, frame, domain });
+        self.frames.push(IndexedFrame {
+            id,
+            frame,
+            domain,
+            language,
+        });
         id
     }
 
@@ -228,6 +257,20 @@ impl FrameIndex {
             return Vec::new();
         }
 
+        // 2b. Language filter. When set, restrict to frames tagged
+        // with the matching language; untagged (language-agnostic)
+        // frames are also accepted so corpora that pre-date the
+        // language-tag rollout keep working.
+        if let Some(lang) = q.language_filter {
+            candidates.retain(|id| {
+                let entry = self.get(*id);
+                match entry.language {
+                    Some(frame_lang) => frame_lang == lang,
+                    None => true,
+                }
+            });
+        }
+
         // 3. Run Stage 3 match_frame on each candidate.
         let mut hits: Vec<RankedFrame<'_>> = candidates
             .into_iter()
@@ -237,6 +280,7 @@ impl FrameIndex {
                     id,
                     frame: &entry.frame,
                     domain: entry.domain.as_ref(),
+                    language: entry.language,
                     match_result: m,
                 })
             })
@@ -352,15 +396,25 @@ pub fn linear_filter<'a>(idx: &'a FrameIndex, q: &QueryIR) -> Vec<RankedFrame<'a
         .iter()
         .filter_map(|e| {
             // Apply domain filter manually.
-            if let Some(d) = &q.domain_filter {
-                if e.domain.as_ref() != Some(d) {
-                    return None;
-                }
+            if let Some(d) = &q.domain_filter
+                && e.domain.as_ref() != Some(d)
+            {
+                return None;
+            }
+            // Language filter (Stage 4.8) — same semantics as
+            // `query`: tagged facts must match, untagged are
+            // visible to every query.
+            if let Some(lang) = q.language_filter
+                && let Some(frame_lang) = e.language
+                && frame_lang != lang
+            {
+                return None;
             }
             q.match_frame(&e.frame).map(|m| RankedFrame {
                 id: e.id,
                 frame: &e.frame,
                 domain: e.domain.as_ref(),
+                language: e.language,
                 match_result: m,
             })
         })
