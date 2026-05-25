@@ -92,15 +92,17 @@ Korean) — giving the research a global frontier.
 
 ## Three goals — and how we measure them
 
-| Goal | Metric | Current state (v5.16.6) |
+| Goal | Metric | Current state (v6.2.0) |
 |---|---|---|
-| **Predictability** | Reproducibility of every response from (input, seed, facts) | 100% deterministic on the kernel path |
-| **Cheapness** | Memory + CPU + GPU per query | 300 MB RSS / 21 ms p50 / **0% GPU** |
-| **Safety** | Hallucination rate (claims without source attribution) | 0% (verified by graph admissibility tests) |
+| **Predictability** | Reproducibility of every response from (input, seed, facts) | 100% deterministic — Stage 4 FrameIndex query + Stage 7 realiser are pure functions; v6.1 cascade preserved as fallback |
+| **Cheapness** | Memory + CPU + GPU per query | **0 MB model**, **0% GPU**, **791 ns** warm median (release, M2 single core) — Stage 3 pipeline ~274 ns, full dialog battery ~791 ns, v6.1 cascade ~21 ms |
+| **Safety** | Hallucination rate (claims without source attribution) | 0% architectural — every Frame in `FrameIndex` traces to a `FrameId` provenance; CI quality gate `dialog_battery_meets_quality_gate` enforces 79/79 real-Kazakh cases must-pass + 0 regressions |
 
 For comparison: Llama-3 8B fp16 inference uses 800–1500 ms per query
 with 16 GB VRAM; GPT-4 uses 50–200 ms with hidden datacentre GPU.
-Both surface answers without source attribution by default.
+Both surface answers without source attribution by default. adam's
+v6.2 stack runs at **~126 000× the rate of a fast (100 ms) LLM call**
+on a single M2 core with **0 MB model loaded**.
 
 ## Why Kazakh
 

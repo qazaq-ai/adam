@@ -2,36 +2,38 @@
 
 Version-by-version history of `adam`, grouped into architectural eras.
 
-> **Status 2026-05-24.** v6.0.0 shipped 2026-05-22 with the
-> algebra-anchored neural composition layer (L5.5) plus seven
-> rounds of audit-driven cascade fixes. The v6.1 series (v6.1.0 →
-> v6.1.50, 11 releases across 2026-05-23 and 2026-05-24) added
-> the AnswerIR research arc behind `ADAM_ANSWER_IR=1` opt-in:
-> typed predicate-aware retrieval, BroadTopic multi-claim composer,
-> gender-pitch vocative, contrastive-farewell rewrite, smart
-> honorific dedup, voice-mode phonetic aliases + `--audio-ctx 768`
-> whisper-cli speedup (≤2 s end-to-end target), time-unit Count
-> / Disagreement answer-shape. 13 user-driven voice + text REPL
-> audit closures. The default cascade remains bit-identical to
-> v5.32.0 / v6.0.0; v6.1 paths are opt-in.
+> **Status 2026-05-25.** **v6.2.0 shipped** as the architectural
+> redesign promised at v6.1.50. Lands the new `adam-algebra` crate
+> (8 modules, 195 lib tests) + `adam-dialog::v6_2_router`
+> integration bridge gated by `ADAM_V6_2=1`. The full typed
+> pipeline (Composition → Frame → QueryIR → FrameIndex → realiser)
+> runs as pure typed-data manipulation: **0 MB model, 0 % GPU,
+> 791 ns warm median latency** on one M2 core (~ 126 000× faster
+> than a 100 ms LLM call). Real-Kazakh dialog battery
+> **79/79 must-pass, 0 known gaps, 0 regressions**. v6.1 cascade
+> unchanged when the gate is off (default).
+>
+> The 11-release v6.1 patch cycle revealed that pattern-matching
+> cascades hit a ceiling on natural speech; v6.2 addressed it by
+> moving every layer onto **typed data**. Five root causes closed
+> as one arc: typed semantic record (Stage 2 — Frame), typed
+> query contract (Stage 3 — QueryIR), structured indexing
+> (Stage 4 — FrameIndex with 5 secondary indexes), sense
+> disambiguation (Stage 5 — cross-shape TimeAnchor matching,
+> bilingual language filter), real-Kazakh quality gate (Stage 4.5
+> — dialog_battery with CI enforcement).
 >
 > Architecture specs:
 > [`architecture_neural_v6.md`](architecture_neural_v6.md) — v6.0
 > base layer; [`v6_1_answer_ir_design.md`](v6_1_answer_ir_design.md)
-> — v6.1 AnswerIR design + decision gate.
+> — v6.1 AnswerIR; [`v6_2_architectural_redesign.md`](v6_2_architectural_redesign.md)
+> — **v6.2 typed pipeline** (signed off 2026-05-24, shipped
+> 2026-05-25).
 >
-> **Next arc — v6.2.0.** Architectural redesign. The 11-release
-> v6.1 patch cycle revealed that pattern-matching cascades hit a
-> ceiling on natural speech. v6.2.0 addresses five root causes as
-> ONE arc, NOT five separate features: context-aware STT
-> correction (N-best lattice + phonetic-bounded + FST round-trip
-> + grammatical expectation), answer-shape detection (Count /
-> TimeWhen / Function / Procedure / Disagreement / ListExamples /
-> SenseDisambiguation), sense disambiguation, structured indexing
-> (POS / predicate / sentence-type / domain), HumanDialogEval as
-> the default-on promotion gate. Design doc planned for next
-> session — `docs/v6_2_architectural_redesign.md`. v6.1.50 is the
-> v6.1 freeze point.
+> **Next arc — Stage 8: HumanDialogEval v1 + default-on flip.**
+> Stage 6 (closed-set neural components inside the typed
+> scaffold) and Stage 9 (ARM PoC for watch / mobile) are
+> deferred to the v6.3.x research arc.
 
 ## Lifecycle view
 

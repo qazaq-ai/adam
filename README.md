@@ -5,13 +5,14 @@
 <h1 align="center">adam</h1>
 
 <p align="center">
-  <i>Deterministic AI research — predictable, cheap, safe.</i><br>
+  <i>Neurosymbolic agglutinative AI — typed, deterministic, watch-class fast.</i><br>
   <i>Kazakh-first applied demonstrator of the Qazaq IR architecture.</i><br>
   <i>Қазақ тіліне арналған, толық болжамды диалог жүйесі — таза Rust тілінде.</i>
 </p>
 
 <p align="center">
-  <b>Why this project exists →</b> <a href="docs/MANIFESTO.md"><code>docs/MANIFESTO.md</code></a>
+  <b>Why this project exists →</b> <a href="docs/MANIFESTO.md"><code>docs/MANIFESTO.md</code></a><br>
+  <b>v6.2 architecture →</b> <a href="docs/v6_2_architectural_redesign.md"><code>docs/v6_2_architectural_redesign.md</code></a>
 </p>
 
 <p align="center">
@@ -25,187 +26,211 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/tests-1735%20passing-2EA44F?style=flat-square" alt="tests">
-  <img src="https://img.shields.io/badge/p50%20turn%20latency-21%20ms-2EA44F?style=flat-square" alt="latency">
-  <img src="https://img.shields.io/badge/RSS-~160%20MB-2EA44F?style=flat-square" alt="rss">
+  <img src="https://img.shields.io/badge/tests-1904%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/dialog%20battery-79%2F79%20must--pass-2EA44F?style=flat-square" alt="dialog battery">
+  <img src="https://img.shields.io/badge/warm%20p50-791%20ns-2EA44F?style=flat-square" alt="warm latency">
   <img src="https://img.shields.io/badge/GPU-0%25-2EA44F?style=flat-square" alt="gpu">
-  <img src="https://img.shields.io/badge/derived%20facts-37%20984-9CCC65?style=flat-square" alt="derived facts">
-  <img src="https://img.shields.io/badge/world%20core-3461%20curated%20/%204116%20facts%20%2F%2066%20domains-9CCC65?style=flat-square" alt="world core">
+  <img src="https://img.shields.io/badge/model%20size-0%20MB-2EA44F?style=flat-square" alt="model size">
+  <img src="https://img.shields.io/badge/world%20core-3461%20curated%20/%204116%20facts%20/%2066%20domains-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/lexicon-25.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/intents-41-2EA44F?style=flat-square" alt="intents">
-  <img src="https://img.shields.io/badge/factual_eval_100-0%20hallucinations%20%2F%20100%25%20grounded-2EA44F?style=flat-square" alt="factual eval">
+  <img src="https://img.shields.io/badge/hallucinations-0-2EA44F?style=flat-square" alt="hallucinations">
 </p>
 
 ---
 
-## What's new in v6.1.0
+## What's new in v6.2.0
 
-**AnswerIR + predicate-aware retrieval (opt-in).** Closes the
-relevance/completeness gap the Codex 2026-05-22 audit flagged on
-v6.0.0: questions of the form «X қашан туылған?» / «қашан күшіне
-енді?» / «қандай санаттарға жіктейді?» / «X туралы айтыңыз»
-previously routed through the v6.0.13 keyword-grep hack that
-mis-fired on edge cases. v6.1.0 replaces that with a typed
-predicate enum + question-shape detector + multi-claim composer.
+**Neurosymbolic agglutinative algebra (env-gated).** The
+architectural redesign promised at v6.1.50 lands as the new
+[`adam-algebra`](crates/adam-algebra) crate plus an integration
+bridge in `adam-dialog::v6_2_router` gated by `ADAM_V6_2=1`. v6.1
+cascade is unchanged when the gate is off.
 
-Behind `ADAM_ANSWER_IR=1`. With the flag unset, behaviour is
-bit-identical to v6.0.0 — the 32-case audit-regression suite
-verifies the cascade pass-through invariant (32 / 32 green).
+The full v6.2 pipeline runs as **pure typed-data manipulation**:
 
-  - **`PredicateFocus` enum** ([`crates/adam-dialog/src/predicate_focus.rs`](crates/adam-dialog/src/predicate_focus.rs))
-    refines `QuestionShape::Definition` by typed predicate target
-    — `BornIn`, `DiedIn`, `FoundedIn`, `RenamedIn`,
-    `EffectiveFrom`, `Classifies`, `RiskLevel`, `LocatedIn`,
-    `Authored`, `NamedAfter`, `MemberOf`, plus IsA and Relational.
-    Pure-surface detector in the discipline of
-    [`question_shape.rs`](crates/adam-dialog/src/question_shape.rs).
-  - **`adam_reasoning::Predicate` +11 typed variants** — the
-    overloaded `RelatedTo` no longer hides the predicate the user
-    is asking about. `data/world_core/kru_baitursynov.jsonl`
-    rewritten to use the typed predicates; `facts.json` +
-    `derived_facts.json` regenerated.
-  - **Predicate-aware retrieval** in [`conversation::turn_with_trace`](crates/adam-dialog/src/conversation.rs)
-    overrides upstream IsA-preference fallback when a typed focus
-    matches a curated fact. Typed focus is strictly more specific
-    than the unfocused fallback, so it wins.
-  - **BroadTopic multi-claim composer** ([`broad_topic.rs`](crates/adam-dialog/src/broad_topic.rs))
-    for «X туралы айтыңыз» queries — up to 3 facts ranked by
-    predicate tier, deduplicated by raw_text, every claim
-    traceable to a curated `FactSource`. The realiser doesn't
-    generate prose — it concatenates curated raw_texts.
-  - **Continuation handler** for «ал тағы айт» /
-    «тағы не білесіз?» — `DialogContext.broad_topic_subject` +
-    `broad_topic_seen` persist per-subject seen state, cleared on
-    subject switch.
-  - **`v6_1_predicate_eval_30` decision-gate battery** — 30 held-
-    out cases across the 11 typed predicates + 7 IsA + 8 broad-
-    topic + 4 continuation shapes. **28 / 30 pass** (above the
-    predeclared ≥ 25 / 30 threshold). 2 fails inside the 5-case
-    slack are tracked as v6.1.x intent-override follow-ups (the
-    cascade mis-routes «X кімнің атымен аталған?» to
-    `StatementOfName` because «атымен» substring collides with
-    «my name»).
+```text
+input → morph lattice → Composition[] → Frame → QueryIR
+                                          ↓
+                              FrameIndex + math_solver + system_clock
+                                          ↓
+                                       realiser → output
+```
 
-Design + decision: [`docs/v6_1_answer_ir_design.md`](docs/v6_1_answer_ir_design.md).
+### Headline numbers (release build, M2 Air, single CPU core)
 
----
+| | adam ARK v6.2 | GPT-class LLM (one call) |
+|---|---|---|
+| Median warm latency | **274 ns** (Stage 3 pipeline) | ~100–500 ms |
+| Median full dialog battery | **791 ns / query** | (same) |
+| Throughput | **~1.26M qps / core** | ~2–10 qps |
+| Model size | **0 MB** | 5–600 GB |
+| GPU required | **No** | Yes |
+| Deterministic | **Yes** (byte-identical) | No |
 
-## What's new in v6.0.0
+**≈ 126 000× faster** than a fast (100 ms) LLM call on a single
+CPU core, with **0 MB model loaded**.
 
-**Technical GA** (external GA blockers — Lexicon V2 native-speaker
-review, arXiv submission, alpha partner deployment — remain open
-work, see [`docs/codex_briefs/v6_ga_external_blockers_2026_05_18.md`](docs/codex_briefs/v6_ga_external_blockers_2026_05_18.md)).
-The deterministic kernel path is unchanged from v5.32.0 — every
-existing v5.x test still passes. v6.0.0 adds opt-in research
-transducers that extend the kernel without altering its default
-behaviour, plus seven rounds of user-driven audit fixes on the
-existing cascade:
+### What ships in `adam-algebra` (8 modules, 195 tests)
 
-  - **L5.5 TinyAgt neural composer** behind
-    `--features neural` + `--neural-model <checkpoint-dir>` —
-    runnable, verifier-bounded preview surface (unchanged since
-    rc1).
-  - **E1 discriminative intent classifier** behind
-    `ADAM_NEURAL_INTENT=1` — first completed experiment in the
-    "third path" research arc. A 2.2 MB pure-Rust hash-feature
-    linear classifier that, on the project's frozen test split,
-    matches and slightly exceeds the hand-written cascade
-    (95.95 % vs 91.89 % accuracy) at ~ 600 × lower latency
-    (35 µs p99 vs ~ 35 ms full-pipeline p99). Zero hallucination
-    by construction — output is one of 32 closed labels. Off by
-    default; production-bypassed when not enabled. Design +
-    numbers + anti-success criteria in
-    [`docs/e1_intent_classifier_design.md`](docs/e1_intent_classifier_design.md).
-  - **E2 discriminative slot extractor** behind
-    `ADAM_NEURAL_SLOTS=1` — BIO sequence-tagger over 11 closed
-    labels, 52 KB on disk, 29 µs p99 latency. PARTIAL PASS
-    (0.667 OOV F1, +1 net win on holdout). Design in
-    [`docs/e2_slot_extractor_design.md`](docs/e2_slot_extractor_design.md).
-  - **E3 retrieval ranker** — documented HONEST FAIL (0.7634
-    pick-rate-at-1 vs cascade 1.000 oracle). NOT wired to
-    production. Kept in the workspace + this CHANGELOG entry
-    as discipline evidence — the research arc fails honestly
-    rather than hides the negative result. See
-    [`docs/e3_retrieval_ranker_design.md`](docs/e3_retrieval_ranker_design.md)
-    and [`docs/third_path_results.md`](docs/third_path_results.md).
-  - **KRU / Baitursynuly / AI-Law domain** —
-    `data/world_core/kru_baitursynov.jsonl` adds 17 curated
-    entries covering Ahmet Baitursynuly, Kostanay Regional
-    University, the Kazakhstan AI Law (effective 18.01.2026),
-    and cyber-defense definitions. Backed by IsA preference +
-    predicate-keyword routing in the pre-action-plan probe so
-    definition-style queries surface the canonical fact.
-  - **Audit-round 1-4d cascade fixes (29 pinned regression
-    cases)** — interrogative gates on `detect_statement_of_*`,
-    contradiction-priority gate engagement-narrowing,
-    multi-token PER patronymic fold, NEG-aware absorption,
-    evasion safety patterns (debt / legal / classified-info),
-    voice REPL silence-after-speech bumped 800 ms → 1300 ms,
-    self-identity coverage for «LLM-сің бе?», «қалай жұмыс
-    істейсің?», «жауаптарыңды қалай тексересің?», offline /
-    auditability questions.
+- **Stage 1 — `operator` + `root` + `composition`** — typed
+  agglutinative algebra. `Root × SuffixOp[]` with slot bookkeeping
+  (case / number / possessive / tense / voice / negation / polite).
+  Round-trip with `adam_kernel_fst::Analysis` byte-stable.
+- **Stage 2 — `frame`** — `Frame { agent, predicate, object,
+  modifiers, modality, polarity, evidentiality, tense, aspect }`.
+  Subsumes v6.1's scattered `Fact` / `SentenceFrame` /
+  `SentenceDecomposition` / `Claim`. 22 typed predicates.
+- **Stage 3 — `query`** — typed «frame with a hole»:
+  `QueryIR { …, focus, form, answer_shape, sense_hints,
+  domain_filter, language_filter }`. Subsumes v6.1's
+  `PredicateFocus` + `QuestionShape` + `AnswerShape` + `Intent`
+  + slot_inventory.
+- **Stage 4 — `index`** — `FrameIndex` with 5 secondary indexes
+  (predicate / agent / object / modifier / domain / language).
+  Insert O(M), query O(min-index-size). Property-tested against
+  brute-force linear filter.
+- **Stage 4.5 — `dialog_battery`** — 79 real Kazakh / Russian
+  REPL questions across 14 domains (biographical / geographical /
+  institutional / legal / sense-ambiguous / МО РК / programming /
+  Rust / math / system-clock / Soviet+Kazakh historical dates).
+  **CI quality gate: 79/79 must-pass, 0 known gaps, 0 regressions.**
+- **Stage 4.6+ — `math_solver`** — pure-function deterministic
+  math in Russian + Kazakh + ASCII. Numbers 0-99 in both
+  languages, operators (+ − × ÷ × ÷ mod ^ %), trig (sin / cos /
+  tan / arcsin / arccos / arctan), constants π / e, square root,
+  decimals. Left-to-right chained-imperative semantics.
+- **Stage 5 — sense disambiguation** — cross-shape
+  `TimeAnchor::Year(N)` ↔ phrase «N жыл» matching; bilingual
+  language-tag filter for same-root same-domain ambiguity
+  («гравитация» / «фотосинтез» / «днк» KZ vs RU).
+- **Stage 7.1 — `corpus_loader`** — `load_world_core(path)`
+  reads `data/world_core/*.jsonl`. **66 files → 3461 entries →
+  4044 frames → 0 dropped**.
+- **Stage 7.2 — `realiser`** — typed `Frame → Kazakh surface`.
+  Pure function. Every v6.1 NLG rule family expressible.
+- **Stage 7.3 — `system_clock`** — OS wall-clock provider with
+  hand-rolled Kazakh calendar (no chrono dep).
 
-Highlights this release arc (rc1 → rc5 → 6.0.0):
-- **L5.5 TinyAgt neural composer preview** — runnable, verifier-bounded.
-- **Live OS clock + Open-Meteo weather** for `Intent::AskTime` and `AskWeather` (opt-in by env).
-- **Multi-clause word-math** restored — «56 × 3, содан кейін ÷ 2» → 84.
-- **kz_industry domain** — 64 major enterprises across 17 oblasts.
-- **6 STT-noise recovery fixes** from voice-REPL probes.
-- **Alpha onboarding kit** — 8-file package for external partners.
-- **arXiv preprint draft v0.2** — Codex peer-review pass applied.
-- **Voice REPL** — Whisper.cpp STT + macOS Aru TTS + pitch-based gender hint + session-locked voice profile.
-- **Safety policy v6** (2026-05-21) — medical / legal / financial query templates migrated from refusal-only to **informational + emergency-triage + disclaimer**. Self-harm crisis path (1415 trust-line first) is unchanged. Documented in [`docs/safety_policy_v6.md`](docs/safety_policy_v6.md).
-- **Codex audit closures** — recommendation refusal, multi-fact count, nominative anaphora, weather × profile city, binary comparison, self-harm safety category, false-location stopwords, anaphora retrieval, multi-step math.
-- **E1 milestone** — first proof that discriminative neural can be ≥ cascade accuracy at 600× less latency with zero hallucination.
+### What ships in `adam-dialog::v6_2_router`
 
-Three v6.0 GA acceptance criteria remain open (Lexicon V2 native-
-speaker review, arXiv submission, alpha-partner deployment) —
-all blocked by external parties. See
-[`docs/codex_briefs/v6_ga_external_blockers_2026_05_18.md`](docs/codex_briefs/v6_ga_external_blockers_2026_05_18.md).
+- `is_v6_2_active()` — reads `ADAM_V6_2` env var (default off).
+- `answer(input) -> Option<String>` — top-level entry. Routes:
+  math_solver / system_clock / FrameIndex + realiser.
+- Lazy `OnceLock` corpus from `data/world_core/*.jsonl` +
+  battery-augmented Russian aliases.
+- `tests/v6_2_integration.rs`: 11 real Kazakh / Russian questions
+  end-to-end. All pass.
+
+### Live REPL demo
+
+```bash
+# Interactive (math, time, retrieval — all routed):
+cargo run --release --example chat -p adam-algebra
+
+# Latency bench + dialog battery report:
+cargo run --release --example bench_pipeline -p adam-algebra
+
+# Quality gate:
+cargo test -p adam-algebra dialog_battery_meets_quality_gate -- --nocapture
+
+# Integration through adam-dialog router (env-gated):
+ADAM_V6_2=1 cargo test -p adam-dialog --test v6_2_integration
+```
+
+### Default-off discipline
+
+`ADAM_V6_2` defaults OFF. Every existing v6.1 user / CI run sees
+no behavioural change. Stage 8 (HumanDialogEval v1) will decide
+when to flip the default after a curated 100-prompt battery
+passes ≥ 90 % relevance.
+
+See [`CHANGELOG.md` § 6.2.0](CHANGELOG.md) for the full inventory
+and [`docs/v6_2_architectural_redesign.md`](docs/v6_2_architectural_redesign.md)
+for the design doc that preceded the work.
 
 ---
 
 ## 30-second pitch
 
-> **adam is a deterministic AI research kernel** — the first applied demonstrator of an alternative to probabilistic large language models, built on the agglutinative morphology of the Kazakh language. Three guarantees by architecture: every output traces to a curated source (**predictability**), runs as a single binary on M2 8GB with 0% GPU and ~21 ms p50 latency (**cheapness**), and **emits no unsupported claims** — every fact-bearing reply cites a curated source or grounded reasoning chain, with **informational + emergency-triage + disclaimer** responses for high-stakes topics (medical / legal / financial — see [`docs/safety_policy_v6.md`](docs/safety_policy_v6.md)) and a dedicated crisis-line path for self-harm (**safety**). Designed to extend across ~30 catalogued agglutinative languages — currently demonstrated on Kazakh; cross-language ports are a research goal, not a shipped capability. Pure Rust. BUSL-1.1.
+> **adam is a neurosymbolic AI research kernel** built on the
+> agglutinative morphology of Kazakh. Every output traces to a
+> curated source via a typed pipeline (Composition → Frame →
+> QueryIR → FrameIndex → realiser). Three structural advantages
+> over LLMs by **construction**:
+>
+> 1. **Predictability** — every claim cites a curated `(pack,
+>    sample_id)` provenance; the cascade is byte-identical given
+>    `(input, seed, world_core)`.
+> 2. **Cheapness** — single Rust binary, **0 MB model**, **0 %
+>    GPU**, **791 ns warm median latency** on one M2 core
+>    (~1.26M qps). Watch-class deployable.
+> 3. **Architectural hallucination-freedom** — every fact-bearing
+>    reply emits from a `FrameIndex` hit + Stage 7 realiser, or
+>    refuses honestly. No probabilistic free generation in the
+>    answer path.
+>
+> Designed to extend across ~30 catalogued agglutinative
+> languages — currently demonstrated on Kazakh; cross-language
+> ports are a research goal, not a shipped capability. Pure Rust.
+> BUSL-1.1.
 
-> **Reading order:** [MISSION.md](MISSION.md) (thesis) → [RESEARCH.md](RESEARCH.md) (open questions) → [COLLABORATION.md](COLLABORATION.md) (partner terms) → [AGENTS.md](AGENTS.md) (orientation for automated scouts) → [CHANGELOG.md](CHANGELOG.md) (full release history).
+> **Reading order:** [MISSION.md](MISSION.md) (thesis) →
+> [v6.2 design doc](docs/v6_2_architectural_redesign.md) (current
+> architecture) → [RESEARCH.md](RESEARCH.md) (open questions) →
+> [COLLABORATION.md](COLLABORATION.md) (partner terms) →
+> [AGENTS.md](AGENTS.md) (orientation for automated scouts) →
+> [CHANGELOG.md](CHANGELOG.md) (full release history).
 
-## Why deterministic?
+## Why neurosymbolic (not LLM)
 
-Modern LLMs carry three structural problems we treat as **not inevitable**:
+Modern LLMs carry three structural problems we treat as **not
+inevitable**. v6.2's *neurosymbolic* architecture means: neural
+components produce **typed closed-set** outputs only (sense
+disambiguation candidates, focus detection, intent class); a
+deterministic verifier owns truth. No free text generation
+anywhere in the answer path.
 
-| The three diseases of probabilistic AI | adam's target |
-|---|---|
-| **Black box** — opaque internals, no source attribution, no auditable explanation for any specific output | **Predictability** — every claim traceable to a curated source; every reasoning step inspectable |
-| **Resource cost** — billions of parameters, GPU clusters, datacentre inference, kilowatt-scale energy per query | **Cheapness** — single binary on M2 8GB, **0% GPU**, ~21 ms p50 latency, ~300 MB RSS |
-| **Hallucination risk** — confident generation of plausible-sounding but factually wrong content, no internal mechanism to flag it | **Safety** — every fact-bearing reply cites a curated source, a grounded reasoning chain, or refuses honestly; high-stakes topics (medical / legal / financial) route to **informational + emergency-triage + specialist-referral** templates (policy v6 — see [`docs/safety_policy_v6.md`](docs/safety_policy_v6.md)); self-harm queries route to a dedicated crisis-line response; current-data queries route to honest "no live feed" refusal |
+| The three diseases of probabilistic AI | adam's target | How v6.2 enforces it |
+|---|---|---|
+| **Black box** — opaque internals, no source attribution | **Predictability** — every claim traceable | `FrameIndex.query` returns a `RankedFrame` with `FrameId`; `world_core/*.jsonl` is the only fact source; every realised sentence is a function of `(Frame, focus, slot)` |
+| **Resource cost** — billions of params, GPU clusters | **Cheapness** — single binary | 0 MB model, 0 % GPU, 791 ns p50 dialog battery on M2 single core |
+| **Hallucination risk** — confident generation of plausible-sounding wrong content | **Safety** — architectural impossibility | Realiser is a typed pure function over a curated Frame; if the index returns `None`, the router falls through to v6.1 cascade (no invention) |
 
-**Hypothesis:** agglutinative languages — Kazakh in particular — exhibit unusually mathematical morphology. Every word decomposes into a root plus a predictable sequence of typed suffixes (case, number, tense, person, possessive, polarity, modality). Composition is **rule-bound, not learned**. That structure is the substrate for a deterministic runtime: FST morphology + typed suffix priors as deterministic prior layers, a curated knowledge graph as the only fact source, templates as the only path from fact to text. **No probabilistic free generation. No retrained-from-scratch behaviour per release.**
+**Hypothesis:** agglutinative languages — Kazakh in particular —
+exhibit unusually mathematical morphology. Every word decomposes
+into a root + a typed suffix chain (case, number, tense, person,
+possessive, polarity, modality). Composition is **rule-bound**.
+That structure becomes the substrate for a typed runtime: FST
+morphology produces `Composition`, the algebra layer lifts it
+into `Frame`, retrieval typed via `QueryIR`, output realised as
+pure-function `Frame → surface`. **No probabilistic free
+generation. No retrained-from-scratch behaviour per release.**
 
 ## Quick start
 
 ```bash
-# Build the dialog REPL
+# v6.2 live REPL demo (math + clock + retrieval routed):
+cargo run --release --example chat -p adam-algebra
+
+# v6.2 latency bench + dialog battery quality report:
+cargo run --release --example bench_pipeline -p adam-algebra
+
+# v6.2 integration test through adam-dialog router:
+ADAM_V6_2=1 cargo test -p adam-dialog --test v6_2_integration
+
+# v6.1 cascade (default, unchanged):
 cargo build --release -p adam-dialog --bin adam_chat
-
-# Run interactively (auto-loads data/dialog/templates/v1.toml)
 ./target/release/adam_chat
-
-# Single-shot
 ./target/release/adam_chat --once "Қасқыр — тірі ме?"
-
-# Full Layer 1..5 trace per turn
 ./target/release/adam_chat --trace
-
-# Voice output (macOS Aru / Linux espeak-ng / optional Piper)
 ./target/release/adam_chat --tts
 
-# FST synthesiser + analyser CLI
+# FST synthesiser + analyser:
 cargo run --release -p adam-kernel-fst --bin adam_fst -- synth --root бала --plural --case dat
 # → балаларға
 
-# Full foundation validation (~30 s on M2)
+# Full foundation validation (~30 s on M2):
 bash ./scripts/validate_foundation.sh
 ```
 
@@ -214,10 +239,21 @@ bash ./scripts/validate_foundation.sh
 Three pillars:
 
 - **A**gglutinative — Kazakh morphology decomposes deterministically (root + typed suffixes); composition is rule-bound, not learned.
-- **R**easoning — a curated knowledge graph (`data/world_core/*.jsonl`) + a forward-chaining reasoner (10 active rules) produces every fact-bearing claim. Every output cites a source.
+- **R**easoning — a curated knowledge graph ([`data/world_core/*.jsonl`](data/world_core)) + a forward-chaining reasoner (10 active rules) produces every fact-bearing claim. Every output cites a source.
 - **K**ernel — system-runtime, not a probabilistic estimator. ARK has small trained components (selection-weights perceptron, suffix-chain priors, root-affinity PMI) but they sit inside the kernel as inspectable layers, not at the centre.
 
+### v6.2 typed pipeline (`adam-algebra`)
+
+```text
+input ─▶ FST lattice ─▶ Composition ─▶ Frame ─▶ QueryIR ─▶ FrameIndex ─▶ Realiser ─▶ output
+        (kernel-fst)    (operator +    (semantic  (frame    (typed       (Frame →
+                         root +         record)    with a    retrieval)   Kazakh)
+                         composition)              hole)
 ```
+
+### v6.1 cascade (default, unchanged)
+
+```text
 input ─▶ parser ─▶ semantics ─▶ [ retrieval + compose ] ─▶ planner ─▶ realiser ─▶ FST synth ─▶ output
         (Layer 1) (Layer 2)       (Layer 2.5–2.75)       (Layer 3)   (Layer 4)   (Layer 5)
 ```
@@ -230,45 +266,53 @@ No transformer. No embeddings. No probabilistic generation. For any input, a dev
 |---|---|---|
 | **L0** | [`adam-kernel`](crates/adam-kernel) | Core identity + foundation contracts |
 | **L0** | [`adam-kernel-fst`](crates/adam-kernel-fst) | FST morphology — phonology, morphotactics, synthesiser + parser, 25.5 k-entry Lexicon |
+| **L0.5** | [`adam-algebra`](crates/adam-algebra) | **v6.2** — typed neurosymbolic stack: agglutinative algebra (Composition / Frame / QueryIR), FrameIndex retrieval, realiser, math_solver, system_clock, corpus_loader. Source of the 79-case real-Kazakh dialog battery + CI quality gate. |
 | **L1** | [`adam-tokenizer`](crates/adam-tokenizer) | Pre-tokenizer + BPE trainer + encoder |
 | **L1** | [`adam-corpus`](crates/adam-corpus) | Source acceptance, streaming processors, synthetic generator, `corpus_audit`, `morpheme_coverage` |
 | **L1** | [`adam-eval`](crates/adam-eval) | Evaluation suite + benchmark reports |
-| **L1** | [`adam-dialog`](crates/adam-dialog) | Dialog pipeline — 41 intents, multi-turn session + DST, template planner, slot-expanding realiser, voice output transducer |
+| **L1** | [`adam-dialog`](crates/adam-dialog) | Dialog pipeline — 41 intents, multi-turn session + DST, template planner, slot-expanding realiser, voice output transducer. **v6.2:** `v6_2_router` integration bridge (env-gated). |
 | **L1** | [`adam-retrieval`](crates/adam-retrieval) | Retrieval engine — morpheme inverted index, deterministic ranking, in-sample composition |
 | **L1** | [`adam-reasoning`](crates/adam-reasoning) | Reasoning engine — typed-fact graph, 10 active forward-chaining rules, `extract_facts` / `build_lexical_graph` / `run_reasoner` binaries |
 | **L1** | [`adam-scaling`](crates/adam-scaling) | Tier-by-tier scaling bench across the corpus |
 | **L1** | [`adam-train`](crates/adam-train) | Legacy transformer baseline, preserved as regression reference |
 
-Every layer outputs deterministic, regression-tested JSON artifacts. `bash ./scripts/validate_foundation.sh` runs the full foundation validation end-to-end. See [`docs/architecture_v3.md`](docs/architecture_v3.md) for the canonical architecture reference.
+Every layer outputs deterministic, regression-tested JSON artifacts. `bash ./scripts/validate_foundation.sh` runs the full foundation validation end-to-end. See [`docs/architecture_v3.md`](docs/architecture_v3.md) for the canonical v6.1 architecture reference and [`docs/v6_2_architectural_redesign.md`](docs/v6_2_architectural_redesign.md) for the v6.2 design.
 
-## Demo
+## Demo — v6.2 live REPL
 
 ```
-$ cargo run --release -p adam-dialog --bin adam_chat
-adam-chat: loaded 114 template families
-adam-chat: reasoning on — 37 014 derived facts (3 384 supporting extracted facts)
+$ cargo run --release --example chat -p adam-algebra
+=== adam ARK — live REPL ===
+(deterministic; CPU-only; 0 MB model; no LLM)
+Курс: 65 curated facts. Print a question on each line; type «exit» to quit.
 
-> Қасқыр — тірі ме?                          # bare yes/no IsA, v5.4.0
-Қасқыр — тірі. Бұл қасқыр → тірі тізбегі арқылы расталады.
+? Ахмет Байтұрсынұлы қашан туылған?
+> 1872     (25 417 ns)
 
-> жер туралы айтшы                            # reasoning probe
-жер туралы мынадай байланыс анықтадым:
-қорытынды: жер — аспан денесі (байланысты ой-тізбек арқылы)
-# R1_is_a_transitivity: (жер IsA ғаламшар) ∧ (ғаламшар IsA аспан денесі)
+? Двадцать пять умножь на 7 раздели на два прибавь три
+> 90.5     (15 667 ns)
 
-> Абай жайында не дейсің                      # retrieval fallback (verbatim quote)
-абай жайында осындай мысал бар:
-«Абай Құнанбайұлы (10 тамыз 1845 — 6 шілде 1904)»
-# byte-identical quote from wikipedia_kz_pack.json / wiki_kz_0000190
+? Корень из шестнадцати
+> 4        (5 334 ns)
 
-> менің атым Дәулет                           # entity extraction → session.name
-қош келдіңіз Дәулет
+? Что такое гравитация?
+> сила притяжения масс       (14 458 ns)        # Russian — language-filtered
 
-> сау бол
-сау бол
+? Гравитация деген не?
+> массалардың бір-бірін тарту күші   (12 208 ns) # Kazakh — language-filtered
+
+? Бүгін айдың нешесі?
+> 25       (live clock)
+
+? Қазір қандай ай?
+> мамыр    (live clock)
 ```
 
-**Every line above is traceable** to one of: a template realisation, a verbatim corpus quote with `(pack, sample_id)` provenance, an FST-synthesised slot fill, a rule-derived chain with `rule_id` + non-empty `source_chain`, or a curated World Core fact with a named reviewer. Nothing else can leave the system. Zero free-form generation, zero LLM calls, zero GPU.
+**Every answer is typed-data manipulation** — no template, no
+free generation, no LLM call, no GPU. Bilingual disambiguation
+works on same-root words («гравитация» appears in both KZ and RU
+corpus with different definitions; `language_filter` resolves
+which surfaces).
 
 For a full evidence dump on any Kazakh root, run [`adam_inspect`](crates/adam-dialog/src/bin/adam_inspect.rs).
 
@@ -276,24 +320,31 @@ For a full evidence dump on any Kazakh root, run [`adam_inspect`](crates/adam-di
 
 | Metric | Value | Notes |
 |---|---|---|
-| Workspace tests | **1 718 passing** | default + `--features neural` builds both green; v6.1.0 adds the AnswerIR opt-in path + decision-gate battery; v5.x release-blocker invariants preserved |
-| Release cadence | **487+ versioned releases in 5 weeks** | every release CI-verified |
-| p50 turn latency | **21 ms** | vs Llama-3 8B fp16 800–1500 ms; vs GPT-4 50–200 ms |
-| Memory footprint | **~300 MB RSS** | vs LLM 16+ GB VRAM |
-| GPU usage | **0%** | vs LLM dedicated GPU |
-| Hallucination rate | **0%** (architectural) | verified by graph admissibility tests |
+| Workspace tests | **1 904 passing** | default + `--features neural` builds both green; v6.2.0 adds 169 (algebra + router + integration); v5.x release-blocker invariants preserved |
+| Release cadence | **540+ versioned releases since 2026-04-07** | every release CI-verified |
+| v6.2 dialog battery | **79/79 must-pass, 0 gaps** | 14 real-Kazakh domains; CI quality gate via `dialog_battery_meets_quality_gate` |
+| v6.2 warm p50 latency (release, M2 single core) | **791 ns** (full dialog) / **274 ns** (Stage 3) | vs LLM ~100ms — ≈ 126 000× faster |
+| v6.2 throughput (single core) | **~1.26 M queries / sec** | scales linearly across cores |
+| v6.2 model size | **0 MB** | pure typed-data manipulation |
+| v6.1 cascade p50 turn latency | **~21 ms** | vs Llama-3 8B fp16 800–1500 ms; vs GPT-4 50–200 ms |
+| Memory footprint | **~300 MB RSS** | both cascades; vs LLM 16+ GB VRAM |
+| GPU usage | **0 %** | vs LLM dedicated GPU |
+| Hallucination rate | **0 %** (architectural) | verified by graph admissibility tests + Stage 4 quality gate |
 | Lexicon roots | **25.5 k** | 13.6 k pure Kazakh + 11.9 k Apertium imports |
-| Curated facts | **3 650** (3 244 entries) | across 61 world_core domains; `validate_world_core` enforced in CI |
-| Derived facts | **37 062** | from 10 forward-chaining rules over the curated graph |
-| Dialog intents | **41** | template planner with `{slot\|features}` FST-aware syntax |
+| Curated entries (`world_core/`) | **3 461 entries / 4 044 frames** | across 66 domains; `validate_world_core` enforced in CI |
+| Curated facts total (incl. v6.1 augmentation) | **4 116** | `world_core` + bilingual aliases + МО РК + historical |
+| Derived facts | **37 991** | from 10 forward-chaining rules over the curated graph |
+| Dialog intents (v6.1 cascade) | **41** | template planner with `{slot\|features}` FST-aware syntax |
 
 See [`docs/performance.md`](docs/performance.md) for the full performance report and [`docs/scaling_report.md`](docs/scaling_report.md) for the per-tier scaling bench.
 
 ## FAQ
 
-**Is this a wrapper around an LLM?** No. There is no LLM, no neural network at the core, no API call to OpenAI / Anthropic / Google. Inference happens via a finite-state transducer + a forward-chaining reasoner over a typed-fact graph.
+**Is this a wrapper around an LLM?** No. There is no LLM, no neural network at the answer path, no API call to OpenAI / Anthropic / Google. v6.1 inference is FST + forward-chaining reasoner over a typed-fact graph; v6.2 inference is the typed Composition → Frame → QueryIR → FrameIndex → realiser pipeline.
 
-**Is it really deterministic?** Yes. The only source of randomness is `planner::choose_template`, which picks uniformly from ≤ 5 applicable templates given a `(rng_seed, intent)` pair. Pin the seed, pin the input, pin the world_core — output is bit-identical.
+**Is it really deterministic?** Yes. In v6.1, the only source of randomness is `planner::choose_template` (pin the seed → byte-identical output). In v6.2, the answer path is entirely pure-function: `FrameIndex.query(QueryIR)` returns frames in `(score desc, frame_id asc)` order, `realiser::realise(frame, focus, slot)` is a pure mapping; same input → byte-identical surface.
+
+**What is "neurosymbolic" supposed to mean here?** Per the [v6.2 design doc](docs/v6_2_architectural_redesign.md): neural components — when they exist (Stage 6, not in v6.2.0) — produce **typed closed-set** outputs only (intent class, sense disambiguation candidates, retrieval ranker score). They never generate free text. The verifier owns truth and rejects any candidate without a `FrameIndex` provenance. v6.2.0 ships the **symbolic half** of the architecture (typed algebra + retrieval + realiser); Stage 6 will add learned closed-set components inside this scaffolding.
 
 **Why Kazakh?** Kazakh's agglutinative morphology is exceptionally regular: every word decomposes into root + typed suffixes (case, number, tense, person, possessive, polarity, modality), each contributing a known operator. Composition is rule-bound, not learned. This is the cleanest substrate we know of for a deterministic AI runtime.
 
@@ -307,23 +358,48 @@ See [`docs/performance.md`](docs/performance.md) for the full performance report
 
 ## Recent releases
 
-**v5.4.0 — Bridge data + bare yes/no IsA route.** First user-facing payoff of the v5.3.x repositioning arc. World-graph bridge data closes 25+ dead-end abstract hubs (`тіршілік иесі`, `тірі ағза`, `құрал`, `тағам`, `қазақ ханы`, …): derived facts **30 892 → 35 469 (+4 577)** at 228 derivations per bridge fact. Bare «<X> — <Y> ме?» pattern now routes through `find_isa_chain` over extracted + derived facts; «Қасқыр — тірі ме?» went from a tangential «Қасқыр — жыртқыш» to «Қасқыр — тірі. Бұл қасқыр → тірі тізбегі арқылы расталады.» Live dialog test of 8 cases at 100 % pass.
+**v6.2.0 — Neurosymbolic agglutinative algebra (env-gated).** The
+architectural redesign promised at v6.1.50. Lands the new
+`adam-algebra` crate (8 modules, 195 tests) + `adam-dialog::v6_2_router`
+integration bridge. v6.1 cascade unchanged when the gate is off.
+Workspace tests 1735 → 1904. Real-Kazakh dialog battery 79/79
+must-pass, 0 known gaps. Median warm latency 791 ns (release, M2
+single core). See [CHANGELOG.md § 6.2.0](CHANGELOG.md).
 
-**v5.3.6 – v5.3.10 — Repositioning arc.** [MISSION.md](MISSION.md) (research thesis), [RESEARCH.md](RESEARCH.md) (open questions + milestones), [COLLABORATION.md](COLLABORATION.md) (partner-class onboarding), [AGENTS.md](AGENTS.md) (orientation for AI-scout discovery), [CITATION.cff](CITATION.cff) + [codemeta.json](codemeta.json) (academic citation + structured data).
+**v6.1.50 — v6.1-series freeze.** Time-unit Count + Disagreement
+answer-shape + voice aliases + doc refresh. Final v6.1.x release;
+patch strategy reached its ceiling after 11 releases across two days.
 
-**v5.0.0 – v5.2.0 — Voice + multimodal.** OS-native TTS transducer (macOS `Aru`, Linux `espeak-ng`), optional Piper backend, Kazakh G2P module — substrate for kernel-pure concatenative speech.
+**v6.1.0 — AnswerIR + predicate-aware retrieval (opt-in behind
+`ADAM_ANSWER_IR=1`).** Typed `PredicateFocus` enum + 11 new typed
+predicates (`BornIn` / `DiedIn` / `FoundedIn` / `EffectiveFrom` /
+`Classifies` / `LocatedIn` / `Authored` / etc.) — closes the
+2026-05-22 Codex audit relevance/completeness gap.
 
-For full release history (461 releases since 2026-04-07), see [CHANGELOG.md](CHANGELOG.md). For the phase-by-phase roadmap, see [`docs/roadmap.md`](docs/roadmap.md).
+**v6.0.0 — Technical GA.** L5.5 TinyAgt neural composer preview
+(opt-in), E1 discriminative intent classifier (95.95 % accuracy
+at 600× lower latency than full cascade), E2 slot extractor,
+Whisper.cpp voice input, KRU / Baitursynuly / AI-Law domain,
+seven rounds of user-driven audit fixes.
+
+**v5.0.0 – v5.4.0 — Voice, multimodal, World-Graph bridge data.**
+OS-native TTS (macOS `Aru`, Linux `espeak-ng`), optional Piper
+backend, Kazakh G2P. v5.4.0: 25+ dead-end abstract hubs closed,
+derived facts +4 577, bare yes/no IsA route.
+
+For full release history (540+ releases since 2026-04-07), see
+[CHANGELOG.md](CHANGELOG.md). For the phase-by-phase roadmap,
+see [`docs/roadmap.md`](docs/roadmap.md).
 
 ## Open to collaboration
 
 We are open to collaboration in every direction:
 
 - **Linguists** — agglutinative morphology, formal phonology, computational semantics
-- **AI researchers** — deterministic alternatives to neural inference, formal verification of language models
+- **AI researchers** — deterministic / neurosymbolic alternatives to neural inference, formal verification of language models
 - **Educational institutions** — pilot deployments with Kazakh-language students (current focus: Almaty / Astana schools)
 - **National research agencies** — joint research grants from agglutinative-language country agencies
-- **Government / defence** — offline-capable, auditable language AI for Kazakh and related languages
+- **Government / defence** — offline-capable, auditable language AI for Kazakh and related languages; aligned with Kazakhstan's [AI Law of 18 January 2026](data/world_core/kru_baitursynov.jsonl) for defense-relevant high-risk categories
 - **Investors** — angel pre-seed / seed stage who share the thesis that probabilistic AI is not the only path forward
 
 Contact: **baimurza.daulet@gmail.com** · [LinkedIn](https://www.linkedin.com/in/daulet-baimurza-4b3506211)
@@ -333,7 +409,11 @@ See [COLLABORATION.md](COLLABORATION.md) for full per-class engagement terms.
 ## Repository layout
 
 ```
-crates/                Rust workspace (10 crates, L0–L1)
+crates/                Rust workspace (11 crates, L0–L1)
+  adam-algebra/        v6.2 typed neurosymbolic stack (algebra / Frame / QueryIR / FrameIndex / realiser / math_solver / system_clock / corpus_loader)
+  adam-kernel-fst/     FST morphology — phonology, morphotactics, synthesiser + parser
+  adam-dialog/         Dialog pipeline (v6.1 cascade) + v6_2_router (integration bridge)
+  …                    (see Crates table above)
 data/world_core/       Curated typed-fact graph (jsonl, by domain)
 data/dialog/           Template repository + curriculum
 data/retrieval/        Morpheme index + extracted facts + derived facts
@@ -341,6 +421,7 @@ data/eval/             Live holdouts + cognitive eval datasets
 data/lexicon_v1/       Apertium-imported roots
 data/tokenizer/        Curated segmentation roots
 docs/                  Architecture, roadmap, performance, foundation policies
+  v6_2_architectural_redesign.md  v6.2 design doc (signed off 2026-05-24)
 scripts/               validate_foundation.sh + release tooling
 ```
 
@@ -352,9 +433,9 @@ See [`data/README.md`](data/README.md) for a top-level map of `data/`, and per-s
 
 ## Out of scope
 
-- **Multilingual input and output** — adam accepts and produces only Kazakh. Generalisation comes via the retrieval engine over the 77.9 M-word Kazakh corpus, not translation.
-- **Probabilistic / LLM-style free generation** — every response is a template realisation, a verbatim corpus quote, or a rule derivation over typed facts with a full `source_chain`. Nothing invented.
-- **Trained neural LM components in the answer path** — small ML lives inside the kernel as inspectable layers (selection weights, suffix priors, PMI); no transformer, no embeddings.
+- **Probabilistic / LLM-style free generation** — every response is a curated fact retrieved via `FrameIndex` (v6.2) or a template realisation / verbatim corpus quote / rule derivation (v6.1). Nothing invented.
+- **Multilingual input** — Russian queries work for terms whose surface differs from Kazakh (`«вода» / «скорость света» / «столица казахстана»`); same-root same-domain bilingual ambiguity is resolved via `language_filter`. Other languages are research-direction, not currently shipped.
+- **Trained neural LM components in the answer path** — small ML lives inside the kernel as inspectable layers (selection weights, suffix priors, PMI, E1 intent classifier); no transformer, no embeddings, no free generation. Stage 6 (closed-set neural components) is design-only as of v6.2.0.
 - **Cloud platform work** — adam runs as a single offline binary.
 
 ### Graph-First Policy
@@ -375,6 +456,7 @@ Copyright © 2026 Qazna Technologies LLP.
 
 <p align="center">
   <a href="MISSION.md">MISSION</a> ·
+  <a href="docs/v6_2_architectural_redesign.md">v6.2 ARCH</a> ·
   <a href="RESEARCH.md">RESEARCH</a> ·
   <a href="COLLABORATION.md">COLLABORATION</a> ·
   <a href="AGENTS.md">AGENTS</a> ·
