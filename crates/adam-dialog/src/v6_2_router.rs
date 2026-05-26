@@ -476,6 +476,59 @@ fn handle_listing_query(input: &str) -> Option<String> {
                 .to_string(),
         );
     }
+    // Session-5 audit (codex 2026-05-26 voice REPL): «Қазақстанда
+    // қандай таулар / өзендер / көлдер бар?» fell through to the
+    // IsA fallback and returned «Мемлекет» (the host country's
+    // type). Curate the list answers from data/world_core/geography_kz
+    // facts that are already tagged PartOf=қазақстан.
+    let mentions_kz = lower.contains("қазақстан") || lower.contains("казахстан");
+    if mentions_kz && (lower.contains("таулар") || lower.contains("тау бар")) {
+        return Some(
+            "Қазақстандағы танымал таулар: Алатау, Алтай, Тянь-Шань, \
+             Жетісу Алатауы, Хан Тәңірі (биік шың)."
+                .to_string(),
+        );
+    }
+    if mentions_kz && (lower.contains("өзендер") || lower.contains("өзен бар")) {
+        return Some(
+            "Қазақстанның негізгі өзендері: Ертіс, Сырдария, Іле, \
+             Жайық, Есіл, Тобыл, Шу, Қаратал, Талас."
+                .to_string(),
+        );
+    }
+    if mentions_kz && (lower.contains("көлдер") || lower.contains("көл бар")) {
+        return Some(
+            "Қазақстанның негізгі көлдері: Балқаш, Зайсан, Алакөл, \
+             Тенгіз, Маркакөл."
+                .to_string(),
+        );
+    }
+    // «Қандай X білесің?» without a Kazakhstan anchor — short
+    // enumerations of the same categories (no host-country
+    // constraint).
+    if lower.contains("қандай") && lower.contains("білесің") {
+        if lower.contains("өзен") {
+            return Some(
+                "Танымал өзендер: Ертіс, Сырдария, Іле, Жайық, Есіл, \
+                 Тобыл, Шу, Қаратал, Талас."
+                    .to_string(),
+            );
+        }
+        if lower.contains("тау") {
+            return Some(
+                "Танымал таулар: Алатау, Алтай, Тянь-Шань, Жетісу \
+                 Алатауы, Хан Тәңірі."
+                    .to_string(),
+            );
+        }
+        if lower.contains("көл") {
+            return Some(
+                "Танымал көлдер: Балқаш, Зайсан, Алакөл, Тенгіз, \
+                 Маркакөл."
+                    .to_string(),
+            );
+        }
+    }
     None
 }
 
@@ -1376,6 +1429,61 @@ mod tests {
         assert!(
             s.contains("жиілігі") || s.contains("pitch"),
             "expected pitch explanation, got: {s}"
+        );
+    }
+
+    /// Session-5 audit (the «Мемлекет» bug): «Қазақстанда қандай
+    /// таулар бар?» must enumerate mountains, not return the host
+    /// country's IsA type («Мемлекет»).
+    #[test]
+    fn listing_mountains_in_kazakhstan() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Қазақстанда қандай таулар бар?", &idx);
+        assert!(r.is_some());
+        let s = r.unwrap();
+        assert!(
+            s.contains("Алатау") && !s.eq_ignore_ascii_case("мемлекет"),
+            "expected mountain list, got: {s}"
+        );
+    }
+
+    /// Session-5 audit: «Қазақстанда қандай өзендер бар?» — rivers.
+    #[test]
+    fn listing_rivers_in_kazakhstan() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Қазақстанда қандай өзендер бар?", &idx);
+        assert!(r.is_some());
+        let s = r.unwrap();
+        assert!(
+            s.contains("Ертіс") || s.contains("Сырдария"),
+            "expected river list, got: {s}"
+        );
+    }
+
+    /// Session-5 audit: «Қазақстанда қандай көлдер бар?» — lakes.
+    #[test]
+    fn listing_lakes_in_kazakhstan() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Қазақстанда қандай көлдер бар?", &idx);
+        assert!(r.is_some());
+        let s = r.unwrap();
+        assert!(
+            s.contains("Балқаш") || s.contains("Зайсан"),
+            "expected lake list, got: {s}"
+        );
+    }
+
+    /// Session-5 audit: «Қандай өзендер білесің?» — un-anchored
+    /// enumeration must still list rivers, not «(нет данных)».
+    #[test]
+    fn listing_rivers_un_anchored() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Қандай өзендер білесің?", &idx);
+        assert!(r.is_some());
+        let s = r.unwrap();
+        assert!(
+            s.contains("Ертіс") || s.contains("Сырдария"),
+            "expected river list, got: {s}"
         );
     }
 }
