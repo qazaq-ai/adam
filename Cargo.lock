@@ -158,6 +158,13 @@ name = "adam-phoneme"
 version = "6.2.0"
 
 [[package]]
+name = "adam-phonotactics"
+version = "6.2.0"
+dependencies = [
+ "adam-phoneme",
+]
+
+[[package]]
 name = "adam-reasoning"
 version = "6.2.0"
 dependencies = [
