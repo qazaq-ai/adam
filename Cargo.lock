@@ -154,6 +154,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "adam-phoneme"
+version = "6.2.0"
+
+[[package]]
 name = "adam-reasoning"
 version = "6.2.0"
 dependencies = [

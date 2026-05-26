@@ -3,6 +3,7 @@ members = [
   "crates/adam-algebra",
   "crates/adam-kernel",
   "crates/adam-kernel-fst",
+  "crates/adam-phoneme",
   "crates/adam-dialog",
   "crates/adam-tokenizer",
   "crates/adam-corpus",
