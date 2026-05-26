@@ -1,0 +1,403 @@
+# v6.3.0 — Phonemic Foundation (design)
+
+**Status.** ⚙️ **Design started 2026-05-26.** No code yet. Branch
+`experimental/v6_3_phonemic_foundation` will be cut from `main`
+at commit `b04ea732` once this doc is signed off.
+
+**Origin.** Voice REPL session-5 (2026-05-26 demo-prep) closed
+yet another batch of STT-mishear / listing-fallback bugs. User
+signal:
+
+> «Мы опять после каждого диалога находим новые баги и они опять
+> не кончаются. … Такое ощущение, что мы стараемся с помощью кода
+> предусмотреть все возможные варианты ответов. Но это теоретически
+> не возможно. … Поэтому, возможно необходимо начать новую
+> исследовательскую ветку v6.3.»
+
+The diagnosis is structural, not tactical: v6.2's router is a
+deterministic case-enumeration over an exponential input space
+(Whisper mishears × phrasing variants × case forms × context).
+Patching cannot win this game. **The graphemes-first foundation
+itself is the defect.**
+
+A second user signal landed the same day, after the v6.3
+brainstorm:
+
+> «Создатели кириллической и латинской графики казахского создали
+> буквы «ы» / «y», которые не имеют казахского звука. Это что-то
+> вроде "апострофа" между двумя звуками. … Необходимо создать на
+> Rust базу чистых звуков казахского и сформировать базу всех
+> слов казахского в аудио двоичном формате. Графический формат
+> будет вытекать из двоичного аудио формата, а не наоборот.»
+
+This is the **architectural pivot** v6.3 demands. Phonemes are
+the foundation; graphemes are a peripheral, lossy projection.
+
+## 1. Thesis under test
+
+> A **phonemic-first agglutinative architecture** — where the
+> sole canonical representation of a Kazakh utterance is a typed
+> phoneme stream over an inventory of ~37 units, all higher
+> layers (morpheme, word, sentence, dialog) operate over that
+> stream, and Cyrillic / Latin orthographies are bidirectional
+> renderers — collapses an entire class of audit bugs into
+> impossible-by-construction errors, eliminates external C
+> dependencies (`whisper.cpp`, macOS `say`), and provides the
+> correct substrate for the v6.3 brainstorm's constrained
+> decoding / DisCoCat / energy-based verifier directions.
+
+## 2. Why graphemes-first is structurally broken
+
+### 2.1 The «ы» / «y» problem
+
+In Cyrillic Kazakh orthography, the letter **ы** is officially
+assigned IPA `/ə/`. In Latin orthography (new alphabets), the
+letter **y** plays the same role. In **actual Kazakh speech**,
+this segment is in most positions:
+
+- an **epenthetic** reduced vowel — a phonetic glue inserted to
+  avoid disallowed consonant clusters, or
+- a **purely orthographic marker** of consonant-cluster cohesion,
+  with **no acoustic realisation** at normal speech rate.
+
+A native speaker pronouncing «қыз» («girl») produces something
+closer to `[qz]` or `[qǝz]` with a minimal, often
+non-syllabic transition — not the full `[qɯz]` that
+non-Kazakh readers infer from the spelling. The orthography
+**promotes a phonetic transition into a full grapheme**, and
+non-native speakers (and Whisper, trained on orthographic
+text) read it back as a full vowel.
+
+This is the same class of defect as French «Renault»: 7 letters,
+4 phonemes (`[ʁə.no]`). The orthography is **lossy in both
+directions**, and the loss is asymmetric — different segments
+get different amounts of artificial padding.
+
+### 2.2 What this costs us in v6.2
+
+The v6.2 morphological FST operates on **graphemes**, not
+phonemes. Every rule must handle orthographic artifacts:
+the «ы»-epenthesis cases, the «у» that flips between `/w/` and
+`/uw/` based on context, the digraph «и» that resolves to
+`/ij/` or `/əj/`. Every Whisper-mishear handler in
+`v6_2_router::stt_fold` is a **graphical hack for a
+phonetically clean phenomenon** — «қобейту»/«кубит»/«кубейт»
+are all the same phoneme sequence `[k̪ø.bɛj.tʉ]` rendered
+differently by a noisy ASR.
+
+In a phoneme-first system these collapse to **one match**, not
+six string-replace rules.
+
+## 3. Architecture
+
+### 3.1 The five layers
+
+```
+Layer 0a  Phoneme Alphabet         (~37 units, typed, discrete)
+   ↓
+Layer 0b  Acoustic Realisation     (MFCC templates + diphone bank)
+   ↓
+Layer 0c  Phonotactic FST          (harmony, clusters, syllable)
+   ↓
+Layer 0d  Bidirectional Renderer   (phoneme ↔ Cyrillic ↔ Latin)
+   ↓
+Layer 1+  Morpheme / Lexicon / Frame / Dialog
+          (existing v6.2 stack, lifted to phonemes)
+```
+
+Each layer is a separate Rust crate. Layers 0a–0d are new;
+Layer 1+ is the v6.2 stack with its string-typed boundaries
+replaced by `Vec<Phoneme>`.
+
+### 3.2 Layer 0a — Phoneme alphabet
+
+A typed enum (~37 variants) plus an attribute table. Each
+phoneme carries:
+
+| field            | values                                          |
+|------------------|--------------------------------------------------|
+| `id`             | `Q`, `K`, `Aa`, `Ae`, `Oo`, `Oe`, …             |
+| `ipa`            | `q`, `k`, `a`, `æ`, `o`, `ø`, …                  |
+| `class`          | Vowel ∣ Consonant ∣ Glide                        |
+| `place`          | (consonants) labial ∣ dental ∣ velar ∣ uvular ∣ … |
+| `manner`         | (consonants) stop ∣ fricative ∣ nasal ∣ trill ∣ …|
+| `voicing`        | voiced ∣ voiceless                               |
+| `harmony_class`  | (vowels) Front ∣ Back                             |
+| `height`         | (vowels) Close ∣ Mid ∣ Open                       |
+| `rounding`       | (vowels) Rounded ∣ Unrounded                      |
+| `length`         | Short ∣ Long                                      |
+| `is_epenthetic`  | `bool` — true for reduced `[ə]` / `[ɪ]` in
+                     positions where Cyrillic writes «ы» / «і»
+                     but speech omits or minimally realises it.  |
+
+Inventory draft (subject to refinement against `docs/kazakh_grammar/01_phonology.md`):
+
+**Vowels (8 full + 2 epenthetic):**
+`A` /a/, `Ä` /æ/, `O` /o/, `Ö` /ø/, `U` /ʊ/, `Ü` /y/, `E` /e/,
+`I` /i/ (full); `Ǝ` /ə/, `Ɨ` /ɪ/ (epenthetic — `is_epenthetic = true`).
+
+**Consonants (~27):**
+`P`/p/, `B`/b/, `T`/t/, `D`/d/, `K`/k/, `Q`/q/, `G`/g/,
+`Ğ`/ʁ/, `M`/m/, `N`/n/, `Ŋ`/ŋ/, `S`/s/, `Z`/z/, `Š`/ʃ/, `Ž`/ʒ/,
+`X`/x/, `H`/h/, `L`/l/, `R`/r/, `J`/j/, `W`/w/, `F`/f/, `V`/v/,
+`C`/ts/, `Č`/tʃ/, `Šč`/ɕɕ/.
+
+(Loanword-only consonants `F V C Č Šč` retained but flagged for
+domain-restricted use.)
+
+**Total: ~37 units.** Exact count finalised in Phase 1.
+
+### 3.3 Layer 0b — Acoustic realisation
+
+Each phoneme is associated with **two** acoustic artefacts,
+stored in a Rust binary format (`bincode` or `rkyv`):
+
+1. **MFCC template** — a `[N_frames × 13]` matrix of mel-cepstral
+   coefficients extracted from a clean reference recording.
+   Used as the matching target in STT (DTW or Viterbi alignment).
+
+2. **Waveform sample** — the source PCM (16-bit, 16 kHz mono) of
+   the reference recording. Used as the synthesis primitive in
+   TTS (concatenated with diphone transitions).
+
+In addition, a **diphone bank** (~400 high-frequency phoneme→phoneme
+transitions, out of 37×37 = 1369 possible) provides smooth
+junctions for synthesis. Recording strategy:
+
+- 2 speakers (1 male, 1 female) for pitch invariance.
+- ~30 minutes of total recording yields ~5 instances of each
+  phoneme and the ~400 most common diphones.
+- All recording done with the same `cpal`-based recorder, so
+  the spectral characteristics match production STT input.
+
+### 3.4 Layer 0c — Phonotactic FST
+
+A small FST over the phoneme alphabet enforces:
+
+- **Vowel harmony**: a Front-class vowel may not co-occur with a
+  Back-class vowel within a single morphological domain. Loan
+  exceptions are flagged at lexicon-load time, not at runtime.
+- **Allowed consonant clusters**: a closed list (e.g. `st`, `nt`,
+  `rk` are common; `tk`, `pq` are not).
+- **Syllable structure**: `(C)V(C)(C)` with restricted final
+  cluster set.
+- **Assimilation rules**: voicing assimilation at morpheme
+  boundaries (the 8-way matrix already documented in
+  `01_phonology.md` § 3 — now lifted from grapheme rules to
+  phoneme rules).
+
+This FST is the **constraint surface** for any future
+constrained-decoding LM (the Spike A direction from the v6.3
+brainstorm). A neural component producing one phoneme at a
+time is masked by this FST: illegal next-phonemes get `-∞`
+logit. **Morphological ill-formedness becomes impossible by
+construction.**
+
+### 3.5 Layer 0d — Bidirectional graphics renderer
+
+Two-way mapping between phoneme streams and orthographic forms:
+
+**Phoneme → Cyrillic** (lossy, but deterministic):
+
+```rust
+fn phonemes_to_cyrillic(stream: &[Phoneme]) -> String
+```
+
+Rules:
+- Each non-epenthetic phoneme has a 1-to-1 Cyrillic glyph.
+- Each epenthetic phoneme (`Ǝ`, `Ɨ`) renders as «ы» or «і»
+  **only when orthographic convention requires it** (consonant
+  cluster boundaries).
+- Compound digraphs like «и» (= `Ɨ`+`J`) and «у»-as-vowel
+  (= `Ʊ`+`W`) are resolved per orthographic context.
+
+**Phoneme → Latin** — analogous, against the post-2025 official
+Latin alphabet (or whichever is current in the corpus).
+
+**Cyrillic → Phoneme** (the harder direction — must undo the
+orthographic padding):
+
+```rust
+fn cyrillic_to_phonemes(s: &str) -> Vec<Phoneme>
+```
+
+Rules:
+- Each Cyrillic glyph has a default phoneme, **but** «ы» and
+  «і» are demoted to epenthetic when adjacent to consonant
+  clusters in positions where speakers omit them.
+- Default-with-override table populated from corpus evidence.
+
+**This is where the «ы»-problem is properly absorbed**: not as a
+runtime hack in the dialog router, but as a one-time projection
+at the orthography boundary. Once converted to phonemes, all
+downstream code is free of the orthographic artefact.
+
+### 3.6 Lifting layers 1+
+
+The existing morphological FST (`adam-kernel-fst`), lexicon
+(`adam-tokenizer`), frame index (`adam-algebra`) and dialog
+router (`adam-dialog`) currently key on `&str` (grapheme
+sequences). v6.3 replaces those `&str` boundaries with
+`&[Phoneme]`.
+
+The transition can be done **incrementally**:
+
+- Phase 1–3 deliver Layers 0a–0d with **no integration**.
+- Phase 4+ wires phoneme STT into `adam_chat` as an optional
+  backend (env-gate `ADAM_V6_3=1`).
+- Phase 5+ lifts each higher layer to phonemes one at a time,
+  keeping graphemes as the in-memory form until the lift is
+  complete for that layer.
+- v6.2 remains the production main branch throughout.
+
+## 4. Pure-Rust audio stack
+
+All audio I/O and DSP done with crates that are pure Rust (no
+C dependencies):
+
+| concern              | crate         | notes                          |
+|----------------------|---------------|--------------------------------|
+| Microphone I/O       | `cpal`        | cross-platform, used by Bevy   |
+| Speaker I/O          | `cpal`        | same                            |
+| WAV read/write       | `hound`       | mature, ubiquitous              |
+| FFT                  | `rustfft`     | fastest pure-Rust FFT           |
+| DSP primitives       | `dasp`        | filters, windowing              |
+| Resampling           | `rubato`      | high-quality, pure Rust         |
+| Pitch detection      | (in-house)    | YIN / cepstral, ~200 LoC         |
+| MFCC extraction      | (in-house)    | rustfft + mel filter bank        |
+| Voice Activity Det.  | (in-house)    | energy + zero-crossing rate      |
+
+**No** dependency on `whisper.cpp`, `libfvad`, macOS `say`,
+`espeak`, or any external binary. The entire audio pipeline is
+`cargo build` away.
+
+## 5. Implementation phases
+
+| phase | scope                                            | duration | gate                  |
+|-------|--------------------------------------------------|----------|-----------------------|
+| 1     | Layer 0a + binary phoneme format                 | 1–2 wk   | inventory frozen + tests |
+| 2     | Layer 0b — record phoneme/diphone bank           | 1–2 wk   | bank file generated     |
+| 3     | Layer 0c — phonotactic FST                       | 1–2 wk   | round-trip tests pass    |
+| 4     | Layer 0d — bidirectional renderer                | 1 wk     | corpus round-trip > 99% |
+| 5     | Pure-Rust audio I/O (cpal-based microphone/TTS)  | 1 wk     | replaces voice-feature   |
+| 6     | Phoneme-level STT (DTW + Viterbi)                | 2–3 wk   | ≥ 70% acc on clean Kk    |
+| 7     | Phoneme-level TTS (concatenative + PSOLA)        | 1–2 wk   | MOS ≥ macOS `say`        |
+| 8     | Wire `adam_chat` to phoneme STT/TTS              | 1 wk     | v6.3 demo viable         |
+| 9     | Lift `adam-kernel-fst` to phoneme input          | 2 wk     | morphology on phonemes   |
+
+**Total: ~14–18 weeks of focused work.** Spike order can be
+shuffled if a phase blocks (e.g. corpus availability).
+
+## 6. Corpus requirements
+
+Three options for the phoneme/diphone bank, in order of
+quality:
+
+1. **Self-recorded** (preferred for control). 2 speakers × 30 min
+   of structured reading produces a clean, consistent bank.
+   Requires a quiet room and a decent USB microphone. **~2 days
+   of work + 1 day post-processing.**
+2. **Common Voice Kazakh** (https://commonvoice.mozilla.org/kk).
+   Crowd-sourced; quality varies; phoneme-aligned subset must
+   be extracted via forced alignment. **~1 week of preprocessing.**
+3. **Kazakh Speech Corpus (KSC)** (ISSAI / Nazarbayev University).
+   Higher quality, possibly licensed; would need contact.
+   **Licensing review needed.**
+
+**Recommendation:** start with self-recording for Phase 2,
+expand to Common Voice as supplementary data in Phase 6 (STT
+training).
+
+## 7. Acceptance metrics
+
+- **Phase 1:** all 37 phonemes round-trip through Cyrillic and
+  Latin renderers losslessly **except** for `is_epenthetic`
+  cases (where round-trip may collapse).
+- **Phase 3:** vowel-harmony FST rejects 100% of synthetic
+  ill-formed sequences and accepts 100% of corpus-evidenced
+  well-formed words.
+- **Phase 6:** phoneme STT achieves ≥ 70% phoneme-level
+  accuracy on a 100-utterance clean-speech test set. (Whisper
+  baseline for reference, not as competitor.)
+- **Phase 7:** in a blind subjective MOS test (5 listeners),
+  the concatenative TTS scores within 0.5 MOS points of macOS
+  `say` with the Aru voice on 10 representative Kazakh
+  sentences.
+- **Phase 8 (v6.3 viable):** the existing voice-REPL audit
+  battery (sessions 1–5 combined) passes with `ADAM_V6_3=1`
+  with at most 2 regressions vs `ADAM_V6_2=1`.
+
+## 8. Risks and honest limitations
+
+1. **STT accuracy will trail Whisper at first.** Whisper-large-v3-turbo
+   was trained on thousands of hours; our phoneme-level DTW will be
+   trained on ~30 minutes. On clean speech this is fine; on noisy
+   or accented speech it will lose. **Compliance framing:** "works
+   locally, no cloud, no C dependencies, deterministic." That is
+   genuine value, but it does not survive being framed as "better
+   than Whisper."
+2. **Diphone synthesis sounds robotic.** PSOLA (Phase 7) buys
+   prosody but no naturalness beyond classic concatenative TTS.
+   Native-grade naturalness requires neural TTS (e.g. VITS, FastSpeech)
+   which is outside the v6.3 deterministic scope. Accept the
+   trade-off or scope-extend Phase 7.
+3. **Self-recorded corpus is one speaker pair.** Generalisation to
+   other accents and timbres is limited until Phase 6 extends with
+   Common Voice. Demo videos with the recording speaker will
+   sound much better than demos with arbitrary users.
+4. **Phase 9 (lifting morphology to phonemes) touches the entire
+   stack.** This is where the actual engineering risk concentrates:
+   all curated `data/world_core/*.jsonl` content is currently
+   Cyrillic-graphemic. The lift must convert (or dual-key) every
+   curated fact. Plan a parallel migration script in Phase 8.
+5. **v6.2 must stay alive as production main throughout.** All v6.3
+   work happens on `experimental/v6_3_phonemic_foundation`; only
+   when Phase 8 passes its acceptance gate does it become merge-eligible.
+
+## 9. Open questions
+
+1. **Self-recorded vs Common Voice for Phase 2?** Decision impacts
+   timeline by ~1 week.
+2. **Latin or Cyrillic as primary renderer in v6.3 demos?** Both
+   must be supported (Layer 0d is bidirectional); the question is
+   which is foregrounded in the demo voice.
+3. **Phoneme-level STT: pure DTW vs. small Conformer/CTC neural
+   net?** Pure DTW is fully deterministic but plateaus around
+   75–80% accuracy. A 5M-param Conformer would lift that to
+   90%+ but introduces a learned component. The v6.3 brainstorm
+   left this open — Spike A (constrained decoding LM) and Spike C
+   (energy-based verifier) **both** assume some neural component
+   in the loop, so a tiny ASR network is not a contradiction with
+   the v6.3 thesis.
+4. **What does «ы» do in dictionary-form lookup?** When a user
+   types a Cyrillic query, the renderer must decide whether each
+   «ы» becomes `Ǝ` (epenthetic, ignored in matching) or stays as
+   a full vowel. The conservative rule: «ы» is epenthetic
+   between two consonants in non-initial syllables of native
+   Kazakh roots; full vowel elsewhere. Corpus-evidenced refinement
+   needed.
+
+## 10. References
+
+- Поппе Н. Н., *Введение в алтайское языкознание* (1965) —
+  classic treatment of Turkic phonology incl. epenthetic vowels.
+- Баскаков Н. А., *Тюркские языки* (1960) — comparative
+  framework.
+- Кайдар А., *Структура односложных корней и основ в казахском
+  языке* (1986) — Kazakh-specific phonotactics.
+- ISSAI / Nazarbayev University Kazakh Speech Corpus (KSC) —
+  https://issai.nu.edu.kz/kz-speech-corpus/
+- Common Voice Kazakh — https://commonvoice.mozilla.org/kk
+- Existing v6.x phonology notes — `docs/kazakh_grammar/01_phonology.md`
+- v6.2 architectural pivot — `docs/v6_2_architectural_redesign.md`
+
+## 11. Sign-off
+
+Once the open questions in § 9 are answered and the inventory
+draft in § 3.2 is reviewed against a phonetic source, this
+document becomes the design contract for v6.3 implementation.
+
+**Next action:** finalise the phoneme inventory (§ 3.2) by
+cross-checking against `docs/kazakh_grammar/01_phonology.md`
+and a fluent native speaker review. Then cut the
+`experimental/v6_3_phonemic_foundation` branch and begin Phase 1.
