@@ -508,6 +508,72 @@ impl Phoneme {
             Glottal => return None,
         })
     }
+
+    /// Latin transliteration for this phoneme. Multi-character
+    /// for the affricate `Ts` (`"ts"`) and the geminate `Shch`
+    /// (`"şç"`); single-character for all others. `None` for the
+    /// boundary marker.
+    ///
+    /// The scheme is the **v6.3 deterministic transliteration**:
+    /// it is anchored in the 2021 official Kazakh Latin alphabet
+    /// (acute / cedilla variant) but adds explicit disambiguators
+    /// where the official alphabet collapses distinct phonemes
+    /// onto the same glyph:
+    ///   - `J` (й, glide) → `"ý"` to distinguish from `Y` (ы) → `"y"`.
+    ///   - `W` (у-glide) → `"w"` to distinguish from `U` (ұ) → `"u"`.
+    ///   - `X` (х) → `"x"` to distinguish from `H` (һ) → `"h"`.
+    ///   - `I` (и digraph) → `"ı"` to distinguish from `Yi` (і)
+    ///     → `"i"`.
+    ///
+    /// These deviations are internal to the v6.3 stack — the
+    /// public Latin orthography may collapse pairs back to
+    /// single glyphs when the host word's morphology makes the
+    /// distinction recoverable.
+    pub fn latin_glyph(self) -> Option<&'static str> {
+        use Phoneme::*;
+        Some(match self {
+            // Vowels.
+            A => "a",
+            Ae => "ä",
+            O => "o",
+            Oe => "ö",
+            U => "u",
+            Ue => "ü",
+            E => "e",
+            I => "ı",
+            Y => "y",
+            Yi => "i",
+            // Consonants — native.
+            P => "p",
+            B => "b",
+            M => "m",
+            T => "t",
+            D => "d",
+            S => "s",
+            Z => "z",
+            N => "n",
+            L => "l",
+            R => "r",
+            Sh => "ş",
+            Zh => "j",
+            J => "ý",
+            K => "k",
+            G => "g",
+            Ng => "ñ",
+            X => "x",
+            Q => "q",
+            Gh => "ğ",
+            H => "h",
+            W => "w",
+            // Consonants — loan.
+            F => "f",
+            V => "v",
+            Ts => "ts",
+            Ch => "ç",
+            Shch => "şç",
+            Glottal => return None,
+        })
+    }
 }
 
 impl fmt::Display for Phoneme {
@@ -636,6 +702,30 @@ mod tests {
         for p in Phoneme::ALL {
             if let Some(g) = p.cyrillic_glyph() {
                 assert!(seen.insert(g), "duplicate glyph {g} on {p:?}");
+            }
+        }
+    }
+
+    /// Latin glyphs are unique across phonemes that have them
+    /// (the disambiguators `ý w x ı` in `latin_glyph` exist
+    /// precisely to maintain this invariant).
+    #[test]
+    fn latin_glyphs_are_unique() {
+        let mut seen = std::collections::HashSet::new();
+        for p in Phoneme::ALL {
+            if let Some(g) = p.latin_glyph() {
+                assert!(seen.insert(g), "duplicate latin glyph {g:?} on {p:?}");
+            }
+        }
+    }
+
+    /// Every non-boundary phoneme has a Latin glyph.
+    #[test]
+    fn latin_glyph_present_for_all_except_boundary() {
+        for &p in Phoneme::ALL {
+            match p.class() {
+                PhonemeClass::Boundary => assert!(p.latin_glyph().is_none()),
+                _ => assert!(p.latin_glyph().is_some(), "no latin glyph for {p:?}"),
             }
         }
     }

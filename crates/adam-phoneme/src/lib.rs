@@ -44,6 +44,7 @@
 
 pub mod binary;
 pub mod cyrillic;
+pub mod latin;
 mod phoneme;
 
 pub use phoneme::{

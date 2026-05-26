@@ -5,7 +5,12 @@
 //! appear in actual demo / audit queries — if the rule misclassifies
 //! a real production word, this test catches it.
 
-use adam_phoneme::{Phoneme::*, cyrillic::cyrillic_to_phonemes, cyrillic::phonemes_to_cyrillic};
+use adam_phoneme::{
+    Phoneme,
+    Phoneme::*,
+    cyrillic::{cyrillic_to_phonemes, phonemes_to_cyrillic},
+    latin::{latin_to_phonemes, phonemes_to_latin},
+};
 
 /// Geography (from `geography_kz.jsonl` and `world_core` agent
 /// surfaces): place names that appear in voice REPL audits.
@@ -118,6 +123,66 @@ fn all_phonemes_have_a_cyrillic_projection_except_boundary() {
         match p.class() {
             PhonemeClass::Boundary => assert!(g.is_none()),
             _ => assert!(g.is_some(), "no glyph for {p:?}"),
+        }
+    }
+}
+
+/// Latin renderer parity with Cyrillic on real words. Both
+/// projections of a Kazakh phoneme stream must round-trip in
+/// loan mode (rule disabled).
+#[test]
+fn latin_cyrillic_parity_on_real_words() {
+    let test_words: &[&[Phoneme]] = &[
+        &[Q, A, Z, A, Q, S, T, A, N],       // қазақстан / qazaqstan
+        &[A, L, M, A, T, Y],                // алматы / almaty
+        &[B, A, J, T, U, R, S, N, U, L, Y], // байтұрсынұлы (post-epenth)
+        &[M, E, M, L, E, K, E, T],          // мемлекет / memleket
+        &[T, U, R, S],                      // тұрс (synthetic test)
+    ];
+    for ph in test_words {
+        let cyr = phonemes_to_cyrillic(ph);
+        let lat = phonemes_to_latin(ph);
+        // Both rendered back through their inverse renderer with
+        // is_native_root=false (rule off) recover the original.
+        assert_eq!(
+            cyrillic_to_phonemes(&cyr, false),
+            ph.to_vec(),
+            "cyr round-trip"
+        );
+        assert_eq!(
+            latin_to_phonemes(&lat, false),
+            ph.to_vec(),
+            "lat round-trip"
+        );
+    }
+}
+
+/// «байтұрсынұлы» Latin: epenthetic «y» drops mid-word, final
+/// «y» stays. Symmetric to the Cyrillic test.
+#[test]
+fn baitursunuly_latin_handles_both_y_positions() {
+    // Cyrillic «байтұрсынұлы» renders Latin «baýturynuly» in our
+    // scheme (J→ý). The middle «ы» (Latin «y») between «s» and
+    // «n» drops; final «y» after «l» stays.
+    let cyr_phonemes = cyrillic_to_phonemes("байтұрсынұлы", true);
+    let lat = phonemes_to_latin(&cyr_phonemes);
+    // Re-parse the Latin form with the native rule on: must
+    // give the same phoneme list (since both rules drop the
+    // same epenthetic).
+    let lat_phonemes = latin_to_phonemes(&lat, true);
+    assert_eq!(cyr_phonemes, lat_phonemes);
+    assert_eq!(cyr_phonemes, vec![B, A, J, T, U, R, S, N, U, L, Y]);
+}
+
+/// Forward render covers every phoneme in `ALL` for Latin too.
+#[test]
+fn all_phonemes_have_a_latin_projection_except_boundary() {
+    use adam_phoneme::{Phoneme, PhonemeClass};
+    for &p in Phoneme::ALL {
+        let g = p.latin_glyph();
+        match p.class() {
+            PhonemeClass::Boundary => assert!(g.is_none()),
+            _ => assert!(g.is_some(), "no latin glyph for {p:?}"),
         }
     }
 }
