@@ -273,40 +273,101 @@ C dependencies):
 
 ## 5. Implementation phases
 
-| phase | scope                                            | duration | gate                  |
-|-------|--------------------------------------------------|----------|-----------------------|
-| 1     | Layer 0a + binary phoneme format                 | 1–2 wk   | inventory frozen + tests |
-| 2     | Layer 0b — record phoneme/diphone bank           | 1–2 wk   | bank file generated     |
-| 3     | Layer 0c — phonotactic FST                       | 1–2 wk   | round-trip tests pass    |
-| 4     | Layer 0d — bidirectional renderer                | 1 wk     | corpus round-trip > 99% |
-| 5     | Pure-Rust audio I/O (cpal-based microphone/TTS)  | 1 wk     | replaces voice-feature   |
-| 6     | Phoneme-level STT (DTW + Viterbi)                | 2–3 wk   | ≥ 70% acc on clean Kk    |
-| 7     | Phoneme-level TTS (concatenative + PSOLA)        | 1–2 wk   | MOS ≥ macOS `say`        |
-| 8     | Wire `adam_chat` to phoneme STT/TTS              | 1 wk     | v6.3 demo viable         |
-| 9     | Lift `adam-kernel-fst` to phoneme input          | 2 wk     | morphology on phonemes   |
+| phase | scope                                                   | gate / acceptance                          |
+|-------|---------------------------------------------------------|--------------------------------------------|
+| 1     | Layer 0a + binary phoneme format                        | inventory frozen + round-trip tests pass    |
+| 2a    | Corpus collection (see § 6)                              | manifest tracks every source                |
+| 2b    | Text normalisation (transcripts → phonetic Cyrillic)     | normalised corpus dump                      |
+| 2c    | MFA bootstrap forced alignment                           | per-phoneme timestamps with confidence ≥ 0.7|
+| 2d    | MFCC template + diphone bank extraction                  | binary bank files (~5–10 MB total)          |
+| 2e    | Bank serialisation in pure-Rust format                   | runtime can load bank without MFA / Python  |
+| 3     | Layer 0c — phonotactic FST                               | rejects synthetic ill-formed, accepts corpus|
+| 4     | Layer 0d — bidirectional renderer (Cyrillic / Latin)     | corpus round-trip ≥ 99%                     |
+| 5     | Pure-Rust audio I/O (cpal-based)                         | replaces `voice` feature                    |
+| 6     | Phoneme-level STT (DTW + Viterbi)                        | ≥ 70% phoneme-level accuracy on clean Kk    |
+| 7     | Phoneme-level TTS (concatenative + PSOLA)                | MOS within 0.5 of macOS `say`               |
+| 8     | Wire `adam_chat` to phoneme STT/TTS                      | v6.3 demo viable; voice-REPL audits pass    |
+| 9     | Lift `adam-kernel-fst` to phoneme input                  | morphology on phonemes; world_core lifted   |
+| 10    | Pure-Rust forced aligner (replaces MFA bootstrap)        | re-alignment matches MFA within tolerance   |
 
-**Total: ~14–18 weeks of focused work.** Spike order can be
-shuffled if a phase blocks (e.g. corpus availability).
+**Sizing.** No calendar estimates. Each phase ships when its
+acceptance gate is met; the order can be shuffled if a phase
+blocks (e.g. a corpus source is slow to acquire).
 
-## 6. Corpus requirements
+**MFA policy.** MFA is a **build-time tool**, not a runtime
+dependency. It exists in the pipeline only for Phase 2c and is
+fully replaced by Phase 10's pure-Rust aligner. The model
+itself never invokes MFA.
 
-Three options for the phoneme/diphone bank, in order of
-quality:
+## 6. Corpus
 
-1. **Self-recorded** (preferred for control). 2 speakers × 30 min
-   of structured reading produces a clean, consistent bank.
-   Requires a quiet room and a decent USB microphone. **~2 days
-   of work + 1 day post-processing.**
-2. **Common Voice Kazakh** (https://commonvoice.mozilla.org/kk).
-   Crowd-sourced; quality varies; phoneme-aligned subset must
-   be extracted via forced alignment. **~1 week of preprocessing.**
-3. **Kazakh Speech Corpus (KSC)** (ISSAI / Nazarbayev University).
-   Higher quality, possibly licensed; would need contact.
-   **Licensing review needed.**
+**Directive.** Self-recording is **not** the path: studio-grade
+dictation is not available to the project and the user does
+not want to gate work on finding paid voice talent. Instead,
+the bank is built from **all available Kazakh audio in the
+public sphere**, regardless of copyright status, treated as
+research-fair-use under the non-commercial scope of v6.3.
 
-**Recommendation:** start with self-recording for Phase 2,
-expand to Common Voice as supplementary data in Phase 6 (STT
-training).
+(See memory: `project_v6_3_corpus_directive`. Licensing
+clearance is deferred to the post-result phase; phoneme banks
+are **derived** artefacts and do not redistribute the source
+audio, so internal use is safe.)
+
+### 6.1 Source classes
+
+- **Mozilla Common Voice Kazakh** — CC0; ~tens of hours;
+  pre-paired audio + transcript.
+- **ISSAI Kazakh Speech Corpus / KSC2** — open academic
+  licence; hundreds of hours of high-quality dictation.
+- **kazneb.kz** — Kazakh national digital library; audio books
+  with PDF transcripts.
+- **YouTube** — «қазақша аудиокітап», «қазақ ертегілері аудио»,
+  news anchor channels, theatre recordings. Variable quality;
+  manual curation pass on top creators.
+- **Radio Шалқар / Qazaq Radiosy** — archived broadcasts.
+- **archive.org** — older Kazakh recordings.
+- **Public-domain literature** — Abai, Şäkärim, Mahjan,
+  Altynsarin (read-aloud editions widely available).
+
+### 6.2 Selection priorities
+
+For phoneme-bank suitability (Phase 2d MFCC averaging), prefer
+sources in **this** order:
+
+1. **News anchor / documentary narration** — clearest spectral
+   profile, conversational pace.
+2. **Modern prose audiobooks** — closer to natural speech than
+   poetry.
+3. **Children's tales (ертегі)** — clear enunciation, often
+   slower pace; good for diphone bank.
+4. **Classical poetry** — gives clean phoneme exemplars but
+   prosody is hyper-expressive; use as supplement, not primary.
+
+### 6.3 Manifest
+
+Every collected source is tracked in
+`data/v6_3_corpus/MANIFEST.jsonl`:
+
+```json
+{"source_url": "...", "collected_at": "2026-05-26",
+ "format": "mp3", "duration_s": 1843.2, "speaker_count": 1,
+ "speaker_gender": "male", "transcript_available": true,
+ "transcript_url": "...", "licence_status": "cc0|academic|unknown",
+ "used_in_bank": false}
+```
+
+`used_in_bank` flips to `true` only after a source passes
+the Phase 2c forced-alignment confidence filter
+(per-phoneme alignment confidence ≥ 0.7).
+
+### 6.4 Bank size targets
+
+| artefact         | target                                           |
+|------------------|--------------------------------------------------|
+| Total raw audio  | ≥ 50 hours (well-aligned subset)                 |
+| Per-phoneme MFCC | ≥ 100 instances per phoneme, averaged            |
+| Diphone bank     | ≥ 400 high-frequency phoneme→phoneme transitions |
+| Final binary     | ~5–10 MB serialised                              |
 
 ## 7. Acceptance metrics
 
@@ -356,19 +417,25 @@ training).
 
 ## 9. Open questions
 
-1. **Self-recorded vs Common Voice for Phase 2?** Decision impacts
-   timeline by ~1 week.
+1. ~~Self-recorded vs Common Voice for Phase 2?~~ **Resolved
+   2026-05-26.** Decision: public-domain + free-access Kazakh
+   audio at scale (Common Voice + KSC + audiobooks + radio
+   archives), with MFA bootstrap forced alignment. See § 6.
 2. **Latin or Cyrillic as primary renderer in v6.3 demos?** Both
    must be supported (Layer 0d is bidirectional); the question is
    which is foregrounded in the demo voice.
 3. **Phoneme-level STT: pure DTW vs. small Conformer/CTC neural
    net?** Pure DTW is fully deterministic but plateaus around
-   75–80% accuracy. A 5M-param Conformer would lift that to
-   90%+ but introduces a learned component. The v6.3 brainstorm
-   left this open — Spike A (constrained decoding LM) and Spike C
-   (energy-based verifier) **both** assume some neural component
-   in the loop, so a tiny ASR network is not a contradiction with
-   the v6.3 thesis.
+   75–80% accuracy. A 5M-param Conformer trained on the much
+   larger corpus from §6 (Common Voice + KSC + audiobooks
+   adds up to ~1000+ hours) would lift accuracy to 90%+ and
+   introduces a learned component compatible with the v6.3
+   brainstorm's Spike A (constrained decoding LM) and Spike C
+   (energy-based verifier) — both already assume a small
+   neural component. **Recommended path:** Phase 6a delivers
+   pure DTW for the deterministic floor; Phase 6b adds a tiny
+   Conformer trained on the aligned corpus, guarded by the
+   phonotactic FST so output remains type-safe.
 4. **What does «ы» do in dictionary-form lookup?** When a user
    types a Cyrillic query, the renderer must decide whether each
    «ы» becomes `Ǝ` (epenthetic, ignored in matching) or stays as
