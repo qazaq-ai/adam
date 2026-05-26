@@ -12,100 +12,107 @@
 use std::fmt;
 
 /// The 37 phonemes of Kazakh.
+///
+/// `#[repr(u8)]` with explicit discriminants gives every variant a
+/// **stable byte assignment** for binary serialisation. Once a
+/// discriminant is published in a saved phoneme bank, it MUST NOT
+/// be renumbered — only new phonemes may be appended with higher
+/// discriminants. See [`crate::binary`] for the on-disk format.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[repr(u8)]
 pub enum Phoneme {
     // === Vowels — 8 full ===
     /// /a/ — back open unrounded. Cyrillic «а».
-    A,
+    A = 0,
     /// /æ/ — front open unrounded. Cyrillic «ә».
-    Ae,
+    Ae = 1,
     /// /o/ — back open rounded. Cyrillic «о».
-    O,
+    O = 2,
     /// /ø/ — front open rounded. Cyrillic «ө».
-    Oe,
+    Oe = 3,
     /// /ʊ/ — back close rounded. Cyrillic «ұ».
-    U,
+    U = 4,
     /// /y/ — front close rounded. Cyrillic «ү».
-    Ue,
+    Ue = 5,
     /// /e/ — front mid unrounded. Cyrillic «е».
-    E,
+    E = 6,
     /// /i/ — front close unrounded, long. Cyrillic «и» (digraph;
     /// resolves to `[Yi, J]` in finer-grained analysis but kept as
     /// one phoneme at this layer for orthographic round-trip).
-    I,
+    I = 7,
 
     // === Vowels — 2 epenthetic ===
     /// /ɯ/ — back close unrounded. Cyrillic «ы». **Epenthetic**:
     /// in most non-initial inter-consonantal positions of native
     /// roots, this segment has no acoustic realisation.
-    Y,
+    Y = 8,
     /// /ɪ/ — front close unrounded. Cyrillic «і». **Epenthetic**,
     /// symmetric counterpart to [`Phoneme::Y`].
-    Yi,
+    Yi = 9,
 
     // === Consonants — 21 native ===
     /// /p/ — bilabial voiceless stop. Cyrillic «п».
-    P,
+    P = 10,
     /// /b/ — bilabial voiced stop. Cyrillic «б».
-    B,
+    B = 11,
     /// /m/ — bilabial nasal. Cyrillic «м».
-    M,
+    M = 12,
     /// /t/ — dental voiceless stop. Cyrillic «т».
-    T,
+    T = 13,
     /// /d/ — dental voiced stop. Cyrillic «д».
-    D,
+    D = 14,
     /// /s/ — alveolar voiceless fricative. Cyrillic «с».
-    S,
+    S = 15,
     /// /z/ — alveolar voiced fricative. Cyrillic «з».
-    Z,
+    Z = 16,
     /// /n/ — alveolar nasal. Cyrillic «н».
-    N,
+    N = 17,
     /// /l/ — alveolar lateral. Cyrillic «л».
-    L,
+    L = 18,
     /// /r/ — alveolar trill. Cyrillic «р».
-    R,
+    R = 19,
     /// /ʃ/ — postalveolar voiceless fricative. Cyrillic «ш».
-    Sh,
+    Sh = 20,
     /// /ʒ/ — postalveolar voiced fricative. Cyrillic «ж».
-    Zh,
+    Zh = 21,
     /// /j/ — palatal glide. Cyrillic «й».
-    J,
+    J = 22,
     /// /k/ — velar voiceless stop. Cyrillic «к».
-    K,
+    K = 23,
     /// /g/ — velar voiced stop. Cyrillic «г».
-    G,
+    G = 24,
     /// /ŋ/ — velar nasal. Cyrillic «ң».
-    Ng,
+    Ng = 25,
     /// /x/ — velar voiceless fricative. Cyrillic «х».
-    X,
+    X = 26,
     /// /q/ — uvular voiceless stop. Cyrillic «қ».
-    Q,
+    Q = 27,
     /// /ʁ/ — uvular voiced fricative. Cyrillic «ғ».
-    Gh,
+    Gh = 28,
     /// /h/ — glottal voiceless fricative. Cyrillic «һ».
-    H,
+    H = 29,
     /// /w/ — labiovelar approximant. Cyrillic «у» (consonantal use).
-    W,
+    W = 30,
 
     // === Consonants — 5 loan-only ===
     /// /f/ — labiodental voiceless fricative. Cyrillic «ф». Loan.
-    F,
+    F = 31,
     /// /v/ — labiodental voiced fricative. Cyrillic «в». Loan.
-    V,
+    V = 32,
     /// /ts/ — alveolar voiceless affricate. Cyrillic «ц». Loan.
-    Ts,
+    Ts = 33,
     /// /tʃ/ — postalveolar voiceless affricate. Cyrillic «ч». Loan.
-    Ch,
+    Ch = 34,
     /// /ɕɕ/ — alveolopalatal voiceless geminate fricative.
     /// Cyrillic «щ». Loan.
-    Shch,
+    Shch = 35,
 
     // === Boundary marker — 1 ===
     /// /ʔ/ — glottal stop, used as an internal boundary marker
     /// at compound-word junctions or hiatus avoidance. Has no
     /// Cyrillic glyph; inserted / elided by the phonotactic FST
     /// (Layer 0c).
-    Glottal,
+    Glottal = 36,
 }
 
 /// Top-level classification of a phoneme.
@@ -225,6 +232,63 @@ impl Phoneme {
         Phoneme::Shch,
         Phoneme::Glottal,
     ];
+
+    /// Stable byte discriminant for binary serialisation. Each
+    /// variant has a fixed assignment via `#[repr(u8)]`; see the
+    /// enum declaration for the assignments. Round-trip with
+    /// [`Phoneme::from_byte`].
+    #[inline]
+    pub fn to_byte(self) -> u8 {
+        self as u8
+    }
+
+    /// Decode a phoneme from its stable byte discriminant. Returns
+    /// `None` for unrecognised bytes (e.g. from a corrupted file
+    /// or a future-version bank with phonemes this build does not
+    /// know).
+    pub fn from_byte(byte: u8) -> Option<Self> {
+        use Phoneme::*;
+        Some(match byte {
+            0 => A,
+            1 => Ae,
+            2 => O,
+            3 => Oe,
+            4 => U,
+            5 => Ue,
+            6 => E,
+            7 => I,
+            8 => Y,
+            9 => Yi,
+            10 => P,
+            11 => B,
+            12 => M,
+            13 => T,
+            14 => D,
+            15 => S,
+            16 => Z,
+            17 => N,
+            18 => L,
+            19 => R,
+            20 => Sh,
+            21 => Zh,
+            22 => J,
+            23 => K,
+            24 => G,
+            25 => Ng,
+            26 => X,
+            27 => Q,
+            28 => Gh,
+            29 => H,
+            30 => W,
+            31 => F,
+            32 => V,
+            33 => Ts,
+            34 => Ch,
+            35 => Shch,
+            36 => Glottal,
+            _ => return None,
+        })
+    }
 
     /// IPA transcription as a `&'static str`.
     pub fn ipa(self) -> &'static str {

@@ -59,3 +59,11 @@ data/training/*.safetensors.bak2
 # -p adam-agg-model --bin poc_kazakh_train`). Each run writes a fresh
 # timestamped directory; sizes 3–30 MB depending on hyperparameters.
 data/checkpoints/
+
+# v6.3 audio corpus (Phase 2a+). The raw audio and large transcripts
+# are local-only; only data/v6_3_corpus/MANIFEST.jsonl and
+# data/v6_3_corpus/README.md ship in git. The derived phoneme bank
+# (Phase 2d output) lives at data/v6_3_phoneme_bank/ and ships
+# (~5–10 MB, well under the 50 MB threshold).
+data/v6_3_corpus/audio/
+data/v6_3_corpus/transcripts/
