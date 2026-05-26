@@ -130,22 +130,75 @@ phoneme carries:
                      positions where Cyrillic writes «ы» / «і»
                      but speech omits or minimally realises it.  |
 
-Inventory draft (subject to refinement against `docs/kazakh_grammar/01_phonology.md`):
+**Finalised inventory: 37 units** (cross-checked against
+`docs/kazakh_grammar/01_phonology.md` and standard Turkic
+phonological descriptions).
 
-**Vowels (8 full + 2 epenthetic):**
-`A` /a/, `Ä` /æ/, `O` /o/, `Ö` /ø/, `U` /ʊ/, `Ü` /y/, `E` /e/,
-`I` /i/ (full); `Ǝ` /ə/, `Ɨ` /ɪ/ (epenthetic — `is_epenthetic = true`).
+### Vowels — 10 units (8 full + 2 epenthetic)
 
-**Consonants (~27):**
-`P`/p/, `B`/b/, `T`/t/, `D`/d/, `K`/k/, `Q`/q/, `G`/g/,
-`Ğ`/ʁ/, `M`/m/, `N`/n/, `Ŋ`/ŋ/, `S`/s/, `Z`/z/, `Š`/ʃ/, `Ž`/ʒ/,
-`X`/x/, `H`/h/, `L`/l/, `R`/r/, `J`/j/, `W`/w/, `F`/f/, `V`/v/,
-`C`/ts/, `Č`/tʃ/, `Šč`/ɕɕ/.
+| id  | IPA  | harmony | height | rounding   | length | epenthetic | Cyrillic |
+|-----|------|---------|--------|------------|--------|------------|----------|
+| `A` | /a/  | Back    | Open   | Unrounded  | Short  | no         | а        |
+| `Ä` | /æ/  | Front   | Open   | Unrounded  | Short  | no         | ә        |
+| `O` | /o/  | Back    | Open   | Rounded    | Short  | no         | о        |
+| `Ö` | /ø/  | Front   | Open   | Rounded    | Short  | no         | ө        |
+| `U` | /ʊ/  | Back    | Close  | Rounded    | Short  | no         | ұ        |
+| `Ü` | /y/  | Front   | Close  | Rounded    | Short  | no         | ү        |
+| `E` | /e/  | Front   | Mid    | Unrounded  | Short  | no         | е        |
+| `I` | /i/  | Front   | Close  | Unrounded  | Long   | no         | и (= Ɨ+J) |
+| `Ǝ` | /ɯ/  | Back    | Close  | Unrounded  | Short  | **yes**    | ы        |
+| `Ɨ` | /ɪ/  | Front   | Close  | Unrounded  | Short  | **yes**    | і        |
 
-(Loanword-only consonants `F V C Č Šč` retained but flagged for
-domain-restricted use.)
+The `is_epenthetic = true` flag on `Ǝ` and `Ɨ` is the technical
+core of the v6.3 thesis: in most positions where Cyrillic
+writes «ы» / «і», the segment is acoustically null or minimal.
+The Layer 0d Cyrillic→Phoneme renderer applies the rule in §9
+OQ4 (resolved below) to decide when these letters become real
+phonemes vs. orthographic markers.
 
-**Total: ~37 units.** Exact count finalised in Phase 1.
+### Consonants — 27 units
+
+| id    | IPA  | place        | manner      | voicing    | native/loan | Cyrillic |
+|-------|------|--------------|-------------|------------|-------------|----------|
+| `P`   | /p/  | Bilabial     | Stop        | Voiceless  | native      | п        |
+| `B`   | /b/  | Bilabial     | Stop        | Voiced     | native      | б        |
+| `M`   | /m/  | Bilabial     | Nasal       | Voiced     | native      | м        |
+| `T`   | /t/  | Dental       | Stop        | Voiceless  | native      | т        |
+| `D`   | /d/  | Dental       | Stop        | Voiced     | native      | д        |
+| `S`   | /s/  | Alveolar     | Fricative   | Voiceless  | native      | с        |
+| `Z`   | /z/  | Alveolar     | Fricative   | Voiced     | native      | з        |
+| `N`   | /n/  | Alveolar     | Nasal       | Voiced     | native      | н        |
+| `L`   | /l/  | Alveolar     | Lateral     | Voiced     | native      | л        |
+| `R`   | /r/  | Alveolar     | Trill       | Voiced     | native      | р        |
+| `Š`   | /ʃ/  | Postalveolar | Fricative   | Voiceless  | native      | ш        |
+| `Ž`   | /ʒ/  | Postalveolar | Fricative   | Voiced     | native      | ж        |
+| `J`   | /j/  | Palatal      | Glide       | Voiced     | native      | й        |
+| `K`   | /k/  | Velar        | Stop        | Voiceless  | native      | к        |
+| `G`   | /g/  | Velar        | Stop        | Voiced     | native      | г        |
+| `Ŋ`   | /ŋ/  | Velar        | Nasal       | Voiced     | native      | ң        |
+| `X`   | /x/  | Velar        | Fricative   | Voiceless  | native      | х        |
+| `Q`   | /q/  | Uvular       | Stop        | Voiceless  | native      | қ        |
+| `Ğ`   | /ʁ/  | Uvular       | Fricative   | Voiced     | native      | ғ        |
+| `H`   | /h/  | Glottal      | Fricative   | Voiceless  | native      | һ        |
+| `W`   | /w/  | Labiovelar   | Approximant | Voiced     | native      | у (cons.) |
+| `F`   | /f/  | Labiodental  | Fricative   | Voiceless  | **loan**   | ф        |
+| `V`   | /v/  | Labiodental  | Fricative   | Voiced     | **loan**   | в        |
+| `C`   | /ts/ | Alveolar     | Affricate   | Voiceless  | **loan**   | ц        |
+| `Č`   | /tʃ/ | Postalveolar | Affricate   | Voiceless  | **loan**   | ч        |
+| `Šč`  | /ɕɕ/ | Alveolopalatal | Fricative | Voiceless  | **loan**   | щ        |
+| `ʔ`   | /ʔ/  | Glottal      | Stop        | Voiceless  | (boundary) | (none)   |
+
+`ʔ` is a phoneme-stream **internal marker** for glottal-stop
+boundaries (compound-word junctions, hiatus avoidance); it has
+no Cyrillic glyph and is inserted/elided by the phonotactic
+FST (Layer 0c).
+
+**Loan-only consonants** (`F`, `V`, `C`, `Č`, `Šč`) are
+permitted in the alphabet but flagged so lexicon load-time
+validation can warn on their appearance in claimed-native
+roots.
+
+**Total: 10 vowels + 27 consonants = 37 phonemes.**
 
 ### 3.3 Layer 0b — Acoustic realisation
 
@@ -421,9 +474,14 @@ the Phase 2c forced-alignment confidence filter
    2026-05-26.** Decision: public-domain + free-access Kazakh
    audio at scale (Common Voice + KSC + audiobooks + radio
    archives), with MFA bootstrap forced alignment. See § 6.
-2. **Latin or Cyrillic as primary renderer in v6.3 demos?** Both
-   must be supported (Layer 0d is bidirectional); the question is
-   which is foregrounded in the demo voice.
+2. ~~Latin or Cyrillic as primary renderer in v6.3 demos?~~
+   **Resolved 2026-05-26.** Decision: **Cyrillic primary**.
+   Reasons: (a) current official orthography of the Republic
+   of Kazakhstan in 2026; (b) the entire `data/world_core/*.jsonl`
+   curated corpus is in Cyrillic; (c) the post-2025 official
+   Latin alphabet is not yet stabilised. The Latin renderer
+   ships in Layer 0d for completeness but is not the demo
+   default. v6.3 demo screens render Cyrillic.
 3. **Phoneme-level STT: pure DTW vs. small Conformer/CTC neural
    net?** Pure DTW is fully deterministic but plateaus around
    75–80% accuracy. A 5M-param Conformer trained on the much
@@ -436,13 +494,32 @@ the Phase 2c forced-alignment confidence filter
    pure DTW for the deterministic floor; Phase 6b adds a tiny
    Conformer trained on the aligned corpus, guarded by the
    phonotactic FST so output remains type-safe.
-4. **What does «ы» do in dictionary-form lookup?** When a user
-   types a Cyrillic query, the renderer must decide whether each
-   «ы» becomes `Ǝ` (epenthetic, ignored in matching) or stays as
-   a full vowel. The conservative rule: «ы» is epenthetic
-   between two consonants in non-initial syllables of native
-   Kazakh roots; full vowel elsewhere. Corpus-evidenced refinement
-   needed.
+4. ~~What does «ы» do in dictionary-form lookup?~~ **Resolved
+   2026-05-26.** Decision: **«ы» (and «і» symmetrically) is
+   classified epenthetic** by the Cyrillic→Phoneme renderer
+   **iff all three conditions hold**:
+   - position is non-initial in the word
+   - both adjacent segments are consonants
+   - the host word is a native Kazakh root (not a Russian /
+     European loan as flagged by lexicon metadata)
+
+   In all other positions, «ы» realises as full `/ɯ/` (id `Ǝ`
+   with `is_epenthetic = false` at instance level) and «і» as
+   full `/ɪ/` (`Ɨ`, full). Examples:
+
+   | word         | analysis                          | «ы»/«і» status |
+   |--------------|-----------------------------------|----------------|
+   | қыз          | initial syllable, CVC             | full           |
+   | жұмыс        | non-initial, between C's, native  | **epenthetic** |
+   | жұмыссыз     | both «ы» non-initial between C's  | **both epenthetic** |
+   | тым (loan)   | initial syllable                  | full           |
+   | бизнес (loan)| loan flag set                     | full           |
+
+   This is a deterministic rule with a single corpus-evidenced
+   parameter (the lexicon's native/loan flag). Refinement of
+   edge cases (compound boundaries, fossilised forms) happens
+   in Phase 4 round-trip evaluation; the rule above is the
+   v6.3 starting contract.
 
 ## 10. References
 
@@ -460,11 +537,23 @@ the Phase 2c forced-alignment confidence filter
 
 ## 11. Sign-off
 
-Once the open questions in § 9 are answered and the inventory
-draft in § 3.2 is reviewed against a phonetic source, this
-document becomes the design contract for v6.3 implementation.
+**Status 2026-05-26:** All four open questions in §9 are
+resolved. The phoneme inventory (§3.2) is finalised at 37
+units. This document is the **signed design contract** for
+v6.3 implementation.
 
-**Next action:** finalise the phoneme inventory (§ 3.2) by
-cross-checking against `docs/kazakh_grammar/01_phonology.md`
-and a fluent native speaker review. Then cut the
-`experimental/v6_3_phonemic_foundation` branch and begin Phase 1.
+**Next actions** (no calendar — gates only):
+1. Cut branch `experimental/v6_3_phonemic_foundation` from
+   `main` at the design-sign-off commit.
+2. Begin **Phase 1**: create `crates/adam-phoneme/` with the
+   typed phoneme enum, the attribute table, the
+   `Phoneme::cyrillic_default()` projection, the «ы»/«і»
+   epenthetic rule from §9 OQ4, and round-trip unit tests
+   against a small word list from `data/world_core`.
+3. Begin **Phase 2a** in parallel (no Rust dependency): start
+   acquiring corpus per §6.1 priorities, populate
+   `data/v6_3_corpus/MANIFEST.jsonl`.
+
+The remaining phases (2b–10) gate sequentially on their
+predecessors' acceptance criteria. v6.2 stays production main
+throughout; v6.3 is merge-eligible only after Phase 8 passes.
