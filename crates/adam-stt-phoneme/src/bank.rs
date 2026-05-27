@@ -177,6 +177,26 @@ impl PhonemeBank {
         Self::from_bytes(&bytes)
     }
 
+    /// Combine this bank with a `fallback` bank: this bank's
+    /// templates win where both have a given phoneme; the
+    /// fallback covers phonemes this bank lacks.
+    ///
+    /// The canonical use is **real + synthetic hybrid**: load
+    /// the corpus-derived bank (`templates.bin`) for phonemes
+    /// we have real data on, fall back to the synthetic bank
+    /// for everything else. Until Phase 2d-plus has full
+    /// real-data coverage of all 36 sounded phonemes, this is
+    /// how the recogniser gets the best of both.
+    ///
+    /// Returns a new bank — neither operand is consumed.
+    pub fn merged_with_fallback(&self, fallback: &PhonemeBank) -> PhonemeBank {
+        let mut out = fallback.clone();
+        for (phoneme, template) in &self.templates {
+            out.templates.insert(*phoneme, template.clone());
+        }
+        out
+    }
+
     /// Build a **synthetic** phoneme bank for development and
     /// algorithm validation.
     ///
@@ -356,6 +376,55 @@ mod tests {
             let back_t = back.get(*p).expect("phoneme lost in round-trip");
             assert_eq!(back_t.mfcc, t.mfcc);
         }
+    }
+
+    /// **Hybrid loader**: real templates win, synthetic fills
+    /// the gaps. Pin both directions: a phoneme that exists
+    /// only in `real` is taken from there; a phoneme that
+    /// exists only in `synth` is taken from there; a phoneme
+    /// in both takes the `real` version.
+    #[test]
+    fn merged_with_fallback_prefers_self() {
+        let mut real = PhonemeBank::new();
+        let mfcc_a = mfcc(
+            &harmonic_voice(100.0, 0.2, 16_000, 0.4, 4),
+            16_000,
+            &MfccConfig::default(),
+        );
+        real.insert(PhonemeTemplate {
+            phoneme: Phoneme::A,
+            mfcc: mfcc_a.clone(),
+        });
+        // synth has many phonemes including A — but with a
+        // *different* MFCC (synth uses harmonic stack at the
+        // phoneme's F0 anchor, and the test "real" above is
+        // also harmonic-based at 100 Hz which matches synth's
+        // A anchor — so they may coincide. Use a distinct
+        // signal to guarantee distinction.)
+        let mfcc_a_distinct = mfcc(
+            &harmonic_voice(199.0, 0.2, 16_000, 0.4, 4),
+            16_000,
+            &MfccConfig::default(),
+        );
+        real.insert(PhonemeTemplate {
+            phoneme: Phoneme::A,
+            mfcc: mfcc_a_distinct.clone(),
+        });
+
+        let synth = PhonemeBank::synthetic(16_000);
+
+        let hybrid = real.merged_with_fallback(&synth);
+
+        // Hybrid has full synth coverage (36) — the real bank
+        // only had A, so length is dominated by synth.
+        assert_eq!(hybrid.len(), synth.len());
+        // A in hybrid is the REAL one (from `real`).
+        let hybrid_a = hybrid.get(Phoneme::A).unwrap();
+        assert_eq!(hybrid_a.mfcc, mfcc_a_distinct);
+        // Q in hybrid is the SYNTH one (real didn't have it).
+        let hybrid_q = hybrid.get(Phoneme::Q).unwrap();
+        let synth_q = synth.get(Phoneme::Q).unwrap();
+        assert_eq!(hybrid_q.mfcc, synth_q.mfcc);
     }
 
     /// Loader rejects malformed input.

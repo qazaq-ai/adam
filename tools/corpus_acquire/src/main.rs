@@ -712,29 +712,29 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
         processed += 1;
     }
 
-    // For each phoneme: keep the LONGEST collected chunk as
-    // the bootstrap template. Future work: DBA-style averaging.
+    // For each phoneme: **pseudo-DBA** averaging — pick the
+    // mean chunk length as target, linearly resample each
+    // chunk to that length, then frame-wise mean.
+    //
+    // This is a simplified DBA (DTW Barycenter Averaging)
+    // good enough for the bootstrap iteration. Proper DBA
+    // does iterative DTW-realignment; we can swap in true
+    // DBA later if cluster quality demands it.
     let mut bank = PhonemeBank::new();
     let mut report: Vec<(Phoneme, usize, usize)> = Vec::new();
     for (phoneme, chunks) in &per_phoneme {
-        let longest = chunks
-            .iter()
-            .max_by_key(|c| c.num_frames())
-            .expect("non-empty per-phoneme bucket")
-            .clone();
-        report.push((*phoneme, chunks.len(), longest.num_frames()));
+        let averaged = average_chunks(chunks);
+        report.push((*phoneme, chunks.len(), averaged.num_frames()));
         bank.insert(PhonemeTemplate {
             phoneme: *phoneme,
-            mfcc: longest,
+            mfcc: averaged,
         });
     }
     report.sort_by_key(|(p, _, _)| p.to_byte());
 
     println!("\n[build-bank] per-phoneme coverage:");
     for (p, n_samples, n_frames) in &report {
-        println!(
-            "  {p:?} → {n_samples} chunks collected, template = {n_frames} frames"
-        );
+        println!("  {p:?} → {n_samples} chunks collected, template = {n_frames} frames");
     }
 
     println!(
@@ -746,6 +746,50 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
     bank.save_to_file(&args.output)?;
     println!("[build-bank] wrote {}", args.output.display());
     Ok(())
+}
+
+/// Pseudo-DBA averaging across a bucket of MFCC chunks: pick
+/// the mean chunk length, linearly resample each chunk to
+/// that length, frame-wise average. Returns one averaged
+/// MfccSequence representing the bucket.
+fn average_chunks(chunks: &[adam_audio::mfcc::MfccSequence]) -> adam_audio::mfcc::MfccSequence {
+    assert!(!chunks.is_empty(), "average_chunks needs ≥1 chunk");
+    let n_mfcc = chunks[0].dim();
+    let target_len = (chunks.iter().map(|c| c.num_frames()).sum::<usize>() / chunks.len()).max(1);
+
+    let mut acc: Vec<Vec<f32>> = vec![vec![0.0_f32; n_mfcc]; target_len];
+    for chunk in chunks {
+        let resampled = resample_frames(&chunk.frames, target_len);
+        for (a, r) in acc.iter_mut().zip(resampled.iter()) {
+            for (ac, rc) in a.iter_mut().zip(r.iter()) {
+                *ac += rc;
+            }
+        }
+    }
+    for frame in &mut acc {
+        for c in frame.iter_mut() {
+            *c /= chunks.len() as f32;
+        }
+    }
+    adam_audio::mfcc::MfccSequence {
+        frames: acc,
+        sample_rate: chunks[0].sample_rate,
+        hop_length: chunks[0].hop_length,
+        n_mfcc,
+    }
+}
+
+/// Linearly resample a frame sequence to `target_len` frames
+/// by nearest-neighbour pick. (For MFCC, simpler than interp
+/// — each coefficient is already smooth across frames.)
+fn resample_frames(frames: &[Vec<f32>], target_len: usize) -> Vec<Vec<f32>> {
+    let src_len = frames.len().max(1);
+    (0..target_len)
+        .map(|i| {
+            let src_i = i * src_len / target_len;
+            frames[src_i.min(src_len - 1)].clone()
+        })
+        .collect()
 }
 
 // ─── helpers ──────────────────────────────────────────────────
