@@ -596,10 +596,17 @@ fn recognize_occupation_statement(input: &str) -> Option<String> {
         return None;
     }
     for (root, canonical) in occupations {
+        // Use char counts (not byte lengths): Kazakh suffixes
+        // like «-мын», «-сың», «-сыз», «-пын» are 2–4 chars.
+        // `len()` would give bytes, which doubles for Cyrillic
+        // and breaks the comparison. The replayed-voice-REPL
+        // battery surfaced this on «бағдарламашымын» (session
+        // 3 — Whisper rendered the «-мын» suffix the user
+        // actually spoke).
+        let root_chars = root.chars().count();
         if lower.split(|c: char| !c.is_alphanumeric()).any(|tok| {
-            tok == *root
-                || tok.starts_with(root)
-                    && (tok.len() == root.len() + 2 || tok.len() == root.len() + 3)
+            let tok_chars = tok.chars().count();
+            tok == *root || (tok.starts_with(root) && (2..=4).contains(&(tok_chars - root_chars)))
         }) {
             return Some(format!(
                 "Түсіндім, сіз {canonical}сыз. Бағдарламалау тілдері, \
