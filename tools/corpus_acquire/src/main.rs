@@ -63,6 +63,11 @@ enum Cmd {
     /// `MANIFEST.jsonl`. Used after manually curating
     /// discover-output transcripts (filename stubs → Cyrillic).
     FixManifestTranscripts(FixArgs),
+    /// Build a real-data phoneme bank from the manifest.
+    /// Equipartitions each word's MFCC across its phoneme
+    /// sequence; per phoneme, keeps the longest collected
+    /// chunk as the template. Writes to `templates.bin`.
+    BuildBank(BuildBankArgs),
 }
 
 #[derive(Debug, clap::Args)]
@@ -127,6 +132,19 @@ struct FixArgs {
     manifest: PathBuf,
 }
 
+#[derive(Debug, clap::Args)]
+struct BuildBankArgs {
+    /// Manifest with (label, transcript, mfcc_path) entries.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank/MANIFEST.jsonl")]
+    manifest: PathBuf,
+    /// Root directory for the manifest's mfcc_path entries.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank")]
+    bank_dir: PathBuf,
+    /// Output template-bank file.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank/templates.bin")]
+    output: PathBuf,
+}
+
 // ─── main ──────────────────────────────────────────────────────
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -135,6 +153,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Cmd::Discover(args) => run_discover(args),
         Cmd::Batch(args) => run_batch(args),
         Cmd::FixManifestTranscripts(args) => run_fix_transcripts(args),
+        Cmd::BuildBank(args) => run_build_bank(args),
     }
 }
 
@@ -590,6 +609,146 @@ fn run_batch(args: BatchArgs) -> Result<(), Box<dyn std::error::Error>> {
     println!("[batch] done: {ok} acquired, {skipped} skipped, {failed} failed");
     Ok(())
 }
+
+// ─── build-bank ───────────────────────────────────────────────
+
+fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>> {
+    use adam_phoneme::Phoneme;
+    use adam_phoneme::cyrillic::cyrillic_to_phonemes;
+    use adam_stt_phoneme::{PhonemeBank, PhonemeTemplate};
+    use std::collections::HashMap;
+
+    if !args.manifest.exists() {
+        return Err(format!("manifest not found: {}", args.manifest.display()).into());
+    }
+
+    // Per-phoneme collected chunks: Vec<MfccSequence> per phoneme.
+    let mut per_phoneme: HashMap<Phoneme, Vec<adam_audio::mfcc::MfccSequence>> = HashMap::new();
+    let mut processed = 0_usize;
+    let mut skipped = 0_usize;
+
+    let file = fs::File::open(&args.manifest)?;
+    for line in BufReader::new(file).lines() {
+        let entry: ManifestEntry = match serde_json::from_str(&line?) {
+            Ok(e) => e,
+            Err(_) => continue,
+        };
+
+        // Only handle single-word transcripts in this first
+        // pass. Multi-word (sentence) entries like the UDHR
+        // need proper word-level alignment first; deferred.
+        if entry.transcript.split_whitespace().count() != 1 {
+            println!(
+                "[build-bank] skipping multi-word entry «{}» ({} words)",
+                entry.label,
+                entry.transcript.split_whitespace().count()
+            );
+            skipped += 1;
+            continue;
+        }
+
+        // Cyrillic transcript → phoneme sequence.
+        // Use is_native_root=true so the epenthetic rule
+        // drops «ы»/«і» that wouldn't be acoustically realised.
+        let phonemes = cyrillic_to_phonemes(&entry.transcript, true);
+        if phonemes.is_empty() {
+            println!(
+                "[build-bank] skipping «{}» — no phonemes parsed",
+                entry.label
+            );
+            skipped += 1;
+            continue;
+        }
+
+        // Load the MFCC sequence.
+        let mfcc_path = args.bank_dir.join(&entry.mfcc_path);
+        let mfcc_bytes = match fs::read(&mfcc_path) {
+            Ok(b) => b,
+            Err(e) => {
+                eprintln!("[build-bank] cannot read {}: {}", mfcc_path.display(), e);
+                skipped += 1;
+                continue;
+            }
+        };
+        let mfcc_seq = adam_audio::mfcc::read_binary(&mfcc_bytes)?;
+
+        let n_frames = mfcc_seq.num_frames();
+        if n_frames < phonemes.len() {
+            println!(
+                "[build-bank] skipping «{}» — {} frames < {} phonemes",
+                entry.label,
+                n_frames,
+                phonemes.len()
+            );
+            skipped += 1;
+            continue;
+        }
+
+        // **Equipartition**: divide the MFCC frames evenly
+        // across phonemes. Crude bootstrap alignment — a
+        // proper DTW-driven re-alignment is the next pass.
+        let chunk = n_frames / phonemes.len();
+        for (i, &phoneme) in phonemes.iter().enumerate() {
+            let start = i * chunk;
+            let end = if i + 1 == phonemes.len() {
+                n_frames
+            } else {
+                (i + 1) * chunk
+            };
+            let frames: Vec<Vec<f32>> = mfcc_seq.frames[start..end].to_vec();
+            if frames.is_empty() {
+                continue;
+            }
+            per_phoneme
+                .entry(phoneme)
+                .or_default()
+                .push(adam_audio::mfcc::MfccSequence {
+                    frames,
+                    sample_rate: mfcc_seq.sample_rate,
+                    hop_length: mfcc_seq.hop_length,
+                    n_mfcc: mfcc_seq.n_mfcc,
+                });
+        }
+        processed += 1;
+    }
+
+    // For each phoneme: keep the LONGEST collected chunk as
+    // the bootstrap template. Future work: DBA-style averaging.
+    let mut bank = PhonemeBank::new();
+    let mut report: Vec<(Phoneme, usize, usize)> = Vec::new();
+    for (phoneme, chunks) in &per_phoneme {
+        let longest = chunks
+            .iter()
+            .max_by_key(|c| c.num_frames())
+            .expect("non-empty per-phoneme bucket")
+            .clone();
+        report.push((*phoneme, chunks.len(), longest.num_frames()));
+        bank.insert(PhonemeTemplate {
+            phoneme: *phoneme,
+            mfcc: longest,
+        });
+    }
+    report.sort_by_key(|(p, _, _)| p.to_byte());
+
+    println!("\n[build-bank] per-phoneme coverage:");
+    for (p, n_samples, n_frames) in &report {
+        println!(
+            "  {p:?} → {n_samples} chunks collected, template = {n_frames} frames"
+        );
+    }
+
+    println!(
+        "\n[build-bank] processed {processed} entries, skipped {skipped}; \
+         bank contains {} phonemes",
+        bank.len()
+    );
+
+    bank.save_to_file(&args.output)?;
+    println!("[build-bank] wrote {}", args.output.display());
+    Ok(())
+}
+
+// ─── helpers ──────────────────────────────────────────────────
 
 fn read_manifest_labels(path: &Path) -> std::io::Result<HashSet<String>> {
     let mut out = HashSet::new();

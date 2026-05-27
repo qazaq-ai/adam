@@ -79,6 +79,125 @@ impl MfccSequence {
     }
 }
 
+// ─── Binary I/O ───────────────────────────────────────────────
+
+/// Magic bytes for the per-sequence MFCC binary format.
+pub const MFCC_MAGIC: [u8; 4] = *b"MFCC";
+
+/// Current format version.
+pub const MFCC_FORMAT_VERSION: u8 = 0x01;
+
+/// Header length in bytes.
+pub const MFCC_HEADER_LEN: usize = 4 + 1 + 4 + 4 + 4 + 4;
+
+/// Errors returned by [`read_binary`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum MfccBinaryError {
+    TruncatedHeader { got: usize, want: usize },
+    BadMagic { got: [u8; 4] },
+    UnsupportedVersion { got: u8 },
+    BodyLengthMismatch { declared: usize, actual: usize },
+}
+
+impl std::fmt::Display for MfccBinaryError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::TruncatedHeader { got, want } => {
+                write!(f, "MFCC: truncated header — got {got}, need {want}")
+            }
+            Self::BadMagic { got } => write!(f, "MFCC: bad magic {got:?} (want b\"MFCC\")"),
+            Self::UnsupportedVersion { got } => {
+                write!(f, "MFCC: unsupported version 0x{got:02x}")
+            }
+            Self::BodyLengthMismatch { declared, actual } => write!(
+                f,
+                "MFCC: body length mismatch — declared {declared}, actual {actual}"
+            ),
+        }
+    }
+}
+
+impl std::error::Error for MfccBinaryError {}
+
+/// Serialise an MFCC sequence to bytes. Format:
+///
+/// ```text
+/// Offset  Bytes  Field
+/// ──────  ─────  ────────────────────────────────
+/// 0       4      Magic b"MFCC"
+/// 4       1      Format version (0x01)
+/// 5       4      n_frames        u32 LE
+/// 9       4      n_mfcc          u32 LE
+/// 13      4      sample_rate     u32 LE
+/// 17      4      hop_length      u32 LE
+/// 21      N      f32 LE coefficients (n_frames × n_mfcc)
+/// ```
+pub fn write_binary(seq: &MfccSequence) -> Vec<u8> {
+    let n_frames = seq.num_frames();
+    let n_mfcc = seq.dim();
+    let mut out = Vec::with_capacity(MFCC_HEADER_LEN + n_frames * n_mfcc * 4);
+    out.extend_from_slice(&MFCC_MAGIC);
+    out.push(MFCC_FORMAT_VERSION);
+    out.extend_from_slice(&(n_frames as u32).to_le_bytes());
+    out.extend_from_slice(&(n_mfcc as u32).to_le_bytes());
+    out.extend_from_slice(&seq.sample_rate.to_le_bytes());
+    out.extend_from_slice(&(seq.hop_length as u32).to_le_bytes());
+    for frame in &seq.frames {
+        debug_assert_eq!(frame.len(), n_mfcc);
+        for &c in frame {
+            out.extend_from_slice(&c.to_le_bytes());
+        }
+    }
+    out
+}
+
+/// Deserialise an MFCC sequence from bytes.
+pub fn read_binary(bytes: &[u8]) -> Result<MfccSequence, MfccBinaryError> {
+    if bytes.len() < MFCC_HEADER_LEN {
+        return Err(MfccBinaryError::TruncatedHeader {
+            got: bytes.len(),
+            want: MFCC_HEADER_LEN,
+        });
+    }
+    let magic: [u8; 4] = bytes[0..4].try_into().unwrap();
+    if magic != MFCC_MAGIC {
+        return Err(MfccBinaryError::BadMagic { got: magic });
+    }
+    let version = bytes[4];
+    if version != MFCC_FORMAT_VERSION {
+        return Err(MfccBinaryError::UnsupportedVersion { got: version });
+    }
+    let n_frames = u32::from_le_bytes(bytes[5..9].try_into().unwrap()) as usize;
+    let n_mfcc = u32::from_le_bytes(bytes[9..13].try_into().unwrap()) as usize;
+    let sample_rate = u32::from_le_bytes(bytes[13..17].try_into().unwrap());
+    let hop_length = u32::from_le_bytes(bytes[17..21].try_into().unwrap()) as usize;
+
+    let body = &bytes[MFCC_HEADER_LEN..];
+    let expected = n_frames * n_mfcc * 4;
+    if body.len() != expected {
+        return Err(MfccBinaryError::BodyLengthMismatch {
+            declared: expected,
+            actual: body.len(),
+        });
+    }
+    let mut frames: Vec<Vec<f32>> = Vec::with_capacity(n_frames);
+    for f in 0..n_frames {
+        let mut frame = Vec::with_capacity(n_mfcc);
+        for c in 0..n_mfcc {
+            let off = (f * n_mfcc + c) * 4;
+            let v = f32::from_le_bytes(body[off..off + 4].try_into().unwrap());
+            frame.push(v);
+        }
+        frames.push(frame);
+    }
+    Ok(MfccSequence {
+        frames,
+        sample_rate,
+        hop_length,
+        n_mfcc,
+    })
+}
+
 /// Compute MFCCs for an audio signal.
 ///
 /// Convenience entry point: runs STFT then [`mfcc_from_spectrogram`].
@@ -333,6 +452,51 @@ mod tests {
                 assert!(c.abs() < 0.1, "silence MFCC coeff too large: {c}");
             }
         }
+    }
+
+    /// Binary write+read round-trip is lossless.
+    #[test]
+    fn binary_round_trip() {
+        let signal = harmonic_voice(150.0, 0.3, 16_000, 0.4, 4);
+        let original = mfcc(&signal, 16_000, &MfccConfig::default());
+        let bytes = write_binary(&original);
+        let back = read_binary(&bytes).unwrap();
+        assert_eq!(back, original);
+    }
+
+    /// Binary reader rejects truncated headers, bad magic, bad
+    /// version, and length-mismatched body.
+    #[test]
+    fn binary_reader_rejects_malformed() {
+        let signal = harmonic_voice(150.0, 0.05, 16_000, 0.4, 4);
+        let seq = mfcc(&signal, 16_000, &MfccConfig::default());
+        let bytes = write_binary(&seq);
+        // Truncated.
+        assert!(matches!(
+            read_binary(&bytes[..MFCC_HEADER_LEN - 1]),
+            Err(MfccBinaryError::TruncatedHeader { .. }),
+        ));
+        // Bad magic.
+        let mut bad = bytes.clone();
+        bad[0] = b'X';
+        assert!(matches!(
+            read_binary(&bad),
+            Err(MfccBinaryError::BadMagic { .. })
+        ));
+        // Bad version.
+        let mut bad = bytes.clone();
+        bad[4] = 0xFF;
+        assert!(matches!(
+            read_binary(&bad),
+            Err(MfccBinaryError::UnsupportedVersion { got: 0xFF })
+        ));
+        // Body shorter than declared.
+        let mut bad = bytes.clone();
+        bad.truncate(bad.len() - 4);
+        assert!(matches!(
+            read_binary(&bad),
+            Err(MfccBinaryError::BodyLengthMismatch { .. })
+        ));
     }
 
     fn cosine(a: &[f32], b: &[f32]) -> f32 {

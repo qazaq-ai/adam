@@ -28,6 +28,34 @@ use adam_audio::pitch::harmonic_voice;
 use adam_phoneme::{Phoneme, PhonemeClass};
 use std::collections::HashMap;
 
+/// Errors surfaced by [`PhonemeBank`] serialisation / loading.
+#[derive(Debug)]
+pub enum PhonemeBankError {
+    Io(std::io::Error),
+    TruncatedHeader,
+    TruncatedEntry,
+    BadMagic,
+    UnsupportedVersion(u8),
+    UnknownPhonemeByte(u8),
+    MfccDecode(adam_audio::mfcc::MfccBinaryError),
+}
+
+impl std::fmt::Display for PhonemeBankError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Io(e) => write!(f, "PhonemeBank I/O: {e}"),
+            Self::TruncatedHeader => write!(f, "PhonemeBank: truncated header"),
+            Self::TruncatedEntry => write!(f, "PhonemeBank: truncated entry"),
+            Self::BadMagic => write!(f, "PhonemeBank: bad magic (want b\"PHBK\")"),
+            Self::UnsupportedVersion(v) => write!(f, "PhonemeBank: unsupported version 0x{v:02x}"),
+            Self::UnknownPhonemeByte(b) => write!(f, "PhonemeBank: unknown phoneme byte 0x{b:02x}"),
+            Self::MfccDecode(e) => write!(f, "PhonemeBank embedded MFCC: {e}"),
+        }
+    }
+}
+
+impl std::error::Error for PhonemeBankError {}
+
 /// A reference MFCC time-series for one phoneme.
 #[derive(Debug, Clone)]
 pub struct PhonemeTemplate {
@@ -72,6 +100,81 @@ impl PhonemeBank {
 
     pub fn is_empty(&self) -> bool {
         self.templates.is_empty()
+    }
+
+    /// Serialise the bank to bytes for on-disk storage. Format:
+    ///
+    /// ```text
+    /// magic     b"PHBK"   4 bytes
+    /// version   u8 = 1    1 byte
+    /// count     u32 LE    4 bytes
+    /// for each entry:
+    ///   phoneme_id u8                       (Phoneme::to_byte())
+    ///   mfcc_bytes_len u32 LE
+    ///   mfcc_bytes (an adam_audio::mfcc::write_binary blob)
+    /// ```
+    pub fn to_bytes(&self) -> Vec<u8> {
+        let mut out = Vec::new();
+        out.extend_from_slice(b"PHBK");
+        out.push(0x01);
+        out.extend_from_slice(&(self.templates.len() as u32).to_le_bytes());
+        // Stable ordering for deterministic output.
+        let mut entries: Vec<_> = self.templates.iter().collect();
+        entries.sort_by_key(|(p, _)| p.to_byte());
+        for (phoneme, template) in entries {
+            out.push(phoneme.to_byte());
+            let mfcc_bytes = adam_audio::mfcc::write_binary(&template.mfcc);
+            out.extend_from_slice(&(mfcc_bytes.len() as u32).to_le_bytes());
+            out.extend_from_slice(&mfcc_bytes);
+        }
+        out
+    }
+
+    /// Deserialise a bank from bytes written by [`Self::to_bytes`].
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self, PhonemeBankError> {
+        if bytes.len() < 9 {
+            return Err(PhonemeBankError::TruncatedHeader);
+        }
+        if &bytes[0..4] != b"PHBK" {
+            return Err(PhonemeBankError::BadMagic);
+        }
+        if bytes[4] != 0x01 {
+            return Err(PhonemeBankError::UnsupportedVersion(bytes[4]));
+        }
+        let count = u32::from_le_bytes(bytes[5..9].try_into().unwrap()) as usize;
+        let mut cursor = 9;
+        let mut bank = Self::new();
+        for _ in 0..count {
+            if cursor + 5 > bytes.len() {
+                return Err(PhonemeBankError::TruncatedEntry);
+            }
+            let phoneme_byte = bytes[cursor];
+            cursor += 1;
+            let phoneme = Phoneme::from_byte(phoneme_byte)
+                .ok_or(PhonemeBankError::UnknownPhonemeByte(phoneme_byte))?;
+            let blob_len =
+                u32::from_le_bytes(bytes[cursor..cursor + 4].try_into().unwrap()) as usize;
+            cursor += 4;
+            if cursor + blob_len > bytes.len() {
+                return Err(PhonemeBankError::TruncatedEntry);
+            }
+            let mfcc = adam_audio::mfcc::read_binary(&bytes[cursor..cursor + blob_len])
+                .map_err(PhonemeBankError::MfccDecode)?;
+            cursor += blob_len;
+            bank.insert(PhonemeTemplate { phoneme, mfcc });
+        }
+        Ok(bank)
+    }
+
+    /// Write the bank to a file via [`Self::to_bytes`].
+    pub fn save_to_file(&self, path: impl AsRef<std::path::Path>) -> std::io::Result<()> {
+        std::fs::write(path, self.to_bytes())
+    }
+
+    /// Load a bank from a file via [`Self::from_bytes`].
+    pub fn load_from_file(path: impl AsRef<std::path::Path>) -> Result<Self, PhonemeBankError> {
+        let bytes = std::fs::read(path).map_err(PhonemeBankError::Io)?;
+        Self::from_bytes(&bytes)
     }
 
     /// Build a **synthetic** phoneme bank for development and
@@ -240,6 +343,43 @@ mod tests {
             assert_eq!(t.mfcc.dim(), 13, "phoneme {p:?} has wrong dim");
             assert!(t.mfcc.num_frames() > 5, "phoneme {p:?} too few frames");
         }
+    }
+
+    /// Bank → bytes → bank round-trip is lossless.
+    #[test]
+    fn bank_binary_round_trip() {
+        let b = PhonemeBank::synthetic(16_000);
+        let bytes = b.to_bytes();
+        let back = PhonemeBank::from_bytes(&bytes).unwrap();
+        assert_eq!(back.len(), b.len());
+        for (p, t) in b.iter() {
+            let back_t = back.get(*p).expect("phoneme lost in round-trip");
+            assert_eq!(back_t.mfcc, t.mfcc);
+        }
+    }
+
+    /// Loader rejects malformed input.
+    #[test]
+    fn bank_loader_rejects_malformed() {
+        // Empty.
+        assert!(matches!(
+            PhonemeBank::from_bytes(&[]),
+            Err(PhonemeBankError::TruncatedHeader)
+        ));
+        // Bad magic.
+        let mut bad = PhonemeBank::synthetic(16_000).to_bytes();
+        bad[0] = b'X';
+        assert!(matches!(
+            PhonemeBank::from_bytes(&bad),
+            Err(PhonemeBankError::BadMagic)
+        ));
+        // Bad version.
+        let mut bad = PhonemeBank::synthetic(16_000).to_bytes();
+        bad[4] = 0xFF;
+        assert!(matches!(
+            PhonemeBank::from_bytes(&bad),
+            Err(PhonemeBankError::UnsupportedVersion(0xFF))
+        ));
     }
 
     /// Two **different** synthesised phonemes have
