@@ -1,0 +1,17 @@
+[package]
+name = "adam-audio"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Pure-Rust audio primitives for the v6.3 phonemic-foundation arc. Provides PCM buffers, WAV I/O (hound), microphone capture / speaker playback (cpal), and an energy-based VAD. No C dependencies, no shell-out. Will host MFCC / FFT primitives in Phase 2d."
+
+[dependencies]
+thiserror.workspace = true
+cpal = "0.15"
+hound = "3.5"
+
+[dev-dependencies]
+tempfile = "3"
+
+[lints]
+workspace = true
