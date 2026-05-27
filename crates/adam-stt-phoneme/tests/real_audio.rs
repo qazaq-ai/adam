@@ -97,10 +97,7 @@ fn qazaq_pipeline_with_rescore() {
     assert!(!rescored.is_empty());
     // The rescored stream must obey the syllable shape — no
     // initial consonant cluster, max coda 3.
-    let n_initial_cons = rescored
-        .iter()
-        .take_while(|p| p.is_consonant())
-        .count();
+    let n_initial_cons = rescored.iter().take_while(|p| p.is_consonant()).count();
     assert!(
         n_initial_cons <= 1,
         "rescored stream has initial cluster of {n_initial_cons}: {rescored:?}"

@@ -1,0 +1,13 @@
+[package]
+name = "adam-tts-phoneme"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Phoneme-level concatenative TTS — the v6.3 alternative to macOS `say` / Piper. Synthesises each phoneme in the input stream as PCM (currently from parametric harmonic + noise signatures; Phase 7b will substitute real per-phoneme PCM templates extracted from the corpus). Phonemes are joined with brief cross-fades. Pure Rust, no external binaries."
+
+[dependencies]
+adam-phoneme = { path = "../adam-phoneme" }
+adam-audio = { path = "../adam-audio" }
+
+[lints]
+workspace = true
