@@ -245,7 +245,13 @@ fn synth_template_mfcc(phoneme: Phoneme, sample_rate: u32, cfg: &MfccConfig) -> 
         PhonemeClass::Consonant => synth_consonant(phoneme, duration_s, sample_rate),
         PhonemeClass::Boundary => unreachable!(),
     };
-    mfcc(&samples, sample_rate, cfg)
+    let mut seq = mfcc(&samples, sample_rate, cfg);
+    // Phase 11: keep synthetic templates in the same CMVN-
+    // normalised space as the real (FLEURS-trained) templates,
+    // so the hybrid bank produces dimensionally consistent
+    // distances regardless of which side a template came from.
+    adam_audio::cmvn::normalise_in_place(&mut seq);
+    seq
 }
 
 /// Synthesise a vowel: harmonic stack with a phoneme-specific

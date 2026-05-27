@@ -720,11 +720,16 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
                 }
             };
             let pcm_mono = if pcm.channels > 1 { pcm.to_mono() } else { pcm };
-            let mfcc_seq = adam_audio::mfcc::mfcc(
+            let mut mfcc_seq = adam_audio::mfcc::mfcc(
                 &pcm_mono.data,
                 pcm_mono.sample_rate,
                 &adam_audio::mfcc::MfccConfig::default(),
             );
+            // Phase 11: CMVN — remove the per-utterance speaker /
+            // channel offset before storing. Bank centroids will
+            // live in normalised space; recognition queries are
+            // CMVN'd with their own stats to match.
+            adam_audio::cmvn::normalise_in_place(&mut mfcc_seq);
             if mfcc_seq.num_frames() < phonemes.len() {
                 skipped += 1;
                 continue;
@@ -772,11 +777,15 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
                     continue;
                 }
                 let word_samples = &pcm_mono.data[*start..*end];
-                let word_mfcc = adam_audio::mfcc::mfcc(
+                let mut word_mfcc = adam_audio::mfcc::mfcc(
                     word_samples,
                     pcm_mono.sample_rate,
                     &adam_audio::mfcc::MfccConfig::default(),
                 );
+                // Phase 11: CMVN per word. Each word is treated
+                // as its own "utterance" for normalisation —
+                // same statistics scope as the source-level path.
+                adam_audio::cmvn::normalise_in_place(&mut word_mfcc);
                 if word_mfcc.num_frames() < phonemes.len() {
                     continue;
                 }
