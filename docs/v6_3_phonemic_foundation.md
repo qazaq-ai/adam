@@ -326,31 +326,46 @@ C dependencies):
 
 ## 5. Implementation phases
 
-| phase | scope                                                   | gate / acceptance                          |
-|-------|---------------------------------------------------------|--------------------------------------------|
-| 1     | Layer 0a + binary phoneme format                        | inventory frozen + round-trip tests pass    |
-| 2a    | Corpus collection (see § 6)                              | manifest tracks every source                |
-| 2b    | Text normalisation (transcripts → phonetic Cyrillic)     | normalised corpus dump                      |
-| 2c    | MFA bootstrap forced alignment                           | per-phoneme timestamps with confidence ≥ 0.7|
-| 2d    | MFCC template + diphone bank extraction                  | binary bank files (~5–10 MB total)          |
-| 2e    | Bank serialisation in pure-Rust format                   | runtime can load bank without MFA / Python  |
-| 3     | Layer 0c — phonotactic FST                               | rejects synthetic ill-formed, accepts corpus|
-| 4     | Layer 0d — bidirectional renderer (Cyrillic / Latin)     | corpus round-trip ≥ 99%                     |
-| 5     | Pure-Rust audio I/O (cpal-based)                         | replaces `voice` feature                    |
-| 6     | Phoneme-level STT (DTW + Viterbi)                        | ≥ 70% phoneme-level accuracy on clean Kk    |
-| 7     | Phoneme-level TTS (concatenative + PSOLA)                | MOS within 0.5 of macOS `say`               |
-| 8     | Wire `adam_chat` to phoneme STT/TTS                      | v6.3 demo viable; voice-REPL audits pass    |
-| 9     | Lift `adam-kernel-fst` to phoneme input                  | morphology on phonemes; world_core lifted   |
-| 10    | Pure-Rust forced aligner (replaces MFA bootstrap)        | re-alignment matches MFA within tolerance   |
+| phase | scope                                                   | gate / acceptance                          | status      |
+|-------|---------------------------------------------------------|--------------------------------------------|-------------|
+| 1     | Layer 0a + binary phoneme format                        | inventory frozen + round-trip tests pass    | **shipped** |
+| 2a    | Corpus collection (see § 6)                              | manifest tracks every source                | **shipped** |
+| 2b    | FLEURS-kk_kz ingest (text normalisation built-in)        | 5441 entries, 21.6 h, 40/40 native Cyr     | **shipped** |
+| 2c    | Forced alignment for per-phoneme timestamps              | Viterbi DP via Phase 10's aligner           | **shipped** |
+| 2d    | MFCC template + diphone bank extraction                  | binary bank files (~12 KB MFCC + 1.8 MB PCM)| **shipped** |
+| 2e    | Bank serialisation in pure-Rust format                   | runtime loads bank without MFA / Python     | **shipped** |
+| 3     | Layer 0c — phonotactic FST                               | rejects synthetic ill-formed, accepts corpus| **shipped** |
+| 4     | Layer 0d — bidirectional renderer (Cyrillic / Latin)     | corpus round-trip ≥ 99%                     | **shipped** |
+| 5     | Pure-Rust audio I/O (cpal-based)                         | replaces `voice` feature                    | **shipped** |
+| 6     | Phoneme-level STT (DTW + Viterbi)                        | ≥ 70% phoneme-level accuracy on clean Kk    | **shipped** |
+| 7     | Phoneme-level TTS (concatenative + PSOLA)                | MOS within 0.5 of macOS `say`               | **shipped** |
+| 8     | Wire `adam_chat` to phoneme STT/TTS                      | v6.3 demo viable; voice-REPL audits pass    | partial     |
+| 9     | Lift `adam-kernel-fst` to phoneme input                  | morphology on phonemes; world_core lifted   | **shipped** |
+| 10    | Pure-Rust forced aligner (replaces MFA bootstrap)        | T×N Viterbi DP with self-loops              | **shipped** |
+| 11    | Speaker normalisation (CMVN / VTLN / per-speaker bank)   | qazaq Wikimedia-probe recovers Q phoneme    | next        |
 
 **Sizing.** No calendar estimates. Each phase ships when its
 acceptance gate is met; the order can be shuffled if a phase
 blocks (e.g. a corpus source is slow to acquire).
 
-**MFA policy.** MFA is a **build-time tool**, not a runtime
-dependency. It exists in the pipeline only for Phase 2c and is
-fully replaced by Phase 10's pure-Rust aligner. The model
-itself never invokes MFA.
+**Phase 11 backlog.** The Phase 10 commit identified speaker
+mismatch — not alignment — as the residual blocker on the
+`qazaq_pipeline_with_rescore` test. The Wikimedia probe is one
+voice; the FLEURS-trained bank is means over 2773 F + 2653 M
+speakers, and the probe's Q frames land closer to FLEURS-Z in
+cepstral distance than to FLEURS-Q. Three candidate fixes:
+cepstral mean/variance normalisation (CMVN — cheapest), vocal-
+tract-length normalisation (VTLN), or a per-speaker bank
+selected by speaker-ID at recognition time.
+
+**MFA policy.** MFA was originally planned as a Phase 2c
+build-time tool, never as a runtime dependency. **Phase 10 has
+shipped the pure-Rust replacement** ([adam-forced-aligner](
+../crates/adam-forced-aligner/)) — Viterbi DP over a T × N
+state machine with self-loops, six unit tests, zero external
+deps. The pipeline never installed MFA; the bootstrap path
+went straight from equipartition baseline to the pure-Rust
+aligner.
 
 ## 6. Corpus
 
