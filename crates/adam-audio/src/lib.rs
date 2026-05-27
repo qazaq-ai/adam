@@ -39,6 +39,7 @@
 
 #![forbid(unsafe_code)]
 
+pub mod cmvn;
 pub mod error;
 pub mod fft;
 pub mod mfcc;
