@@ -60,6 +60,7 @@ version = "6.2.0"
 dependencies = [
  "cpal",
  "hound",
+ "rustfft",
  "tempfile",
  "thiserror 2.0.18",
 ]

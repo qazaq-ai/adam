@@ -40,13 +40,17 @@
 #![forbid(unsafe_code)]
 
 pub mod error;
+pub mod fft;
+pub mod mfcc;
 pub mod pcm;
 pub mod pitch;
 pub mod play;
 pub mod record;
 pub mod speaker_profile;
+pub mod spectrogram;
 pub mod vad;
 pub mod wav;
+pub mod window;
 
 pub use error::AudioError;
 pub use pcm::PcmSamples;
