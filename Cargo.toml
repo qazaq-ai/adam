@@ -26,6 +26,7 @@ members = [
   "crates/adam-retrieval-ranker",
   "tools/intent_dataset",
   "tools/corpus_acquire",
+  "tools/voice_repl_v6_3",
 ]
 resolver = "2"
 

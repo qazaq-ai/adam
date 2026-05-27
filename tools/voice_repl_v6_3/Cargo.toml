@@ -1,0 +1,20 @@
+[package]
+name = "adam-voice-repl-v6-3"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Full v6.3 voice loop demonstrator — mic → DTW STT → phonotactic rescoring → Cyrillic → concatenative TTS → speaker. No Whisper, no `say`, pure Rust end-to-end. Standalone tool for sanity-checking the v6.3 stack before wiring it into `adam_chat`."
+
+[[bin]]
+name = "voice_repl_v6_3"
+path = "src/main.rs"
+
+[dependencies]
+adam-audio = { path = "../../crates/adam-audio" }
+adam-phoneme = { path = "../../crates/adam-phoneme" }
+adam-stt-phoneme = { path = "../../crates/adam-stt-phoneme" }
+adam-tts-phoneme = { path = "../../crates/adam-tts-phoneme" }
+clap = { version = "4.5", features = ["derive"] }
+
+[lints]
+workspace = true
