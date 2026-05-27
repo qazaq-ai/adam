@@ -13,6 +13,7 @@ path = "src/main.rs"
 adam-audio = { path = "../../crates/adam-audio" }
 adam-phoneme = { path = "../../crates/adam-phoneme" }
 adam-stt-phoneme = { path = "../../crates/adam-stt-phoneme" }
+adam-tts-phoneme = { path = "../../crates/adam-tts-phoneme" }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

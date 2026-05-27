@@ -140,9 +140,14 @@ struct BuildBankArgs {
     /// Root directory for the manifest's mfcc_path entries.
     #[arg(long, default_value = "data/v6_3_phoneme_bank")]
     bank_dir: PathBuf,
-    /// Output template-bank file.
+    /// Output MFCC template-bank file (STT side).
     #[arg(long, default_value = "data/v6_3_phoneme_bank/templates.bin")]
     output: PathBuf,
+    /// Output PCM template-bank file (TTS side). Same per-
+    /// phoneme alignment regions, but stores the raw PCM
+    /// segments instead of MFCC vectors.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank/pcm_templates.bin")]
+    pcm_output: PathBuf,
     /// Number of bootstrap iterations. Iteration 0 = naive
     /// equipartition; subsequent iterations DTW-realign each
     /// word against the current bank to refine per-phoneme
@@ -619,13 +624,19 @@ fn run_batch(args: BatchArgs) -> Result<(), Box<dyn std::error::Error>> {
 
 // ─── build-bank ───────────────────────────────────────────────
 
-/// One usable (audio MFCC, phoneme sequence) pair preloaded for
-/// reuse across bootstrap iterations.
+/// One usable source preloaded for reuse across bootstrap
+/// iterations. Holds both the PCM samples (for TTS PCM
+/// extraction) and their derived MFCC (for STT alignment).
 #[allow(dead_code)] // label is for diagnostics
 struct BankSource {
     label: String,
     phonemes: Vec<adam_phoneme::Phoneme>,
     mfcc: adam_audio::mfcc::MfccSequence,
+    /// Mono PCM samples at `pcm_sample_rate`. Same audio the
+    /// MFCC was derived from. Used by Phase 7b for PCM-template
+    /// extraction.
+    pcm: Vec<f32>,
+    pcm_sample_rate: u32,
 }
 
 fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>> {
@@ -656,22 +667,29 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
         }
 
         if words.len() == 1 {
-            // Single-word path: use the pre-computed MFCC.
+            // Single-word path: load the WAV (so we have PCM for
+            // Phase 7b PCM-bank extraction) and compute MFCC
+            // inline.
             let phonemes = cyrillic_to_phonemes(&entry.transcript, true);
             if phonemes.is_empty() {
                 skipped += 1;
                 continue;
             }
-            let mfcc_path = args.bank_dir.join(&entry.mfcc_path);
-            let mfcc_bytes = match fs::read(&mfcc_path) {
-                Ok(b) => b,
+            let wav_path = args.bank_dir.join(&entry.wav_path);
+            let pcm = match adam_audio::wav::read_wav(&wav_path) {
+                Ok(p) => p,
                 Err(e) => {
-                    eprintln!("[build-bank] cannot read {}: {}", mfcc_path.display(), e);
+                    eprintln!("[build-bank] cannot read {}: {}", wav_path.display(), e);
                     skipped += 1;
                     continue;
                 }
             };
-            let mfcc_seq = adam_audio::mfcc::read_binary(&mfcc_bytes)?;
+            let pcm_mono = if pcm.channels > 1 { pcm.to_mono() } else { pcm };
+            let mfcc_seq = adam_audio::mfcc::mfcc(
+                &pcm_mono.data,
+                pcm_mono.sample_rate,
+                &adam_audio::mfcc::MfccConfig::default(),
+            );
             if mfcc_seq.num_frames() < phonemes.len() {
                 skipped += 1;
                 continue;
@@ -680,6 +698,8 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
                 label: entry.label,
                 phonemes,
                 mfcc: mfcc_seq,
+                pcm: pcm_mono.data,
+                pcm_sample_rate: pcm_mono.sample_rate,
             });
         } else {
             // Multi-word path: load the WAV, split at silent
@@ -729,6 +749,8 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
                     label: format!("{}_w{w_idx}", entry.label),
                     phonemes,
                     mfcc: word_mfcc,
+                    pcm: word_samples.to_vec(),
+                    pcm_sample_rate: pcm_mono.sample_rate,
                 });
             }
         }
@@ -772,7 +794,109 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
 
     bank.save_to_file(&args.output)?;
     println!("\n[build-bank] wrote {}", args.output.display());
+
+    // Phase 7b: extract per-phoneme PCM chunks using the
+    // converged bank's alignment and write the PCM bank.
+    let pcm_bank = extract_pcm_bank(&sources, &bank);
+    pcm_bank.save_to_file(&args.pcm_output)?;
+    println!(
+        "[build-bank] wrote {} ({} phonemes covered)",
+        args.pcm_output.display(),
+        pcm_bank.len()
+    );
     Ok(())
+}
+
+/// After the MFCC bank converges, run one more DTW alignment
+/// pass per source — but this time keep the PCM samples that
+/// align to each phoneme's range, not the MFCC frames. For
+/// each phoneme, store the LONGEST collected PCM chunk as
+/// its template (proper averaging across PCM segments needs
+/// formant-aware alignment; "longest chunk" is the simplest
+/// representative for Phase 7b first iteration).
+fn extract_pcm_bank(
+    sources: &[BankSource],
+    bank: &adam_stt_phoneme::PhonemeBank,
+) -> adam_tts_phoneme::PcmBank {
+    use adam_phoneme::Phoneme;
+    use adam_stt_phoneme::{dtw, euclidean_distance};
+    use adam_tts_phoneme::{PcmBank, PcmTemplate};
+    use std::collections::HashMap;
+
+    let mut per_phoneme: HashMap<Phoneme, Vec<(Vec<f32>, u32)>> = HashMap::new();
+    let stft_cfg = adam_audio::spectrogram::StftConfig::speech_16khz();
+    let hop = stft_cfg.hop_length;
+    let window = stft_cfg.window_length;
+
+    for src in sources {
+        let templates: Vec<&adam_audio::mfcc::MfccSequence> = src
+            .phonemes
+            .iter()
+            .filter_map(|p| bank.get(*p).map(|t| &t.mfcc))
+            .collect();
+        if templates.len() != src.phonemes.len() {
+            continue;
+        }
+        let mut expected_frames: Vec<Vec<f32>> = Vec::new();
+        let mut phoneme_ranges: Vec<(usize, usize)> = Vec::with_capacity(templates.len());
+        for t in &templates {
+            let start = expected_frames.len();
+            expected_frames.extend_from_slice(&t.frames);
+            phoneme_ranges.push((start, expected_frames.len()));
+        }
+        let Some(result) =
+            dtw::dtw_with_distance(&src.mfcc.frames, &expected_frames, euclidean_distance)
+        else {
+            continue;
+        };
+
+        for (p_idx, &(rng_start, rng_end)) in phoneme_ranges.iter().enumerate() {
+            let phoneme = src.phonemes[p_idx];
+            let mut frame_indices: Vec<usize> = Vec::new();
+            for &(qi, ti) in &result.path {
+                if ti >= rng_start && ti < rng_end {
+                    frame_indices.push(qi);
+                }
+            }
+            frame_indices.sort_unstable();
+            frame_indices.dedup();
+            if frame_indices.is_empty() {
+                continue;
+            }
+            // MFCC frame range → PCM sample range:
+            //   first sample = frame * hop
+            //   last  sample = last_frame * hop + window_length
+            let first_frame = *frame_indices.first().unwrap();
+            let last_frame = *frame_indices.last().unwrap();
+            let pcm_start = first_frame * hop;
+            let pcm_end = (last_frame * hop + window).min(src.pcm.len());
+            if pcm_end <= pcm_start {
+                continue;
+            }
+            per_phoneme
+                .entry(phoneme)
+                .or_default()
+                .push((src.pcm[pcm_start..pcm_end].to_vec(), src.pcm_sample_rate));
+        }
+    }
+
+    // For each phoneme: pick the LONGEST collected PCM chunk
+    // (proper PCM averaging is a Phase 7c concern — needs
+    // formant-aware time-domain averaging or spectral
+    // averaging via STFT inverse).
+    let mut pcm_bank = PcmBank::new();
+    for (phoneme, chunks) in per_phoneme {
+        let (longest, sr) = chunks
+            .into_iter()
+            .max_by_key(|(c, _)| c.len())
+            .expect("non-empty bucket");
+        pcm_bank.insert(PcmTemplate {
+            phoneme,
+            sample_rate: sr,
+            samples: longest,
+        });
+    }
+    pcm_bank
 }
 
 /// Bootstrap iteration 0: equipartition each source's MFCC

@@ -52,7 +52,10 @@
 use adam_audio::PcmSamples;
 use adam_phoneme::{Phoneme, PhonemeClass};
 
+pub mod pcm_bank;
 mod signatures;
+
+pub use pcm_bank::{PcmBank, PcmBankError, PcmTemplate};
 
 /// Configuration for [`synthesise`].
 #[derive(Debug, Clone)]
@@ -81,12 +84,27 @@ impl Default for TtsConfig {
     }
 }
 
-/// Synthesise a phoneme stream into a mono PCM buffer.
+/// Synthesise a phoneme stream into a mono PCM buffer using
+/// parametric signatures only (synth-only path).
 ///
 /// Empty input → empty buffer. The [`Phoneme::Glottal`]
 /// boundary marker produces a brief silent gap (the value of
 /// `phoneme_ms / 3`) rather than a sounded segment.
 pub fn synthesise(phonemes: &[Phoneme], config: &TtsConfig) -> PcmSamples {
+    synthesise_with_bank(phonemes, None, config)
+}
+
+/// Synthesise a phoneme stream using a **real PCM bank** where
+/// templates are available, falling back to parametric synth
+/// otherwise. The canonical hybrid path: corpus-derived real
+/// PCM for phonemes the bank covers, synth signatures for the
+/// rest (matching `adam_stt_phoneme::PhonemeBank::
+/// merged_with_fallback` on the recognition side).
+pub fn synthesise_with_bank(
+    phonemes: &[Phoneme],
+    pcm_bank: Option<&PcmBank>,
+    config: &TtsConfig,
+) -> PcmSamples {
     let mut buffer: Vec<f32> = Vec::new();
     let crossfade_samples = (config.crossfade_ms as usize * config.sample_rate as usize) / 1000;
 
@@ -95,7 +113,17 @@ pub fn synthesise(phonemes: &[Phoneme], config: &TtsConfig) -> PcmSamples {
             PhonemeClass::Boundary => config.phoneme_ms / 3,
             _ => config.phoneme_ms,
         };
-        let segment = synth_phoneme_pcm(phoneme, dur_ms, config);
+        let segment = match pcm_bank
+            .and_then(|b| b.get(phoneme))
+            .filter(|t| t.sample_rate == config.sample_rate && !t.samples.is_empty())
+        {
+            Some(template) => stretch_or_truncate(
+                &template.samples,
+                (dur_ms as usize * config.sample_rate as usize) / 1000,
+                config.amplitude,
+            ),
+            None => synth_phoneme_pcm(phoneme, dur_ms, config),
+        };
 
         if buffer.is_empty() || crossfade_samples == 0 {
             buffer.extend(segment);
@@ -109,6 +137,37 @@ pub fn synthesise(phonemes: &[Phoneme], config: &TtsConfig) -> PcmSamples {
         channels: 1,
         data: buffer,
     }
+}
+
+/// Linearly resample a real-PCM template chunk to the desired
+/// duration and scale to the configured amplitude.
+///
+/// Resampling is nearest-neighbour here (cheap; high-quality
+/// resampling is a Phase 7c concern — for now phoneme
+/// duration is a synthesis parameter and the underlying
+/// template will be at most a few hundred ms, so the
+/// stretching is mild). Output amplitude is normalised to
+/// the template's peak then scaled to `target_amplitude`.
+fn stretch_or_truncate(template: &[f32], target_samples: usize, target_amplitude: f32) -> Vec<f32> {
+    if template.is_empty() || target_samples == 0 {
+        return vec![0.0; target_samples];
+    }
+    let src_len = template.len();
+    let peak = template
+        .iter()
+        .cloned()
+        .fold(0.0_f32, |a, b| a.max(b.abs()));
+    let gain = if peak > 0.0 {
+        target_amplitude / peak
+    } else {
+        0.0
+    };
+    (0..target_samples)
+        .map(|i| {
+            let src_i = (i * src_len) / target_samples.max(1);
+            template[src_i.min(src_len - 1)] * gain
+        })
+        .collect()
 }
 
 /// Synthesise one phoneme as PCM with the given duration.
@@ -256,6 +315,69 @@ mod tests {
         assert!(c.phoneme_ms >= 50);
         assert!(c.crossfade_ms < c.phoneme_ms);
         assert!(c.amplitude > 0.0 && c.amplitude <= 1.0);
+    }
+
+    /// Synth-with-bank produces audio. PCM templates in the
+    /// bank replace synth signatures for the phonemes they
+    /// cover.
+    #[test]
+    fn synthesise_with_real_bank_uses_template() {
+        let cfg = TtsConfig::default();
+        // Build a tiny bank: phoneme A → custom-looking PCM
+        // (constant 0.5).
+        let mut bank = PcmBank::new();
+        bank.insert(PcmTemplate {
+            phoneme: A,
+            sample_rate: cfg.sample_rate,
+            samples: vec![0.5_f32; cfg.sample_rate as usize / 10], // 100 ms
+        });
+        let pcm_synth = synthesise(&[A], &cfg);
+        let pcm_real = synthesise_with_bank(&[A], Some(&bank), &cfg);
+        // Both produce phoneme_ms of audio.
+        assert_eq!(pcm_synth.data.len(), pcm_real.data.len());
+        // But the content differs (real is constant-amplitude
+        // post-stretch; synth is oscillatory).
+        let diff: f32 = pcm_synth
+            .data
+            .iter()
+            .zip(pcm_real.data.iter())
+            .map(|(a, b)| (a - b).abs())
+            .sum();
+        assert!(diff > 1.0, "real-bank output should differ from synth");
+    }
+
+    /// Bank fallback: phoneme absent from bank → synth used.
+    #[test]
+    fn missing_bank_phoneme_falls_back_to_synth() {
+        let cfg = TtsConfig::default();
+        // Bank only has Q.
+        let mut bank = PcmBank::new();
+        bank.insert(PcmTemplate {
+            phoneme: Q,
+            sample_rate: cfg.sample_rate,
+            samples: vec![0.5_f32; cfg.sample_rate as usize / 10],
+        });
+        // Synthesising A goes through synth path (bank doesn't
+        // have A). Should produce same as synth-only.
+        let synth_only = synthesise(&[A], &cfg);
+        let with_bank = synthesise_with_bank(&[A], Some(&bank), &cfg);
+        assert_eq!(synth_only.data, with_bank.data);
+    }
+
+    /// Sample-rate mismatch → fall back to synth (we don't
+    /// resample bank templates across rates at this layer).
+    #[test]
+    fn sample_rate_mismatch_falls_back() {
+        let cfg = TtsConfig::default();
+        let mut bank = PcmBank::new();
+        bank.insert(PcmTemplate {
+            phoneme: A,
+            sample_rate: 48_000, // mismatch with cfg's 16 kHz
+            samples: vec![0.5_f32; 1000],
+        });
+        let synth_only = synthesise(&[A], &cfg);
+        let with_bank = synthesise_with_bank(&[A], Some(&bank), &cfg);
+        assert_eq!(synth_only.data, with_bank.data);
     }
 
     /// Default crossfade is non-zero (proves the crossfade
