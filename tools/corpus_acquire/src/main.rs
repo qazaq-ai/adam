@@ -143,6 +143,13 @@ struct BuildBankArgs {
     /// Output template-bank file.
     #[arg(long, default_value = "data/v6_3_phoneme_bank/templates.bin")]
     output: PathBuf,
+    /// Number of bootstrap iterations. Iteration 0 = naive
+    /// equipartition; subsequent iterations DTW-realign each
+    /// word against the current bank to refine per-phoneme
+    /// chunk boundaries. Default 2 = one equipartition pass +
+    /// one DTW pass.
+    #[arg(long, default_value = "2")]
+    iterations: usize,
 }
 
 // ─── main ──────────────────────────────────────────────────────
@@ -612,31 +619,33 @@ fn run_batch(args: BatchArgs) -> Result<(), Box<dyn std::error::Error>> {
 
 // ─── build-bank ───────────────────────────────────────────────
 
+/// One usable (audio MFCC, phoneme sequence) pair preloaded for
+/// reuse across bootstrap iterations.
+#[allow(dead_code)] // label is for diagnostics
+struct BankSource {
+    label: String,
+    phonemes: Vec<adam_phoneme::Phoneme>,
+    mfcc: adam_audio::mfcc::MfccSequence,
+}
+
 fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>> {
     use adam_phoneme::Phoneme;
     use adam_phoneme::cyrillic::cyrillic_to_phonemes;
-    use adam_stt_phoneme::{PhonemeBank, PhonemeTemplate};
-    use std::collections::HashMap;
 
     if !args.manifest.exists() {
         return Err(format!("manifest not found: {}", args.manifest.display()).into());
     }
 
-    // Per-phoneme collected chunks: Vec<MfccSequence> per phoneme.
-    let mut per_phoneme: HashMap<Phoneme, Vec<adam_audio::mfcc::MfccSequence>> = HashMap::new();
-    let mut processed = 0_usize;
+    // Pre-load all usable entries so each iteration can re-use
+    // them without re-reading + re-parsing.
+    let mut sources: Vec<BankSource> = Vec::new();
     let mut skipped = 0_usize;
-
     let file = fs::File::open(&args.manifest)?;
     for line in BufReader::new(file).lines() {
         let entry: ManifestEntry = match serde_json::from_str(&line?) {
             Ok(e) => e,
             Err(_) => continue,
         };
-
-        // Only handle single-word transcripts in this first
-        // pass. Multi-word (sentence) entries like the UDHR
-        // need proper word-level alignment first; deferred.
         if entry.transcript.split_whitespace().count() != 1 {
             println!(
                 "[build-bank] skipping multi-word entry «{}» ({} words)",
@@ -646,10 +655,6 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
             skipped += 1;
             continue;
         }
-
-        // Cyrillic transcript → phoneme sequence.
-        // Use is_native_root=true so the epenthetic rule
-        // drops «ы»/«і» that wouldn't be acoustically realised.
         let phonemes = cyrillic_to_phonemes(&entry.transcript, true);
         if phonemes.is_empty() {
             println!(
@@ -659,8 +664,6 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
             skipped += 1;
             continue;
         }
-
-        // Load the MFCC sequence.
         let mfcc_path = args.bank_dir.join(&entry.mfcc_path);
         let mfcc_bytes = match fs::read(&mfcc_path) {
             Ok(b) => b,
@@ -671,31 +674,84 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
             }
         };
         let mfcc_seq = adam_audio::mfcc::read_binary(&mfcc_bytes)?;
-
-        let n_frames = mfcc_seq.num_frames();
-        if n_frames < phonemes.len() {
+        if mfcc_seq.num_frames() < phonemes.len() {
             println!(
                 "[build-bank] skipping «{}» — {} frames < {} phonemes",
                 entry.label,
-                n_frames,
+                mfcc_seq.num_frames(),
                 phonemes.len()
             );
             skipped += 1;
             continue;
         }
+        sources.push(BankSource {
+            label: entry.label,
+            phonemes,
+            mfcc: mfcc_seq,
+        });
+    }
 
-        // **Equipartition**: divide the MFCC frames evenly
-        // across phonemes. Crude bootstrap alignment — a
-        // proper DTW-driven re-alignment is the next pass.
-        let chunk = n_frames / phonemes.len();
-        for (i, &phoneme) in phonemes.iter().enumerate() {
+    println!(
+        "[build-bank] loaded {} usable sources, {skipped} skipped",
+        sources.len()
+    );
+    println!(
+        "[build-bank] running {} bootstrap iterations",
+        args.iterations
+    );
+
+    // Iteration 0: equipartition.
+    let mut bank = build_pass_equipartition(&sources);
+    println!(
+        "[build-bank] iter 0 (equipartition): {} phonemes",
+        bank.len()
+    );
+
+    // Iterations 1+: DTW re-alignment against the current bank.
+    for iter in 1..args.iterations {
+        bank = build_pass_dtw_realign(&sources, &bank);
+        println!(
+            "[build-bank] iter {iter} (DTW re-align): {} phonemes",
+            bank.len()
+        );
+    }
+
+    // Final coverage report.
+    let mut report: Vec<(Phoneme, usize)> = bank
+        .iter()
+        .map(|(p, t)| (*p, t.mfcc.num_frames()))
+        .collect();
+    report.sort_by_key(|(p, _)| p.to_byte());
+    println!("\n[build-bank] final per-phoneme template lengths:");
+    for (p, n_frames) in &report {
+        println!("  {p:?} → {n_frames} frames");
+    }
+
+    bank.save_to_file(&args.output)?;
+    println!("\n[build-bank] wrote {}", args.output.display());
+    Ok(())
+}
+
+/// Bootstrap iteration 0: equipartition each source's MFCC
+/// across its phoneme sequence, collect per-phoneme chunks,
+/// DBA-average per phoneme → bank.
+fn build_pass_equipartition(sources: &[BankSource]) -> adam_stt_phoneme::PhonemeBank {
+    use adam_phoneme::Phoneme;
+    use adam_stt_phoneme::{PhonemeBank, PhonemeTemplate};
+    use std::collections::HashMap;
+
+    let mut per_phoneme: HashMap<Phoneme, Vec<adam_audio::mfcc::MfccSequence>> = HashMap::new();
+    for src in sources {
+        let n_frames = src.mfcc.num_frames();
+        let chunk = n_frames / src.phonemes.len();
+        for (i, &phoneme) in src.phonemes.iter().enumerate() {
             let start = i * chunk;
-            let end = if i + 1 == phonemes.len() {
+            let end = if i + 1 == src.phonemes.len() {
                 n_frames
             } else {
                 (i + 1) * chunk
             };
-            let frames: Vec<Vec<f32>> = mfcc_seq.frames[start..end].to_vec();
+            let frames: Vec<Vec<f32>> = src.mfcc.frames[start..end].to_vec();
             if frames.is_empty() {
                 continue;
             }
@@ -704,48 +760,115 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
                 .or_default()
                 .push(adam_audio::mfcc::MfccSequence {
                     frames,
-                    sample_rate: mfcc_seq.sample_rate,
-                    hop_length: mfcc_seq.hop_length,
-                    n_mfcc: mfcc_seq.n_mfcc,
+                    sample_rate: src.mfcc.sample_rate,
+                    hop_length: src.mfcc.hop_length,
+                    n_mfcc: src.mfcc.n_mfcc,
                 });
         }
-        processed += 1;
     }
-
-    // For each phoneme: **pseudo-DBA** averaging — pick the
-    // mean chunk length as target, linearly resample each
-    // chunk to that length, then frame-wise mean.
-    //
-    // This is a simplified DBA (DTW Barycenter Averaging)
-    // good enough for the bootstrap iteration. Proper DBA
-    // does iterative DTW-realignment; we can swap in true
-    // DBA later if cluster quality demands it.
     let mut bank = PhonemeBank::new();
-    let mut report: Vec<(Phoneme, usize, usize)> = Vec::new();
-    for (phoneme, chunks) in &per_phoneme {
-        let averaged = average_chunks(chunks);
-        report.push((*phoneme, chunks.len(), averaged.num_frames()));
+    for (phoneme, chunks) in per_phoneme {
         bank.insert(PhonemeTemplate {
-            phoneme: *phoneme,
-            mfcc: averaged,
+            phoneme,
+            mfcc: average_chunks(&chunks),
         });
     }
-    report.sort_by_key(|(p, _, _)| p.to_byte());
+    bank
+}
 
-    println!("\n[build-bank] per-phoneme coverage:");
-    for (p, n_samples, n_frames) in &report {
-        println!("  {p:?} → {n_samples} chunks collected, template = {n_frames} frames");
+/// Bootstrap iteration N>0: for each source, DTW-align its
+/// MFCC against the concatenation of current templates for
+/// its phoneme sequence; use the alignment path to extract
+/// refined per-phoneme chunks; DBA-average → new bank.
+///
+/// Sources whose phoneme sequence isn't fully covered by the
+/// current bank are skipped — they keep the previous-iteration
+/// template if any (the new bank seeds from `current`).
+fn build_pass_dtw_realign(
+    sources: &[BankSource],
+    current: &adam_stt_phoneme::PhonemeBank,
+) -> adam_stt_phoneme::PhonemeBank {
+    use adam_phoneme::Phoneme;
+    use adam_stt_phoneme::{PhonemeTemplate, dtw, euclidean_distance};
+    use std::collections::HashMap;
+
+    let mut per_phoneme: HashMap<Phoneme, Vec<adam_audio::mfcc::MfccSequence>> = HashMap::new();
+    let mut realigned = 0_usize;
+    let mut uncovered = 0_usize;
+
+    for src in sources {
+        // Pull templates for every phoneme in this source.
+        let templates: Vec<&adam_audio::mfcc::MfccSequence> = src
+            .phonemes
+            .iter()
+            .filter_map(|p| current.get(*p).map(|t| &t.mfcc))
+            .collect();
+        if templates.len() != src.phonemes.len() {
+            uncovered += 1;
+            continue;
+        }
+
+        // Build expected = concatenation of templates, with
+        // per-phoneme [start, end] ranges in expected coords.
+        let mut expected_frames: Vec<Vec<f32>> = Vec::new();
+        let mut phoneme_ranges: Vec<(usize, usize)> = Vec::with_capacity(templates.len());
+        for t in &templates {
+            let start = expected_frames.len();
+            expected_frames.extend_from_slice(&t.frames);
+            phoneme_ranges.push((start, expected_frames.len()));
+        }
+
+        // DTW-align source MFCC (M frames) vs expected (N frames).
+        let Some(result) =
+            dtw::dtw_with_distance(&src.mfcc.frames, &expected_frames, euclidean_distance)
+        else {
+            continue;
+        };
+
+        // Walk the path; for each phoneme range, collect the
+        // source-frame indices that mapped into that range.
+        for (p_idx, &(rng_start, rng_end)) in phoneme_ranges.iter().enumerate() {
+            let phoneme = src.phonemes[p_idx];
+            let mut src_indices: Vec<usize> = Vec::new();
+            for &(qi, ti) in &result.path {
+                if ti >= rng_start && ti < rng_end {
+                    src_indices.push(qi);
+                }
+            }
+            src_indices.sort_unstable();
+            src_indices.dedup();
+            if src_indices.is_empty() {
+                continue;
+            }
+            let chunk_frames: Vec<Vec<f32>> = src_indices
+                .iter()
+                .map(|&i| src.mfcc.frames[i].clone())
+                .collect();
+            per_phoneme
+                .entry(phoneme)
+                .or_default()
+                .push(adam_audio::mfcc::MfccSequence {
+                    frames: chunk_frames,
+                    sample_rate: src.mfcc.sample_rate,
+                    hop_length: src.mfcc.hop_length,
+                    n_mfcc: src.mfcc.n_mfcc,
+                });
+        }
+        realigned += 1;
     }
 
-    println!(
-        "\n[build-bank] processed {processed} entries, skipped {skipped}; \
-         bank contains {} phonemes",
-        bank.len()
-    );
+    eprintln!("[build-bank]   re-aligned {realigned} sources, {uncovered} uncovered (skipped)");
 
-    bank.save_to_file(&args.output)?;
-    println!("[build-bank] wrote {}", args.output.display());
-    Ok(())
+    // Seed new bank from current so phonemes without new
+    // chunks keep their previous template.
+    let mut bank = current.clone();
+    for (phoneme, chunks) in per_phoneme {
+        bank.insert(PhonemeTemplate {
+            phoneme,
+            mfcc: average_chunks(&chunks),
+        });
+    }
+    bank
 }
 
 /// Pseudo-DBA averaging across a bucket of MFCC chunks: pick

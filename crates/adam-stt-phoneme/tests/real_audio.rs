@@ -103,10 +103,7 @@ fn hybrid_bank_has_full_inventory_coverage() {
         if matches!(p.class(), PhonemeClass::Boundary) {
             continue;
         }
-        assert!(
-            bank.get(p).is_some(),
-            "hybrid bank missing phoneme {p:?}"
-        );
+        assert!(bank.get(p).is_some(), "hybrid bank missing phoneme {p:?}");
     }
 }
 
@@ -134,7 +131,5 @@ fn hybrid_bank_contains_real_overrides() {
         differing >= 10,
         "expected ≥10 real overrides in hybrid bank, got {differing}",
     );
-    eprintln!(
-        "[real-audio] hybrid bank has {differing} real-data overrides over synthetic"
-    );
+    eprintln!("[real-audio] hybrid bank has {differing} real-data overrides over synthetic");
 }
