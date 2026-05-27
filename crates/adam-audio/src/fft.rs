@@ -192,12 +192,7 @@ mod tests {
         let peak_pow = pow.iter().cloned().fold(0.0_f32, f32::max);
         let tol = 1e-5 * peak_pow.max(1.0);
         for (m, p) in mag.iter().zip(pow.iter()) {
-            assert!(
-                (m * m - p).abs() < tol,
-                "{} vs {} (tol {tol})",
-                m * m,
-                p,
-            );
+            assert!((m * m - p).abs() < tol, "{} vs {} (tol {tol})", m * m, p,);
         }
     }
 

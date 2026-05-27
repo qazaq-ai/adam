@@ -24,6 +24,7 @@ members = [
   "crates/adam-slot-extractor",
   "crates/adam-retrieval-ranker",
   "tools/intent_dataset",
+  "tools/corpus_acquire",
 ]
 resolver = "2"
 

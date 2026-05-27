@@ -67,3 +67,9 @@ data/checkpoints/
 # (~5–10 MB, well under the 50 MB threshold).
 data/v6_3_corpus/audio/
 data/v6_3_corpus/transcripts/
+
+# v6.3 phoneme bank: in-flight downloads (deleted after each
+# acquisition cycle by corpus_acquire). The committed artefacts
+# (audio/*.wav, mfcc/*.bin, MANIFEST.jsonl) are tiny derivatives
+# and DO ship.
+data/v6_3_phoneme_bank/tmp/
