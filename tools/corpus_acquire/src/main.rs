@@ -68,6 +68,12 @@ enum Cmd {
     /// sequence; per phoneme, keeps the longest collected
     /// chunk as the template. Writes to `templates.bin`.
     BuildBank(BuildBankArgs),
+    /// Stream-ingest the FLEURS Kazakh (kk_kz) subset from
+    /// Google's xtreme_translations bucket. Pipes the .tar.gz
+    /// through gunzip + tar in memory; never materialises the
+    /// archive on disk. Each utterance lands as one manifest
+    /// entry (16 kHz WAV + MFCC + transcript + gender).
+    Fleurs(FleursArgs),
 }
 
 #[derive(Debug, clap::Args)]
@@ -133,6 +139,34 @@ struct FixArgs {
 }
 
 #[derive(Debug, clap::Args)]
+struct FleursArgs {
+    /// FLEURS tarball URL. Defaults to the Kazakh subset from
+    /// Google's xtreme_translations bucket (FLEURS-102, CC BY 4.0).
+    #[arg(
+        long,
+        default_value = "https://storage.googleapis.com/xtreme_translations/FLEURS102/kk_kz.tar.gz"
+    )]
+    url: String,
+    /// Output directory (re-uses the existing manifest +
+    /// audio/mfcc layout).
+    #[arg(long, default_value = "data/v6_3_phoneme_bank")]
+    out_dir: PathBuf,
+    /// Which splits to ingest. Comma-separated subset of
+    /// `dev,test,train`. The smaller the split the faster the
+    /// first useful corpus increment.
+    #[arg(long, default_value = "dev,test")]
+    splits: String,
+    /// Stop after this many successful utterances per split
+    /// (0 = no limit). FLEURS dev/test are ~370 each; train is
+    /// ~2300. `--max 100` is a reasonable first probe.
+    #[arg(long, default_value = "0")]
+    max: usize,
+    /// Source-class label written to the manifest.
+    #[arg(long, default_value = "fleurs")]
+    source_class: String,
+}
+
+#[derive(Debug, clap::Args)]
 struct BuildBankArgs {
     /// Manifest with (label, transcript, mfcc_path) entries.
     #[arg(long, default_value = "data/v6_3_phoneme_bank/MANIFEST.jsonl")]
@@ -166,6 +200,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Cmd::Batch(args) => run_batch(args),
         Cmd::FixManifestTranscripts(args) => run_fix_transcripts(args),
         Cmd::BuildBank(args) => run_build_bank(args),
+        Cmd::Fleurs(args) => run_fleurs(args),
     }
 }
 
@@ -1124,4 +1159,299 @@ fn days_to_ymd(mut days: i64) -> (i32, u32, u32) {
     let m = (if mp < 10 { mp + 3 } else { mp - 9 }) as u32;
     let y = if m <= 2 { y + 1 } else { y };
     (y as i32, m, d)
+}
+
+// ─── fleurs (streaming tar.gz ingest) ─────────────────────────
+
+/// Per-utterance row from a FLEURS `<split>.tsv` file.
+///
+/// FLEURS TSV columns (tab-separated):
+/// `id    audio_filename    transcript_with_punct    transcript_clean    phoneme_segmentation    sample_count    gender`
+struct FleursMeta {
+    transcript: String,
+    gender: String,
+    split: String,
+}
+
+fn run_fleurs(args: FleursArgs) -> Result<(), Box<dyn std::error::Error>> {
+    use flate2::read::GzDecoder;
+    use std::collections::HashMap;
+    use std::io::Read as _;
+
+    let wanted_splits: std::collections::HashSet<String> = args
+        .splits
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect();
+    if wanted_splits.is_empty() {
+        return Err("no splits requested (--splits dev,test,train …)".into());
+    }
+    println!(
+        "[fleurs] splits={:?} max={} out_dir={}",
+        wanted_splits,
+        args.max,
+        args.out_dir.display(),
+    );
+
+    fs::create_dir_all(args.out_dir.join("audio"))?;
+    fs::create_dir_all(args.out_dir.join("mfcc"))?;
+    let manifest_path = args.out_dir.join("MANIFEST.jsonl");
+    let already = read_manifest_labels(&manifest_path)?;
+
+    // Open the tarball as a streaming HTTP body. Symphonia takes
+    // a MediaSource, but tar wants a Read — pipe the response
+    // straight through GzDecoder → tar::Archive without any
+    // temporary file. The archive stays a stream end-to-end.
+    let client = reqwest::blocking::Client::builder()
+        .user_agent("adam-corpus-acquire/0.1 (https://github.com/qazaq-ai/adam)")
+        .timeout(std::time::Duration::from_secs(60 * 60))
+        .build()?;
+    let resp = client.get(&args.url).send()?.error_for_status()?;
+    let gz = GzDecoder::new(resp);
+    let mut archive = tar::Archive::new(gz);
+
+    // Per-split transcript map. Filled as TSV entries are
+    // encountered; consulted when WAV entries are processed.
+    let mut transcripts: HashMap<String, FleursMeta> = HashMap::new();
+    // Audio entries that arrived before their TSV did. Keyed by
+    // basename (e.g. "8861332316175673768.wav") → in-memory bytes.
+    let mut pending_audio: HashMap<String, (Vec<u8>, String)> = HashMap::new();
+
+    let mut counts: HashMap<String, usize> = HashMap::new();
+    let mut ok = 0_usize;
+    let mut skipped = 0_usize;
+    let mut failed = 0_usize;
+
+    for entry in archive.entries()? {
+        let mut entry = entry?;
+        let path = entry.path()?.into_owned();
+        let path_str = path.to_string_lossy().to_string();
+        if entry.header().entry_type().is_dir() {
+            continue;
+        }
+
+        // Classify entry: TSV (transcripts) or WAV (audio).
+        // FLEURS uses `kk_kz/<split>.tsv` and
+        // `kk_kz/audio/<split>/<id>.wav`.
+        if path_str.ends_with(".tsv") {
+            let split = match path
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .map(|s| s.to_string())
+            {
+                Some(s) => s,
+                None => continue,
+            };
+            if !wanted_splits.contains(&split) {
+                continue;
+            }
+            let mut buf = String::new();
+            entry.read_to_string(&mut buf)?;
+            for line in buf.lines() {
+                let cols: Vec<&str> = line.split('\t').collect();
+                if cols.len() < 6 {
+                    continue;
+                }
+                let basename = cols[1].to_string();
+                let transcript = cols[3].to_string(); // cleaned, no punctuation
+                let gender = cols.get(6).unwrap_or(&"unknown").to_lowercase();
+                transcripts.insert(
+                    basename.clone(),
+                    FleursMeta {
+                        transcript,
+                        gender,
+                        split: split.clone(),
+                    },
+                );
+            }
+            // Drain any pending audio that now has a transcript.
+            let basenames: Vec<String> = pending_audio.keys().cloned().collect();
+            for bn in basenames {
+                if let Some(meta) = transcripts.get(&bn) {
+                    if !wanted_splits.contains(&meta.split) {
+                        pending_audio.remove(&bn);
+                        continue;
+                    }
+                    let (bytes, _ext) = pending_audio.remove(&bn).unwrap();
+                    match process_fleurs_entry(
+                        &bn,
+                        bytes,
+                        meta,
+                        &args.source_class,
+                        &args.out_dir,
+                        &manifest_path,
+                        &already,
+                    ) {
+                        Ok(Some(())) => {
+                            ok += 1;
+                            *counts.entry(meta.split.clone()).or_insert(0) += 1;
+                        }
+                        Ok(None) => skipped += 1,
+                        Err(e) => {
+                            eprintln!("[fleurs] FAILED {bn}: {e}");
+                            failed += 1;
+                        }
+                    }
+                }
+            }
+            continue;
+        }
+
+        // Audio path: only .wav / .ogg matter.
+        let ext = path
+            .extension()
+            .and_then(|s| s.to_str())
+            .unwrap_or("")
+            .to_ascii_lowercase();
+        if ext != "wav" && ext != "ogg" {
+            continue;
+        }
+        let basename = match path.file_name().and_then(|s| s.to_str()) {
+            Some(s) => s.to_string(),
+            None => continue,
+        };
+
+        // If this split's TSV hasn't been seen yet, we don't
+        // know if we want this file. Stash it and try again on
+        // the next TSV pass. (Bounded by what fits per split.)
+        let meta = match transcripts.get(&basename) {
+            Some(m) => m,
+            None => {
+                let mut bytes = Vec::new();
+                entry.read_to_end(&mut bytes)?;
+                pending_audio.insert(basename, (bytes, ext));
+                continue;
+            }
+        };
+        if !wanted_splits.contains(&meta.split) {
+            continue;
+        }
+        if args.max > 0 && counts.get(&meta.split).copied().unwrap_or(0) >= args.max {
+            continue;
+        }
+
+        let mut bytes = Vec::new();
+        entry.read_to_end(&mut bytes)?;
+        match process_fleurs_entry(
+            &basename,
+            bytes,
+            meta,
+            &args.source_class,
+            &args.out_dir,
+            &manifest_path,
+            &already,
+        ) {
+            Ok(Some(())) => {
+                ok += 1;
+                *counts.entry(meta.split.clone()).or_insert(0) += 1;
+            }
+            Ok(None) => skipped += 1,
+            Err(e) => {
+                eprintln!("[fleurs] FAILED {basename}: {e}");
+                failed += 1;
+            }
+        }
+
+        // Per-split budget reached? If all wanted splits are
+        // full, bail out of the stream.
+        if args.max > 0
+            && wanted_splits
+                .iter()
+                .all(|s| counts.get(s).copied().unwrap_or(0) >= args.max)
+        {
+            println!(
+                "[fleurs] per-split budget {} reached for all splits",
+                args.max
+            );
+            break;
+        }
+    }
+
+    println!(
+        "[fleurs] done: {ok} acquired, {skipped} skipped, {failed} failed; per-split counts: {:?}",
+        counts,
+    );
+    if !pending_audio.is_empty() {
+        eprintln!(
+            "[fleurs] WARNING: {} audio entries had no matching TSV row (FLEURS upstream inconsistency?)",
+            pending_audio.len()
+        );
+    }
+    Ok(())
+}
+
+fn process_fleurs_entry(
+    basename: &str,
+    bytes: Vec<u8>,
+    meta: &FleursMeta,
+    source_class: &str,
+    out_dir: &Path,
+    manifest_path: &Path,
+    already: &HashSet<String>,
+) -> Result<Option<()>, Box<dyn std::error::Error>> {
+    let stem = basename.trim_end_matches(".wav").trim_end_matches(".ogg");
+    let label = format!("fleurs_{}_{}", meta.split, stem);
+    if already.contains(&label) {
+        return Ok(None);
+    }
+
+    let ext = basename
+        .rsplit_once('.')
+        .map(|(_, e)| e)
+        .unwrap_or("wav")
+        .to_string();
+    let pcm = decode::decode_bytes(bytes, &ext)?;
+    let pcm_mono = if pcm.channels > 1 { pcm.to_mono() } else { pcm };
+    let pcm_16k = if pcm_mono.sample_rate != 16_000 {
+        resample::to_16khz(&pcm_mono)?
+    } else {
+        pcm_mono
+    };
+
+    let mfcc_seq = adam_audio::mfcc::mfcc(
+        &pcm_16k.data,
+        pcm_16k.sample_rate,
+        &adam_audio::mfcc::MfccConfig::default(),
+    );
+
+    let wav_path = out_dir.join("audio").join(format!("{label}.wav"));
+    let mfcc_path = out_dir.join("mfcc").join(format!("{label}.bin"));
+    adam_audio::wav::write_wav(&wav_path, &pcm_16k)?;
+    write_mfcc_binary(&mfcc_path, &mfcc_seq)?;
+    let wav_size = fs::metadata(&wav_path)?.len();
+    let mfcc_size = fs::metadata(&mfcc_path)?.len();
+
+    let entry = ManifestEntry {
+        label: label.clone(),
+        source_url: format!("FLEURS102/kk_kz/{}/{basename}", meta.split),
+        transcript: meta.transcript.clone(),
+        gender: meta.gender.clone(),
+        source_class: source_class.to_string(),
+        original_bytes: wav_size, // upstream byte count not retained
+        duration_s: pcm_16k.duration_s(),
+        wav_path: wav_path
+            .strip_prefix(out_dir)
+            .unwrap_or(&wav_path)
+            .to_string_lossy()
+            .to_string(),
+        wav_bytes: wav_size,
+        mfcc_path: mfcc_path
+            .strip_prefix(out_dir)
+            .unwrap_or(&mfcc_path)
+            .to_string_lossy()
+            .to_string(),
+        mfcc_frames: mfcc_seq.num_frames(),
+        mfcc_bytes: mfcc_size,
+        collected_at: chrono_date(),
+        used_in_bank: false,
+    };
+    append_manifest(manifest_path, &entry)?;
+    println!(
+        "[fleurs]   {} ({:.1}s, {:.1} KB derived)",
+        label,
+        pcm_16k.duration_s(),
+        (wav_size + mfcc_size) as f32 / 1024.0
+    );
+    Ok(Some(()))
 }

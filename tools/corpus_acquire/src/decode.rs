@@ -22,12 +22,32 @@ use symphonia::core::probe::Hint;
 pub fn decode_file(path: &Path) -> Result<PcmSamples, Box<dyn std::error::Error>> {
     let file = File::open(path)?;
     let mss = MediaSourceStream::new(Box::new(file), Default::default());
-
     let mut hint = Hint::new();
     if let Some(ext) = path.extension().and_then(|s| s.to_str()) {
         hint.with_extension(ext);
     }
+    decode_mss(mss, hint)
+}
 
+/// Decode raw bytes (e.g., from a streamed tar entry) without
+/// ever touching the filesystem. `extension_hint` may be "wav",
+/// "ogg", "mp3", etc.
+pub fn decode_bytes(
+    bytes: Vec<u8>,
+    extension_hint: &str,
+) -> Result<PcmSamples, Box<dyn std::error::Error>> {
+    use std::io::Cursor;
+    let cursor = Cursor::new(bytes);
+    let mss = MediaSourceStream::new(Box::new(cursor), Default::default());
+    let mut hint = Hint::new();
+    hint.with_extension(extension_hint);
+    decode_mss(mss, hint)
+}
+
+fn decode_mss(
+    mss: MediaSourceStream,
+    hint: Hint,
+) -> Result<PcmSamples, Box<dyn std::error::Error>> {
     let probed = symphonia::default::get_probe().format(
         &hint,
         mss,

@@ -73,3 +73,12 @@ data/v6_3_corpus/transcripts/
 # (audio/*.wav, mfcc/*.bin, MANIFEST.jsonl) are tiny derivatives
 # and DO ship.
 data/v6_3_phoneme_bank/tmp/
+# FLEURS-ingested artefacts (kk_kz subset, ~5400 utterances ≈
+# 2.2 GB on disk). Fully regeneratable via:
+#   cargo run --release -p adam-corpus-acquire -- fleurs --splits dev,test,train
+# MANIFEST.jsonl carries full provenance + transcripts; templates.bin
+# / pcm_templates.bin are the actual derived banks that DO ship.
+# Curated Wikimedia entries (15 small files, hand-curated transcripts)
+# DO ship — they are not regeneratable from FLEURS.
+data/v6_3_phoneme_bank/audio/fleurs_*.wav
+data/v6_3_phoneme_bank/mfcc/fleurs_*.bin
