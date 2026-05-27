@@ -70,6 +70,6 @@ pub mod word;
 pub use bank::{PhonemeBank, PhonemeTemplate};
 pub use distance::{cosine_distance, euclidean_distance};
 pub use dtw::{DtwResult, dtw};
-pub use recogniser::{RecognitionResult, recognise};
+pub use recogniser::{RecognitionResult, StreamConfig, recognise, recognise_stream};
 pub use rescore::{dedupe_adjacent, enforce_syllable_shape, rescore};
 pub use word::{WordConfig, recognise_word};

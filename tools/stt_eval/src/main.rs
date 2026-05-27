@@ -23,9 +23,10 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
 
+use adam_audio::mfcc::{MfccConfig, mfcc};
 use adam_phoneme::Phoneme;
 use adam_phoneme::cyrillic::cyrillic_to_phonemes;
-use adam_stt_phoneme::{PhonemeBank, WordConfig, recognise_word};
+use adam_stt_phoneme::{PhonemeBank, StreamConfig, WordConfig, recognise_stream, recognise_word};
 use clap::Parser;
 use serde::Deserialize;
 
@@ -54,6 +55,15 @@ struct Cli {
     /// sanity-check the harness itself.
     #[arg(long)]
     synthetic_only: bool,
+    /// Recogniser: "stream" (frame-synchronous Viterbi, default)
+    /// or "window" (legacy sliding-window classifier).
+    #[arg(long, default_value = "stream")]
+    recogniser: String,
+    /// Switch penalty for the stream recogniser (flat-LM
+    /// transition cost). Higher = fewer, longer segments.
+    /// Default 3.0 minimises PER on the FLEURS test sweep.
+    #[arg(long, default_value = "3.0")]
+    switch_penalty: f32,
 }
 
 #[derive(Debug, Deserialize)]
@@ -82,6 +92,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let manifest = std::fs::read_to_string(&manifest_path)?;
 
     let cfg = WordConfig::default();
+    let stream_cfg = StreamConfig {
+        switch_penalty: cli.switch_penalty,
+    };
+    println!(
+        "[stt_eval] recogniser: {} (switch_penalty={})",
+        cli.recogniser, cli.switch_penalty
+    );
 
     let mut total_ref = 0_usize;
     let mut total_edits = 0_usize;
@@ -115,7 +132,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         };
         let pcm_mono = if pcm.channels > 1 { pcm.to_mono() } else { pcm };
 
-        let hyp = recognise_word(&pcm_mono.data, pcm_mono.sample_rate, &bank, &cfg);
+        let hyp = if cli.recogniser == "window" {
+            recognise_word(&pcm_mono.data, pcm_mono.sample_rate, &bank, &cfg)
+        } else {
+            let query = mfcc(&pcm_mono.data, pcm_mono.sample_rate, &MfccConfig::default());
+            recognise_stream(&query, &bank, &stream_cfg)
+        };
 
         let (dist, ops) = levenshtein_with_ops(&reference, &hyp);
         total_edits += dist;
