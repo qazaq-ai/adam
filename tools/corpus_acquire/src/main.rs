@@ -59,6 +59,10 @@ enum Cmd {
     /// pull pipeline. Idempotent: existing manifest labels are
     /// skipped.
     Batch(BatchArgs),
+    /// Sync the curated `sources.toml` transcripts back into
+    /// `MANIFEST.jsonl`. Used after manually curating
+    /// discover-output transcripts (filename stubs → Cyrillic).
+    FixManifestTranscripts(FixArgs),
 }
 
 #[derive(Debug, clap::Args)]
@@ -113,6 +117,16 @@ struct BatchArgs {
     max: usize,
 }
 
+#[derive(Debug, clap::Args)]
+struct FixArgs {
+    /// Curated sources.toml (source of truth for transcripts).
+    #[arg(long, default_value = "data/v6_3_phoneme_bank/sources.toml")]
+    sources: PathBuf,
+    /// Manifest file to update in place.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank/MANIFEST.jsonl")]
+    manifest: PathBuf,
+}
+
 // ─── main ──────────────────────────────────────────────────────
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -120,6 +134,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Cmd::Pull(args) => run_pull(args),
         Cmd::Discover(args) => run_discover(args),
         Cmd::Batch(args) => run_batch(args),
+        Cmd::FixManifestTranscripts(args) => run_fix_transcripts(args),
     }
 }
 
@@ -454,6 +469,71 @@ fn transcript_placeholder(title: &str) -> String {
         .strip_prefix("Kk-")
         .unwrap_or(no_ns)
         .to_string()
+}
+
+// ─── fix-manifest-transcripts ─────────────────────────────────
+
+fn run_fix_transcripts(args: FixArgs) -> Result<(), Box<dyn std::error::Error>> {
+    let contents = fs::read_to_string(&args.sources)?;
+    let parsed: SourcesFile = toml::from_str(&contents)?;
+    let by_label: std::collections::HashMap<String, String> = parsed
+        .source
+        .into_iter()
+        .map(|s| (s.label, s.transcript))
+        .collect();
+
+    if !args.manifest.exists() {
+        return Err(format!("manifest not found: {}", args.manifest.display()).into());
+    }
+
+    let file = fs::File::open(&args.manifest)?;
+    let mut updated: Vec<ManifestEntry> = Vec::new();
+    let mut changed = 0_usize;
+    let mut unchanged = 0_usize;
+    let mut unmatched = 0_usize;
+    for line in BufReader::new(file).lines() {
+        let line = line?;
+        let mut entry: ManifestEntry = match serde_json::from_str(&line) {
+            Ok(e) => e,
+            Err(_) => {
+                eprintln!("[fix] skipping malformed line");
+                continue;
+            }
+        };
+        if let Some(new_transcript) = by_label.get(&entry.label) {
+            if &entry.transcript == new_transcript {
+                unchanged += 1;
+            } else {
+                println!(
+                    "[fix] {}: «{}» → «{}»",
+                    entry.label, entry.transcript, new_transcript
+                );
+                entry.transcript = new_transcript.clone();
+                changed += 1;
+            }
+        } else {
+            eprintln!(
+                "[fix] {} not found in sources.toml — leaving transcript unchanged",
+                entry.label
+            );
+            unmatched += 1;
+        }
+        updated.push(entry);
+    }
+
+    // Rewrite manifest atomically.
+    let tmp_path = args.manifest.with_extension("jsonl.tmp");
+    {
+        let mut tmp = fs::File::create(&tmp_path)?;
+        for e in &updated {
+            writeln!(tmp, "{}", serde_json::to_string(e)?)?;
+        }
+    }
+    fs::rename(&tmp_path, &args.manifest)?;
+    println!(
+        "[fix] done: {changed} updated, {unchanged} already current, {unmatched} no source entry"
+    );
+    Ok(())
 }
 
 // ─── batch ────────────────────────────────────────────────────

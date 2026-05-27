@@ -1,104 +1,120 @@
+# Wikimedia Commons — Category:Kazakh pronunciation.
+# Auto-discovered by `corpus_acquire discover`, then **manually
+# curated**: transcripts rewritten from filename stems into
+# proper Cyrillic. Uncertain readings noted in trailing
+# comments.
+
 [[source]]
 label = "almaty_kj_rd_mi_kz"
 url = "https://upload.wikimedia.org/wikipedia/commons/f/fd/Almaty_Kj%C3%B6rd%C3%A6mi_KZ.ogg"
-transcript = "Almaty Kjördæmi KZ.ogg"
+transcript = "Алматы"
 gender = "unknown"
 source_class = "wikimedia"
+# "Kjördæmi" is Icelandic for "constituency". Likely a
+# non-native pronunciation of «Алматы» recorded in an
+# Icelandic context. Audio still useful for the place-name
+# phoneme stretch.
 
 [[source]]
 label = "jibek"
 url = "https://upload.wikimedia.org/wikipedia/commons/1/1e/Jibek.ogg"
-transcript = "Jibek.ogg"
+transcript = "жібек"
 gender = "unknown"
 source_class = "wikimedia"
 
 [[source]]
 label = "kazakh_word__men"
 url = "https://upload.wikimedia.org/wikipedia/commons/b/bc/Kazakh_word_%22men%22.ogg"
-transcript = 'Kazakh word "men".ogg'
+transcript = "мен"
 gender = "unknown"
 source_class = "wikimedia"
 
 [[source]]
 label = "kazakh_word_ol"
 url = "https://upload.wikimedia.org/wikipedia/commons/6/6e/Kazakh_word_Ol.ogg"
-transcript = "Kazakh word Ol.ogg"
+transcript = "ол"
 gender = "unknown"
 source_class = "wikimedia"
 
 [[source]]
 label = "kazakh_word_sen"
 url = "https://upload.wikimedia.org/wikipedia/commons/6/67/Kazakh_word_sen.ogg"
-transcript = "Kazakh word sen.ogg"
+transcript = "сен"
 gender = "unknown"
 source_class = "wikimedia"
 
 [[source]]
 label = "kazakh_word_seng"
 url = "https://upload.wikimedia.org/wikipedia/commons/c/ce/Kazakh_word_Seng.ogg"
-transcript = "Kazakh word Seng.ogg"
+transcript = "сең"
 gender = "unknown"
 source_class = "wikimedia"
+# Uncertain — likely a variant or typo for «сен»; keeping as
+# «сең» pending listener verification.
 
 [[source]]
 label = "kk_abay_qunanbayuli"
 url = "https://upload.wikimedia.org/wikipedia/commons/9/98/Kk-Abay-Qunanbayuli.ogg"
-transcript = "Abay-Qunanbayuli"
+transcript = "Абай Құнанбайұлы"
 gender = "unknown"
 source_class = "wikimedia"
 
 [[source]]
 label = "kk_kazakh"
 url = "https://upload.wikimedia.org/wikipedia/commons/c/c8/Kk-kazakh.ogg"
-transcript = "kazakh"
+transcript = "қазақ"
 gender = "unknown"
 source_class = "wikimedia"
 
 [[source]]
 label = "kk_kazakhs"
 url = "https://upload.wikimedia.org/wikipedia/commons/0/0a/Kk-kazakhs.ogg"
-transcript = "kazakhs"
+transcript = "қазақтар"
 gender = "unknown"
 source_class = "wikimedia"
 
 [[source]]
 label = "kk_mukaghali_makatayev"
 url = "https://upload.wikimedia.org/wikipedia/commons/9/95/Kk-Mukaghali-Makatayev.ogg"
-transcript = "Mukaghali-Makatayev"
+transcript = "Мұқағали Мақатаев"
 gender = "unknown"
 source_class = "wikimedia"
 
 [[source]]
 label = "kk_murat"
 url = "https://upload.wikimedia.org/wikipedia/commons/8/8a/Kk-murat.ogg"
-transcript = "murat"
+transcript = "Мұрат"
 gender = "unknown"
 source_class = "wikimedia"
 
 [[source]]
 label = "kk_nursulltan_abishuly_nazarbayev"
 url = "https://upload.wikimedia.org/wikipedia/commons/b/b6/Kk-nursulltan-abishuly-nazarbayev.ogg"
-transcript = "nursulltan-abishuly-nazarbayev"
+transcript = "Нұрсұлтан Әбішұлы Назарбаев"
 gender = "unknown"
 source_class = "wikimedia"
 
 [[source]]
 label = "nasar"
 url = "https://upload.wikimedia.org/wikipedia/commons/3/3b/Nasar.ogg"
-transcript = "Nasar.ogg"
+transcript = "назар"
 gender = "unknown"
 source_class = "wikimedia"
+# Uncertain — could also be «нәсәр»; «назар» (attention) is
+# the more common word.
 
 [[source]]
 label = "turuw"
 url = "https://upload.wikimedia.org/wikipedia/commons/7/77/Turuw.ogg"
-transcript = "Turuw.ogg"
+transcript = "тұру"
 gender = "unknown"
 source_class = "wikimedia"
 
 [[source]]
 label = "universal_declaration_of_human_rights___kaz___eb___art_1"
 url = "https://upload.wikimedia.org/wikipedia/commons/8/8d/Universal_Declaration_of_Human_Rights_-_kaz_-_eb_-_Art_1.ogg"
-transcript = "Universal Declaration of Human Rights - kaz - eb - Art 1.ogg"
+transcript = "Барлық адамдар тумысынан азат және қадір-қасиеті мен құқықтары тең болып дүниеге келеді. Адамдарға ақыл-парасат, ар-ождан берілген, сондықтан олар бір-бірімен туыстық, бауырмалдық қарым-қатынас жасаулары тиіс."
 gender = "unknown"
 source_class = "wikimedia"
+# UDHR Article 1 in Kazakh — connected speech, ideal for
+# Phase 2c forced-alignment work.
