@@ -2,34 +2,30 @@
 // Part of: adam · ARK (Agglutinative Reasoning Kernel) · github.com/qazaq-ai/adam
 //! `corpus_acquire` — disk-constrained Kazakh-audio acquisition.
 //!
+//! Three subcommands:
+//!
+//! 1. **`pull`** — download + decode + extract + delete one
+//!    URL. The original disk-bounded primitive.
+//! 2. **`discover`** — query Wikimedia Commons category API for
+//!    Kazakh pronunciation files, write a curatable
+//!    `sources.toml`.
+//! 3. **`batch`** — read a `sources.toml` and process every
+//!    entry through the `pull` pipeline. Skips entries already
+//!    present in the manifest (idempotent re-runs).
+//!
 //! Per the user directive (2026-05-26):
 //!
-//! > «Скачай одну, переработай её, а потом из-за отсутствия
-//! >  надобности удаляй этот скаченный файл. … В итоге в конце
-//! >  может остаться совсем небольшой, но чистый от мусора
-//! >  файл.»
+//! > «Скачай одну, переработай её, удали скаченный файл,
+//! >  перейди к следующей. Не засоряя диск.»
 //!
-//! Pipeline for each source:
-//! 1. **Download** the original audio (any format symphonia
-//!    can decode: OGG/Vorbis, WAV, MP3, FLAC, AAC, MP4).
-//! 2. **Decode** to f32 PCM at the source's native sample rate.
-//! 3. **Resample** to 16 kHz mono.
-//! 4. **Extract MFCC** via [`adam_audio::mfcc`].
-//! 5. **Persist** in `data/v6_3_phoneme_bank/`:
-//!    - `audio/<label>.wav` — 16 kHz mono curated WAV (≪ original)
-//!    - `mfcc/<label>.bin` — MFCC sequence in binary form
-//! 6. **Update** `MANIFEST.jsonl` with source URL, label,
-//!    durations, sizes.
-//! 7. **Delete** the downloaded original.
-//!
-//! The persistent artefacts are 10–100× smaller than the
-//! source: a typical Wikimedia OGG of one Kazakh word at
-//! 44 kHz weighs ~80 KB; the derived 16 kHz mono WAV is
-//! ~30 KB and the MFCC ~5 KB.
+//! Each acquisition cycle: download → decode → resample to
+//! 16 kHz mono → extract MFCC → persist WAV+MFCC+manifest
+//! line → delete original.
 
-use clap::Parser;
+use clap::{Parser, Subcommand};
+use std::collections::HashSet;
 use std::fs;
-use std::io::{Read, Write};
+use std::io::{BufRead, BufReader, Read, Write};
 use std::path::{Path, PathBuf};
 
 mod decode;
@@ -38,74 +34,137 @@ mod resample;
 
 use manifest::{ManifestEntry, append_manifest};
 
+// ─── CLI ──────────────────────────────────────────────────────
+
 #[derive(Debug, Parser)]
 #[command(
     name = "corpus_acquire",
-    about = "Download + decode + extract one Kazakh audio source, then delete the original.",
+    about = "Disk-bounded Kazakh-audio acquisition + extraction pipeline.",
     version
 )]
-struct Args {
+struct Cli {
+    #[command(subcommand)]
+    cmd: Cmd,
+}
+
+#[derive(Debug, Subcommand)]
+enum Cmd {
+    /// Download one URL, decode, extract MFCC, persist
+    /// (audio+mfcc+manifest), delete original.
+    Pull(PullArgs),
+    /// Query Wikimedia Commons category for files, write a
+    /// curatable `sources.toml`.
+    Discover(DiscoverArgs),
+    /// Read a sources.toml and process every entry through the
+    /// pull pipeline. Idempotent: existing manifest labels are
+    /// skipped.
+    Batch(BatchArgs),
+}
+
+#[derive(Debug, clap::Args)]
+struct PullArgs {
     /// Direct URL to download.
     #[arg(long)]
     url: String,
-    /// Human-readable label (e.g. "kazakhstan" or "salam"). Used as
-    /// the filename root for derived artefacts.
+    /// Human-readable label (filename root for derived files).
     #[arg(long)]
     label: String,
-    /// Cyrillic transcript (the spoken word / phrase). Goes into
-    /// the manifest entry — required for later forced alignment.
+    /// Cyrillic transcript of the spoken content.
     #[arg(long)]
     transcript: String,
-    /// Speaker gender hint, if known: "male" / "female" / "mixed".
-    /// Defaults to "unknown".
+    /// Speaker gender: "male" / "female" / "mixed" / "unknown".
     #[arg(long, default_value = "unknown")]
     gender: String,
-    /// Provenance tag (e.g. "wikimedia", "archive-org", "kazneb",
-    /// "common-voice", "self").
+    /// Provenance class.
     #[arg(long, default_value = "wikimedia")]
     source_class: String,
-    /// Output directory for derived artefacts (audio + mfcc +
-    /// manifest). Defaults to `data/v6_3_phoneme_bank`.
+    /// Output directory.
     #[arg(long, default_value = "data/v6_3_phoneme_bank")]
     out_dir: PathBuf,
 }
 
+#[derive(Debug, clap::Args)]
+struct DiscoverArgs {
+    /// Wikimedia Commons category title (without "Category:"
+    /// prefix; we prepend it).
+    #[arg(long, default_value = "Kazakh pronunciation")]
+    category: String,
+    /// Output sources.toml file.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank/sources.toml")]
+    output: PathBuf,
+    /// Maximum number of files to include (the API paginates
+    /// 500 at a time; this caps total).
+    #[arg(long, default_value = "500")]
+    limit: usize,
+}
+
+#[derive(Debug, clap::Args)]
+struct BatchArgs {
+    /// Sources file produced by `discover` (or hand-curated).
+    #[arg(long, default_value = "data/v6_3_phoneme_bank/sources.toml")]
+    sources: PathBuf,
+    /// Output directory.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank")]
+    out_dir: PathBuf,
+    /// Stop after this many successful acquisitions (0 = no
+    /// limit). Useful for incremental runs that respect disk
+    /// pressure.
+    #[arg(long, default_value = "0")]
+    max: usize,
+}
+
+// ─── main ──────────────────────────────────────────────────────
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let args = Args::parse();
+    match Cli::parse().cmd {
+        Cmd::Pull(args) => run_pull(args),
+        Cmd::Discover(args) => run_discover(args),
+        Cmd::Batch(args) => run_batch(args),
+    }
+}
+
+// ─── pull ──────────────────────────────────────────────────────
+
+fn run_pull(args: PullArgs) -> Result<(), Box<dyn std::error::Error>> {
     fs::create_dir_all(args.out_dir.join("audio"))?;
     fs::create_dir_all(args.out_dir.join("mfcc"))?;
     fs::create_dir_all(args.out_dir.join("tmp"))?;
+    pull_one(
+        &args.url,
+        &args.label,
+        &args.transcript,
+        &args.gender,
+        &args.source_class,
+        &args.out_dir,
+    )
+}
 
-    let tmp_path = args.out_dir.join("tmp").join(format!("{}.dl", args.label));
-    let wav_path = args
-        .out_dir
-        .join("audio")
-        .join(format!("{}.wav", args.label));
-    let mfcc_path = args
-        .out_dir
-        .join("mfcc")
-        .join(format!("{}.bin", args.label));
-    let manifest_path = args.out_dir.join("MANIFEST.jsonl");
+fn pull_one(
+    url: &str,
+    label: &str,
+    transcript: &str,
+    gender: &str,
+    source_class: &str,
+    out_dir: &Path,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let tmp_path = out_dir.join("tmp").join(format!("{label}.dl"));
+    let wav_path = out_dir.join("audio").join(format!("{label}.wav"));
+    let mfcc_path = out_dir.join("mfcc").join(format!("{label}.bin"));
+    let manifest_path = out_dir.join("MANIFEST.jsonl");
 
-    println!("[acquire] {} → {}", args.url, args.label);
+    println!("[acquire] {url} → {label}");
 
     // 1. Download.
     let dl_start = std::time::Instant::now();
-    let original_bytes = download_to(&args.url, &tmp_path)?;
+    let original_bytes = download_to(url, &tmp_path)?;
     println!(
-        "[acquire] downloaded {} bytes in {:.2}s",
+        "[acquire]   downloaded {} bytes in {:.2}s",
         original_bytes,
         dl_start.elapsed().as_secs_f32(),
     );
 
-    // 2 + 3. Decode + resample to 16 kHz mono.
+    // 2 + 3. Decode + resample.
     let pcm = decode::decode_file(&tmp_path)?;
-    println!(
-        "[acquire] decoded: {:.2} s @ {} Hz, {} channels",
-        pcm.duration_s(),
-        pcm.sample_rate,
-        pcm.channels,
-    );
     let pcm_mono = if pcm.channels > 1 { pcm.to_mono() } else { pcm };
     let pcm_16k = if pcm_mono.sample_rate != 16_000 {
         resample::to_16khz(&pcm_mono)?
@@ -113,37 +172,36 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         pcm_mono
     };
 
-    // 4. MFCC extraction.
+    // 4. MFCC.
     let mfcc_seq = adam_audio::mfcc::mfcc(
         &pcm_16k.data,
         pcm_16k.sample_rate,
         &adam_audio::mfcc::MfccConfig::default(),
     );
 
-    // 5. Persist curated WAV + MFCC.
+    // 5. Persist.
     adam_audio::wav::write_wav(&wav_path, &pcm_16k)?;
     write_mfcc_binary(&mfcc_path, &mfcc_seq)?;
-
     let wav_size = fs::metadata(&wav_path)?.len();
     let mfcc_size = fs::metadata(&mfcc_path)?.len();
 
-    // 6. Manifest entry.
+    // 6. Manifest.
     let entry = ManifestEntry {
-        label: args.label.clone(),
-        source_url: args.url.clone(),
-        transcript: args.transcript.clone(),
-        gender: args.gender.clone(),
-        source_class: args.source_class.clone(),
+        label: label.to_string(),
+        source_url: url.to_string(),
+        transcript: transcript.to_string(),
+        gender: gender.to_string(),
+        source_class: source_class.to_string(),
         original_bytes,
         duration_s: pcm_16k.duration_s(),
         wav_path: wav_path
-            .strip_prefix(&args.out_dir)
+            .strip_prefix(out_dir)
             .unwrap_or(&wav_path)
             .to_string_lossy()
             .to_string(),
         wav_bytes: wav_size,
         mfcc_path: mfcc_path
-            .strip_prefix(&args.out_dir)
+            .strip_prefix(out_dir)
             .unwrap_or(&mfcc_path)
             .to_string_lossy()
             .to_string(),
@@ -154,28 +212,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
     append_manifest(&manifest_path, &entry)?;
 
-    // 7. Delete the downloaded original.
+    // 7. Delete original.
     fs::remove_file(&tmp_path)?;
 
-    // Report disk footprint. We don't claim compression — for
-    // lossy-encoded sources (OGG, MP3) the persisted PCM WAV is
-    // typically larger than the original, and that's fine: the
-    // point is the persistent footprint is **bounded** (~50 KB
-    // per Kazakh word) regardless of how big the corpus grows.
-    let persisted = wav_size + mfcc_size;
     println!(
-        "[acquire] persisted {} ({} B WAV + {} B MFCC = {:.1} KB total; source was {:.1} KB)",
-        args.label,
-        wav_size,
-        mfcc_size,
-        persisted as f32 / 1024.0,
+        "[acquire]   persisted {label} ({:.1} KB derived; source was {:.1} KB)",
+        (wav_size + mfcc_size) as f32 / 1024.0,
         original_bytes as f32 / 1024.0,
     );
-    println!("[acquire] manifest: {}", manifest_path.display());
     Ok(())
 }
 
-/// Download a URL to a file. Returns the number of bytes written.
 fn download_to(url: &str, path: &Path) -> Result<u64, Box<dyn std::error::Error>> {
     let client = reqwest::blocking::Client::builder()
         .user_agent("adam-corpus-acquire/0.1 (https://github.com/qazaq-ai/adam)")
@@ -196,10 +243,6 @@ fn download_to(url: &str, path: &Path) -> Result<u64, Box<dyn std::error::Error>
     Ok(total)
 }
 
-/// Write an MFCC sequence to a simple binary file:
-/// `[4 bytes magic "MFCC"][1 byte version=1][4 bytes n_frames LE]
-///  [4 bytes n_mfcc LE][4 bytes sample_rate LE][4 bytes hop LE]
-///  [f32 data...]`.
 fn write_mfcc_binary(
     path: &Path,
     seq: &adam_audio::mfcc::MfccSequence,
@@ -219,7 +262,272 @@ fn write_mfcc_binary(
     Ok(())
 }
 
-/// Today's date in ISO format.
+// ─── discover ─────────────────────────────────────────────────
+
+#[derive(Debug, serde::Deserialize)]
+struct CmResponse {
+    query: CmQuery,
+    #[serde(default)]
+    #[serde(rename = "continue")]
+    cont: Option<CmContinue>,
+}
+#[derive(Debug, serde::Deserialize)]
+struct CmQuery {
+    categorymembers: Vec<CmMember>,
+}
+#[derive(Debug, serde::Deserialize)]
+struct CmMember {
+    title: String,
+    ns: i32,
+}
+#[derive(Debug, serde::Deserialize)]
+struct CmContinue {
+    cmcontinue: Option<String>,
+}
+
+#[derive(Debug, serde::Deserialize)]
+struct IiResponse {
+    query: IiQuery,
+}
+#[derive(Debug, serde::Deserialize)]
+struct IiQuery {
+    pages: std::collections::HashMap<String, IiPage>,
+}
+#[derive(Debug, serde::Deserialize)]
+struct IiPage {
+    title: String,
+    #[serde(default)]
+    imageinfo: Vec<IiInfo>,
+}
+#[derive(Debug, serde::Deserialize)]
+#[allow(dead_code)] // size/duration kept for future curation pass
+struct IiInfo {
+    url: String,
+    #[serde(default)]
+    size: u64,
+    #[serde(default)]
+    duration: f32,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+struct SourcesFile {
+    source: Vec<SourceEntry>,
+}
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+struct SourceEntry {
+    label: String,
+    url: String,
+    transcript: String,
+    #[serde(default = "default_gender")]
+    gender: String,
+    #[serde(default = "default_class")]
+    source_class: String,
+}
+fn default_gender() -> String {
+    "unknown".into()
+}
+fn default_class() -> String {
+    "wikimedia".into()
+}
+
+fn run_discover(args: DiscoverArgs) -> Result<(), Box<dyn std::error::Error>> {
+    let client = reqwest::blocking::Client::builder()
+        .user_agent("adam-corpus-acquire/0.1 (https://github.com/qazaq-ai/adam)")
+        .timeout(std::time::Duration::from_secs(60))
+        .build()?;
+
+    let cat_title = format!("Category:{}", args.category);
+    println!("[discover] enumerating files in «{cat_title}»");
+
+    // 1. Walk category members (paginated) to collect file titles.
+    let mut file_titles: Vec<String> = Vec::new();
+    let mut cmcontinue: Option<String> = None;
+    while file_titles.len() < args.limit {
+        let mut url = format!(
+            "https://commons.wikimedia.org/w/api.php?action=query&list=categorymembers&\
+             cmtitle={}&cmtype=file&cmlimit=500&format=json",
+            urlencode(&cat_title),
+        );
+        if let Some(c) = &cmcontinue {
+            url.push_str(&format!("&cmcontinue={}", urlencode(c)));
+        }
+        let resp: CmResponse = client.get(&url).send()?.error_for_status()?.json()?;
+        for m in resp.query.categorymembers {
+            if m.ns == 6 {
+                // File namespace.
+                file_titles.push(m.title);
+            }
+        }
+        match resp.cont.and_then(|c| c.cmcontinue) {
+            Some(c) => cmcontinue = Some(c),
+            None => break,
+        }
+    }
+    file_titles.truncate(args.limit);
+    println!("[discover] {} files found", file_titles.len());
+
+    // 2. Look up imageinfo (URL + size + duration) for each file.
+    // The API accepts up to 50 titles per call.
+    let mut entries: Vec<SourceEntry> = Vec::new();
+    for chunk in file_titles.chunks(50) {
+        let titles = chunk.join("|");
+        let url = format!(
+            "https://commons.wikimedia.org/w/api.php?action=query&titles={}\
+             &prop=imageinfo&iiprop=url|size|duration&format=json",
+            urlencode(&titles),
+        );
+        let resp: IiResponse = client.get(&url).send()?.error_for_status()?.json()?;
+        for page in resp.query.pages.values() {
+            if let Some(info) = page.imageinfo.first() {
+                let label = label_from_title(&page.title);
+                let transcript = transcript_placeholder(&page.title);
+                entries.push(SourceEntry {
+                    label,
+                    url: info.url.clone(),
+                    transcript,
+                    gender: "unknown".into(),
+                    source_class: "wikimedia".into(),
+                });
+            }
+        }
+    }
+
+    // 3. Sort by label for stable output.
+    entries.sort_by(|a, b| a.label.cmp(&b.label));
+
+    // 4. Write sources.toml.
+    if let Some(parent) = args.output.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    let serialised = toml::to_string_pretty(&SourcesFile { source: entries })?;
+    fs::write(&args.output, serialised)?;
+    println!("[discover] wrote {}", args.output.display());
+    Ok(())
+}
+
+fn urlencode(s: &str) -> String {
+    // Minimal percent-encoding for query-string values. Avoids
+    // pulling another dep just for this.
+    let mut out = String::with_capacity(s.len() * 3);
+    for b in s.bytes() {
+        match b {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => {
+                out.push(b as char)
+            }
+            _ => out.push_str(&format!("%{b:02X}")),
+        }
+    }
+    out
+}
+
+/// Extract a stable filename-root label from a Wikimedia title
+/// like `File:Kk-kazakh.ogg` → `kk_kazakh`.
+fn label_from_title(title: &str) -> String {
+    let no_ns = title.strip_prefix("File:").unwrap_or(title);
+    let no_ext = no_ns
+        .rsplit_once('.')
+        .map(|(stem, _)| stem)
+        .unwrap_or(no_ns);
+    no_ext
+        .chars()
+        .map(|c| {
+            if c.is_ascii_alphanumeric() {
+                c.to_ascii_lowercase()
+            } else {
+                '_'
+            }
+        })
+        .collect::<String>()
+        .trim_matches('_')
+        .to_string()
+}
+
+/// Best-effort transcript placeholder. Without an explicit
+/// transcript field, we put the filename stem here; the user
+/// curates the sources.toml before running `batch`.
+fn transcript_placeholder(title: &str) -> String {
+    let no_ns = title.strip_prefix("File:").unwrap_or(title);
+    no_ns
+        .rsplit_once('.')
+        .map(|(s, _)| s)
+        .unwrap_or(no_ns)
+        .strip_prefix("Kk-")
+        .unwrap_or(no_ns)
+        .to_string()
+}
+
+// ─── batch ────────────────────────────────────────────────────
+
+fn run_batch(args: BatchArgs) -> Result<(), Box<dyn std::error::Error>> {
+    let contents = fs::read_to_string(&args.sources)?;
+    let parsed: SourcesFile = toml::from_str(&contents)?;
+    println!(
+        "[batch] {} sources in {}",
+        parsed.source.len(),
+        args.sources.display()
+    );
+
+    fs::create_dir_all(args.out_dir.join("audio"))?;
+    fs::create_dir_all(args.out_dir.join("mfcc"))?;
+    fs::create_dir_all(args.out_dir.join("tmp"))?;
+
+    let manifest_path = args.out_dir.join("MANIFEST.jsonl");
+    let acquired_labels = read_manifest_labels(&manifest_path)?;
+    println!(
+        "[batch] {} labels already in manifest, will skip",
+        acquired_labels.len()
+    );
+
+    let mut ok = 0_usize;
+    let mut skipped = 0_usize;
+    let mut failed = 0_usize;
+    for src in &parsed.source {
+        if acquired_labels.contains(&src.label) {
+            skipped += 1;
+            continue;
+        }
+        match pull_one(
+            &src.url,
+            &src.label,
+            &src.transcript,
+            &src.gender,
+            &src.source_class,
+            &args.out_dir,
+        ) {
+            Ok(()) => {
+                ok += 1;
+                if args.max > 0 && ok >= args.max {
+                    println!("[batch] reached --max {} — stopping", args.max);
+                    break;
+                }
+            }
+            Err(e) => {
+                eprintln!("[batch] FAILED «{}»: {}", src.label, e);
+                failed += 1;
+            }
+        }
+    }
+    println!("[batch] done: {ok} acquired, {skipped} skipped, {failed} failed");
+    Ok(())
+}
+
+fn read_manifest_labels(path: &Path) -> std::io::Result<HashSet<String>> {
+    let mut out = HashSet::new();
+    if !path.exists() {
+        return Ok(out);
+    }
+    let file = fs::File::open(path)?;
+    for line in BufReader::new(file).lines() {
+        let line = line?;
+        if let Ok(entry) = serde_json::from_str::<ManifestEntry>(&line) {
+            out.insert(entry.label);
+        }
+    }
+    Ok(out)
+}
+
+// ─── date util ────────────────────────────────────────────────
+
 fn chrono_date() -> String {
     use std::time::{SystemTime, UNIX_EPOCH};
     let secs = SystemTime::now()
@@ -231,8 +539,6 @@ fn chrono_date() -> String {
     format!("{y:04}-{m:02}-{d:02}")
 }
 
-/// Convert days-since-1970 to (year, month, day). Naive but
-/// correct for years 1970-9999.
 fn days_to_ymd(mut days: i64) -> (i32, u32, u32) {
     days += 719468;
     let era = if days >= 0 { days } else { days - 146_096 } / 146_097;
