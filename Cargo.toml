@@ -9,6 +9,7 @@ members = [
   "crates/adam-stt-phoneme",
   "crates/adam-tts-phoneme",
   "crates/adam-kernel-phoneme",
+  "crates/adam-forced-aligner",
   "crates/adam-dialog",
   "crates/adam-tokenizer",
   "crates/adam-corpus",

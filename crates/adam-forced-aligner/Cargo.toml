@@ -1,0 +1,14 @@
+[package]
+name = "adam-forced-aligner"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Pure-Rust forced aligner for the v6.3 phonemic-foundation arc. Viterbi DP over a left-to-right HMM-style state machine constrained to a known phoneme sequence. Emission cost = Euclidean distance from each frame's MFCC to its candidate phoneme's template centroid; transitions are self-loop OR forward-advance only (monotonic). Replaces the equipartition + DTW-realign baseline in adam-corpus-acquire build-bank, producing clean per-phoneme frame boundaries needed for sharp template extraction. Replaces the Montreal Forced Aligner (MFA) dependency hinted at in the v6.3 corpus directive."
+
+[dependencies]
+adam-audio = { path = "../adam-audio" }
+adam-phoneme = { path = "../adam-phoneme" }
+adam-stt-phoneme = { path = "../adam-stt-phoneme" }
+
+[lints]
+workspace = true

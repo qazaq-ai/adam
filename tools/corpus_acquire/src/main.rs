@@ -807,11 +807,17 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
         bank.len()
     );
 
-    // Iterations 1+: DTW re-alignment against the current bank.
+    // Iterations 1+: forced-aligner re-alignment against the
+    // current bank. Replaces the v1 DTW-realign pass that used
+    // a concatenation of templates as the "expected" length —
+    // that approach starved long phonemes on multi-word FLEURS
+    // utterances. The forced aligner runs Viterbi over a
+    // T × N DP table with self-loops, so each phoneme can own
+    // an arbitrary frame range.
     for iter in 1..args.iterations {
-        bank = build_pass_dtw_realign(&sources, &bank);
+        bank = build_pass_forced_align(&sources, &bank);
         println!(
-            "[build-bank] iter {iter} (DTW re-align): {} phonemes",
+            "[build-bank] iter {iter} (forced-align): {} phonemes",
             bank.len()
         );
     }
@@ -978,76 +984,46 @@ fn build_pass_equipartition(sources: &[BankSource]) -> adam_stt_phoneme::Phoneme
     bank
 }
 
-/// Bootstrap iteration N>0: for each source, DTW-align its
-/// MFCC against the concatenation of current templates for
-/// its phoneme sequence; use the alignment path to extract
-/// refined per-phoneme chunks; DBA-average → new bank.
+/// Bootstrap iteration N>0 **using the Phase 10 forced
+/// aligner**. For each source, Viterbi-align its MFCC against
+/// its phoneme sequence using the current bank's per-phoneme
+/// centroids; the alignment partitions the source frames into
+/// strictly monotonic per-phoneme ranges. Average each
+/// phoneme's contributed chunks → new bank.
 ///
-/// Sources whose phoneme sequence isn't fully covered by the
-/// current bank are skipped — they keep the previous-iteration
-/// template if any (the new bank seeds from `current`).
-fn build_pass_dtw_realign(
+/// This replaces `build_pass_dtw_realign` for the FLEURS-scale
+/// corpus: long phonemes can absorb many source frames via
+/// self-loops, the issue that crippled the DTW-concat approach.
+fn build_pass_forced_align(
     sources: &[BankSource],
     current: &adam_stt_phoneme::PhonemeBank,
 ) -> adam_stt_phoneme::PhonemeBank {
     use adam_phoneme::Phoneme;
-    use adam_stt_phoneme::{PhonemeTemplate, dtw, euclidean_distance};
+    use adam_stt_phoneme::PhonemeTemplate;
     use std::collections::HashMap;
 
     let mut per_phoneme: HashMap<Phoneme, Vec<adam_audio::mfcc::MfccSequence>> = HashMap::new();
-    let mut realigned = 0_usize;
+    let mut aligned = 0_usize;
     let mut uncovered = 0_usize;
+    let mut too_short = 0_usize;
 
     for src in sources {
-        // Pull templates for every phoneme in this source.
-        let templates: Vec<&adam_audio::mfcc::MfccSequence> = src
-            .phonemes
-            .iter()
-            .filter_map(|p| current.get(*p).map(|t| &t.mfcc))
-            .collect();
-        if templates.len() != src.phonemes.len() {
-            uncovered += 1;
-            continue;
-        }
-
-        // Build expected = concatenation of templates, with
-        // per-phoneme [start, end] ranges in expected coords.
-        let mut expected_frames: Vec<Vec<f32>> = Vec::new();
-        let mut phoneme_ranges: Vec<(usize, usize)> = Vec::with_capacity(templates.len());
-        for t in &templates {
-            let start = expected_frames.len();
-            expected_frames.extend_from_slice(&t.frames);
-            phoneme_ranges.push((start, expected_frames.len()));
-        }
-
-        // DTW-align source MFCC (M frames) vs expected (N frames).
-        let Some(result) =
-            dtw::dtw_with_distance(&src.mfcc.frames, &expected_frames, euclidean_distance)
-        else {
-            continue;
-        };
-
-        // Walk the path; for each phoneme range, collect the
-        // source-frame indices that mapped into that range.
-        for (p_idx, &(rng_start, rng_end)) in phoneme_ranges.iter().enumerate() {
-            let phoneme = src.phonemes[p_idx];
-            let mut src_indices: Vec<usize> = Vec::new();
-            for &(qi, ti) in &result.path {
-                if ti >= rng_start && ti < rng_end {
-                    src_indices.push(qi);
-                }
-            }
-            src_indices.sort_unstable();
-            src_indices.dedup();
-            if src_indices.is_empty() {
+        let result = match adam_forced_aligner::align(&src.mfcc, &src.phonemes, current) {
+            Ok(r) => r,
+            Err(adam_forced_aligner::AlignError::UncoveredPhoneme(_)) => {
+                uncovered += 1;
                 continue;
             }
-            let chunk_frames: Vec<Vec<f32>> = src_indices
-                .iter()
-                .map(|&i| src.mfcc.frames[i].clone())
-                .collect();
+            Err(adam_forced_aligner::AlignError::PhonemesExceedFrames { .. }) => {
+                too_short += 1;
+                continue;
+            }
+            Err(_) => continue,
+        };
+        for seg in &result.segments {
+            let chunk_frames: Vec<Vec<f32>> = src.mfcc.frames[seg.start..seg.end].to_vec();
             per_phoneme
-                .entry(phoneme)
+                .entry(seg.phoneme)
                 .or_default()
                 .push(adam_audio::mfcc::MfccSequence {
                     frames: chunk_frames,
@@ -1056,18 +1032,52 @@ fn build_pass_dtw_realign(
                     n_mfcc: src.mfcc.n_mfcc,
                 });
         }
-        realigned += 1;
+        aligned += 1;
     }
 
-    eprintln!("[build-bank]   re-aligned {realigned} sources, {uncovered} uncovered (skipped)");
+    eprintln!(
+        "[build-bank]   forced-aligned {aligned} sources, {uncovered} uncovered, {too_short} too-short (skipped)"
+    );
 
-    // Seed new bank from current so phonemes without new
-    // chunks keep their previous template.
+    // Per-phoneme: pick the LONGEST forced-aligned segment,
+    // capped at TEMPLATE_MAX_FRAMES = 25 (~250 ms typical
+    // phoneme duration at 10 ms hop). Three earlier strategies
+    // for combining per-phoneme chunks failed:
+    //   • Mean-of-all: blurred every centroid towards a
+    //     "speech blob"; the recogniser collapsed to runs of
+    //     the same phoneme.
+    //   • Longest-uncapped: produced 100-200-frame templates
+    //     (whole syllables stretched as one phoneme by the
+    //     aligner); the DTW recogniser self-looped through
+    //     them and lost short phonemes entirely.
+    //   • Median: the alignment-length distribution is heavily
+    //     skewed towards 1-frame degenerate segments (EM cold-
+    //     start failure); median picks the degenerate mass.
+    // Longest-then-cap preserves a concrete, well-aligned
+    // exemplar while constraining its DTW-recogniser footprint.
+    // Centre-cropping keeps the formant-stable body and drops
+    // the transition tails.
+    const TEMPLATE_MAX_FRAMES: usize = 25;
     let mut bank = current.clone();
     for (phoneme, chunks) in per_phoneme {
+        let longest = chunks
+            .into_iter()
+            .max_by_key(|c| c.num_frames())
+            .expect("per_phoneme entry has ≥1 chunk by construction");
+        let capped = if longest.num_frames() > TEMPLATE_MAX_FRAMES {
+            let skip = (longest.num_frames() - TEMPLATE_MAX_FRAMES) / 2;
+            adam_audio::mfcc::MfccSequence {
+                frames: longest.frames[skip..skip + TEMPLATE_MAX_FRAMES].to_vec(),
+                sample_rate: longest.sample_rate,
+                hop_length: longest.hop_length,
+                n_mfcc: longest.n_mfcc,
+            }
+        } else {
+            longest
+        };
         bank.insert(PhonemeTemplate {
             phoneme,
-            mfcc: average_chunks(&chunks),
+            mfcc: capped,
         });
     }
     bank

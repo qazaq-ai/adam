@@ -82,6 +82,7 @@ name = "adam-corpus-acquire"
 version = "6.2.0"
 dependencies = [
  "adam-audio",
+ "adam-forced-aligner",
  "adam-phoneme",
  "adam-stt-phoneme",
  "adam-tts-phoneme",
@@ -140,6 +141,15 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 2.0.18",
+]
+
+[[package]]
+name = "adam-forced-aligner"
+version = "6.2.0"
+dependencies = [
+ "adam-audio",
+ "adam-phoneme",
+ "adam-stt-phoneme",
 ]
 
 [[package]]
