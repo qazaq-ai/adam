@@ -183,6 +183,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "adam-kernel-phoneme"
+version = "6.2.0"
+dependencies = [
+ "adam-phoneme",
+ "adam-phonotactics",
+]
+
+[[package]]
 name = "adam-phoneme"
 version = "6.2.0"
 

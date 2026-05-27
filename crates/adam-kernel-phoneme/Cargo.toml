@@ -1,0 +1,13 @@
+[package]
+name = "adam-kernel-phoneme"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Phoneme-native morphological kernel for v6.3 — proof of concept. Roots are stored as Vec<Phoneme>, suffixes as harmony+voicing-typed variants. Vowel harmony and voicing assimilation are TYPE-LEVEL constraints (consumed via Phoneme attributes), not separate graphemic rules. The v6.3 alternative to graphemic adam-kernel-fst — same morphology, no orthographic noise."
+
+[dependencies]
+adam-phoneme = { path = "../adam-phoneme" }
+adam-phonotactics = { path = "../adam-phonotactics" }
+
+[lints]
+workspace = true
