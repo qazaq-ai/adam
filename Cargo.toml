@@ -6,6 +6,7 @@ members = [
   "crates/adam-phoneme",
   "crates/adam-phonotactics",
   "crates/adam-audio",
+  "crates/adam-stt-phoneme",
   "crates/adam-dialog",
   "crates/adam-tokenizer",
   "crates/adam-corpus",
