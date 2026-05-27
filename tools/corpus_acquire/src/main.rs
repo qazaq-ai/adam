@@ -1049,9 +1049,16 @@ fn build_pass_forced_align(
     );
 
     // Per-phoneme: pick the LONGEST forced-aligned segment,
-    // capped at TEMPLATE_MAX_FRAMES = 25 (~250 ms typical
-    // phoneme duration at 10 ms hop). Three earlier strategies
-    // for combining per-phoneme chunks failed:
+    // capped at a class-specific frame count. Vowels carry
+    // formant trajectory that needs more frames to be matched
+    // robustly under DTW; obstruents (stops + fricatives) are
+    // characterised by short bursts so a longer template just
+    // dilutes their signature. Phase 11 step 3 tuning:
+    //   • Vowels: cap at 35 frames (~350 ms — fits stressed
+    //     Kazakh vowels with diphthong tails).
+    //   • Consonants: cap at 18 frames (~180 ms — typical
+    //     fricative/stop body, narrower than vowels).
+    // Three earlier per-phoneme combination strategies failed:
     //   • Mean-of-all: blurred every centroid towards a
     //     "speech blob"; the recogniser collapsed to runs of
     //     the same phoneme.
@@ -1062,21 +1069,26 @@ fn build_pass_forced_align(
     //   • Median: the alignment-length distribution is heavily
     //     skewed towards 1-frame degenerate segments (EM cold-
     //     start failure); median picks the degenerate mass.
-    // Longest-then-cap preserves a concrete, well-aligned
-    // exemplar while constraining its DTW-recogniser footprint.
-    // Centre-cropping keeps the formant-stable body and drops
-    // the transition tails.
-    const TEMPLATE_MAX_FRAMES: usize = 25;
+    // Longest-then-class-cap preserves a concrete, well-aligned
+    // exemplar while giving vowels enough room to carry their
+    // formant signature.
+    const VOWEL_CAP_FRAMES: usize = 35;
+    const CONSONANT_CAP_FRAMES: usize = 18;
     let mut bank = current.clone();
     for (phoneme, chunks) in per_phoneme {
+        let template_cap = if phoneme.is_vowel() {
+            VOWEL_CAP_FRAMES
+        } else {
+            CONSONANT_CAP_FRAMES
+        };
         let longest = chunks
             .into_iter()
             .max_by_key(|c| c.num_frames())
             .expect("per_phoneme entry has ≥1 chunk by construction");
-        let capped = if longest.num_frames() > TEMPLATE_MAX_FRAMES {
-            let skip = (longest.num_frames() - TEMPLATE_MAX_FRAMES) / 2;
+        let capped = if longest.num_frames() > template_cap {
+            let skip = (longest.num_frames() - template_cap) / 2;
             adam_audio::mfcc::MfccSequence {
-                frames: longest.frames[skip..skip + TEMPLATE_MAX_FRAMES].to_vec(),
+                frames: longest.frames[skip..skip + template_cap].to_vec(),
                 sample_rate: longest.sample_rate,
                 hop_length: longest.hop_length,
                 n_mfcc: longest.n_mfcc,

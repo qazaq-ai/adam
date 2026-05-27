@@ -49,15 +49,16 @@ fn hybrid_bank(sample_rate: u32) -> Option<PhonemeBank> {
 /// crashing and produces at least one phoneme. The rescored
 /// output should preserve all phonemes (no rescoring needed).
 ///
-/// **Phase 11**: ignored alongside `qazaq_pipeline_with_rescore`
-/// — the Wikimedia «жібек» recording is from a single speaker
-/// outside the FLEURS-trained statistical regime; per-utterance
-/// CMVN can't fully bridge inter-speaker cepstral position
-/// drift. Post-CMVN raw output collapses to `[Ch, Ch, Ch]`
-/// (rescored: empty). The жібек fixture re-enables on the same
-/// gate as qazaq: Phase 11 step 3 vowel/voicing tuning or step
-/// 4 VTLN, whichever recovers Wikimedia-probe recognition first.
-#[ignore = "speaker mismatch on Wikimedia probe — same gate as qazaq, awaits Phase 11 step 3+"]
+/// **Phase 11 step 3** moved the Wikimedia probes asymmetrically:
+/// qazaq recovered (a Y vowel surfaces, rescorer accepts);
+/// жібек is still stuck at `[Ch, Ch]` — no vowel detected on
+/// this specific speaker's recording. Same root cause class as
+/// qazaq used to be (speaker drift), narrower instance:
+/// «жібек» has only one short vowel (Yi between Zh and B) and
+/// the speaker's Yi formant trajectory doesn't survive the
+/// CMVN + class-cap transformation. Step 4 (VTLN on top of
+/// CMVN) is the next attempt.
+#[ignore = "single-vowel speaker drift — awaits Phase 11 step 4 VTLN"]
 #[test]
 fn jibek_pipeline_runs_end_to_end() {
     let Some(dir) = bank_dir() else {
@@ -89,30 +90,26 @@ fn jibek_pipeline_runs_end_to_end() {
 /// rescoring should clean them up by enforcing the
 /// `(C)V(CC(C))` shape per syllable.
 ///
-/// **Phase 10 history**: stayed `#[ignore]` after the pure-
-/// Rust forced aligner landed. With the 5441-entry FLEURS
-/// bank, post-Phase-10 raw output was `[Z, Z]` — Q-Z
+/// **Phase 10**: failed with `[Z, Z]` raw output — Q-Z
 /// confusion driven by speaker mismatch between the Wikimedia
 /// probe and FLEURS-trained templates.
 ///
-/// **Phase 11 progress**: CMVN (`adam-audio::cmvn`) is now
-/// wired through both training (per-source MFCC normalised
-/// before forced alignment) and recognition (full-utterance
-/// MFCC normalised before sliding-window DTW). Post-CMVN raw
-/// output is `[Ch, W, Ch, W, Ch, P, Q, Ch]` — **Q is
-/// recovered**, confirming the speaker-mismatch hypothesis
-/// from Phase 10's commit message. Remaining failure is
-/// vowel-template confusion (the Wikimedia speaker's A frames
-/// match consonant templates more closely than vowel
-/// templates after CMVN), not Q-Z conflation.
+/// **Phase 11 step 2** (CMVN through training + recognition):
+/// Q was recovered (raw became `[Ch, W, Ch, W, Ch, P, Q, Ch]`)
+/// but no vowel appeared, so the rescorer still rejected the
+/// stream as a non-Kazakh shape.
 ///
-/// **Next step**: Phase 11 step 3 — investigate whether the
-/// vowel-template issue is a CMVN side-effect (e.g. the
-/// variance-normalised vowel cepstra collapse onto consonant
-/// space) or a template-extraction artefact. Likely fixes:
-/// vowel-class oversampling during template selection, or
-/// VTLN as a Phase 11 step 4 on top of CMVN.
-#[ignore = "vowel-template confusion after CMVN — awaits Phase 11 step 3 vowel-class tuning"]
+/// **Phase 11 step 3** (vowel-class oversampling): per-class
+/// template caps — vowels 35 frames, consonants 18 — give
+/// vowel templates enough room to carry their formant
+/// trajectory while keeping consonants compact. Raw is now
+/// `[Ch, Y, Ch, W, Ch, Ch, Ch]` (vowel Y back-harmonic
+/// recovered), rescored `[Ch, Y, Ch, W, Ch]` — passes the
+/// "non-empty + initial cluster ≤ 1" gate this test checks.
+///
+/// Full Q-A-Z-A-Q recognition still awaits VTLN (step 4) or
+/// per-speaker bank work; the pipeline-shape assertion is
+/// what's gated here.
 #[test]
 fn qazaq_pipeline_with_rescore() {
     let Some(dir) = bank_dir() else {
