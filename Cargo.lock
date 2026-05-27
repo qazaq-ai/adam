@@ -267,6 +267,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "adam-stt-eval"
+version = "6.2.0"
+dependencies = [
+ "adam-audio",
+ "adam-phoneme",
+ "adam-stt-phoneme",
+ "clap",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "adam-stt-phoneme"
 version = "6.2.0"
 dependencies = [

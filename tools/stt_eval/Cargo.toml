@@ -1,0 +1,21 @@
+[package]
+name = "adam-stt-eval"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Phoneme Error Rate (PER) evaluation harness for the v6.3 STT path. Runs recognise_word over a held-out manifest split (FLEURS test by default), compares the recognised phoneme stream against the ground-truth phonemes derived from each transcript, and reports aggregate PER (Levenshtein over phoneme sequences). Replaces ad-hoc two-word smoke tests with a real held-out metric."
+
+[[bin]]
+name = "stt_eval"
+path = "src/main.rs"
+
+[dependencies]
+adam-audio = { path = "../../crates/adam-audio" }
+adam-phoneme = { path = "../../crates/adam-phoneme" }
+adam-stt-phoneme = { path = "../../crates/adam-stt-phoneme" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+clap = { version = "4.5", features = ["derive"] }
+
+[lints]
+workspace = true

@@ -1,8 +1,24 @@
-# v6.3.0 — Phonemic Foundation (design)
+# v6.3.0 — Phonemic Foundation
 
-**Status.** ⚙️ **Design started 2026-05-26.** No code yet. Branch
-`experimental/v6_3_phonemic_foundation` will be cut from `main`
-at commit `b04ea732` once this doc is signed off.
+**Status.** 🚧 **Implementation in progress on
+`experimental/v6_3_phonemic_foundation`** (cut from `main` at
+`b04ea732`). As of 2026-05-27 the arc has shipped phases 1-7, 9
+and 10 plus Phase 11 steps 1-3; see the phase table in § 5 for
+per-phase status. New crates landed: `adam-phoneme`,
+`adam-phonotactics`, `adam-audio`, `adam-stt-phoneme`,
+`adam-tts-phoneme`, `adam-kernel-phoneme`, `adam-forced-aligner`,
+plus the `voice_repl_v6_3` demonstrator. The full audio path
+(audio → MFCC → CMVN → phonemes → Cyrillic → dialog → phoneme
+TTS) builds without whisper.cpp or macOS `say`.
+
+**Open risks (2026-05-27 external audit).** STT phoneme accuracy
+is not yet measured on a held-out set — only smoke-tested on two
+Wikimedia probes (see § 5 Phase 11). A PER/WER report over the
+FLEURS test split is the next deliverable. The `data/
+v6_3_phoneme_bank` derived corpus (~2.2 GB) is `.gitignore`d and
+regenerable; `data/v6_3_corpus/MANIFEST.jsonl` provenance is
+still to be reconciled. The workspace `Cargo.toml` version stays
+`6.2.0` until the branch merges to `main`.
 
 **Origin.** Voice REPL session-5 (2026-05-26 demo-prep) closed
 yet another batch of STT-mishear / listing-fallback bugs. User
