@@ -51,6 +51,7 @@ pub mod spectrogram;
 pub mod vad;
 pub mod wav;
 pub mod window;
+pub mod word_split;
 
 pub use error::AudioError;
 pub use pcm::PcmSamples;

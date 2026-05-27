@@ -637,7 +637,9 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
     }
 
     // Pre-load all usable entries so each iteration can re-use
-    // them without re-reading + re-parsing.
+    // them without re-reading + re-parsing. Multi-word entries
+    // are split via energy-based word segmentation; each word
+    // becomes its own source.
     let mut sources: Vec<BankSource> = Vec::new();
     let mut skipped = 0_usize;
     let file = fs::File::open(&args.manifest)?;
@@ -646,49 +648,90 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
             Ok(e) => e,
             Err(_) => continue,
         };
-        if entry.transcript.split_whitespace().count() != 1 {
-            println!(
-                "[build-bank] skipping multi-word entry «{}» ({} words)",
-                entry.label,
-                entry.transcript.split_whitespace().count()
-            );
+
+        let words: Vec<&str> = entry.transcript.split_whitespace().collect();
+        if words.is_empty() {
             skipped += 1;
             continue;
         }
-        let phonemes = cyrillic_to_phonemes(&entry.transcript, true);
-        if phonemes.is_empty() {
-            println!(
-                "[build-bank] skipping «{}» — no phonemes parsed",
-                entry.label
-            );
-            skipped += 1;
-            continue;
-        }
-        let mfcc_path = args.bank_dir.join(&entry.mfcc_path);
-        let mfcc_bytes = match fs::read(&mfcc_path) {
-            Ok(b) => b,
-            Err(e) => {
-                eprintln!("[build-bank] cannot read {}: {}", mfcc_path.display(), e);
+
+        if words.len() == 1 {
+            // Single-word path: use the pre-computed MFCC.
+            let phonemes = cyrillic_to_phonemes(&entry.transcript, true);
+            if phonemes.is_empty() {
                 skipped += 1;
                 continue;
             }
-        };
-        let mfcc_seq = adam_audio::mfcc::read_binary(&mfcc_bytes)?;
-        if mfcc_seq.num_frames() < phonemes.len() {
-            println!(
-                "[build-bank] skipping «{}» — {} frames < {} phonemes",
-                entry.label,
-                mfcc_seq.num_frames(),
-                phonemes.len()
+            let mfcc_path = args.bank_dir.join(&entry.mfcc_path);
+            let mfcc_bytes = match fs::read(&mfcc_path) {
+                Ok(b) => b,
+                Err(e) => {
+                    eprintln!("[build-bank] cannot read {}: {}", mfcc_path.display(), e);
+                    skipped += 1;
+                    continue;
+                }
+            };
+            let mfcc_seq = adam_audio::mfcc::read_binary(&mfcc_bytes)?;
+            if mfcc_seq.num_frames() < phonemes.len() {
+                skipped += 1;
+                continue;
+            }
+            sources.push(BankSource {
+                label: entry.label,
+                phonemes,
+                mfcc: mfcc_seq,
+            });
+        } else {
+            // Multi-word path: load the WAV, split at silent
+            // gaps, compute per-word MFCC, generate one source
+            // per word. Skip the whole entry if word count
+            // doesn't match the splitter's output.
+            let wav_path = args.bank_dir.join(&entry.wav_path);
+            let pcm = match adam_audio::wav::read_wav(&wav_path) {
+                Ok(p) => p,
+                Err(e) => {
+                    eprintln!("[build-bank] cannot read {}: {}", wav_path.display(), e);
+                    skipped += 1;
+                    continue;
+                }
+            };
+            let pcm_mono = if pcm.channels > 1 { pcm.to_mono() } else { pcm };
+            let segs = adam_audio::word_split::split_words(
+                &pcm_mono.data,
+                pcm_mono.sample_rate,
+                &adam_audio::word_split::WordSplitConfig::default(),
             );
-            skipped += 1;
-            continue;
+            if segs.len() != words.len() {
+                println!(
+                    "[build-bank] skipping «{}» — splitter found {} segments, transcript has {} words",
+                    entry.label,
+                    segs.len(),
+                    words.len(),
+                );
+                skipped += 1;
+                continue;
+            }
+            for (w_idx, (word_txt, (start, end))) in words.iter().zip(segs.iter()).enumerate() {
+                let phonemes = cyrillic_to_phonemes(word_txt, true);
+                if phonemes.is_empty() {
+                    continue;
+                }
+                let word_samples = &pcm_mono.data[*start..*end];
+                let word_mfcc = adam_audio::mfcc::mfcc(
+                    word_samples,
+                    pcm_mono.sample_rate,
+                    &adam_audio::mfcc::MfccConfig::default(),
+                );
+                if word_mfcc.num_frames() < phonemes.len() {
+                    continue;
+                }
+                sources.push(BankSource {
+                    label: format!("{}_w{w_idx}", entry.label),
+                    phonemes,
+                    mfcc: word_mfcc,
+                });
+            }
         }
-        sources.push(BankSource {
-            label: entry.label,
-            phonemes,
-            mfcc: mfcc_seq,
-        });
     }
 
     println!(
