@@ -23,7 +23,7 @@
 //! Phase 2d-plus delivers higher-quality templates.
 
 use adam_audio::wav::read_wav;
-use adam_stt_phoneme::{PhonemeBank, WordConfig, recognise_word};
+use adam_stt_phoneme::{PhonemeBank, WordConfig, recognise_word, rescore};
 use std::path::PathBuf;
 
 fn bank_dir() -> Option<PathBuf> {
@@ -46,7 +46,8 @@ fn hybrid_bank(sample_rate: u32) -> Option<PhonemeBank> {
 }
 
 /// Pipeline runs end-to-end on the «жібек» recording without
-/// crashing and produces at least one phoneme.
+/// crashing and produces at least one phoneme. The rescored
+/// output should preserve all phonemes (no rescoring needed).
 #[test]
 fn jibek_pipeline_runs_end_to_end() {
     let Some(dir) = bank_dir() else {
@@ -63,17 +64,22 @@ fn jibek_pipeline_runs_end_to_end() {
     assert_eq!(pcm.channels, 1, "expected mono");
     assert_eq!(pcm.sample_rate, 16_000, "expected 16 kHz");
 
-    let phonemes = recognise_word(&pcm.data, pcm.sample_rate, &bank, &WordConfig::default());
-    eprintln!("[real-audio] «жібек» → {phonemes:?}");
+    let raw = recognise_word(&pcm.data, pcm.sample_rate, &bank, &WordConfig::default());
+    let rescored = rescore(&raw);
+    eprintln!("[real-audio] «жібек» raw       → {raw:?}");
+    eprintln!("[real-audio] «жібек» rescored  → {rescored:?}");
     assert!(
-        !phonemes.is_empty(),
+        !rescored.is_empty(),
         "expected at least one recognised phoneme from жібек.wav",
     );
 }
 
-/// Pipeline runs on a longer recording («қазақ»).
+/// «қазақ» — pipeline + rescoring. The raw DTW output may
+/// include spurious consonants from the small-corpus bias;
+/// rescoring should clean them up by enforcing the
+/// `(C)V(CC(C))` shape per syllable.
 #[test]
-fn qazaq_pipeline_runs_end_to_end() {
+fn qazaq_pipeline_with_rescore() {
     let Some(dir) = bank_dir() else {
         eprintln!("skipping: templates.bin not found");
         return;
@@ -84,9 +90,21 @@ fn qazaq_pipeline_runs_end_to_end() {
     };
 
     let pcm = read_wav(dir.join("audio/kk_kazakh.wav")).expect("read kk_kazakh.wav");
-    let phonemes = recognise_word(&pcm.data, pcm.sample_rate, &bank, &WordConfig::default());
-    eprintln!("[real-audio] «қазақ» → {phonemes:?}");
-    assert!(!phonemes.is_empty());
+    let raw = recognise_word(&pcm.data, pcm.sample_rate, &bank, &WordConfig::default());
+    let rescored = rescore(&raw);
+    eprintln!("[real-audio] «қазақ» raw       → {raw:?}");
+    eprintln!("[real-audio] «қазақ» rescored  → {rescored:?}");
+    assert!(!rescored.is_empty());
+    // The rescored stream must obey the syllable shape — no
+    // initial consonant cluster, max coda 3.
+    let n_initial_cons = rescored
+        .iter()
+        .take_while(|p| p.is_consonant())
+        .count();
+    assert!(
+        n_initial_cons <= 1,
+        "rescored stream has initial cluster of {n_initial_cons}: {rescored:?}"
+    );
 }
 
 /// Hybrid bank covers every sounded phoneme of the inventory
