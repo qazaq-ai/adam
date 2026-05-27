@@ -9,5 +9,12 @@ description = "Phoneme-level speech-to-text via Dynamic Time Warping over MFCC s
 adam-phoneme = { path = "../adam-phoneme" }
 adam-audio = { path = "../adam-audio" }
 
+[dev-dependencies]
+# End-to-end pipeline tests reach for the phonotactic validator
+# to confirm the recognised stream is harmonic. Phonotactics
+# is not a runtime dependency of the recogniser — keep it as
+# dev-only.
+adam-phonotactics = { path = "../adam-phonotactics" }
+
 [lints]
 workspace = true
