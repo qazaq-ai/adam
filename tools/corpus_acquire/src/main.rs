@@ -1618,6 +1618,18 @@ fn process_fleurs_entry(
     if already.contains(&label) {
         return Ok(None);
     }
+    // Defensive: if a previous call within this same run already
+    // wrote `label` (e.g. the same basename re-emitted from the
+    // pending_audio buffer after a later TSV pass), don't dup.
+    // The boot-time `already` only covers labels that pre-existed
+    // before the run started.
+    if std::path::Path::new(out_dir)
+        .join("audio")
+        .join(format!("{label}.wav"))
+        .exists()
+    {
+        return Ok(None);
+    }
 
     let ext = basename
         .rsplit_once('.')
