@@ -30,6 +30,7 @@ use std::path::{Path, PathBuf};
 
 mod decode;
 mod manifest;
+mod quality;
 mod resample;
 
 use manifest::{ManifestEntry, append_manifest};
@@ -74,6 +75,11 @@ enum Cmd {
     /// archive on disk. Each utterance lands as one manifest
     /// entry (16 kHz WAV + MFCC + transcript + gender).
     Fleurs(FleursArgs),
+    /// Audit every manifest entry against the acoustic-quality
+    /// gate (RMS / duration / clipping / non-finite). Reports
+    /// the verdict for each entry and a rollup; optionally
+    /// prunes failed entries from the manifest.
+    Audit(AuditArgs),
 }
 
 #[derive(Debug, clap::Args)]
@@ -167,6 +173,23 @@ struct FleursArgs {
 }
 
 #[derive(Debug, clap::Args)]
+struct AuditArgs {
+    /// Bank directory containing MANIFEST.jsonl + audio/.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank")]
+    bank_dir: PathBuf,
+    /// Apply the audit results: rewrite MANIFEST.jsonl with only
+    /// passing entries, move failing WAV / MFCC pairs aside
+    /// under audio/quarantine/ and mfcc/quarantine/.
+    /// Without `--apply` the run is read-only and just reports.
+    #[arg(long)]
+    apply: bool,
+    /// Optional per-class breakdown — show how many entries
+    /// failed per `source_class` (wikimedia / fleurs / …).
+    #[arg(long)]
+    by_source_class: bool,
+}
+
+#[derive(Debug, clap::Args)]
 struct BuildBankArgs {
     /// Manifest with (label, transcript, mfcc_path) entries.
     #[arg(long, default_value = "data/v6_3_phoneme_bank/MANIFEST.jsonl")]
@@ -201,6 +224,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Cmd::FixManifestTranscripts(args) => run_fix_transcripts(args),
         Cmd::BuildBank(args) => run_build_bank(args),
         Cmd::Fleurs(args) => run_fleurs(args),
+        Cmd::Audit(args) => run_audit(args),
     }
 }
 
@@ -252,6 +276,22 @@ fn pull_one(
     } else {
         pcm_mono
     };
+
+    // 3b. Quality gate — reject silent / clipped / truncated /
+    // non-finite clips BEFORE they reach the manifest. User
+    // directive 2026-05-28: «при скачивании сразу проверять на
+    // качество аудио файлов, чтобы потом не искать причину
+    // неудачь».
+    let (verdict, stats) = quality::check(&pcm_16k, &quality::QualityConfig::default());
+    if verdict != quality::QualityVerdict::Pass {
+        // Clean up tmp + don't persist anything else.
+        let _ = fs::remove_file(&tmp_path);
+        eprintln!(
+            "[acquire]   REJECT {label}: {verdict} (rms={:.4} peak={:.3} dur={:.2}s)",
+            stats.rms, stats.peak, stats.duration_s,
+        );
+        return Err(format!("quality gate failed for {label}: {verdict}").into());
+    }
 
     // 4. MFCC.
     let mfcc_seq = adam_audio::mfcc::mfcc(
@@ -672,6 +712,158 @@ struct BankSource {
     /// extraction.
     pcm: Vec<f32>,
     pcm_sample_rate: u32,
+}
+
+// ─── audit ────────────────────────────────────────────────────
+
+fn run_audit(args: AuditArgs) -> Result<(), Box<dyn std::error::Error>> {
+    use std::collections::BTreeMap;
+
+    let manifest_path = args.bank_dir.join("MANIFEST.jsonl");
+    if !manifest_path.exists() {
+        return Err(format!("manifest not found: {}", manifest_path.display()).into());
+    }
+    let cfg = quality::QualityConfig::default();
+
+    let file = fs::File::open(&manifest_path)?;
+    let mut entries: Vec<ManifestEntry> = Vec::new();
+    for line in BufReader::new(file).lines() {
+        if let Ok(e) = serde_json::from_str::<ManifestEntry>(&line?) {
+            entries.push(e);
+        }
+    }
+    println!("[audit] {} manifest entries", entries.len());
+
+    let mut verdicts: Vec<(usize, quality::QualityVerdict, quality::AudioStats)> = Vec::new();
+    let mut rollup: BTreeMap<String, usize> = BTreeMap::new();
+    let mut per_class: BTreeMap<(String, String), usize> = BTreeMap::new();
+    let mut io_errors = 0_usize;
+
+    for (idx, e) in entries.iter().enumerate() {
+        let wav = args.bank_dir.join(&e.wav_path);
+        let pcm = match adam_audio::wav::read_wav(&wav) {
+            Ok(p) => p,
+            Err(_) => {
+                io_errors += 1;
+                continue;
+            }
+        };
+        let pcm_mono = if pcm.channels > 1 { pcm.to_mono() } else { pcm };
+        let (v, s) = quality::check(&pcm_mono, &cfg);
+        *rollup.entry(v.to_string()).or_insert(0) += 1;
+        if args.by_source_class {
+            *per_class
+                .entry((e.source_class.clone(), v.to_string()))
+                .or_insert(0) += 1;
+        }
+        verdicts.push((idx, v, s));
+    }
+
+    println!("\n[audit] ===== Quality verdict rollup =====");
+    let total = verdicts.len();
+    for (verdict, n) in &rollup {
+        let pct = 100.0 * (*n as f32) / (total as f32);
+        println!("  {verdict:<18} {n:>5}  ({pct:>5.1}%)");
+    }
+    if io_errors > 0 {
+        println!(
+            "  (note: {io_errors} entries had no readable WAV on disk — likely .gitignored / not regenerated locally)"
+        );
+    }
+
+    if args.by_source_class {
+        println!("\n[audit] ===== Per source_class =====");
+        for ((cls, v), n) in &per_class {
+            println!("  {cls:<10} {v:<18} {n}");
+        }
+    }
+
+    // Surface a few examples of each failure mode for manual
+    // listening / triage.
+    println!("\n[audit] ===== Sample failing labels (up to 5 each) =====");
+    let mut shown: BTreeMap<quality::QualityVerdict, usize> = BTreeMap::new();
+    for (idx, v, s) in &verdicts {
+        if *v == quality::QualityVerdict::Pass {
+            continue;
+        }
+        let cnt = shown.entry(*v).or_insert(0);
+        if *cnt < 5 {
+            println!(
+                "  {:<18} {} (rms={:.4} peak={:.3} dur={:.2}s) — {}",
+                v.to_string(),
+                entries[*idx].label,
+                s.rms,
+                s.peak,
+                s.duration_s,
+                entries[*idx].wav_path,
+            );
+            *cnt += 1;
+        }
+    }
+
+    if !args.apply {
+        println!("\n[audit] read-only run; pass --apply to prune failing entries");
+        return Ok(());
+    }
+
+    // ─── --apply: rewrite manifest, quarantine failed files ──
+    let quarantine_audio = args.bank_dir.join("audio").join("quarantine");
+    let quarantine_mfcc = args.bank_dir.join("mfcc").join("quarantine");
+    fs::create_dir_all(&quarantine_audio)?;
+    fs::create_dir_all(&quarantine_mfcc)?;
+
+    let mut keep: Vec<&ManifestEntry> = Vec::new();
+    let mut moved = 0_usize;
+    let mut io_missing_kept = 0_usize;
+    let mut idx_to_verdict: std::collections::HashMap<usize, quality::QualityVerdict> =
+        std::collections::HashMap::new();
+    for (idx, v, _) in &verdicts {
+        idx_to_verdict.insert(*idx, *v);
+    }
+    for (idx, e) in entries.iter().enumerate() {
+        match idx_to_verdict.get(&idx) {
+            Some(quality::QualityVerdict::Pass) => keep.push(e),
+            Some(_) => {
+                // Move WAV + MFCC into the quarantine dir.
+                let wav_src = args.bank_dir.join(&e.wav_path);
+                let mfcc_src = args.bank_dir.join(&e.mfcc_path);
+                let wav_basename = std::path::Path::new(&e.wav_path)
+                    .file_name()
+                    .unwrap_or_default();
+                let mfcc_basename = std::path::Path::new(&e.mfcc_path)
+                    .file_name()
+                    .unwrap_or_default();
+                let _ = fs::rename(&wav_src, quarantine_audio.join(wav_basename));
+                let _ = fs::rename(&mfcc_src, quarantine_mfcc.join(mfcc_basename));
+                moved += 1;
+            }
+            None => {
+                // No verdict means we couldn't even read the WAV
+                // (gitignored FLEURS file not regenerated). Keep
+                // the manifest row so a future `fleurs` pass can
+                // restore it; report the count.
+                io_missing_kept += 1;
+                keep.push(e);
+            }
+        }
+    }
+
+    // Atomic rewrite of the manifest.
+    let tmp = manifest_path.with_extension("jsonl.tmp");
+    {
+        let mut f = fs::File::create(&tmp)?;
+        for e in &keep {
+            writeln!(f, "{}", serde_json::to_string(e)?)?;
+        }
+    }
+    fs::rename(&tmp, &manifest_path)?;
+    println!(
+        "[audit] applied: kept {} entries (incl. {} with no readable WAV), quarantined {}",
+        keep.len(),
+        io_missing_kept,
+        moved
+    );
+    Ok(())
 }
 
 fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>> {
@@ -1439,6 +1631,18 @@ fn process_fleurs_entry(
     } else {
         pcm_mono
     };
+
+    // Quality gate (Phase 11+): reject silent / clipped /
+    // truncated / non-finite FLEURS clips before they reach the
+    // manifest. User directive 2026-05-28.
+    let (verdict, stats) = quality::check(&pcm_16k, &quality::QualityConfig::default());
+    if verdict != quality::QualityVerdict::Pass {
+        eprintln!(
+            "[fleurs]   REJECT {label}: {verdict} (rms={:.4} peak={:.3} dur={:.2}s)",
+            stats.rms, stats.peak, stats.duration_s,
+        );
+        return Ok(None);
+    }
 
     let mfcc_seq = adam_audio::mfcc::mfcc(
         &pcm_16k.data,
