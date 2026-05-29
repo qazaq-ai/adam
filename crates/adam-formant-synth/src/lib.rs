@@ -121,13 +121,12 @@ pub fn synth_phoneme(phoneme: Phoneme, cfg: &SynthConfig) -> Vec<f32> {
         ),
         _ => vec![0.0; (cfg.phoneme_duration_s * cfg.sample_rate as f32) as usize],
     };
-    // The resonator coefficient choice gives a small static
-    // gain; normalise each phoneme to a target peak of 0.3 so
-    // every output is at a consistent listenable level and well
-    // above the quality-gate RMS floor. (Per-phoneme peak
-    // normalisation is fine because we keep all phonemes ~same
-    // loudness when concatenated.)
-    normalise_to_peak(&mut pcm, 0.30);
+    // Per-phoneme peak normalisation. User feedback
+    // 2026-05-29: 0.30 (~−10 dB) was too quiet at typical
+    // playback volume; bumped to 0.70 (~−3 dB), leaving a
+    // ~3 dB headroom under f32 unity to avoid intersample
+    // clipping when adjacent phonemes are concatenated.
+    normalise_to_peak(&mut pcm, 0.70);
     source::apply_envelope(&mut pcm, cfg.edge_ramp_s, cfg.edge_ramp_s, cfg.sample_rate);
     pcm
 }

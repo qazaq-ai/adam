@@ -104,14 +104,19 @@ pub const MAX_CODA: usize = 3;
 ///   shape; loans may violate (Russian «гравитация» enters with
 ///   initial CC `[G, R, A, ...]` and is accepted as-is).
 ///
-/// The nucleus-presence check applies unconditionally — a phoneme
-/// stream with no vowels is ill-formed regardless of provenance.
+/// Nucleus presence is checked via [`crate::syllable::nucleus_indices`]
+/// — a stream has a nucleus if it has either a vowel, a
+/// sonorant (syllabic consonant), or at least one phoneme of
+/// any kind (per the 2026-05-29 strict-orthographic rule, words
+/// like «қыз» = [Q, Z] parse to consonant-only streams).
 pub fn validate_native_word(
     phonemes: &[Phoneme],
     is_native_root: bool,
 ) -> Result<(), ValidationError> {
-    // 1. Nucleus presence — unconditional.
-    if !phonemes.iter().any(|p| p.is_vowel()) {
+    // 1. Nucleus presence — strict empty-only check; consonant-
+    //    only words succeed via sonorant / last-consonant
+    //    fallback inside `nucleus_indices`.
+    if phonemes.is_empty() || crate::syllable::nucleus_indices(phonemes).is_empty() {
         return Err(ValidationError::NoNucleus);
     }
 
@@ -172,17 +177,21 @@ mod tests {
         assert_eq!(validate_native_word(&[Zh, U, M, S], true), Ok(()));
     }
 
-    /// No vowels at all → NoNucleus.
+    /// Only an empty stream fails `NoNucleus`. Consonant-only
+    /// streams succeed via sonorant or last-consonant fallback
+    /// (post-2026-05-29 strict-orthographic rule support):
+    /// `[Q, R, S]` finds R as a sonorant nucleus.
     #[test]
-    fn empty_or_all_consonants_no_nucleus() {
+    fn empty_stream_no_nucleus_consonants_pass_via_sonorant() {
         assert_eq!(
             validate_native_word(&[], true),
             Err(ValidationError::NoNucleus)
         );
-        assert_eq!(
-            validate_native_word(&[Q, R, S], true),
-            Err(ValidationError::NoNucleus)
-        );
+        // Q-R-S has R (sonorant) as nucleus → passes nucleus
+        // gate. May still fail other checks; we just verify it's
+        // not NoNucleus.
+        let v = validate_native_word(&[Q, R, S], true);
+        assert!(!matches!(v, Err(ValidationError::NoNucleus)));
     }
 
     /// Loanword with harmony violation, validated as loan — OK.

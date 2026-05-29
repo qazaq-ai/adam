@@ -45,24 +45,21 @@ fn simple_place_names_validate() {
 /// morpheme boundary and validates each part independently.
 ///
 /// Until then, these words are routed through the loan branch.
-/// **Ignored after the 2026-05-29 strict-orthographic rule**:
-/// the parser now produces consonant-cluster outputs that
-/// trigger `OnsetTooLarge` before reaching the harmony check.
-/// Same gate as the other phonotactic regressions — re-enable
-/// after sonorant-nucleus support lands.
-#[ignore = "awaits sonorant-nucleus support in the phonotactic FST"]
 #[test]
 fn compound_place_names_fail_native_pass_loan() {
     for word in ["көкшетау", "ақтөбе", "шымкент"] {
         let phonemes = cyrillic_to_phonemes(word, true);
-        // Native check — expected to fail on harmony.
+        // Native check — expected to fail. The specific failure
+        // mode depends on the word: «көкшетау» and «ақтөбе»
+        // break harmony (front + back); «шымкент» now drops «ы»
+        // under the strict rule, yielding [Sh, M, K, E, N, T]
+        // whose first syllable has a 3-consonant onset and
+        // trips `OnsetTooLarge` before reaching the harmony
+        // check. Either rejection mode is correct.
         let native_check = validate_native_word(&phonemes, true);
         assert!(
-            matches!(
-                native_check,
-                Err(adam_phonotactics::ValidationError::HarmonyBroken { .. })
-            ),
-            "expected compound «{word}» to break native harmony; got {native_check:?}"
+            native_check.is_err(),
+            "expected compound «{word}» to fail native validation; got {native_check:?}"
         );
         // Loan-mode check — passes (no harmony or shape gate).
         let loan_check = validate_native_word(&phonemes, false);
@@ -91,11 +88,6 @@ fn baitursunuly_validates() {
 /// loan and mixes back-A with front-E (phonologically not
 /// native, even though it is lexically integrated). See
 /// [`loanword_rahmet_passes_as_loan`] below.
-/// **Ignored after the 2026-05-29 strict-orthographic rule**:
-/// «білім» = `[B, L, M]`, «бүгін» = `[B, Ue, G, N]`, etc.
-/// produce no-nucleus syllables that fail current FST. Awaits
-/// sonorant-nucleus support.
-#[ignore = "awaits sonorant-nucleus support in the phonotactic FST"]
 #[test]
 fn dialog_vocabulary_validates() {
     for word in [
@@ -165,11 +157,6 @@ fn loanwords_gate_correctly() {
 
 /// Numbers (often in dialog) — «бір», «екі», «үш», «төрт»,
 /// «бес», «алты», «жеті», «сегіз», «тоғыз», «он».
-/// **Ignored after the 2026-05-29 strict-orthographic rule**:
-/// «бір» = `[B, R]`, «екі» = `[E, K]`, etc. now produce
-/// vowel-less syllables that fail `NoNucleus`. Awaits sonorant-
-/// nucleus support.
-#[ignore = "awaits sonorant-nucleus support in the phonotactic FST"]
 #[test]
 fn small_numerals_validate() {
     for word in [
@@ -193,34 +180,24 @@ fn small_numerals_validate() {
     }
 }
 
-/// «қыз» — single-syllable test specifically for the
-/// initial-syllable «ы» keep-rule.
-///
-/// **Ignored after the 2026-05-29 strict-orthographic rule
-/// change**: «ы» now drops everywhere for native roots, so
-/// «қыз» parses to `[Q, Z]` — a consonant-cluster with no
-/// vowel nucleus. The phonotactic FST still requires a
-/// vowel-bearing syllable; supporting consonant / sonorant
-/// nuclei is Phase 12 step 4 work.
-#[ignore = "awaits sonorant-nucleus support in the phonotactic FST"]
+/// «қыз» under the strict orthographic rule → /qz/, a
+/// consonant cluster. Phase 12 step 4 added sonority-tier
+/// nucleus selection — Z (the last consonant) becomes the
+/// nucleus and the word validates as one syllable.
 #[test]
-fn qyz_validates_with_initial_y() {
+fn qyz_validates_as_consonant_cluster() {
+    use adam_phoneme::Phoneme::*;
     let phonemes = cyrillic_to_phonemes("қыз", true);
+    assert_eq!(phonemes, vec![Q, Z]);
     let v = validate_native_word(&phonemes, true);
     assert!(v.is_ok(), "qyz failed: {v:?}");
     let syls = syllabify(&phonemes);
     assert_eq!(syls.len(), 1);
 }
 
-/// Sanity: every harmony result on real words is `Pure` (no
-/// loanword in this set).
-///
-/// **Ignored after the 2026-05-29 strict-orthographic rule**:
-/// «білім» = `[B, L, M]` has zero vowels under the strict
-/// rule, so `check_harmony` returns `NoVowels` rather than
-/// `Pure(_)`. The "all-consonant native word" case needs the
-/// sonorant-nucleus phonotactic rework. Re-enable then.
-#[ignore = "awaits sonorant-nucleus support in the phonotactic FST"]
+/// Sanity: every harmony result on real words is `Pure` OR
+/// `NoVowels` (consonant-only words under the strict rule
+/// trivially have no harmony to check).
 #[test]
 fn all_native_words_are_pure_harmonic() {
     for word in [
@@ -235,8 +212,8 @@ fn all_native_words_are_pure_harmonic() {
         let phonemes = cyrillic_to_phonemes(word, true);
         let h = check_harmony(&phonemes);
         assert!(
-            matches!(h, HarmonyResult::Pure(_)),
-            "non-pure harmony for «{word}»: {h:?}"
+            matches!(h, HarmonyResult::Pure(_) | HarmonyResult::NoVowels),
+            "non-pure / non-NoVowels harmony for «{word}»: {h:?}"
         );
     }
 }

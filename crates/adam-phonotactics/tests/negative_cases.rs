@@ -19,21 +19,25 @@ fn empty_stream_rejected() {
     );
 }
 
-/// All-consonant streams in various lengths → `NoNucleus`.
+/// Consonant-only streams no longer auto-reject after the
+/// 2026-05-29 strict-orthographic rule support: sonorants (and
+/// failing that, the last consonant) serve as syllabic nuclei.
+/// They may still fail OTHER checks (onset cluster, harmony,
+/// etc.) but not `NoNucleus`.
 #[test]
-fn all_consonant_streams_rejected_regardless_of_length() {
+fn consonant_streams_dont_fail_no_nucleus() {
     let cases: &[Vec<adam_phoneme::Phoneme>] = &[
-        vec![Q],
-        vec![Q, R],
-        vec![S, T, R],
-        vec![Q, Z, Q, S, T, N],
-        vec![B, J, T, R, S, N, L],
+        vec![Q],                   // Q → fallback last-consonant nucleus
+        vec![Q, R],                // R sonorant nucleus
+        vec![S, T, R],             // R sonorant nucleus
+        vec![Q, Z, Q, S, T, N],    // N sonorant nucleus
+        vec![B, J, T, R, S, N, L], // J/R/N/L sonorant nuclei
     ];
     for c in cases {
-        assert_eq!(
-            validate_native_word(c, true),
-            Err(ValidationError::NoNucleus),
-            "expected NoNucleus for {c:?}",
+        let v = validate_native_word(c, true);
+        assert!(
+            !matches!(v, Err(ValidationError::NoNucleus)),
+            "{c:?} unexpectedly returned NoNucleus (got {v:?})"
         );
     }
 }

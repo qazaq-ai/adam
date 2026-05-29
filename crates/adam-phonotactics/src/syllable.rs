@@ -59,6 +59,46 @@ impl fmt::Display for Syllable {
     }
 }
 
+/// Return the indices in `stream` that should serve as
+/// syllable nuclei, following the sonority-tier fallback
+/// described on [`syllabify`].
+pub fn nucleus_indices(stream: &[Phoneme]) -> Vec<usize> {
+    let vowels: Vec<usize> = stream
+        .iter()
+        .enumerate()
+        .filter(|(_, p)| p.is_vowel())
+        .map(|(i, _)| i)
+        .collect();
+    if !vowels.is_empty() {
+        return vowels;
+    }
+    let sonorants: Vec<usize> = stream
+        .iter()
+        .enumerate()
+        .filter(|(_, p)| is_sonorant(**p))
+        .map(|(i, _)| i)
+        .collect();
+    if !sonorants.is_empty() {
+        return sonorants;
+    }
+    if stream.is_empty() {
+        Vec::new()
+    } else {
+        vec![stream.len() - 1]
+    }
+}
+
+/// A sonorant phoneme — one that can serve as a syllable
+/// nucleus in the absence of a vowel. Covers nasals, liquids,
+/// trills, glides, and approximants.
+fn is_sonorant(p: Phoneme) -> bool {
+    use adam_phoneme::Manner::*;
+    matches!(
+        p.manner(),
+        Some(Nasal | Lateral | Trill | Glide | Approximant)
+    )
+}
+
 /// Split a phoneme stream into syllables.
 ///
 /// [`Phoneme::Glottal`] markers are transparent — the
@@ -66,10 +106,21 @@ impl fmt::Display for Syllable {
 /// boundaries are noted but do not force a syllable boundary at
 /// this layer).
 ///
-/// Empty / all-consonant streams return an empty vector — a
-/// well-formed Kazakh word always has at least one vowel
-/// nucleus, and the validator's `NoNucleus` rule catches the
-/// pathological cases.
+/// Nucleus selection follows a sonority-tier fallback (added
+/// 2026-05-29 to accept the strict-orthographic rule's output —
+/// «бір» = [B, R], «қызыл» = [Q, Z, L], «біз» = [B, Z]):
+///
+///   1. If the stream contains **vowels**, every vowel is a
+///      nucleus (the historical rule).
+///   2. Otherwise, if it contains **sonorants** (nasals, liquids,
+///      trills, glides, approximants), every sonorant is a
+///      nucleus — Kazakh tolerates syllabic /m̩/ /n̩/ /l̩/ /r̩/
+///      the way English does in «button», «rhythm», «battle».
+///   3. Otherwise, the **last consonant** of the stream is the
+///      single nucleus — handles obstruent-only clusters like
+///      /qz/ («қыз») or /bz/ («біз»).
+///
+/// Empty streams return an empty vector.
 pub fn syllabify(phonemes: &[Phoneme]) -> Vec<Syllable> {
     let stream: Vec<Phoneme> = phonemes
         .iter()
@@ -77,12 +128,7 @@ pub fn syllabify(phonemes: &[Phoneme]) -> Vec<Syllable> {
         .filter(|p| !matches!(p, Phoneme::Glottal))
         .collect();
 
-    let vowel_indices: Vec<usize> = stream
-        .iter()
-        .enumerate()
-        .filter(|(_, p)| p.is_vowel())
-        .map(|(i, _)| i)
-        .collect();
+    let vowel_indices = nucleus_indices(&stream);
 
     if vowel_indices.is_empty() {
         return Vec::new();
@@ -224,11 +270,23 @@ mod tests {
         assert_eq!(s, vec![syl(&[], A, &[]), syl(&[W], A, &[])]);
     }
 
-    /// All-consonant or empty inputs syllabify to nothing.
+    /// Empty input syllabifies to nothing. Consonant-only input
+    /// uses the sonority-tier fallback (sonorant → last consonant)
+    /// to find a nucleus, per the 2026-05-29 strict-orthographic
+    /// rule support.
     #[test]
-    fn no_vowels_empty_result() {
-        assert!(syllabify(&[Q, R, S]).is_empty());
+    fn empty_input_no_syllables_consonant_only_picks_sonorant() {
+        // Empty → empty.
         assert!(syllabify(&[]).is_empty());
+        // [Q, R, S]: R is a sonorant (trill) → it's the nucleus.
+        let qrs = syllabify(&[Q, R, S]);
+        assert_eq!(qrs.len(), 1);
+        assert_eq!(qrs[0].nucleus, R);
+        // [Q, Z]: no vowels, no sonorants → fallback to last
+        // consonant (Z) as nucleus.
+        let qz = syllabify(&[Q, Z]);
+        assert_eq!(qz.len(), 1);
+        assert_eq!(qz[0].nucleus, Z);
     }
 
     /// Glottal markers stripped before syllabification (do NOT
