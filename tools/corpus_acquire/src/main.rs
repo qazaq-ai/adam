@@ -80,6 +80,11 @@ enum Cmd {
     /// the verdict for each entry and a rollup; optionally
     /// prunes failed entries from the manifest.
     Audit(AuditArgs),
+    /// Generate the v6.3 audio corpus from the hand-curated
+    /// Kazakh lexicon × every voice profile, using the pure-
+    /// Rust formant synthesiser. No external recordings — every
+    /// WAV is produced from physics on the fly.
+    Synth(SynthArgs),
 }
 
 #[derive(Debug, clap::Args)]
@@ -173,6 +178,28 @@ struct FleursArgs {
 }
 
 #[derive(Debug, clap::Args)]
+struct SynthArgs {
+    /// Output bank directory.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank")]
+    out_dir: PathBuf,
+    /// Comma-separated voice presets to render, or `all` for the
+    /// full 12-voice typology (bass→soprano + youth + child +
+    /// elderly).
+    #[arg(long, default_value = "all")]
+    voices: String,
+    /// Per-phoneme synthesis duration, seconds. Default 0.12
+    /// matches the formant-synth crate default.
+    #[arg(long, default_value = "0.12")]
+    phoneme_duration_s: f32,
+    /// Cap on lexicon entries (0 = all).
+    #[arg(long, default_value = "0")]
+    max: usize,
+    /// Source-class label written to the manifest.
+    #[arg(long, default_value = "synth")]
+    source_class: String,
+}
+
+#[derive(Debug, clap::Args)]
 struct AuditArgs {
     /// Bank directory containing MANIFEST.jsonl + audio/.
     #[arg(long, default_value = "data/v6_3_phoneme_bank")]
@@ -225,6 +252,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Cmd::BuildBank(args) => run_build_bank(args),
         Cmd::Fleurs(args) => run_fleurs(args),
         Cmd::Audit(args) => run_audit(args),
+        Cmd::Synth(args) => run_synth(args),
     }
 }
 
@@ -863,6 +891,138 @@ fn run_audit(args: AuditArgs) -> Result<(), Box<dyn std::error::Error>> {
         io_missing_kept,
         moved
     );
+    Ok(())
+}
+
+// ─── synth (formant-synth corpus generation) ──────────────────
+
+fn run_synth(args: SynthArgs) -> Result<(), Box<dyn std::error::Error>> {
+    use adam_formant_synth::{ALL_VOICES, SynthConfig, VoiceProfile, synth_word};
+
+    let voices: Vec<&'static VoiceProfile> = if args.voices == "all" {
+        ALL_VOICES.iter().collect()
+    } else {
+        let wanted: std::collections::HashSet<&str> =
+            args.voices.split(',').map(str::trim).collect();
+        ALL_VOICES
+            .iter()
+            .filter(|v| wanted.contains(v.name))
+            .collect()
+    };
+    if voices.is_empty() {
+        return Err(format!("no matching voice presets in --voices {}", args.voices).into());
+    }
+    println!(
+        "[synth] {} voices × {} lexicon entries",
+        voices.len(),
+        adam_lexicon_curated::full_lexicon().len()
+    );
+
+    fs::create_dir_all(args.out_dir.join("audio"))?;
+    fs::create_dir_all(args.out_dir.join("mfcc"))?;
+    let manifest_path = args.out_dir.join("MANIFEST.jsonl");
+    let already = read_manifest_labels(&manifest_path)?;
+    // Synth path: relaxed `min_duration_s` because we control
+    // the source — short single-phoneme clips (e.g. an alphabet
+    // entry at 0.18 s) aren't truncated downloads, they're
+    // intentionally brief. RMS / clipping / NaN checks still
+    // run with the usual thresholds.
+    let qcfg = quality::QualityConfig {
+        min_duration_s: 0.05,
+        ..quality::QualityConfig::default()
+    };
+
+    let lex = adam_lexicon_curated::full_lexicon();
+    let mut ok = 0_usize;
+    let mut skipped = 0_usize;
+    let mut rejected = 0_usize;
+
+    'voices: for voice in &voices {
+        for entry in &lex {
+            if args.max > 0 && ok >= args.max {
+                break 'voices;
+            }
+            let label = format!("synth_{}_{}", voice.name, entry.label);
+            if already.contains(&label) {
+                skipped += 1;
+                continue;
+            }
+            let cfg = SynthConfig {
+                voice: **voice,
+                phoneme_duration_s: args.phoneme_duration_s,
+                ..SynthConfig::default()
+            };
+            let pcm_data = synth_word(entry.phonemes, &cfg);
+            let pcm_16k = adam_audio::PcmSamples {
+                sample_rate: cfg.sample_rate,
+                channels: 1,
+                data: pcm_data,
+            };
+
+            // Quality gate (same as ingest paths).
+            let (v, st) = quality::check(&pcm_16k, &qcfg);
+            if v != quality::QualityVerdict::Pass {
+                eprintln!(
+                    "[synth]   REJECT {label}: {v} (rms={:.4} peak={:.3} dur={:.2}s)",
+                    st.rms, st.peak, st.duration_s,
+                );
+                rejected += 1;
+                continue;
+            }
+
+            let mfcc_seq = adam_audio::mfcc::mfcc(
+                &pcm_16k.data,
+                pcm_16k.sample_rate,
+                &adam_audio::mfcc::MfccConfig::default(),
+            );
+
+            let wav_path = args.out_dir.join("audio").join(format!("{label}.wav"));
+            let mfcc_path = args.out_dir.join("mfcc").join(format!("{label}.bin"));
+            adam_audio::wav::write_wav(&wav_path, &pcm_16k)?;
+            write_mfcc_binary(&mfcc_path, &mfcc_seq)?;
+            let wav_size = fs::metadata(&wav_path)?.len();
+            let mfcc_size = fs::metadata(&mfcc_path)?.len();
+
+            // Map our preset → manifest gender field (best-effort).
+            let gender = match voice.name {
+                "bass" | "baritone" | "tenor" | "youth_male" | "elderly_male" => "male",
+                "contralto" | "mezzo" | "soprano" | "youth_female" | "elderly_female" => "female",
+                _ => "unknown",
+            };
+
+            let manifest_entry = ManifestEntry {
+                label: label.clone(),
+                source_url: format!(
+                    "formant-synth://{}/{}?dur={:.3}",
+                    voice.name, entry.label, args.phoneme_duration_s
+                ),
+                transcript: entry.cyrillic.to_string(),
+                gender: gender.to_string(),
+                source_class: args.source_class.clone(),
+                original_bytes: wav_size,
+                duration_s: pcm_16k.duration_s(),
+                wav_path: wav_path
+                    .strip_prefix(&args.out_dir)
+                    .unwrap_or(&wav_path)
+                    .to_string_lossy()
+                    .to_string(),
+                wav_bytes: wav_size,
+                mfcc_path: mfcc_path
+                    .strip_prefix(&args.out_dir)
+                    .unwrap_or(&mfcc_path)
+                    .to_string_lossy()
+                    .to_string(),
+                mfcc_frames: mfcc_seq.num_frames(),
+                mfcc_bytes: mfcc_size,
+                collected_at: chrono_date(),
+                used_in_bank: false,
+            };
+            append_manifest(&manifest_path, &manifest_entry)?;
+            ok += 1;
+        }
+    }
+
+    println!("[synth] done: {ok} acquired, {skipped} skipped, {rejected} rejected");
     Ok(())
 }
 

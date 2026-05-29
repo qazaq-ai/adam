@@ -1,0 +1,12 @@
+[package]
+name = "adam-lexicon-curated"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Hand-curated Kazakh lexicon for the v6.3 phonemic-foundation arc. Structured by linguistic feature: alphabet, then words by growing phoneme count, then by part of speech (nouns, verbs, adjectives, numerals, pronouns). Each entry carries Cyrillic surface, phoneme sequence, POS, and a stable label — the inputs the formant synthesiser turns into the v6.3 audio corpus."
+
+[dependencies]
+adam-phoneme = { path = "../adam-phoneme" }
+
+[lints]
+workspace = true

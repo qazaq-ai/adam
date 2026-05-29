@@ -82,6 +82,11 @@ data/v6_3_phoneme_bank/tmp/
 # DO ship — they are not regeneratable from FLEURS.
 data/v6_3_phoneme_bank/audio/fleurs_*.wav
 data/v6_3_phoneme_bank/mfcc/fleurs_*.bin
+# Formant-synth-generated WAVs (deterministic from lexicon ×
+# voice profile via `corpus_acquire synth` — bit-exact
+# regenerable, no need to ship).
+data/v6_3_phoneme_bank/audio/synth_*.wav
+data/v6_3_phoneme_bank/mfcc/synth_*.bin
 # Quarantine dirs produced by `corpus_acquire audit --apply` —
 # failing FLEURS WAVs / MFCCs are moved here instead of deleted
 # so the user can listen to them and adjust thresholds. Same

@@ -83,6 +83,8 @@ version = "6.2.0"
 dependencies = [
  "adam-audio",
  "adam-forced-aligner",
+ "adam-formant-synth",
+ "adam-lexicon-curated",
  "adam-phoneme",
  "adam-stt-phoneme",
  "adam-tts-phoneme",
@@ -208,6 +210,13 @@ version = "6.2.0"
 dependencies = [
  "adam-phoneme",
  "adam-phonotactics",
+]
+
+[[package]]
+name = "adam-lexicon-curated"
+version = "6.2.0"
+dependencies = [
+ "adam-phoneme",
 ]
 
 [[package]]

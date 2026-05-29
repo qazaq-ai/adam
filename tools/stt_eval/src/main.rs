@@ -116,7 +116,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         if entry.source_class != cli.source_class {
             continue;
         }
-        if !entry.label.contains(&format!("_{}_", cli.split)) {
+        // Empty `--split` = no split filter (all entries of this
+        // source-class). Synth labels have no `_<split>_` segment
+        // so the substring filter would skip everything; pass
+        // `--split ""` to evaluate the whole source-class.
+        if !cli.split.is_empty() && !entry.label.contains(&format!("_{}_", cli.split)) {
             continue;
         }
 

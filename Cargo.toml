@@ -11,6 +11,7 @@ members = [
   "crates/adam-kernel-phoneme",
   "crates/adam-forced-aligner",
   "crates/adam-formant-synth",
+  "crates/adam-lexicon-curated",
   "crates/adam-dialog",
   "crates/adam-tokenizer",
   "crates/adam-corpus",

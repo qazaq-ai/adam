@@ -15,6 +15,8 @@ adam-phoneme = { path = "../../crates/adam-phoneme" }
 adam-stt-phoneme = { path = "../../crates/adam-stt-phoneme" }
 adam-tts-phoneme = { path = "../../crates/adam-tts-phoneme" }
 adam-forced-aligner = { path = "../../crates/adam-forced-aligner" }
+adam-formant-synth = { path = "../../crates/adam-formant-synth" }
+adam-lexicon-curated = { path = "../../crates/adam-lexicon-curated" }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
