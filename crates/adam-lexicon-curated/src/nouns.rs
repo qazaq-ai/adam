@@ -39,7 +39,7 @@ pub const NOUNS_LEN3: &[LexEntry] = &[
     LexEntry::new("n3_koz", "көз", &[K, Oe, Z], Pos::Noun, "len3"), // eye
     LexEntry::new("n3_qol", "қол", &[Q, O, L], Pos::Noun, "len3"), // hand
     LexEntry::new("n3_kol", "көл", &[K, Oe, L], Pos::Noun, "len3"), // lake
-    LexEntry::new("n3_til", "тіл", &[T, Yi, L], Pos::Noun, "len3"), // language
+    LexEntry::new("n3_til", "тіл", &[T, L], Pos::Noun, "len3"), // language — orthographic «і» drops
     LexEntry::new("n3_dos", "дос", &[D, O, S], Pos::Noun, "len3"), // friend
     LexEntry::new("n3_tau", "тау", &[T, A, W], Pos::Noun, "len3"), // mountain
     LexEntry::new("n3_nan", "нан", &[N, A, N], Pos::Noun, "len3"), // bread
@@ -47,7 +47,7 @@ pub const NOUNS_LEN3: &[LexEntry] = &[
     LexEntry::new("n3_san", "сан", &[S, A, N], Pos::Noun, "len3"), // number
     LexEntry::new("n3_qos", "көш", &[K, Oe, Sh], Pos::Noun, "len3"), // nomadic move
     LexEntry::new("n3_jaz", "жаз", &[Zh, A, Z], Pos::Noun, "len3"), // summer
-    LexEntry::new("n3_qis", "қыс", &[Q, Y, S], Pos::Noun, "len3"), // winter
+    LexEntry::new("n3_qis", "қыс", &[Q, S], Pos::Noun, "len3"), // winter — orthographic «ы» drops
     LexEntry::new("n3_kuz", "күз", &[K, Ue, Z], Pos::Noun, "len3"), // autumn
     LexEntry::new("n3_aru", "ару", &[A, R, W], Pos::Noun, "len3"), // beauty
     LexEntry::new("n3_kop", "көп", &[K, Oe, P], Pos::Noun, "len3"), // many
@@ -74,11 +74,11 @@ pub const NOUNS_LEN4: &[LexEntry] = &[
     LexEntry::new("n4_omir", "өмір", &[Oe, M, R], Pos::Noun, "len4"), // life — epenthetic
     LexEntry::new("n4_otan", "отан", &[O, T, A, N], Pos::Noun, "len4"), // motherland
     LexEntry::new("n4_aqyl", "ақыл", &[A, Q, L], Pos::Noun, "len4"), // mind — epenthetic
-    LexEntry::new("n4_eski", "ескі", &[E, S, K, Yi], Pos::Noun, "len4"), // old — final-«і» = nucleus, stays
-    LexEntry::new("n4_uyim", "ұйым", &[U, J, M], Pos::Noun, "len4"), // organisation — epenthetic
-    LexEntry::new("n4_tary", "тары", &[T, A, R, Y], Pos::Noun, "len4"), // millet — final-«ы» = nucleus, stays
-    LexEntry::new("n4_anyq", "анық", &[A, N, Q], Pos::Noun, "len4"),    // clear — epenthetic
-    LexEntry::new("n4_jaqsi", "жақсы", &[Zh, A, Q, S, Y], Pos::Noun, "len5"), // good (len-5; placed here for organisational continuity)
+    LexEntry::new("n4_eski", "ескі", &[E, S, K], Pos::Noun, "len4"), // old — orthographic «і» drops
+    LexEntry::new("n4_uyim", "ұйым", &[U, J, M], Pos::Noun, "len4"), // organisation
+    LexEntry::new("n4_tary", "тары", &[T, A, R], Pos::Noun, "len4"), // millet — orthographic «ы» drops
+    LexEntry::new("n4_anyq", "анық", &[A, N, Q], Pos::Noun, "len4"), // clear — epenthetic
+    LexEntry::new("n4_jaqsi", "жақсы", &[Zh, A, Q, S], Pos::Noun, "len5"), // good — orthographic «ы» drops
 ];
 
 pub const NOUNS_LEN5PLUS: &[LexEntry] = &[
@@ -91,9 +91,9 @@ pub const NOUNS_LEN5PLUS: &[LexEntry] = &[
     LexEntry::new("n5_baqyt", "бақыт", &[B, A, Q, T], Pos::Noun, "len5"), // happiness — epenthetic «ы»
     LexEntry::new("n5_qogham", "қоғам", &[Q, O, Gh, A, M], Pos::Noun, "len5"), // society
     LexEntry::new("n5_dunie", "дүние", &[D, Ue, N, I, E], Pos::Noun, "len5"), // world
-    LexEntry::new("n5_atasy", "атасы", &[A, T, A, S, Y], Pos::Noun, "len5"), // his grandfather
-    LexEntry::new("n5_anasy", "анасы", &[A, N, A, S, Y], Pos::Noun, "len5"), // his mother
-    LexEntry::new("n5_jibek", "жібек", &[Zh, Yi, B, E, K], Pos::Noun, "len5"), // silk
+    LexEntry::new("n5_atasy", "атасы", &[A, T, A, S], Pos::Noun, "len5"), // his grandfather — final «ы» drops
+    LexEntry::new("n5_anasy", "анасы", &[A, N, A, S], Pos::Noun, "len5"), // his mother — final «ы» drops
+    LexEntry::new("n5_jibek", "жібек", &[Zh, B, E, K], Pos::Noun, "len5"), // silk — orthographic «і» drops
     LexEntry::new(
         "n5_mektep",
         "мектеп",
@@ -102,13 +102,7 @@ pub const NOUNS_LEN5PLUS: &[LexEntry] = &[
         "len6",
     ), // school
     LexEntry::new("n5_dostyq", "достық", &[D, O, S, T, Q], Pos::Noun, "len6"), // friendship — epenthetic «ы»
-    LexEntry::new(
-        "n5_almaty",
-        "алматы",
-        &[A, L, M, A, T, Y],
-        Pos::Noun,
-        "len6",
-    ), // Almaty
+    LexEntry::new("n5_almaty", "алматы", &[A, L, M, A, T], Pos::Noun, "len6"), // Almaty — final «ы» drops
     LexEntry::new(
         "n5_astana",
         "астана",
@@ -116,13 +110,7 @@ pub const NOUNS_LEN5PLUS: &[LexEntry] = &[
         Pos::Noun,
         "len6",
     ), // Astana
-    LexEntry::new(
-        "n5_balasy",
-        "баласы",
-        &[B, A, L, A, S, Y],
-        Pos::Noun,
-        "len6",
-    ), // his child
+    LexEntry::new("n5_balasy", "баласы", &[B, A, L, A, S], Pos::Noun, "len6"), // his child — final «ы» drops
     LexEntry::new("n5_juldyz", "жұлдыз", &[Zh, U, L, D, Z], Pos::Noun, "len6"), // star — epenthetic «ы»
     LexEntry::new(
         "n5_balalar",
@@ -134,8 +122,8 @@ pub const NOUNS_LEN5PLUS: &[LexEntry] = &[
     LexEntry::new(
         "n5_jasandy",
         "жасанды",
-        &[Zh, A, S, A, N, D, Y],
+        &[Zh, A, S, A, N, D],
         Pos::Noun,
         "len7",
-    ), // artificial
+    ), // artificial — final «ы» drops
 ];

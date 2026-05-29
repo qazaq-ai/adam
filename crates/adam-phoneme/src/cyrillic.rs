@@ -69,28 +69,39 @@ pub fn cyrillic_to_phonemes(text: &str, is_native_root: bool) -> Vec<Phoneme> {
     let chars: Vec<char> = lowered.chars().collect();
     let mut out: Vec<Phoneme> = Vec::with_capacity(chars.len());
 
-    for (i, c) in chars.iter().enumerate() {
+    for c in chars.iter() {
         let p = match cyrillic_char_to_phoneme(*c) {
             Some(p) => p,
             None => continue,
         };
 
-        // Epenthetic rule (§9 OQ4). The first criterion is
-        // «non-initial syllable» — equivalent to «some vowel has
-        // already been emitted to `out`». The second criterion
-        // is «both neighbours map to consonants».
+        // Strict orthographic rule (v6.3 updated 2026-05-29, user
+        // directive). Earlier interpretation of §9 OQ4 dropped
+        // «ы» / «і» only in non-initial syllables between
+        // consonants; that was too generous. User's deeper
+        // claim, with the French «Renault» (7 letters, 4 sounds)
+        // analogy:
+        //
+        // > «мы произносим «қз», а не «қыз», мы произносим
+        // >  «қ зл», а не «қызыл».»
+        //
+        // i.e. «ы» / «і» are **pure orthographic markers**, not
+        // phonemes at all — they're written between consonants
+        // to make the cluster look syllabic to Indo-European
+        // eyes, but native speakers articulate the consonants
+        // directly. So for a native root we drop EVERY «ы» /
+        // «і», regardless of position, even when they're the
+        // only candidate syllable nucleus (Kazakh tolerates
+        // sonorant-cluster realisations like /qz/ for «қыз»).
+        // Phoneme::Y / Phoneme::Yi remain in the inventory for
+        // backward compatibility with suffix tables in
+        // adam-kernel-phoneme; the parser just never emits them
+        // from native-root text.
+        //
+        // Loan-words (`is_native_root = false`) keep their
+        // orthographic Y / Yi unchanged.
         if is_native_root && matches!(p, Phoneme::Y | Phoneme::Yi) {
-            let in_non_initial_syllable = out.iter().any(|p| p.is_vowel());
-            let prev_is_consonant = out.last().is_some_and(|p| p.is_consonant());
-            let next_is_consonant = chars
-                .get(i + 1)
-                .and_then(|&c| cyrillic_char_to_phoneme(c))
-                .is_some_and(|p| p.is_consonant());
-
-            if in_non_initial_syllable && prev_is_consonant && next_is_consonant {
-                // Drop — orthographic epenthetic position.
-                continue;
-            }
+            continue;
         }
 
         out.push(p);
@@ -182,12 +193,16 @@ mod tests {
         }
     }
 
-    /// «қыз» — single-syllable, «ы» is initial-syllable nucleus,
-    /// so even with the rule enabled it stays full.
+    /// «қыз» — single-syllable cluster. Under the v6.3 strict
+    /// orthographic rule (2026-05-29 user directive) «ы» is a
+    /// pure orthographic marker and is dropped from the
+    /// phonemic stream, leaving a /qz/ consonant cluster — same
+    /// principle as French «Renault» = /ʁəno/ (7 letters,
+    /// 4 sounds).
     #[test]
-    fn qyz_keeps_ы_in_initial_syllable() {
+    fn qyz_drops_orthographic_ы() {
         let ph = cyrillic_to_phonemes("қыз", true);
-        assert_eq!(ph, vec![Q, Y, Z]);
+        assert_eq!(ph, vec![Q, Z]);
     }
 
     /// «жұмыс» — «ы» in second syllable between consonants in a
@@ -216,35 +231,37 @@ mod tests {
         assert_eq!(ph, vec![B, I, Z, N, E, S]);
     }
 
-    /// Symmetric: «і» in non-initial inter-consonantal native
-    /// position is also epenthetic.
+    /// Symmetric: «і» is also pure orthography under the strict
+    /// rule and never appears in the phonemic stream of a native
+    /// root.
     #[test]
-    fn epenthetic_і_drops_symmetrically() {
-        // «кітап» — «і» is the initial-syllable nucleus, must
-        // STAY full. (book, K Yi T A P — actually loanword from
-        // Arabic, but treated as native by Kazakh lexicon.)
+    fn orthographic_і_drops_everywhere() {
+        // «кітап» — was [K, Yi, T, A, P] under the old rule; now
+        // [K, T, A, P]. The vowel nucleus is /a/, the initial
+        // K-T cluster is pronounced as a smooth onset.
         let kitap = cyrillic_to_phonemes("кітап", true);
-        assert_eq!(kitap, vec![K, Yi, T, A, P]);
+        assert_eq!(kitap, vec![K, T, A, P]);
 
-        // «білім» — «і» appears twice; first is initial, stays
-        // full; second is non-initial between L and M, both
-        // consonants → epenthetic → dropped.
+        // «білім» — was [B, Yi, L, M] under the old rule; now
+        // [B, L, M], same logic.
         let bilim = cyrillic_to_phonemes("білім", true);
-        assert_eq!(bilim, vec![B, Yi, L, M]);
+        assert_eq!(bilim, vec![B, L, M]);
     }
 
-    /// Whitespace and punctuation are silently dropped.
+    /// Whitespace and punctuation are silently dropped (still
+    /// holds; «ы» now also drops per the strict rule).
     #[test]
     fn whitespace_and_punctuation_silent() {
         let ph = cyrillic_to_phonemes("қыз!  ?", true);
-        assert_eq!(ph, vec![Q, Y, Z]);
+        assert_eq!(ph, vec![Q, Z]);
     }
 
-    /// Unknown / Latin / digit characters silently dropped.
+    /// Unknown / Latin / digit characters silently dropped
+    /// (and the orthographic «ы» drops as well).
     #[test]
     fn unknown_chars_silent() {
         let ph = cyrillic_to_phonemes("қыз2 abc", true);
-        assert_eq!(ph, vec![Q, Y, Z]);
+        assert_eq!(ph, vec![Q, Z]);
     }
 
     /// Boundary marker projection: appears in a stream, gets

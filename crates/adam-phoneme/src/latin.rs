@@ -68,30 +68,13 @@ pub fn latin_to_phonemes(text: &str, is_native_root: bool) -> Vec<Phoneme> {
             continue;
         };
 
-        // Epenthetic rule, symmetric to cyrillic.rs.
+        // Strict orthographic rule, symmetric to cyrillic.rs:
+        // for a native root, every Latin `y` / `i` (= Cyrillic
+        // «ы» / «і») drops unconditionally — they are pure
+        // orthographic markers, not phonemes.
         if is_native_root && matches!(p, Phoneme::Y | Phoneme::Yi) {
-            let in_non_initial_syllable = out.iter().any(|p| p.is_vowel());
-            let prev_is_consonant = out.last().is_some_and(|p| p.is_consonant());
-            let next_is_consonant = chars
-                .get(i + advance)
-                .copied()
-                .and_then(|c| {
-                    // 2-char lookahead for ts / şç at the next
-                    // position before checking is_consonant.
-                    if c == 't' && chars.get(i + advance + 1) == Some(&'s') {
-                        Some(Phoneme::Ts)
-                    } else if c == 'ş' && chars.get(i + advance + 1) == Some(&'ç') {
-                        Some(Phoneme::Shch)
-                    } else {
-                        latin_char_to_phoneme(c)
-                    }
-                })
-                .is_some_and(|p| p.is_consonant());
-
-            if in_non_initial_syllable && prev_is_consonant && next_is_consonant {
-                i += advance;
-                continue;
-            }
+            i += advance;
+            continue;
         }
 
         out.push(p);
@@ -220,10 +203,12 @@ mod tests {
         }
     }
 
-    /// «qyz» — initial-syllable «y» stays full.
+    /// «qyz» — Latin `y` drops under the v6.3 strict
+    /// orthographic rule, leaving /qz/. Symmetric to the
+    /// Cyrillic test `qyz_drops_orthographic_ы`.
     #[test]
-    fn qyz_keeps_initial_y() {
-        assert_eq!(latin_to_phonemes("qyz", true), vec![Q, Y, Z]);
+    fn qyz_drops_orthographic_y() {
+        assert_eq!(latin_to_phonemes("qyz", true), vec![Q, Z]);
     }
 
     /// «jumys» — non-initial «y» between consonants → epenthetic
@@ -253,10 +238,12 @@ mod tests {
         assert_eq!(upper, vec![Q, A, Z, A, Q]);
     }
 
-    /// Whitespace / punctuation / unknown chars silently dropped.
+    /// Whitespace / punctuation / unknown chars silently dropped
+    /// (and the orthographic `y` drops as well under the strict
+    /// rule).
     #[test]
     fn unknown_chars_silent() {
-        assert_eq!(latin_to_phonemes("qyz! 123", true), vec![Q, Y, Z]);
+        assert_eq!(latin_to_phonemes("qyz! 123", true), vec![Q, Z]);
     }
 
     /// Loan-mode round-trip on a stream containing all loan

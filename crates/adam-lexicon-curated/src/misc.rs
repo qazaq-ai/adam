@@ -6,13 +6,12 @@ use crate::{LexEntry, Pos};
 use adam_phoneme::Phoneme::*;
 
 pub const ADJECTIVES: &[LexEntry] = &[
-    // First «ы» = nucleus of «қыз» (initial syllable, kept).
-    // Second «ы» = epenthetic between Z and L, dropped.
-    LexEntry::new("adj_qyzyl", "қызыл", &[Q, Y, Z, L], Pos::Adjective, "color"),
+    // Strict rule: both «ы»s are pure orthography → /qzl/.
+    LexEntry::new("adj_qyzyl", "қызыл", &[Q, Z, L], Pos::Adjective, "color"),
     LexEntry::new("adj_aq", "ақ", &[A, Q], Pos::Adjective, "color"),
     LexEntry::new("adj_qara", "қара", &[Q, A, R, A], Pos::Adjective, "color"),
     LexEntry::new("adj_kok", "көк", &[K, Oe, K], Pos::Adjective, "color"),
-    LexEntry::new("adj_sary", "сары", &[S, A, R, Y], Pos::Adjective, "color"),
+    LexEntry::new("adj_sary", "сары", &[S, A, R], Pos::Adjective, "color"), // final «ы» drops
     LexEntry::new(
         "adj_jasyl",
         "жасыл",
@@ -27,20 +26,14 @@ pub const ADJECTIVES: &[LexEntry] = &[
         Pos::Adjective,
         "size",
     ),
-    LexEntry::new(
-        "adj_kishi",
-        "кіші",
-        &[K, Yi, Sh, Yi],
-        Pos::Adjective,
-        "size",
-    ),
+    LexEntry::new("adj_kishi", "кіші", &[K, Sh], Pos::Adjective, "size"), // both «і»s drop
     LexEntry::new(
         "adj_jaqsy",
         "жақсы",
-        &[Zh, A, Q, S, Y],
+        &[Zh, A, Q, S],
         Pos::Adjective,
         "quality",
-    ),
+    ), // final «ы» drops
     LexEntry::new(
         "adj_jaman",
         "жаман",
@@ -55,13 +48,7 @@ pub const ADJECTIVES: &[LexEntry] = &[
         Pos::Adjective,
         "quality",
     ),
-    LexEntry::new(
-        "adj_eski",
-        "ескі",
-        &[E, S, K, Yi],
-        Pos::Adjective,
-        "quality",
-    ),
+    LexEntry::new("adj_eski", "ескі", &[E, S, K], Pos::Adjective, "quality"), // «і» drops
     LexEntry::new("adj_alys", "алыс", &[A, L, S], Pos::Adjective, "distance"), // epenthetic «ы»
     LexEntry::new(
         "adj_jaqyn",
@@ -73,19 +60,19 @@ pub const ADJECTIVES: &[LexEntry] = &[
     LexEntry::new(
         "adj_tatti",
         "тәтті",
-        &[T, Ae, T, T, Yi],
+        &[T, Ae, T, T],
         Pos::Adjective,
         "taste",
-    ),
-    LexEntry::new("adj_ashshy", "ащы", &[A, Shch, Y], Pos::Adjective, "taste"),
+    ), // final «і» drops
+    LexEntry::new("adj_ashshy", "ащы", &[A, Shch], Pos::Adjective, "taste"),  // final «ы» drops
 ];
 
 pub const PRONOUNS: &[LexEntry] = &[
     LexEntry::new("pn_men", "мен", &[M, E, N], Pos::Pronoun, "personal"),
     LexEntry::new("pn_sen", "сен", &[S, E, N], Pos::Pronoun, "personal"),
-    LexEntry::new("pn_siz", "сіз", &[S, Yi, Z], Pos::Pronoun, "personal"),
+    LexEntry::new("pn_siz", "сіз", &[S, Z], Pos::Pronoun, "personal"), // «і» drops
     LexEntry::new("pn_ol", "ол", &[O, L], Pos::Pronoun, "personal"),
-    LexEntry::new("pn_biz", "біз", &[B, Yi, Z], Pos::Pronoun, "personal"),
+    LexEntry::new("pn_biz", "біз", &[B, Z], Pos::Pronoun, "personal"), // «і» drops
     LexEntry::new(
         "pn_sender",
         "сендер",
@@ -102,7 +89,7 @@ pub const PRONOUNS: &[LexEntry] = &[
         Pos::Pronoun,
         "demonstrative",
     ),
-    LexEntry::new("pn_kim", "кім", &[K, Yi, M], Pos::Pronoun, "interrogative"),
+    LexEntry::new("pn_kim", "кім", &[K, M], Pos::Pronoun, "interrogative"), // «і» drops
     LexEntry::new("pn_ne", "не", &[N, E], Pos::Pronoun, "interrogative"),
     LexEntry::new(
         "pn_qaida",
@@ -121,25 +108,25 @@ pub const PRONOUNS: &[LexEntry] = &[
 ];
 
 pub const NUMERALS: &[LexEntry] = &[
-    LexEntry::new("num_bir", "бір", &[B, Yi, R], Pos::Numeral, "1-10"),
-    LexEntry::new("num_eki", "екі", &[E, K, Yi], Pos::Numeral, "1-10"),
+    LexEntry::new("num_bir", "бір", &[B, R], Pos::Numeral, "1-10"), // «і» drops → /br/
+    LexEntry::new("num_eki", "екі", &[E, K], Pos::Numeral, "1-10"), // «і» drops
     LexEntry::new("num_ush", "үш", &[Ue, Sh], Pos::Numeral, "1-10"),
     LexEntry::new("num_tort", "төрт", &[T, Oe, R, T], Pos::Numeral, "1-10"),
     LexEntry::new("num_bes", "бес", &[B, E, S], Pos::Numeral, "1-10"),
-    LexEntry::new("num_alty", "алты", &[A, L, T, Y], Pos::Numeral, "1-10"),
-    LexEntry::new("num_jeti", "жеті", &[Zh, E, T, Yi], Pos::Numeral, "1-10"),
+    LexEntry::new("num_alty", "алты", &[A, L, T], Pos::Numeral, "1-10"), // final «ы» drops
+    LexEntry::new("num_jeti", "жеті", &[Zh, E, T], Pos::Numeral, "1-10"), // final «і» drops
     LexEntry::new("num_segiz", "сегіз", &[S, E, G, Z], Pos::Numeral, "1-10"), // epenthetic «і»
     LexEntry::new("num_toghyz", "тоғыз", &[T, O, Gh, Z], Pos::Numeral, "1-10"), // epenthetic «ы»
     LexEntry::new("num_on", "он", &[O, N], Pos::Numeral, "10s"),
     LexEntry::new(
         "num_jiyrma",
         "жиырма",
-        &[Zh, I, Y, R, M, A],
+        &[Zh, I, R, M, A],
         Pos::Numeral,
         "10s",
-    ),
+    ), // «ы» drops
     LexEntry::new("num_otyz", "отыз", &[O, T, Z], Pos::Numeral, "10s"), // epenthetic «ы»
-    LexEntry::new("num_qyryq", "қырық", &[Q, Y, R, Q], Pos::Numeral, "10s"), // first ы = nucleus, second epenthetic
+    LexEntry::new("num_qyryq", "қырық", &[Q, R, Q], Pos::Numeral, "10s"), // both «ы»s drop → /qrq/
     LexEntry::new("num_elyu", "елу", &[E, L, W], Pos::Numeral, "10s"),
     LexEntry::new("num_alpys", "алпыс", &[A, L, P, S], Pos::Numeral, "10s"), // epenthetic «ы»
     LexEntry::new(
@@ -164,7 +151,7 @@ pub const NUMERALS: &[LexEntry] = &[
         "10s",
     ),
     LexEntry::new("num_juz", "жүз", &[Zh, Ue, Z], Pos::Numeral, "100s"),
-    LexEntry::new("num_myng", "мың", &[M, Y, Ng], Pos::Numeral, "1000s"),
+    LexEntry::new("num_myng", "мың", &[M, Ng], Pos::Numeral, "1000s"), // «ы» drops → /mŋ/
 ];
 
 pub const INTERJECTIONS: &[LexEntry] = &[
@@ -202,10 +189,10 @@ pub const INTERJECTIONS: &[LexEntry] = &[
     LexEntry::new(
         "intj_jaraidy",
         "жарайды",
-        &[Zh, A, R, A, J, D, Y],
+        &[Zh, A, R, A, J, D],
         Pos::Interjection,
         "agree",
-    ), // ok
+    ), // ok — final «ы» drops
 ];
 
 pub const ADVERBS: &[LexEntry] = &[

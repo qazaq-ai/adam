@@ -1,9 +1,13 @@
 // SPDX-License-Identifier: BUSL-1.1
 // Part of: adam · ARK (Agglutinative Reasoning Kernel) · github.com/qazaq-ai/adam
 //! Real Kazakh words from `data/world_core` through the phoneme
-//! renderer. Pins the §9 OQ4 epenthetic rule against words that
-//! appear in actual demo / audit queries — if the rule misclassifies
-//! a real production word, this test catches it.
+//! renderer.
+//!
+//! As of 2026-05-29 the «ы» / «і» strict-orthographic rule
+//! (user directive: «ы» / «і» are pure orthographic markers,
+//! analogous to Renault's silent letters) means every
+//! occurrence drops from a native-root parse — initial,
+//! medial, final. These pinning tests reflect the strict rule.
 
 use adam_phoneme::{
     Phoneme,
@@ -21,8 +25,9 @@ fn geography_round_trips() {
         cyrillic_to_phonemes("қазақстан", true),
         vec![Q, A, Z, A, Q, S, T, A, N]
     );
-    // «алматы» — final «ы», prev consonant, next nothing → keep.
-    assert_eq!(cyrillic_to_phonemes("алматы", true), vec![A, L, M, A, T, Y]);
+    // «алматы» — final «ы» drops under the strict rule, leaving
+    // /almat/ (final T is its own coda).
+    assert_eq!(cyrillic_to_phonemes("алматы", true), vec![A, L, M, A, T]);
     // «астана» — no epenthetics.
     assert_eq!(cyrillic_to_phonemes("астана", true), vec![A, S, T, A, N, A]);
     // «балқаш» (lake) — no «ы».
@@ -37,26 +42,19 @@ fn geography_round_trips() {
     assert_eq!(cyrillic_to_phonemes("алтай", true), vec![A, L, T, A, J]);
 }
 
-/// Historic names: «байтұрсынұлы» exercises **both** epenthetic
-/// and full «ы» in the same word.
+/// Historic names: «байтұрсынұлы» under the strict rule drops
+/// every «ы» — both the medial and the final.
 #[test]
-fn baitursynuly_handles_both_y_positions() {
+fn baitursynuly_drops_all_orthographic_ы() {
     let ph = cyrillic_to_phonemes("байтұрсынұлы", true);
-    // Trace:
-    //   б A J т U р с ы н U л ы
-    //   0 1 2 3 4 5 6 7 8 9 10 11
-    // Position 7 «ы»: out=[B,A,J,T,U,R,S], has vowel A → non-init;
-    //   prev S consonant; next н consonant → DROP.
-    // Position 11 «ы»: out=[B,A,J,T,U,R,S,N,U,L], has vowels →
-    //   non-init; prev L consonant; next nothing → KEEP.
-    assert_eq!(ph, vec![B, A, J, T, U, R, S, N, U, L, Y]);
+    assert_eq!(ph, vec![B, A, J, T, U, R, S, N, U, L]);
 }
 
 /// Common nouns from physics / state vocabulary.
 #[test]
 fn common_nouns_round_trip() {
-    // «мысал» (example) — «ы» in FIRST syllable → KEEP.
-    assert_eq!(cyrillic_to_phonemes("мысал", true), vec![M, Y, S, A, L]);
+    // «мысал» (example) — «ы» drops, leaving /msal/.
+    assert_eq!(cyrillic_to_phonemes("мысал", true), vec![M, S, A, L]);
 
     // «жұмыс» (work) — «ы» in SECOND syllable between consonants
     // → DROP.
@@ -69,17 +67,15 @@ fn common_nouns_round_trip() {
         vec![Zh, U, M, S, S, Z]
     );
 
-    // «алты» (six) — «ы» word-final after consonant, no next
-    // consonant → KEEP.
-    assert_eq!(cyrillic_to_phonemes("алты", true), vec![A, L, T, Y]);
+    // «алты» (six) — final «ы» drops, leaving /alt/.
+    assert_eq!(cyrillic_to_phonemes("алты", true), vec![A, L, T]);
 
     // «алтын» (gold) — «ы» between т and н in second syllable
     // → DROP.
     assert_eq!(cyrillic_to_phonemes("алтын", true), vec![A, L, T, N]);
 
-    // «білім» (knowledge) — first «і» in initial syllable → KEEP;
-    // second «і» in second syllable between L and M → DROP.
-    assert_eq!(cyrillic_to_phonemes("білім", true), vec![B, Yi, L, M]);
+    // «білім» (knowledge) — both «і»s drop → /blm/.
+    assert_eq!(cyrillic_to_phonemes("білім", true), vec![B, L, M]);
 
     // «мемлекет» (state) — no «ы», no «і», no epenthetic
     // candidates. Full round-trip.
@@ -133,11 +129,11 @@ fn all_phonemes_have_a_cyrillic_projection_except_boundary() {
 #[test]
 fn latin_cyrillic_parity_on_real_words() {
     let test_words: &[&[Phoneme]] = &[
-        &[Q, A, Z, A, Q, S, T, A, N],       // қазақстан / qazaqstan
-        &[A, L, M, A, T, Y],                // алматы / almaty
-        &[B, A, J, T, U, R, S, N, U, L, Y], // байтұрсынұлы (post-epenth)
-        &[M, E, M, L, E, K, E, T],          // мемлекет / memleket
-        &[T, U, R, S],                      // тұрс (synthetic test)
+        &[Q, A, Z, A, Q, S, T, A, N],    // қазақстан / qazaqstan
+        &[A, L, M, A, T],                // алматы → /almat/ under strict rule
+        &[B, A, J, T, U, R, S, N, U, L], // байтұрсынұлы → all «ы» drop
+        &[M, E, M, L, E, K, E, T],       // мемлекет / memleket
+        &[T, U, R, S],                   // тұрс (synthetic test)
     ];
     for ph in test_words {
         let cyr = phonemes_to_cyrillic(ph);
@@ -160,18 +156,15 @@ fn latin_cyrillic_parity_on_real_words() {
 /// «байтұрсынұлы» Latin: epenthetic «y» drops mid-word, final
 /// «y» stays. Symmetric to the Cyrillic test.
 #[test]
-fn baitursunuly_latin_handles_both_y_positions() {
-    // Cyrillic «байтұрсынұлы» renders Latin «baýturynuly» in our
-    // scheme (J→ý). The middle «ы» (Latin «y») between «s» and
-    // «n» drops; final «y» after «l» stays.
+fn baitursunuly_latin_drops_all_orthographic_y() {
+    // Under the strict v6.3 rule every orthographic «ы» drops
+    // regardless of position, so both the medial and final «ы»
+    // disappear from the parsed phoneme stream.
     let cyr_phonemes = cyrillic_to_phonemes("байтұрсынұлы", true);
     let lat = phonemes_to_latin(&cyr_phonemes);
-    // Re-parse the Latin form with the native rule on: must
-    // give the same phoneme list (since both rules drop the
-    // same epenthetic).
     let lat_phonemes = latin_to_phonemes(&lat, true);
     assert_eq!(cyr_phonemes, lat_phonemes);
-    assert_eq!(cyr_phonemes, vec![B, A, J, T, U, R, S, N, U, L, Y]);
+    assert_eq!(cyr_phonemes, vec![B, A, J, T, U, R, S, N, U, L]);
 }
 
 /// Forward render covers every phoneme in `ALL` for Latin too.
