@@ -1,0 +1,23 @@
+[package]
+name = "adam-build-pcm-bank"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Phase 7 step 2 (2026-05-29): build a per-phoneme PCM template bank from forced-aligned human Kazakh audio. Replaces the formant-synth-derived PCM bank (which sounded like «robot from the 80s» — user diagnosis) with concatenative-quality real-speech PCM segments. Output drives adam-tts-phoneme's synthesise_with_bank() for natural-sounding TTS."
+
+[[bin]]
+name = "build_pcm_bank"
+path = "src/main.rs"
+
+[dependencies]
+adam-audio = { path = "../../crates/adam-audio" }
+adam-phoneme = { path = "../../crates/adam-phoneme" }
+adam-stt-phoneme = { path = "../../crates/adam-stt-phoneme" }
+adam-tts-phoneme = { path = "../../crates/adam-tts-phoneme" }
+adam-forced-aligner = { path = "../../crates/adam-forced-aligner" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+clap = { version = "4.5", features = ["derive"] }
+
+[lints]
+workspace = true

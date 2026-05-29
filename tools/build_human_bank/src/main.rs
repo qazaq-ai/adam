@@ -70,6 +70,16 @@ struct Cli {
     #[arg(long, default_value_t = 0)]
     max: usize,
 
+    /// Drop the top-q fraction of segments per phoneme, ranked
+    /// by per-segment alignment cost (mean Euclidean distance
+    /// of segment frames to the bootstrap-bank centroid for
+    /// that phoneme). `0.0` = keep everything (rounds 1..4
+    /// behaviour). Typical Phase 6 step 2 round 5 setting is
+    /// `0.10` — drop the worst-aligned 10 % which are most
+    /// likely mis-labelled exemplars.
+    #[arg(long, default_value_t = 0.0)]
+    cost_drop_quantile: f32,
+
     /// Which manifest rows to consume. `human` excludes
     /// FLEURS test. `human-all` includes FLEURS test (useful
     /// for diagnostics only — DO NOT use for a bank that will
@@ -136,10 +146,11 @@ fn main() -> std::io::Result<()> {
                 r.source_class == "wikimedia"
                     || (r.source_class == "fleurs" && !r.label.starts_with("fleurs_test_"))
                     || r.source_class == "common_voice"
+                    || r.source_class == "kaz_tili"
             }
             "human-all" => matches!(
                 r.source_class.as_str(),
-                "wikimedia" | "fleurs" | "common_voice"
+                "wikimedia" | "fleurs" | "common_voice" | "kaz_tili"
             ),
             other => {
                 eprintln!("[build_human_bank] unknown --source {other:?}; matching nothing");
@@ -157,7 +168,36 @@ fn main() -> std::io::Result<()> {
         total_dur / 60.0
     );
 
-    let mut bank = PhonemeBank::new();
+    // Cache bootstrap-bank centroids so per-segment cost
+    // scoring is one HashMap hit per phoneme, not per frame.
+    let mut bootstrap_centroids: HashMap<adam_phoneme::Phoneme, Vec<f32>> = HashMap::new();
+    for (p, tmpls) in bootstrap.iter_all() {
+        if tmpls.is_empty() {
+            continue;
+        }
+        // Average centroid across all exemplars — same shape the
+        // forced aligner uses.
+        let dim = tmpls[0].mfcc.dim();
+        let mut acc = vec![0.0_f32; dim];
+        let mut n_frames_total = 0_usize;
+        for tmpl in tmpls {
+            for frame in &tmpl.mfcc.frames {
+                for (a, x) in acc.iter_mut().zip(frame.iter()) {
+                    *a += *x;
+                }
+                n_frames_total += 1;
+            }
+        }
+        if n_frames_total > 0 {
+            let inv = 1.0 / n_frames_total as f32;
+            for a in &mut acc {
+                *a *= inv;
+            }
+            bootstrap_centroids.insert(*p, acc);
+        }
+    }
+
+    let mut candidates: Vec<Candidate> = Vec::new();
     let mut stats = Stats::default();
 
     for (i, row) in kept.iter().enumerate() {
@@ -213,7 +253,12 @@ fn main() -> std::io::Result<()> {
 
         match align(&audio, &phonemes, &bootstrap) {
             Ok(alignment) => {
-                push_segments(&mut bank, &audio, &alignment.segments, cli.per_phoneme_cap);
+                collect_segments(
+                    &mut candidates,
+                    &audio,
+                    &alignment.segments,
+                    &bootstrap_centroids,
+                );
                 stats.aligned += 1;
                 stats.total_phonemes += alignment.segments.len();
             }
@@ -229,16 +274,65 @@ fn main() -> std::io::Result<()> {
             }
         }
 
-        if (i + 1) % 200 == 0 {
+        if (i + 1) % 500 == 0 {
             eprintln!(
-                "[build_human_bank] {}/{} utterances processed; bank: {} phonemes / {} templates",
+                "[build_human_bank] {}/{} utterances processed; candidates: {}",
                 i + 1,
                 kept.len(),
-                bank.len(),
-                bank.template_count()
+                candidates.len()
             );
         }
     }
+
+    // Cost-quantile filter + per-phoneme cap: sort each
+    // phoneme's candidates by cost ascending, drop the worst
+    // `cost_drop_quantile` fraction, then keep at most
+    // `per_phoneme_cap` of the survivors. Order-of-insertion
+    // bias from rounds 1..4 (first-K-utterances wins) is gone —
+    // every segment gets a fair comparison against every other
+    // segment of the same phoneme.
+    let mut by_phoneme: HashMap<adam_phoneme::Phoneme, Vec<Candidate>> = HashMap::new();
+    for c in candidates.drain(..) {
+        by_phoneme.entry(c.phoneme).or_default().push(c);
+    }
+    let q = cli.cost_drop_quantile.clamp(0.0, 0.99);
+    let mut bank = PhonemeBank::new();
+    let mut dropped_quantile = 0_usize;
+    let mut dropped_cap = 0_usize;
+    let mut admitted = 0_usize;
+    let mut keys: Vec<adam_phoneme::Phoneme> = by_phoneme.keys().copied().collect();
+    keys.sort_by_key(|p| format!("{p:?}"));
+    for p in keys {
+        let mut group = by_phoneme.remove(&p).unwrap();
+        group.sort_by(|a, b| {
+            a.cost
+                .partial_cmp(&b.cost)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
+        let drop_n = (group.len() as f32 * q).floor() as usize;
+        let kept_after_quantile = group.len().saturating_sub(drop_n);
+        dropped_quantile += drop_n;
+        let take = kept_after_quantile.min(cli.per_phoneme_cap);
+        let drop_cap = kept_after_quantile.saturating_sub(take);
+        dropped_cap += drop_cap;
+        for c in group.into_iter().take(take) {
+            bank.insert(PhonemeTemplate {
+                phoneme: c.phoneme,
+                mfcc: c.mfcc,
+            });
+            admitted += 1;
+        }
+    }
+    eprintln!(
+        "[build_human_bank] quantile filter   : dropped {} segments (top {:.0}% cost)",
+        dropped_quantile,
+        q * 100.0
+    );
+    eprintln!(
+        "[build_human_bank] per-phoneme cap   : dropped {} extra segments (cap {})",
+        dropped_cap, cli.per_phoneme_cap
+    );
+    eprintln!("[build_human_bank] admitted segments  : {}", admitted);
 
     eprintln!("[build_human_bank] === done ===");
     eprintln!("[build_human_bank] aligned          : {}", stats.aligned);
@@ -267,6 +361,7 @@ fn main() -> std::io::Result<()> {
         bank.len(),
         bank.template_count()
     );
+    let _ = (admitted, dropped_quantile, dropped_cap); // already logged above
 
     if let Some(parent) = cli.out.parent() {
         std::fs::create_dir_all(parent)?;
@@ -307,31 +402,54 @@ fn phonemes_from_transcript(text: &str) -> Vec<adam_phoneme::Phoneme> {
     out
 }
 
-/// Walk forced-alignment segments and push each one as a new
-/// `PhonemeTemplate` exemplar, capped per phoneme. Empty
-/// segments (`end == start`) are dropped — the aligner
-/// guarantees `end > start`, but we double-check.
-fn push_segments(
-    bank: &mut PhonemeBank,
+/// One forced-aligned phoneme segment with the audio MFCC slice
+/// and the segment's alignment cost (mean Euclidean distance
+/// per frame to the bootstrap centroid for that phoneme).
+struct Candidate {
+    phoneme: adam_phoneme::Phoneme,
+    mfcc: MfccSequence,
+    cost: f32,
+}
+
+/// Walk a forced-alignment result and push each segment into
+/// the candidate pool with its per-frame mean cost. Cost is
+/// computed against the bootstrap-bank centroid for the
+/// segment's phoneme — phonemes absent from the bootstrap
+/// (shouldn't happen, but defensive) get `f32::INFINITY` so the
+/// quantile filter drops them first.
+fn collect_segments(
+    candidates: &mut Vec<Candidate>,
     audio: &MfccSequence,
     segments: &[adam_forced_aligner::PhoneSegment],
-    per_phoneme_cap: usize,
+    bootstrap_centroids: &HashMap<adam_phoneme::Phoneme, Vec<f32>>,
 ) {
-    // Track current per-phoneme count locally so we don't have
-    // to call `bank.all(p).len()` on every iteration (HashMap
-    // hit per call).
-    let mut counts: HashMap<adam_phoneme::Phoneme, usize> = HashMap::new();
-    for p in segments.iter().map(|s| s.phoneme) {
-        counts.entry(p).or_insert_with(|| bank.all(p).len());
-    }
     for seg in segments {
         if seg.end <= seg.start {
             continue;
         }
-        let cnt = counts.entry(seg.phoneme).or_insert(0);
-        if *cnt >= per_phoneme_cap {
-            continue;
+        let centroid = match bootstrap_centroids.get(&seg.phoneme) {
+            Some(c) => c,
+            None => continue,
+        };
+        let mut sum_d = 0.0_f32;
+        let mut n = 0_usize;
+        for frame in &audio.frames[seg.start..seg.end] {
+            if frame.len() != centroid.len() {
+                continue;
+            }
+            let mut acc = 0.0_f32;
+            for (x, y) in frame.iter().zip(centroid.iter()) {
+                let d = x - y;
+                acc += d * d;
+            }
+            sum_d += acc.sqrt();
+            n += 1;
         }
+        let cost = if n > 0 {
+            sum_d / n as f32
+        } else {
+            f32::INFINITY
+        };
         let frames: Vec<Vec<f32>> = audio.frames[seg.start..seg.end].to_vec();
         let mfcc = MfccSequence {
             frames,
@@ -339,11 +457,11 @@ fn push_segments(
             hop_length: audio.hop_length,
             n_mfcc: audio.n_mfcc,
         };
-        bank.insert(PhonemeTemplate {
+        candidates.push(Candidate {
             phoneme: seg.phoneme,
             mfcc,
+            cost,
         });
-        *cnt += 1;
     }
 }
 

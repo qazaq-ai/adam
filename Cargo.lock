@@ -79,6 +79,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "adam-build-pcm-bank"
+version = "6.2.0"
+dependencies = [
+ "adam-audio",
+ "adam-forced-aligner",
+ "adam-phoneme",
+ "adam-stt-phoneme",
+ "adam-tts-phoneme",
+ "clap",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "adam-corpus"
 version = "6.2.0"
 dependencies = [
@@ -173,6 +187,16 @@ version = "6.2.0"
 dependencies = [
  "adam-audio",
  "adam-phoneme",
+]
+
+[[package]]
+name = "adam-ingest-kaz-tili"
+version = "6.2.0"
+dependencies = [
+ "adam-audio",
+ "clap",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

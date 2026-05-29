@@ -1,0 +1,19 @@
+[package]
+name = "adam-ingest-kaz-tili"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Phase 6 step 3: ingest scraped kaz-tili.kz audio (data/kaz_tili/) into the v6.3 phoneme bank manifest. Reads each WAV, computes MFCC at the canonical 13-coefficient / 16 kHz / hop 160 settings, writes the .bin to data/v6_3_phoneme_bank/mfcc/, copies the WAV under data/v6_3_phoneme_bank/audio/, and appends a manifest row with source_class=\"kaz_tili\". Idempotent — labels already in the manifest are skipped."
+
+[[bin]]
+name = "ingest_kaz_tili"
+path = "src/main.rs"
+
+[dependencies]
+adam-audio = { path = "../../crates/adam-audio" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+clap = { version = "4.5", features = ["derive"] }
+
+[lints]
+workspace = true
