@@ -66,6 +66,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "adam-build-human-bank"
+version = "6.2.0"
+dependencies = [
+ "adam-audio",
+ "adam-forced-aligner",
+ "adam-phoneme",
+ "adam-stt-phoneme",
+ "clap",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "adam-corpus"
 version = "6.2.0"
 dependencies = [

@@ -1,0 +1,22 @@
+[package]
+name = "adam-build-human-bank"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Phase 6 step 2: build a human-voice-derived phoneme bank by forced-aligning every human Kazakh utterance in the v6.3 manifest against its transcript and extracting per-phoneme MFCC segments. Replaces the formant-synth bootstrap bank which mismatched real speech in MFCC space (root cause of the 84% FLEURS PER floor)."
+
+[[bin]]
+name = "build_human_bank"
+path = "src/main.rs"
+
+[dependencies]
+adam-audio = { path = "../../crates/adam-audio" }
+adam-phoneme = { path = "../../crates/adam-phoneme" }
+adam-stt-phoneme = { path = "../../crates/adam-stt-phoneme" }
+adam-forced-aligner = { path = "../../crates/adam-forced-aligner" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+clap = { version = "4.5", features = ["derive"] }
+
+[lints]
+workspace = true

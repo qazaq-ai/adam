@@ -33,6 +33,7 @@ members = [
   "tools/voice_repl_v6_3",
   "tools/stt_eval",
   "tools/lexicon_gen",
+  "tools/build_human_bank",
 ]
 resolver = "2"
 

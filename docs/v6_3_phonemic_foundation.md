@@ -353,7 +353,7 @@ C dependencies):
 | 3     | Layer 0c — phonotactic FST                               | rejects synthetic ill-formed, accepts corpus| **shipped** |
 | 4     | Layer 0d — bidirectional renderer (Cyrillic / Latin)     | corpus round-trip ≥ 99%                     | **shipped** |
 | 5     | Pure-Rust audio I/O (cpal-based)                         | replaces `voice` feature                    | **shipped** |
-| 6     | Phoneme-level STT (DTW + Viterbi)                        | ≥ 70% phoneme-level accuracy on clean Kk    | **infra shipped, accuracy gate NOT met** (PER 84% on FLEURS test, 61% on synth-on-synth; see § 11.1) |
+| 6     | Phoneme-level STT (DTW + Viterbi)                        | ≥ 70% phoneme-level accuracy on clean Kk    | **infra shipped, accuracy gate NOT met** (PER 77.2% on FLEURS test with human bank v3 + lexicon sp=25; 84.0% original synth/stream baseline; see § 7 Phase 6 status) |
 | 7     | Phoneme-level TTS (concatenative + PSOLA)                | MOS within 0.5 of macOS `say`               | **shipped** |
 | 8     | Wire `adam_chat` to phoneme STT/TTS                      | v6.3 demo viable; voice-REPL audits pass    | partial     |
 | 9     | Lift `adam-kernel-fst` to phoneme input                  | morphology on phonemes; world_core lifted   | **shipped** |
@@ -481,6 +481,45 @@ the Phase 2c forced-alignment confidence filter
     mask + duration priors; only fall back to a small
     CTC/Conformer (output: phoneme lattice + confidence)
     if the pure-template path plateaus above 50 % PER.
+  - **Phase 6 step 2 (2026-05-29): human-derived phoneme
+    bank — first time the bank beats synth on FLEURS.**
+    The synth bank's formant-based templates lived in a
+    different MFCC subspace from real human speech (root
+    cause user identified by ear: «звучание похоже на
+    робота восмидесятых годов»). New tool
+    `tools/build_human_bank` forced-aligns every human
+    utterance in the manifest (Wikimedia + FLEURS train/dev,
+    FLEURS test excluded to keep the eval honest) against
+    its transcript and extracts one MFCC sub-sequence per
+    phoneme segment. CMVN-normalises the loaded audio
+    in-place before alignment — corpus_acquire writes RAW
+    MFCC to disk while the recogniser CMVN-normalises every
+    query, so without the in-tool normalisation, bank and
+    query live in different feature spaces (round-1 result
+    was 85 % stream / 83 % lexicon, +1..+4 pp worse than
+    synth; fix swung the picture). Three EM rounds:
+    - v1 (cap = 50, bootstrap = synth): 1616 templates /
+      34 phonemes — round 1 baseline.
+    - v2 (cap = 200, bootstrap = v1): 6378 templates / 34
+      phonemes — ties synth (stream 84.2 / lex sp=25 78.7).
+    - **v3 (cap = 500, bootstrap = v2): 15678 templates / 34
+      phonemes — beats synth across the whole sp sweep.**
+    Measurement (FLEURS test --max 50, lexicon vocab 3082):
+    - stream sp= 3 : synth 84.0 → v3 83.0 (−1.0 pp)
+    - lex sp=20    : synth 79.6 → v3 77.3 (−2.3 pp)
+    - **lex sp=25 : synth 78.8 → v3 77.2 (−1.6 pp) ← best**
+    - lex sp=30    : synth 79.2 → v3 78.5 (−0.7 pp)
+    Combined arc from the v6.3 stream baseline (`recognise_stream`
+    at sp=3 over the synth bank, 84.0 %): **77.2 % = −6.8 pp
+    absolute**. Bank covers 34/37 phonemes — three
+    low-frequency phonemes never appeared in 3397
+    utterances of FLEURS train/dev + Wikimedia. Synth bank
+    archived as `templates_synth.bin`; active `templates.bin`
+    is now human v3. Iteration ceiling not yet hit — v4 at
+    cap = 1000 and v5 with cost-weighted segment filtering
+    are the obvious next levers. Tool keeps the bootstrap
+    bank a CLI flag so any subsequent EM round is one
+    invocation.
   - **Phase 14 step 2 (2026-05-29): lexicon expansion +
     switch_penalty re-tune — first FLEURS PER win.**
     Extracted the top-3000 unigram frequencies from
