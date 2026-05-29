@@ -295,6 +295,7 @@ name = "adam-stt-eval"
 version = "6.2.0"
 dependencies = [
  "adam-audio",
+ "adam-lexicon-curated",
  "adam-phoneme",
  "adam-stt-phoneme",
  "clap",

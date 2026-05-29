@@ -26,7 +26,10 @@ use std::path::PathBuf;
 use adam_audio::mfcc::{MfccConfig, mfcc};
 use adam_phoneme::Phoneme;
 use adam_phoneme::cyrillic::cyrillic_to_phonemes;
-use adam_stt_phoneme::{PhonemeBank, StreamConfig, WordConfig, recognise_stream, recognise_word};
+use adam_stt_phoneme::{
+    LexiconDecoderConfig, PhonemeBank, StreamConfig, WordConfig, recognise_lexicon_constrained,
+    recognise_stream, recognise_word,
+};
 use clap::Parser;
 use serde::Deserialize;
 
@@ -55,8 +58,12 @@ struct Cli {
     /// sanity-check the harness itself.
     #[arg(long)]
     synthetic_only: bool,
-    /// Recogniser: "stream" (frame-synchronous Viterbi, default)
-    /// or "window" (legacy sliding-window classifier).
+    /// Recogniser:
+    ///   `stream`     — Phase 13 free-grammar Viterbi (default)
+    ///   `window`     — legacy Phase 6 sliding-window classifier
+    ///   `lexicon`    — Phase 14 lexicon-constrained Viterbi
+    ///                  (paths must be concatenations of words
+    ///                  from `adam-lexicon-curated`)
     #[arg(long, default_value = "stream")]
     recogniser: String,
     /// Switch penalty for the stream recogniser (flat-LM
@@ -101,9 +108,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let stream_cfg = StreamConfig {
         switch_penalty: cli.switch_penalty,
     };
+    // Phase 14: phoneme sequences of every **real word** in the
+    // curated lexicon — used by the `lexicon` decoder to
+    // constrain recognised paths. Alphabet entries
+    // (`Pos::Phoneme`, single-phoneme letter exemplars) are
+    // excluded: they are pronunciation references, not Kazakh
+    // lexical items, and including them collapses the lexicon
+    // constraint into a free decoder (any phoneme can be its
+    // own one-letter "word", so any sequence becomes legal).
+    let lexicon_entries = adam_lexicon_curated::full_lexicon();
+    let lexicon_vocab: Vec<&[adam_phoneme::Phoneme]> = lexicon_entries
+        .iter()
+        .filter(|e| e.pos != adam_lexicon_curated::Pos::Phoneme)
+        .map(|e| e.phonemes)
+        .collect();
     println!(
-        "[stt_eval] recogniser: {} (switch_penalty={})",
-        cli.recogniser, cli.switch_penalty
+        "[stt_eval] recogniser: {} (switch_penalty={}, vocab={} words)",
+        cli.recogniser,
+        cli.switch_penalty,
+        lexicon_vocab.len(),
     );
 
     let mut total_ref = 0_usize;
@@ -142,11 +165,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         };
         let pcm_mono = if pcm.channels > 1 { pcm.to_mono() } else { pcm };
 
-        let hyp = if cli.recogniser == "window" {
-            recognise_word(&pcm_mono.data, pcm_mono.sample_rate, &bank, &cfg)
-        } else {
-            let query = mfcc(&pcm_mono.data, pcm_mono.sample_rate, &MfccConfig::default());
-            recognise_stream(&query, &bank, &stream_cfg)
+        let hyp = match cli.recogniser.as_str() {
+            "window" => recognise_word(&pcm_mono.data, pcm_mono.sample_rate, &bank, &cfg),
+            "lexicon" => {
+                let query = mfcc(&pcm_mono.data, pcm_mono.sample_rate, &MfccConfig::default());
+                let lex_cfg = LexiconDecoderConfig {
+                    switch_penalty: cli.switch_penalty,
+                };
+                recognise_lexicon_constrained(&query, &bank, &lexicon_vocab, &lex_cfg)
+            }
+            _ => {
+                let query = mfcc(&pcm_mono.data, pcm_mono.sample_rate, &MfccConfig::default());
+                recognise_stream(&query, &bank, &stream_cfg)
+            }
         };
 
         let (dist, ops) = levenshtein_with_ops(&reference, &hyp);

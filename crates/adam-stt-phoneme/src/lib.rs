@@ -63,6 +63,7 @@
 pub mod bank;
 pub mod distance;
 pub mod dtw;
+pub mod lexicon_decode;
 pub mod recogniser;
 pub mod rescore;
 pub mod word;
@@ -70,6 +71,7 @@ pub mod word;
 pub use bank::{PhonemeBank, PhonemeTemplate};
 pub use distance::{cosine_distance, euclidean_distance};
 pub use dtw::{DtwResult, dtw};
+pub use lexicon_decode::{LexiconDecoderConfig, recognise_lexicon_constrained};
 pub use recogniser::{RecognitionResult, StreamConfig, recognise, recognise_stream};
 pub use rescore::{dedupe_adjacent, enforce_syllable_shape, rescore};
 pub use word::{WordConfig, recognise_word};

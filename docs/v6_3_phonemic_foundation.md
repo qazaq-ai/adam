@@ -481,6 +481,31 @@ the Phase 2c forced-alignment confidence filter
     mask + duration priors; only fall back to a small
     CTC/Conformer (output: phoneme lattice + confidence)
     if the pure-template path plateaus above 50 % PER.
+  - **Phase 14 step 1 (2026-05-29): lexicon-constrained
+    Viterbi decoder shipped, current-corpus PER no-win.**
+    `adam_stt_phoneme::recognise_lexicon_constrained` —
+    phoneme trie + frame-synchronous Viterbi DP with a root-
+    less state machine (every frame consumes exactly one
+    phoneme emission; word-boundary is a direct
+    terminal→first-phoneme transition between frames,
+    paying `switch_penalty`). Wired into `stt_eval` as
+    `--recogniser lexicon`. Measured on the 278-real-word
+    curated lexicon (35 alphabet entries excluded to prevent
+    "any phoneme is its own one-letter word" collapse):
+    FLEURS test --max 50 PER 137.8 %, synth-on-synth --max
+    100 PER 156.4 %–194.7 % across switch_penalty 3–80
+    (plateaus above sp=20). Even at sp=∞ (one word per
+    utterance) PER stays at 156 % on synth, which proves the
+    bottleneck is **lexical coverage**, not word-boundary
+    overuse: the 278-word vocabulary cannot approximate the
+    test transcripts well enough for the constraint to pay
+    off, so the decoder is forced into the closest-but-wrong
+    legal word rather than the right free-decoded phoneme
+    sequence. The trie + DP is correct (4/4 unit tests on
+    constructed cases pass); the lever needs a much larger
+    lexicon (thousands of words) or word-level language
+    modelling to outperform `recognise_stream`. Filed as
+    Phase 14 step 2 backlog.
 - **Phase 7:** in a blind subjective MOS test (5 listeners),
   the concatenative TTS scores within 0.5 MOS points of macOS
   `say` with the Aru voice on 10 representative Kazakh
