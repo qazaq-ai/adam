@@ -10,6 +10,7 @@ members = [
   "crates/adam-tts-phoneme",
   "crates/adam-kernel-phoneme",
   "crates/adam-forced-aligner",
+  "crates/adam-formant-synth",
   "crates/adam-dialog",
   "crates/adam-tokenizer",
   "crates/adam-corpus",

@@ -1,0 +1,13 @@
+[package]
+name = "adam-formant-synth"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Pure-Rust formant-based Kazakh speech synthesiser. Source-filter model: glottal pulse train (voiced) or filtered noise (unvoiced) excites a cascade of biquad resonators tuned to each phoneme's documented formant frequencies. Replaces the toy F0-anchor `bank::synthetic` with a physically motivated synthesiser that produces audio with real formant structure — the kind that survives CMVN and gives the v6.3 recogniser something meaningful to match against."
+
+[dependencies]
+adam-audio = { path = "../adam-audio" }
+adam-phoneme = { path = "../adam-phoneme" }
+
+[lints]
+workspace = true

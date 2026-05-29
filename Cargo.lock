@@ -153,6 +153,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "adam-formant-synth"
+version = "6.2.0"
+dependencies = [
+ "adam-audio",
+ "adam-phoneme",
+]
+
+[[package]]
 name = "adam-intent-classifier"
 version = "6.2.0"
 dependencies = [
