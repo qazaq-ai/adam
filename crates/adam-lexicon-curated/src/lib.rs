@@ -90,6 +90,7 @@ impl LexEntry {
 
 mod alphabet;
 mod expanded;
+mod frequency;
 mod misc;
 mod nouns;
 mod verbs;
@@ -111,6 +112,7 @@ pub fn full_lexicon() -> Vec<LexEntry> {
     out.extend_from_slice(misc::INTERJECTIONS);
     out.extend_from_slice(misc::ADVERBS);
     out.extend_from_slice(expanded::EXPANDED);
+    out.extend_from_slice(frequency::FREQUENCY);
     out
 }
 

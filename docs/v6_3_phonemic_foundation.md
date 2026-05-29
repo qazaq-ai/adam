@@ -481,6 +481,33 @@ the Phase 2c forced-alignment confidence filter
     mask + duration priors; only fall back to a small
     CTC/Conformer (output: phoneme lattice + confidence)
     if the pure-template path plateaus above 50 % PER.
+  - **Phase 14 step 2 (2026-05-29): lexicon expansion +
+    switch_penalty re-tune — first FLEURS PER win.**
+    Extracted the top-3000 unigram frequencies from
+    `data/curated/{wikipedia_kz,cc100_kk,kazakh_textbooks}_pack.json`
+    (318k clean Cyrillic sentences, 228k distinct native-
+    letter tokens; loanword filter drops «ё ц щ ъ ь э»).
+    Deduplicated against the original 303-entry curated set
+    → 2804 net new entries shipped as
+    `adam_lexicon_curated::frequency::FREQUENCY`. Combined
+    `full_lexicon()` now exposes 3082 distinct real words to
+    the lexicon decoder (alphabet excluded as before).
+    Re-measured on FLEURS test --max 50 across sp = 3..100:
+    - sp =  3 → PER 184.1 %, ratio 2.31 (boundary spam)
+    - sp = 15 → PER 83.6 %, ratio 0.91
+    - sp = 20 → PER 79.6 %, ratio 0.71
+    - **sp = 25 → PER 78.8 %, ratio 0.61 ← best**
+    - sp = 30 → PER 79.2 %, ratio 0.51
+    - sp = 60 → PER 85.3 %, ratio 0.25 (under-segments)
+    First decoder to beat the `recognise_stream` baseline
+    (84.0 %) on FLEURS — net **−5.2 pp PER**. Synth-on-synth
+    stays at PER 215.6 % across the whole sweep because the
+    synth corpus was generated from the original 312-entry
+    curated lexicon, not the frequency-extension words — its
+    transcripts are now an even smaller subset of vocabulary,
+    so the decoder picks longer (wrong) words. Synth gain
+    requires regenerating that corpus from the combined
+    lexicon; tracked separately.
   - **Phase 14 step 1 (2026-05-29): lexicon-constrained
     Viterbi decoder shipped, current-corpus PER no-win.**
     `adam_stt_phoneme::recognise_lexicon_constrained` —
