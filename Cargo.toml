@@ -32,6 +32,7 @@ members = [
   "tools/corpus_acquire",
   "tools/voice_repl_v6_3",
   "tools/stt_eval",
+  "tools/lexicon_gen",
 ]
 resolver = "2"
 

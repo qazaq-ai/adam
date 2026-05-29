@@ -220,6 +220,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "adam-lexicon-gen"
+version = "6.2.0"
+dependencies = [
+ "adam-phoneme",
+]
+
+[[package]]
 name = "adam-phoneme"
 version = "6.2.0"
 
