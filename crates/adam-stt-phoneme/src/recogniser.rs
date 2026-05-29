@@ -154,6 +154,17 @@ pub fn recognise_stream(
     // closest exemplar at every frame, capturing speaker /
     // context variety. Dimension-mismatched templates are
     // silently dropped.
+    //
+    // Phase 13 step 3 (2026-05-29): diagonal-Gaussian scoring
+    // was tried as a more principled alternative (negative
+    // log-likelihood instead of Euclidean distance). On a
+    // controlled synth-only sweep with K=50 templates per
+    // phoneme it tied Euclidean (62.7% vs 61.0% PER) at the
+    // best switch_penalty, with no consistent win — the
+    // K-exemplar coverage already absorbs the discriminative
+    // information per-template variance would model. Reverted.
+    // `TemplateStats` infrastructure kept in the file for
+    // future GMM experiments.
     let mut phonemes: Vec<Phoneme> = Vec::with_capacity(bank.len());
     let mut centroid_sets: Vec<Vec<Vec<f32>>> = Vec::with_capacity(bank.len());
     for (p, exemplars) in bank.iter_all() {
@@ -174,8 +185,6 @@ pub fn recognise_stream(
         return Vec::new();
     }
 
-    // emit(frame, p) = min over p's exemplar centroids of the
-    // Euclidean distance to the frame.
     let emit = |frame: &[f32], p: usize| -> f32 {
         centroid_sets[p]
             .iter()
@@ -242,7 +251,92 @@ pub fn recognise_stream(
     out
 }
 
+/// Diagonal-Gaussian statistics of one template — the mean
+/// MFCC vector and the per-coefficient variance computed over
+/// the template's own frames. Built for Phase 13 step 3 to
+/// score query frames via Gaussian negative log-likelihood
+/// instead of Euclidean centroid distance; reverted because
+/// the K=50 multi-template Euclidean baseline already absorbs
+/// the discriminative information per-template variance models
+/// (62.7% vs 61.0% PER tie on synth, no consistent win).
+/// Kept as scaffolding for future GMM experiments.
+#[allow(dead_code)]
+struct TemplateStats {
+    mean: Vec<f32>,
+    /// Pre-computed `0.5 * log(2π σ²_c)` per coefficient — the
+    /// `c`-independent part of the negative log-likelihood.
+    /// Folding it into the stats means the per-frame inner loop
+    /// only does `(x-μ)² / (2σ²)` plus a sum.
+    log_norm: Vec<f32>,
+    /// Pre-computed `1.0 / (2.0 * σ²_c)` per coefficient.
+    inv_two_var: Vec<f32>,
+}
+
+#[allow(dead_code)]
+impl TemplateStats {
+    fn from_mfcc(seq: &MfccSequence) -> Self {
+        let dim = seq.dim();
+        let n = seq.num_frames();
+        // Mean.
+        let mut mean = vec![0.0_f32; dim];
+        for frame in &seq.frames {
+            for (m, x) in mean.iter_mut().zip(frame.iter()) {
+                *m += *x;
+            }
+        }
+        let inv_n = 1.0 / n.max(1) as f32;
+        for m in &mut mean {
+            *m *= inv_n;
+        }
+        // Population variance + floor + pre-computed factors.
+        // VAR_FLOOR=0.05 keeps the Gaussian's per-coefficient
+        // standard deviation ≥ ~0.22 — wide enough that an
+        // outlier frame doesn't blow up NLL, narrow enough to
+        // still discriminate the typical CMVN'd MFCC range
+        // (~±2). Tighter floors over-penalised outliers; looser
+        // floors lost selectivity. Tuned empirically against
+        // the synth PER sweep.
+        const VAR_FLOOR: f32 = 0.05;
+        let mut var = vec![0.0_f32; dim];
+        for frame in &seq.frames {
+            for (v, (x, m)) in var.iter_mut().zip(frame.iter().zip(mean.iter())) {
+                let d = *x - *m;
+                *v += d * d;
+            }
+        }
+        let two_pi = 2.0 * std::f32::consts::PI;
+        let mut log_norm = Vec::with_capacity(dim);
+        let mut inv_two_var = Vec::with_capacity(dim);
+        for v in var.iter_mut() {
+            *v = (*v * inv_n).max(VAR_FLOOR);
+            log_norm.push(0.5 * (two_pi * *v).ln());
+            inv_two_var.push(1.0 / (2.0 * *v));
+        }
+        Self {
+            mean,
+            log_norm,
+            inv_two_var,
+        }
+    }
+
+    /// Diagonal-Gaussian negative log-likelihood:
+    /// `Σ_c [ 0.5·log(2π σ²_c) + (x_c − μ_c)² / (2σ²_c) ]`.
+    /// `+∞` on dimension mismatch.
+    fn neg_log_likelihood(&self, frame: &[f32]) -> f32 {
+        if frame.len() != self.mean.len() {
+            return f32::INFINITY;
+        }
+        let mut nll = 0.0_f32;
+        for c in 0..frame.len() {
+            let d = frame[c] - self.mean[c];
+            nll += self.log_norm[c] + d * d * self.inv_two_var[c];
+        }
+        nll
+    }
+}
+
 /// Mean MFCC frame of a template (the phoneme centroid).
+#[allow(dead_code)] // kept for tests + diagnostics; live scoring uses TemplateStats
 fn centroid(seq: &MfccSequence) -> Vec<f32> {
     let dim = seq.dim();
     let mut mean = vec![0.0_f32; dim];
