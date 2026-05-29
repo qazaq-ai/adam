@@ -353,7 +353,7 @@ C dependencies):
 | 3     | Layer 0c — phonotactic FST                               | rejects synthetic ill-formed, accepts corpus| **shipped** |
 | 4     | Layer 0d — bidirectional renderer (Cyrillic / Latin)     | corpus round-trip ≥ 99%                     | **shipped** |
 | 5     | Pure-Rust audio I/O (cpal-based)                         | replaces `voice` feature                    | **shipped** |
-| 6     | Phoneme-level STT (DTW + Viterbi)                        | ≥ 70% phoneme-level accuracy on clean Kk    | **shipped** |
+| 6     | Phoneme-level STT (DTW + Viterbi)                        | ≥ 70% phoneme-level accuracy on clean Kk    | **infra shipped, accuracy gate NOT met** (PER 84% on FLEURS test, 61% on synth-on-synth; see § 11.1) |
 | 7     | Phoneme-level TTS (concatenative + PSOLA)                | MOS within 0.5 of macOS `say`               | **shipped** |
 | 8     | Wire `adam_chat` to phoneme STT/TTS                      | v6.3 demo viable; voice-REPL audits pass    | partial     |
 | 9     | Lift `adam-kernel-fst` to phoneme input                  | morphology on phonemes; world_core lifted   | **shipped** |
@@ -464,6 +464,23 @@ the Phase 2c forced-alignment confidence filter
 - **Phase 6:** phoneme STT achieves ≥ 70% phoneme-level
   accuracy on a 100-utterance clean-speech test set. (Whisper
   baseline for reference, not as competitor.)
+  - **Status 2026-05-29: gate NOT met.** Infrastructure
+    shipped (`tools/stt_eval` PER harness; multi-template
+    bank with K=50 exemplars; CMVN, forced aligner,
+    sonorant-nucleus phonotactics, formant synthesiser, 312-
+    entry curated lexicon). Measured PER on FLEURS test
+    --max 100 = **84.0 %** (target ≤ 30 %), `hyp/ref` ratio
+    0.58 (under-segments). On the homogeneous synth-on-synth
+    corpus PER = 61.0 % (also short of 30 %). Two
+    architectural negative results recorded: diagonal-
+    Gaussian scoring ties Euclidean, K > 50 over-fits synth
+    without lifting FLEURS. **Branch should be read as
+    "phonemic foundation + STT research" until PER ≤ 30 %.**
+    Next planned lever per codex review (2026-05-29):
+    lexicon-constrained decoding + phonotactic transition
+    mask + duration priors; only fall back to a small
+    CTC/Conformer (output: phoneme lattice + confidence)
+    if the pure-template path plateaus above 50 % PER.
 - **Phase 7:** in a blind subjective MOS test (5 listeners),
   the concatenative TTS scores within 0.5 MOS points of macOS
   `say` with the Aru voice on 10 representative Kazakh
@@ -526,31 +543,40 @@ the Phase 2c forced-alignment confidence filter
    Conformer trained on the aligned corpus, guarded by the
    phonotactic FST so output remains type-safe.
 4. ~~What does «ы» do in dictionary-form lookup?~~ **Resolved
-   2026-05-26.** Decision: **«ы» (and «і» symmetrically) is
-   classified epenthetic** by the Cyrillic→Phoneme renderer
-   **iff all three conditions hold**:
-   - position is non-initial in the word
-   - both adjacent segments are consonants
-   - the host word is a native Kazakh root (not a Russian /
-     European loan as flagged by lexicon metadata)
+   2026-05-26, tightened 2026-05-29.** The original 2026-05-26
+   resolution drew a three-clause line (non-initial + between
+   consonants + native root). Implementation hit a 2026-05-29
+   user pushback that the carve-out for initial-syllable «ы»
+   was the same orthographic illusion native speakers actually
+   collapse — «қыз» is articulated as `/qz/`, with a fleeting
+   schwa-ish glide if any, and «қызыл» as `/qzl/`. The Renault
+   analogy (7 letters, 4 phonemes) applies symmetrically: «ы»
+   and «і» are **orthographic markers, not phonemes**, and the
+   parser must not emit them.
 
-   In all other positions, «ы» realises as full `/ɯ/` (id `Ǝ`
-   with `is_epenthetic = false` at instance level) and «і» as
-   full `/ɪ/` (`Ɨ`, full). Examples:
+   **Final v6.3 rule (this is what the code does):** for any
+   native Kazakh root, **every** «ы» and «і» drops from the
+   phonemic stream, regardless of syllable position. Loan
+   words (`is_native_root = false`) keep both glyphs because
+   the loan source language treats them as full vowels.
 
-   | word         | analysis                          | «ы»/«і» status |
-   |--------------|-----------------------------------|----------------|
-   | қыз          | initial syllable, CVC             | full           |
-   | жұмыс        | non-initial, between C's, native  | **epenthetic** |
-   | жұмыссыз     | both «ы» non-initial between C's  | **both epenthetic** |
-   | тым (loan)   | initial syllable                  | full           |
-   | бизнес (loan)| loan flag set                     | full           |
+   | word         | analysis                          | parsed phonemes      |
+   |--------------|-----------------------------------|----------------------|
+   | қыз          | native                            | `[Q, Z]`             |
+   | қызыл        | native                            | `[Q, Z, L]`          |
+   | жұмыс        | native                            | `[Zh, U, M, S]`      |
+   | жұмыссыз     | native, two «ы»s                  | `[Zh, U, M, S, S, Z]`|
+   | білім        | native, two «і»s                  | `[B, L, M]`          |
+   | байтұрсынұлы | native, two «ы»s incl. final      | `[B, A, J, T, U, R, S, N, U, L]` |
+   | бизнес       | loan                              | `[B, I, Z, N, E, S]` |
 
-   This is a deterministic rule with a single corpus-evidenced
-   parameter (the lexicon's native/loan flag). Refinement of
-   edge cases (compound boundaries, fossilised forms) happens
-   in Phase 4 round-trip evaluation; the rule above is the
-   v6.3 starting contract.
+   `Phoneme::Y` / `Phoneme::Yi` stay in the inventory enum (for
+   loan-word parsing and back-compat with suffix tables in
+   `adam-kernel-phoneme`), but the Cyrillic→Phoneme and Latin→
+   Phoneme parsers never emit them in native mode. Consonant-
+   only words like `[Q, Z]` validate via the **sonorant /
+   last-consonant nucleus fallback** added in the same change
+   (see `adam-phonotactics::syllable::nucleus_indices`).
 
 ## 10. References
 
