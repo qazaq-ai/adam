@@ -353,7 +353,7 @@ C dependencies):
 | 3     | Layer 0c — phonotactic FST                               | rejects synthetic ill-formed, accepts corpus| **shipped** |
 | 4     | Layer 0d — bidirectional renderer (Cyrillic / Latin)     | corpus round-trip ≥ 99%                     | **shipped** |
 | 5     | Pure-Rust audio I/O (cpal-based)                         | replaces `voice` feature                    | **shipped** |
-| 6     | Phoneme-level STT (DTW + Viterbi)                        | ≥ 70% phoneme-level accuracy on clean Kk    | **infra shipped, accuracy gate NOT met** (PER 77.2% on FLEURS test with human bank v3 + lexicon sp=25; 84.0% original synth/stream baseline; see § 7 Phase 6 status) |
+| 6     | Phoneme-level STT (DTW + Viterbi)                        | ≥ 70% phoneme-level accuracy on clean Kk    | **infra shipped, accuracy gate NOT met** (PER 76.6% on FLEURS test with human bank v4 + lexicon sp=25; 84.0% original synth/stream baseline; see § 7 Phase 6 status) |
 | 7     | Phoneme-level TTS (concatenative + PSOLA)                | MOS within 0.5 of macOS `say`               | **shipped** |
 | 8     | Wire `adam_chat` to phoneme STT/TTS                      | v6.3 demo viable; voice-REPL audits pass    | partial     |
 | 9     | Lift `adam-kernel-fst` to phoneme input                  | morphology on phonemes; world_core lifted   | **shipped** |
@@ -502,15 +502,15 @@ the Phase 2c forced-alignment confidence filter
       34 phonemes — round 1 baseline.
     - v2 (cap = 200, bootstrap = v1): 6378 templates / 34
       phonemes — ties synth (stream 84.2 / lex sp=25 78.7).
-    - **v3 (cap = 500, bootstrap = v2): 15678 templates / 34
-      phonemes — beats synth across the whole sp sweep.**
+    - v3 (cap = 500, bootstrap = v2): 15678 templates / 34
+      phonemes — first sweep where human bank beats synth.
+    - **v4 (cap = 1000, bootstrap = v3): 30362 templates /
+      34 phonemes — current active `templates.bin`.**
     Measurement (FLEURS test --max 50, lexicon vocab 3082):
-    - stream sp= 3 : synth 84.0 → v3 83.0 (−1.0 pp)
-    - lex sp=20    : synth 79.6 → v3 77.3 (−2.3 pp)
-    - **lex sp=25 : synth 78.8 → v3 77.2 (−1.6 pp) ← best**
-    - lex sp=30    : synth 79.2 → v3 78.5 (−0.7 pp)
+    - stream sp= 3 : synth 84.0 → v3 83.0 → **v4 81.7** (−2.3 pp vs synth)
+    - lex sp=25    : synth 78.8 → v3 77.2 → **v4 76.6** (−2.2 pp vs synth) ← best
     Combined arc from the v6.3 stream baseline (`recognise_stream`
-    at sp=3 over the synth bank, 84.0 %): **77.2 % = −6.8 pp
+    at sp=3 over the synth bank, 84.0 %): **76.6 % = −7.4 pp
     absolute**. Bank covers 34/37 phonemes — three
     low-frequency phonemes never appeared in 3397
     utterances of FLEURS train/dev + Wikimedia. Synth bank
