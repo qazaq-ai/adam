@@ -239,6 +239,15 @@ struct BuildBankArgs {
     /// one DTW pass.
     #[arg(long, default_value = "2")]
     iterations: usize,
+    /// Multi-template `K` — how many exemplars to keep per
+    /// phoneme (Phase 13). 1 = single-centroid (legacy).
+    /// Default 50: tuned by the Phase 13 step 2 sweep on synth-
+    /// only (K=1: 85.4% PER → K=50: 61.0% PER, -24.4 pp) and
+    /// validated on FLEURS test (K=5: 88.1% → K=50: 84.0%,
+    /// -4.1 pp). Diminishing returns past 50; K=100 left as
+    /// future experiment if disk cost stays acceptable.
+    #[arg(long, default_value = "50")]
+    templates_per_phoneme: usize,
 }
 
 // ─── main ──────────────────────────────────────────────────────
@@ -1176,10 +1185,12 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
     // T × N DP table with self-loops, so each phoneme can own
     // an arbitrary frame range.
     for iter in 1..args.iterations {
-        bank = build_pass_forced_align(&sources, &bank);
+        bank = build_pass_forced_align(&sources, &bank, args.templates_per_phoneme);
         println!(
-            "[build-bank] iter {iter} (forced-align): {} phonemes",
-            bank.len()
+            "[build-bank] iter {iter} (forced-align, K={}): {} phonemes / {} templates",
+            args.templates_per_phoneme,
+            bank.len(),
+            bank.template_count(),
         );
     }
 
@@ -1358,6 +1369,7 @@ fn build_pass_equipartition(sources: &[BankSource]) -> adam_stt_phoneme::Phoneme
 fn build_pass_forced_align(
     sources: &[BankSource],
     current: &adam_stt_phoneme::PhonemeBank,
+    templates_per_phoneme: usize,
 ) -> adam_stt_phoneme::PhonemeBank {
     use adam_phoneme::Phoneme;
     use adam_stt_phoneme::PhonemeTemplate;
@@ -1417,7 +1429,7 @@ fn build_pass_forced_align(
     // given phoneme contribute everything they have; no padding.
     const VOWEL_CAP_FRAMES: usize = 35;
     const CONSONANT_CAP_FRAMES: usize = 18;
-    const NUM_TEMPLATES_PER_PHONEME: usize = 5;
+    let k = templates_per_phoneme.max(1);
 
     let mut bank = adam_stt_phoneme::PhonemeBank::new();
     for (phoneme, chunks) in per_phoneme {
@@ -1429,7 +1441,7 @@ fn build_pass_forced_align(
         // Sort by length descending; take top-K.
         let mut sorted: Vec<_> = chunks;
         sorted.sort_by(|a, b| b.num_frames().cmp(&a.num_frames()));
-        for chunk in sorted.into_iter().take(NUM_TEMPLATES_PER_PHONEME) {
+        for chunk in sorted.into_iter().take(k) {
             let capped = if chunk.num_frames() > template_cap {
                 let skip = (chunk.num_frames() - template_cap) / 2;
                 adam_audio::mfcc::MfccSequence {
