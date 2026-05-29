@@ -1400,58 +1400,61 @@ fn build_pass_forced_align(
         "[build-bank]   forced-aligned {aligned} sources, {uncovered} uncovered, {too_short} too-short (skipped)"
     );
 
-    // Per-phoneme: pick the LONGEST forced-aligned segment,
-    // capped at a class-specific frame count. Vowels carry
-    // formant trajectory that needs more frames to be matched
-    // robustly under DTW; obstruents (stops + fricatives) are
-    // characterised by short bursts so a longer template just
-    // dilutes their signature. Phase 11 step 3 tuning:
-    //   • Vowels: cap at 35 frames (~350 ms — fits stressed
-    //     Kazakh vowels with diphthong tails).
-    //   • Consonants: cap at 18 frames (~180 ms — typical
-    //     fricative/stop body, narrower than vowels).
-    // Three earlier per-phoneme combination strategies failed:
-    //   • Mean-of-all: blurred every centroid towards a
-    //     "speech blob"; the recogniser collapsed to runs of
-    //     the same phoneme.
-    //   • Longest-uncapped: produced 100-200-frame templates
-    //     (whole syllables stretched as one phoneme by the
-    //     aligner); the DTW recogniser self-looped through
-    //     them and lost short phonemes entirely.
-    //   • Median: the alignment-length distribution is heavily
-    //     skewed towards 1-frame degenerate segments (EM cold-
-    //     start failure); median picks the degenerate mass.
-    // Longest-then-class-cap preserves a concrete, well-aligned
-    // exemplar while giving vowels enough room to carry their
-    // formant signature.
+    // Phase 13 step 1: multi-template acoustic model. Per
+    // phoneme we keep up to `NUM_TEMPLATES_PER_PHONEME` distinct
+    // exemplars instead of a single centroid. The recogniser
+    // scores a frame by taking the minimum cepstral distance
+    // across all exemplars — capturing speaker / context variety
+    // the single-centroid model cannot. Exemplar selection is
+    // top-K-by-length (descending); each is centre-cropped to
+    // the same class-specific cap that single-template used.
+    //
+    //   • Vowels: 35 frames (~350 ms) per template
+    //   • Consonants: 18 frames (~180 ms)
+    //   • K = 5 templates per phoneme
+    //
+    // Sources below `NUM_TEMPLATES_PER_PHONEME` chunks for a
+    // given phoneme contribute everything they have; no padding.
     const VOWEL_CAP_FRAMES: usize = 35;
     const CONSONANT_CAP_FRAMES: usize = 18;
-    let mut bank = current.clone();
+    const NUM_TEMPLATES_PER_PHONEME: usize = 5;
+
+    let mut bank = adam_stt_phoneme::PhonemeBank::new();
     for (phoneme, chunks) in per_phoneme {
         let template_cap = if phoneme.is_vowel() {
             VOWEL_CAP_FRAMES
         } else {
             CONSONANT_CAP_FRAMES
         };
-        let longest = chunks
-            .into_iter()
-            .max_by_key(|c| c.num_frames())
-            .expect("per_phoneme entry has ≥1 chunk by construction");
-        let capped = if longest.num_frames() > template_cap {
-            let skip = (longest.num_frames() - template_cap) / 2;
-            adam_audio::mfcc::MfccSequence {
-                frames: longest.frames[skip..skip + template_cap].to_vec(),
-                sample_rate: longest.sample_rate,
-                hop_length: longest.hop_length,
-                n_mfcc: longest.n_mfcc,
+        // Sort by length descending; take top-K.
+        let mut sorted: Vec<_> = chunks;
+        sorted.sort_by(|a, b| b.num_frames().cmp(&a.num_frames()));
+        for chunk in sorted.into_iter().take(NUM_TEMPLATES_PER_PHONEME) {
+            let capped = if chunk.num_frames() > template_cap {
+                let skip = (chunk.num_frames() - template_cap) / 2;
+                adam_audio::mfcc::MfccSequence {
+                    frames: chunk.frames[skip..skip + template_cap].to_vec(),
+                    sample_rate: chunk.sample_rate,
+                    hop_length: chunk.hop_length,
+                    n_mfcc: chunk.n_mfcc,
+                }
+            } else {
+                chunk
+            };
+            bank.insert(PhonemeTemplate {
+                phoneme,
+                mfcc: capped,
+            });
+        }
+    }
+    // Fallback: phonemes the alignment didn't see this iteration
+    // keep their previous-iteration templates.
+    for (phoneme, exemplars) in current.iter_all() {
+        if bank.all(*phoneme).is_empty() {
+            for t in exemplars {
+                bank.insert(t.clone());
             }
-        } else {
-            longest
-        };
-        bank.insert(PhonemeTemplate {
-            phoneme,
-            mfcc: capped,
-        });
+        }
     }
     bank
 }

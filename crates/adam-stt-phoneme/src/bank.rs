@@ -63,11 +63,20 @@ pub struct PhonemeTemplate {
     pub mfcc: MfccSequence,
 }
 
-/// A bank of phoneme templates: one [`PhonemeTemplate`] per
-/// [`Phoneme`] variant the recogniser should consider.
+/// A bank of phoneme templates.
+///
+/// **Multi-template acoustic model (Phase 13 step 1, 2026-05-29):**
+/// each phoneme can carry multiple template exemplars (K of them).
+/// The recogniser scores a frame against a phoneme by taking the
+/// minimum distance over all K templates — capturing speaker /
+/// context variety the single-centroid model cannot. The original
+/// single-template callers stay valid: [`Self::get`] returns the
+/// **primary** (first-inserted) template, and [`Self::iter`]
+/// yields one `(phoneme, primary_template)` pair per phoneme.
+/// Multi-template callers use [`Self::all`] / [`Self::iter_all`].
 #[derive(Debug, Clone, Default)]
 pub struct PhonemeBank {
-    templates: HashMap<Phoneme, PhonemeTemplate>,
+    templates: HashMap<Phoneme, Vec<PhonemeTemplate>>,
 }
 
 impl PhonemeBank {
@@ -78,59 +87,104 @@ impl PhonemeBank {
         }
     }
 
-    /// Add or replace a template.
+    /// Append a template for its phoneme. If the bank already
+    /// holds templates for this phoneme, the new one is added as
+    /// an additional exemplar (does NOT replace).
     pub fn insert(&mut self, template: PhonemeTemplate) {
-        self.templates.insert(template.phoneme, template);
+        self.templates
+            .entry(template.phoneme)
+            .or_default()
+            .push(template);
     }
 
-    /// Look up a template.
+    /// Look up the **primary** (first-inserted) template for a
+    /// phoneme. Single-template callers still see the bank the
+    /// way they always did.
     pub fn get(&self, phoneme: Phoneme) -> Option<&PhonemeTemplate> {
-        self.templates.get(&phoneme)
+        self.templates.get(&phoneme).and_then(|v| v.first())
     }
 
-    /// Iterate over all (phoneme, template) pairs.
+    /// All exemplars for a phoneme (multi-template scoring). Empty
+    /// slice if the phoneme is absent.
+    pub fn all(&self, phoneme: Phoneme) -> &[PhonemeTemplate] {
+        self.templates
+            .get(&phoneme)
+            .map(Vec::as_slice)
+            .unwrap_or(&[])
+    }
+
+    /// Iterate over `(phoneme, primary_template)` pairs (one per
+    /// covered phoneme). Backward-compatible with the original
+    /// single-template iteration.
     pub fn iter(&self) -> impl Iterator<Item = (&Phoneme, &PhonemeTemplate)> {
-        self.templates.iter()
+        self.templates
+            .iter()
+            .filter_map(|(p, v)| v.first().map(|t| (p, t)))
     }
 
-    /// Number of templates in the bank.
+    /// Iterate over `(phoneme, all_templates_for_that_phoneme)`
+    /// pairs. Multi-template-aware callers (the Phase 13
+    /// recogniser) use this.
+    pub fn iter_all(&self) -> impl Iterator<Item = (&Phoneme, &[PhonemeTemplate])> {
+        self.templates.iter().map(|(p, v)| (p, v.as_slice()))
+    }
+
+    /// Number of **distinct phonemes** covered (not the total
+    /// number of templates). Preserves the semantics callers
+    /// expect from `len()`.
     pub fn len(&self) -> usize {
         self.templates.len()
+    }
+
+    /// Total number of template exemplars across all phonemes.
+    pub fn template_count(&self) -> usize {
+        self.templates.values().map(Vec::len).sum()
     }
 
     pub fn is_empty(&self) -> bool {
         self.templates.is_empty()
     }
 
-    /// Serialise the bank to bytes for on-disk storage. Format:
+    /// Serialise the bank to bytes for on-disk storage.
+    ///
+    /// **Format v2 (Phase 13 step 1):**
     ///
     /// ```text
-    /// magic     b"PHBK"   4 bytes
-    /// version   u8 = 1    1 byte
-    /// count     u32 LE    4 bytes
-    /// for each entry:
-    ///   phoneme_id u8                       (Phoneme::to_byte())
-    ///   mfcc_bytes_len u32 LE
-    ///   mfcc_bytes (an adam_audio::mfcc::write_binary blob)
+    /// magic     b"PHBK"     4 bytes
+    /// version   u8 = 2      1 byte
+    /// count     u32 LE      4 bytes   — distinct phonemes
+    /// for each phoneme:
+    ///   phoneme_id  u8                — Phoneme::to_byte()
+    ///   n_templates u32 LE            — number of exemplars
+    ///   for each exemplar:
+    ///     mfcc_bytes_len u32 LE
+    ///     mfcc_bytes     ...          — adam_audio::mfcc::write_binary blob
     /// ```
+    ///
+    /// **Format v1** (single-template-per-phoneme) is still
+    /// accepted by [`Self::from_bytes`] for backward compat with
+    /// banks built before this commit.
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut out = Vec::new();
         out.extend_from_slice(b"PHBK");
-        out.push(0x01);
+        out.push(0x02);
         out.extend_from_slice(&(self.templates.len() as u32).to_le_bytes());
-        // Stable ordering for deterministic output.
         let mut entries: Vec<_> = self.templates.iter().collect();
         entries.sort_by_key(|(p, _)| p.to_byte());
-        for (phoneme, template) in entries {
+        for (phoneme, exemplars) in entries {
             out.push(phoneme.to_byte());
-            let mfcc_bytes = adam_audio::mfcc::write_binary(&template.mfcc);
-            out.extend_from_slice(&(mfcc_bytes.len() as u32).to_le_bytes());
-            out.extend_from_slice(&mfcc_bytes);
+            out.extend_from_slice(&(exemplars.len() as u32).to_le_bytes());
+            for template in exemplars {
+                let mfcc_bytes = adam_audio::mfcc::write_binary(&template.mfcc);
+                out.extend_from_slice(&(mfcc_bytes.len() as u32).to_le_bytes());
+                out.extend_from_slice(&mfcc_bytes);
+            }
         }
         out
     }
 
-    /// Deserialise a bank from bytes written by [`Self::to_bytes`].
+    /// Deserialise a bank. Accepts both v1 (legacy, single
+    /// template per phoneme) and v2 (multi-template) layouts.
     pub fn from_bytes(bytes: &[u8]) -> Result<Self, PhonemeBankError> {
         if bytes.len() < 9 {
             return Err(PhonemeBankError::TruncatedHeader);
@@ -138,30 +192,51 @@ impl PhonemeBank {
         if &bytes[0..4] != b"PHBK" {
             return Err(PhonemeBankError::BadMagic);
         }
-        if bytes[4] != 0x01 {
-            return Err(PhonemeBankError::UnsupportedVersion(bytes[4]));
-        }
+        let version = bytes[4];
         let count = u32::from_le_bytes(bytes[5..9].try_into().unwrap()) as usize;
         let mut cursor = 9;
         let mut bank = Self::new();
-        for _ in 0..count {
-            if cursor + 5 > bytes.len() {
-                return Err(PhonemeBankError::TruncatedEntry);
+        match version {
+            0x01 => {
+                // Legacy: one template per phoneme entry.
+                for _ in 0..count {
+                    let (phoneme, blob) = read_phoneme_blob(bytes, &mut cursor)?;
+                    let mfcc = adam_audio::mfcc::read_binary(blob)
+                        .map_err(PhonemeBankError::MfccDecode)?;
+                    bank.insert(PhonemeTemplate { phoneme, mfcc });
+                }
             }
-            let phoneme_byte = bytes[cursor];
-            cursor += 1;
-            let phoneme = Phoneme::from_byte(phoneme_byte)
-                .ok_or(PhonemeBankError::UnknownPhonemeByte(phoneme_byte))?;
-            let blob_len =
-                u32::from_le_bytes(bytes[cursor..cursor + 4].try_into().unwrap()) as usize;
-            cursor += 4;
-            if cursor + blob_len > bytes.len() {
-                return Err(PhonemeBankError::TruncatedEntry);
+            0x02 => {
+                for _ in 0..count {
+                    if cursor + 5 > bytes.len() {
+                        return Err(PhonemeBankError::TruncatedEntry);
+                    }
+                    let phoneme_byte = bytes[cursor];
+                    cursor += 1;
+                    let phoneme = Phoneme::from_byte(phoneme_byte)
+                        .ok_or(PhonemeBankError::UnknownPhonemeByte(phoneme_byte))?;
+                    let n_templates =
+                        u32::from_le_bytes(bytes[cursor..cursor + 4].try_into().unwrap()) as usize;
+                    cursor += 4;
+                    for _ in 0..n_templates {
+                        if cursor + 4 > bytes.len() {
+                            return Err(PhonemeBankError::TruncatedEntry);
+                        }
+                        let blob_len =
+                            u32::from_le_bytes(bytes[cursor..cursor + 4].try_into().unwrap())
+                                as usize;
+                        cursor += 4;
+                        if cursor + blob_len > bytes.len() {
+                            return Err(PhonemeBankError::TruncatedEntry);
+                        }
+                        let mfcc = adam_audio::mfcc::read_binary(&bytes[cursor..cursor + blob_len])
+                            .map_err(PhonemeBankError::MfccDecode)?;
+                        cursor += blob_len;
+                        bank.insert(PhonemeTemplate { phoneme, mfcc });
+                    }
+                }
             }
-            let mfcc = adam_audio::mfcc::read_binary(&bytes[cursor..cursor + blob_len])
-                .map_err(PhonemeBankError::MfccDecode)?;
-            cursor += blob_len;
-            bank.insert(PhonemeTemplate { phoneme, mfcc });
+            other => return Err(PhonemeBankError::UnsupportedVersion(other)),
         }
         Ok(bank)
     }
@@ -235,6 +310,29 @@ impl PhonemeBank {
 }
 
 /// Synthesise one phoneme's MFCC template.
+/// Parse a single `phoneme_byte + blob_len + blob` chunk from
+/// the bank's serialised bytes. Used only by the v1 reader.
+fn read_phoneme_blob<'a>(
+    bytes: &'a [u8],
+    cursor: &mut usize,
+) -> Result<(Phoneme, &'a [u8]), PhonemeBankError> {
+    if *cursor + 5 > bytes.len() {
+        return Err(PhonemeBankError::TruncatedEntry);
+    }
+    let phoneme_byte = bytes[*cursor];
+    *cursor += 1;
+    let phoneme = Phoneme::from_byte(phoneme_byte)
+        .ok_or(PhonemeBankError::UnknownPhonemeByte(phoneme_byte))?;
+    let blob_len = u32::from_le_bytes(bytes[*cursor..*cursor + 4].try_into().unwrap()) as usize;
+    *cursor += 4;
+    if *cursor + blob_len > bytes.len() {
+        return Err(PhonemeBankError::TruncatedEntry);
+    }
+    let blob = &bytes[*cursor..*cursor + blob_len];
+    *cursor += blob_len;
+    Ok((phoneme, blob))
+}
+
 fn synth_template_mfcc(phoneme: Phoneme, sample_rate: u32, cfg: &MfccConfig) -> MfccSequence {
     // 200 ms of synthesised audio is enough for ~20 MFCC
     // frames at 10 ms hop — comparable to a real spoken
@@ -391,22 +489,10 @@ mod tests {
     /// in both takes the `real` version.
     #[test]
     fn merged_with_fallback_prefers_self() {
+        // Multi-template semantics (Phase 13): `insert` appends.
+        // Build `real` with one A template (distinct from any
+        // synth signature) so merge picks it as the primary.
         let mut real = PhonemeBank::new();
-        let mfcc_a = mfcc(
-            &harmonic_voice(100.0, 0.2, 16_000, 0.4, 4),
-            16_000,
-            &MfccConfig::default(),
-        );
-        real.insert(PhonemeTemplate {
-            phoneme: Phoneme::A,
-            mfcc: mfcc_a.clone(),
-        });
-        // synth has many phonemes including A — but with a
-        // *different* MFCC (synth uses harmonic stack at the
-        // phoneme's F0 anchor, and the test "real" above is
-        // also harmonic-based at 100 Hz which matches synth's
-        // A anchor — so they may coincide. Use a distinct
-        // signal to guarantee distinction.)
         let mfcc_a_distinct = mfcc(
             &harmonic_voice(199.0, 0.2, 16_000, 0.4, 4),
             16_000,
@@ -418,19 +504,53 @@ mod tests {
         });
 
         let synth = PhonemeBank::synthetic(16_000);
-
         let hybrid = real.merged_with_fallback(&synth);
 
-        // Hybrid has full synth coverage (36) — the real bank
-        // only had A, so length is dominated by synth.
+        // Hybrid has full synth coverage — the real bank only
+        // contributed A; phoneme count is dominated by synth.
         assert_eq!(hybrid.len(), synth.len());
-        // A in hybrid is the REAL one (from `real`).
+        // A in hybrid is from `real` (self wins on overlap).
         let hybrid_a = hybrid.get(Phoneme::A).unwrap();
         assert_eq!(hybrid_a.mfcc, mfcc_a_distinct);
-        // Q in hybrid is the SYNTH one (real didn't have it).
+        // Q in hybrid is from `synth` (real didn't have it).
         let hybrid_q = hybrid.get(Phoneme::Q).unwrap();
         let synth_q = synth.get(Phoneme::Q).unwrap();
         assert_eq!(hybrid_q.mfcc, synth_q.mfcc);
+    }
+
+    /// Multi-template smoke test (Phase 13): inserting two
+    /// templates for the same phoneme keeps both — `get` returns
+    /// the first, `all` returns both.
+    #[test]
+    fn multi_insert_appends_exemplars() {
+        let mut bank = PhonemeBank::new();
+        let m1 = mfcc(
+            &harmonic_voice(100.0, 0.20, 16_000, 0.4, 4),
+            16_000,
+            &MfccConfig::default(),
+        );
+        let m2 = mfcc(
+            &harmonic_voice(199.0, 0.20, 16_000, 0.4, 4),
+            16_000,
+            &MfccConfig::default(),
+        );
+        bank.insert(PhonemeTemplate {
+            phoneme: Phoneme::A,
+            mfcc: m1.clone(),
+        });
+        bank.insert(PhonemeTemplate {
+            phoneme: Phoneme::A,
+            mfcc: m2.clone(),
+        });
+        assert_eq!(bank.len(), 1); // one phoneme covered
+        assert_eq!(bank.template_count(), 2); // two exemplars
+        // `get` returns the first-inserted.
+        assert_eq!(bank.get(Phoneme::A).unwrap().mfcc, m1);
+        // `all` returns both.
+        let all = bank.all(Phoneme::A);
+        assert_eq!(all.len(), 2);
+        assert_eq!(all[0].mfcc, m1);
+        assert_eq!(all[1].mfcc, m2);
     }
 
     /// Loader rejects malformed input.

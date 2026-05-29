@@ -148,23 +148,40 @@ pub fn recognise_stream(
     // matching `recognise`.
     let query = adam_audio::cmvn::normalise(query);
 
-    // Collect phonemes + centroids, dimension-compatible only.
+    // Phase 13: multi-template scoring. For each phoneme, store
+    // the centroids of ALL its exemplars; the emission cost is
+    // `min` over all centroids — the recogniser picks the
+    // closest exemplar at every frame, capturing speaker /
+    // context variety. Dimension-mismatched templates are
+    // silently dropped.
     let mut phonemes: Vec<Phoneme> = Vec::with_capacity(bank.len());
-    let mut centroids: Vec<Vec<f32>> = Vec::with_capacity(bank.len());
-    for (p, tmpl) in bank.iter() {
-        if tmpl.mfcc.dim() != query.dim() || tmpl.mfcc.num_frames() == 0 {
-            continue;
+    let mut centroid_sets: Vec<Vec<Vec<f32>>> = Vec::with_capacity(bank.len());
+    for (p, exemplars) in bank.iter_all() {
+        let mut set: Vec<Vec<f32>> = Vec::new();
+        for tmpl in exemplars {
+            if tmpl.mfcc.dim() != query.dim() || tmpl.mfcc.num_frames() == 0 {
+                continue;
+            }
+            set.push(centroid(&tmpl.mfcc));
         }
-        phonemes.push(*p);
-        centroids.push(centroid(&tmpl.mfcc));
+        if !set.is_empty() {
+            phonemes.push(*p);
+            centroid_sets.push(set);
+        }
     }
     let p_count = phonemes.len();
     if p_count == 0 {
         return Vec::new();
     }
 
-    // Precompute emission costs: emit[t][p].
-    let emit = |frame: &[f32], p: usize| -> f32 { euclid(frame, &centroids[p]) };
+    // emit(frame, p) = min over p's exemplar centroids of the
+    // Euclidean distance to the frame.
+    let emit = |frame: &[f32], p: usize| -> f32 {
+        centroid_sets[p]
+            .iter()
+            .map(|c| euclid(frame, c))
+            .fold(f32::INFINITY, f32::min)
+    };
 
     let inf = f32::INFINITY;
     // cost[p] for the current frame; back[t][p] = best previous p.
