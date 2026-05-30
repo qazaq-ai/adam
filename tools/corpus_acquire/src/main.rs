@@ -85,6 +85,14 @@ enum Cmd {
     /// Rust formant synthesiser. No external recordings — every
     /// WAV is produced from physics on the fly.
     Synth(SynthArgs),
+    /// Stream-ingest the **OpenSLR 102 Kazakh Speech Corpus**
+    /// (ISSAI NU, ~332h, FLAC). Pipes the .tar.gz through
+    /// gunzip + tar in memory; per FLAC entry: decode → resample
+    /// 16 kHz mono → MFCC + (optional) WAV → manifest. Default
+    /// `--save-wav=false` keeps the disk footprint tractable
+    /// (FLAC 19 GB compressed; 16 kHz mono WAV would inflate to
+    /// 38 GB).
+    OpenSlrKsc(OpenSlrKscArgs),
 }
 
 #[derive(Debug, clap::Args)]
@@ -200,6 +208,46 @@ struct SynthArgs {
 }
 
 #[derive(Debug, clap::Args)]
+struct OpenSlrKscArgs {
+    /// OpenSLR 102 (Kazakh Speech Corpus / KSC) tarball URL.
+    /// Defaults to the canonical openslr.org host. Only used
+    /// when `--tarball-path` does not yet exist.
+    #[arg(
+        long,
+        default_value = "https://openslr.org/resources/102/ISSAI_KSC_335RS_v1.1_flac.tar.gz"
+    )]
+    url: String,
+    /// On-disk path for the tarball. If it already exists we
+    /// skip the network download (so reruns are cheap). After
+    /// processing the file is **kept** by default — use
+    /// `--cleanup-tarball` to delete it once ingest succeeds.
+    #[arg(long, default_value = "/tmp/openslr_102_ksc.tar.gz")]
+    tarball_path: PathBuf,
+    /// Output directory (re-uses the existing v6.3 bank layout).
+    #[arg(long, default_value = "data/v6_3_phoneme_bank")]
+    out_dir: PathBuf,
+    /// Stop after this many successful utterances (0 = no limit).
+    /// First probe = small (e.g. 200) to verify the pipeline
+    /// before a multi-hour full run.
+    #[arg(long, default_value = "0")]
+    max: usize,
+    /// Persist the 16 kHz mono WAV alongside the MFCC bin.
+    /// Default `false`: KSC at 332h would inflate to ~38 GB of
+    /// WAV which exceeds typical free disk. MFCC-only keeps the
+    /// derived footprint at ~6.6 GB.
+    #[arg(long, default_value_t = false)]
+    save_wav: bool,
+    /// Delete the on-disk tarball after a successful ingest.
+    /// Default false — keep the archive so a restart with a
+    /// different `--max` or `--save-wav` skips the download.
+    #[arg(long, default_value_t = false)]
+    cleanup_tarball: bool,
+    /// Source-class label written to the manifest.
+    #[arg(long, default_value = "openslr_ksc")]
+    source_class: String,
+}
+
+#[derive(Debug, clap::Args)]
 struct AuditArgs {
     /// Bank directory containing MANIFEST.jsonl + audio/.
     #[arg(long, default_value = "data/v6_3_phoneme_bank")]
@@ -259,6 +307,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Cmd::Batch(args) => run_batch(args),
         Cmd::FixManifestTranscripts(args) => run_fix_transcripts(args),
         Cmd::BuildBank(args) => run_build_bank(args),
+        Cmd::OpenSlrKsc(args) => run_openslr_ksc(args),
         Cmd::Fleurs(args) => run_fleurs(args),
         Cmd::Audit(args) => run_audit(args),
         Cmd::Synth(args) => run_synth(args),
@@ -1875,5 +1924,271 @@ fn process_fleurs_entry(
         pcm_16k.duration_s(),
         (wav_size + mfcc_size) as f32 / 1024.0
     );
+    Ok(Some(()))
+}
+
+// ─── openslr 102 / KSC (streaming tar.gz ingest) ──────────────
+
+fn run_openslr_ksc(args: OpenSlrKscArgs) -> Result<(), Box<dyn std::error::Error>> {
+    use flate2::read::GzDecoder;
+    use std::collections::HashMap;
+    use std::io::Read as _;
+
+    println!(
+        "[ksc] url={} tarball={} out_dir={} max={} save_wav={}",
+        args.url,
+        args.tarball_path.display(),
+        args.out_dir.display(),
+        args.max,
+        args.save_wav,
+    );
+    fs::create_dir_all(args.out_dir.join("audio"))?;
+    fs::create_dir_all(args.out_dir.join("mfcc"))?;
+    let manifest_path = args.out_dir.join("MANIFEST.jsonl");
+    let already = read_manifest_labels(&manifest_path)?;
+
+    // KSC layout (probed 2026-05-30):
+    //   ISSAI_KSC_335RS_v1.1_flac/Audios_flac/<id>.flac   (~19 GB)
+    //   ISSAI_KSC_335RS_v1.1_flac/Meta/<id>.txt           (transcripts; arrive AFTER audio in the tarball)
+    //
+    // A naive single-pass stream → in-RAM `pending_audio` map
+    // blows up to >15 GB (153k FLAC × ~100 KB) before any
+    // transcript arrives. To avoid that we materialise the
+    // tarball to disk once, then make TWO passes from the disk
+    // file: pass 1 collects transcripts only, pass 2 processes
+    // audio with the full transcript map in hand.
+
+    // 1. fetch tarball if not already cached on disk
+    if !args.tarball_path.exists() {
+        if let Some(parent) = args.tarball_path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        println!(
+            "[ksc] downloading tarball to {} (~19 GB; this can take 30..90 min)",
+            args.tarball_path.display()
+        );
+        let t0 = std::time::Instant::now();
+        let client = reqwest::blocking::Client::builder()
+            .user_agent("adam-corpus-acquire/0.1 (https://github.com/qazaq-ai/adam)")
+            .timeout(std::time::Duration::from_secs(60 * 60 * 6))
+            .build()?;
+        let mut resp = client.get(&args.url).send()?.error_for_status()?;
+        let mut tmp = fs::File::create(&args.tarball_path)?;
+        let bytes = std::io::copy(&mut resp, &mut tmp)?;
+        let secs = t0.elapsed().as_secs_f32().max(0.001);
+        println!(
+            "[ksc] downloaded {:.2} GB in {:.1} min ({:.1} MB/s)",
+            bytes as f32 / 1e9,
+            secs / 60.0,
+            (bytes as f32 / 1e6) / secs,
+        );
+    } else {
+        let sz = fs::metadata(&args.tarball_path)?.len();
+        println!("[ksc] using cached tarball ({:.2} GB)", sz as f32 / 1e9);
+    }
+
+    // 2. pass 1 — collect every transcript from .txt entries
+    let mut transcripts: HashMap<String, String> = HashMap::new();
+    {
+        let f = fs::File::open(&args.tarball_path)?;
+        let gz = GzDecoder::new(f);
+        let mut archive = tar::Archive::new(gz);
+        let mut t_count = 0_usize;
+        let mut last_log = std::time::Instant::now();
+        for entry in archive.entries()? {
+            let mut entry = entry?;
+            let path = entry.path()?.into_owned();
+            if entry.header().entry_type().is_dir() {
+                continue;
+            }
+            if !path.to_string_lossy().ends_with(".txt") {
+                continue;
+            }
+            let stem = match path.file_stem().and_then(|s| s.to_str()) {
+                Some(s) => s.to_string(),
+                None => continue,
+            };
+            let mut buf = String::new();
+            entry.read_to_string(&mut buf)?;
+            let transcript = buf.trim().to_string();
+            if transcript.is_empty() {
+                continue;
+            }
+            transcripts.insert(stem, transcript);
+            t_count += 1;
+            if last_log.elapsed().as_secs() >= 30 {
+                println!("[ksc pass 1] {t_count} transcripts collected");
+                last_log = std::time::Instant::now();
+            }
+        }
+        println!("[ksc pass 1] total transcripts: {t_count}");
+    }
+
+    if transcripts.is_empty() {
+        return Err(
+            "ksc: pass 1 found no transcripts (.txt entries) — archive layout may have changed"
+                .into(),
+        );
+    }
+
+    // 3. pass 2 — process audio entries with full transcript map
+    let mut ok = 0_usize;
+    let mut skipped = 0_usize;
+    let mut failed = 0_usize;
+    let mut no_transcript = 0_usize;
+    {
+        let f = fs::File::open(&args.tarball_path)?;
+        let gz = GzDecoder::new(f);
+        let mut archive = tar::Archive::new(gz);
+        let mut last_log = std::time::Instant::now();
+        for entry in archive.entries()? {
+            let mut entry = entry?;
+            let path = entry.path()?.into_owned();
+            if entry.header().entry_type().is_dir() {
+                continue;
+            }
+            if !path.to_string_lossy().ends_with(".flac") {
+                continue;
+            }
+            if args.max > 0 && ok >= args.max {
+                break;
+            }
+            let stem = match path.file_stem().and_then(|s| s.to_str()) {
+                Some(s) => s.to_string(),
+                None => continue,
+            };
+            let label = format!("ksc_{stem}");
+            if already.contains(&label) {
+                skipped += 1;
+                continue;
+            }
+            let transcript = match transcripts.get(&stem) {
+                Some(t) => t.clone(),
+                None => {
+                    no_transcript += 1;
+                    continue;
+                }
+            };
+            let mut bytes = Vec::new();
+            entry.read_to_end(&mut bytes)?;
+            match process_ksc_entry(
+                &stem,
+                bytes,
+                &transcript,
+                &args.source_class,
+                &args.out_dir,
+                &manifest_path,
+                &already,
+                args.save_wav,
+            ) {
+                Ok(Some(())) => ok += 1,
+                Ok(None) => skipped += 1,
+                Err(e) => {
+                    eprintln!("[ksc] FAILED {stem}: {e}");
+                    failed += 1;
+                }
+            }
+            if last_log.elapsed().as_secs() >= 30 {
+                println!(
+                    "[ksc pass 2] {ok} acquired, {skipped} skipped, {failed} failed, {no_transcript} no-transcript"
+                );
+                last_log = std::time::Instant::now();
+            }
+        }
+    }
+    println!(
+        "[ksc] done: {ok} acquired, {skipped} skipped, {failed} failed, {no_transcript} no-transcript"
+    );
+
+    if args.cleanup_tarball {
+        let _ = fs::remove_file(&args.tarball_path);
+        println!(
+            "[ksc] removed cached tarball {}",
+            args.tarball_path.display()
+        );
+    }
+    Ok(())
+}
+
+#[allow(clippy::too_many_arguments)]
+fn process_ksc_entry(
+    stem: &str,
+    bytes: Vec<u8>,
+    transcript: &str,
+    source_class: &str,
+    out_dir: &Path,
+    manifest_path: &Path,
+    already: &HashSet<String>,
+    save_wav: bool,
+) -> Result<Option<()>, Box<dyn std::error::Error>> {
+    let label = format!("ksc_{stem}");
+    if already.contains(&label) {
+        return Ok(None);
+    }
+    let original_bytes = bytes.len() as u64;
+    let pcm = decode::decode_bytes(bytes, "flac")?;
+    let pcm_mono = if pcm.channels > 1 { pcm.to_mono() } else { pcm };
+    let pcm_16k = if pcm_mono.sample_rate != 16_000 {
+        resample::to_16khz(&pcm_mono)?
+    } else {
+        pcm_mono
+    };
+    let (verdict, stats) = quality::check(&pcm_16k, &quality::QualityConfig::default());
+    if verdict != quality::QualityVerdict::Pass {
+        eprintln!(
+            "[ksc]   REJECT {label}: {verdict} (rms={:.4} peak={:.3} dur={:.2}s)",
+            stats.rms, stats.peak, stats.duration_s,
+        );
+        return Ok(None);
+    }
+    let mfcc_seq = adam_audio::mfcc::mfcc(
+        &pcm_16k.data,
+        pcm_16k.sample_rate,
+        &adam_audio::mfcc::MfccConfig::default(),
+    );
+
+    let mfcc_path = out_dir.join("mfcc").join(format!("{label}.bin"));
+    write_mfcc_binary(&mfcc_path, &mfcc_seq)?;
+    let mfcc_size = fs::metadata(&mfcc_path)?.len();
+
+    let (wav_rel, wav_size) = if save_wav {
+        let wav_path = out_dir.join("audio").join(format!("{label}.wav"));
+        adam_audio::wav::write_wav(&wav_path, &pcm_16k)?;
+        let size = fs::metadata(&wav_path)?.len();
+        (
+            wav_path
+                .strip_prefix(out_dir)
+                .unwrap_or(&wav_path)
+                .to_string_lossy()
+                .to_string(),
+            size,
+        )
+    } else {
+        // No WAV — manifest still expects a wav_path string; emit
+        // an empty marker so the absence is explicit.
+        (String::new(), 0)
+    };
+
+    let entry = ManifestEntry {
+        label: label.clone(),
+        source_url: format!("OpenSLR/102/{stem}.flac"),
+        transcript: transcript.to_string(),
+        gender: "unknown".to_string(),
+        source_class: source_class.to_string(),
+        original_bytes,
+        duration_s: pcm_16k.duration_s(),
+        wav_path: wav_rel,
+        wav_bytes: wav_size,
+        mfcc_path: mfcc_path
+            .strip_prefix(out_dir)
+            .unwrap_or(&mfcc_path)
+            .to_string_lossy()
+            .to_string(),
+        mfcc_frames: mfcc_seq.num_frames(),
+        mfcc_bytes: mfcc_size,
+        collected_at: chrono_date(),
+        used_in_bank: false,
+    };
+    append_manifest(manifest_path, &entry)?;
     Ok(Some(()))
 }
