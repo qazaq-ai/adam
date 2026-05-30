@@ -481,6 +481,42 @@ the Phase 2c forced-alignment confidence filter
     mask + duration priors; only fall back to a small
     CTC/Conformer (output: phoneme lattice + confidence)
     if the pure-template path plateaus above 50 % PER.
+  - **Phase 6 step 5 (2026-05-30): 332h OpenSLR KSC ingest +
+    3 bank-rebuild experiments — none beat v4 on FLEURS test;
+    architectural plateau confirmed.** New `corpus_acquire
+    open-slr-ksc` subcommand pulled the ISSAI Kazakh Speech
+    Corpus (332h FLAC, CC BY 4.0) via a disk-cached two-pass
+    streaming pipeline: download → pass-1 collect transcripts →
+    pass-2 decode + resample + MFCC + quality gate. Result:
+    153,826 utterances, 27 quality-rejected (0.018%), 0 decode
+    failures. Corpus grew 17h → 348.9h (20×).
+    `build_human_bank` refactored to streaming with three
+    `--selection` modes (legacy-greedy / cost-top / reservoir)
+    bounded to ~50 MB peak RAM regardless of corpus size.
+    Three bank rebuilds on the 157k-utt pool, all worse than
+    v4 (3397-utt FLEURS+Wikimedia, lex sp=25 = 76.6%):
+    - v5 (cost-top, cap=1000)     : stream 89.4 / lex25 80.7  (+7.7/+4.1 pp WORSE)
+    - v6 (legacy-greedy, cap=1000): stream 82.4 / lex25 77.3  (+0.7/+0.7 pp WORSE)
+    - v7 (reservoir, cap=1000)    : stream 84.9 / lex25 …     (+3.2 pp WORSE on stream)
+    Root-cause analysis: **the FLEURS test split is sourced
+    from the same recording conditions as the FLEURS train
+    split**. v4's bank is FLEURS-train-derived (legacy-greedy
+    on a manifest whose first 3397 rows were FLEURS+Wikimedia).
+    KSC was recorded under different conditions (mic, room,
+    speaker pool) — mixing it into the bank dilutes the
+    FLEURS-test centroid even when the bank itself is larger.
+    This makes the 76.6% PER an **in-domain (FLEURS-only)
+    ceiling for the monophone-DTW architecture**, not a
+    capacity ceiling. The 30k templates / 34 phonemes / single-
+    centroid-per-phoneme structure cannot exploit a 20×
+    corpus growth for a same-distribution eval. The lever
+    that *would* exploit a 332h corpus is **triphone-aware
+    modelling** (~50k context-dependent templates) — major
+    architectural change, out of scope for this step. Bank v4
+    stays as `templates.bin`; v5/v6/v7 dropped. Infrastructure
+    (streaming builder, selection modes, KSC subcommand) is
+    retained for the inevitable cross-domain eval and future
+    triphone work.
   - **Phase 6 step 2 (2026-05-29): human-derived phoneme
     bank — first time the bank beats synth on FLEURS.**
     The synth bank's formant-based templates lived in a

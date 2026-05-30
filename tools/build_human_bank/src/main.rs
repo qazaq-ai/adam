@@ -87,6 +87,27 @@ struct Cli {
     /// MVP slice.
     #[arg(long, default_value = "human")]
     source: String,
+
+    /// Selection strategy used to pick the per-phoneme survivors
+    /// after collecting candidates.
+    ///
+    /// - `legacy-greedy` — first-arrived wins (the v3/v4 rounds-1..4
+    ///   behaviour). Preserves source/speaker diversity, ignores
+    ///   alignment cost. Best PER track-record (v4 = 76.6 % FLEURS
+    ///   PER); strongly recommended unless you know why you want
+    ///   something else.
+    /// - `cost-top` — sorts each phoneme's pool by cost ascending
+    ///   and keeps the `cap` lowest-cost. On enlarged corpora
+    ///   (e.g. 157 k utts) this collapses bank diversity towards
+    ///   the bootstrap centroid and degrades PER (v5 experiment,
+    ///   2026-05-30: stream 89.4 vs v4 81.7, lex sp=25 80.7 vs v4
+    ///   76.6). Kept available for ablation.
+    /// - `reservoir` — uniform random reservoir sample of size
+    ///   `cap` per phoneme. Memory-bounded streaming alternative
+    ///   to `legacy-greedy`; relies on a deterministic PRNG seed
+    ///   so reruns reproduce.
+    #[arg(long, default_value = "legacy-greedy")]
+    selection: String,
 }
 
 #[derive(Deserialize, Debug)]
@@ -142,15 +163,23 @@ fn main() -> std::io::Result<()> {
         .into_iter()
         .filter(|r| match cli.source.as_str() {
             "wikimedia-only" => r.source_class == "wikimedia",
+            // `human` = natural-speech corpora suitable for STT
+            // (MFCC) bank construction. **Excludes kaz_tili**
+            // because that source is morpheme drills, not
+            // running speech — including it skews the phoneme
+            // distribution and degrades PER on real audio (v6
+            // experiment, 2026-05-29: +5.6pp stream / +3.7pp
+            // lexicon worse vs v4). kaz_tili belongs in the
+            // **PCM/TTS** bank (build_pcm_bank), not here.
             "human" => {
                 r.source_class == "wikimedia"
                     || (r.source_class == "fleurs" && !r.label.starts_with("fleurs_test_"))
                     || r.source_class == "common_voice"
-                    || r.source_class == "kaz_tili"
+                    || r.source_class == "openslr_ksc"
             }
             "human-all" => matches!(
                 r.source_class.as_str(),
-                "wikimedia" | "fleurs" | "common_voice" | "kaz_tili"
+                "wikimedia" | "fleurs" | "common_voice" | "kaz_tili" | "openslr_ksc"
             ),
             other => {
                 eprintln!("[build_human_bank] unknown --source {other:?}; matching nothing");
@@ -197,7 +226,28 @@ fn main() -> std::io::Result<()> {
         }
     }
 
-    let mut candidates: Vec<Candidate> = Vec::new();
+    // Online per-phoneme candidate pool. Each phoneme keeps at
+    // most `cap` survivors. Selection strategy (set via
+    // `--selection`) decides which `cap` survive when more
+    // candidates arrive:
+    //   - legacy-greedy: keep the first `cap` arrivals; cheap +
+    //     diversity-preserving; v3/v4 winning behaviour.
+    //   - cost-top: every push appends; every `2 * cap` pushes
+    //     prune by cost ASC and truncate back to `cap`; biases
+    //     bank towards bootstrap centroid (v5 regression).
+    //   - reservoir: uniform random reservoir sampling over the
+    //     full unseen stream; diversity-preserving without
+    //     speaker bias.
+    let cap = cli.per_phoneme_cap.max(1);
+    let selection = SelectionMode::parse(&cli.selection)?;
+    let prune_threshold = 2 * cap;
+    let mut by_phoneme: HashMap<adam_phoneme::Phoneme, Vec<Candidate>> = HashMap::new();
+    // For `reservoir` mode we track total candidates seen per
+    // phoneme so the replacement probability is correct.
+    let mut seen_count: HashMap<adam_phoneme::Phoneme, usize> = HashMap::new();
+    // Deterministic PRNG (XorShift64). Seed is fixed so reruns
+    // produce bit-identical banks.
+    let mut prng_state: u64 = 0x9E37_79B9_7F4A_7C15;
     let mut stats = Stats::default();
 
     for (i, row) in kept.iter().enumerate() {
@@ -253,11 +303,16 @@ fn main() -> std::io::Result<()> {
 
         match align(&audio, &phonemes, &bootstrap) {
             Ok(alignment) => {
-                collect_segments(
-                    &mut candidates,
+                collect_segments_streaming(
+                    &mut by_phoneme,
+                    &mut seen_count,
+                    &mut prng_state,
                     &audio,
                     &alignment.segments,
                     &bootstrap_centroids,
+                    prune_threshold,
+                    cap,
+                    selection,
                 );
                 stats.aligned += 1;
                 stats.total_phonemes += alignment.segments.len();
@@ -275,26 +330,28 @@ fn main() -> std::io::Result<()> {
         }
 
         if (i + 1) % 500 == 0 {
+            let live: usize = by_phoneme.values().map(Vec::len).sum();
             eprintln!(
-                "[build_human_bank] {}/{} utterances processed; candidates: {}",
+                "[build_human_bank] {}/{} utterances processed; live candidates: {} across {} phonemes",
                 i + 1,
                 kept.len(),
-                candidates.len()
+                live,
+                by_phoneme.len()
             );
         }
     }
 
     // Cost-quantile filter + per-phoneme cap: sort each
-    // phoneme's candidates by cost ascending, drop the worst
-    // `cost_drop_quantile` fraction, then keep at most
-    // `per_phoneme_cap` of the survivors. Order-of-insertion
-    // bias from rounds 1..4 (first-K-utterances wins) is gone —
-    // every segment gets a fair comparison against every other
-    // segment of the same phoneme.
-    let mut by_phoneme: HashMap<adam_phoneme::Phoneme, Vec<Candidate>> = HashMap::new();
-    for c in candidates.drain(..) {
-        by_phoneme.entry(c.phoneme).or_default().push(c);
-    }
+    // phoneme's surviving candidates by cost ascending, drop
+    // the worst `cost_drop_quantile` fraction, then keep at
+    // most `per_phoneme_cap` of the survivors.
+    //
+    // NOTE: under the streaming collector each phoneme's pool
+    // already saw every candidate but pruned to roughly the
+    // top `cap` by cost (a few `2 * cap`-sized batches were
+    // sorted + truncated en route). The post-loop pass here
+    // applies the user-requested quantile filter and the
+    // final hard cap.
     let q = cli.cost_drop_quantile.clamp(0.0, 0.99);
     let mut bank = PhonemeBank::new();
     let mut dropped_quantile = 0_usize;
@@ -411,12 +468,155 @@ struct Candidate {
     cost: f32,
 }
 
-/// Walk a forced-alignment result and push each segment into
-/// the candidate pool with its per-frame mean cost. Cost is
-/// computed against the bootstrap-bank centroid for the
-/// segment's phoneme — phonemes absent from the bootstrap
-/// (shouldn't happen, but defensive) get `f32::INFINITY` so the
-/// quantile filter drops them first.
+/// Selection strategy for per-phoneme candidate survival.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum SelectionMode {
+    LegacyGreedy,
+    CostTop,
+    Reservoir,
+}
+
+impl SelectionMode {
+    fn parse(s: &str) -> Result<Self, std::io::Error> {
+        match s {
+            "legacy-greedy" | "greedy" => Ok(Self::LegacyGreedy),
+            "cost-top" | "cost" => Ok(Self::CostTop),
+            "reservoir" => Ok(Self::Reservoir),
+            other => Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                format!(
+                    "unknown --selection {other:?} (choices: legacy-greedy, cost-top, reservoir)"
+                ),
+            )),
+        }
+    }
+}
+
+/// XorShift64 — deterministic, lightweight, no extra deps.
+fn xorshift64_next(state: &mut u64) -> u64 {
+    let mut x = *state;
+    x ^= x << 13;
+    x ^= x >> 7;
+    x ^= x << 17;
+    *state = x;
+    x
+}
+
+/// Walk a forced-alignment result and place each segment into
+/// the per-phoneme candidate pool with bounded memory.
+///
+/// Behaviour by `selection`:
+///   - LegacyGreedy: push only if pool.len() < cap; otherwise drop.
+///   - CostTop: push; when pool.len() ≥ prune_threshold, sort by
+///     cost ASC and truncate back to cap.
+///   - Reservoir: classic Algorithm R reservoir sampling — pool
+///     fills to cap, then for the k-th candidate (k ≥ cap),
+///     replace a uniformly-random pool slot with probability
+///     cap / k.
+fn collect_segments_streaming(
+    by_phoneme: &mut HashMap<adam_phoneme::Phoneme, Vec<Candidate>>,
+    seen_count: &mut HashMap<adam_phoneme::Phoneme, usize>,
+    prng_state: &mut u64,
+    audio: &MfccSequence,
+    segments: &[adam_forced_aligner::PhoneSegment],
+    bootstrap_centroids: &HashMap<adam_phoneme::Phoneme, Vec<f32>>,
+    prune_threshold: usize,
+    cap: usize,
+    selection: SelectionMode,
+) {
+    for seg in segments {
+        if seg.end <= seg.start {
+            continue;
+        }
+        let centroid = bootstrap_centroids.get(&seg.phoneme);
+
+        // For LegacyGreedy we can short-circuit: if the pool is
+        // already at cap we don't even need to read the segment
+        // (skip the frame copy + cost calc).
+        let pool_len = by_phoneme.get(&seg.phoneme).map(Vec::len).unwrap_or(0);
+        if selection == SelectionMode::LegacyGreedy && pool_len >= cap {
+            *seen_count.entry(seg.phoneme).or_insert(0) += 1;
+            continue;
+        }
+
+        // Compute cost (only needed for cost-based selection or
+        // reporting). Use INFINITY when centroid is missing.
+        let cost = if let Some(c) = centroid {
+            mean_euclid_to_centroid(&audio.frames[seg.start..seg.end], c)
+        } else {
+            f32::INFINITY
+        };
+
+        let frames: Vec<Vec<f32>> = audio.frames[seg.start..seg.end].to_vec();
+        let mfcc = MfccSequence {
+            frames,
+            sample_rate: audio.sample_rate,
+            hop_length: audio.hop_length,
+            n_mfcc: audio.n_mfcc,
+        };
+        let candidate = Candidate {
+            phoneme: seg.phoneme,
+            mfcc,
+            cost,
+        };
+
+        match selection {
+            SelectionMode::LegacyGreedy => {
+                // pool_len < cap by the early-skip above.
+                by_phoneme.entry(seg.phoneme).or_default().push(candidate);
+            }
+            SelectionMode::CostTop => {
+                let pool = by_phoneme.entry(seg.phoneme).or_default();
+                pool.push(candidate);
+                if pool.len() >= prune_threshold {
+                    pool.sort_by(|a, b| {
+                        a.cost
+                            .partial_cmp(&b.cost)
+                            .unwrap_or(std::cmp::Ordering::Equal)
+                    });
+                    pool.truncate(cap);
+                }
+            }
+            SelectionMode::Reservoir => {
+                let k = seen_count.entry(seg.phoneme).or_insert(0);
+                *k += 1;
+                let pool = by_phoneme.entry(seg.phoneme).or_default();
+                if pool.len() < cap {
+                    pool.push(candidate);
+                } else {
+                    // Algorithm R: replace pool[r] with probability cap/k
+                    // where r = uniform(0..cap-1).
+                    let r = (xorshift64_next(prng_state) % (*k as u64)) as usize;
+                    if r < cap {
+                        pool[r] = candidate;
+                    }
+                }
+            }
+        }
+        *seen_count.entry(seg.phoneme).or_insert(0) += 1;
+    }
+}
+
+fn mean_euclid_to_centroid(frames: &[Vec<f32>], centroid: &[f32]) -> f32 {
+    let mut sum = 0.0_f32;
+    let mut n = 0_usize;
+    for frame in frames {
+        if frame.len() != centroid.len() {
+            continue;
+        }
+        let mut acc = 0.0_f32;
+        for (x, y) in frame.iter().zip(centroid.iter()) {
+            let d = x - y;
+            acc += d * d;
+        }
+        sum += acc.sqrt();
+        n += 1;
+    }
+    if n > 0 { sum / n as f32 } else { f32::INFINITY }
+}
+
+/// Legacy unbounded collector — kept for reference / tests.
+#[allow(dead_code)]
 fn collect_segments(
     candidates: &mut Vec<Candidate>,
     audio: &MfccSequence,
