@@ -14,6 +14,9 @@ adam-audio = { path = "../../crates/adam-audio" }
 adam-phoneme = { path = "../../crates/adam-phoneme" }
 adam-stt-phoneme = { path = "../../crates/adam-stt-phoneme" }
 adam-tts-phoneme = { path = "../../crates/adam-tts-phoneme" }
+# cpal for probing the output device's preferred sample rate
+# (we resample Piper output before playback — see synthesise_via_piper).
+cpal = "0.15"
 clap = { version = "4.5", features = ["derive"] }
 
 [lints]

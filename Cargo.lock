@@ -416,6 +416,7 @@ dependencies = [
  "adam-stt-phoneme",
  "adam-tts-phoneme",
  "clap",
+ "cpal",
 ]
 
 [[package]]

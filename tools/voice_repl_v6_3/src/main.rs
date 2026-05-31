@@ -349,9 +349,62 @@ fn synthesise_via_piper(
     if !tmp_out.exists() {
         return Err(format!("piper produced no output at {}", tmp_out.display()).into());
     }
-    let pcm = adam_audio::wav::read_wav(&tmp_out)?;
+    let raw_pcm = adam_audio::wav::read_wav(&tmp_out)?;
     let _ = std::fs::remove_file(&tmp_out);
-    Ok(pcm)
+
+    // adam-audio's `play_blocking` does NOT resample — it feeds
+    // raw samples at the device's preferred rate. On macOS the
+    // default output device is typically 48 kHz; Piper produces
+    // 22 050 Hz; without resampling the 22 050 Hz buffer plays
+    // at 48 kHz device rate → 2.18× too fast → exactly the
+    // «скоростной неразборчивый звук» the user heard
+    // (2026-05-31 test, captured 48000 Hz mic, played 22050 Hz
+    // Piper output, audio chipmunked). Resample to the device's
+    // rate via ffmpeg before handing off. Phase 13b will land a
+    // pure-Rust resample inside `play_blocking` itself.
+    let device_rate = preferred_output_sample_rate();
+    if raw_pcm.sample_rate == device_rate {
+        return Ok(raw_pcm);
+    }
+    let in_path = tmp_dir.join(format!("voice_repl_piper_pre_{pid}.wav"));
+    let out_path = tmp_dir.join(format!("voice_repl_piper_rs_{pid}.wav"));
+    adam_audio::wav::write_wav(&in_path, &raw_pcm)?;
+    let status = Command::new("ffmpeg")
+        .arg("-hide_banner")
+        .arg("-loglevel")
+        .arg("error")
+        .arg("-y")
+        .arg("-i")
+        .arg(&in_path)
+        .arg("-ar")
+        .arg(device_rate.to_string())
+        .arg("-ac")
+        .arg("1")
+        .arg("-c:a")
+        .arg("pcm_s16le")
+        .arg(&out_path)
+        .status()?;
+    let _ = std::fs::remove_file(&in_path);
+    if !status.success() {
+        return Err("ffmpeg resample failed".into());
+    }
+    let resampled = adam_audio::wav::read_wav(&out_path)?;
+    let _ = std::fs::remove_file(&out_path);
+    Ok(resampled)
+}
+
+/// Query cpal's default output device for its preferred sample
+/// rate. Falls back to 48 kHz on any error (the most common
+/// macOS / Linux default).
+fn preferred_output_sample_rate() -> u32 {
+    use cpal::traits::{DeviceTrait, HostTrait};
+    match cpal::default_host().default_output_device() {
+        Some(dev) => match dev.default_output_config() {
+            Ok(cfg) => cfg.sample_rate().0,
+            Err(_) => 48_000,
+        },
+        None => 48_000,
+    }
 }
 
 /// Phase 15 (2026-05-31) whisper.cpp STT backend.
