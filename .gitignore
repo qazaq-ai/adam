@@ -105,3 +105,22 @@ data/v6_3_phoneme_bank/mfcc/quarantine/
 data/v6_3_phoneme_bank/audio/ksc_*.wav
 data/v6_3_phoneme_bank/mfcc/ksc_*.bin
 data/audiobooks/
+
+# Phase 13 (2026-05-31) Piper neural TTS asset:
+# kk_KZ-issai-high.onnx is 128 MB (over the 50 MB git threshold),
+# regenerable via:
+#   curl -L -o data/tts_models/kk_KZ-issai-high.onnx \
+#     "https://huggingface.co/rhasspy/piper-voices/resolve/main/kk/kk_KZ/issai/high/kk_KZ-issai-high.onnx"
+# Trained on the ISSAI KazakhTTS2 corpus (271h / 5 speakers), CC BY 4.0.
+# The .onnx.json config + MODEL_CARD ship in git — they are tiny.
+data/tts_models/kk_KZ-issai-high.onnx
+# Python venv for the Piper CLI (146 MB). Reproducible via the README
+# in tools/synthesize_piper/.
+data/tts_models/.venv/
+
+# Listening-test artefacts that are NOT a committed reference set:
+# untracked listening_tests/* are local probes. Phase 13's curated
+# 9-word reference set under phase13_neural_piper/ IS committed
+# (small, audio-validated).
+data/listening_tests/
+!data/listening_tests/phase13_neural_piper/
