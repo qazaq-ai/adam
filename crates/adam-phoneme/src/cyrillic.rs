@@ -110,6 +110,68 @@ pub fn cyrillic_to_phonemes(text: &str, is_native_root: bool) -> Vec<Phoneme> {
     out
 }
 
+/// Like [`cyrillic_to_phonemes`] but **prayer-aware**: any
+/// Arabic prayer span detected by
+/// [`crate::prayer::tag_prayer_spans`] inside `text` is
+/// rendered with `is_native_root = false` regardless of the
+/// caller's `is_native_root_default`, so the strict «і»/«ы»-
+/// drop rule does not corrupt borrowed Arabic words.
+///
+/// All non-prayer text uses `is_native_root_default`.
+///
+/// This is the canonical entry point for processing literary
+/// Kazakh text (Abai, Шакарим, religious texts) where Arabic
+/// citations are intermixed with native Kazakh prose.
+///
+/// `text` round-trip note: this function operates on
+/// `text.to_lowercase()` byte offsets. For Kazakh Cyrillic and
+/// Arabic script — every letter has the same UTF-8 byte width
+/// under case conversion (2 bytes each), so byte positions
+/// match across the original and lowercase strings. Latin
+/// letters (rare in this path) likewise preserve their byte
+/// width across `to_lowercase`.
+pub fn cyrillic_to_phonemes_prayer_aware(text: &str, is_native_root_default: bool) -> Vec<Phoneme> {
+    let spans = crate::prayer::tag_prayer_spans(text);
+    if spans.is_empty() {
+        return cyrillic_to_phonemes(text, is_native_root_default);
+    }
+
+    let lowered = text.to_lowercase();
+    let mut out: Vec<Phoneme> = Vec::with_capacity(lowered.chars().count());
+    let mut byte_pos = 0_usize;
+
+    for c in lowered.chars() {
+        let clen = c.len_utf8();
+        let in_prayer = spans
+            .iter()
+            .any(|s| byte_pos >= s.range.start && byte_pos < s.range.end);
+        // Inside a prayer span we behave as for a loanword:
+        // every «ы» / «і» is preserved as a real phoneme so
+        // Arabic patterns like «-фир-» (астағфируллаһ) parse
+        // correctly. Outside prayer spans we honour the
+        // caller's default.
+        let effective_native_root = if in_prayer {
+            false
+        } else {
+            is_native_root_default
+        };
+
+        if let Some(p) = cyrillic_char_to_phoneme(c) {
+            // Same strict orthographic drop rule as
+            // `cyrillic_to_phonemes`, but the `is_native_root`
+            // flag is the **per-char** effective value.
+            if effective_native_root && matches!(p, Phoneme::Y | Phoneme::Yi) {
+                byte_pos += clen;
+                continue;
+            }
+            out.push(p);
+        }
+        byte_pos += clen;
+    }
+
+    out
+}
+
 /// Single-character Cyrillic→Phoneme lookup. Returns `None` for
 /// non-Kazakh characters (whitespace, digits, punctuation,
 /// foreign letters). Used internally; exposed for tests.
@@ -279,5 +341,94 @@ mod tests {
         let lower = cyrillic_to_phonemes("қазақ", false);
         assert_eq!(upper, lower);
         assert_eq!(upper, vec![Q, A, Z, A, Q]);
+    }
+
+    // ─── Phase 11: prayer-aware variant ─────────────────────
+
+    /// Pure-native text without prayer spans behaves exactly
+    /// the same as the original `cyrillic_to_phonemes`. The
+    /// new function must be a non-disruptive overlay.
+    #[test]
+    fn prayer_aware_no_spans_matches_plain() {
+        for (text, native) in [("қыз", true), ("кітап", true), ("бизнес", false)] {
+            assert_eq!(
+                cyrillic_to_phonemes_prayer_aware(text, native),
+                cyrillic_to_phonemes(text, native),
+                "no-prayer text mismatched on {text:?} native={native}"
+            );
+        }
+    }
+
+    /// «Бісмілләһ» inside a sentence: it contains two «і»
+    /// (U+0456 = Phoneme::Yi). In plain native-root mode they
+    /// drop and the prayer becomes /b s m l l ä h/ — wrong. In
+    /// prayer-aware mode both «і»s survive as Yi.
+    #[test]
+    fn prayer_span_keeps_orthographic_і() {
+        let text = "Ол бісмілләһ деді.";
+        let plain = cyrillic_to_phonemes(text, true);
+        let aware = cyrillic_to_phonemes_prayer_aware(text, true);
+        // Aware should keep 2 extra phonemes (the two Yi inside
+        // бісмілләһ that plain native-root drops).
+        assert_eq!(
+            aware.len(),
+            plain.len() + 2,
+            "expected +2 phonemes in aware (Yi×2 in бісмілләһ); plain={:?} aware={:?}",
+            plain,
+            aware
+        );
+        let aware_yi_count = aware.iter().filter(|p| **p == Yi).count();
+        let plain_yi_count = plain.iter().filter(|p| **p == Yi).count();
+        // «деді» ends in «і» which is OUTSIDE the prayer span,
+        // so still drops in both modes. The full sentence has
+        // 3 «і»s total: 2 inside «бісмілләһ» (preserved by
+        // aware) + 1 in «деді» (dropped in both modes).
+        assert_eq!(plain_yi_count, 0, "all 3 «і»s drop in plain; got {plain:?}");
+        assert_eq!(
+            aware_yi_count, 2,
+            "the 2 «і»s inside the prayer span survive; got {aware:?}"
+        );
+    }
+
+    /// Mixed text: native Kazakh sentence first, then a prayer
+    /// citation. The native part still applies the strict drop
+    /// rule; only the prayer span keeps «і»/«ы».
+    #[test]
+    fn prayer_aware_mixed_kazakh_and_prayer() {
+        // «Қыз» (native, strict-drop) then «бісмілләһ» (prayer,
+        // keeps everything).
+        let text = "Қыз бісмілләһ";
+        let aware = cyrillic_to_phonemes_prayer_aware(text, true);
+        // Q + Z (qyz with і dropped) + B + Yi + S + M + Yi + L + L + Ae + H
+        // Strict-drop should have dropped «ы» from «қыз» but
+        // kept «і» in «бісмілләһ» (twice).
+        assert_eq!(aware[0], Q);
+        assert_eq!(aware[1], Z);
+        // After Q,Z come the phonemes of the prayer span.
+        assert!(
+            aware[2..].contains(&Yi),
+            "prayer span should preserve «і» as Yi; got {:?}",
+            aware
+        );
+    }
+
+    /// Without prayer detection, «бісмілләһ» loses its «і»s
+    /// under strict native-root mode → wrong rendering. This
+    /// asserts the pre-Phase-11 bug exists in plain mode so we
+    /// don't accidentally regress the fix.
+    #[test]
+    fn plain_mode_corrupts_prayer_text() {
+        let plain = cyrillic_to_phonemes("бісмілләһ", true);
+        assert!(
+            !plain.contains(&Yi),
+            "plain native-root mode should drop «і» (this is the bug Phase 11 fixes); got {:?}",
+            plain
+        );
+        let aware = cyrillic_to_phonemes_prayer_aware("бісмілләһ", true);
+        assert!(
+            aware.contains(&Yi),
+            "prayer-aware mode should preserve «і»; got {:?}",
+            aware
+        );
     }
 }
