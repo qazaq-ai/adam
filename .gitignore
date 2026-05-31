@@ -121,6 +121,8 @@ data/tts_models/.venv/
 # Listening-test artefacts that are NOT a committed reference set:
 # untracked listening_tests/* are local probes. Phase 13's curated
 # 9-word reference set under phase13_neural_piper/ IS committed
-# (small, audio-validated).
-data/listening_tests/
+# (small, audio-validated). Use a glob exclude + double-star
+# negation so individual files re-include cleanly.
+data/listening_tests/*
 !data/listening_tests/phase13_neural_piper/
+!data/listening_tests/phase13_neural_piper/**
