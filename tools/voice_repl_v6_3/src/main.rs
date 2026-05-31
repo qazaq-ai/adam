@@ -267,6 +267,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
 
+        // **Phase 15f.4 (2026-05-31)** — default duration 3 → 6 s.
+        // Live REPL surfaced «Мен еркек.» cut off mid-syllable
+        // (Whisper returned the word but the user had more to say).
+        // 6 s covers a typical two-clause Kazakh sentence
+        // («Калыңыз қалай? Бүгін жексенбі ма?») without timing out.
+        // Users who want shorter recordings still pass --duration N
+        // explicitly; --vad remains the open-ended option.
         let pcm = if let Some(d) = args.duration {
             println!("[voice-repl] recording {d} s...");
             record_fixed_duration(Duration::from_secs(d))?
@@ -274,8 +281,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("[voice-repl] recording (auto-stop on 1.5 s of silence, 30 s max)...");
             record_until_silence(RecordConfig::default())?
         } else {
-            println!("[voice-repl] recording 3 s (default)...");
-            record_fixed_duration(Duration::from_secs(3))?
+            println!("[voice-repl] recording 6 s (default)...");
+            record_fixed_duration(Duration::from_secs(6))?
         };
         println!(
             "[voice-repl] captured {:.2} s at {} Hz",
@@ -828,6 +835,24 @@ fn fuzzy_normalise(text: &str) -> String {
             "жоқ",
             "рахмет",
             "кешіріңіз",
+            // **Phase 15f.4 (2026-05-31)** — gender / person words.
+            // Live REPL turn «Мен еркек.» got fuzzy-mangled to
+            // «Мен ертең.» because «еркек» was missing from vocab
+            // and the 0.70 best_match gate pulled it to the
+            // closest canonical form. Adding both gender words
+            // and the negative copula keeps fuzzy honest on
+            // identity-correction utterances like:
+            //   «Мен апа емеспін.»  / «Мен еркек.»  / «Мен әйел.»
+            "еркек",
+            "әйел",
+            "емес",
+            "емеспін",
+            "емессіз",
+            "емессің",
+            "жоқпын",
+            "жасым",
+            "жасыңыз",
+            "жасы",
             // **Phase 15e.next (2026-05-31)** — math operators
             // + numerals. Live REPL turns 11–14 surfaced
             // «кубей» (Whisper) for «көбейт» (multiply), «азаид»
