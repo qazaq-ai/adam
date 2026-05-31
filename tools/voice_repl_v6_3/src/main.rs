@@ -100,7 +100,11 @@ struct Args {
     #[arg(long, default_value = "whisper")]
     stt_backend: String,
     /// Whisper ggml model path (used only when --stt-backend=whisper).
-    #[arg(long, default_value = "data/stt_models/ggml-small.bin")]
+    /// Default: ggml-medium.bin (~1.5 GB, multilingual incl. Kazakh).
+    /// Smaller alternative: ggml-small.bin (488 MB) — works but mangles
+    /// the distinctive Kazakh letters (Қ/Ғ/Ң/Ө/Ұ/Ү/Һ/І/Ә) more often,
+    /// which trips the dialog engine's intent classifier.
+    #[arg(long, default_value = "data/stt_models/ggml-medium.bin")]
     whisper_model: PathBuf,
     /// Dialog mode. `echo` (default for now) = TTS re-speaks the
     /// STT output (Phase 13/15 loopback validation). `respond` =

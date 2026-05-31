@@ -118,13 +118,18 @@ data/tts_models/kk_KZ-issai-high.onnx
 # in tools/synthesize_piper/.
 data/tts_models/.venv/
 
-# Phase 15 (2026-05-31) whisper.cpp STT model:
-# ggml-small.bin is 488 MB (over the 50 MB git threshold), regenerable via:
+# Phase 15+15b (2026-05-31) whisper.cpp STT models:
+# ggml-small.bin  (488 MB) and ggml-medium.bin (1.5 GB), regenerable via:
 #   curl -L -o data/stt_models/ggml-small.bin \
 #     https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.bin
-# Multilingual whisper-small (~50 languages incl. kk). Used by
-# voice_repl_v6_3 when --stt-backend=whisper (default).
+#   curl -L -o data/stt_models/ggml-medium.bin \
+#     https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin
+# Both multilingual. Medium handles Kazakh-specific letters
+# (Қ/Ғ/Ң/Ө/Ұ/Ү/Һ/І/Ә) measurably better than small. Phase 15c will
+# convert Shirali/whisper-small-ISSAI_KSC_335RS_v2 (HF format,
+# needs vocab.json synthesis) for production-grade KZ accuracy.
 data/stt_models/*.bin
+data/stt_models/_convert/
 
 # Listening-test artefacts that are NOT a committed reference set:
 # untracked listening_tests/* are local probes. Phase 13's curated
