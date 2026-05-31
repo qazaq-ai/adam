@@ -71,6 +71,22 @@ struct Args {
     /// Bank directory.
     #[arg(long, default_value = "data/v6_3_phoneme_bank")]
     bank_dir: PathBuf,
+    /// TTS backend. `concat` = the in-tree concatenative
+    /// pipeline (PcmBank + parametric fallback, Phase 7).
+    /// `piper` = subprocess to the Piper neural TTS CLI using
+    /// the ISSAI kk_KZ-issai-high voice from Phase 13.
+    /// Piper produces single-speaker, sentence-level, natural-
+    /// sounding output and is the recommended default once the
+    /// model + venv are present.
+    #[arg(long, default_value = "piper")]
+    tts_backend: String,
+    /// Piper voice .onnx path (used only when --tts-backend=piper).
+    #[arg(long, default_value = "data/tts_models/kk_KZ-issai-high.onnx")]
+    piper_model: PathBuf,
+    /// Path to the Python venv where `piper-tts` is installed
+    /// (built per tools/synthesize_piper/README.md).
+    #[arg(long, default_value = "data/tts_models/.venv")]
+    piper_venv: PathBuf,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -134,11 +150,44 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         // Optional TTS playback.
         if args.speak {
-            let tts_out = synthesise_with_bank(&rescored, pcm_bank.as_ref(), &TtsConfig::default());
-            println!(
-                "[voice-repl] synthesised {:.2} s, playing back",
-                tts_out.duration_s()
-            );
+            let tts_out = match args.tts_backend.as_str() {
+                "piper" => {
+                    match synthesise_via_piper(&cyrillic, &args.piper_model, &args.piper_venv) {
+                        Ok(pcm) => {
+                            println!(
+                                "[voice-repl] piper synthesised {:.2} s @ {} Hz, playing back",
+                                pcm.duration_s(),
+                                pcm.sample_rate,
+                            );
+                            pcm
+                        }
+                        Err(e) => {
+                            eprintln!(
+                                "[voice-repl] piper backend failed: {e} — falling back to concat",
+                            );
+                            let pcm = synthesise_with_bank(
+                                &rescored,
+                                pcm_bank.as_ref(),
+                                &TtsConfig::default(),
+                            );
+                            println!(
+                                "[voice-repl] concat synthesised {:.2} s, playing back",
+                                pcm.duration_s(),
+                            );
+                            pcm
+                        }
+                    }
+                }
+                _ => {
+                    let pcm =
+                        synthesise_with_bank(&rescored, pcm_bank.as_ref(), &TtsConfig::default());
+                    println!(
+                        "[voice-repl] concat synthesised {:.2} s, playing back",
+                        pcm.duration_s(),
+                    );
+                    pcm
+                }
+            };
             play_blocking(&tts_out)?;
         }
 
@@ -178,4 +227,93 @@ fn load_mfcc_bank(bank_dir: &std::path::Path, sample_rate: u32) -> std::io::Resu
 fn load_pcm_bank(bank_dir: &std::path::Path) -> Result<PcmBank, Box<dyn std::error::Error>> {
     let path = bank_dir.join("pcm_templates.bin");
     Ok(PcmBank::load_from_file(path)?)
+}
+
+/// Phase 13 (2026-05-31) Piper neural TTS backend.
+///
+/// Shells out to the Piper CLI installed in the Python venv at
+/// `venv_path`. Input is the recognised Cyrillic text with the
+/// canonical formatting we tuned during the listening session:
+/// **capitalise first letter + append "."** so the model gets a
+/// proper sentence shape (otherwise short utterances lose their
+/// initial consonant). Output is a 22 050 Hz mono WAV which
+/// `play_blocking` accepts directly.
+///
+/// This is the «integration bridge» implementation. Phase 13b
+/// will replace it with a pure-Rust `tract-onnx` adapter that
+/// runs the same model in-process, eliminating the Python +
+/// onnxruntime C++ dependencies at runtime.
+fn synthesise_via_piper(
+    cyrillic_text: &str,
+    model_path: &std::path::Path,
+    venv_path: &std::path::Path,
+) -> Result<adam_audio::PcmSamples, Box<dyn std::error::Error>> {
+    use std::io::Write;
+    use std::process::{Command, Stdio};
+
+    if !model_path.exists() {
+        return Err(format!(
+            "piper model not found at {} — fetch via the URL in .gitignore",
+            model_path.display()
+        )
+        .into());
+    }
+    let piper_bin = venv_path.join("bin/piper");
+    if !piper_bin.exists() {
+        return Err(format!(
+            "piper CLI not found at {} — set up the venv per tools/synthesize_piper/README.md",
+            piper_bin.display()
+        )
+        .into());
+    }
+
+    // Canonical sentence shape: capitalise first char + trailing period.
+    let trimmed = cyrillic_text.trim();
+    if trimmed.is_empty() {
+        return Err("piper backend: empty input text".into());
+    }
+    let mut chars = trimmed.chars();
+    let head = chars.next().unwrap();
+    let head_upper: String = head.to_uppercase().collect();
+    let cap = format!("{head_upper}{}", chars.as_str());
+    let needs_period = !cap.ends_with(['.', '!', '?']);
+    let prompt = if needs_period { format!("{cap}.") } else { cap };
+
+    let tmp_dir = std::env::temp_dir();
+    let pid = std::process::id();
+    let tmp_out = tmp_dir.join(format!("voice_repl_piper_{pid}.wav"));
+
+    let mut child = Command::new(&piper_bin)
+        .arg("--model")
+        .arg(model_path)
+        .arg("--length-scale")
+        .arg("1.0")
+        .arg("--sentence-silence")
+        .arg("0.2")
+        .arg("--output-file")
+        .arg(&tmp_out)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::null())
+        .stderr(Stdio::piped())
+        .spawn()?;
+
+    if let Some(mut stdin) = child.stdin.take() {
+        stdin.write_all(prompt.as_bytes())?;
+    }
+    let output = child.wait_with_output()?;
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(format!(
+            "piper exited with {:?}: {}",
+            output.status.code(),
+            stderr.trim()
+        )
+        .into());
+    }
+    if !tmp_out.exists() {
+        return Err(format!("piper produced no output at {}", tmp_out.display()).into());
+    }
+    let pcm = adam_audio::wav::read_wav(&tmp_out)?;
+    let _ = std::fs::remove_file(&tmp_out);
+    Ok(pcm)
 }

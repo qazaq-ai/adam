@@ -126,3 +126,5 @@ data/tts_models/.venv/
 data/listening_tests/*
 !data/listening_tests/phase13_neural_piper/
 !data/listening_tests/phase13_neural_piper/**
+!data/listening_tests/phase14_sentences/
+!data/listening_tests/phase14_sentences/**
