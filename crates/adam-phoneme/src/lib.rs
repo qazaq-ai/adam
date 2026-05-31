@@ -46,6 +46,7 @@ pub mod binary;
 pub mod cyrillic;
 pub mod latin;
 mod phoneme;
+pub mod prayer;
 
 pub use phoneme::{
     HarmonyClass, Height, Length, Manner, Phoneme, PhonemeClass, Place, Rounding, Voicing,
