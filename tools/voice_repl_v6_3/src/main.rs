@@ -87,6 +87,18 @@ struct Args {
     /// (built per tools/synthesize_piper/README.md).
     #[arg(long, default_value = "data/tts_models/.venv")]
     piper_venv: PathBuf,
+    /// STT backend. `dtw` = the in-tree DTW phoneme recogniser
+    /// (Phase 13 «human bank v4», FLEURS PER ≈ 76.6 %).
+    /// `whisper` = subprocess to whisper.cpp's `whisper-cli`
+    /// CLI using a multilingual ggml model — dramatically
+    /// better word-level accuracy on natural Kazakh speech.
+    /// Default `whisper` once the model is present; auto-falls
+    /// back to `dtw` if model/binary missing.
+    #[arg(long, default_value = "whisper")]
+    stt_backend: String,
+    /// Whisper ggml model path (used only when --stt-backend=whisper).
+    #[arg(long, default_value = "data/stt_models/ggml-small.bin")]
+    whisper_model: PathBuf,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -135,7 +147,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("[voice-repl] saved {}", path.display());
         }
 
-        // STT: recognise phoneme stream + rescore.
+        // STT: recognise. Whisper backend takes the WAV directly and
+        // returns Cyrillic text; DTW backend produces a phoneme
+        // stream that's rendered via phonemes_to_cyrillic.
+        // `rescored` is also needed below for the concat-TTS fallback
+        // path, so we always run the DTW recogniser for that pathway
+        // and use whisper's Cyrillic when --stt-backend=whisper.
         let raw = recognise_word(
             &pcm.data,
             pcm.sample_rate,
@@ -143,10 +160,29 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             &WordConfig::default(),
         );
         let rescored = rescore(&raw);
-        let cyrillic = phonemes_to_cyrillic(&rescored);
-        println!("[voice-repl] phonemes (raw):       {raw:?}");
-        println!("[voice-repl] phonemes (rescored):  {rescored:?}");
-        println!("[voice-repl] cyrillic:             «{cyrillic}»");
+        let dtw_cyrillic = phonemes_to_cyrillic(&rescored);
+
+        let cyrillic = match args.stt_backend.as_str() {
+            "whisper" => match transcribe_via_whisper(&pcm, &args.whisper_model) {
+                Ok(text) => {
+                    println!("[voice-repl] whisper transcribed: «{text}»");
+                    text
+                }
+                Err(e) => {
+                    eprintln!("[voice-repl] whisper backend failed: {e} — falling back to DTW",);
+                    println!("[voice-repl] dtw phonemes (raw):       {raw:?}");
+                    println!("[voice-repl] dtw phonemes (rescored):  {rescored:?}");
+                    println!("[voice-repl] dtw cyrillic:             «{dtw_cyrillic}»");
+                    dtw_cyrillic.clone()
+                }
+            },
+            _ => {
+                println!("[voice-repl] dtw phonemes (raw):       {raw:?}");
+                println!("[voice-repl] dtw phonemes (rescored):  {rescored:?}");
+                println!("[voice-repl] dtw cyrillic:             «{dtw_cyrillic}»");
+                dtw_cyrillic.clone()
+            }
+        };
 
         // Optional TTS playback.
         if args.speak {
@@ -316,4 +352,93 @@ fn synthesise_via_piper(
     let pcm = adam_audio::wav::read_wav(&tmp_out)?;
     let _ = std::fs::remove_file(&tmp_out);
     Ok(pcm)
+}
+
+/// Phase 15 (2026-05-31) whisper.cpp STT backend.
+///
+/// Shells out to the `whisper-cli` binary (brew install
+/// whisper-cpp) with a ggml-format multilingual model and the
+/// Kazakh language hint. Input is the recorded `PcmSamples`;
+/// we write it as a 16 kHz mono WAV in `/tmp/` (whisper-cli
+/// reads from disk), invoke whisper-cli, strip its progress
+/// banner from the stdout, and return the recognised Cyrillic
+/// text.
+///
+/// Pairs symmetrically with `synthesise_via_piper`: both are
+/// subprocess wrappers around well-maintained C/C++ neural
+/// runtimes that ship as `brew` binaries. Phase 13b will
+/// replace BOTH with pure-Rust `tract-onnx` adapters that run
+/// the same models in-process.
+fn transcribe_via_whisper(
+    pcm: &adam_audio::PcmSamples,
+    model_path: &std::path::Path,
+) -> Result<String, Box<dyn std::error::Error>> {
+    use std::process::Command;
+
+    if !model_path.exists() {
+        return Err(format!(
+            "whisper ggml model not found at {} — fetch with:\n  \
+             curl -L -o {} https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.bin",
+            model_path.display(),
+            model_path.display()
+        )
+        .into());
+    }
+    // whisper-cli expects 16 kHz mono WAV on disk.
+    let tmp_dir = std::env::temp_dir();
+    let pid = std::process::id();
+    let tmp_wav = tmp_dir.join(format!("voice_repl_whisper_in_{pid}.wav"));
+    adam_audio::wav::write_wav(&tmp_wav, pcm)?;
+
+    let output = Command::new("whisper-cli")
+        .arg("-m")
+        .arg(model_path)
+        .arg("-l")
+        .arg("kk")
+        .arg("-f")
+        .arg(&tmp_wav)
+        .arg("-nt") // no timestamps
+        .arg("--print-progress")
+        .arg("false")
+        .stderr(std::process::Stdio::piped())
+        .output()?;
+
+    let _ = std::fs::remove_file(&tmp_wav);
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(format!(
+            "whisper-cli exited with {:?}: {}",
+            output.status.code(),
+            stderr.trim()
+        )
+        .into());
+    }
+
+    // Parse stdout: whisper-cli prints lots of init noise before
+    // the transcription. The transcription itself is on lines
+    // that aren't bracket/log-prefixed. Keep the longest non-log
+    // line as the transcript.
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let mut best: String = String::new();
+    for line in stdout.lines() {
+        let line = line.trim();
+        if line.is_empty()
+            || line.starts_with('[')
+            || line.starts_with("whisper_")
+            || line.starts_with("ggml_")
+            || line.starts_with("load_")
+            || line.starts_with("main")
+            || line.starts_with("system_info")
+        {
+            continue;
+        }
+        if line.len() > best.len() {
+            best = line.to_string();
+        }
+    }
+    if best.is_empty() {
+        return Err(format!("whisper-cli produced no recognisable output:\n{stdout}").into());
+    }
+    Ok(best)
 }
