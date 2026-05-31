@@ -256,9 +256,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         // Phase 16: route through dialog engine when --mode=respond,
         // else echo the user's own text back (Phase 13/15 loopback).
+        // Phase 15e (2026-05-31): before dispatch, fuzzy-normalise
+        // STT noise — substitute K→Қ, Г→Ғ, Н→Ң, И→Й, И→І etc. when
+        // the input token is a near-neighbour of a canonical
+        // intent-trigger word. Built on adam_dialog::kazakh_fuzzy's
+        // phonetic-aware edit distance (PHONETIC_PAIRS table).
+        let normalised = if args.mode == "respond" {
+            fuzzy_normalise(&user_text)
+        } else {
+            user_text.clone()
+        };
+        if normalised != user_text {
+            println!("[voice-repl] fuzzy → «{normalised}»");
+        }
         let cyrillic = match (&mut conversation, dialog_state.as_ref(), args.mode.as_str()) {
             (Some(conv), Some((lex, repo)), "respond") => {
-                let reply = conv.turn(&user_text, lex, repo, args.seed);
+                let reply = conv.turn(&normalised, lex, repo, args.seed);
                 println!("[voice-repl] adam → «{reply}»");
                 reply
             }
@@ -578,4 +591,153 @@ fn transcribe_via_whisper(
         return Err(format!("whisper-cli produced no recognisable output:\n{stdout}").into());
     }
     Ok(best)
+}
+
+/// Phase 15e (2026-05-31) — fuzzy STT-output normaliser.
+///
+/// User directive (live REPL feedback 2026-05-31):
+/// > «Используя математические графы, найти и извлечь из памяти
+/// >  ближайшие похожие слова на этот «Калымыз қалай!», а не
+/// >  отвечать, что не понял.»
+///
+/// Multilingual Whisper substitutes the Kazakh-specific letters
+/// (Қ→К, Ғ→Г, Ң→Н, Ө→О, Ұ→У, Ү→У, Һ→Х, І→И, Ә→Е) on ambiguous
+/// audio. The Phase 15d initial-prompt fix anchors most of these,
+/// but live REPL still showed «Калыңыз» / «Танысаиық» (1-letter
+/// drift). This normaliser closes that long-tail by mapping each
+/// noisy token to its nearest canonical intent-trigger word
+/// under `kazakh_edit_distance` (Kazakh-aware Levenshtein with
+/// phonetic-pair substitution cost = 0.4 for K↔Қ etc.).
+///
+/// Conservative thresholding: only substitute when the
+/// similarity score ≥ 0.75 AND there IS a non-identity change
+/// (i.e. the input is genuinely different from the canonical).
+/// Otherwise pass through. Punctuation around tokens is
+/// preserved by stripping/re-attaching at the boundary.
+///
+/// The vocabulary is the union of:
+///   - identity-question triggers («кімсің», «боласың», «екенсің»,
+///     «өзіңіз», «менің», «атым», …)
+///   - common interrogatives («қалай», «неше», «қай»)
+///   - time/date keywords («бүгін», «қазір», «сағат», «күн»)
+///   - greeting/introduction («сәлеметсіз», «сәлем», «танысайық»)
+///   - polite-2nd-person variants («қалыңыз», «жайыңыз», «сіз»)
+///
+/// We deliberately keep this list SHORT to avoid over-correction
+/// on out-of-domain inputs (we'd rather pass through unknown
+/// words than pull them toward a wrong canonical).
+fn fuzzy_normalise(text: &str) -> String {
+    use adam_dialog::kazakh_fuzzy::best_match;
+    use std::sync::OnceLock;
+
+    static VOCAB_OWNED: OnceLock<Vec<String>> = OnceLock::new();
+    let vocab: &[String] = VOCAB_OWNED.get_or_init(|| {
+        intent_vocab_static()
+            .iter()
+            .map(|s| s.to_string())
+            .collect()
+    });
+
+    const fn intent_vocab_static() -> &'static [&'static str] {
+        &[
+            // Greeting
+            "сәлем",
+            "сәлеметсіз",
+            "ассалаумағалейкум",
+            // How-are-you
+            "қалай",
+            "қалайсыз",
+            "қалыңыз",
+            "жайыңыз",
+            "жағдайыңыз",
+            // Identity
+            "сен",
+            "сіз",
+            "өзің",
+            "өзіңіз",
+            "кімсің",
+            "кімсіз",
+            "кімсін",
+            "боласың",
+            "боласыз",
+            "боласын",
+            "екенсің",
+            "екенсіз",
+            "адам",
+            // Name
+            "менің",
+            "атым",
+            "есімім",
+            "кім",
+            // Time/Date
+            "бүгін",
+            "қазір",
+            "сағат",
+            "неше",
+            "күн",
+            "қай",
+            "ертең",
+            "кеше",
+            // Place
+            "қазақстан",
+            "алматы",
+            "астана",
+            "нұр-сұлтан",
+            // Discourse
+            "танысайық",
+            "танысалық",
+            "алдымен",
+            "туралы",
+            "айтшы",
+            "айтыңыз",
+            "айтасыз",
+            "ба",
+            "ма",
+            // Common short particles
+            "иә",
+            "жоқ",
+            "рахмет",
+            "кешіріңіз",
+        ]
+    }
+
+    text.split_whitespace()
+        .map(|word| {
+            // Strip leading/trailing punctuation, keep core token.
+            let leading: String = word.chars().take_while(|c| !c.is_alphabetic()).collect();
+            let trailing: String = word
+                .chars()
+                .rev()
+                .take_while(|c| !c.is_alphabetic())
+                .collect::<String>()
+                .chars()
+                .rev()
+                .collect();
+            let core: String = word
+                .chars()
+                .skip_while(|c| !c.is_alphabetic())
+                .collect::<String>()
+                .trim_end_matches(|c: char| !c.is_alphabetic())
+                .to_string();
+            if core.is_empty() {
+                return word.to_string();
+            }
+            let lower = core.to_lowercase();
+            // Already canonical → skip (saves a scan).
+            if vocab.iter().any(|c| c == &lower) {
+                return word.to_string();
+            }
+            // best_match returns (canonical, score) when score ≥
+            // threshold. We use 0.75 — empirically clears K↔Қ /
+            // и↔й 1-letter substitutions without over-correcting
+            // on genuinely out-of-vocab words.
+            if let Some((canonical, _score)) = best_match(&lower, vocab, 0.75) {
+                if canonical != lower {
+                    return format!("{leading}{canonical}{trailing}");
+                }
+            }
+            word.to_string()
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
 }
