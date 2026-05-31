@@ -118,15 +118,19 @@ struct Args {
     /// Initial prompt fed to whisper-cli to bias decoding toward
     /// Kazakh-specific phonotactics. Multilingual Whisper otherwise
     /// substitutes Қ→К, Ғ→Г, Ң→Н, Ө→О, Ұ→У, Ү→У, Һ→Х, І→И, Ә→Е.
-    /// Providing canonical Kazakh phrases in the prompt re-anchors
-    /// the distribution toward those letters (validated 2026-05-31:
-    /// «Қалыңыз», «отанымыз», «қазақша сөйл» all recover when the
-    /// prompt is set; without it they get butchered).
+    ///
+    /// **Phase 15g.A.1 (2026-05-31)** — was a full-sentence prompt;
+    /// caused prompt leakage where unclear / noisy audio would have
+    /// Whisper hallucinate phrases straight from the prompt
+    /// («Ассаламу алейкум» → «Сәлеметсіз бе. Қазір сағат неше?»).
+    /// Now a letter-anchor list — one short word per Kazakh-specific
+    /// letter. Same biasing effect, no full phrases for Whisper to
+    /// regurgitate.
     #[arg(
         long,
-        default_value = "Сәлеметсіз бе. Қалыңыз қалай? Менің атым Даулет. \
-            Сен кімсің? Қазір сағат неше? Бүгін қай күн? Танысайық. \
-            Алдымен танысайық. Бүгін жексенбі. Қазақша сөйлесейік."
+        default_value = "Қ: қазақ. Ғ: ғылым. Ң: оның. \
+            Ө: өзен. Ұ: ұлы. Ү: үй. \
+            Һ: һәм. І: іс. Ә: әке."
     )]
     whisper_prompt: String,
     /// Dialog mode. `echo` (default for now) = TTS re-speaks the
@@ -831,11 +835,35 @@ const fn intent_vocab_static() -> &'static [&'static str] {
         "қайсы",
         "ертең",
         "кеше",
-        // Place
+        // Place + geography (Phase 15g.A.1 — hot-path so fuzzy
+        // doesn't pull «тауылар» (горы with stray ы) toward the
+        // curated lexicon entry «тауарлар» (товары) when «таулар»
+        // is the intended canonical. Geographic plurals also keep
+        // questions like «Қазақстанда қандай {таулар/көлдер/...}
+        // бар» routing through the right world-core domain.)
         "қазақстан",
         "алматы",
         "астана",
         "нұр-сұлтан",
+        "тау",
+        "таулар",
+        "өзен",
+        "өзендер",
+        "көл",
+        "көлдер",
+        "теңіз",
+        "теңіздер",
+        "қала",
+        "қалалар",
+        "жер",
+        "жерлер",
+        "ауыл",
+        "облыс",
+        "облыстар",
+        "ел",
+        "елдер",
+        "халық",
+        "халықтар",
         // Discourse
         "танысайық",
         "танысалық",
