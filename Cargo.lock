@@ -414,6 +414,7 @@ dependencies = [
  "adam-audio",
  "adam-dialog",
  "adam-kernel-fst",
+ "adam-lexicon-curated",
  "adam-phoneme",
  "adam-reasoning",
  "adam-retrieval",

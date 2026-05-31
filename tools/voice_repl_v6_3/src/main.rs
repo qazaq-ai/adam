@@ -257,6 +257,40 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         (None, None)
     };
 
+    // **Phase 15g.A (2026-05-31)** — Fuzzy vocabulary assembly.
+    // The dialog-time fuzzy_normalise() needs a canonical
+    // wordlist to map OOV STT outputs against. Build it once at
+    // startup:
+    //   * INTENT_VOCAB (~100 hot-path triggers) — high-frequency
+    //     intent/identity/time/math words; checked as an
+    //     exact-match short-circuit.
+    //   * full_lexicon() (~3000 frequency-extracted canonical
+    //     surface forms from `adam-lexicon-curated`) — the
+    //     N-best rescoring layer that catches Whisper drift on
+    //     content words like «көлдер» / «жер» / «таулар».
+    // Dedup at build time so best_match doesn't waste cycles on
+    // duplicates.
+    let fuzzy_vocab: Vec<String> = {
+        let mut seen = std::collections::HashSet::<String>::new();
+        let mut out: Vec<String> = Vec::with_capacity(3200);
+        for w in intent_vocab_static() {
+            if seen.insert(w.to_string()) {
+                out.push(w.to_string());
+            }
+        }
+        for entry in adam_lexicon_curated::full_lexicon() {
+            let cyr = entry.cyrillic.to_lowercase();
+            if !cyr.is_empty() && seen.insert(cyr.clone()) {
+                out.push(cyr);
+            }
+        }
+        out
+    };
+    println!(
+        "[voice-repl] fuzzy vocab: {} canonical forms (hot-path + curated lexicon)",
+        fuzzy_vocab.len()
+    );
+
     let single = !args.loop_mode;
     loop {
         if args.loop_mode {
@@ -340,7 +374,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // intent-trigger word. Built on adam_dialog::kazakh_fuzzy's
         // phonetic-aware edit distance (PHONETIC_PAIRS table).
         let normalised = if args.mode == "respond" {
-            fuzzy_normalise(&user_text)
+            fuzzy_normalise(&user_text, &fuzzy_vocab)
         } else {
             user_text.clone()
         };
@@ -727,190 +761,177 @@ fn transcribe_via_whisper(
 
 /// Phase 15e (2026-05-31) — fuzzy STT-output normaliser.
 ///
-/// User directive (live REPL feedback 2026-05-31):
-/// > «Используя математические графы, найти и извлечь из памяти
-/// >  ближайшие похожие слова на этот «Калымыз қалай!», а не
-/// >  отвечать, что не понял.»
+/// User directive: «Используя математические графы, найти и
+/// извлечь из памяти ближайшие похожие слова, а не отвечать, что
+/// не понял.» Multilingual Whisper drifts on Kazakh-specific
+/// letters (Қ→К, Ғ→Г, Ң→Н, Ө→О, Ұ→У, Ү→У, Һ→Х, І→И, Ә→Е) and
+/// drops trailing short vowels. The Phase 15d initial-prompt
+/// re-anchors most of these but residual drift remains, so this
+/// normaliser maps each OOV token to its nearest canonical word
+/// under `kazakh_edit_distance` (Kazakh-aware Levenshtein, K↔Қ
+/// pair-cost 0.4).
 ///
-/// Multilingual Whisper substitutes the Kazakh-specific letters
-/// (Қ→К, Ғ→Г, Ң→Н, Ө→О, Ұ→У, Ү→У, Һ→Х, І→И, Ә→Е) on ambiguous
-/// audio. The Phase 15d initial-prompt fix anchors most of these,
-/// but live REPL still showed «Калыңыз» / «Танысаиық» (1-letter
-/// drift). This normaliser closes that long-tail by mapping each
-/// noisy token to its nearest canonical intent-trigger word
-/// under `kazakh_edit_distance` (Kazakh-aware Levenshtein with
-/// phonetic-pair substitution cost = 0.4 for K↔Қ etc.).
+/// Vocabulary structure (Phase 15g.A 2026-05-31):
+///   1. Hot-path INTENT_VOCAB (~100 frequent triggers — identity,
+///      time, math, greeting, gender) checked first as an
+///      exact-match short-circuit.
+///   2. Curated lexicon (~3000 frequency-extracted canonical
+///      surface forms from `adam-lexicon-curated::full_lexicon()`)
+///      checked next via `best_match` with threshold 0.70 — this
+///      is the N-best rescoring layer that recovers «көргері» →
+///      «көлдер» without needing Whisper to surface alternatives.
 ///
-/// Conservative thresholding: only substitute when the
-/// similarity score ≥ 0.75 AND there IS a non-identity change
-/// (i.e. the input is genuinely different from the canonical).
-/// Otherwise pass through. Punctuation around tokens is
-/// preserved by stripping/re-attaching at the boundary.
+/// Conservative threshold (0.70): substitute only when similarity
+/// crosses the gate AND the canonical differs from the input.
+/// Otherwise pass through.
 ///
-/// The vocabulary is the union of:
-///   - identity-question triggers («кімсің», «боласың», «екенсің»,
-///     «өзіңіз», «менің», «атым», …)
-///   - common interrogatives («қалай», «неше», «қай»)
-///   - time/date keywords («бүгін», «қазір», «сағат», «күн»)
-///   - greeting/introduction («сәлеметсіз», «сәлем», «танысайық»)
-///   - polite-2nd-person variants («қалыңыз», «жайыңыз», «сіз»)
-///
-/// We deliberately keep this list SHORT to avoid over-correction
-/// on out-of-domain inputs (we'd rather pass through unknown
-/// words than pull them toward a wrong canonical).
-fn fuzzy_normalise(text: &str) -> String {
+/// Hot-path "intent vocab" — short list of high-frequency canonical
+/// words. Exact-match against this list short-circuits the broader
+/// curated-lexicon fuzzy pass.
+const fn intent_vocab_static() -> &'static [&'static str] {
+    &[
+        // Greeting
+        "сәлем",
+        "сәлеметсіз",
+        "ассалаумағалейкум",
+        // How-are-you
+        "қалай",
+        "қалайсыз",
+        "қалыңыз",
+        "жайыңыз",
+        "жағдайыңыз",
+        // Identity
+        "сен",
+        "сіз",
+        "өзің",
+        "өзіңіз",
+        "кімсің",
+        "кімсіз",
+        "кімсін",
+        "боласың",
+        "боласыз",
+        "боласын",
+        "екенсің",
+        "екенсіз",
+        "адам",
+        // Name
+        "менің",
+        "атым",
+        "есімім",
+        "кім",
+        // Time/Date — note: «бүгінгі» helps the fuzzy match
+        // reach «бүгін» from 4-letter STT drift «бұғың».
+        "бүгін",
+        "бүгінгі",
+        "қазір",
+        "сағат",
+        "неше",
+        "күн",
+        "қай",
+        "қайсы",
+        "ертең",
+        "кеше",
+        // Place
+        "қазақстан",
+        "алматы",
+        "астана",
+        "нұр-сұлтан",
+        // Discourse
+        "танысайық",
+        "танысалық",
+        "алдымен",
+        "туралы",
+        "айтшы",
+        "айтыңыз",
+        "айтасыз",
+        "ба",
+        "ма",
+        // Common short particles
+        "иә",
+        "жоқ",
+        "рахмет",
+        "кешіріңіз",
+        // **Phase 15f.4 (2026-05-31)** — gender / person words.
+        // Live REPL turn «Мен еркек.» got fuzzy-mangled to
+        // «Мен ертең.» because «еркек» was missing from vocab
+        // and the 0.70 best_match gate pulled it to the
+        // closest canonical form. Adding both gender words
+        // and the negative copula keeps fuzzy honest on
+        // identity-correction utterances like:
+        //   «Мен апа емеспін.»  / «Мен еркек.»  / «Мен әйел.»
+        "еркек",
+        "әйел",
+        "емес",
+        "емеспін",
+        "емессіз",
+        "емессің",
+        "жоқпын",
+        "жасым",
+        "жасыңыз",
+        "жасы",
+        // **Phase 15e.next (2026-05-31)** — math operators
+        // + numerals. Live REPL turns 11–14 surfaced
+        // «кубей» (Whisper) for «көбейт» (multiply), «азаид»
+        // for «азайт» (subtract), «жерма» for «жиырма» (20),
+        // «бісті» for «бесті» (acc. of 5), «түртке» for
+        // «төртке» (dat. of 4). Adding the canonical roots
+        // + frequent case-marked forms lets fuzzy_normalise
+        // repair them before the dialog engine's math
+        // handler runs.
+        "қосу",
+        "қос",
+        "плюс",
+        "көбейту",
+        "көбейт",
+        "көбейтіңіз",
+        "азайту",
+        "азайт",
+        "азайтыңыз",
+        "минус",
+        "бөлу",
+        "бөл",
+        "бөліңіз",
+        "тең",
+        "нәтиже",
+        "есепте",
+        "қанша",
+        "болады",
+        // Numerals — base forms
+        "бір",
+        "екі",
+        "үш",
+        "төрт",
+        "бес",
+        "алты",
+        "жеті",
+        "сегіз",
+        "тоғыз",
+        "он",
+        "жиырма",
+        "отыз",
+        "қырық",
+        "елу",
+        "алпыс",
+        "жетпіс",
+        "сексен",
+        "тоқсан",
+        "жүз",
+        "мың",
+        // Frequent case forms used in math («екіні бөл»,
+        // «бесті көбейт», «отызға тең»):
+        "екіге",
+        "үшке",
+        "төртке",
+        "беске",
+        "екіні",
+        "үшті",
+        "төртті",
+        "бесті",
+    ]
+}
+
+fn fuzzy_normalise(text: &str, vocab: &[String]) -> String {
     use adam_dialog::kazakh_fuzzy::best_match;
-    use std::sync::OnceLock;
-
-    static VOCAB_OWNED: OnceLock<Vec<String>> = OnceLock::new();
-    let vocab: &[String] = VOCAB_OWNED.get_or_init(|| {
-        intent_vocab_static()
-            .iter()
-            .map(|s| s.to_string())
-            .collect()
-    });
-
-    const fn intent_vocab_static() -> &'static [&'static str] {
-        &[
-            // Greeting
-            "сәлем",
-            "сәлеметсіз",
-            "ассалаумағалейкум",
-            // How-are-you
-            "қалай",
-            "қалайсыз",
-            "қалыңыз",
-            "жайыңыз",
-            "жағдайыңыз",
-            // Identity
-            "сен",
-            "сіз",
-            "өзің",
-            "өзіңіз",
-            "кімсің",
-            "кімсіз",
-            "кімсін",
-            "боласың",
-            "боласыз",
-            "боласын",
-            "екенсің",
-            "екенсіз",
-            "адам",
-            // Name
-            "менің",
-            "атым",
-            "есімім",
-            "кім",
-            // Time/Date — note: «бүгінгі» helps the fuzzy match
-            // reach «бүгін» from 4-letter STT drift «бұғың».
-            "бүгін",
-            "бүгінгі",
-            "қазір",
-            "сағат",
-            "неше",
-            "күн",
-            "қай",
-            "қайсы",
-            "ертең",
-            "кеше",
-            // Place
-            "қазақстан",
-            "алматы",
-            "астана",
-            "нұр-сұлтан",
-            // Discourse
-            "танысайық",
-            "танысалық",
-            "алдымен",
-            "туралы",
-            "айтшы",
-            "айтыңыз",
-            "айтасыз",
-            "ба",
-            "ма",
-            // Common short particles
-            "иә",
-            "жоқ",
-            "рахмет",
-            "кешіріңіз",
-            // **Phase 15f.4 (2026-05-31)** — gender / person words.
-            // Live REPL turn «Мен еркек.» got fuzzy-mangled to
-            // «Мен ертең.» because «еркек» was missing from vocab
-            // and the 0.70 best_match gate pulled it to the
-            // closest canonical form. Adding both gender words
-            // and the negative copula keeps fuzzy honest on
-            // identity-correction utterances like:
-            //   «Мен апа емеспін.»  / «Мен еркек.»  / «Мен әйел.»
-            "еркек",
-            "әйел",
-            "емес",
-            "емеспін",
-            "емессіз",
-            "емессің",
-            "жоқпын",
-            "жасым",
-            "жасыңыз",
-            "жасы",
-            // **Phase 15e.next (2026-05-31)** — math operators
-            // + numerals. Live REPL turns 11–14 surfaced
-            // «кубей» (Whisper) for «көбейт» (multiply), «азаид»
-            // for «азайт» (subtract), «жерма» for «жиырма» (20),
-            // «бісті» for «бесті» (acc. of 5), «түртке» for
-            // «төртке» (dat. of 4). Adding the canonical roots
-            // + frequent case-marked forms lets fuzzy_normalise
-            // repair them before the dialog engine's math
-            // handler runs.
-            "қосу",
-            "қос",
-            "плюс",
-            "көбейту",
-            "көбейт",
-            "көбейтіңіз",
-            "азайту",
-            "азайт",
-            "азайтыңыз",
-            "минус",
-            "бөлу",
-            "бөл",
-            "бөліңіз",
-            "тең",
-            "нәтиже",
-            "есепте",
-            "қанша",
-            "болады",
-            // Numerals — base forms
-            "бір",
-            "екі",
-            "үш",
-            "төрт",
-            "бес",
-            "алты",
-            "жеті",
-            "сегіз",
-            "тоғыз",
-            "он",
-            "жиырма",
-            "отыз",
-            "қырық",
-            "елу",
-            "алпыс",
-            "жетпіс",
-            "сексен",
-            "тоқсан",
-            "жүз",
-            "мың",
-            // Frequent case forms used in math («екіні бөл»,
-            // «бесті көбейт», «отызға тең»):
-            "екіге",
-            "үшке",
-            "төртке",
-            "беске",
-            "екіні",
-            "үшті",
-            "төртті",
-            "бесті",
-        ]
-    }
 
     // **Phase 15f.3 (2026-05-31)** — Whisper's «і»/«ы»/«ө»-drop on
     // short numerals («екі»→«ек», «үш»→«уш», «төрт»→«торт»,
