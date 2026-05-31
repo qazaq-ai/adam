@@ -14,6 +14,10 @@ adam-audio = { path = "../../crates/adam-audio" }
 adam-phoneme = { path = "../../crates/adam-phoneme" }
 adam-stt-phoneme = { path = "../../crates/adam-stt-phoneme" }
 adam-tts-phoneme = { path = "../../crates/adam-tts-phoneme" }
+# Phase 16: dialog engine — turns recognised text into a response
+# instead of echoing it back through TTS.
+adam-dialog = { path = "../../crates/adam-dialog" }
+adam-kernel-fst = { path = "../../crates/adam-kernel-fst" }
 # cpal for probing the output device's preferred sample rate
 # (we resample Piper output before playback — see synthesise_via_piper).
 cpal = "0.15"

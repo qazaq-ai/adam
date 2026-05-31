@@ -412,6 +412,8 @@ name = "adam-voice-repl-v6-3"
 version = "6.2.0"
 dependencies = [
  "adam-audio",
+ "adam-dialog",
+ "adam-kernel-fst",
  "adam-phoneme",
  "adam-stt-phoneme",
  "adam-tts-phoneme",

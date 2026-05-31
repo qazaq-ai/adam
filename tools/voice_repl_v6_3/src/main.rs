@@ -35,6 +35,9 @@
 use adam_audio::play::play_blocking;
 use adam_audio::record::{RecordConfig, record_fixed_duration, record_until_silence};
 use adam_audio::wav::write_wav;
+use adam_dialog::Conversation;
+use adam_dialog::templates::TemplateRepository;
+use adam_kernel_fst::lexicon::LexiconV1;
 use adam_phoneme::cyrillic::phonemes_to_cyrillic;
 use adam_stt_phoneme::{PhonemeBank, WordConfig, recognise_word, rescore};
 use adam_tts_phoneme::{PcmBank, TtsConfig, synthesise_with_bank};
@@ -99,6 +102,15 @@ struct Args {
     /// Whisper ggml model path (used only when --stt-backend=whisper).
     #[arg(long, default_value = "data/stt_models/ggml-small.bin")]
     whisper_model: PathBuf,
+    /// Dialog mode. `echo` (default for now) = TTS re-speaks the
+    /// STT output (Phase 13/15 loopback validation). `respond` =
+    /// route the recognised text through `adam_dialog::Conversation`
+    /// so the system answers instead of echoing.
+    #[arg(long, default_value = "respond")]
+    mode: String,
+    /// Per-session RNG seed for dialog response selection.
+    #[arg(long, default_value_t = 42)]
+    seed: u64,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -115,6 +127,44 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .map(|b| format!("covers {} phonemes", b.len()))
             .unwrap_or_else(|| "absent (synth-only TTS)".into()),
     );
+
+    // Phase 16: load dialog engine if --mode=respond. Cheap when off
+    // (one Option pair); pricey when on (LexiconV1 + TemplateRepository
+    // load ≈ 1 second on a cold filesystem), so we do it once at
+    // startup and reuse across turns.
+    let (dialog_state, mut conversation): (
+        Option<(LexiconV1, TemplateRepository)>,
+        Option<Conversation>,
+    ) = if args.mode == "respond" {
+        match (
+            LexiconV1::load_default(),
+            TemplateRepository::load_default(),
+        ) {
+            (Ok(lex), Ok(repo)) => {
+                println!(
+                    "[voice-repl] dialog engine: lexicon + {} template families loaded",
+                    repo.len()
+                );
+                let conv = Conversation::new();
+                (Some((lex, repo)), Some(conv))
+            }
+            (lex_res, repo_res) => {
+                if let Err(e) = lex_res {
+                    eprintln!(
+                        "[voice-repl] dialog: lexicon load failed ({e}) — degrading to echo mode"
+                    );
+                }
+                if let Err(e) = repo_res {
+                    eprintln!(
+                        "[voice-repl] dialog: template repo load failed ({e}) — degrading to echo mode"
+                    );
+                }
+                (None, None)
+            }
+        }
+    } else {
+        (None, None)
+    };
 
     let single = !args.loop_mode;
     loop {
@@ -162,26 +212,37 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let rescored = rescore(&raw);
         let dtw_cyrillic = phonemes_to_cyrillic(&rescored);
 
-        let cyrillic = match args.stt_backend.as_str() {
+        let user_text = match args.stt_backend.as_str() {
             "whisper" => match transcribe_via_whisper(&pcm, &args.whisper_model) {
                 Ok(text) => {
-                    println!("[voice-repl] whisper transcribed: «{text}»");
+                    println!("[voice-repl] you said: «{text}»");
                     text
                 }
                 Err(e) => {
                     eprintln!("[voice-repl] whisper backend failed: {e} — falling back to DTW",);
                     println!("[voice-repl] dtw phonemes (raw):       {raw:?}");
                     println!("[voice-repl] dtw phonemes (rescored):  {rescored:?}");
-                    println!("[voice-repl] dtw cyrillic:             «{dtw_cyrillic}»");
+                    println!("[voice-repl] you said (dtw):           «{dtw_cyrillic}»");
                     dtw_cyrillic.clone()
                 }
             },
             _ => {
                 println!("[voice-repl] dtw phonemes (raw):       {raw:?}");
                 println!("[voice-repl] dtw phonemes (rescored):  {rescored:?}");
-                println!("[voice-repl] dtw cyrillic:             «{dtw_cyrillic}»");
+                println!("[voice-repl] you said (dtw):           «{dtw_cyrillic}»");
                 dtw_cyrillic.clone()
             }
+        };
+
+        // Phase 16: route through dialog engine when --mode=respond,
+        // else echo the user's own text back (Phase 13/15 loopback).
+        let cyrillic = match (&mut conversation, dialog_state.as_ref(), args.mode.as_str()) {
+            (Some(conv), Some((lex, repo)), "respond") => {
+                let reply = conv.turn(&user_text, lex, repo, args.seed);
+                println!("[voice-repl] adam → «{reply}»");
+                reply
+            }
+            _ => user_text,
         };
 
         // Optional TTS playback.
