@@ -669,13 +669,16 @@ fn fuzzy_normalise(text: &str) -> String {
             "атым",
             "есімім",
             "кім",
-            // Time/Date
+            // Time/Date — note: «бүгінгі» helps the fuzzy match
+            // reach «бүгін» from 4-letter STT drift «бұғың».
             "бүгін",
+            "бүгінгі",
             "қазір",
             "сағат",
             "неше",
             "күн",
             "қай",
+            "қайсы",
             "ертең",
             "кеше",
             // Place
@@ -698,6 +701,64 @@ fn fuzzy_normalise(text: &str) -> String {
             "жоқ",
             "рахмет",
             "кешіріңіз",
+            // **Phase 15e.next (2026-05-31)** — math operators
+            // + numerals. Live REPL turns 11–14 surfaced
+            // «кубей» (Whisper) for «көбейт» (multiply), «азаид»
+            // for «азайт» (subtract), «жерма» for «жиырма» (20),
+            // «бісті» for «бесті» (acc. of 5), «түртке» for
+            // «төртке» (dat. of 4). Adding the canonical roots
+            // + frequent case-marked forms lets fuzzy_normalise
+            // repair them before the dialog engine's math
+            // handler runs.
+            "қосу",
+            "қос",
+            "плюс",
+            "көбейту",
+            "көбейт",
+            "көбейтіңіз",
+            "азайту",
+            "азайт",
+            "азайтыңыз",
+            "минус",
+            "бөлу",
+            "бөл",
+            "бөліңіз",
+            "тең",
+            "нәтиже",
+            "есепте",
+            "қанша",
+            "болады",
+            // Numerals — base forms
+            "бір",
+            "екі",
+            "үш",
+            "төрт",
+            "бес",
+            "алты",
+            "жеті",
+            "сегіз",
+            "тоғыз",
+            "он",
+            "жиырма",
+            "отыз",
+            "қырық",
+            "елу",
+            "алпыс",
+            "жетпіс",
+            "сексен",
+            "тоқсан",
+            "жүз",
+            "мың",
+            // Frequent case forms used in math («екіні бөл»,
+            // «бесті көбейт», «отызға тең»):
+            "екіге",
+            "үшке",
+            "төртке",
+            "беске",
+            "екіні",
+            "үшті",
+            "төртті",
+            "бесті",
         ]
     }
 
@@ -728,10 +789,14 @@ fn fuzzy_normalise(text: &str) -> String {
                 return word.to_string();
             }
             // best_match returns (canonical, score) when score ≥
-            // threshold. We use 0.75 — empirically clears K↔Қ /
-            // и↔й 1-letter substitutions without over-correcting
-            // on genuinely out-of-vocab words.
-            if let Some((canonical, _score)) = best_match(&lower, vocab, 0.75) {
+            // threshold. 0.70 catches up-to-3 phonetically-close
+            // substitutions (e.g. «бұғың»→«бүгін»: ұ↔ү + ы↔і +
+            // ң↔н with phonetic cost 0.4 each ≈ similarity 0.76);
+            // a lower threshold risks pulling out-of-domain words
+            // to wrong canonicals. Tuned 2026-05-31 from 0.75
+            // after live REPL surfaced the 4-substitution case
+            // «Бұғың→Бүгін» falling just short of the 0.75 gate.
+            if let Some((canonical, _score)) = best_match(&lower, vocab, 0.70) {
                 if canonical != lower {
                     return format!("{leading}{canonical}{trailing}");
                 }
