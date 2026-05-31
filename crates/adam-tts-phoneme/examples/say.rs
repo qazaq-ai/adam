@@ -12,7 +12,7 @@
 
 use adam_audio::play::play_blocking;
 use adam_audio::wav::write_wav;
-use adam_phoneme::cyrillic::cyrillic_to_phonemes;
+use adam_phoneme::cyrillic::cyrillic_to_phonemes_prayer_aware;
 use adam_tts_phoneme::{TtsConfig, synthesise};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -20,7 +20,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .nth(1)
         .unwrap_or_else(|| "сәлем".to_string());
     println!("[say] input: «{word}»");
-    let phonemes = cyrillic_to_phonemes(&word, true);
+    let phonemes = cyrillic_to_phonemes_prayer_aware(&word, true);
     println!("[say] phonemes: {phonemes:?}");
 
     let pcm = synthesise(&phonemes, &TtsConfig::default());

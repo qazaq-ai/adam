@@ -21,7 +21,7 @@
 //! audit needed.
 
 use adam_phoneme::Phoneme;
-use adam_phoneme::cyrillic::cyrillic_to_phonemes;
+use adam_phoneme::cyrillic::cyrillic_to_phonemes_prayer_aware;
 use std::io::{self, BufRead, Write};
 
 fn main() -> io::Result<()> {
@@ -46,7 +46,14 @@ fn main() -> io::Result<()> {
             continue;
         }
         let (label, cyrillic, pos, category) = (parts[0], parts[1], parts[2], parts[3]);
-        let phonemes = cyrillic_to_phonemes(cyrillic, /* is_native_root */ true);
+        // Phase 11: prayer-aware so future religious-lexicon
+        // entries (e.g. «бісмілләһ» if added to the curated
+        // file) get phonemes that match how the rest of the
+        // pipeline now treats them. Pure native KZ words —
+        // the entire current 312-entry lexicon — fall through
+        // the no-prayer-spans early-return path and produce
+        // bit-identical output.
+        let phonemes = cyrillic_to_phonemes_prayer_aware(cyrillic, /* is_native_root */ true);
         if phonemes.is_empty() {
             eprintln!(
                 "[lexicon_gen] skipping {label} «{cyrillic}» — produces zero phonemes under the native-root rule"

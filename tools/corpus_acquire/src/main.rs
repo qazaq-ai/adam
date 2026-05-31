@@ -1086,7 +1086,7 @@ fn run_synth(args: SynthArgs) -> Result<(), Box<dyn std::error::Error>> {
 
 fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>> {
     use adam_phoneme::Phoneme;
-    use adam_phoneme::cyrillic::cyrillic_to_phonemes;
+    use adam_phoneme::cyrillic::cyrillic_to_phonemes_prayer_aware;
 
     if !args.manifest.exists() {
         return Err(format!("manifest not found: {}", args.manifest.display()).into());
@@ -1114,8 +1114,9 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
         if words.len() == 1 {
             // Single-word path: load the WAV (so we have PCM for
             // Phase 7b PCM-bank extraction) and compute MFCC
-            // inline.
-            let phonemes = cyrillic_to_phonemes(&entry.transcript, true);
+            // inline. Phase 11 prayer-aware variant — secular
+            // transcripts hit the no-spans early return.
+            let phonemes = cyrillic_to_phonemes_prayer_aware(&entry.transcript, true);
             if phonemes.is_empty() {
                 skipped += 1;
                 continue;
@@ -1182,7 +1183,7 @@ fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>>
                 continue;
             }
             for (w_idx, (word_txt, (start, end))) in words.iter().zip(segs.iter()).enumerate() {
-                let phonemes = cyrillic_to_phonemes(word_txt, true);
+                let phonemes = cyrillic_to_phonemes_prayer_aware(word_txt, true);
                 if phonemes.is_empty() {
                     continue;
                 }

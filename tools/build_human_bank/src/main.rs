@@ -33,7 +33,7 @@
 
 use adam_audio::mfcc::{MfccSequence, read_binary};
 use adam_forced_aligner::{AlignError, align};
-use adam_phoneme::cyrillic::cyrillic_to_phonemes;
+use adam_phoneme::cyrillic::cyrillic_to_phonemes_prayer_aware;
 use adam_stt_phoneme::{PhonemeBank, PhonemeTemplate};
 use clap::Parser;
 use serde::Deserialize;
@@ -441,22 +441,22 @@ struct Stats {
 
 /// Convert a transcript into a flat phoneme sequence.
 ///
-/// Tokens are split on whitespace and punctuation. For each
-/// token, `is_native_root=true` is set (the v6.3 strict-«і»
-/// rule applies to native lexical material; for loanwords we'd
-/// pass `false`, but the corpus is curated to native KZ so this
-/// is the right default for the manifest sources we ingest).
+/// Uses `cyrillic_to_phonemes_prayer_aware` (Phase 11) so that
+/// any Arabic prayer citation inside the transcript (e.g.
+/// «бісмілләһ», «лә иләһе илла Аллаһ») is preserved verbatim
+/// instead of having its «і»/«ы» stripped by the strict
+/// native-root rule. Non-prayer text — i.e. every FLEURS, KSC,
+/// Wikimedia row — is bit-identical to the previous behaviour
+/// because the prayer-aware function early-returns through
+/// the original implementation when no spans are detected.
+///
+/// Passing the whole transcript (instead of pre-splitting on
+/// whitespace/punctuation) is required: prayer detection
+/// matches multi-word phrases like
+/// «бісмілләһир-рахманир-рахим», which a token-level scan
+/// would shred at the hyphens before any lexicon hit can fire.
 fn phonemes_from_transcript(text: &str) -> Vec<adam_phoneme::Phoneme> {
-    let mut out = Vec::new();
-    for token in text.split(|c: char| !c.is_alphabetic()) {
-        if token.is_empty() {
-            continue;
-        }
-        let lower = token.to_lowercase();
-        let phones = cyrillic_to_phonemes(&lower, true);
-        out.extend(phones);
-    }
-    out
+    cyrillic_to_phonemes_prayer_aware(text, /* is_native_root */ true)
 }
 
 /// One forced-aligned phoneme segment with the audio MFCC slice

@@ -25,7 +25,7 @@ use std::path::PathBuf;
 
 use adam_audio::mfcc::{MfccConfig, mfcc};
 use adam_phoneme::Phoneme;
-use adam_phoneme::cyrillic::cyrillic_to_phonemes;
+use adam_phoneme::cyrillic::cyrillic_to_phonemes_prayer_aware;
 use adam_stt_phoneme::{
     LexiconDecoderConfig, PhonemeBank, StreamConfig, WordConfig, recognise_lexicon_constrained,
     recognise_stream, recognise_word,
@@ -153,7 +153,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             continue;
         }
 
-        let reference = cyrillic_to_phonemes(&entry.transcript, true);
+        // Phase 11: prayer-aware so literary references (Abai
+        // Qara Soz incl. Arabic citations) are not penalised
+        // for correctly preserving «і»/«ы» inside prayer
+        // spans. FLEURS/KSC are secular speech → no spans →
+        // identical to the prior `cyrillic_to_phonemes` path.
+        let reference = cyrillic_to_phonemes_prayer_aware(&entry.transcript, true);
         if reference.is_empty() {
             continue;
         }

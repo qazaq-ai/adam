@@ -119,7 +119,7 @@ pub fn full_lexicon() -> Vec<LexEntry> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use adam_phoneme::cyrillic::cyrillic_to_phonemes;
+    use adam_phoneme::cyrillic::cyrillic_to_phonemes_prayer_aware;
     use std::collections::HashSet;
 
     #[test]
@@ -162,7 +162,13 @@ mod tests {
     fn declared_phonemes_match_cyrillic_parse() {
         let mut bad: Vec<String> = Vec::new();
         for e in full_lexicon() {
-            let parsed = cyrillic_to_phonemes(e.cyrillic, /* is_native_root */ true);
+            // Phase 11: prayer-aware so any future religious
+            // lexicon entry (e.g. «бісмілләһ») produces matching
+            // phonemes. Existing 312 native-KZ entries fall
+            // through the early-return path and validate
+            // bit-identically.
+            let parsed =
+                cyrillic_to_phonemes_prayer_aware(e.cyrillic, /* is_native_root */ true);
             if parsed != e.phonemes {
                 bad.push(format!(
                     "  {} declared {:?} but cyrillic_to_phonemes(«{}») = {:?}",

@@ -38,7 +38,7 @@ use adam_audio::cmvn::normalise_in_place;
 use adam_audio::mfcc::{MfccConfig, mfcc};
 use adam_audio::wav::read_wav;
 use adam_forced_aligner::align;
-use adam_phoneme::cyrillic::cyrillic_to_phonemes;
+use adam_phoneme::cyrillic::cyrillic_to_phonemes_prayer_aware;
 use adam_stt_phoneme::PhonemeBank;
 use adam_tts_phoneme::{PcmBank, PcmTemplate};
 use clap::Parser;
@@ -413,13 +413,10 @@ fn mean_frame_distance(frames: &[Vec<f32>], centroid: &[f32]) -> f32 {
 }
 
 fn phonemes_from_transcript(text: &str) -> Vec<adam_phoneme::Phoneme> {
-    let mut out = Vec::new();
-    for token in text.split(|c: char| !c.is_alphabetic()) {
-        if token.is_empty() {
-            continue;
-        }
-        let lower = token.to_lowercase();
-        out.extend(cyrillic_to_phonemes(&lower, true));
-    }
-    out
+    // Phase 11: prayer-aware so Arabic citations inside
+    // literary transcripts (Abai, Шакарим, religious texts)
+    // keep their «і»/«ы». Secular transcripts (FLEURS, KSC,
+    // kaz-tili drills) trip the early-return path and stay
+    // bit-identical to the prior implementation.
+    cyrillic_to_phonemes_prayer_aware(text, /* is_native_root */ true)
 }
