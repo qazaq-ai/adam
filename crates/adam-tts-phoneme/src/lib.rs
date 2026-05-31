@@ -52,9 +52,11 @@
 use adam_audio::PcmSamples;
 use adam_phoneme::{Phoneme, PhonemeClass};
 
+pub mod morpheme_bank;
 pub mod pcm_bank;
 mod signatures;
 
+pub use morpheme_bank::{MorphemeBank, MorphemeBankError, MorphemeTemplate};
 pub use pcm_bank::{PcmBank, PcmBankError, PcmTemplate};
 
 /// Configuration for [`synthesise`].
@@ -130,6 +132,102 @@ pub fn synthesise_with_bank(
         } else {
             crossfade_into(&mut buffer, &segment, crossfade_samples);
         }
+    }
+
+    PcmSamples {
+        sample_rate: config.sample_rate,
+        channels: 1,
+        data: buffer,
+    }
+}
+
+/// Phase 12 step 3 (2026-05-31): morpheme-aware concatenative TTS.
+///
+/// Architecture user directive (2026-05-31):
+///
+/// > «Сначала фундамент алфавита, потом морфемы, потом слова.»
+///
+/// This function implements the **morpheme layer** of TTS. For
+/// every word in `text`:
+///
+/// 1. Try a greedy longest-prefix match against `morpheme_bank`.
+///    Each hit emits the bank's recorded PCM verbatim (real
+///    human voice from the kaz-tili drills).
+/// 2. Any character span the morpheme bank does NOT cover falls
+///    back to phoneme-level synthesis via
+///    `synthesise_with_bank(remainder_phonemes, pcm_bank, config)`.
+///
+/// Phoneme conversion of remainders uses
+/// `cyrillic_to_phonemes_prayer_aware` so prayer citations
+/// inside literary text still avoid the strict «і»/«ы» drop.
+///
+/// Word boundaries get a brief silent gap so the output sounds
+/// like discrete words rather than one slurred phrase.
+pub fn synthesise_morpheme_aware(
+    text: &str,
+    morpheme_bank: &MorphemeBank,
+    pcm_bank: Option<&PcmBank>,
+    config: &TtsConfig,
+) -> PcmSamples {
+    let crossfade_samples = (config.crossfade_ms as usize * config.sample_rate as usize) / 1000;
+    let word_gap = vec![0.0_f32; (config.sample_rate as usize) / 20]; // 50 ms
+    let mut buffer: Vec<f32> = Vec::new();
+
+    for word in text.split(|c: char| !c.is_alphabetic()) {
+        if word.is_empty() {
+            continue;
+        }
+        let lower = word.to_lowercase();
+        let (matched, remainder) = morpheme_bank.match_greedy(&lower);
+
+        for template in matched {
+            // Resample if sample rates differ; otherwise pass
+            // the recorded PCM through unchanged.
+            let segment: Vec<f32> = if template.sample_rate == config.sample_rate {
+                let peak = template
+                    .samples
+                    .iter()
+                    .cloned()
+                    .fold(0.0_f32, |a, b| a.max(b.abs()));
+                let gain = if peak > 0.0 {
+                    config.amplitude / peak
+                } else {
+                    0.0
+                };
+                template.samples.iter().map(|s| s * gain).collect()
+            } else {
+                // Sample-rate mismatch — nearest-neighbour
+                // resample. Higher quality SRC is a Phase 7c
+                // concern; bank construction targets the
+                // config rate by default so this branch is
+                // rare.
+                let target = template.samples.len() * config.sample_rate as usize
+                    / template.sample_rate as usize;
+                stretch_or_truncate(&template.samples, target, config.amplitude)
+            };
+            if buffer.is_empty() || crossfade_samples == 0 {
+                buffer.extend(&segment);
+            } else {
+                crossfade_into(&mut buffer, &segment, crossfade_samples);
+            }
+        }
+
+        // Remainder (if any) falls back to phoneme synthesis.
+        if !remainder.is_empty() {
+            let phonemes =
+                adam_phoneme::cyrillic::cyrillic_to_phonemes_prayer_aware(remainder, true);
+            if !phonemes.is_empty() {
+                let tail = synthesise_with_bank(&phonemes, pcm_bank, config);
+                if buffer.is_empty() || crossfade_samples == 0 {
+                    buffer.extend(&tail.data);
+                } else {
+                    crossfade_into(&mut buffer, &tail.data, crossfade_samples);
+                }
+            }
+        }
+
+        // Word boundary silence.
+        buffer.extend(&word_gap);
     }
 
     PcmSamples {

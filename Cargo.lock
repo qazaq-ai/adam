@@ -79,6 +79,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "adam-build-morpheme-bank"
+version = "6.2.0"
+dependencies = [
+ "adam-audio",
+ "adam-forced-aligner",
+ "adam-phoneme",
+ "adam-stt-phoneme",
+ "adam-tts-phoneme",
+ "clap",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "adam-build-pcm-bank"
 version = "6.2.0"
 dependencies = [

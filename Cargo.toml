@@ -36,6 +36,7 @@ members = [
   "tools/build_human_bank",
   "tools/ingest_kaz_tili",
   "tools/build_pcm_bank",
+  "tools/build_morpheme_bank",
 ]
 resolver = "2"
 

@@ -1,0 +1,23 @@
+[package]
+name = "adam-build-morpheme-bank"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Phase 12 step 2 (2026-05-31): build a per-morpheme PCM template bank from forced-aligned kaz-tili.kz drill audio. Each kaz-tili clip is a deliberate articulation of a morpheme pair («ша/ше», «тайын/дейін», …); we forced-align the full phoneme sequence against the audio, then group the resulting frame segments by source token. Output drives morpheme-aware concatenative TTS — the layer above the alphabet PCM bank in the v6.3 architecture."
+
+[[bin]]
+name = "build_morpheme_bank"
+path = "src/main.rs"
+
+[dependencies]
+adam-audio = { path = "../../crates/adam-audio" }
+adam-phoneme = { path = "../../crates/adam-phoneme" }
+adam-stt-phoneme = { path = "../../crates/adam-stt-phoneme" }
+adam-tts-phoneme = { path = "../../crates/adam-tts-phoneme" }
+adam-forced-aligner = { path = "../../crates/adam-forced-aligner" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+clap = { version = "4.5", features = ["derive"] }
+
+[lints]
+workspace = true
