@@ -39,11 +39,20 @@ use adam_dialog::Conversation;
 use adam_dialog::templates::TemplateRepository;
 use adam_kernel_fst::lexicon::LexiconV1;
 use adam_phoneme::cyrillic::phonemes_to_cyrillic;
+use adam_retrieval::MorphemeIndex;
 use adam_stt_phoneme::{PhonemeBank, WordConfig, recognise_word, rescore};
 use adam_tts_phoneme::{PcmBank, TtsConfig, synthesise_with_bank};
 use clap::Parser;
 use std::path::PathBuf;
 use std::time::Duration;
+
+// Phase 15f (2026-05-31) — KB / retrieval / reasoning artefact
+// paths. Same constants as `adam_chat.rs` so the two REPLs read
+// the same artefacts and behave identically on factual queries.
+const RETRIEVAL_INDEX_PATH: &str = "data/retrieval/morpheme_index.json";
+const FACTS_PATH: &str = "data/retrieval/facts.json";
+const DERIVED_FACTS_PATH: &str = "data/retrieval/derived_facts.json";
+const WORLD_CORE_DIR: &str = "data/world_core";
 
 #[derive(Debug, Parser)]
 #[command(
@@ -150,6 +159,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // (one Option pair); pricey when on (LexiconV1 + TemplateRepository
     // load ≈ 1 second on a cold filesystem), so we do it once at
     // startup and reuse across turns.
+    //
+    // Phase 15f (2026-05-31): also load the KB / retrieval / reasoning
+    // / world-core artefacts in the same startup phase so factual
+    // queries («Қазақстан туралы», «Абай кім», «Алматы туралы»)
+    // route through `adam-retrieval`'s morpheme-index O(1) lookup
+    // and `adam-reasoning`'s curated fact graph instead of falling
+    // through to «Бәлкім, X туралы айтасыз ба».
+    //
+    // Each loader fails silently — missing files just disable that
+    // capability, the REPL still runs.
     let (dialog_state, mut conversation): (
         Option<(LexiconV1, TemplateRepository)>,
         Option<Conversation>,
@@ -163,7 +182,61 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     "[voice-repl] dialog engine: lexicon + {} template families loaded",
                     repo.len()
                 );
-                let conv = Conversation::new();
+                let mut conv = Conversation::new();
+
+                // 1. MorphemeIndex from data/retrieval/morpheme_index.json
+                if let Some(idx) = load_retrieval_index() {
+                    println!(
+                        "[voice-repl] retrieval: {} morphemes / {} postings indexed",
+                        idx.unique_morphemes, idx.total_postings
+                    );
+                    conv = conv.with_morpheme_index(idx);
+                } else {
+                    eprintln!(
+                        "[voice-repl] retrieval: {} not found — factual queries deflect",
+                        RETRIEVAL_INDEX_PATH
+                    );
+                }
+
+                // 2. Reasoning chains (facts + derived_facts JSON).
+                let (extracted, derived) = load_reasoning_chains();
+                if !extracted.is_empty() || !derived.is_empty() {
+                    println!(
+                        "[voice-repl] reasoning: {} facts + {} derived loaded",
+                        extracted.len(),
+                        derived.len()
+                    );
+                    conv = conv.with_reasoning_chains(extracted, derived);
+                }
+
+                // 3. DomainIndex from data/world_core/*.jsonl — enables
+                //    current-domain inference (which jsonl pack a query
+                //    most likely belongs to).
+                let domain_idx = match adam_reasoning::world_core::load_world_core_dir(
+                    std::path::Path::new(WORLD_CORE_DIR),
+                ) {
+                    Ok(report) => {
+                        // `load_world_core_dir` returns `Vec<(WorldCoreEntry, PathBuf)>`
+                        // — DomainIndex::build wants `&[WorldCoreEntry]`, so we
+                        // strip the provenance paths here.
+                        let entries: Vec<_> = report.entries.into_iter().map(|(e, _)| e).collect();
+                        let idx = adam_dialog::DomainIndex::build(&entries);
+                        println!(
+                            "[voice-repl] world_core: {} domains / {} entries indexed",
+                            idx.len(),
+                            entries.len()
+                        );
+                        idx
+                    }
+                    Err(e) => {
+                        eprintln!(
+                            "[voice-repl] world_core: load failed ({e}); domain inference disabled"
+                        );
+                        adam_dialog::DomainIndex::empty()
+                    }
+                };
+                conv = conv.with_domain_index(domain_idx);
+
                 (Some((lex, repo)), Some(conv))
             }
             (lex_res, repo_res) => {
@@ -855,4 +928,44 @@ fn fuzzy_normalise(text: &str) -> String {
         })
         .collect::<Vec<_>>()
         .join(" ")
+}
+
+/// Phase 15f loader — same logic as `adam_chat.rs`'s
+/// `load_retrieval_index` (kept in sync so both REPLs read the
+/// same JSON artefact). The index ships at
+/// `data/retrieval/morpheme_index.json`.
+fn load_retrieval_index() -> Option<MorphemeIndex> {
+    let file = std::fs::File::open(RETRIEVAL_INDEX_PATH).ok()?;
+    let reader = std::io::BufReader::new(file);
+    let mut idx: MorphemeIndex = serde_json::from_reader(reader).ok()?;
+    idx.refresh_stats();
+    Some(idx)
+}
+
+/// Phase 15f loader — extracted + derived facts. Missing files
+/// return empty vectors so the REPL stays usable on a trimmed
+/// checkout.
+fn load_reasoning_chains() -> (
+    Vec<adam_reasoning::Fact>,
+    Vec<adam_reasoning::reasoner::DerivedFact>,
+) {
+    #[derive(serde::Deserialize)]
+    struct FactsFile {
+        facts: Vec<adam_reasoning::Fact>,
+    }
+    #[derive(serde::Deserialize)]
+    struct DerivedFile {
+        derived: Vec<adam_reasoning::reasoner::DerivedFact>,
+    }
+    let extracted = std::fs::File::open(FACTS_PATH)
+        .ok()
+        .and_then(|f| serde_json::from_reader::<_, FactsFile>(std::io::BufReader::new(f)).ok())
+        .map(|f| f.facts)
+        .unwrap_or_default();
+    let derived = std::fs::File::open(DERIVED_FACTS_PATH)
+        .ok()
+        .and_then(|f| serde_json::from_reader::<_, DerivedFile>(std::io::BufReader::new(f)).ok())
+        .map(|f| f.derived)
+        .unwrap_or_default();
+    (extracted, derived)
 }

@@ -415,11 +415,15 @@ dependencies = [
  "adam-dialog",
  "adam-kernel-fst",
  "adam-phoneme",
+ "adam-reasoning",
+ "adam-retrieval",
  "adam-stt-phoneme",
  "adam-tts-phoneme",
  "adam-voice",
  "clap",
  "cpal",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

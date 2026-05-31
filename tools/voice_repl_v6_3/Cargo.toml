@@ -22,6 +22,14 @@ adam-kernel-fst = { path = "../../crates/adam-kernel-fst" }
 # so the dialog engine can address an unnamed speaker with the
 # right Kazakh honorific («Ағай» / «Апай» / «Балам»).
 adam-voice = { path = "../../crates/adam-voice" }
+# Phase 15f: KB retrieval — load morpheme_index.json + world_core
+# facts so factual queries like «Қазақстан туралы», «Абай кім»,
+# «Алматы туралы» answer with curated knowledge instead of
+# deflecting to «Бәлкім, X туралы айтасыз ба».
+adam-retrieval = { path = "../../crates/adam-retrieval" }
+adam-reasoning = { path = "../../crates/adam-reasoning" }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
 # cpal for probing the output device's preferred sample rate
 # (we resample Piper output before playback — see synthesise_via_piper).
 cpal = "0.15"
