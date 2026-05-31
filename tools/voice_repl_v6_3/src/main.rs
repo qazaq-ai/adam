@@ -267,22 +267,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
 
-        // **Phase 15f.4 (2026-05-31)** — default duration 3 → 6 s.
-        // Live REPL surfaced «Мен еркек.» cut off mid-syllable
-        // (Whisper returned the word but the user had more to say).
-        // 6 s covers a typical two-clause Kazakh sentence
-        // («Калыңыз қалай? Бүгін жексенбі ма?») without timing out.
-        // Users who want shorter recordings still pass --duration N
-        // explicitly; --vad remains the open-ended option.
+        // **Phase 15f.5 (2026-05-31)** — VAD is now the default.
+        // Earlier phases used a fixed N-second cap (3 → 6 → 4),
+        // which guillotined long sentences mid-syllable. The right
+        // shape — the one we had pre-v6.3 — is: record while the
+        // speaker is speaking, stop on a 1.5 s silence trail.
+        // `--duration N` still forces a fixed cap; `--vad` is a
+        // no-op now that VAD is on by default but kept for muscle
+        // memory.
         let pcm = if let Some(d) = args.duration {
-            println!("[voice-repl] recording {d} s...");
+            println!("[voice-repl] recording {d} s (fixed)...");
             record_fixed_duration(Duration::from_secs(d))?
-        } else if args.vad {
+        } else {
             println!("[voice-repl] recording (auto-stop on 1.5 s of silence, 30 s max)...");
             record_until_silence(RecordConfig::default())?
-        } else {
-            println!("[voice-repl] recording 6 s (default)...");
-            record_fixed_duration(Duration::from_secs(6))?
         };
         println!(
             "[voice-repl] captured {:.2} s at {} Hz",
