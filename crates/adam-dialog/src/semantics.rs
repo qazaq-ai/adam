@@ -1962,6 +1962,23 @@ fn detect_ask_about_system(
         || joined.contains("өзіңіз кімсіз")
         || joined.contains("өзің кімсін")
         || joined.contains("сен кімсін")
+        // **v6.3 Phase 15d follow-up (2026-05-31)** — when the
+        // speaker uses the analytic «бол-» auxiliary instead of
+        // the synthetic copula («кім боласың» = «who are you»
+        // lit. «who will you be / who do you turn out to be»),
+        // the same identity intent applies. Live REPL log:
+        //   you said: «Сен өзің кім боласын.» (STT got it
+        //   perfectly — that's grammatical Kazakh) but the
+        //   intent fell through to the generic «бәлкім…
+        //   туралы айтасыз ба» clarification.
+        // Final «-ң» often comes back from Whisper as «-н», so
+        // accept both spellings — same pattern as «кімсің /
+        // кімсін» above.
+        || joined.contains("кім боласың")
+        || joined.contains("кім боласын")
+        || joined.contains("кім боласыз")
+        || joined.contains("кім екенсің")
+        || joined.contains("кім екенсіз")
         || joined.contains("өзіңіз туралы")
         || joined.contains("өзің туралы")
         || joined.contains("не екен");
@@ -2548,11 +2565,40 @@ fn detect_ask_about_system(
         || joined.contains("сіздің кімсің")
         || joined.contains("сең кімсің")
         || joined.contains("сең кімсіз")
-        || joined.contains("сең кімсін");
+        || joined.contains("сең кімсін")
+        // **v6.3 Phase 15d follow-up (2026-05-31)** — analytic
+        // «бол-» / «екен-» phrasings of the identity question.
+        // Live REPL log:
+        //   you said: «Сен өзің кім боласын.»
+        //   adam → «Бәлкім, өзің туралы айтасыз ба.»  (fall-through)
+        // STT was perfect — «Сен өзің кім боласың» is grammatical
+        // Kazakh for «Who are you?» using the «бол-» auxiliary
+        // instead of the synthetic copula. Final «-ң» often
+        // collapses to «-н» on voice STT (see -ң→-н comments
+        // above), so accept both spellings.
+        || joined.contains("өзің кім боласың")
+        || joined.contains("өзіңіз кім боласыз")
+        || joined.contains("өзің кім боласын")
+        || joined.contains("сен кім боласың")
+        || joined.contains("сен кім боласын")
+        || joined.contains("сіз кім боласыз")
+        || joined.contains("сіз кім боласын")
+        || joined.contains("өзің кім екенсің")
+        || joined.contains("өзіңіз кім екенсіз")
+        || joined.contains("сен кім екенсің")
+        || joined.contains("сіз кім екенсіз");
     if pronoun
         && (joined.contains("кімсің")
             || joined.contains("кімсіз")
             || joined.contains("кімсін")  // v6.0 — Whisper -ң→-н variant
+            // v6.3 Phase 15d — «бол-» / «екен-» analytic identity
+            // forms (see reflexive_pronoun_identity comment).
+            || joined.contains("кім боласың")
+            || joined.contains("кім боласыз")
+            || joined.contains("кім боласын")  // -ң→-н variant
+            || joined.contains("кім екенсің")
+            || joined.contains("кім екенсіз")
+            || joined.contains("кім екенсін")  // -ң→-н variant
             || joined.contains("қандай моделсің")
             || joined.contains("қандай моделсіз")
             || joined.contains("қандай ботсың")
