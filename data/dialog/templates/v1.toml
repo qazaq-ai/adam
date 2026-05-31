@@ -40,12 +40,19 @@ templates = [
 # fell to `greeting.polite` and replied «Сәлеметсіз бе, Ағай.» —
 # culturally wrong: the Islamic greeting expects «Уағалайкум-ас-
 # салам», not a secular Kazakh polite form.
+# v6.3 phase 15f.2 (2026-05-31): honorific-bearing variants moved to
+# the head of the list so that when `name_respect` is present
+# (voice REPL with pitch-gender hint set, or text REPL with a
+# captured name), the seed=42 default of `idx = 42 % 3 = 0` picks
+# a vocative reply ("Уағалайкум-ас-салам, Ағай") instead of the
+# bare greeting. The bare form is kept last as a fallback for
+# sessions with no `name_respect` slot.
 [[families]]
 key = "greeting.muslim"
 templates = [
-    "уағалайкум-ас-салам",
     "уағалайкум-ас-салам, {name_respect}",
     "уағалайкум-ас-салам, {name_respect}, қалыңыз қалай",
+    "уағалайкум-ас-салам",
 ]
 
 [[families]]

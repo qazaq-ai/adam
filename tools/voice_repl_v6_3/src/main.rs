@@ -401,8 +401,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             _ => user_text,
         };
 
-        // Optional TTS playback.
-        if args.speak {
+        // TTS playback. Phase 15f.1 (2026-05-31): in --mode=respond the
+        // REPL is a voice dialog, not a STT tester — a silent reply
+        // makes no sense. Force speak ON whenever we're responding.
+        // `--speak` still works for --mode=echo (loopback debugging).
+        let should_speak = args.speak || args.mode == "respond";
+        if should_speak {
             let tts_out = match args.tts_backend.as_str() {
                 "piper" => {
                     match synthesise_via_piper(&cyrillic, &args.piper_model, &args.piper_venv) {
@@ -885,6 +889,27 @@ fn fuzzy_normalise(text: &str) -> String {
         ]
     }
 
+    // **Phase 15f.3 (2026-05-31)** — Whisper's «і»/«ы»/«ө»-drop on
+    // short numerals («екі»→«ек», «үш»→«уш», «төрт»→«торт»,
+    // «бес»→«бис», «алты»→«алт», «жеті»→«жет»). These fall just
+    // under the 0.70 best_match gate (one-char delete on a 3-char
+    // word ≈ 0.67 similarity), so they get repaired by explicit
+    // alias BEFORE the general fuzzy pass. Math-only — restoring
+    // these is unambiguous: «ек» is never a real Kazakh word.
+    // Live REPL turn 11 surfaced this when «Екі қосу екі» came
+    // back as «Ек қосу ек» and the dialog engine routed to a
+    // definition_lookup of «қосу» instead of arithmetic_eval.
+    static SHORT_NUMERAL_ALIAS: &[(&str, &str)] = &[
+        ("ек", "екі"),
+        ("уш", "үш"),
+        ("торт", "төрт"),
+        ("бис", "бес"),
+        ("алт", "алты"),
+        ("жет", "жеті"),
+        ("сегиз", "сегіз"),
+        ("тогиз", "тоғыз"),
+    ];
+
     text.split_whitespace()
         .map(|word| {
             // Strip leading/trailing punctuation, keep core token.
@@ -907,6 +932,14 @@ fn fuzzy_normalise(text: &str) -> String {
                 return word.to_string();
             }
             let lower = core.to_lowercase();
+            // Phase 15f.3: explicit short-numeral alias pass before
+            // any other normalisation. Cheap O(n) over an 8-entry
+            // table; runs once per word.
+            for (drift, canonical) in SHORT_NUMERAL_ALIAS {
+                if &lower == drift {
+                    return format!("{leading}{canonical}{trailing}");
+                }
+            }
             // Already canonical → skip (saves a scan).
             if vocab.iter().any(|c| c == &lower) {
                 return word.to_string();
