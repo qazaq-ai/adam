@@ -269,6 +269,56 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         if normalised != user_text {
             println!("[voice-repl] fuzzy → «{normalised}»");
         }
+
+        // Phase 17 (2026-05-31): voice-derived gender hint. Same
+        // pattern as `adam-dialog/src/bin/adam_chat.rs:1045+`:
+        // run YIN F0 over the recorded segment, classify into
+        // male/female/child, write it (and a stability lock) into
+        // the Conversation session so any greeting / vocative
+        // template that interpolates the addressee uses the
+        // correct Kazakh honorific («Ағай» / «Апай» / «Балам»).
+        //
+        // The lock prevents per-turn flapping when a speaker's F0
+        // straddles the male/female boundary (~165 Hz). After two
+        // consecutive estimates pick the same label, the session
+        // becomes immutable for the rest of the run.
+        if let Some(conv) = conversation.as_mut() {
+            let i16_samples: Vec<i16> = pcm
+                .data
+                .iter()
+                .map(|s| (s.clamp(-1.0, 1.0) * 32767.0) as i16)
+                .collect();
+            if let Some(g) = adam_voice::pitch::estimate_pitch_hz(&i16_samples, pcm.sample_rate)
+                .and_then(adam_voice::pitch::classify_gender)
+            {
+                let label = match g {
+                    adam_voice::pitch::PitchGender::Male => "male",
+                    adam_voice::pitch::PitchGender::Female => "female",
+                    adam_voice::pitch::PitchGender::Child => "child",
+                };
+                let locked = conv.session.get("voice_gender_locked").is_some();
+                if !locked {
+                    let counter_key = format!("voice_gender_count_{label}");
+                    let prior_count: u32 = conv
+                        .session
+                        .get(&counter_key)
+                        .and_then(|s| s.parse().ok())
+                        .unwrap_or(0);
+                    let new_count = prior_count + 1;
+                    conv.session.insert(counter_key, new_count.to_string());
+                    conv.session
+                        .insert("voice_gender_hint".into(), label.to_string());
+                    if new_count >= 2 {
+                        conv.session
+                            .insert("voice_gender_locked".into(), label.to_string());
+                        println!("[voice-repl] pitch-gender locked = {label}");
+                    } else {
+                        println!("[voice-repl] pitch-gender hint = {label} ({new_count}/2)");
+                    }
+                }
+            }
+        }
+
         let cyrillic = match (&mut conversation, dialog_state.as_ref(), args.mode.as_str()) {
             (Some(conv), Some((lex, repo)), "respond") => {
                 let reply = conv.turn(&normalised, lex, repo, args.seed);

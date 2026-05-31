@@ -18,6 +18,10 @@ adam-tts-phoneme = { path = "../../crates/adam-tts-phoneme" }
 # instead of echoing it back through TTS.
 adam-dialog = { path = "../../crates/adam-dialog" }
 adam-kernel-fst = { path = "../../crates/adam-kernel-fst" }
+# Phase 17: voice-derived gender hint (F0 → male/female/child)
+# so the dialog engine can address an unnamed speaker with the
+# right Kazakh honorific («Ағай» / «Апай» / «Балам»).
+adam-voice = { path = "../../crates/adam-voice" }
 # cpal for probing the output device's preferred sample rate
 # (we resample Piper output before playback — see synthesise_via_piper).
 cpal = "0.15"
