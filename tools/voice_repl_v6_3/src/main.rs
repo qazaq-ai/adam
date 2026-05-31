@@ -106,6 +106,20 @@ struct Args {
     /// which trips the dialog engine's intent classifier.
     #[arg(long, default_value = "data/stt_models/ggml-medium.bin")]
     whisper_model: PathBuf,
+    /// Initial prompt fed to whisper-cli to bias decoding toward
+    /// Kazakh-specific phonotactics. Multilingual Whisper otherwise
+    /// substitutes Қ→К, Ғ→Г, Ң→Н, Ө→О, Ұ→У, Ү→У, Һ→Х, І→И, Ә→Е.
+    /// Providing canonical Kazakh phrases in the prompt re-anchors
+    /// the distribution toward those letters (validated 2026-05-31:
+    /// «Қалыңыз», «отанымыз», «қазақша сөйл» all recover when the
+    /// prompt is set; without it they get butchered).
+    #[arg(
+        long,
+        default_value = "Сәлеметсіз бе. Қалыңыз қалай? Менің атым Даулет. \
+            Сен кімсің? Қазір сағат неше? Бүгін қай күн? Танысайық. \
+            Алдымен танысайық. Бүгін жексенбі. Қазақша сөйлесейік."
+    )]
+    whisper_prompt: String,
     /// Dialog mode. `echo` (default for now) = TTS re-speaks the
     /// STT output (Phase 13/15 loopback validation). `respond` =
     /// route the recognised text through `adam_dialog::Conversation`
@@ -217,19 +231,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let dtw_cyrillic = phonemes_to_cyrillic(&rescored);
 
         let user_text = match args.stt_backend.as_str() {
-            "whisper" => match transcribe_via_whisper(&pcm, &args.whisper_model) {
-                Ok(text) => {
-                    println!("[voice-repl] you said: «{text}»");
-                    text
+            "whisper" => {
+                match transcribe_via_whisper(&pcm, &args.whisper_model, &args.whisper_prompt) {
+                    Ok(text) => {
+                        println!("[voice-repl] you said: «{text}»");
+                        text
+                    }
+                    Err(e) => {
+                        eprintln!("[voice-repl] whisper backend failed: {e} — falling back to DTW",);
+                        println!("[voice-repl] dtw phonemes (raw):       {raw:?}");
+                        println!("[voice-repl] dtw phonemes (rescored):  {rescored:?}");
+                        println!("[voice-repl] you said (dtw):           «{dtw_cyrillic}»");
+                        dtw_cyrillic.clone()
+                    }
                 }
-                Err(e) => {
-                    eprintln!("[voice-repl] whisper backend failed: {e} — falling back to DTW",);
-                    println!("[voice-repl] dtw phonemes (raw):       {raw:?}");
-                    println!("[voice-repl] dtw phonemes (rescored):  {rescored:?}");
-                    println!("[voice-repl] you said (dtw):           «{dtw_cyrillic}»");
-                    dtw_cyrillic.clone()
-                }
-            },
+            }
             _ => {
                 println!("[voice-repl] dtw phonemes (raw):       {raw:?}");
                 println!("[voice-repl] dtw phonemes (rescored):  {rescored:?}");
@@ -490,6 +506,7 @@ fn preferred_output_sample_rate() -> u32 {
 fn transcribe_via_whisper(
     pcm: &adam_audio::PcmSamples,
     model_path: &std::path::Path,
+    prompt: &str,
 ) -> Result<String, Box<dyn std::error::Error>> {
     use std::process::Command;
 
@@ -508,8 +525,8 @@ fn transcribe_via_whisper(
     let tmp_wav = tmp_dir.join(format!("voice_repl_whisper_in_{pid}.wav"));
     adam_audio::wav::write_wav(&tmp_wav, pcm)?;
 
-    let output = Command::new("whisper-cli")
-        .arg("-m")
+    let mut cmd = Command::new("whisper-cli");
+    cmd.arg("-m")
         .arg(model_path)
         .arg("-l")
         .arg("kk")
@@ -517,9 +534,11 @@ fn transcribe_via_whisper(
         .arg(&tmp_wav)
         .arg("-nt") // no timestamps
         .arg("--print-progress")
-        .arg("false")
-        .stderr(std::process::Stdio::piped())
-        .output()?;
+        .arg("false");
+    if !prompt.is_empty() {
+        cmd.arg("--prompt").arg(prompt);
+    }
+    let output = cmd.stderr(std::process::Stdio::piped()).output()?;
 
     let _ = std::fs::remove_file(&tmp_wav);
 
