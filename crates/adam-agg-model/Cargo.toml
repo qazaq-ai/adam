@@ -10,7 +10,7 @@ adam-kernel = { path = "../adam-kernel" }
 adam-kernel-fst = { path = "../adam-kernel-fst" }
 adam-agg-tokenizer = { path = "../adam-agg-tokenizer" }
 adam-agg-synth = { path = "../adam-agg-synth" }
-burn = { version = "0.17", default-features = false, features = ["std", "train", "autodiff", "ndarray"] }
+burn = { version = "0.17", default-features = false, features = ["std", "train", "autodiff", "ndarray", "wgpu"] }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
@@ -30,6 +30,14 @@ path = "src/bin/verifier_demo.rs"
 [[bin]]
 name = "train_contextual_lm"
 path = "src/bin/train_contextual_lm.rs"
+
+# Phase 15g.F (2026-06-01) — GPU variant of train_contextual_lm.
+# Uses burn-wgpu backend, which selects Metal automatically on
+# Apple Silicon. Same training pipeline; faster matmul throughput
+# at larger batch sizes.
+[[bin]]
+name = "train_contextual_lm_gpu"
+path = "src/bin/train_contextual_lm_gpu.rs"
 
 [dev-dependencies]
 criterion = { version = "0.5", default-features = false, features = ["cargo_bench_support"] }
