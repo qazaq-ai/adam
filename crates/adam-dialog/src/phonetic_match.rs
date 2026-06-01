@@ -76,6 +76,17 @@ fn canonicalize_char(c: char) -> char {
         'Ғ' | 'ғ' | 'Г' => 'г',
         'Ң' | 'ң' | 'Н' => 'н',
         'Һ' | 'һ' | 'Х' => 'х',
+        // **Phase 18.1 (2026-06-01)** — Ы / И / І all collapse
+        // into one class. Whisper-multilingual flips these freely
+        // («қазір»→«казыр», «неше»→«ниши», «бір»→«бы́р»). At
+        // root level the three are not minimal-pair distinguishers
+        // in modern Kazakh (І is positional in front-vowel words,
+        // Ы in back-vowel words, И is loaned mostly from Russian;
+        // most Kazakh roots have exactly one of them by harmony).
+        // Live REPL surfaced «Казыр сағат ниші» missing ask_time
+        // intent three times in a row — this merge closes the
+        // family.
+        'Ы' | 'ы' | 'И' | 'и' | 'І' | 'і' => 'и',
         // Other Cyrillic uppercase → lowercase identity.
         c if c.is_alphabetic() => c.to_lowercase().next().unwrap_or(c),
         c => c,
@@ -144,14 +155,22 @@ mod tests {
     }
 
     #[test]
-    fn canonicalize_preserves_kazakh_vowels() {
-        // Vowels Ө/Ұ/Ү/І/Ә stay distinct from О/У/И/Е because
-        // they distinguish meaning at the root level.
+    fn canonicalize_preserves_back_vowels_and_special_pairs() {
+        // Vowels Ө/Ұ/Ү/Ә stay distinct from О/У/Е because they
+        // distinguish meaning at the root level
+        // («көл» / «кол», «ұл» / «ул», «үй» / «уй», «әке» / «еке»).
         assert_ne!(canonicalize("көл"), canonicalize("кол"));
         assert_ne!(canonicalize("ұл"), canonicalize("ул"));
         assert_ne!(canonicalize("үй"), canonicalize("уй"));
-        assert_ne!(canonicalize("іс"), canonicalize("ис"));
         assert_ne!(canonicalize("әке"), canonicalize("еке"));
+        // **Phase 18.1**: Ы↔И↔І are merged intentionally — see
+        // `canonicalize_char` doc. Trade-off documented: closes
+        // the «қазір/казыр/казір» Whisper drift family at the
+        // cost of folding rare minimal pairs like «іс» (work)
+        // and «ис» (smell).
+        assert_eq!(canonicalize("іс"), canonicalize("ис"));
+        assert_eq!(canonicalize("қазыр"), canonicalize("қазір"));
+        assert_eq!(canonicalize("неше"), canonicalize("неше"));
     }
 
     #[test]

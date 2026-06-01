@@ -4661,8 +4661,22 @@ fn detect_insult(tokens: &[String], joined: &str) -> bool {
         "ессіз",
         "ессізсің",
     ];
-    tokens_have_any(tokens, triggers)
-        || phonetic_contains(joined, "ақылсыз")
+    if tokens_have_any(tokens, triggers) {
+        return true;
+    }
+    // **Phase 18.1 (2026-06-01)** — Whisper sometimes splits the
+    // bare insult «ақмақсың» into two tokens «ақ» + «мақсын» (or
+    // «мақсың»), losing the matchable surface. Detect the joined
+    // bigram via `phonetic_contains` so the split case still
+    // routes to Insult.
+    if phonetic_contains(joined, "ақ мақсың")
+        || phonetic_contains(joined, "ақ мақсын")
+        || phonetic_contains(joined, "ақы мақсың")
+        || phonetic_contains(joined, "ақы мақсын")
+    {
+        return true;
+    }
+    phonetic_contains(joined, "ақылсыз")
         || phonetic_contains(joined, "түкке тұрмайсың")
         || phonetic_contains(joined, "пайдасыз")
         || phonetic_contains(joined, "жарамайсың")
