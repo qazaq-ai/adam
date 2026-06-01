@@ -41,6 +41,13 @@ adam-reasoning = { path = "../../crates/adam-reasoning" }
 adam-agg-model = { path = "../../crates/adam-agg-model" }
 adam-tokenizer = { path = "../../crates/adam-tokenizer" }
 adam-kernel = { path = "../../crates/adam-kernel" }
+# **Phase 15g.J (2026-06-01)** — large canonical wordlist for the
+# fuzzy candidate pool. The Phase 15g.B.2 vocab held only ~82
+# overrides; with the v4 LM safety net now reliable (perplexity
+# 1.16, validates every proposed rewrite) we can extend the pool
+# to the full ~3000 frequency-extracted curated lexicon without
+# the «даулет → сәулет» false positives from Phase 15g.B.
+adam-lexicon-curated = { path = "../../crates/adam-lexicon-curated" }
 burn = { version = "0.17", default-features = false, features = ["std", "ndarray"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }

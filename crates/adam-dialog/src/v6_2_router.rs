@@ -481,7 +481,21 @@ fn handle_listing_query(input: &str) -> Option<String> {
     // IsA fallback and returned «Мемлекет» (the host country's
     // type). Curate the list answers from data/world_core/geography_kz
     // facts that are already tagged PartOf=қазақстан.
-    let mentions_kz = lower.contains("қазақстан") || lower.contains("казахстан");
+    //
+    // **Phase 15g.J (2026-06-01)** — extend the country-match check
+    // to cover Whisper drift surfaces from the live v4 retest:
+    //   «казастан» — Whisper drops the second «қ» AND swallows the
+    //                «х» (cyrillic split: казас + тан).
+    //   «казахстан» — Russian-Cyrillic spelling Whisper defaults to.
+    //   «қазастан» — same drop with Қ→Қ preserved.
+    //   «казахстанда» / «қазақстанда» — locative forms — already
+    //                                    covered by `.contains` on
+    //                                    the root.
+    let mentions_kz = lower.contains("қазақстан")
+        || lower.contains("казахстан")
+        || lower.contains("казастан")
+        || lower.contains("қазастан")
+        || lower.contains("казас");
     if mentions_kz && (lower.contains("таулар") || lower.contains("тау бар")) {
         return Some(
             "Қазақстандағы танымал таулар: Алатау, Алтай, Тянь-Шань, \

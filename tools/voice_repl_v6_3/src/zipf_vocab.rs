@@ -201,12 +201,31 @@ impl ZipfVocab {
     /// sites; it is no longer read.
     pub fn load_or_overrides_only<P: AsRef<Path>>(_path: P) -> Self {
         let mut seen = std::collections::HashSet::<String>::new();
-        let mut entries: Vec<String> = Vec::with_capacity(OVERRIDES.len());
+        let mut entries: Vec<String> = Vec::with_capacity(OVERRIDES.len() + 3500);
         for w in OVERRIDES {
             if seen.insert((*w).to_string()) {
                 entries.push((*w).to_string());
             }
         }
+
+        // **Phase 15g.J (2026-06-01)** — broaden the candidate pool
+        // to the full curated lexicon (~3000 frequency-extracted
+        // canonical surface forms). The v4 contextual LM is now the
+        // gatekeeper at the call site: any proposed rewrite must
+        // improve sentence log-likelihood or it gets reverted. So
+        // fuzzy can be aggressive on candidate generation without
+        // re-introducing the «даулет → сәулет» Phase 15g.B regression.
+        let lex_added: usize = {
+            let mut count = 0usize;
+            for entry in adam_lexicon_curated::full_lexicon() {
+                let cyr = entry.cyrillic.to_lowercase();
+                if !cyr.is_empty() && seen.insert(cyr.clone()) {
+                    entries.push(cyr);
+                    count += 1;
+                }
+            }
+            count
+        };
 
         let names = KazakhNameIndex::load_default();
         let mut names_lower: Vec<(String, String)> =
@@ -216,7 +235,10 @@ impl ZipfVocab {
         }
 
         println!(
-            "[voice-repl] hot vocab: {} overrides; name DB: {} male + {} female",
+            "[voice-repl] hot vocab: {} overrides + {} curated lexicon = {} total; \
+             name DB: {} male + {} female",
+            OVERRIDES.len(),
+            lex_added,
             entries.len(),
             names.male.len(),
             names.female.len(),
@@ -273,7 +295,15 @@ impl ZipfVocab {
     ///   * Final similarity ≥ caller-supplied threshold (0.80).
     pub fn best_match(&self, token: &str, threshold: f32) -> Option<(&str, f32)> {
         let token_len_chars = token.chars().count();
-        if token_len_chars < 5 {
+        // **Phase 15g.J (2026-06-01)** — lowered length floor 5 → 4
+        // and edit floor 1.5 → 1.0. The neural rescorer at the call
+        // site (`fuzzy_normalise` in main.rs) now scores BOTH the
+        // raw Whisper output AND the proposed rewrite via the v4
+        // contextual LM (perplexity 1.16) — if the rewrite doesn't
+        // improve sentence likelihood, it's reverted to raw. The
+        // LM is now the gatekeeper, so fuzzy can afford to be more
+        // aggressive in proposing candidates.
+        if token_len_chars < 4 {
             return None;
         }
         let mut best: Option<(&str, f32)> = None;
@@ -285,7 +315,7 @@ impl ZipfVocab {
             let cand_len_chars = cand.chars().count();
             let denom = token_len_chars.max(cand_len_chars) as f32;
             let edit = (1.0 - sim) * denom;
-            if edit < 1.5 {
+            if edit < 1.0 {
                 continue;
             }
             match best {
