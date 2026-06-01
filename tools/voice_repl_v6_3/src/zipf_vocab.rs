@@ -295,15 +295,21 @@ impl ZipfVocab {
     ///   * Final similarity ≥ caller-supplied threshold (0.80).
     pub fn best_match(&self, token: &str, threshold: f32) -> Option<(&str, f32)> {
         let token_len_chars = token.chars().count();
-        // **Phase 15g.J (2026-06-01)** — lowered length floor 5 → 4
-        // and edit floor 1.5 → 1.0. The neural rescorer at the call
-        // site (`fuzzy_normalise` in main.rs) now scores BOTH the
-        // raw Whisper output AND the proposed rewrite via the v4
-        // contextual LM (perplexity 1.16) — if the rewrite doesn't
-        // improve sentence likelihood, it's reverted to raw. The
-        // LM is now the gatekeeper, so fuzzy can afford to be more
-        // aggressive in proposing candidates.
-        if token_len_chars < 4 {
+        // **Phase 15g.J.1 (2026-06-01)** — REVERTED to conservative
+        // gates after 15g.J live retest showed the v4 LM is not yet
+        // strong enough to gatekeep aggressive fuzzy. Observed
+        // regressions:
+        //   «қатым даулет» → fuzzy «қауын сәулет» — LM kept the
+        //                    rewrite (rew=-3.13 < orig=-3.92);
+        //   «бұғын қай күн» → fuzzy «ұғым қай күн» — LM kept;
+        //   «бірінше президенті» → fuzzy «бірнеше президенті» — LM kept.
+        // The minimal-pair Kazakh meanings («қатым/қауын»,
+        // «бұғын/ұғым», «бірінше/бірнеше») differ by 1-2 chars and
+        // the v4 LM's per-token perplexity 1.16 isn't enough to
+        // distinguish them in short noisy contexts. Reverting to
+        // 15g.B.1 thresholds (length≥5, edit≥1.5, sim≥0.80) until
+        // a stronger LM ships.
+        if token_len_chars < 5 {
             return None;
         }
         let mut best: Option<(&str, f32)> = None;
@@ -315,7 +321,7 @@ impl ZipfVocab {
             let cand_len_chars = cand.chars().count();
             let denom = token_len_chars.max(cand_len_chars) as f32;
             let edit = (1.0 - sim) * denom;
-            if edit < 1.0 {
+            if edit < 1.5 {
                 continue;
             }
             match best {

@@ -1160,16 +1160,12 @@ fn fuzzy_normalise(text: &str, vocab: &zipf_vocab::ZipfVocab) -> String {
         }
 
         // 4. Phonetic best_match.
-        //    **15g.J (2026-06-01)** — threshold lowered 0.80 → 0.70
-        //    after the v4 LM (perplexity 1.16) became reliable
-        //    enough to gatekeep rewrites at the call site. fuzzy
-        //    now proposes more candidates (length≥4, edit≥1.0,
-        //    sim≥0.70, ~3000-word curated lexicon pool); the LM
-        //    safety net immediately downstream scores both raw and
-        //    rewritten — wrong rewrites get reverted. Net effect:
-        //    Whisper drift is recoverable AND semantic-pair false
-        //    positives stay blocked by LM, not by hand-tuned bars.
-        if let Some((canonical, _score)) = vocab.best_match(&lower, 0.70) {
+        //    **15g.J.1 (2026-06-01)** — back to 0.80 threshold after
+        //    LM v4 proved insufficient as gatekeeper (see
+        //    `ZipfVocab::best_match` doc). Wide pool stays — the
+        //    coverage helps when fuzzy DOES fire — but the bar is
+        //    tight so it rarely fires on noisy short surfaces.
+        if let Some((canonical, _score)) = vocab.best_match(&lower, 0.80) {
             if canonical != lower {
                 out_tokens.push(format!("{leading}{canonical}{trailing}"));
                 continue;

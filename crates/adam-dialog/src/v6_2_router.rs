@@ -491,10 +491,18 @@ fn handle_listing_query(input: &str) -> Option<String> {
     //   «казахстанда» / «қазақстанда» — locative forms — already
     //                                    covered by `.contains` on
     //                                    the root.
-    let mentions_kz = lower.contains("қазақстан")
-        || lower.contains("казахстан")
-        || lower.contains("казастан")
-        || lower.contains("қазастан")
+    // **Phase 15g.J.1 (2026-06-01)** — broaden the anchor to cover
+    // EVERY Whisper drift surface seen in live tests. The key
+    // realisation: Whisper alternately keeps or drops the four
+    // Kazakh consonants Қ/Ғ/Ң, AND alternately spells the country
+    // with «х» (Russian) or «қ» (Kazakh). So «қазақстанда»,
+    // «казақстанда» (К-first, Қ-mid), «қазақстанға», «казахстан»,
+    // «казастан» all need to anchor the inventory branch. A bare
+    // «қазақ» / «казақ» / «казах» root-substring catches all of
+    // them at once.
+    let mentions_kz = lower.contains("қазақ")
+        || lower.contains("казақ")
+        || lower.contains("казах")
         || lower.contains("казас");
     if mentions_kz && (lower.contains("таулар") || lower.contains("тау бар")) {
         return Some(
