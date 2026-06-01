@@ -24,6 +24,13 @@ path = "src/bin/poc_kazakh_train.rs"
 name = "verifier_demo"
 path = "src/bin/verifier_demo.rs"
 
+# Phase 15g.C.2 (2026-06-01) — contextual LM trainer on BPE
+# pretokenized natural-language pack. Replaces the static fuzzy
+# vocabulary loop with a learned rescorer; consumed by voice_repl_v6_3.
+[[bin]]
+name = "train_contextual_lm"
+path = "src/bin/train_contextual_lm.rs"
+
 [dev-dependencies]
 criterion = { version = "0.5", default-features = false, features = ["cargo_bench_support"] }
 tempfile = "3"
