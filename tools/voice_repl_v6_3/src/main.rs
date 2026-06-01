@@ -1027,6 +1027,7 @@ fn fuzzy_normalise(text: &str, vocab: &zipf_vocab::ZipfVocab) -> String {
     // unambiguous alias table fixes them BEFORE best_match runs.
     // Math-only — no legitimate Kazakh word is «ек» / «уш».
     static SHORT_NUMERAL_ALIAS: &[(&str, &str)] = &[
+        // Base numerals — Whisper drops trailing short vowels.
         ("ек", "екі"),
         ("уш", "үш"),
         ("торт", "төрт"),
@@ -1035,6 +1036,41 @@ fn fuzzy_normalise(text: &str, vocab: &zipf_vocab::ZipfVocab) -> String {
         ("жет", "жеті"),
         ("сегиз", "сегіз"),
         ("тогиз", "тоғыз"),
+        // **Phase 15g.I (2026-06-01)** — math-context Whisper drift
+        // observed across multiple live REPL sessions. These fall
+        // outside the length-floor-5 fuzzy gate AND outside the
+        // base-numeral alias above. Each replaces a Whisper-noisy
+        // surface form with the canonical Kazakh math root that
+        // `discourse::try_evaluate_kazakh_word_math` recognises.
+        // Limited to math-unambiguous strings — none of these is a
+        // legitimate Kazakh word in its own right.
+        //
+        // «тоғыз» (9) cases — Whisper drift Ұ↔О: «тұғыз», «туғыз».
+        ("тұғыз", "тоғыз"),
+        ("туғыз", "тоғыз"),
+        ("тұғызды", "тоғызды"),
+        ("туғызды", "тоғызды"),
+        // «көбейт» (multiply imperative) — Whisper drift Ө→О and
+        // /-эйт/ → /-эт/ slur drops the -й-.
+        ("кубейт", "көбейт"),
+        ("кубет", "көбейт"),
+        ("көбет", "көбейт"),
+        ("кубетынғыз", "көбейтіңіз"),
+        ("кубетыңыз", "көбейтіңіз"),
+        // «азайт» (subtract) — observed drift /ай/→/а/ in slurred
+        // speech, and /айт/→/айд/ voicing of final consonant.
+        ("азаид", "азайт"),
+        ("азайд", "азайт"),
+        // «бөл» (divide) — usually clean but Ө→О on slurred input.
+        ("бол", "бөл"),
+        // «жиырма» (20) — drift /жи/→/же/.
+        ("жерма", "жиырма"),
+        // Dative «-ке/-қа» suffixed forms that Whisper sometimes
+        // mis-attaches («үшке» → «үш ке» split → drift). The
+        // dative survives lexicon analysis as long as the root
+        // matches a numeral.
+        ("түртке", "төртке"),
+        ("тортке", "төртке"),
     ];
 
     // We rebuild a per-word `previous_tokens` slice as we iterate
