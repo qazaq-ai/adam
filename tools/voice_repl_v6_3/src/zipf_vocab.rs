@@ -40,12 +40,23 @@
 //!    more frequent canonical instead of toward whichever happens
 //!    to be in the curated lexicon.
 
-use adam_dialog::kazakh_fuzzy::kazakh_similarity;
-use serde::Deserialize;
-use std::path::Path;
+// **Phase 15g.B.2 (2026-06-01)** — Zipf vocabulary is removed.
+//
+// Two live tests showed the corpus-derived 1 000-word vocabulary
+// caused fuzzy to substitute semantically-different short words
+// («құн» → «қан», «бұғын» → «бұрын», «әтім» → «әкімі»). The patch-
+// loop the user flagged was rooted in trying to derive corrections
+// from a static list of canonicals with no contextual signal.
+//
+// This module now keeps **only** the explicit `OVERRIDES` — the
+// short list of greetings / honorifics / math operators / gender
+// words / geographic plurals that fuzzy can safely commit on
+// without contextual signal. The rest of the recovery happens
+// elsewhere: via the Kazakh name DB (this module), and — when
+// implemented — via a neural contextual rescorer (Phase 15g.C).
 
-/// Default committed path to the JSON the Python builder writes.
-pub const ZIPF_HOT_JSON: &str = "data/voice_repl/zipf_hot_1000.json";
+use adam_dialog::kazakh_fuzzy::{KazakhNameIndex, kazakh_similarity};
+use std::path::Path;
 
 /// **Overrides** — words that must be in the hot path regardless
 /// of their corpus rank. Greetings, honorifics, math operators,
@@ -164,148 +175,117 @@ pub const NAMED_ENTITY_TRIGGERS: &[&str] = &[
     "есімі",
 ];
 
-#[derive(Debug, Deserialize)]
-struct ZipfEntryJson {
-    word: String,
-    count: u32,
-}
-
-#[derive(Debug, Deserialize)]
-struct ZipfFileJson {
-    vocab: Vec<ZipfEntryJson>,
-    #[serde(default)]
-    total_tokens: u64,
-    #[serde(default)]
-    top_n: u32,
-}
-
-/// In-memory hot vocabulary.
+/// **Hot vocabulary** for STT post-processing.
 ///
-/// `entries` is sorted **descending by count** so iteration in
-/// `best_match` visits the most frequent canonical first; on equal
-/// `final_score`, the ordering breaks toward the higher rank.
+/// Phase 15g.B.2: holds only the explicit `OVERRIDES` list (no
+/// corpus-derived Zipf top-N anymore — that caused short-word
+/// regression). The Kazakh name DB is held separately so the
+/// caller can do a context-gated name pass.
 pub struct ZipfVocab {
-    pub entries: Vec<(String, u32)>,
-    pub max_count: u32,
-    pub total_tokens: u64,
+    pub entries: Vec<String>,
+    pub names: KazakhNameIndex,
+    /// Combined male+female name list, lowercased, for fast
+    /// case-insensitive comparison; canonical-cased originals live
+    /// in `names.{male,female}`.
+    pub names_lower: Vec<(String, String)>,
 }
 
 impl ZipfVocab {
-    /// Load the committed JSON and merge with `OVERRIDES`.
-    /// Missing file → an `OVERRIDES`-only vocabulary; the REPL
-    /// still runs but with degraded fuzzy quality.
-    pub fn load_or_overrides_only<P: AsRef<Path>>(path: P) -> Self {
-        let json = std::fs::read_to_string(path.as_ref()).ok();
-        let parsed: Option<ZipfFileJson> = json.and_then(|s| serde_json::from_str(&s).ok());
-
-        let (corpus_entries, total_tokens, top_n) = match parsed {
-            Some(p) => (p.vocab, p.total_tokens, p.top_n),
-            None => (Vec::new(), 0, 0),
-        };
-
-        let mut entries: Vec<(String, u32)> =
-            Vec::with_capacity(corpus_entries.len() + OVERRIDES.len());
+    /// Build a minimal vocab from the OVERRIDES list, plus load
+    /// the Kazakh name DB (`data/lexicon/kazakh_names_*.json`,
+    /// ~352 entries combined). Missing name files → empty index;
+    /// the REPL still runs but loses the proper-name pass.
+    ///
+    /// The `_path` argument is kept on the signature for one
+    /// release of source-compatibility with Phase 15g.B call
+    /// sites; it is no longer read.
+    pub fn load_or_overrides_only<P: AsRef<Path>>(_path: P) -> Self {
         let mut seen = std::collections::HashSet::<String>::new();
-        for e in corpus_entries.into_iter() {
-            if seen.insert(e.word.clone()) {
-                entries.push((e.word, e.count));
-            }
-        }
+        let mut entries: Vec<String> = Vec::with_capacity(OVERRIDES.len());
         for w in OVERRIDES {
             if seen.insert((*w).to_string()) {
-                entries.push((w.to_string(), OVERRIDE_COUNT));
+                entries.push((*w).to_string());
             }
         }
 
-        // Sort high-to-low so iteration order during `best_match`
-        // naturally prefers more frequent canonicals on tie-break.
-        entries.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
-        let max_count = entries.iter().map(|(_, c)| *c).max().unwrap_or(1);
+        let names = KazakhNameIndex::load_default();
+        let mut names_lower: Vec<(String, String)> =
+            Vec::with_capacity(names.male.len() + names.female.len());
+        for n in names.male.iter().chain(names.female.iter()) {
+            names_lower.push((n.to_lowercase(), n.clone()));
+        }
 
         println!(
-            "[voice-repl] zipf vocab: {} entries (corpus top-{} + {} overrides), max_count={}",
+            "[voice-repl] hot vocab: {} overrides; name DB: {} male + {} female",
             entries.len(),
-            top_n,
-            OVERRIDES.len(),
-            max_count,
+            names.male.len(),
+            names.female.len(),
         );
 
         Self {
             entries,
-            max_count,
-            total_tokens,
+            names,
+            names_lower,
         }
-    }
-
-    /// Iterator over canonical surface forms — used elsewhere when
-    /// only the wordlist (not the counts) is needed.
-    pub fn words(&self) -> impl Iterator<Item = &str> {
-        self.entries.iter().map(|(w, _)| w.as_str())
     }
 
     /// Exact-match check (case-sensitive on lowercase tokens).
     pub fn contains(&self, lower: &str) -> bool {
-        self.entries.iter().any(|(w, _)| w == lower)
+        self.entries.iter().any(|w| w == lower)
     }
 
-    /// Zipf-weighted best-match.
+    /// Look up the best matching Kazakh proper name for `lower`
+    /// (typically a Whisper-transcribed name in lowercase). Returns
+    /// the **canonical-cased** form when similarity ≥ threshold.
+    /// Used after a name trigger («атым», «есімім») to recover
+    /// proper-name capitalisation that Whisper drops.
+    pub fn best_name_match(&self, lower: &str, threshold: f32) -> Option<String> {
+        let mut best: Option<(&str, f32)> = None;
+        for (lc, canonical) in &self.names_lower {
+            let sim = kazakh_similarity(lower, lc);
+            match best {
+                None => best = Some((canonical.as_str(), sim)),
+                Some((_, prev)) if sim > prev => {
+                    best = Some((canonical.as_str(), sim));
+                }
+                _ => {}
+            }
+        }
+        best.filter(|(_, s)| *s >= threshold)
+            .map(|(name, _)| name.to_string())
+    }
+
+    /// Phonetic best-match against the small OVERRIDES list ONLY.
     ///
-    /// `final = similarity * (1 + zipf_bonus)` where
-    /// `zipf_bonus = (log(count + 1) / log(max_count + 1)) * BONUS_WEIGHT`.
-    /// `BONUS_WEIGHT = 0.10` — at most a 10 % lift, so the
-    /// phonetic distance still dominates; frequency only breaks
-    /// ties between equally-plausible canonicals.
+    /// **Phase 15g.B.2 (2026-06-01)** — vocabulary now contains
+    /// ~82 explicit overrides, not 1 061 corpus-derived canonicals.
+    /// This shrinks the false-positive surface to almost zero —
+    /// the OVERRIDES list is curated by hand to NOT contain
+    /// confusable short-word neighbours («қан» / «құн» / «күн»
+    /// are deliberately absent). Long-tail recovery moves to the
+    /// neural rescorer planned for Phase 15g.C.
     ///
-    /// Phonetic best-match.
-    ///
-    /// **Phase 15g.B.1 (2026-06-01)** — Zipf bonus REMOVED.
-    /// First live test (HEAD c2de5afa) showed Zipf prior
-    /// systematically substituted semantically-different short
-    /// words («құн»/день → «қан»/кровь, «бұғын»/сегодня → «бұрын»/
-    /// раньше, «әтім»/имя → «әкімі»/мэр). The bonus is correct in
-    /// theory but on 3-4 char Kazakh roots a 1-char edit gives
-    /// similarity ≈ 0.67-0.85; a +10 % bonus to the more-frequent
-    /// alternative crosses the gate too easily. Pure phonetic
-    /// similarity now drives selection, ties broken by
-    /// frequency-descending iteration order.
-    ///
-    /// Additional defenses (15g.B.1):
-    ///   * **Length floor 5** — short tokens (≤ 4 chars) are NOT
-    ///     auto-corrected. Their edit-distance budget is too tight
-    ///     to distinguish a true mishear from a real-word
-    ///     near-neighbour. Whisper's «құн» / «қан» / «күн» go
-    ///     through untouched.
-    ///   * **Min absolute edit ≥ 2** — single-char edits never
-    ///     trigger a rewrite; only canonicals reached via ≥ 2 unit
-    ///     of `kazakh_edit_distance` flip. Closes «қандай» →
-    ///     «қан-» / «-дай», «айтшы» → «айтты», «құн» → «күн».
-    ///   * **Higher final threshold (0.80)** — caller-supplied.
+    /// Defences retained from 15g.B.1:
+    ///   * Length floor 5 — short OOVs pass through untouched.
+    ///   * Absolute edit ≥ 1.5 — single-char drifts don't flip
+    ///     (covers the K→Қ / Г→Ғ phonetic-pair zone where we
+    ///     intentionally trust Whisper).
+    ///   * Final similarity ≥ caller-supplied threshold (0.80).
     pub fn best_match(&self, token: &str, threshold: f32) -> Option<(&str, f32)> {
-        // Length floor: too few chars, edit-distance budget is too
-        // small to safely distinguish true OOV from a real word.
         let token_len_chars = token.chars().count();
         if token_len_chars < 5 {
             return None;
         }
         let mut best: Option<(&str, f32)> = None;
-        for (cand, _count) in &self.entries {
+        for cand in &self.entries {
             let sim = kazakh_similarity(token, cand);
             if sim < threshold {
                 continue;
             }
-            // Minimum absolute edit-distance ≥ 2: similarity is a
-            // ratio, but a 1-char swap on a 6-char word also sits
-            // at 0.83 and that's the false-positive zone.
-            // Reconstruct the absolute edit cost from similarity:
-            //   edit = (1 - sim) * max(len_a, len_b)
             let cand_len_chars = cand.chars().count();
             let denom = token_len_chars.max(cand_len_chars) as f32;
             let edit = (1.0 - sim) * denom;
             if edit < 1.5 {
-                // < 1.5 covers single-substitution / single-edit
-                // cases including phonetic-pair K↔Қ (cost 0.4) on
-                // a 3-pair drift — those are explicitly the
-                // "trust Whisper" zone.
                 continue;
             }
             match best {

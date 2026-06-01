@@ -281,7 +281,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Build once at startup; `best_match` weighs phonetic
     // similarity AND Zipf rank so the tie-break goes to the more
     // frequent canonical, not the alphabetically-first one.
-    let zipf_vocab = zipf_vocab::ZipfVocab::load_or_overrides_only(zipf_vocab::ZIPF_HOT_JSON);
+    // Phase 15g.B.2 — vocabulary loader takes a path arg for source
+    // compatibility; the corpus-derived Zipf JSON is no longer read.
+    let zipf_vocab = zipf_vocab::ZipfVocab::load_or_overrides_only("");
 
     let single = !args.loop_mode;
     loop {
@@ -1019,18 +1021,40 @@ fn fuzzy_normalise(text: &str, vocab: &zipf_vocab::ZipfVocab) -> String {
             continue;
         }
 
-        // 3. **Context-aware named-entity skip.** If the previous
-        //    1-2 RAW tokens contained a name-trigger («атым»,
-        //    «есімім», «менің атым»), this token is the proper
-        //    name itself — leave it alone. Pre-15g.B fuzzy
-        //    mangled «менің атым Даулет» → «менің атым сәулет».
+        // 3. **Context-aware named-entity pass.** When the previous
+        //    1-2 raw tokens contain a name-trigger («атым»,
+        //    «есімім», «менің атым»), the current token is the
+        //    proper name itself. Phase 15g.B.2 (2026-06-01) — we
+        //    look it up in the Kazakh name DB (211 male + 141
+        //    female canonical names) and:
+        //       a) replace with the canonical-cased form if similarity
+        //          ≥ 0.80 (e.g. «даулет» → «Даулет»);
+        //       b) if no DB match, capitalise the first letter so the
+        //          downstream dialog engine treats it as a proper noun
+        //          rather than a common content word.
+        //    Either way fuzzy NEVER rewrites the name to a different
+        //    word — the bug in c2de5afa («даулет» → «сәулет») can't
+        //    happen here, the only candidate pool is real names.
         let lookback: &[String] = if idx >= 2 {
             &raw_tokens[idx - 2..idx]
         } else {
             &raw_tokens[..idx]
         };
         if zipf_vocab::is_after_name_trigger(lookback) {
-            out_tokens.push(word.to_string());
+            let chosen = match vocab.best_name_match(&lower, 0.80) {
+                Some(canonical) => canonical,
+                None => {
+                    // No DB match → capitalise the input as-is so
+                    // the dialog engine's NamedAfter / IsA path can
+                    // still pick it up as a name slot.
+                    let mut chars = lower.chars();
+                    match chars.next() {
+                        Some(c) => c.to_uppercase().chain(chars).collect(),
+                        None => lower.clone(),
+                    }
+                }
+            };
+            out_tokens.push(format!("{leading}{chosen}{trailing}"));
             continue;
         }
 

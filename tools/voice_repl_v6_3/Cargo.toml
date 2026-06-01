@@ -28,12 +28,6 @@ adam-voice = { path = "../../crates/adam-voice" }
 # deflecting to «Бәлкім, X туралы айтасыз ба».
 adam-retrieval = { path = "../../crates/adam-retrieval" }
 adam-reasoning = { path = "../../crates/adam-reasoning" }
-# Phase 15g.A: curated lexicon (~3000 canonical Kazakh wordforms,
-# frequency-extracted from the v6_3 corpus) — feeds the fuzzy
-# rescorer so OOV STT outputs like «көргері» can be re-mapped to
-# the closest canonical surface form «көлдер» before reaching the
-# dialog engine.
-adam-lexicon-curated = { path = "../../crates/adam-lexicon-curated" }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 # cpal for probing the output device's preferred sample rate
