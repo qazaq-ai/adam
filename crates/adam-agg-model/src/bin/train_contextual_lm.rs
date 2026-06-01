@@ -45,7 +45,7 @@ use std::time::Instant;
 
 use adam_agg_model::TinyAgt;
 use adam_agg_model::TinyAgtConfig;
-use adam_agg_model::checkpoint::{CheckpointMeta, save_checkpoint};
+use adam_agg_model::checkpoint::{CheckpointMeta, load_checkpoint, save_checkpoint};
 use adam_agg_model::train::{TrainConfig, train_next_token};
 use burn::backend::Autodiff;
 use burn::backend::ndarray::{NdArray, NdArrayDevice};
@@ -106,6 +106,27 @@ fn main() {
         train_pack.vocab_size
     );
 
+    // **Phase 15g.D (2026-06-01)** — optional dialog-corpus pack.
+    // If `CLM_DIALOG_PACK` is set we load that second pack and mix
+    // its sequences in, repeated `CLM_DIALOG_UPSAMPLE` times so it
+    // is exposed to the model on a similar order-of-magnitude as
+    // the natural-text pack (defaults: 6× upsample).
+    let dialog_pack: Option<Pack> = env_string("CLM_DIALOG_PACK", "")
+        .as_str()
+        .strip_prefix("")
+        .filter(|s| !s.is_empty() && PathBuf::from(s).exists())
+        .and_then(|p| std::fs::read(p).ok())
+        .and_then(|b| serde_json::from_slice(&b).ok());
+    let dialog_upsample = env_usize("CLM_DIALOG_UPSAMPLE", 6);
+    if let Some(d) = &dialog_pack {
+        eprintln!(
+            "       Dialog pack: {} sequences (upsample ×{} → {} mixed-in)",
+            d.samples.len(),
+            dialog_upsample,
+            d.samples.len() * dialog_upsample
+        );
+    }
+
     let val_pack: Option<Pack> = if PathBuf::from(VAL_PACK).exists() {
         let bytes = std::fs::read(VAL_PACK).expect("read val pack");
         Some(serde_json::from_slice(&bytes).expect("parse val pack"))
@@ -129,17 +150,57 @@ fn main() {
         "[2/4] Model: vocab={} d_model={} layers={} heads={} d_ff={} max_seq={}",
         vocab_size, d_model, n_layers, n_heads, d_ff, max_seq_len
     );
-    let model: TinyAgt<B> = cfg.init(&device);
+    // **Phase 15g.D** — optional resume-from-checkpoint. When set,
+    // we load weights from an existing run instead of initialising
+    // fresh, then keep training. Config dims must match.
+    let resume_from = env_string("CLM_RESUME_FROM", "");
+    let model: TinyAgt<B> = if !resume_from.is_empty() {
+        match load_checkpoint::<B>(std::path::Path::new(&resume_from), &device) {
+            Ok(c) => {
+                eprintln!("       Resuming from checkpoint: {resume_from}");
+                c.model
+            }
+            Err(e) => {
+                eprintln!("       Resume failed ({e}); falling back to fresh init");
+                cfg.init(&device)
+            }
+        }
+    } else {
+        cfg.init(&device)
+    };
 
     // ---- 3. Build training sequences (i64) ------------------------
     // Drop empties; truncate at max_seq_len; the model's `train_next_token`
     // does its own pad/truncate so we just pass Vec<i64> per sample.
-    let sequences: Vec<Vec<i64>> = train_pack
+    let mut sequences: Vec<Vec<i64>> = train_pack
         .samples
         .into_iter()
         .filter_map(|s| if s.ids.is_empty() { None } else { Some(s.ids) })
         .collect();
-    eprintln!("[3/4] Built {} training sequences", sequences.len());
+    let natural_count = sequences.len();
+
+    // **Phase 15g.D** — mix in the dialog pack `dialog_upsample`
+    // times so it has comparable weight to the natural-text pack.
+    let mut dialog_added = 0usize;
+    if let Some(d) = dialog_pack {
+        let dialog_seqs: Vec<Vec<i64>> = d
+            .samples
+            .into_iter()
+            .filter_map(|s| if s.ids.is_empty() { None } else { Some(s.ids) })
+            .collect();
+        for _ in 0..dialog_upsample {
+            for seq in &dialog_seqs {
+                sequences.push(seq.clone());
+                dialog_added += 1;
+            }
+        }
+    }
+    eprintln!(
+        "[3/4] Built {} training sequences ({} natural + {} dialog repeats)",
+        sequences.len(),
+        natural_count,
+        dialog_added
+    );
 
     // ---- 4. Train -------------------------------------------------
     let tc = TrainConfig {
