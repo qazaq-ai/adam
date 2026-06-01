@@ -126,6 +126,34 @@ def gen_qa(entry: dict) -> list[str]:
     return out
 
 
+def gen_aggregate_qa(entries_by_class: dict[tuple[str, str], list[str]]) -> list[str]:
+    """**Phase 15g.G (2026-06-01)** — list-style inventory Q&A.
+    `entries_by_class` is `{(container, object_class): [subjects...]}`
+    e.g. `{("қазақстан", "тау"): ["алтай", "тянь-шань", "алатау", ...]}`.
+
+    User retest of v3 surfaced the missing pattern: «Қазақстанда
+    қандай таулар бар?» fell to a definition lookup of «тау»
+    because the LM had only seen one-fact pairs, not aggregated
+    lists. This generator builds multi-subject answers so the
+    model learns the inventory-query shape.
+    """
+    out: list[str] = []
+    for (container, obj_class), subjects in entries_by_class.items():
+        if len(subjects) < 2:
+            continue
+        items = ", ".join(sorted(set(subjects))[:15])
+        # 4 phrasings of the same question.
+        for q in [
+            f"{container}да қандай {obj_class} бар",
+            f"{container}да қандай {obj_class}лар бар",
+            f"{container}ның қандай {obj_class}лары бар",
+            f"{container}да {obj_class} тізімі",
+            f"{container}дағы {obj_class}лар",
+        ]:
+            out.append(f"{q}. {container}да: {items}.")
+    return out
+
+
 def main() -> int:
     if not WORLD_CORE_DIR.is_dir():
         print(f"[wc-qa] missing: {WORLD_CORE_DIR}", file=sys.stderr)
@@ -134,6 +162,10 @@ def main() -> int:
     seen: set[str] = set()
     samples: list[dict] = []
     facts_processed = 0
+    # **Phase 15g.G** — accumulate `(container, class) → [subjects]`
+    # so we can emit list-style answers («Қазақстанда таулар: X, Y, Z»)
+    # AFTER processing all entries.
+    aggregates: dict[tuple[str, str], list[str]] = {}
     for path in sorted(WORLD_CORE_DIR.iterdir()):
         if path.suffix != ".jsonl":
             continue
@@ -147,6 +179,29 @@ def main() -> int:
                 except json.JSONDecodeError:
                     continue
                 facts_processed += 1
+
+                # Collect (container, class) → [subject] for aggregates.
+                # A subject is `is_a <class>` AND `part_of <container>`
+                # — both facts together imply the subject belongs to
+                # the container's <class>-inventory.
+                facts = entry.get("facts", [])
+                subj_classes: dict[str, set[str]] = {}
+                subj_containers: dict[str, set[str]] = {}
+                for f in facts:
+                    s = f.get("subject", "").strip().lower()
+                    p = f.get("predicate", "").strip()
+                    o = f.get("object", "").strip().lower()
+                    if not s or not o:
+                        continue
+                    if p == "is_a":
+                        subj_classes.setdefault(s, set()).add(o)
+                    elif p in ("part_of", "located_in", "is_in"):
+                        subj_containers.setdefault(s, set()).add(o)
+                for s, classes in subj_classes.items():
+                    for cls in classes:
+                        for container in subj_containers.get(s, set()):
+                            aggregates.setdefault((container, cls), []).append(s)
+
                 for text in gen_qa(entry):
                     text = text.strip()
                     if not text:
@@ -160,8 +215,30 @@ def main() -> int:
                         "text": text,
                     })
 
+    # **Phase 15g.G** — append aggregate list samples, repeated
+    # `AGGREGATE_REPEATS` times. Single-fact Q&A swamp the aggregate
+    # pattern (32 000 vs 145 raw), so the LM treats inventory queries
+    # as a minority case. Brute-force balance via repetition.
+    AGGREGATE_REPEATS = 30
+    agg_added = 0
+    agg_unique = 0
+    for text in gen_aggregate_qa(aggregates):
+        if text in seen:
+            continue
+        seen.add(text)
+        agg_unique += 1
+        for r in range(AGGREGATE_REPEATS):
+            samples.append({
+                "id": f"wc_qa_{len(samples):06d}",
+                "domain": "world_core_aggregate",
+                "text": text,
+            })
+            agg_added += 1
+
     print(f"[wc-qa] facts processed: {facts_processed:,}")
-    print(f"[wc-qa] dedup samples:   {len(samples):,}")
+    print(f"[wc-qa] aggregate (container, class) groups: {len(aggregates):,}")
+    print(f"[wc-qa] aggregate samples added: {agg_added:,}")
+    print(f"[wc-qa] total dedup samples:   {len(samples):,}")
 
     out = {
         "version": "v6.3-world-core-qa-2026-06-01",
