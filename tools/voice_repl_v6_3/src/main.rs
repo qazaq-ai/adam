@@ -32,6 +32,8 @@
 //! and `pcm_templates.bin` (PCM for TTS) when present. Both
 //! are merged with synth fallback covering uncovered phonemes.
 
+mod zipf_vocab;
+
 use adam_audio::play::play_blocking;
 use adam_audio::record::{RecordConfig, record_fixed_duration, record_until_silence};
 use adam_audio::wav::write_wav;
@@ -261,39 +263,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         (None, None)
     };
 
-    // **Phase 15g.A (2026-05-31)** — Fuzzy vocabulary assembly.
-    // The dialog-time fuzzy_normalise() needs a canonical
-    // wordlist to map OOV STT outputs against. Build it once at
-    // startup:
-    //   * INTENT_VOCAB (~100 hot-path triggers) — high-frequency
-    //     intent/identity/time/math words; checked as an
-    //     exact-match short-circuit.
-    //   * full_lexicon() (~3000 frequency-extracted canonical
-    //     surface forms from `adam-lexicon-curated`) — the
-    //     N-best rescoring layer that catches Whisper drift on
-    //     content words like «көлдер» / «жер» / «таулар».
-    // Dedup at build time so best_match doesn't waste cycles on
-    // duplicates.
-    let fuzzy_vocab: Vec<String> = {
-        let mut seen = std::collections::HashSet::<String>::new();
-        let mut out: Vec<String> = Vec::with_capacity(3200);
-        for w in intent_vocab_static() {
-            if seen.insert(w.to_string()) {
-                out.push(w.to_string());
-            }
-        }
-        for entry in adam_lexicon_curated::full_lexicon() {
-            let cyr = entry.cyrillic.to_lowercase();
-            if !cyr.is_empty() && seen.insert(cyr.clone()) {
-                out.push(cyr);
-            }
-        }
-        out
-    };
-    println!(
-        "[voice-repl] fuzzy vocab: {} canonical forms (hot-path + curated lexicon)",
-        fuzzy_vocab.len()
-    );
+    // **Phase 15g.B (2026-06-01)** — Zipf-ranked hot vocabulary.
+    //
+    // Pre-15g.B used a flat 3155-word list built from
+    // `INTENT_VOCAB` ∪ `adam_lexicon_curated::full_lexicon()`.
+    // That set had no frequency signal, so on ties fuzzy pulled
+    // STT outputs toward whichever canonical happened to be
+    // alphabetically first («даулет» → «сәулет»). 15g.B replaces
+    // it with a corpus-derived Zipf-ranked list:
+    //   * 1 000 most-frequent surface forms from cc100_kk +
+    //     Wikipedia + Abai (3.48 M tokens / 243 k distinct),
+    //     covering 43.74 % of corpus tokens — the cheapest 80 %
+    //     of conversational vocabulary;
+    //   * ≈70 explicit overrides (greetings, honorifics, math
+    //     ops, gender words) so rare-but-critical canonicals stay
+    //     in the hot path.
+    // Build once at startup; `best_match` weighs phonetic
+    // similarity AND Zipf rank so the tie-break goes to the more
+    // frequent canonical, not the alphabetically-first one.
+    let zipf_vocab = zipf_vocab::ZipfVocab::load_or_overrides_only(zipf_vocab::ZIPF_HOT_JSON);
 
     let single = !args.loop_mode;
     loop {
@@ -378,7 +366,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // intent-trigger word. Built on adam_dialog::kazakh_fuzzy's
         // phonetic-aware edit distance (PHONETIC_PAIRS table).
         let normalised = if args.mode == "respond" {
-            fuzzy_normalise(&user_text, &fuzzy_vocab)
+            fuzzy_normalise(&user_text, &zipf_vocab)
         } else {
             user_text.clone()
         };
@@ -763,36 +751,42 @@ fn transcribe_via_whisper(
     Ok(best)
 }
 
-/// Phase 15e (2026-05-31) — fuzzy STT-output normaliser.
+/// **Phase 15g.B (2026-06-01)** — Zipf-aware fuzzy STT normaliser.
 ///
-/// User directive: «Используя математические графы, найти и
-/// извлечь из памяти ближайшие похожие слова, а не отвечать, что
-/// не понял.» Multilingual Whisper drifts on Kazakh-specific
-/// letters (Қ→К, Ғ→Г, Ң→Н, Ө→О, Ұ→У, Ү→У, Һ→Х, І→И, Ә→Е) and
-/// drops trailing short vowels. The Phase 15d initial-prompt
-/// re-anchors most of these but residual drift remains, so this
-/// normaliser maps each OOV token to its nearest canonical word
-/// under `kazakh_edit_distance` (Kazakh-aware Levenshtein, K↔Қ
-/// pair-cost 0.4).
+/// User directive: «Знание ~1000 слов покрывает до 80% разговорных
+/// текстов. Чтобы наша модель знала их наизусть и могла мгновенно
+/// заменить плохо расслышанные или невнятные слова.»
 ///
-/// Vocabulary structure (Phase 15g.A 2026-05-31):
-///   1. Hot-path INTENT_VOCAB (~100 frequent triggers — identity,
-///      time, math, greeting, gender) checked first as an
-///      exact-match short-circuit.
-///   2. Curated lexicon (~3000 frequency-extracted canonical
-///      surface forms from `adam-lexicon-curated::full_lexicon()`)
-///      checked next via `best_match` with threshold 0.70 — this
-///      is the N-best rescoring layer that recovers «көргері» →
-///      «көлдер» without needing Whisper to surface alternatives.
+/// Pre-15g.B used a flat 3155-word list (`INTENT_VOCAB ∪
+/// adam_lexicon_curated::full_lexicon()`) with no frequency
+/// signal — so on ties fuzzy pulled STT outputs to whichever
+/// canonical happened to be alphabetically first («даулет» →
+/// «сәулет», «тауылар» → «тауарлар»). 15g.B fixes the root cause:
 ///
-/// Conservative threshold (0.70): substitute only when similarity
-/// crosses the gate AND the canonical differs from the input.
-/// Otherwise pass through.
+///   1. **Zipf-ranked vocabulary** (corpus top-1000 + ~70 explicit
+///      overrides) — see [`zipf_vocab::ZipfVocab`]. Built from
+///      cc100_kk + Wikipedia + Abai (3.48 M tokens). On ties
+///      `best_match` prefers the canonical with higher Zipf rank.
 ///
-/// Hot-path "intent vocab" — short list of high-frequency canonical
-/// words. Exact-match against this list short-circuits the broader
-/// curated-lexicon fuzzy pass.
-const fn intent_vocab_static() -> &'static [&'static str] {
+///   2. **Context-aware named-entity skip** — when the previous
+///      1-2 tokens contain a name-trigger («атым», «есімім»,
+///      «менің атым»), the next token is left alone. Whisper-out
+///      «менің атым даулет» no longer mangles «даулет» into a
+///      hand-curated architecture term.
+///
+///   3. **Short-numeral alias pass** retained from 15f.3 (kept
+///      pre-fuzzy because Whisper drops trailing «і»/«ы»/«ө» on
+///      single-syllable numerals where alias is unambiguous).
+///
+/// Threshold 0.70 (similarity * (1 + zipf_bonus)) — see
+/// [`zipf_vocab::ZipfVocab::best_match`].
+
+// **Phase 15g.B (2026-06-01)** — `intent_vocab_static_legacy` is
+// retained one release for `git log` archaeology / diff context;
+// runtime path no longer touches it. Promoted overrides live in
+// `zipf_vocab::OVERRIDES`. Drop after Phase 15g.B.1 ships.
+#[allow(dead_code)]
+const fn intent_vocab_static_legacy() -> &'static [&'static str] {
     &[
         // Greeting
         "сәлем",
@@ -958,19 +952,13 @@ const fn intent_vocab_static() -> &'static [&'static str] {
     ]
 }
 
-fn fuzzy_normalise(text: &str, vocab: &[String]) -> String {
-    use adam_dialog::kazakh_fuzzy::best_match;
-
-    // **Phase 15f.3 (2026-05-31)** — Whisper's «і»/«ы»/«ө»-drop on
-    // short numerals («екі»→«ек», «үш»→«уш», «төрт»→«торт»,
-    // «бес»→«бис», «алты»→«алт», «жеті»→«жет»). These fall just
-    // under the 0.70 best_match gate (one-char delete on a 3-char
-    // word ≈ 0.67 similarity), so they get repaired by explicit
-    // alias BEFORE the general fuzzy pass. Math-only — restoring
-    // these is unambiguous: «ек» is never a real Kazakh word.
-    // Live REPL turn 11 surfaced this when «Екі қосу екі» came
-    // back as «Ек қосу ек» and the dialog engine routed to a
-    // definition_lookup of «қосу» instead of arithmetic_eval.
+fn fuzzy_normalise(text: &str, vocab: &zipf_vocab::ZipfVocab) -> String {
+    // **Phase 15f.3 (retained 15g.B)** — Whisper's trailing-vowel
+    // drop on 3-char numerals («екі»→«ек», «үш»→«уш», «төрт»→
+    // «торт», «бес»→«бис», «алты»→«алт», «жеті»→«жет»). These
+    // fall under the 0.70 gate even with the Zipf bonus, so an
+    // unambiguous alias table fixes them BEFORE best_match runs.
+    // Math-only — no legitimate Kazakh word is «ек» / «уш».
     static SHORT_NUMERAL_ALIAS: &[(&str, &str)] = &[
         ("ек", "екі"),
         ("уш", "үш"),
@@ -982,57 +970,82 @@ fn fuzzy_normalise(text: &str, vocab: &[String]) -> String {
         ("тогиз", "тоғыз"),
     ];
 
-    text.split_whitespace()
-        .map(|word| {
-            // Strip leading/trailing punctuation, keep core token.
-            let leading: String = word.chars().take_while(|c| !c.is_alphabetic()).collect();
-            let trailing: String = word
-                .chars()
-                .rev()
-                .take_while(|c| !c.is_alphabetic())
-                .collect::<String>()
-                .chars()
-                .rev()
-                .collect();
-            let core: String = word
-                .chars()
-                .skip_while(|c| !c.is_alphabetic())
-                .collect::<String>()
-                .trim_end_matches(|c: char| !c.is_alphabetic())
-                .to_string();
-            if core.is_empty() {
-                return word.to_string();
+    // We rebuild a per-word `previous_tokens` slice as we iterate
+    // so context-aware skip (named-entity detection) sees the
+    // ORIGINAL surface forms — not the rewritten ones. This matters
+    // when «атым» itself was rewritten by a prior best_match call.
+    let raw_tokens: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
+    let mut out_tokens: Vec<String> = Vec::with_capacity(raw_tokens.len());
+
+    for (idx, word) in raw_tokens.iter().enumerate() {
+        let leading: String = word.chars().take_while(|c| !c.is_alphabetic()).collect();
+        let trailing: String = word
+            .chars()
+            .rev()
+            .take_while(|c| !c.is_alphabetic())
+            .collect::<String>()
+            .chars()
+            .rev()
+            .collect();
+        let core: String = word
+            .chars()
+            .skip_while(|c| !c.is_alphabetic())
+            .collect::<String>()
+            .trim_end_matches(|c: char| !c.is_alphabetic())
+            .to_string();
+        if core.is_empty() {
+            out_tokens.push(word.to_string());
+            continue;
+        }
+        let lower = core.to_lowercase();
+
+        // 1. Explicit short-numeral alias (cheap O(1) per word).
+        let mut aliased: Option<String> = None;
+        for (drift, canonical) in SHORT_NUMERAL_ALIAS {
+            if &lower == drift {
+                aliased = Some((*canonical).to_string());
+                break;
             }
-            let lower = core.to_lowercase();
-            // Phase 15f.3: explicit short-numeral alias pass before
-            // any other normalisation. Cheap O(n) over an 8-entry
-            // table; runs once per word.
-            for (drift, canonical) in SHORT_NUMERAL_ALIAS {
-                if &lower == drift {
-                    return format!("{leading}{canonical}{trailing}");
-                }
+        }
+        if let Some(canonical) = aliased {
+            out_tokens.push(format!("{leading}{canonical}{trailing}"));
+            continue;
+        }
+
+        // 2. Already canonical → skip (cheap O(N) scan over the
+        //    Zipf vocab; for the top-1000 case this is fast).
+        if vocab.contains(&lower) {
+            out_tokens.push(word.to_string());
+            continue;
+        }
+
+        // 3. **Context-aware named-entity skip.** If the previous
+        //    1-2 RAW tokens contained a name-trigger («атым»,
+        //    «есімім», «менің атым»), this token is the proper
+        //    name itself — leave it alone. Pre-15g.B fuzzy
+        //    mangled «менің атым Даулет» → «менің атым сәулет».
+        let lookback: &[String] = if idx >= 2 {
+            &raw_tokens[idx - 2..idx]
+        } else {
+            &raw_tokens[..idx]
+        };
+        if zipf_vocab::is_after_name_trigger(lookback) {
+            out_tokens.push(word.to_string());
+            continue;
+        }
+
+        // 4. Zipf-aware best_match (similarity * (1 + zipf_bonus)).
+        //    Threshold 0.70 on the FINAL score.
+        if let Some((canonical, _score)) = vocab.best_match(&lower, 0.70) {
+            if canonical != lower {
+                out_tokens.push(format!("{leading}{canonical}{trailing}"));
+                continue;
             }
-            // Already canonical → skip (saves a scan).
-            if vocab.iter().any(|c| c == &lower) {
-                return word.to_string();
-            }
-            // best_match returns (canonical, score) when score ≥
-            // threshold. 0.70 catches up-to-3 phonetically-close
-            // substitutions (e.g. «бұғың»→«бүгін»: ұ↔ү + ы↔і +
-            // ң↔н with phonetic cost 0.4 each ≈ similarity 0.76);
-            // a lower threshold risks pulling out-of-domain words
-            // to wrong canonicals. Tuned 2026-05-31 from 0.75
-            // after live REPL surfaced the 4-substitution case
-            // «Бұғың→Бүгін» falling just short of the 0.75 gate.
-            if let Some((canonical, _score)) = best_match(&lower, vocab, 0.70) {
-                if canonical != lower {
-                    return format!("{leading}{canonical}{trailing}");
-                }
-            }
-            word.to_string()
-        })
-        .collect::<Vec<_>>()
-        .join(" ")
+        }
+        out_tokens.push(word.to_string());
+    }
+
+    out_tokens.join(" ")
 }
 
 /// Phase 15f loader — same logic as `adam_chat.rs`'s
