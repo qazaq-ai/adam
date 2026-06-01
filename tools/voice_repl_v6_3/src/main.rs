@@ -150,6 +150,25 @@ struct Args {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
+    // **Phase 15g.H (2026-06-01)** — enable the v6.2 router by
+    // default in the voice REPL. The router (`adam_dialog::v6_2_router`)
+    // handles inventory queries («Қазақстанда қандай таулар бар»
+    // → list of mountains, not the «тау = жер бедері» definition
+    // lookup the v6.1 stack falls back to), plus a curated geo /
+    // history / abai factual battery. It defaults to off elsewhere
+    // (opt-in via ADAM_V6_2=1) so existing CI / text REPL stay
+    // identical. On the voice path we want the inventory answers
+    // by default.
+    if std::env::var("ADAM_V6_2").is_err() {
+        // SAFETY: env::set_var is `unsafe` since Rust 1.79 due to a
+        // documented race with threaded readers — we're calling it
+        // BEFORE spawning any worker threads and reading the var,
+        // and only when it's not already set, so this single write
+        // is sound.
+        unsafe { std::env::set_var("ADAM_V6_2", "1") };
+        println!("[voice-repl] ADAM_V6_2=1 (v6.2 inventory router enabled)");
+    }
+
     // Load banks (real templates + synth fallback hybrid).
     let mfcc_bank = load_mfcc_bank(&args.bank_dir, 16_000)?;
     let pcm_bank = load_pcm_bank(&args.bank_dir).ok();

@@ -26,13 +26,19 @@ templates = [
     "сәлем, {name_respect}, {city|ablative} бәрі жақсы ма",
 ]
 
+# **v6.3 phase 15g.H (2026-06-01)** — like the muslim greeting
+# (15f.2), put the honorific-bearing variants FIRST so that with
+# the default seed=42 the planner's `idx = 42 % len = 0` lands on
+# a vocative response. Pre-15g.H the polite greeting returned
+# bare «Сәлеметсіз бе» even when `voice_gender_hint` was set,
+# missing the «Ағай» / «Апай» honorific the speaker expects.
 [[families]]
 key = "greeting.polite"
 templates = [
-    "сәлеметсіз бе",
-    "армысыз",
     "сәлеметсіз бе, {name_respect}",
     "сәлеметсіз бе, {name_respect}, {city|ablative} бәрі аман ба",
+    "сәлеметсіз бе",
+    "армысыз",
 ]
 
 # **v6.1.30 — 2026-05-23 voice REPL audit round 4.** Islamic
