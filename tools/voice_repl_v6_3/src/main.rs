@@ -32,6 +32,7 @@
 //! and `pcm_templates.bin` (PCM for TTS) when present. Both
 //! are merged with synth fallback covering uncovered phonemes.
 
+mod neural_rescorer;
 mod zipf_vocab;
 
 use adam_audio::play::play_blocking;
@@ -285,6 +286,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // compatibility; the corpus-derived Zipf JSON is no longer read.
     let zipf_vocab = zipf_vocab::ZipfVocab::load_or_overrides_only("");
 
+    // **Phase 15g.C.2 step 3 (2026-06-01)** — neural rescorer.
+    // Loads the contextual LM trained by `train_contextual_lm`
+    // (vocab 5188, ~2 M params, final CE 1.12). If any artefact
+    // is missing the loader returns None and rescoring is skipped
+    // — voice REPL behaviour is then identical to 15g.B.2.
+    let neural = neural_rescorer::NeuralRescorer::load_default();
+
     let single = !args.loop_mode;
     loop {
         if args.loop_mode {
@@ -367,14 +375,52 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // the input token is a near-neighbour of a canonical
         // intent-trigger word. Built on adam_dialog::kazakh_fuzzy's
         // phonetic-aware edit distance (PHONETIC_PAIRS table).
-        let normalised = if args.mode == "respond" {
+        let fuzzy_out = if args.mode == "respond" {
             fuzzy_normalise(&user_text, &zipf_vocab)
         } else {
             user_text.clone()
         };
-        if normalised != user_text {
-            println!("[voice-repl] fuzzy → «{normalised}»");
-        }
+
+        // **Phase 15g.C.2 step 3 (2026-06-01)** — neural rescorer
+        // safety net. When fuzzy proposed a rewrite, check the
+        // contextual LM agrees the rewritten sentence is more
+        // plausible than the raw Whisper output. If LM disagrees
+        // (rewrite has LOWER per-token log-prob than original),
+        // revert to the raw output — catches regressions like
+        // «даулет → сәулет» that were B.1 / B.2's failure mode.
+        // If no rescorer (missing checkpoint), keep fuzzy as-is.
+        let normalised = if fuzzy_out != user_text {
+            if let Some(r) = neural.as_ref() {
+                match (r.score_text(&user_text), r.score_text(&fuzzy_out)) {
+                    (Some(orig), Some(rew)) => {
+                        // Tolerance: only revert when the rewrite is
+                        // clearly worse than the original (≥ 0.05 nats/
+                        // token gap). Avoids flapping on numerical noise.
+                        if rew + 0.05 < orig {
+                            println!(
+                                "[voice-repl] fuzzy → «{fuzzy_out}» — LM score \
+                                 (orig={orig:.3} vs rew={rew:.3}) reverted to raw"
+                            );
+                            user_text.clone()
+                        } else {
+                            println!(
+                                "[voice-repl] fuzzy → «{fuzzy_out}» (LM orig={orig:.3} rew={rew:.3})"
+                            );
+                            fuzzy_out
+                        }
+                    }
+                    _ => {
+                        println!("[voice-repl] fuzzy → «{fuzzy_out}»");
+                        fuzzy_out
+                    }
+                }
+            } else {
+                println!("[voice-repl] fuzzy → «{fuzzy_out}»");
+                fuzzy_out
+            }
+        } else {
+            user_text.clone()
+        };
 
         // Phase 17 (2026-05-31): voice-derived gender hint. Same
         // pattern as `adam-dialog/src/bin/adam_chat.rs:1045+`:

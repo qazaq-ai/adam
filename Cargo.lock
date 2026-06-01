@@ -411,15 +411,19 @@ dependencies = [
 name = "adam-voice-repl-v6-3"
 version = "6.2.0"
 dependencies = [
+ "adam-agg-model",
  "adam-audio",
  "adam-dialog",
+ "adam-kernel",
  "adam-kernel-fst",
  "adam-phoneme",
  "adam-reasoning",
  "adam-retrieval",
  "adam-stt-phoneme",
+ "adam-tokenizer",
  "adam-tts-phoneme",
  "adam-voice",
+ "burn",
  "clap",
  "cpal",
  "serde",
