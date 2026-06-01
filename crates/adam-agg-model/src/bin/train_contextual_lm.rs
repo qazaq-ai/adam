@@ -106,24 +106,41 @@ fn main() {
         train_pack.vocab_size
     );
 
-    // **Phase 15g.D (2026-06-01)** — optional dialog-corpus pack.
-    // If `CLM_DIALOG_PACK` is set we load that second pack and mix
-    // its sequences in, repeated `CLM_DIALOG_UPSAMPLE` times so it
-    // is exposed to the model on a similar order-of-magnitude as
-    // the natural-text pack (defaults: 6× upsample).
-    let dialog_pack: Option<Pack> = env_string("CLM_DIALOG_PACK", "")
-        .as_str()
-        .strip_prefix("")
-        .filter(|s| !s.is_empty() && PathBuf::from(s).exists())
-        .and_then(|p| std::fs::read(p).ok())
-        .and_then(|b| serde_json::from_slice(&b).ok());
+    // **Phase 15g.D / 15g.E (2026-06-01)** — optional dialog /
+    // Q&A corpus packs. `CLM_DIALOG_PACK` accepts a single path
+    // OR a colon-separated list of paths; every pack is loaded
+    // and concatenated, then the combined set is upsampled
+    // `CLM_DIALOG_UPSAMPLE` times relative to the natural pack.
+    let dialog_packs: Vec<Pack> = env_string("CLM_DIALOG_PACK", "")
+        .split(':')
+        .filter(|s| !s.is_empty())
+        .filter_map(|p| {
+            let path = PathBuf::from(p);
+            if !path.exists() {
+                eprintln!("       dialog pack missing: {p}");
+                return None;
+            }
+            std::fs::read(&path)
+                .ok()
+                .and_then(|b| serde_json::from_slice::<Pack>(&b).ok())
+                .map(|pack| {
+                    eprintln!(
+                        "       Dialog pack: {} loaded ({} sequences)",
+                        p,
+                        pack.samples.len()
+                    );
+                    pack
+                })
+        })
+        .collect();
     let dialog_upsample = env_usize("CLM_DIALOG_UPSAMPLE", 6);
-    if let Some(d) = &dialog_pack {
+    if !dialog_packs.is_empty() {
+        let total: usize = dialog_packs.iter().map(|p| p.samples.len()).sum();
         eprintln!(
-            "       Dialog pack: {} sequences (upsample ×{} → {} mixed-in)",
-            d.samples.len(),
+            "       Total dialog sequences: {} (upsample ×{} → {} mixed-in)",
+            total,
             dialog_upsample,
-            d.samples.len() * dialog_upsample
+            total * dialog_upsample
         );
     }
 
@@ -179,20 +196,22 @@ fn main() {
         .collect();
     let natural_count = sequences.len();
 
-    // **Phase 15g.D** — mix in the dialog pack `dialog_upsample`
-    // times so it has comparable weight to the natural-text pack.
+    // **Phase 15g.D / 15g.E** — mix in every dialog pack
+    // `dialog_upsample` times so they have comparable weight to
+    // the natural-text pack.
     let mut dialog_added = 0usize;
-    if let Some(d) = dialog_pack {
-        let dialog_seqs: Vec<Vec<i64>> = d
-            .samples
-            .into_iter()
-            .filter_map(|s| if s.ids.is_empty() { None } else { Some(s.ids) })
-            .collect();
-        for _ in 0..dialog_upsample {
-            for seq in &dialog_seqs {
-                sequences.push(seq.clone());
-                dialog_added += 1;
+    let mut all_dialog_seqs: Vec<Vec<i64>> = Vec::new();
+    for d in dialog_packs {
+        for s in d.samples {
+            if !s.ids.is_empty() {
+                all_dialog_seqs.push(s.ids);
             }
+        }
+    }
+    for _ in 0..dialog_upsample {
+        for seq in &all_dialog_seqs {
+            sequences.push(seq.clone());
+            dialog_added += 1;
         }
     }
     eprintln!(
