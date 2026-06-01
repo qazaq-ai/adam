@@ -256,30 +256,62 @@ impl ZipfVocab {
     /// phonetic distance still dominates; frequency only breaks
     /// ties between equally-plausible canonicals.
     ///
-    /// Threshold gate applies to `final_score`, not raw similarity
-    /// — a marginal phonetic match (sim = 0.65) on a very common
-    /// word can still cross 0.70 via the Zipf bonus, which is the
-    /// whole point: if Whisper drops two letters of «қазақстан»,
-    /// we'd rather rescore against the rank-3 canonical than
-    /// pass through a fragment.
+    /// Phonetic best-match.
+    ///
+    /// **Phase 15g.B.1 (2026-06-01)** — Zipf bonus REMOVED.
+    /// First live test (HEAD c2de5afa) showed Zipf prior
+    /// systematically substituted semantically-different short
+    /// words («құн»/день → «қан»/кровь, «бұғын»/сегодня → «бұрын»/
+    /// раньше, «әтім»/имя → «әкімі»/мэр). The bonus is correct in
+    /// theory but on 3-4 char Kazakh roots a 1-char edit gives
+    /// similarity ≈ 0.67-0.85; a +10 % bonus to the more-frequent
+    /// alternative crosses the gate too easily. Pure phonetic
+    /// similarity now drives selection, ties broken by
+    /// frequency-descending iteration order.
+    ///
+    /// Additional defenses (15g.B.1):
+    ///   * **Length floor 5** — short tokens (≤ 4 chars) are NOT
+    ///     auto-corrected. Their edit-distance budget is too tight
+    ///     to distinguish a true mishear from a real-word
+    ///     near-neighbour. Whisper's «құн» / «қан» / «күн» go
+    ///     through untouched.
+    ///   * **Min absolute edit ≥ 2** — single-char edits never
+    ///     trigger a rewrite; only canonicals reached via ≥ 2 unit
+    ///     of `kazakh_edit_distance` flip. Closes «қандай» →
+    ///     «қан-» / «-дай», «айтшы» → «айтты», «құн» → «күн».
+    ///   * **Higher final threshold (0.80)** — caller-supplied.
     pub fn best_match(&self, token: &str, threshold: f32) -> Option<(&str, f32)> {
-        let max_log = ((self.max_count + 1) as f32).ln().max(1e-6);
-        let bonus_weight = 0.10_f32;
+        // Length floor: too few chars, edit-distance budget is too
+        // small to safely distinguish true OOV from a real word.
+        let token_len_chars = token.chars().count();
+        if token_len_chars < 5 {
+            return None;
+        }
         let mut best: Option<(&str, f32)> = None;
-        for (cand, count) in &self.entries {
+        for (cand, _count) in &self.entries {
             let sim = kazakh_similarity(token, cand);
-            if sim < 0.30 {
-                // Cheap prune: a phonetic distance of <0.30 cannot
-                // be lifted past 0.70 by a 10 % Zipf bonus.
+            if sim < threshold {
                 continue;
             }
-            let log_c = ((*count + 1) as f32).ln();
-            let zipf_bonus = (log_c / max_log) * bonus_weight;
-            let final_score = sim * (1.0 + zipf_bonus);
+            // Minimum absolute edit-distance ≥ 2: similarity is a
+            // ratio, but a 1-char swap on a 6-char word also sits
+            // at 0.83 and that's the false-positive zone.
+            // Reconstruct the absolute edit cost from similarity:
+            //   edit = (1 - sim) * max(len_a, len_b)
+            let cand_len_chars = cand.chars().count();
+            let denom = token_len_chars.max(cand_len_chars) as f32;
+            let edit = (1.0 - sim) * denom;
+            if edit < 1.5 {
+                // < 1.5 covers single-substitution / single-edit
+                // cases including phonetic-pair K↔Қ (cost 0.4) on
+                // a 3-pair drift — those are explicitly the
+                // "trust Whisper" zone.
+                continue;
+            }
             match best {
-                None => best = Some((cand.as_str(), final_score)),
-                Some((_, prev)) if final_score > prev => {
-                    best = Some((cand.as_str(), final_score));
+                None => best = Some((cand.as_str(), sim)),
+                Some((_, prev)) if sim > prev => {
+                    best = Some((cand.as_str(), sim));
                 }
                 _ => {}
             }

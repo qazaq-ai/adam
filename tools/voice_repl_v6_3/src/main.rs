@@ -1034,9 +1034,14 @@ fn fuzzy_normalise(text: &str, vocab: &zipf_vocab::ZipfVocab) -> String {
             continue;
         }
 
-        // 4. Zipf-aware best_match (similarity * (1 + zipf_bonus)).
-        //    Threshold 0.70 on the FINAL score.
-        if let Some((canonical, _score)) = vocab.best_match(&lower, 0.70) {
+        // 4. Phonetic best_match.
+        //    **15g.B.1 (2026-06-01)** — threshold raised 0.70 → 0.80
+        //    after live REPL showed the 0.70 gate let through
+        //    semantically-different short-word swaps. The defense
+        //    chain is now: vocab length ≥ 5 + min edit-distance ≥ 2
+        //    + similarity ≥ 0.80, all enforced inside
+        //    `ZipfVocab::best_match`.
+        if let Some((canonical, _score)) = vocab.best_match(&lower, 0.80) {
             if canonical != lower {
                 out_tokens.push(format!("{leading}{canonical}{trailing}"));
                 continue;
