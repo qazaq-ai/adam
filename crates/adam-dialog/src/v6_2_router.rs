@@ -500,10 +500,17 @@ fn handle_listing_query(input: &str) -> Option<String> {
     // «казастан» all need to anchor the inventory branch. A bare
     // «қазақ» / «казақ» / «казах» root-substring catches all of
     // them at once.
+    // **Phase 15g.C.2 (2026-06-02)** — Shirali Whisper preserves Қ
+    // (where multilingual drifted to К), so add Қ-prefix variants
+    // alongside the К forms. Live REPL: «Қазастанда қандай таулар
+    // бар» got `mentions_kz = false` because only К-prefix
+    // «казас» was listed; Shirali's «қазас» wasn't covered.
     let mentions_kz = lower.contains("қазақ")
         || lower.contains("казақ")
         || lower.contains("казах")
-        || lower.contains("казас");
+        || lower.contains("қазах")
+        || lower.contains("казас")
+        || lower.contains("қазас");
     if mentions_kz && (lower.contains("таулар") || lower.contains("тау бар")) {
         return Some(
             "Қазақстандағы танымал таулар: Алатау, Алтай, Тянь-Шань, \
