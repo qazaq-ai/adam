@@ -28,6 +28,12 @@ struct ReplayCase {
     /// Substring (lowercased before comparison) the answer must
     /// contain. Picking a stable substring rather than the
     /// whole answer keeps tests robust to incidental rewording.
+    ///
+    /// **Phase 20 multi-paraphrase tolerance** (2026-06-02) — when
+    /// the handler returns one of N paraphrased variants, use a
+    /// `|`-separated alternation here (e.g. «А|Б|В»). The test
+    /// passes if the answer contains ANY of the alternatives.
+    /// Single-string cases continue to work unchanged.
     expects_substring: &'static str,
     /// Which audit session surfaced this case. Documentation
     /// only — not asserted, but useful for archaeology.
@@ -81,7 +87,11 @@ const BATTERY: &[ReplayCase] = &[
     },
     ReplayCase {
         input: "Сен не білесің?",
-        expects_substring: "жауап бере аламын",
+        // Phase 20 capability response is one of 5 paraphrased variants
+        // (FNV-1a input hash selects). Stable substring across all 5:
+        // every variant mentions «Rust» and «математика». Use the
+        // alternation form so the test stays green if variant pool grows.
+        expects_substring: "математика|rust",
         session: 3,
     },
     ReplayCase {
@@ -210,8 +220,15 @@ fn full_replay_battery_passes() {
     for case in BATTERY {
         let got = answer(case.input).unwrap_or_else(|| "<no answer>".to_string());
         let got_lc = got.to_lowercase();
+        // Phase 20 multi-paraphrase tolerance: split on `|` so any one of
+        // the alternatives is enough to pass. Single-string cases reduce
+        // to a one-element split → behaves the same as before.
         let want_lc = case.expects_substring.to_lowercase();
-        if !got_lc.contains(&want_lc) {
+        let any_match = want_lc.split('|').any(|alt| {
+            let trimmed = alt.trim();
+            !trimmed.is_empty() && got_lc.contains(trimmed)
+        });
+        if !any_match {
             failures.push(format!(
                 "[session {}] «{}» → «{}» (expected substring «{}»)",
                 case.session, case.input, got, case.expects_substring,

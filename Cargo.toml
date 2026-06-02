@@ -41,7 +41,12 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "6.2.0"
+# 2026-06-02 — bump to v6.3.0 to match the experimental/v6_3_phonemic_foundation
+# arc (voice REPL, BPE tokenizer, contextual LM, neural intent classifier,
+# Phase 21 relative-day handler). v6.2 deterministic core stays the
+# bedrock; v6.3 wraps it in a voice surface with controlled neural
+# boundaries (Whisper STT + Piper TTS + tiny LM rescoring).
+version = "6.3.0"
 edition = "2024"
 license = "BUSL-1.1"
 

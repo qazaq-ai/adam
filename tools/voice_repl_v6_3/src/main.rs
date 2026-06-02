@@ -1,20 +1,39 @@
 // SPDX-License-Identifier: BUSL-1.1
 // Part of: adam · ARK (Agglutinative Reasoning Kernel) · github.com/qazaq-ai/adam
-//! **Voice REPL v6.3** — the full Whisper-free Kazakh voice
-//! loop, standalone.
+//! **Voice REPL v6.3** — the full Kazakh voice loop, standalone.
+//!
+//! ## Honest hybrid (2026-06-02 doc audit)
+//!
+//! Earlier drafts of this docstring claimed a «Whisper-free, pure
+//! Rust end-to-end» pipeline. That was the v6.3 design goal but is
+//! no longer what the binary does. Live STT accuracy on natural
+//! Kazakh speech was too low to be useful with the in-tree DTW
+//! recogniser alone, so the production path now runs:
 //!
 //! ```text
 //!   microphone (cpal via adam-audio::record)
-//!     ↓ PCM mono 16 kHz
-//!     ↓ adam-audio::mfcc
-//!     ↓ adam-stt-phoneme::recognise_word + rescore
-//!   Vec<Phoneme>
-//!     ↓ adam-phoneme::cyrillic::phonemes_to_cyrillic
-//!   Cyrillic transcript
-//!     ↓ adam-tts-phoneme::synthesise_with_bank
+//!     ↓ PCM mono 48 kHz
+//!     ↓ STT — Whisper.cpp (`whisper-cli`, multilingual ggml model)
+//!                  default; in-tree DTW phoneme recogniser as
+//!                  `--stt-backend dtw` fallback when model absent.
+//!     ↓ token-split merge + Zipf-fuzzy + neural LM rescoring
+//!   normalised Cyrillic transcript
+//!     ↓ BPE-tokenised neural intent classifier (parallel log)
+//!     ↓ Phase 19.G high-confidence override (input rewriting)
+//!     ↓ adam-dialog v6.2 router (deterministic, ADAM_V6_2=1)
+//!   Kazakh response sentence
+//!     ↓ Piper TTS (`kk_KZ-issai-high`) via subprocess
 //!     ↓ adam-audio::play
 //!   speaker
 //! ```
+//!
+//! **Deterministic vs. neural**: the v6.2 dialog router (intent
+//! routing, retrieval, reasoning, realisation) stays 100 % rule-
+//! based and inspectable. The neural pieces (Whisper STT, Piper
+//! TTS, tiny contextual LM, BPE intent classifier) live at the
+//! voice surface only — pre-processing inputs and post-processing
+//! outputs around the deterministic core. None of them invent
+//! facts; they only normalise audio ↔ text.
 //!
 //! ## Usage
 //!

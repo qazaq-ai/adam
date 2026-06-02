@@ -3,7 +3,7 @@ name = "adam-voice-repl-v6-3"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Full v6.3 voice loop demonstrator — mic → DTW STT → phonotactic rescoring → Cyrillic → concatenative TTS → speaker. No Whisper, no `say`, pure Rust end-to-end. Standalone tool for sanity-checking the v6.3 stack before wiring it into `adam_chat`."
+description = "Full v6.3 voice loop demonstrator — mic → STT (Whisper.cpp default, in-tree DTW fallback) → fuzzy + neural LM rescoring → BPE intent classifier (parallel-log) → deterministic v6.2 dialog router → Piper TTS → speaker. Honest hybrid: deterministic core (v6.2), controlled neural boundaries at STT / TTS / rescoring (v6.3). Standalone tool for sanity-checking the v6.3 stack before wiring it into `adam_chat`."
 
 [[bin]]
 name = "voice_repl_v6_3"
