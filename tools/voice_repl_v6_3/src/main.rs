@@ -405,10 +405,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // the input token is a near-neighbour of a canonical
         // intent-trigger word. Built on adam_dialog::kazakh_fuzzy's
         // phonetic-aware edit distance (PHONETIC_PAIRS table).
+        // **Phase 15g.C.1 (2026-06-02)** — merge Whisper-Shirali
+        // token splits («көл дер» → «көлдер», etc.) BEFORE fuzzy /
+        // intent classification. This is a pre-step, not a rewrite,
+        // so the LM safety net below sees the merged surface as
+        // both the «raw» and (typically) the «proposed» state.
+        let user_text_merged = merge_whisper_splits(&user_text);
+        if user_text_merged != user_text {
+            println!("[voice-repl] split-merge → «{user_text_merged}»");
+        }
+
         let fuzzy_out = if args.mode == "respond" {
-            fuzzy_normalise(&user_text, &zipf_vocab)
+            fuzzy_normalise(&user_text_merged, &zipf_vocab)
         } else {
-            user_text.clone()
+            user_text_merged.clone()
         };
 
         // **Phase 15g.C.2 step 3 (2026-06-01)** — neural rescorer
@@ -419,9 +429,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // revert to the raw output — catches regressions like
         // «даулет → сәулет» that were B.1 / B.2's failure mode.
         // If no rescorer (missing checkpoint), keep fuzzy as-is.
-        let normalised = if fuzzy_out != user_text {
+        let normalised = if fuzzy_out != user_text_merged {
             if let Some(r) = neural.as_ref() {
-                match (r.score_text(&user_text), r.score_text(&fuzzy_out)) {
+                match (r.score_text(&user_text_merged), r.score_text(&fuzzy_out)) {
                     (Some(orig), Some(rew)) => {
                         // Tolerance: only revert when the rewrite is
                         // clearly worse than the original (≥ 0.05 nats/
@@ -431,7 +441,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 "[voice-repl] fuzzy → «{fuzzy_out}» — LM score \
                                  (orig={orig:.3} vs rew={rew:.3}) reverted to raw"
                             );
-                            user_text.clone()
+                            user_text_merged.clone()
                         } else {
                             println!(
                                 "[voice-repl] fuzzy → «{fuzzy_out}» (LM orig={orig:.3} rew={rew:.3})"
@@ -449,7 +459,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 fuzzy_out
             }
         } else {
-            user_text.clone()
+            user_text_merged.clone()
         };
 
         // Phase 17 (2026-05-31): voice-derived gender hint. Same
@@ -1028,6 +1038,39 @@ const fn intent_vocab_static_legacy() -> &'static [&'static str] {
         "төртті",
         "бесті",
     ]
+}
+
+/// **Phase 15g.C.1 (2026-06-02)** — Whisper-Shirali token-split merge.
+/// Shirali sometimes splits compound Kazakh plural / suffixed forms
+/// across a space boundary that the dialog engine's substring
+/// matchers don't recognise («көлдер» → «көл дер», «таулар» →
+/// «тау лар», «қазақстан» → «қаз ас тан»). The merge pairs below
+/// rejoin them BEFORE fuzzy / intent classification runs.
+///
+/// Each pair is `(split_form, merged_form)` — the substring is
+/// safe to merge because none of the split forms is a real
+/// Kazakh word collocation (e.g. nobody says «көл дер» as two
+/// separate tokens).
+fn merge_whisper_splits(text: &str) -> String {
+    static SPLIT_MERGES: &[(&str, &str)] = &[
+        ("көл дер", "көлдер"),
+        ("тау лар", "таулар"),
+        ("өзен дер", "өзендер"),
+        ("теңіз дер", "теңіздер"),
+        ("қала лар", "қалалар"),
+        ("қаз ас тан", "қазақстан"),
+        ("қазақ стан", "қазақстан"),
+        ("қазас тан", "қазақстан"),
+        ("таныс айық", "танысайық"),
+        ("алды мен", "алдымен"),
+    ];
+    let mut out = text.to_string();
+    for (split, merged) in SPLIT_MERGES {
+        if out.contains(split) {
+            out = out.replace(split, merged);
+        }
+    }
+    out
 }
 
 fn fuzzy_normalise(text: &str, vocab: &zipf_vocab::ZipfVocab) -> String {
