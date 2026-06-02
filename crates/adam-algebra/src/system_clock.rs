@@ -163,6 +163,63 @@ pub fn now() -> ClockReading {
     read_clock(tz_offset_secs_from_env())
 }
 
+/// **Phase 21 (2026-06-02)** — relative-day clock reading. Returns
+/// the wall clock as it would be at `days_offset` days from now in
+/// the resolved timezone. Negative = past, positive = future. Used
+/// by the dialog router to answer «Кеше қай күн болды?» / «Ертең
+/// нешесі?» / «Бүрсігүні аптаның қай күні болады?».
+pub fn read_clock_offset(tz_offset_secs: i64, days_offset: i64) -> ClockReading {
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs() as i64)
+        .unwrap_or(0);
+    let local = now + tz_offset_secs + days_offset * 86_400;
+    let secs_of_day = local.rem_euclid(86_400);
+    let hour = (secs_of_day / 3_600) as u32;
+    let minute = ((secs_of_day % 3_600) / 60) as u32;
+    let days = local.div_euclid(86_400);
+    let (year, month, day) = civil_from_days(days);
+    let weekday = ((days.rem_euclid(7) + 3).rem_euclid(7) + 1) as u32;
+    ClockReading {
+        year,
+        month,
+        day,
+        weekday,
+        hour,
+        minute,
+    }
+}
+
+/// Convenience: relative day reading using the resolved tz offset.
+/// `days_offset = -1` → yesterday, `0` → today, `1` → tomorrow.
+pub fn now_offset(days_offset: i64) -> ClockReading {
+    read_clock_offset(tz_offset_secs_from_env(), days_offset)
+}
+
+/// Kazakh label for relative-day prefixes used in dialog answers.
+/// Covers the common range −2…+2 with hand-rolled words; falls back
+/// to a numeric date phrase for anything farther.
+pub fn relative_day_label_kk(days_offset: i64) -> &'static str {
+    match days_offset {
+        -2 => "Алдыңғы күні",
+        -1 => "Кеше",
+        0 => "Бүгін",
+        1 => "Ертең",
+        2 => "Бүрсігүні",
+        _ => "Сол күні",
+    }
+}
+
+/// Past-tense Kazakh copula for relative day phrases. -1 / -2 →
+/// «болды»; 0 / +1 / +2 → «болады».
+pub fn relative_day_copula_kk(days_offset: i64) -> &'static str {
+    if days_offset < 0 {
+        "болды"
+    } else {
+        "болады"
+    }
+}
+
 /// Howard Hinnant's `civil_from_days` — public domain. Maps a
 /// Unix-epoch day count to a proleptic Gregorian (year, month, day).
 fn civil_from_days(days: i64) -> (i32, u32, u32) {
@@ -239,6 +296,67 @@ mod tests {
         assert_eq!(c.weekday_kk(), "дүйсенбі");
         assert_eq!(c.time_hhmm(), "08:30");
         assert_eq!(c.date_iso(), "2026-05-25");
+    }
+
+    #[test]
+    fn read_clock_offset_yesterday_is_one_day_before_today() {
+        let tz = 5 * 3_600;
+        let today = read_clock(tz);
+        let yesterday = read_clock_offset(tz, -1);
+        // Convert both to absolute days since 1970-01-01 and verify the
+        // difference is exactly 1 (independent of month/year boundaries).
+        let today_days = absolute_day(today.year, today.month, today.day);
+        let yest_days = absolute_day(yesterday.year, yesterday.month, yesterday.day);
+        assert_eq!(today_days - yest_days, 1);
+    }
+
+    #[test]
+    fn read_clock_offset_tomorrow_is_one_day_after_today() {
+        let tz = 5 * 3_600;
+        let today = read_clock(tz);
+        let tomorrow = read_clock_offset(tz, 1);
+        let today_days = absolute_day(today.year, today.month, today.day);
+        let tomo_days = absolute_day(tomorrow.year, tomorrow.month, tomorrow.day);
+        assert_eq!(tomo_days - today_days, 1);
+    }
+
+    #[test]
+    fn relative_day_labels_cover_common_range() {
+        assert_eq!(relative_day_label_kk(-2), "Алдыңғы күні");
+        assert_eq!(relative_day_label_kk(-1), "Кеше");
+        assert_eq!(relative_day_label_kk(0), "Бүгін");
+        assert_eq!(relative_day_label_kk(1), "Ертең");
+        assert_eq!(relative_day_label_kk(2), "Бүрсігүні");
+        assert_eq!(relative_day_label_kk(7), "Сол күні");
+    }
+
+    #[test]
+    fn relative_day_copula_picks_past_for_negative() {
+        assert_eq!(relative_day_copula_kk(-1), "болды");
+        assert_eq!(relative_day_copula_kk(-2), "болды");
+        assert_eq!(relative_day_copula_kk(0), "болады");
+        assert_eq!(relative_day_copula_kk(1), "болады");
+    }
+
+    /// Helper for the offset tests: count absolute days since 1970-01-01.
+    fn absolute_day(year: i32, month: u32, day: u32) -> i64 {
+        let mut days: i64 = 0;
+        let mut y = 1970;
+        while y < year {
+            days += if is_leap(y) { 366 } else { 365 };
+            y += 1;
+        }
+        let months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        for m in 1..month {
+            days += months[(m - 1) as usize];
+            if m == 2 && is_leap(year) {
+                days += 1;
+            }
+        }
+        days + (day as i64 - 1)
+    }
+    fn is_leap(y: i32) -> bool {
+        (y % 4 == 0 && y % 100 != 0) || y % 400 == 0
     }
 
     #[test]

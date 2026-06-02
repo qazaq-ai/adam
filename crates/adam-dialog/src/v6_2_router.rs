@@ -888,13 +888,66 @@ fn looks_like_time_query(s: &str) -> bool {
         "неделя",
         "какая дата",
         "какой день",
+        // Phase 21 (2026-06-02) — relative-day anchors.
+        "кеше",
+        "ертең",
+        "бүрсігүні",
+        "алдыңғы күн",
+        "вчера",
+        "завтра",
     ];
     markers.iter().any(|m| lower.contains(m))
+}
+
+/// **Phase 21 (2026-06-02)** — detect relative-day anchor in the
+/// input. Returns the day-offset (−2…+2) and `None` if the input
+/// has no relative-day marker (caller should treat it as «today»).
+fn relative_day_offset(lower: &str) -> Option<i64> {
+    if lower.contains("бүрсігүні") {
+        return Some(2);
+    }
+    if lower.contains("ертең") || lower.contains("завтра") {
+        return Some(1);
+    }
+    if lower.contains("алдыңғы күн") || lower.contains("позавчера") {
+        return Some(-2);
+    }
+    if lower.contains("кеше") || lower.contains("вчера") {
+        return Some(-1);
+    }
+    None
 }
 
 fn emit_clock_answer(input: &str) -> String {
     let c = system_clock::now();
     let lower = input.to_lowercase();
+    // **Phase 21** — handle relative-day questions before the
+    // generic «today» path. If the user says «Кеше / Ертең …»,
+    // shift the clock reading and render with the matching prefix.
+    if let Some(offset) = relative_day_offset(&lower) {
+        let rc = system_clock::now_offset(offset);
+        let label = system_clock::relative_day_label_kk(offset);
+        let copula = system_clock::relative_day_copula_kk(offset);
+        // Weekday-only ask: «Кеше қай күн болды?» / «Ертең қай күн?»
+        if lower.contains("апта")
+            || lower.contains("неделя")
+            || (lower.contains("күн") && (lower.contains("қай") || lower.contains("қандай")))
+        {
+            return format!("{label} — {} {copula}.", rc.weekday_kk());
+        }
+        // Day-of-month ask: «Кеше нешесі еді?» / «Ертең нешесі?»
+        if lower.contains("нешесі") || lower.contains("число") {
+            return format!("{label} {} {} {copula}.", rc.day, rc.month_kk());
+        }
+        // Generic relative-day date.
+        return format!(
+            "{label} — {} {} {} жыл, {} {copula}.",
+            rc.day,
+            rc.month_kk(),
+            rc.year,
+            rc.weekday_kk()
+        );
+    }
     if lower.contains("сағат") || lower.contains("часов") || lower.contains("уақыт")
     {
         return format!("Қазір сағат {}.", c.time_hhmm());
@@ -1451,6 +1504,45 @@ mod tests {
         let r = answer_with_corpus("Қазір сағат неше?", &idx);
         assert!(r.is_some());
         assert!(r.unwrap().contains(":"));
+    }
+
+    /// **Phase 21 (2026-06-02)** — relative-day queries route to the
+    /// clock handler instead of the substring fact lookup.  Without
+    /// the «кеше» / «ертең» markers the router previously fell into
+    /// `Күн IsA дөңгелек` (live REPL 2026-06-02 retest).
+    #[test]
+    fn yesterday_query_routes_to_clock_with_past_copula() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Кеше қай күн болды?", &idx);
+        let s = r.expect("yesterday query should answer");
+        assert!(s.starts_with("Кеше"), "expected «Кеше …» prefix, got: {s}");
+        assert!(
+            s.contains("болды"),
+            "expected past copula «болды», got: {s}"
+        );
+        // Must NOT be the «Күн — дөңгелек» substring misroute.
+        assert!(
+            !s.contains("дөңгелек"),
+            "regression: routed to fact, got: {s}"
+        );
+    }
+
+    #[test]
+    fn tomorrow_query_routes_to_clock_with_future_copula() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Ертең қандай күн?", &idx);
+        let s = r.expect("tomorrow query should answer");
+        assert!(s.starts_with("Ертең"), "got: {s}");
+        assert!(s.contains("болады"), "got: {s}");
+    }
+
+    #[test]
+    fn day_after_tomorrow_query_routes_to_clock() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Бүрсігүні нешесі болады?", &idx);
+        let s = r.expect("day-after-tomorrow query should answer");
+        assert!(s.starts_with("Бүрсігүні"), "got: {s}");
+        assert!(s.contains("болады"), "got: {s}");
     }
 
     /// Real biographical question → realised Kazakh sentence.
