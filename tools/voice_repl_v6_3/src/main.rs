@@ -112,11 +112,22 @@ struct Args {
     #[arg(long, default_value = "whisper")]
     stt_backend: String,
     /// Whisper ggml model path (used only when --stt-backend=whisper).
-    /// Default: ggml-medium.bin (~1.5 GB, multilingual incl. Kazakh).
-    /// Smaller alternative: ggml-small.bin (488 MB) — works but mangles
-    /// the distinctive Kazakh letters (Қ/Ғ/Ң/Ө/Ұ/Ү/Һ/І/Ә) more often,
-    /// which trips the dialog engine's intent classifier.
-    #[arg(long, default_value = "data/stt_models/ggml-medium.bin")]
+    ///
+    /// **Phase 15g.C (2026-06-02) — default switched to Shirali
+    /// fine-tuned KZ Whisper.** The ISSAI/Shirali model
+    /// (`whisper-small-ISSAI_KSC_335RS_v2` from HuggingFace,
+    /// converted HF→ggml via `whisper.cpp/models/convert-h5-to-ggml.py`)
+    /// is trained on the Kazakh Speech Corpus and produces canonical
+    /// Қ/Ғ/Ң/Ө/Ұ/Ү/Һ/І/Ә where multilingual Whisper drifts to К/Г/Н/etc.
+    /// File size: 465 MB (whisper-small architecture).
+    ///
+    /// Fallback alternatives if Shirali file missing or produces
+    /// artefacts on a specific audio:
+    ///   data/stt_models/ggml-medium.bin   (multilingual, 1.5 GB)
+    ///   data/stt_models/ggml-small.bin    (multilingual, 488 MB)
+    /// Override at runtime:
+    ///   --whisper-model data/stt_models/ggml-medium.bin
+    #[arg(long, default_value = "data/stt_models/ggml-shirali-kz.bin")]
     whisper_model: PathBuf,
     /// Initial prompt fed to whisper-cli to bias decoding toward
     /// Kazakh-specific phonotactics. Multilingual Whisper otherwise
