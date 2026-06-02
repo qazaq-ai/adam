@@ -26,6 +26,7 @@
 
 pub mod checkpoint;
 pub mod generate;
+pub mod intent_classifier;
 pub mod score;
 pub mod train;
 pub mod verifier;

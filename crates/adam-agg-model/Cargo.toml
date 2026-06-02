@@ -10,6 +10,9 @@ adam-kernel = { path = "../adam-kernel" }
 adam-kernel-fst = { path = "../adam-kernel-fst" }
 adam-agg-tokenizer = { path = "../adam-agg-tokenizer" }
 adam-agg-synth = { path = "../adam-agg-synth" }
+# Phase 19 step C — intent classifier trainer needs BPE encoding
+# at training time, same tokenizer the v6 LM uses.
+adam-tokenizer = { path = "../adam-tokenizer" }
 burn = { version = "0.17", default-features = false, features = ["std", "train", "autodiff", "ndarray", "wgpu"] }
 serde.workspace = true
 serde_json.workspace = true
@@ -38,6 +41,15 @@ path = "src/bin/train_contextual_lm.rs"
 [[bin]]
 name = "train_contextual_lm_gpu"
 path = "src/bin/train_contextual_lm_gpu.rs"
+
+# Phase 19 step C (2026-06-02) — train the pooled-embedding
+# intent classifier on `adam_intent_training_pack.json`.
+[[bin]]
+name = "train_intent_classifier_gpu"
+path = "src/bin/train_intent_classifier_gpu.rs"
+# Phase 19 — neural intent classifier as a Burn module — also needs
+# the BPE tokenizer + kernel segmentation types for encoding the
+# training pack at training time.
 
 [dev-dependencies]
 criterion = { version = "0.5", default-features = false, features = ["cargo_bench_support"] }

@@ -420,6 +420,50 @@ def load_eval_queries() -> list[dict]:
     return out
 
 
+def whisper_drift_versions(text: str) -> list[str]:
+    """**Phase 19.C.1 (2026-06-02)** — generate Whisper-like drift
+    versions of a training sample to combat overfitting on the
+    small base pack (1 180 unique → 52 classes ≈ 22 each).
+
+    Each drift transform mimics a real Whisper-multilingual
+    confusion observed in live voice REPL sessions.  The classifier
+    learns to map all drift forms to the same intent.
+
+    Returns 0–4 new versions per call (deduplicated against the
+    input).  Empty list when no drift would change the surface.
+    """
+    import re
+    drifts = []
+    # 1. Қ → К (multilingual-Whisper letter drift).
+    if "қ" in text.lower() or "Қ" in text:
+        drifts.append(text.replace("Қ", "К").replace("қ", "к"))
+    # 2. Ғ → Г
+    if "ғ" in text.lower() or "Ғ" in text:
+        drifts.append(text.replace("Ғ", "Г").replace("ғ", "г"))
+    # 3. Ң → Н
+    if "ң" in text.lower() or "Ң" in text:
+        drifts.append(text.replace("Ң", "Н").replace("ң", "н"))
+    # 4. Drop trailing -і / -ы (short-vowel drop).
+    short_dropped = re.sub(r"([а-яёәғіңөұүһ])[іы]\b", r"\1", text, flags=re.I)
+    if short_dropped != text:
+        drifts.append(short_dropped)
+    # 5. Combine #1+#2 (deep drift — both К and Г variants).
+    if ("қ" in text.lower() or "Қ" in text) and ("ғ" in text.lower() or "Ғ" in text):
+        combo = (
+            text.replace("Қ", "К").replace("қ", "к")
+            .replace("Ғ", "Г").replace("ғ", "г")
+        )
+        drifts.append(combo)
+    # Dedup against original + each other.
+    seen = {text}
+    out = []
+    for d in drifts:
+        if d not in seen:
+            seen.add(d)
+            out.append(d)
+    return out
+
+
 def has_template_placeholder(text: str) -> bool:
     """Reject samples that still contain unfilled `{slot}` template
     placeholders.  These slipped in from v1.toml response templates
@@ -454,6 +498,25 @@ def main() -> int:
         samples.append(s)
 
     print(f"[intent-pack] unique after dedup: {len(samples):>5}", file=sys.stderr)
+
+    # **Phase 19.C.1** — augment with Whisper-drift versions.
+    augmented = list(samples)
+    for s in samples:
+        for drift in whisper_drift_versions(s["text"]):
+            key = (drift.strip().lower(), s["intent"])
+            if key in seen:
+                continue
+            seen.add(key)
+            augmented.append({
+                "text": drift,
+                "intent": s["intent"],
+                "source": s["source"] + "+drift",
+            })
+    print(
+        f"[intent-pack] after Whisper-drift augmentation: {len(augmented):>5}",
+        file=sys.stderr,
+    )
+    samples = augmented
 
     # Per-intent distribution.
     by_intent = Counter(s["intent"] for s in samples)
