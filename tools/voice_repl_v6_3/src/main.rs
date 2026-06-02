@@ -32,6 +32,7 @@
 //! and `pcm_templates.bin` (PCM for TTS) when present. Both
 //! are merged with synth fallback covering uncovered phonemes.
 
+mod intent_classifier_runtime;
 mod neural_rescorer;
 mod zipf_vocab;
 
@@ -323,6 +324,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // — voice REPL behaviour is then identical to 15g.B.2.
     let neural = neural_rescorer::NeuralRescorer::load_default();
 
+    // **Phase 19 step E (2026-06-02)** — neural intent classifier
+    // runs **alongside** the substring intent matchers in
+    // adam-dialog. We don't override the substring decision yet —
+    // just log the neural prediction (intent + confidence) so we
+    // can see when neural and substring agree / disagree on the
+    // same input. Once the discrepancy data shows neural is
+    // reliable on a category, we'll switch that category to
+    // neural-first routing.
+    let intent_classifier = intent_classifier_runtime::IntentClassifierRuntime::load_default();
+
     let single = !args.loop_mode;
     loop {
         if args.loop_mode {
@@ -461,6 +472,27 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         } else {
             user_text_merged.clone()
         };
+
+        // **Phase 19 step E (2026-06-02)** — parallel-log neural
+        // intent classifier prediction.  Runs ALONGSIDE the
+        // adam-dialog substring intent layer.  We log:
+        //   [voice-repl] intent (neural) → AskTime (conf=0.83)
+        // The substring path still drives the final response;
+        // this is observability for the Phase 19.F iteration
+        // where we'll start trusting neural-first on high-
+        // confidence predictions.
+        if let Some(ic) = intent_classifier.as_ref() {
+            if let Some((label, conf)) = ic.classify(&normalised) {
+                let marker = if conf >= 0.70 {
+                    "✓"
+                } else if conf >= 0.40 {
+                    "~"
+                } else {
+                    "?"
+                };
+                println!("[voice-repl] intent (neural) → {label} (conf={conf:.2}) {marker}");
+            }
+        }
 
         // Phase 17 (2026-05-31): voice-derived gender hint. Same
         // pattern as `adam-dialog/src/bin/adam_chat.rs:1045+`:
