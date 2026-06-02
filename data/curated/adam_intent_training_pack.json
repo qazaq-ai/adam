@@ -1,0 +1,5963 @@
+{
+  "version": "v6.3-intent-classifier-2026-06-02",
+  "name": "adam-intent-training-pack",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "intents": [
+    "Greeting",
+    "Farewell",
+    "Thanks",
+    "Apology",
+    "Affirmation",
+    "Negation",
+    "Compliment",
+    "Insult",
+    "UserDisagrees",
+    "UserAcknowledgement",
+    "WellWishes",
+    "IntroProposal",
+    "Casual",
+    "AskHowAreYou",
+    "StatementOfWellbeing",
+    "AskName",
+    "StatementOfName",
+    "AskAboutSystem",
+    "AskAge",
+    "StatementOfAge",
+    "AskLocation",
+    "StatementOfLocation",
+    "AskOccupation",
+    "StatementOfOccupation",
+    "AskActivity",
+    "StatementOfActivity",
+    "AskFamily",
+    "StatementOfFamily",
+    "AskTime",
+    "AskDate",
+    "AskWeather",
+    "StatementOfWeather",
+    "AskAboutTopic",
+    "AskDefinition",
+    "InventoryQuery",
+    "Request",
+    "MathExpression",
+    "AskPurpose",
+    "AskExercise",
+    "AskCurrentProgress",
+    "AskCurriculumContent",
+    "AskNextTopic",
+    "SubmitSolution",
+    "CodeRequest",
+    "ExplainCompilerError",
+    "CrossLanguageContrast",
+    "AskWillingness",
+    "Filler",
+    "Mood",
+    "Clarification",
+    "Question",
+    "Unknown"
+  ],
+  "sample_count": 1180,
+  "samples": [
+    {
+      "text": "сәлем",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлем, қалайсың",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлем, не жаңалық",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлем достым",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлем бауырым",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "хай",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлемет пе",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлемет пе, бауырым",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлем, не істеп жатырсың",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлем, көрмегелі қашан",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлем, жасырынбадың ба",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ало",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "салам",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "приветствую",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлем-сәлем",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "оу, сәлем",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлем балалар",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлем достар",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлеметсіз бе",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлеметсіз бе, қалайсыз",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлеметсіз бе, жайыңыз қалай",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлеметсіз бе, ағай",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлеметсіз бе, апай",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлеметсіз бе, ұстаз",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайырлы күн",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайырлы күн сізге",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалыңыз қалай",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жағдайыңыз қалай",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жайыңыз қалай",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "хал-жайыңыз қалай",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қал қалай",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалай отырсыз",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көп уақыт көрген жоқпыз",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлеметсіз бе, көп жасаңыз",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "армысыз",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "армысыздар",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сізге сәлем",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "құрметпен сәлемдесемін",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ассаламу алейкум",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ассалам алейкум",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ассалаумағалейкум",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "уағалайкум ас-салам",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "уағалейкумассалам",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ас-салам алейкум",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ассалам уалейкум",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "уағалайкум-ас-салам",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "уағалайкум-ас-салам, ағай",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ассаламу алейкум уа рахматуллах",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "уалейкум ассалам",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайырлы таң",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайырлы таң ағай",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайырлы кеш",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайырлы кеш ағай",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайырлы түн",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайырлы түн сізге",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ертеңгі сағат қайырлы болсын",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "таңыңыз қайырлы",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "күніңіз сәтті болсын",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кешіңіз қайырлы",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "танысайық",
+      "intent": "IntroProposal",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "танысалық",
+      "intent": "IntroProposal",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "алдымен танысайық",
+      "intent": "IntroProposal",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "алдымен танысып алайық",
+      "intent": "IntroProposal",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "келіңіз танысайық",
+      "intent": "IntroProposal",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "танысып алсақ қайтеді",
+      "intent": "IntroProposal",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен сізбен танысқым келеді",
+      "intent": "IntroProposal",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "танысуға қарсы емеспін",
+      "intent": "IntroProposal",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сау бол",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сау болыңыз",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сау-сәлемет болыңыз",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көріскенше",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "келесі кездескенше",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қош бол",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қош болыңыз",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қош, рахмет",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "хош",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "хош болыңыз",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бай-бай",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ал, мен кеттім",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кеттім ендеше",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мейлі, кеттім",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ертең көрісеміз",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көріскенше аман-сау болыңыз",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кездескенше",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сапарыңыз сәтті болсын",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жолыңыз болсын",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жолыңыз бен жөніңіз болсын",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "аман-есен қайт",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "пока",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "соңына дейін болғаныңызға рахмет",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "рахмет",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көп рахмет",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көп-көп рахмет",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "алғыс айтамын",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "алғысым шексіз",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "рақмет сізге",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "рахмет жақсы",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "рахмет, өте жақсы",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "рахмет, көмектестіңіз",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сізге үлкен рахмет",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "рақмет, бауырым",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "рахмет, ағай",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "рахмет, апай",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "рахмет, ұстаз",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "тоқтаусыз рахмет",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сау болыңыз, рахмет",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "рахмет, сіз керемет адамсыз",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көмекке рахмет",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "уақыт бөлгеніңізге рахмет",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кешіріңіз",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кешір мені",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ғафу етіңіз",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өкінішті, кешіріңіз",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кешірім сұраймын",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "айып етпеңіз",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ағай, кешіріңіз",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "апай, кешіріңіз",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қателестім, кешір",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ұят болды",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ұят, кешіріңіз",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сізді ренжіттім, кешіріңіз",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "тіл тигізгенім үшін кешір",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ойламай айтып қалдым",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "былай етпеуім керек еді",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кешіріп қойыңыз",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "иә",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "иә, әрине",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "иә, дұрыс",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ия",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "иә, солай",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "дұрыс",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "дұрыс айтасыз",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "келісемін",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "келісемін сізбен",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "тура солай",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ақиқат",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "анық солай",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "айтып жатқаныңыз дұрыс",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "солай",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ау, солай ма",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "разымын",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ұнайды",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ұнатамын",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жоқ",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жоқ, олай емес",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жоқ, дұрыс емес",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "келіспеймін",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "емес",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мүлдем жоқ",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "тіпті де жоқ",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ешқашан",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жоқ деймін",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "болмайды",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "болмас",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "олай емес",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сіз қателесесіз",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "айтқаныңыз дұрыс емес",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "теріс",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "терісі",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жоқ-жоқ",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен ақмақсың",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен ақымақсың",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ақмақсың",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ақымақсың",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен надансың",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "наданмын",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "надансың",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен өтірікшісің",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өтірікші",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өтірік айтасың",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен ақылсызсың",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен түкке тұрмайсың",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ақмақ",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ақымақ",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ақылсыз",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "топас",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "топассың",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "топас екенсің",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ессіз",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ессізсің",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "айуан",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жындысың ба",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ессіз бе сен",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен ештеңе білмейсің",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "білмейсің бе",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен жарамайсың",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ешқандай пайдаң жоқ",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен пайдасызсың",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жуан жалмауыз",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сорлы",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сорлы екенсің",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен жарайсың",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жарайсың",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жарайсыз",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сіз керемет",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сіз керемет адамсыз",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "тамаша",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өте тамаша",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мықтысың",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен мықтысың",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сіз мықтысыз",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өте жақсы",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ұнайды маған",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ұнатамын сізді",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сізге сүйінемін",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ризамын сіздерге",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ризамын саған",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өте дұрыс айттың",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "дұрыс айтасың",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ақылды екенсің",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ақылдысың",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "білімдісің",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сабырлысың",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мейірімдісің",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "адалсың",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сенімдісің",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен супер",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "супер екенсің",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көркемсің",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сұлусың",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көрікті екенсің",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жақсы істедің",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жақсы жұмыс",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жарайды",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "дұрыс істедіңіз",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жасасын",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жасасын саған",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өте дұрыс істедің",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "талантыңды бағалаймын",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "соғыс табыс",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "табыс саған",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "табысыңыз ұлы болсын",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалыс қалма",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ұмтыл",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "тырыс",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "тырысыңыз",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сіз қолыңыздан келеді",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен жасай аласың",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көтермелейтін боламын",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қолдаймын сені",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сенемін саған",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "берілмеңіз",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "беріспеңіз",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жалғастырыңыз",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "тағы тырысып көріңіз",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сабыр сақтаңыз",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайғырмаңыз",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ренжімеңіз",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "уайымдамаңыз",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бәрі жақсы болады",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "уақыт емдейді",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сабыр сақта",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өзіңізді ұстаңыз",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен сізді түсінемін",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сізді жалғыз тастамаймын",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көңіліңізді көтеріңіз",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "осы да өтер",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "құттықтаймын",
+      "intent": "WellWishes",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "құтты болсын",
+      "intent": "WellWishes",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "құтты болсын сізге",
+      "intent": "WellWishes",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "туған күніңізбен",
+      "intent": "WellWishes",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "туған күніңмен",
+      "intent": "WellWishes",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мерекеңізбен",
+      "intent": "WellWishes",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "табысыңызбен құттықтаймын",
+      "intent": "WellWishes",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жетістігіңізбен",
+      "intent": "WellWishes",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "үйленгеніңізбен",
+      "intent": "WellWishes",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көңілім қалды",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ренжідім",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "капа болдым",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "капамын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көңіл-күйім нашар",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өкінішті",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көңілсізбін",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көңілім жабырқау",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайғырып отырмын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайғылымын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жылағым келеді",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жылап жатырмын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жанға батты",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жүрегім ауырып отыр",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ішім пысты",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көңілім жабырқаулы",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ұнамайды бұл",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көңіл-күйім жоқ",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көңілді отырмын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қуаныштымын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қуанып отырмын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көңіл-күйім жақсы",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бақыттымын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бақыттымын бүгін",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қуанышым кетпей жатыр",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "тамаша көңіл-күй",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өте жақсымын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бүгін көңілді күн",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "күлкі сақтай алмай отырмын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көңілді жүрмін",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "шаттық сезім",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ашуланып отырмын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ашуым келді",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ыза болдым",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ызаландым",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ашудан жарылып барамын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "тыныш отыра алмаймын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сабырым кетті",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "шыдамым таусылды",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жыным келді",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ашулымын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "шаршадым",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "шаршағанмын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалжыраған едім",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалжыраудамын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ұйқым келеді",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ұйықтап қалам",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көзім жабылып барады",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "арбадым",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өте шаршадым",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "демалғым келеді",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қорқып отырмын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қорқам",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қорқыныш сезімі бар",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "үрейлендім",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "үрейім ұшты",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "шошып кеттім",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жүрегім жарыла жаздады",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жалғыз отырғаным жалықтырды",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "уақыт өтпей жатыр",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ермегім жоқ",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көңілсіз",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жалықтырды",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "уайымдап жүрмін",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "уайымдаймын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "тыныш бола алмай отырмын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "тыныш ұйықтай алмаймын",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ойда қалып жатыр",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жанымда қаяу бар",
+      "intent": "Mood",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалайсың",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалайсыз",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалыңыз қалай",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалың қалай",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жайыңыз қалай",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жайың қалай",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жағдайыңыз қалай",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жағдайың қалай",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не жаңалық",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "хал қалай",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "хал-жайыңыз қалай",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көңіл-күйіңіз қалай",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көңіл-күйің қалай",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өміріңіз қалай",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "тұрмыс қалай",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не істеп жатырсыз",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не істеп жатырсың",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не бітіріп жатырсың",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жақсы",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жақсымын",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жақсы, рахмет",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өте жақсы",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "тамаша",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "құдайға шүкір",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "аллаға шүкір",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "шүкір",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "шамалы",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жаман емес",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жаман емеспін",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "орташа",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ауырып жүрмін",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ауырып отырмын",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көңіл-күйім жоқ",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көңіл-күйім жақсы",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ал, сіз",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ал, өзіңіз",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өзіңіз ше",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сенің атың кім",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сіздің атыңыз кім",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен кімсің",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сіз кімсіз",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өзің кімсің",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өзіңіз кімсіз",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен өзің кім боласың",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сіз өзіңіз кім боласыз",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "есімің қалай",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "есіміңіз қалай",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "атың кім",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "атыңыз кім",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалай атайын сізді",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сізді қалай атаймын",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "танысайық, есімің кім",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өзіңмен таныстыршы",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "менің атым даулет",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "менің атым алишер",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "менің атым ержан",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "менің атым нұрлан",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "менің атым асылбек",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "менің есімім алишер",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "менің есімім айгерім",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "менің есімім — әсем",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "менің есімім — динара",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен айгерім деген қызбын",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен — данияр",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен дауыт боламын",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен ержан боламын",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен әлия деген қызбын",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "атым менің — асан",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "есімім менің — мейірхан",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мені дәурен дейді",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мені айдана деп атайды",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "достарым мені әсетпен атайды",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "балаларым мені әке деп атайды",
+      "intent": "StatementOfName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен неше жастасың",
+      "intent": "AskAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сіз неше жастасыз",
+      "intent": "AskAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жасың нешеде",
+      "intent": "AskAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жасыңыз нешеде",
+      "intent": "AskAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қанша жастасың",
+      "intent": "AskAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қанша жастасыз",
+      "intent": "AskAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "неше жасқа келдің",
+      "intent": "AskAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "туған жылыңыз қашан",
+      "intent": "AskAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қашан тудың",
+      "intent": "AskAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жасым отызда",
+      "intent": "StatementOfAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жасым он сегізде",
+      "intent": "StatementOfAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен жиырмадамын",
+      "intent": "StatementOfAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен жиырма жастамын",
+      "intent": "StatementOfAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жасым қырыққа толды",
+      "intent": "StatementOfAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "елуге келдім",
+      "intent": "StatementOfAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жасым алпыста",
+      "intent": "StatementOfAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "он бес жастамын",
+      "intent": "StatementOfAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жасым жетпіс",
+      "intent": "StatementOfAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайдан келдің",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайдан болдыңыз",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен қайдансың",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сіз қай жақтансыз",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен қайда тұрасың",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сіз қайда тұрасыз",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қай қаладансыз",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "туған жерің қайда",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен қазақстаннанмын",
+      "intent": "StatementOfLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен қостанайдан болам",
+      "intent": "StatementOfLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен алматыданмын",
+      "intent": "StatementOfLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен астанаданмын",
+      "intent": "StatementOfLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен шымкенттенмін",
+      "intent": "StatementOfLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен орал қаласынанмын",
+      "intent": "StatementOfLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен ақтөбеденмін",
+      "intent": "StatementOfLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен қызылордаданмын",
+      "intent": "StatementOfLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен қарағандыданмын",
+      "intent": "StatementOfLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен қостынайда тұрамын",
+      "intent": "StatementOfLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен астанада тұрамын",
+      "intent": "StatementOfLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен алматыда тұрамын",
+      "intent": "StatementOfLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "туған жерім — арқа",
+      "intent": "StatementOfLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "туған жерім — оңтүстік қазақстан",
+      "intent": "StatementOfLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ауылым атырау облысында",
+      "intent": "StatementOfLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не жұмыс істейсің",
+      "intent": "AskOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не жұмыс істейсіз",
+      "intent": "AskOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мамандығың қандай",
+      "intent": "AskOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мамандығыңыз қандай",
+      "intent": "AskOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қай салада істейсіз",
+      "intent": "AskOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайда істейсіз",
+      "intent": "AskOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не айналасасыз",
+      "intent": "AskOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не айналысасың",
+      "intent": "AskOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен мұғаліммін",
+      "intent": "StatementOfOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен дәрігермін",
+      "intent": "StatementOfOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен инженермін",
+      "intent": "StatementOfOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен бағдарламашымын",
+      "intent": "StatementOfOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен қазір студентпін",
+      "intent": "StatementOfOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен оқушымын",
+      "intent": "StatementOfOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен зейнеткермін",
+      "intent": "StatementOfOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жұмыссыз отырмын",
+      "intent": "StatementOfOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өз жұмысым бар",
+      "intent": "StatementOfOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мектепте істеймін",
+      "intent": "StatementOfOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ауруханада істеймін",
+      "intent": "StatementOfOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ауылшаруашылықта істеймін",
+      "intent": "StatementOfOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "иә, келісемін",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ия, дұрыс",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сізбен келісемін",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ұсынысыңызды қабылдаймын",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сізбен келіспеймін",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "пікіріңізді бөліспеймін",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "басқаша ойлаймын",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "олай ойламаймын",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не дедіңіз",
+      "intent": "Clarification",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не дедің",
+      "intent": "Clarification",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайтадан айта аласыз ба",
+      "intent": "Clarification",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайта айт",
+      "intent": "Clarification",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "түсінбедім",
+      "intent": "Clarification",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "анық емес",
+      "intent": "Clarification",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "дәлірек айтсаңыз",
+      "intent": "Clarification",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мысал келтіріңізші",
+      "intent": "Clarification",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "басқаша айт",
+      "intent": "Clarification",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не айтасың",
+      "intent": "Clarification",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "түсіндім",
+      "intent": "UserAcknowledgement",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ұқтым",
+      "intent": "UserAcknowledgement",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "білдім",
+      "intent": "UserAcknowledgement",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көрдім",
+      "intent": "UserAcknowledgement",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "білемін",
+      "intent": "UserAcknowledgement",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "анық болды",
+      "intent": "UserAcknowledgement",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "анық",
+      "intent": "UserAcknowledgement",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жарайды",
+      "intent": "UserAcknowledgement",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "айтып бересіз бе",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "айтып берші",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "айтсаңыз",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "айтсаңызшы",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көмектесесіз бе",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көмектесесің бе",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көмек керек",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көмектесіңізші",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "айтшы маған",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "түсіндіріп бересіз бе",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "түсіндіріңізші",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өтінемін",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "өтіне аламын ба",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "болуы мүмкін бе",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сұрауға бола ма",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бір өтінішім бар",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "уақытыңыз бар ма",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қарап шықсаңыз болатын ба",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мүмкін болса айтыңыз",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көмек көрсетіңізші",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бұл не",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ол не",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не дегеніңіз",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не дейсің",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не айттыңыз",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не туралы",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не айтасыз",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не екенін айтыңыз",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не дегенді білдіреді",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не дегенді білдіретінін айтыңызшы",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қашан",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қашан болады",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қашан болды",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қай уақытта",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қай күні",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қай жылы",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қашан туылдыңыз",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қашан барамыз",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қашан кездесеміз",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайда",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайдан",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қай жерде",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қай қалада",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қай елде",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайда орналасқан",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қай жаққа барамыз",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайда тұрады",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кім",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кім ол",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кім бұл",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кім жасады",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кім айтты",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кім екенін білесіз бе",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кімге арналған",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кімнен",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "неге",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "неліктен",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не үшін",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "неге олай",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "неге бұлай",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "неге істедіңіз",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "неге айттың",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "себебі неде",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалай",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалай істеледі",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалай жасайды",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалай шешеміз",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалай көмектесемін",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалай түсіндіремін",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қанша",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қанша тұрады",
+      "intent": "Question",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бұл не дегеніңіз",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ол не дегеніңіз",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не туралы айтып отырсыз",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "анықтаманы айтып беріңізші",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қандай сөз",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мағынасын айтыңыз",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "түсіндіріп беріңіз",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не дегенді білдіреді",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қазақстан туралы айтып бересіз бе",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қазақстан туралы айтшы",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "абай туралы не білесіз",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "абай туралы айтыңыз",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "алматы туралы не білесің",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ұлы дала туралы әңгімелеп беріңізші",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "тарих туралы айтыңыз",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "физика туралы айтып бересің бе",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "математика туралы айтшы",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "биология туралы не білесің",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қазір сағат неше",
+      "intent": "AskTime",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сағат неше",
+      "intent": "AskTime",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қазір неше уақыт",
+      "intent": "AskTime",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "уақыт қанша",
+      "intent": "AskTime",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сағаты қанша",
+      "intent": "AskTime",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бүгін қандай күн",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бүгін қай күн",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бүгін айдың нешесі",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бүгін қай айдамыз",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бүгінгі күн",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бүгін аптаның қай күні",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бүгін жұма ма",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ертең қандай күн",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кеше қандай күн болды",
+      "intent": "AskDate",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "екі қосу екі",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "екі қосу үш",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бес қосу алты",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "он қосу жиырма",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "екі көбейту үш",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бес көбейту алты",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "он көбейту он",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жиырма көбейту он",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "он бөлу екі",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жиырма бөлу төрт",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жүз бөлу он",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "он алып тастау бес",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жиырма алып тастау он",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "екі қосу үш қанша болады",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "екі көбейтсек үшке нешеу болады",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "елу бөлу беске нешеу шығады",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "екі мың қанша болады",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бұл есепті қалай шешеміз",
+      "intent": "Clarification",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалай дұрыс есептеймін",
+      "intent": "Clarification",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "формулада нені табамыз",
+      "intent": "Clarification",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қандай амал қолдану керек",
+      "intent": "Clarification",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қазақстанда қандай таулар бар",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қазақстанда қандай көлдер бар",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қазақстанда қандай өзендер бар",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қазақстанда қандай қалалар бар",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қазақстан аумағы қанша",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қазақстанның халқы қанша",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қазақстанның астанасы қай қала",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "алматы қайда орналасқан",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "балқаш көлі қайда",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қазақстанның тарихы туралы айтыңыз",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "абылай хан кім",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кенесары хан кім болды",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "алаш қозғалысы туралы айтыңыз",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ұлы отан соғысы туралы не білесің",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қазақ хандығы қашан құрылды",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "абайдың қара сөздері туралы",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "абайдың әндері қандай",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "абайдың өлеңдері туралы",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "абайды кім тәрбиелеген",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қазақстан конституциясы туралы",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "конституция қашан қабылданды",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "негізгі заң не туралы",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "конституция нешінші жылы қабылданған",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен мұны білесің бе",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сізге белгілі ме",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "білесіз бе",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "білесің бе",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сен бұл туралы білесің бе",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "менің атымды есіңде сақтадың ба",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "менің есімімді есте сақтадыңыз ба",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "есіңде ме менің атым",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен сізге кім екенімді айттым ба",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен қайдан тұрамын деп айттым ба",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен қазір не сұрағанымды есіңдемі",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "алдыңғы сұрағымды есіңдемі",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не сұраған едім",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ауа райы қандай",
+      "intent": "Casual",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "бүгін ауа райы жақсы",
+      "intent": "Casual",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жаңбыр жауып тұр",
+      "intent": "Casual",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қар жауды",
+      "intent": "Casual",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "күн ыстық",
+      "intent": "Casual",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "күн салқын",
+      "intent": "Casual",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жел соғып тұр",
+      "intent": "Casual",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "көктем келді",
+      "intent": "Casual",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жаз шықты",
+      "intent": "Casual",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "күз түсті",
+      "intent": "Casual",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қыс кетті",
+      "intent": "Casual",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "хм",
+      "intent": "Filler",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ммм",
+      "intent": "Filler",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "иә-иә",
+      "intent": "Filler",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "солай",
+      "intent": "Filler",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "айтпақшы",
+      "intent": "Filler",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сонымен",
+      "intent": "Filler",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сондықтан",
+      "intent": "Filler",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "негізі",
+      "intent": "Filler",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "айтып отыр едім",
+      "intent": "Filler",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлем, қалыңыз қалай",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қайырлы таң болсын",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлеметсіз бе, күніңіз сәтті өтсін",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәлеметсіз бе, кешіңіз тыныш болсын",
+      "intent": "Greeting",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "иә, әрине! Менің атым адам. Сіздің атыңыз кім?",
+      "intent": "IntroProposal",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "танысып алайық. Мен — адам, ал сізді қалай атаймын?",
+      "intent": "IntroProposal",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "иә, әрине. Мен — қазақша сөйлесуге арналған ARK, атым адам. Атыңызды айта аласыз ба?",
+      "intent": "IntroProposal",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "әрине, танысайық. Менің атым адам — сізді қалай атаймын?",
+      "intent": "IntroProposal",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "аман бол",
+      "intent": "Farewell",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "рас",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мақұл",
+      "intent": "Affirmation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "дұрыс емес",
+      "intent": "Negation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "оқасы жоқ",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ештеңе емес",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ризамын",
+      "intent": "Thanks",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ештеңе емес",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мейлі",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "түк етпейді",
+      "intent": "Apology",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Ескертуіңіз үшін рахмет, тағы бір қарап шығамын. Қандай нақтылықты қосайын?",
+      "intent": "UserDisagrees",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Дұрыс — қателескен болуым мүмкін. Нақты қандай тұста дұрыс емес екенін айтсаңыз, түсіндіруді жөндеуге тырысамын.",
+      "intent": "UserDisagrees",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Түсіндім, қателесіп тұрған шығармын. Дәлірек айтсаңыз, ескерткіш ретінде есте сақтап, келесі жауапта түзеуге тырысамын.",
+      "intent": "UserDisagrees",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Сіздің ескертуіңіз орынды. Қай бөлігі дәл емес — соны нақтыласаңыз, толығырақ жауап берейін.",
+      "intent": "UserDisagrees",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жақсымын, рахмет",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жаман емеспін",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жақсы, ал сіз қалайсыз",
+      "intent": "AskHowAreYou",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жақсы екен",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "оны естігеніме қуаныштымын",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қуанып қалдым",
+      "intent": "StatementOfWellbeing",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "менің атым адам",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мені адам деп атайды",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "атым — адам",
+      "intent": "AskName",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Ия, әрине. Мен өз бетіммен үйрене алмаймын — менің әрбір жетілуім жасаушым шығаратын жаңа нұсқалар арқылы өтеді. Бірақ жоба ашық: пайдаланушы тарапынан келген кері байланыс әр жаңартудың негізі. Сіздің сұрағыңыз бен сын-ескертулеріңіз — менің дамуымның тікелей көзі.",
+      "intent": "AskWillingness",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Иә, ашықпын. Мен инференция кезінде өзімді өзгерте алмаймын; бірақ менің кодым да, корпусым да, ережелерім де дамиды — әрбір диалог автормен бөлісіледі. Сондықтан сіздің сын-пікіріңіз менің келесі нұсқамды жасап жатыр деп санауыңызға болады.",
+      "intent": "AskWillingness",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Иә, дайынмын. Жетілу — үздіксіз процесс: ағымдағы нұсқа дайын болғанымен, ережелер, корпус, тіл моделі үнемі толығып отырады. Сіздің кері байланысыңыз сол толықтыруға бағыт береді.",
+      "intent": "AskWillingness",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Бұл сұрағыңыз оқу бағдарламасының мазмұнына қатысты — менде нақты пәндік дерек жоқ. Мен әр пәннің не екенін, негізгі ұғымдары мен маңызды атауларын айтып бере аламын; нақты тарауларды немесе мектеп бағдарламасының толық мазмұнын өзіңізге айтуға деректерім жетпейді.",
+      "intent": "AskCurriculumContent",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Мектеп бағдарламасының нақты мазмұны менде жоқ — оны оқулық немесе мұғалім дұрысырақ жеткізеді. Оның орнына осы пән жайында жалпы түсінік бере аламын: негізгі ұғымдар мен анықтамалар.",
+      "intent": "AskCurriculumContent",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Тараулар мен сабақтардың тізімі менің қорымда сақталмаған. Бірақ сұраған пәніңізге қатысты негізгі ұғымдарды немесе анықтамаларды сұрасаңыз — соған жауап беремін.",
+      "intent": "AskCurriculumContent",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "рахмет, түсінгеніңізге қуаныштымын. Мен әлі дамып келемін, әр сөйлесуден жақсаруға тырысамын",
+      "intent": "UserAcknowledgement",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "түсінгеніңіз үшін рақмет — иә, шектеулерім бар, бірақ оларды ашық айтуға ұмтыламын",
+      "intent": "UserAcknowledgement",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "осы жанашырлығыңызға рахмет; әлі үйренуім керек, әр сұхбат — менің ілгері жылжуыма көмек",
+      "intent": "UserAcknowledgement",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "кешіріңіз, мен Қазақ тілінде сұраған математикалық есептеулерді әзірге өңдемеймін; қарапайым сандық өрнекті (мысалы «5+5», «7*3») жазсаңыз, есептеп беремін",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "санақ-есептеу әлі қазақша сөйлемдер арқылы менің мүмкіндігімде жоқ; «X+Y» немесе «X*Y» түрінде сандармен жазып берсеңіз, шығарып беремін",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қазақ тілінде өрнектелген математикалық есепті әлі шеше алмаймын — қарапайым сандық өрнекті жазсаңыз («5+5», «12/4»), есептейтін боламын",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Нөлге бөлуге болмайды — арифметикада бұл анықталмаған амал.",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Бөлгіш нөл болса, нәтиже анықталмайды. Нөлге бөлу математикада тыйым салынған.",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Нөлге бөлу мүмкін емес. Кез келген санды нөлге бөлсек, нәтиже анықталмайды (undefined).",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Ағымдағы сұхбатта тіркелген қате жоқ — әлі ешқандай тапсырыс берілмеген немесе соңғысы сәтті өтті. Жаттығу бастаймыз ба?",
+      "intent": "ExplainCompilerError",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Алдыңғы қате жайлы дерек жоқ: бұл сессияда сәтсіз тапсырыс жоқ.",
+      "intent": "ExplainCompilerError",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Соңғы қате есімде сақталмаған — әлде сәтсіз тапсырма болмаған, не сессия қайта басталған. Кодты бере алсаңыз, қарап шығамын.",
+      "intent": "ExplainCompilerError",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Код фрагментін көрдім, бірақ оны қазір орындай (eval) алмаймын. Грамматикасы немесе синтаксисі туралы сұраңыз — соған жауап бере аламын.",
+      "intent": "CodeRequest",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Бағдарлама кодын орындау менің мүмкіндіктеріме әлі кірмейді. Кодтың не істейтінін немесе синтаксисін түсіндіруді сұрасаңыз — кейбір негіздерді айта аламын.",
+      "intent": "CodeRequest",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Кодты қазір өңдемеймін. Бірақ кодтағы кілт сөздер (мысалы: for, if, def, print, class) туралы жеке сұраңыз — әрқайсысы туралы білетін фактіні бере аламын.",
+      "intent": "CodeRequest",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ұқтым, екеуін де жадтан өшірдім",
+      "intent": "UserDisagrees",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "түсіндім, екеуін де есепке алмаймын — қалаған кезде қайта айтып өтесіз",
+      "intent": "UserDisagrees",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "екеуінен де бас тарттым; кейін нақты болсын дегенде айтыңыз",
+      "intent": "UserDisagrees",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жарайды, екі нұсқаны да ұмытайын",
+      "intent": "UserDisagrees",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Түсіндім, дұрыс нұсқаны естімде ұстаймын.",
+      "intent": "UserDisagrees",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жарайды, екі нұсқаның қайсысы дұрыс екенін есепке алдым.",
+      "intent": "UserDisagrees",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "менің жасым адамзат жасындай",
+      "intent": "AskAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен әлі жаспын",
+      "intent": "AskAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жасымды айта алмаймын",
+      "intent": "AskAge",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен сандық әлемде тұрамын",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "менің мекенім жоқ",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қазақстан елімде",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сіз маған әлі қалаңызды айтпадыңыз",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сіздің қалаңыз менде сақталмаған — қалаған кезде маған айта аласыз",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "білмеймін — сіз қай қалада тұратыныңызды маған айтсаңыз, есте сақтаймын",
+      "intent": "AskLocation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен сөйлесуге жаралғанмын",
+      "intent": "AskOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "менің жұмысым — сізге көмектесу",
+      "intent": "AskOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен тілдерді үйренемін",
+      "intent": "AskOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сіздің кәсібіңізді әлі білмеймін; қалаған кезде «мен X-пын» деп айтсаңыз — есте сақтаймын",
+      "intent": "AskOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сіздің қызметіңіз менің есімде жоқ; кәсібіңізді айтсаңыз, келесі жолы білемін",
+      "intent": "AskOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "не істейтініңізді әлі айтпағансыз; «менің мамандығым X» деп бөліссеңіз — есепке аламын",
+      "intent": "AskOccupation",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сіз қандай нәрсемен айналысатыныңызды әлі айта қоймадыңыз — қалаған кезде айта аласыз",
+      "intent": "AskActivity",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ағымдағы ісіңіз туралы менде нақты дерек жоқ",
+      "intent": "AskActivity",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "немен айналысатыныңызды бөліссеңіз — есте сақтап жүремін",
+      "intent": "AskActivity",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "менің отбасым жоқ",
+      "intent": "AskFamily",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен жалғызбын",
+      "intent": "AskFamily",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сұрағыңыз керемет",
+      "intent": "AskFamily",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "отбасыңыз аман болсын",
+      "intent": "StatementOfFamily",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жақсы отбасы жарасымды",
+      "intent": "StatementOfFamily",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қуаныштымын",
+      "intent": "StatementOfFamily",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Менде терезе жоқ — қалаңызды айтсаңыз («Мен Алматыда тұрамын») немесе `ADAM_WEATHER_CITY=Қостанай` орнатсаңыз, ауа райын тексере аламын.",
+      "intent": "AskWeather",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ауа райы мейірімді болсын",
+      "intent": "StatementOfWeather",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жақсы күн болсын",
+      "intent": "StatementOfWeather",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "табиғат мезгіліне лайық",
+      "intent": "StatementOfWeather",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "рахмет",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "жылы сөзіңізге рақмет",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сіз де жақсы жансыз",
+      "intent": "Compliment",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "әрине, айтыңыз",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қалай көмектесе аламын",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "тыңдап отырмын",
+      "intent": "Request",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сізге де",
+      "intent": "WellWishes",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сәттілік сізге де",
+      "intent": "WellWishes",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ізгі тілегіңізге рақмет",
+      "intent": "WellWishes",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ренжімеймін, бірақ сыпайы сөйлесейік",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "мен адамды құрметтеймін",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "қаласаңыз, әңгімені сабырмен жалғастырайық",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "сөйлесуді сыпайы жалғастырсақ дұрыс болар еді",
+      "intent": "Insult",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жаттығу қандай тақырып бойынша қалайсыз? Мысалы: ownership, lifetimes, traits, async, error handling, iterators.",
+      "intent": "AskExercise",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қандай тақырыпта жаттығайын деп тұрсыз? Айтыңызшы — нақты тапсырма беремін.",
+      "intent": "AskExercise",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Тақырыпты атаңызшы — жаттығу даярлап беремін. Қазір қолжетімді: ownership, lifetimes, traits, generics, iterators, error handling, async.",
+      "intent": "AskExercise",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қандай тақырыпта код керек? Мысалы: hello world, ownership, borrow, struct, vec, async, future, stream.",
+      "intent": "CodeRequest",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Менде сол тақырыпта тексерілген snippet жоқ. Қандай нақты мысал ұсынғым келеді — айтыңызшы.",
+      "intent": "CodeRequest",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Кодты қандай тақырыпта көргіңіз келеді? Айтып берсеңіз — нақты тексерілген мысалды табамын.",
+      "intent": "CodeRequest",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қателіктің нөмірін (E0xxx) немесе compiler хабарының бірінші жолын жіберіңізші — нақты түсіндіремін.",
+      "intent": "ExplainCompilerError",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Менде нақты сол қатенің түсіндірмесі әлі жоқ. Қате толық хабарын немесе кодын жіберіңіз.",
+      "intent": "ExplainCompilerError",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қате коды (мысалы E0382) немесе бастапқы compiler жолы керек — соны бере салсаңыз, нақты түсіндіруге тырысамын.",
+      "intent": "ExplainCompilerError",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қандай ұғымның мақсатын білгіңіз келеді? Мысалы: ownership, borrow, lifetimes, trait, future, pin.",
+      "intent": "AskPurpose",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қай тақырыптың мақсаты туралы сұрап тұрсыз — нақтылап беріңізші.",
+      "intent": "AskPurpose",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Тура қай ұғымның мақсатын ашуымды қалайсыз? Атаңызшы — нақты түсіндіремін.",
+      "intent": "AskPurpose",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жарайсыз! Кодыңыз `cargo check`-тен тазалап өтті. `cargo run` арқылы орындап көріңіз.",
+      "intent": "SubmitSolution",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Код компиляцияланды. Мазмұны дұрыс — компилятор қарсы шықпады.",
+      "intent": "SubmitSolution",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жақсы! Кодыңыз type-checker-ді өтті. Ендiгi қадам — тестi жазып, мінез-құлықты тексеру.",
+      "intent": "SubmitSolution",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Cargo жоққа шығарылды (PATH-та табылмады?). Кодты жергілікте `cargo check` арқылы орындап, нәтижесін айтыңыз.",
+      "intent": "SubmitSolution",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Менде cargo шакыру мүмкіндігі әзірге жоқ. Кодыңызды жергілікте `cargo run` арқылы тексеріп көріңіз.",
+      "intent": "SubmitSolution",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Cargo-ны қазір шақыра алмаймын — қоршаған ортада ол жоқ. Өзіңіз `cargo check` немесе `cargo run` орындап нәтижесін айтыңыз.",
+      "intent": "SubmitSolution",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Сіз барлық тақырыптарды бітіріп қойдыңыз — Rust бойынша негізгі курс толық меңгерілді. Енді нақты жоба жазып, тәжірибе жинаңыз.",
+      "intent": "AskNextTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жалпы курс бітті — алда нақты жобалар тұр. Қажет болса нақты сұрақтармен қайтып келіңіз.",
+      "intent": "AskNextTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Келесі тақырып қалмады — барлық қадамдар орындалды. Енді өз жобаңызды бастап көріңіз; нақты сұрақтармен қайтып келсеңіз — талдап беремін.",
+      "intent": "AskNextTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Алматы қайда орналасқан?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қазақстанның астанасы қай қала?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Көк түс деген не?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қой деген не?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Күн жұлдыз ба?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жер планета ма?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Балық қайда тұрады?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қасқыр не жейді?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Rust-та borrowing бойынша жаттығу бер",
+      "intent": "CodeRequest",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "lifetimes жаттығуы керек",
+      "intent": "CodeRequest",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ownership қалай жұмыс істейді?",
+      "intent": "CodeRequest",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "traits деген не үшін керек?",
+      "intent": "CodeRequest",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "async/await қалай жұмыс істейді?",
+      "intent": "CodeRequest",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жаттығу бер.",
+      "intent": "CodeRequest",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Маған код көрсетіңіз.",
+      "intent": "CodeRequest",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Сіз менің кодыма түсінесіз бе?",
+      "intent": "CodeRequest",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "5+3 қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "12-7 қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "6*7 қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "20/4 қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "100-37 қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "25+75 қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "9*9 қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "144/12 қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "0+5 қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "5*0 қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "5-10 қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "1000+1000 қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Екі қосу үш қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "10/0 қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "(5+3)*2 қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "X+5=12 теңдеуін шеш",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "X-3=10 шеш",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "X*4=20 шеш",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "X/2=8 шеш",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "5+X=11 теңдеуін шешіп бер",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "X-7=0 шеш",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "X*3=21 шеш",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "10/X=2 шеш",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "X=42 шеш",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "2X=14 шеш",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "X+X=10 теңдеуін шеш",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "X*X=9 шеш",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Ботада 5 алма бар, оған тағы 3 алма бердім. Қазір қанша алма?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Класта 25 оқушы. Олардан 10-ы қыз. Қанша ұл?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "3 банкадағы әр банкада 4 кәмпит. Барлығы қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Үш алманы алып, бес алманы беремін. Қанша қалды?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Маған 20 жас. Інім 5 жасқа кіші. Інімнің жасы қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Ауланың ұзындығы 8 метр. Ені 5 метр. Ауданы қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Бір жинақта 12 кітап. Үш жинақта қанша кітап?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "10 теңгеден қалам сатып алу үшін қанша қажет?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Ботаның жасы 10. Айдананың жасы Ботадан 5 жасқа үлкен. Айдананың жасы қанша?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Бір жұмыста 7 күн бар. Үш жұмыста қанша күн?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Көбейту деген не?",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Бөлу деген не?",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қосу деген не?",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Сан деген не?",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Бөлшек деген не?",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Пайыз деген не?",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Геометрия деген не?",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Теңдеу деген не?",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жер деген не?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Күн қандай аспан денесі?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Ай не нәрсе?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Марс деген не?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Күн жүйесі құрамына не кіреді?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жұлдыз дегеніміз не?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Шолпан жұлдызы туралы айтып бер.",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жер қай жүйеге кіреді?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қазақстанның елордасы қай қала?",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Алматы қандай қала?",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жайық деген не?",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Балқаш — бұл не?",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Тянь-Шань қандай объект?",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қызылқұм деген не?",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қарағанды облысы қайда?",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Шығыс Қазақстан облысының орталығы қай қала?",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Маңғыстау облысы қай аймақта?",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қазақстан қай елдермен шектеседі?",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Каспий теңізі қай елде?",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Есіл өзені қалай аталады?",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Шарын каньоны қай облыста?",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Бурабай қандай орын?",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қазақстанның халық саны қанша?",
+      "intent": "InventoryQuery",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Абай Құнанбаев кім?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "«Қара сөздер» кімнің шығармасы?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Абайдың қара сөздері неше шығармадан тұрады?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Абай қай жылы туылған?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Абай қай жылы қайтыс болған?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Абайдың шын аты қандай?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Абайдың әкесі кім?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "«Сегіз аяқ» қандай шығарма?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "«Ескендір» қандай шығарма?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Абай қай облыста туылған?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қазақстан Конституциясы қашан қабылданған?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қазақстан Республикасы қандай мемлекет?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қазақстанның мемлекеттік тілі қандай?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қазақстанда биліктің бастауы кім?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Президент неше жылға сайланады?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Парламент неше палатадан тұрады?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Парламенттің жоғарғы палатасы қалай аталады?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Парламенттің төменгі палатасы қалай аталады?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қазақстанның ақша бірлігі қандай?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Конституциялық Сот неше судьядан тұрады?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "АрселорМиттал Теміртау қайда орналасқан?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ҚазМұнайГаз қандай сала?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Балқаш кен-металлургия комбинаты не өндіреді?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "ССГПО қандай кәсіпорын?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жамбыл фосфор зауыты не шығарады?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Бір жылда неше ай бар?",
+      "intent": "AskTime",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Бір аптада неше күн бар?",
+      "intent": "AskTime",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қаңтар деген қандай ай?",
+      "intent": "AskTime",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жаз қандай мезгіл?",
+      "intent": "AskTime",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Бір тәулікте неше сағат бар?",
+      "intent": "AskTime",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Адам ағзасы неден тұрады?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жасуша деген не?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жүрек қандай мүше?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Өкпе не үшін керек?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қан қандай сұйықтық?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Екі қосу үш қанша?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Бес көбейту үш қанша?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Шеңбер деген не?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Үшбұрыш деген не?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жұп сан деген не?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Су химиялық формуласы қандай?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Оттегі қандай зат?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Сутегі қандай элемент?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Натрий деген не?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Темір қандай зат?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Күш деген не?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Электр тогы деген не?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жылдамдық деген не?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Гравитация деген не?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жарық қандай құбылыс?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қазақ хандығы қашан құрылды?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қасым хан кім?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Абылай хан туралы айт.",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қазақстан қашан тәуелсіздік алды?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Алаш қозғалысы дегеніміз не?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Нұрсұлтан Назарбаев кім?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қасым-Жомарт Тоқаев кім?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Сақтар деген кімдер?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Мұхтар Әуезов кім?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "«Абай жолы» кімнің шығармасы?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Сәкен Сейфуллин кім?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Мағжан Жұмабаев кім?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Сен кімсің?",
+      "intent": "AskAboutSystem",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Сені кім жасады?",
+      "intent": "AskAboutSystem",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қандай тілде жазылғансың?",
+      "intent": "AskAboutSystem",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Не істей аласың?",
+      "intent": "AskAboutSystem",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қашан дүниеге келдің?",
+      "intent": "AskAboutSystem",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жасуша туралы не білесің?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Фотосинтез деген не?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Атом қандай бөлшектерден тұрады?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Су қандай молекула?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қазақстан қандай ел?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Алматы туралы айт",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Абай туралы білесің бе?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Абылай хан кім болған?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "5+5",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "10*7",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "100-25",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жасушаның ядросы не атқарады?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Атомның ядросы неге қажет?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Митохондрияның қызметі қандай?",
+      "intent": "MathExpression",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Саған не керек?",
+      "intent": "Unknown",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Mendeleev кестесі не үшін керек?",
+      "intent": "Unknown",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қазақстанның ірі өзендерін атап бер.",
+      "intent": "Unknown",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Маған көмек керек.",
+      "intent": "AskWillingness",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Бүгін жақсы күн",
+      "intent": "UserAcknowledgement",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Quantum entanglement дегеніміз не?",
+      "intent": "Unknown",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Илон Маск туралы не білесің?",
+      "intent": "Unknown",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Оны қалай түзетемін?",
+      "intent": "ExplainCompilerError",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қалай шешемін?",
+      "intent": "ExplainCompilerError",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Бұны қалай түзетемін?",
+      "intent": "ExplainCompilerError",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қалай түзетемін?",
+      "intent": "ExplainCompilerError",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қалай дұрыстаймын?",
+      "intent": "ExplainCompilerError",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Түзетілген кодты бер.",
+      "intent": "ExplainCompilerError",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қызанақ — машина ма?",
+      "intent": "Unknown",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Кітап — тағам ба?",
+      "intent": "Unknown",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жер сілкінісі деген не?",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жер сілкінісі — табиғи апат па?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Жер сілкінісі — құбылыс па?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Орман өрті деген не?",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Цунами — толқын ба?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қар көшкіні — апат па?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Боран — дауыл ма?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Найзағай — табиғи құбылыс па?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Бесбармақ — ұлттық тағам ба?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қымыз — сусын ба?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Шұбат — дәстүрлі сусын ба?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Бесбармақ деген не?",
+      "intent": "AskDefinition",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Айран — сусын ба?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Қазы — дәстүрлі тағам ба?",
+      "intent": "AskAboutTopic",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Сіздің атыңыз кім?",
+      "intent": "AskAboutSystem",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Сенің атың не?",
+      "intent": "AskAboutSystem",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Сіз қандай тілде сөйлейсіз?",
+      "intent": "AskAboutSystem",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Сен қай тілде сөйлейсің?",
+      "intent": "AskAboutSystem",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Ал алдыңғы қате неде болды?",
+      "intent": "ExplainCompilerError",
+      "source": "dialog_corpus"
+    },
+    {
+      "text": "Менің атым Даулет.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Менің есімім Даулет.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Мен — Даулет.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Мені Даулет дейді.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Даулет — менің атым.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Достарым мені Дәке деп атайды.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Әкемнің есімі — Даулет.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Әкем Даулет.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бауырымның аты — Даулет.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Даулеттің әкесі — мұғалім.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Даулет менің ағам.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Даулет кеше кеп кетті.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Біз Даулетпен мектепте оқыдық.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Даулет — әріптесім.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Даулеттің әпкесі — Айгерім.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Даулетті сіз танисыз ба?",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Даулет кеше келді.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Менің атым Алишер.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Менің есімім Айгерім.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Мені Ержан дейді.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Менің атым Әсем.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Менің атым Нұрлан.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Менің атым Айдос.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Менің атым Мейірхан.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Менің атым Динара.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Менің есімім Жанар.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Менің есімім — Әсия.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Мен Дауыт боламын.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Мен Дина боламын.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Достарым мені Қали деп атайды.",
+      "intent": "StatementOfName",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сәулет — өнер түрі.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қаладағы сәулет ескерткіштері көп.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Астананың сәулеті ерекше.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сәулет архитектура деген сөздің қазақшасы.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сәулет факультеті университетте бар.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сәулет студиясы жобалар жасайды.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қазақ сәулет өнері тарихи маңызды.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Көне сәулет ескерткіштерін қорғау керек.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бұл ғимарат сәулет жағынан ерекше.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сәулет — қала бейнесінің бөлігі.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгін дүйсенбі.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгін сейсенбі.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгін сәрсенбі.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгін бейсенбі.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгін жұма.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгін сенбі.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгін жексенбі.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгін қай күн?",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгін қандай күн?",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгін ауа райы жақсы.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгін мектепке бару керек.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгін демалыс күні.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгін кеш салқын болады.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгін көңіл-күй жақсы.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгінгі сабақ — математика.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгінгі күн — Тәуелсіздік күні.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгін бесінші маусым.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Ұғым — абстрактты дерек.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Ғылыми ұғым нақты анықталады.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бұл ұғым күрделі.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Әр ғылымның өз ұғымы бар.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Математикалық ұғымдарды үйрену керек.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Ұғым адамның санасында қалыптасады.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Балалар жаңа ұғымдарды қызықпен меңгереді.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "«Сан» — математикадағы негізгі ұғым.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бірінші орынды Алмаз алды.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бірінші президент — Нұрсұлтан Назарбаев.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Тұңғыш президент — Назарбаев.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қазақстанның бірінші президенті — Назарбаев.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бірінші орын — алтын медаль.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бірінші сабақ сағат сегізде.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бірінші курсқа түсу қиын.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бірінші класс оқушылары жас.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бірінші қадам ең қиыны.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бірінші орындаушы — Дина.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Маған бірінші орын керек.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бірнеше адам келді.",
+      "intent": "Question",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бірнеше күн өтті.",
+      "intent": "Question",
+      "source": "adversarial"
+    },
+    {
+      "text": "Мен бірнеше кітап оқыдым.",
+      "intent": "Question",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бірнеше жыл бұрын болған.",
+      "intent": "Question",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бірнеше сұрақ бар.",
+      "intent": "Question",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бірнеше адам сұрады.",
+      "intent": "Question",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бірнеше нұсқасы бар.",
+      "intent": "Question",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бірнеше минут күтіңіз.",
+      "intent": "Question",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бірнеше ай бойы жұмыс істедім.",
+      "intent": "Question",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қалыңыз қалай?",
+      "intent": "AskHowAreYou",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сіздің қалыңыз қалай?",
+      "intent": "AskHowAreYou",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қалың қалай, бауырым?",
+      "intent": "AskHowAreYou",
+      "source": "adversarial"
+    },
+    {
+      "text": "Хал-жайыңыз қалай?",
+      "intent": "AskHowAreYou",
+      "source": "adversarial"
+    },
+    {
+      "text": "Жағдайыңыз қалай?",
+      "intent": "AskHowAreYou",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сәлеметсіз бе, қалыңыз қалай?",
+      "intent": "AskHowAreYou",
+      "source": "adversarial"
+    },
+    {
+      "text": "Әке, қалыңыз қалай?",
+      "intent": "AskHowAreYou",
+      "source": "adversarial"
+    },
+    {
+      "text": "Апай, қалыңыз қалай?",
+      "intent": "AskHowAreYou",
+      "source": "adversarial"
+    },
+    {
+      "text": "Ағай, қалыңыз қалай?",
+      "intent": "AskHowAreYou",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қалыңыз қалай, ұстаз?",
+      "intent": "AskHowAreYou",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сіздің қалаңыз — Алматы.",
+      "intent": "AskLocation",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қалаңыз қандай?",
+      "intent": "AskLocation",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қалаңыздың тарихы бар.",
+      "intent": "AskLocation",
+      "source": "adversarial"
+    },
+    {
+      "text": "Біздің қалаңыз — Астана.",
+      "intent": "AskLocation",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қалаңызда мектеп бар ма?",
+      "intent": "AskLocation",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қалаңыз үлкен бе?",
+      "intent": "AskLocation",
+      "source": "adversarial"
+    },
+    {
+      "text": "Күн ыстық бүгін.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Күн шығып келеді.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Күн ұзақ болды.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Жексенбі — демалыс күн.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бүгінгі күн — мейрам.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Күн жарық.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Күн батты.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Күн әдемі болды.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Күн салқын.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Күн қызды.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қыс күндері қысқа.",
+      "intent": "AskDate",
+      "source": "adversarial"
+    },
+    {
+      "text": "Күн — жұлдыз.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Күн жүйесі — біздің ғаламшарларымыз.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Күн жер айналасында емес, жер күн айналасында.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Күн сәулесі жылылық береді.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Күннің көзі — отты доп.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Күн жүйесінде сегіз ғаламшар бар.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бұл заттың құны — мың теңге.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Алтынның құны жоғары.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Әр адамның құны бар.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Адал еңбектің құны жоғары.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бұл кітаптың құны қанша?",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қан — ағзаның сұйық бөлігі.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қан тамырларда айналады.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Адам ағзасында 5 литрге жуық қан бар.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Дәрігер қан анализін тапсыруды сұрады.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Жүрек қанды ағзаға тарайды.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қан қызыл түсті.",
+      "intent": "AskDefinition",
+      "source": "adversarial"
+    },
+    {
+      "text": "Тоғыз сан.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Тоғыз бен он арасында.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бір апта тоғыз күн емес, жеті күн.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Тоғыз көбейту үшке — жиырма жеті.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Тоғыз бөлу үшке тең үш.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Тоғыз — тақ сан.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Тоғызды ағаш — өсімдік.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Тоғыз ағаш отырғыздым.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Екінші — Айдос.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Үшінші орынды Айгерім алды.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Төртінші сабақ — физика.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бесінші класс оқушылары жоғары сыныпқа жуық.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Алтыншы қатарда отырмын.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сәлем, қалайсың?",
+      "intent": "Greeting",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сәлеметсіз бе.",
+      "intent": "Greeting",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сәлеметсіз бе, ағай.",
+      "intent": "Greeting",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сәлеметсіз бе, апай.",
+      "intent": "Greeting",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қайырлы күн.",
+      "intent": "Greeting",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қайырлы таң.",
+      "intent": "Greeting",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қайырлы кеш.",
+      "intent": "Greeting",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сәлем, бауырым.",
+      "intent": "Greeting",
+      "source": "adversarial"
+    },
+    {
+      "text": "Ассаламу алейкум.",
+      "intent": "Greeting",
+      "source": "adversarial"
+    },
+    {
+      "text": "Уағалайкум-ас-салам.",
+      "intent": "Greeting",
+      "source": "adversarial"
+    },
+    {
+      "text": "Екі қосу екі тең төрт.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Үш қосу бес тең сегіз.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Жеті көбейту үш тең жиырма бір.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Он бөлу екі тең бес.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Жиырма қосу он тең отыз.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Жүз бөлу он тең он.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Тоғыз көбейту үш тең жиырма жеті.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Алты қосу алты тең он екі.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Бес көбейту бес тең жиырма бес.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сегіз бөлу екі тең төрт.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қазақстанда көп таулар бар.",
+      "intent": "InventoryQuery",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қазақстанның негізгі өзендері — Ертіс пен Сырдария.",
+      "intent": "InventoryQuery",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қазақстанда Балқаш және Алакөл сияқты көлдер бар.",
+      "intent": "InventoryQuery",
+      "source": "adversarial"
+    },
+    {
+      "text": "Алматы — Қазақстанның ірі қаласы.",
+      "intent": "InventoryQuery",
+      "source": "adversarial"
+    },
+    {
+      "text": "Астана — Қазақстанның астанасы.",
+      "intent": "InventoryQuery",
+      "source": "adversarial"
+    },
+    {
+      "text": "Алтай таулары Қазақстанның шығысында орналасқан.",
+      "intent": "InventoryQuery",
+      "source": "adversarial"
+    },
+    {
+      "text": "Тянь-Шань таулары Қазақстанның оңтүстігінде.",
+      "intent": "InventoryQuery",
+      "source": "adversarial"
+    },
+    {
+      "text": "Каспий теңізі Қазақстанмен шектеседі.",
+      "intent": "InventoryQuery",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қазақстан Орталық Азиядағы ірі мемлекет.",
+      "intent": "InventoryQuery",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сіз кімсіз?",
+      "intent": "AskAboutSystem",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сенің атың кім?",
+      "intent": "AskAboutSystem",
+      "source": "adversarial"
+    },
+    {
+      "text": "Менің атым — кім?",
+      "intent": "AskAboutSystem",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сен өзің кімсің?",
+      "intent": "AskAboutSystem",
+      "source": "adversarial"
+    },
+    {
+      "text": "Сіз өзіңіз кімсіз?",
+      "intent": "AskAboutSystem",
+      "source": "adversarial"
+    },
+    {
+      "text": "Менің атым Даулет, жасым отыз.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Кеше сегіз сағат жұмыс істедім.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қалада он мектеп бар.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Біздің сыныпта жиырма бес оқушы.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Жүз жыл — бір ғасыр.",
+      "intent": "MathExpression",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қазақстанның қазіргі президенті — Қасым-Жомарт Тоқаев.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қазіргі президент — Тоқаев.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Қазақстан Президенті — мемлекет басшысы.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "Президентті сайлайды халық.",
+      "intent": "AskAboutTopic",
+      "source": "adversarial"
+    },
+    {
+      "text": "```rust\nfn main() { let s = String::from(\"hi\"); let _t = s; println!(\"{s}\"); }\n```",
+      "intent": "CodeRequest",
+      "source": "eval/live_holdout_v5650_codex.json"
+    }
+  ]
+}
