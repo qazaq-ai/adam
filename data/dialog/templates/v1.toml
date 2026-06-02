@@ -106,12 +106,20 @@ templates = [
 # ---------- Farewell ----------
 
 [[families]]
+# **Phase 15g.C.3 (2026-06-02)** — polite forms first. Previous
+# order `["сау бол", "кездескенше", "аман бол", "сау болыңыз"]`
+# put informal forms at index 0 and 2, so the default-seed 42
+# (42 % 4 = 2) always landed on bare informal «аман бол». User
+# expects the polite -ыз forms when addressing adam. Polite
+# variants moved to front; informal kept as last fallback.
 key = "farewell"
 templates = [
-    "сау бол",
-    "кездескенше",
-    "аман бол",
     "сау болыңыз",
+    "аман болыңыз",
+    "қош сау болыңыз",
+    "кездескенше",
+    "сау бол",
+    "аман бол",
 ]
 
 # ---------- Affirmation / Negation ----------

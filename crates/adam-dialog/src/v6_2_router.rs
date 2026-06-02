@@ -532,6 +532,42 @@ fn handle_listing_query(input: &str) -> Option<String> {
                 .to_string(),
         );
     }
+
+    // **Phase 15g.C.3 (2026-06-02)** — president routing was
+    // missing from the v6.2 router. Live tests showed «Қазақстанның
+    // президенті кім» falling through to the generic IsA fallback
+    // (adam: «Қазақстан — мемлекет»). Facts are in
+    // data/world_core/government_kazakhstan.jsonl but the substring
+    // intent layer didn't pick them up reliably. Route here:
+    //   «бірінші / тұңғыш» + «президент»  → Nazarbayev
+    //   «қазіргі / ағымдағы / қазір» + «президент»  → Tokayev
+    //   bare «президент» without ordinal qualifier → assume current
+    if mentions_kz && lower.contains("президент") {
+        let is_first = lower.contains("бірінші")
+            || lower.contains("бiрiншi")
+            || lower.contains("тұңғыш")
+            || lower.contains("туңғыш")
+            || lower.contains("first");
+        let is_current = lower.contains("қазіргі")
+            || lower.contains("казiргi")
+            || lower.contains("қазір")
+            || lower.contains("қазыр")
+            || lower.contains("ағымдағы");
+        if is_first {
+            return Some(
+                "Қазақстанның тұңғыш Президенті — Нұрсұлтан Әбішұлы Назарбаев \
+                 (1991–2019)."
+                    .to_string(),
+            );
+        }
+        // Default (and explicit current) → Tokayev.
+        let _ = is_current;
+        return Some(
+            "Қазақстанның қазіргі Президенті — Қасым-Жомарт Кемелұлы Тоқаев \
+             (2019 жылдан бері)."
+                .to_string(),
+        );
+    }
     // «Қандай X білесің?» without a Kazakhstan anchor — short
     // enumerations of the same categories (no host-country
     // constraint).
