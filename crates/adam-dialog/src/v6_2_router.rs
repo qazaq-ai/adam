@@ -143,22 +143,29 @@ pub fn answer_with_corpus(input: &str, idx: &FrameIndex) -> Option<String> {
     // аласың?» — user wants a self-description of what adam can
     // answer. Distinct from self-identity («Сен кімсің?»).
     if is_capabilities_query(input) {
-        return Some(capabilities_response());
+        return Some(capabilities_response(input));
     }
 
     // 1c. Pitch-gender explanation. «Сен мені ағай дедің. Қалай
     // түсіндің?» — user asks how adam detected gender. Honest
     // explanation: pitch analysis on voice input.
     if is_pitch_detection_query(input) {
-        return Some(
+        // **Phase 20** — 2 paraphrases of pitch detection explanation.
+        let variants: &[&str] = &[
             "Сіздің даусыңыздың жиілігі (pitch) бойынша анықтадым. \
              Voice-input режимінде whisper.cpp дауысты транскрипциялаған \
              соң, мен оның негізгі жиілігін («male» болса ~ 85–155 Гц, \
              «female» болса ~ 165–255 Гц) есептеймін де, соған сай \
              қазақша құрметтеу формасын — «Ағай» немесе «Апай» — \
-             таңдаймын. Бұл — детерминирленген эвристика, нейрожүйе емес."
-                .to_string(),
-        );
+             таңдаймын. Бұл — детерминирленген эвристика, нейрожүйе емес.",
+            "Дауыс жиілігі (F0) арқылы. Whisper аудионы транскрипциялаған \
+             соң, мен оның негізгі жиілігін есептеймін — ер адам \
+             даусы әдетте 85–155 Гц аралығында, әйел даусы 165–255 Гц. \
+             Соған қарап «Ағай» немесе «Апай» вокативін таңдаймын. \
+             Алгоритм — autocorrelation-based YIN-тәріздес pitch \
+             detection, ешқандай нейрожүйе емес.",
+        ];
+        return Some(pick_variant(variants, input).to_string());
     }
 
     // 2. Self-identity short-circuit. «Сен кімсің?» / «Сен өзің
@@ -167,13 +174,22 @@ pub fn answer_with_corpus(input: &str, idx: &FrameIndex) -> Option<String> {
     // «сен» / «өзің» and emits Abai poetry quotes (codex
     // 2026-05-25 audit caught this).
     if is_self_identity_query(input) {
-        return Some(
+        // **Phase 20** — 3 paraphrases of the self-introduction.
+        let variants: &[&str] = &[
             "Мен — адам, толық атауым Agglutinative Reasoning Kernel \
              (ARK). Қазақ тіліне арналған детерминирленген тілдік \
              модель. Тілдік модельмін, бірақ LLM емес — мен \
-             curated фактілер арқылы жауап беремін."
-                .to_string(),
-        );
+             curated фактілер арқылы жауап беремін.",
+            "Менің атым — адам. Толық атауым Agglutinative Reasoning \
+             Kernel (ARK), қазақ тіліне арналған детерминирленген \
+             тілдік модель. LLM емеспін: жауаптарым тек curated \
+             деректерге сүйенеді.",
+            "Мен — ARK (Agglutinative Reasoning Kernel) атты тілдік \
+             модельмін, қысқаша «адам» деп аталамын. Қазақ тілінің \
+             морфологиясы бойынша құрастырылған детерминирленген \
+             жүйемін, әр сөзімді curated фактілермен растаймын.",
+        ];
+        return Some(pick_variant(variants, input).to_string());
     }
 
     // 3. Honest «no live data» refusals — weather, currency,
@@ -182,12 +198,19 @@ pub fn answer_with_corpus(input: &str, idx: &FrameIndex) -> Option<String> {
     // Алматыда қандай ауа райы?» (which has «бүгін» trigger for
     // clock) routes correctly to the weather-refusal path.
     if needs_live_data_refusal(input) {
-        return Some(
+        // **Phase 20** — 3 paraphrases for live-data refusal.
+        let variants: &[&str] = &[
             "Бұл сұраққа жауап беру үшін менде нақты дерек жоқ. \
              Менің білім қорым curated фактілерден тұрады, тікелей \
-             интернет немесе live-feed қосылған емес."
-                .to_string(),
-        );
+             интернет немесе live-feed қосылған емес.",
+            "Бұл сұраққа дерек бере алмаймын — менің білім қорымда \
+             ағымдағы / реалды-уақыттық мәлімет жоқ. Тек curated \
+             фактілермен жұмыс істеймін.",
+            "Кешіріңіз, бұл сұраққа жауап беретін live-дерек менде \
+             жоқ. Интернетке немесе сыртқы feed-ке қосылмаймын — \
+             curated тарихи фактілер ғана қолымда.",
+        ];
+        return Some(pick_variant(variants, input).to_string());
     }
 
     // 4. System clock — live state (date / month / weekday /
@@ -704,16 +727,65 @@ fn is_capabilities_query(input: &str) -> bool {
     markers.iter().any(|m| lower.contains(m))
 }
 
-fn capabilities_response() -> String {
-    "Менің білім қорым curated деректерден тұрады. Жауап бере аламын: \
-     (1) Қазақстан туралы — география, тарих, әдебиет, танымал тұлғалар, \
-     мемлекеттік құрылым; (2) мектеп пәндері — математика, физика, химия, \
-     биология, тарих, ана тілі; (3) бағдарламалау тілдері және Rust; \
-     (4) дата / уақыт / апта күні (live clock); (5) қарапайым және күрделі \
-     математикалық есептеулер (қазақша / орысша / ASCII). LLM емеспін, \
-     curated деректерден тыс сұрақтарға «нақты дерек жоқ» деп шынайы \
-     жауап беремін."
-        .to_string()
+/// **Phase 20 (2026-06-02)** — paraphrase variants for high-frequency
+/// static responses. The user flagged «заученность и однотипность» —
+/// the same monologue coming back to multiple distinct capability
+/// queries. Each call now selects one of N paraphrased variants
+/// using a stable hash of the input — same query → same answer
+/// (no flicker on retry), different queries → different surface.
+fn pick_variant<'a>(variants: &[&'a str], seed: &str) -> &'a str {
+    if variants.is_empty() {
+        return "";
+    }
+    // FNV-1a — stable, no allocations, deterministic across runs.
+    let mut h: u64 = 14695981039346656037;
+    for b in seed.bytes() {
+        h ^= b as u64;
+        h = h.wrapping_mul(1099511628211);
+    }
+    variants[(h as usize) % variants.len()]
+}
+
+fn capabilities_response(input: &str) -> String {
+    // **Phase 20** — five paraphrased variants. Same canonical content
+    // (the curated-knowledge disclosure) in different shapes so the
+    // user doesn't feel like they're hitting one fixed template
+    // every time they ask about adam's capabilities.
+    let variants: &[&str] = &[
+        "Менің білім қорым curated деректерден тұрады. Жауап бере аламын: \
+         (1) Қазақстан туралы — география, тарих, әдебиет, танымал тұлғалар, \
+         мемлекеттік құрылым; (2) мектеп пәндері — математика, физика, химия, \
+         биология, тарих, ана тілі; (3) бағдарламалау тілдері және Rust; \
+         (4) дата / уақыт / апта күні (live clock); (5) қарапайым және күрделі \
+         математикалық есептеулер (қазақша / орысша / ASCII). LLM емеспін, \
+         curated деректерден тыс сұрақтарға «нақты дерек жоқ» деп шынайы \
+         жауап беремін.",
+        "Мен бірнеше тақырыпта көмектесе аламын: Қазақстанның географиясы, \
+         тарихы, әдебиеті мен танымал тұлғалары; мектеп пәндері — \
+         математика, физика, химия, биология, ана тілі; бағдарламалау \
+         (әсіресе Rust); ағымдағы күн, уақыт пен апта; қарапайым және \
+         көп қадамды математикалық есептеулер. Тыс тақырыпта «дерек жоқ» \
+         деп шынайы айтамын — LLM емеспін.",
+        "Қолымдағы білім аясы — curated facts. Жауап бере алатын тақырыптарым: \
+         Қазақстан туралы (география / тарих / әдебиет / тұлғалар / мемлекет); \
+         мектеп пәндері (физика, химия, биология, математика, тарих); \
+         бағдарламалау тілдері мен Rust; live уақыт-күн-апта; математикалық \
+         амалдар. Тыс сұрақтарға қалай ойдан жауап жасайтын LLM емеспін — \
+         «білмеймін» дегенді жасырмаймын.",
+        "Жауап бере алатын негізгі салаларым: Қазақстан жайында жалпы дерек \
+         (география, тарих, әдебиет, белгілі тұлғалар, мемлекеттік құрылым); \
+         мектеп бағдарламасы (математика, физика, химия, биология, тарих, \
+         ана тілі); бағдарламалау, әсіресе Rust; live дата / уақыт / апта \
+         күні; қазақша / орысша / ASCII форматтағы математикалық есептер. \
+         LLM емеспін — curated деректер шегінен шықпаймын.",
+        "Менің көмектесе алатын тақырыптарым: (1) Қазақстан туралы — \
+         география, тарих, әдебиет, белгілі адамдар, мемлекет құрылымы; \
+         (2) мектеп пәндері — математика, физика, химия, биология; \
+         (3) Rust пен бағдарламалау тілдері; (4) уақыт, күн, апта (live); \
+         (5) математикалық есептеулер. Әзірге осы шеңберде ғана нақты \
+         жауап бере аламын — қалғанын ойдан құрастырмаймын.",
+    ];
+    pick_variant(variants, input).to_string()
 }
 
 /// Detect «how did you determine my gender?» kind of meta-query.
