@@ -123,6 +123,28 @@ def gen_qa(entry: dict) -> list[str]:
     for r in related_targets:
         out.append(f"{r} мен {next(iter(subjects), '')} туралы. {kk}")
 
+    # 5. **Phase 15g.L (2026-06-01)** — formula-specific Q&A pairs.
+    # When the entry's `kk` sentence contains the word «формула»,
+    # the user is likely to ask «X-ның формуласын жаз / X
+    # формуласы қандай / X химиялық формуласы». Emit those
+    # phrasings explicitly so the LM learns the
+    # «<chemical>-formula-query → <kk>» conditional.
+    # Live REPL retest of v5 surfaced this gap: «Судың химия
+    # формуласын жаз» fell through to a chemistry-definition
+    # lookup instead of the H2O fact.
+    if "формула" in kk.lower():
+        for s in subjects:
+            out.append(f"{s} формуласы. {kk}")
+            out.append(f"{s} формуласы қандай. {kk}")
+            out.append(f"{s}ның формуласы қандай. {kk}")
+            out.append(f"{s}ның формуласын жаз. {kk}")
+            out.append(f"{s} формуласын жазып бер. {kk}")
+            out.append(f"{s} химиялық формуласы. {kk}")
+            out.append(f"{s}ның химиялық формуласы. {kk}")
+            out.append(f"{s}ның химия формуласын жаз. {kk}")
+            out.append(f"{s} химия формуласын айтшы. {kk}")
+            out.append(f"{s}ның формуласы. {kk}")
+
     return out
 
 
