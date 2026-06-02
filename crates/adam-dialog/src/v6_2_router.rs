@@ -888,10 +888,23 @@ fn looks_like_time_query(s: &str) -> bool {
         "неделя",
         "какая дата",
         "какой день",
-        // Phase 21 (2026-06-02) — relative-day anchors.
+        // Phase 21 (2026-06-02) — relative-day anchors + Phase 21.A
+        // STT-drift aliases (Whisper hears «ертең» as «еркең» etc.).
         "кеше",
+        "кешее",
+        "кешеу",
         "ертең",
+        "еркең",
+        "ертен",
+        "эртен",
         "бүрсігүні",
+        "бүрсүгүні",
+        "бірсүгіне",
+        "бір сүгіне",
+        "бірсүгіні",
+        "бір сүгіні",
+        "бір сігүні",
+        "бірсігүні",
         "алдыңғы күн",
         "вчера",
         "завтра",
@@ -902,18 +915,41 @@ fn looks_like_time_query(s: &str) -> bool {
 /// **Phase 21 (2026-06-02)** — detect relative-day anchor in the
 /// input. Returns the day-offset (−2…+2) and `None` if the input
 /// has no relative-day marker (caller should treat it as «today»).
+///
+/// **Phase 21.A** — STT-drift aliases for each marker. The 2026-06-02
+/// live REPL showed Whisper hears «ертең» as «еркең» (т→к) and
+/// «бүрсігүні» as «бірсүгіне» / «бір сүгіні» (ү→і + word split).
+/// Adding the drifted forms keeps the calendar handler from falling
+/// through to substring fact lookup on a recognisable utterance.
 fn relative_day_offset(lower: &str) -> Option<i64> {
-    if lower.contains("бүрсігүні") {
-        return Some(2);
+    for marker in [
+        "бүрсігүні",
+        "бүрсүгүні",
+        "бірсүгіне",
+        "бір сүгіне",
+        "бірсүгіні",
+        "бір сүгіні",
+        "бір сігүні",
+        "бірсігүні",
+    ] {
+        if lower.contains(marker) {
+            return Some(2);
+        }
     }
-    if lower.contains("ертең") || lower.contains("завтра") {
-        return Some(1);
+    for marker in ["ертең", "еркең", "ертен", "эртен", "завтра"] {
+        if lower.contains(marker) {
+            return Some(1);
+        }
     }
-    if lower.contains("алдыңғы күн") || lower.contains("позавчера") {
-        return Some(-2);
+    for marker in ["алдыңғы күн", "алдыңғы күні", "позавчера"] {
+        if lower.contains(marker) {
+            return Some(-2);
+        }
     }
-    if lower.contains("кеше") || lower.contains("вчера") {
-        return Some(-1);
+    for marker in ["кеше", "кешее", "кешеу", "вчера"] {
+        if lower.contains(marker) {
+            return Some(-1);
+        }
     }
     None
 }
@@ -1543,6 +1579,39 @@ mod tests {
         let s = r.expect("day-after-tomorrow query should answer");
         assert!(s.starts_with("Бүрсігүні"), "got: {s}");
         assert!(s.contains("болады"), "got: {s}");
+    }
+
+    /// **Phase 21.A (2026-06-02)** — Whisper-drift aliases recover the
+    /// calendar handler when STT mishears the marker. 2026-06-02 live
+    /// REPL: «ертең» → «еркең», «бүрсігүні» → «бірсүгіне» / «бір сүгіні».
+    #[test]
+    fn whisper_drift_yerken_routes_to_tomorrow() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Еркең қай күн болады?", &idx);
+        let s = r.expect("еркең drift should still route to tomorrow");
+        assert!(s.starts_with("Ертең"), "got: {s}");
+        assert!(s.contains("болады"), "got: {s}");
+        assert!(
+            !s.contains("дөңгелек"),
+            "regression: fell through, got: {s}"
+        );
+    }
+
+    #[test]
+    fn whisper_drift_birsugine_routes_to_day_after_tomorrow() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Бірсүгіне нешесі болады?", &idx);
+        let s = r.expect("бірсүгіне drift should route to day-after");
+        assert!(s.starts_with("Бүрсігүні"), "got: {s}");
+        assert!(s.contains("болады"), "got: {s}");
+    }
+
+    #[test]
+    fn whisper_drift_bir_sugini_routes_to_day_after_tomorrow() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Бір сүгіні нешесі болады.", &idx);
+        let s = r.expect("space-split бір сүгіні should still route");
+        assert!(s.starts_with("Бүрсігүні"), "got: {s}");
     }
 
     /// Real biographical question → realised Kazakh sentence.
