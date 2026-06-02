@@ -44,10 +44,7 @@
 //! single self-attention block over the same embeddings.
 
 use burn::module::Module;
-use burn::nn::{
-    Embedding, EmbeddingConfig, Linear, LinearConfig,
-    loss::CrossEntropyLossConfig,
-};
+use burn::nn::{Embedding, EmbeddingConfig, Linear, LinearConfig, loss::CrossEntropyLossConfig};
 use burn::prelude::*;
 use burn::tensor::backend::Backend;
 
@@ -143,12 +140,13 @@ impl<B: Backend> IntentClassifier<B> {
             .convert::<f32>()
             .into_vec()
             .unwrap_or_default();
-        let (idx, conf) = row
-            .iter()
-            .enumerate()
-            .fold((0usize, 0.0_f32), |(bi, bv), (i, &v)| {
-                if v > bv { (i, v) } else { (bi, bv) }
-            });
+        let (idx, conf) =
+            row.iter().enumerate().fold(
+                (0usize, 0.0_f32),
+                |(bi, bv), (i, &v)| {
+                    if v > bv { (i, v) } else { (bi, bv) }
+                },
+            );
         (idx, conf)
     }
 

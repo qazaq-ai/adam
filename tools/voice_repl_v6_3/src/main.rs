@@ -33,6 +33,7 @@
 //! are merged with synth fallback covering uncovered phonemes.
 
 mod intent_classifier_runtime;
+mod neural_override;
 mod neural_rescorer;
 mod zipf_vocab;
 
@@ -481,18 +482,43 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // this is observability for the Phase 19.F iteration
         // where we'll start trusting neural-first on high-
         // confidence predictions.
-        if let Some(ic) = intent_classifier.as_ref() {
-            if let Some((label, conf)) = ic.classify(&normalised) {
-                let marker = if conf >= 0.70 {
+        let neural_intent: Option<(String, f32)> = if let Some(ic) = intent_classifier.as_ref() {
+            let pred = ic.classify(&normalised);
+            if let Some((label, conf)) = pred.as_ref() {
+                let marker = if *conf >= 0.70 {
                     "✓"
-                } else if conf >= 0.40 {
+                } else if *conf >= 0.40 {
                     "~"
                 } else {
                     "?"
                 };
                 println!("[voice-repl] intent (neural) → {label} (conf={conf:.2}) {marker}");
             }
-        }
+            pred
+        } else {
+            None
+        };
+
+        // **Phase 19 step G (2026-06-02)** — high-confidence neural
+        // override. When the neural classifier is strongly sure the
+        // utterance is `AskAboutTopic` but the surface form contains
+        // substring triggers that misroute (capability handler on
+        // «не білесің», language definition on «тіл»), rewrite the
+        // input so the substring router falls into the right branch.
+        // Conservative: only kicks in at conf ≥ 0.85 and only when a
+        // known trigger pattern is present.
+        let normalised = match neural_intent.as_ref() {
+            Some((label, conf)) if *conf >= 0.85 && label == "AskAboutTopic" => {
+                let rewritten = neural_override::rewrite_topic_query(&normalised);
+                if rewritten != normalised {
+                    println!(
+                        "[voice-repl] intent override → «{rewritten}» (neural AskAboutTopic conf={conf:.2})"
+                    );
+                }
+                rewritten
+            }
+            _ => normalised,
+        };
 
         // Phase 17 (2026-05-31): voice-derived gender hint. Same
         // pattern as `adam-dialog/src/bin/adam_chat.rs:1045+`:

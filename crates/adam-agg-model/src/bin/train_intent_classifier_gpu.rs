@@ -46,8 +46,8 @@
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
-use adam_agg_model::intent_classifier::{IntentClassifier, IntentClassifierConfig};
 use adam_agg_model::checkpoint::{CheckpointMeta, save_checkpoint};
+use adam_agg_model::intent_classifier::{IntentClassifier, IntentClassifierConfig};
 use adam_kernel::{SegmentationLexicon, SegmentationRuleSet};
 use adam_tokenizer::bpe::BpeTokenizer;
 use burn::backend::Autodiff;
@@ -79,10 +79,16 @@ struct Pack {
 }
 
 fn env_usize(key: &str, default: usize) -> usize {
-    std::env::var(key).ok().and_then(|s| s.parse().ok()).unwrap_or(default)
+    std::env::var(key)
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(default)
 }
 fn env_f64(key: &str, default: f64) -> f64 {
-    std::env::var(key).ok().and_then(|s| s.parse().ok()).unwrap_or(default)
+    std::env::var(key)
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(default)
 }
 fn env_string(key: &str, default: &str) -> String {
     std::env::var(key).unwrap_or_else(|_| default.to_string())
@@ -177,9 +183,7 @@ fn main() {
     let mut val_idx: Vec<usize> = Vec::with_capacity(val_n);
     for i in 0..n {
         // hash(i) % 10 == 0 → val.
-        let h = (i as u64)
-            .wrapping_mul(2654435761)
-            .wrapping_add(0xDEADBEEF);
+        let h = (i as u64).wrapping_mul(2654435761).wrapping_add(0xDEADBEEF);
         if (h % 10) < (val_frac * 10.0) as u64 {
             val_idx.push(i);
         } else {
@@ -208,8 +212,7 @@ fn main() {
     let lr = env_f64("ICX_LR", 1e-3);
     eprintln!("[4/4] Training: batch={batch_size} epochs={epochs} lr={lr}");
 
-    let mut optim: OptimizerAdaptor<Adam, IntentClassifier<B>, B> =
-        AdamConfig::new().init();
+    let mut optim: OptimizerAdaptor<Adam, IntentClassifier<B>, B> = AdamConfig::new().init();
 
     let started = Instant::now();
     let mut final_train_ce = f32::NAN;
@@ -240,10 +243,8 @@ fn main() {
                 burn::tensor::TensorData::new(mask_buf, [bs, max_seq_len]),
                 &device,
             );
-            let labels: Tensor<B, 1, Int> = Tensor::from_data(
-                burn::tensor::TensorData::new(lbl_buf, [bs]),
-                &device,
-            );
+            let labels: Tensor<B, 1, Int> =
+                Tensor::from_data(burn::tensor::TensorData::new(lbl_buf, [bs]), &device);
             let logits = model.forward(tokens, mask);
             let loss = model.loss(logits, labels);
             let loss_value: f32 = loss.clone().into_scalar().elem();
@@ -370,7 +371,9 @@ fn main() {
     .unwrap();
     let recorder = NamedMpkFileRecorder::<FullPrecisionSettings>::new();
     use burn::module::Module;
-    model.save_file(outpath.join("model"), &recorder).expect("save model");
+    model
+        .save_file(outpath.join("model"), &recorder)
+        .expect("save model");
     eprintln!("[save] checkpoint → {}", outpath.display());
 
     // Silence the unused-ctor warning if save_checkpoint helper is
