@@ -42,8 +42,7 @@
 > reproducibility commands across both tracks.
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/main-v6.2.0-2EA44F?style=for-the-badge" alt="main version"></a>
-  <a href="https://github.com/qazaq-ai/adam/tree/experimental/v6_3_phonemic_foundation"><img src="https://img.shields.io/badge/branch-v6.3.0--experimental-FBC02D?style=for-the-badge" alt="experimental branch"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.3.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">

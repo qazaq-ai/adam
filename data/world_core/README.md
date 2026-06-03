@@ -103,9 +103,9 @@ Validator checks:
   hits into distinct sections of its per-root report, so the user can
   tell at a glance where each fact came from.
 
-## Current scale (v6.0.0-rc4)
+## Current scale (v6.3.0)
 
-**Live totals: 3461 entries / 4116 facts across 66 domains**, all `approved`
+**Live totals: 3444 entries / 4116 facts across 65 domains**, all `approved`
 by `shaman`. v6.0.9 adds `kru_baitursynov.jsonl` (17 entries on Ahmet
 Baitursynuly + Kostanay Regional University + Kazakhstan AI Law +
 cyber-defense), rewritten in v6.0.13 with canonical `is_a / part_of /
