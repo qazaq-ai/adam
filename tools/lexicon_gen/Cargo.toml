@@ -1,0 +1,16 @@
+[package]
+name = "adam-lexicon-gen"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "One-shot generator for adam-lexicon-curated entries. Reads a tab-separated list of `label\\tcyrillic\\tpos\\tcategory` lines, runs each Cyrillic word through `cyrillic_to_phonemes` with native-root semantics, and emits ready-to-paste `LexEntry::new(...)` Rust literals. Eliminates the hand-transcription error class that gave us 28+ wrong Y/Yi placements earlier."
+
+[[bin]]
+name = "lexicon_gen"
+path = "src/main.rs"
+
+[dependencies]
+adam-phoneme = { path = "../../crates/adam-phoneme" }
+
+[lints]
+workspace = true

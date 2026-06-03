@@ -1,0 +1,38 @@
+[package]
+name = "adam-corpus-acquire"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Disk-constrained corpus acquisition pipeline for the v6.3 phonemic-foundation arc. Downloads one source at a time, decodes (ogg/wav via symphonia), resamples to 16 kHz mono (rubato), extracts MFCC features (adam-audio), persists ONLY the derived features + a curated 16 kHz WAV, then deletes the original. Keeps the disk footprint bounded regardless of source-archive size."
+
+[[bin]]
+name = "corpus_acquire"
+path = "src/main.rs"
+
+[dependencies]
+adam-audio = { path = "../../crates/adam-audio" }
+adam-phoneme = { path = "../../crates/adam-phoneme" }
+adam-stt-phoneme = { path = "../../crates/adam-stt-phoneme" }
+adam-tts-phoneme = { path = "../../crates/adam-tts-phoneme" }
+adam-forced-aligner = { path = "../../crates/adam-forced-aligner" }
+adam-formant-synth = { path = "../../crates/adam-formant-synth" }
+adam-lexicon-curated = { path = "../../crates/adam-lexicon-curated" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+toml.workspace = true
+clap = { version = "4.5", features = ["derive"] }
+# HTTP client (blocking, rustls — no OpenSSL dependency).
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "rustls-tls", "json"] }
+# Audio decoder (pure Rust). Features cover the formats we'll
+# realistically encounter from open Kazakh sources.
+symphonia = { version = "0.5", default-features = false, features = ["ogg", "vorbis", "wav", "pcm", "isomp4", "aac", "flac", "mp3"] }
+# Pure-Rust resampler.
+rubato = "0.16"
+# Streaming gunzip + tar (for FLEURS / OpenSLR-style tarball
+# ingestion without ever materialising the archive on disk).
+flate2 = "1.0"
+tar = "0.4"
+
+[lints]
+workspace = true

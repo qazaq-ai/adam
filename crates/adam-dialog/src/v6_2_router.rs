@@ -143,22 +143,29 @@ pub fn answer_with_corpus(input: &str, idx: &FrameIndex) -> Option<String> {
     // аласың?» — user wants a self-description of what adam can
     // answer. Distinct from self-identity («Сен кімсің?»).
     if is_capabilities_query(input) {
-        return Some(capabilities_response());
+        return Some(capabilities_response(input));
     }
 
     // 1c. Pitch-gender explanation. «Сен мені ағай дедің. Қалай
     // түсіндің?» — user asks how adam detected gender. Honest
     // explanation: pitch analysis on voice input.
     if is_pitch_detection_query(input) {
-        return Some(
+        // **Phase 20** — 2 paraphrases of pitch detection explanation.
+        let variants: &[&str] = &[
             "Сіздің даусыңыздың жиілігі (pitch) бойынша анықтадым. \
              Voice-input режимінде whisper.cpp дауысты транскрипциялаған \
              соң, мен оның негізгі жиілігін («male» болса ~ 85–155 Гц, \
              «female» болса ~ 165–255 Гц) есептеймін де, соған сай \
              қазақша құрметтеу формасын — «Ағай» немесе «Апай» — \
-             таңдаймын. Бұл — детерминирленген эвристика, нейрожүйе емес."
-                .to_string(),
-        );
+             таңдаймын. Бұл — детерминирленген эвристика, нейрожүйе емес.",
+            "Дауыс жиілігі (F0) арқылы. Whisper аудионы транскрипциялаған \
+             соң, мен оның негізгі жиілігін есептеймін — ер адам \
+             даусы әдетте 85–155 Гц аралығында, әйел даусы 165–255 Гц. \
+             Соған қарап «Ағай» немесе «Апай» вокативін таңдаймын. \
+             Алгоритм — autocorrelation-based YIN-тәріздес pitch \
+             detection, ешқандай нейрожүйе емес.",
+        ];
+        return Some(pick_variant(variants, input).to_string());
     }
 
     // 2. Self-identity short-circuit. «Сен кімсің?» / «Сен өзің
@@ -167,13 +174,22 @@ pub fn answer_with_corpus(input: &str, idx: &FrameIndex) -> Option<String> {
     // «сен» / «өзің» and emits Abai poetry quotes (codex
     // 2026-05-25 audit caught this).
     if is_self_identity_query(input) {
-        return Some(
+        // **Phase 20** — 3 paraphrases of the self-introduction.
+        let variants: &[&str] = &[
             "Мен — адам, толық атауым Agglutinative Reasoning Kernel \
              (ARK). Қазақ тіліне арналған детерминирленген тілдік \
              модель. Тілдік модельмін, бірақ LLM емес — мен \
-             curated фактілер арқылы жауап беремін."
-                .to_string(),
-        );
+             curated фактілер арқылы жауап беремін.",
+            "Менің атым — адам. Толық атауым Agglutinative Reasoning \
+             Kernel (ARK), қазақ тіліне арналған детерминирленген \
+             тілдік модель. LLM емеспін: жауаптарым тек curated \
+             деректерге сүйенеді.",
+            "Мен — ARK (Agglutinative Reasoning Kernel) атты тілдік \
+             модельмін, қысқаша «адам» деп аталамын. Қазақ тілінің \
+             морфологиясы бойынша құрастырылған детерминирленген \
+             жүйемін, әр сөзімді curated фактілермен растаймын.",
+        ];
+        return Some(pick_variant(variants, input).to_string());
     }
 
     // 3. Honest «no live data» refusals — weather, currency,
@@ -182,12 +198,19 @@ pub fn answer_with_corpus(input: &str, idx: &FrameIndex) -> Option<String> {
     // Алматыда қандай ауа райы?» (which has «бүгін» trigger for
     // clock) routes correctly to the weather-refusal path.
     if needs_live_data_refusal(input) {
-        return Some(
+        // **Phase 20** — 3 paraphrases for live-data refusal.
+        let variants: &[&str] = &[
             "Бұл сұраққа жауап беру үшін менде нақты дерек жоқ. \
              Менің білім қорым curated фактілерден тұрады, тікелей \
-             интернет немесе live-feed қосылған емес."
-                .to_string(),
-        );
+             интернет немесе live-feed қосылған емес.",
+            "Бұл сұраққа дерек бере алмаймын — менің білім қорымда \
+             ағымдағы / реалды-уақыттық мәлімет жоқ. Тек curated \
+             фактілермен жұмыс істеймін.",
+            "Кешіріңіз, бұл сұраққа жауап беретін live-дерек менде \
+             жоқ. Интернетке немесе сыртқы feed-ке қосылмаймын — \
+             curated тарихи фактілер ғана қолымда.",
+        ];
+        return Some(pick_variant(variants, input).to_string());
     }
 
     // 4. System clock — live state (date / month / weekday /
@@ -481,7 +504,36 @@ fn handle_listing_query(input: &str) -> Option<String> {
     // IsA fallback and returned «Мемлекет» (the host country's
     // type). Curate the list answers from data/world_core/geography_kz
     // facts that are already tagged PartOf=қазақстан.
-    let mentions_kz = lower.contains("қазақстан") || lower.contains("казахстан");
+    //
+    // **Phase 15g.J (2026-06-01)** — extend the country-match check
+    // to cover Whisper drift surfaces from the live v4 retest:
+    //   «казастан» — Whisper drops the second «қ» AND swallows the
+    //                «х» (cyrillic split: казас + тан).
+    //   «казахстан» — Russian-Cyrillic spelling Whisper defaults to.
+    //   «қазастан» — same drop with Қ→Қ preserved.
+    //   «казахстанда» / «қазақстанда» — locative forms — already
+    //                                    covered by `.contains` on
+    //                                    the root.
+    // **Phase 15g.J.1 (2026-06-01)** — broaden the anchor to cover
+    // EVERY Whisper drift surface seen in live tests. The key
+    // realisation: Whisper alternately keeps or drops the four
+    // Kazakh consonants Қ/Ғ/Ң, AND alternately spells the country
+    // with «х» (Russian) or «қ» (Kazakh). So «қазақстанда»,
+    // «казақстанда» (К-first, Қ-mid), «қазақстанға», «казахстан»,
+    // «казастан» all need to anchor the inventory branch. A bare
+    // «қазақ» / «казақ» / «казах» root-substring catches all of
+    // them at once.
+    // **Phase 15g.C.2 (2026-06-02)** — Shirali Whisper preserves Қ
+    // (where multilingual drifted to К), so add Қ-prefix variants
+    // alongside the К forms. Live REPL: «Қазастанда қандай таулар
+    // бар» got `mentions_kz = false` because only К-prefix
+    // «казас» was listed; Shirali's «қазас» wasn't covered.
+    let mentions_kz = lower.contains("қазақ")
+        || lower.contains("казақ")
+        || lower.contains("казах")
+        || lower.contains("қазах")
+        || lower.contains("казас")
+        || lower.contains("қазас");
     if mentions_kz && (lower.contains("таулар") || lower.contains("тау бар")) {
         return Some(
             "Қазақстандағы танымал таулар: Алатау, Алтай, Тянь-Шань, \
@@ -500,6 +552,42 @@ fn handle_listing_query(input: &str) -> Option<String> {
         return Some(
             "Қазақстанның негізгі көлдері: Балқаш, Зайсан, Алакөл, \
              Тенгіз, Маркакөл."
+                .to_string(),
+        );
+    }
+
+    // **Phase 15g.C.3 (2026-06-02)** — president routing was
+    // missing from the v6.2 router. Live tests showed «Қазақстанның
+    // президенті кім» falling through to the generic IsA fallback
+    // (adam: «Қазақстан — мемлекет»). Facts are in
+    // data/world_core/government_kazakhstan.jsonl but the substring
+    // intent layer didn't pick them up reliably. Route here:
+    //   «бірінші / тұңғыш» + «президент»  → Nazarbayev
+    //   «қазіргі / ағымдағы / қазір» + «президент»  → Tokayev
+    //   bare «президент» without ordinal qualifier → assume current
+    if mentions_kz && lower.contains("президент") {
+        let is_first = lower.contains("бірінші")
+            || lower.contains("бiрiншi")
+            || lower.contains("тұңғыш")
+            || lower.contains("туңғыш")
+            || lower.contains("first");
+        let is_current = lower.contains("қазіргі")
+            || lower.contains("казiргi")
+            || lower.contains("қазір")
+            || lower.contains("қазыр")
+            || lower.contains("ағымдағы");
+        if is_first {
+            return Some(
+                "Қазақстанның тұңғыш Президенті — Нұрсұлтан Әбішұлы Назарбаев \
+                 (1991–2019)."
+                    .to_string(),
+            );
+        }
+        // Default (and explicit current) → Tokayev.
+        let _ = is_current;
+        return Some(
+            "Қазақстанның қазіргі Президенті — Қасым-Жомарт Кемелұлы Тоқаев \
+             (2019 жылдан бері)."
                 .to_string(),
         );
     }
@@ -596,10 +684,17 @@ fn recognize_occupation_statement(input: &str) -> Option<String> {
         return None;
     }
     for (root, canonical) in occupations {
+        // Use char counts (not byte lengths): Kazakh suffixes
+        // like «-мын», «-сың», «-сыз», «-пын» are 2–4 chars.
+        // `len()` would give bytes, which doubles for Cyrillic
+        // and breaks the comparison. The replayed-voice-REPL
+        // battery surfaced this on «бағдарламашымын» (session
+        // 3 — Whisper rendered the «-мын» suffix the user
+        // actually spoke).
+        let root_chars = root.chars().count();
         if lower.split(|c: char| !c.is_alphanumeric()).any(|tok| {
-            tok == *root
-                || tok.starts_with(root)
-                    && (tok.len() == root.len() + 2 || tok.len() == root.len() + 3)
+            let tok_chars = tok.chars().count();
+            tok == *root || (tok.starts_with(root) && (2..=4).contains(&(tok_chars - root_chars)))
         }) {
             return Some(format!(
                 "Түсіндім, сіз {canonical}сыз. Бағдарламалау тілдері, \
@@ -632,16 +727,65 @@ fn is_capabilities_query(input: &str) -> bool {
     markers.iter().any(|m| lower.contains(m))
 }
 
-fn capabilities_response() -> String {
-    "Менің білім қорым curated деректерден тұрады. Жауап бере аламын: \
-     (1) Қазақстан туралы — география, тарих, әдебиет, танымал тұлғалар, \
-     мемлекеттік құрылым; (2) мектеп пәндері — математика, физика, химия, \
-     биология, тарих, ана тілі; (3) бағдарламалау тілдері және Rust; \
-     (4) дата / уақыт / апта күні (live clock); (5) қарапайым және күрделі \
-     математикалық есептеулер (қазақша / орысша / ASCII). LLM емеспін, \
-     curated деректерден тыс сұрақтарға «нақты дерек жоқ» деп шынайы \
-     жауап беремін."
-        .to_string()
+/// **Phase 20 (2026-06-02)** — paraphrase variants for high-frequency
+/// static responses. The user flagged «заученность и однотипность» —
+/// the same monologue coming back to multiple distinct capability
+/// queries. Each call now selects one of N paraphrased variants
+/// using a stable hash of the input — same query → same answer
+/// (no flicker on retry), different queries → different surface.
+fn pick_variant<'a>(variants: &[&'a str], seed: &str) -> &'a str {
+    if variants.is_empty() {
+        return "";
+    }
+    // FNV-1a — stable, no allocations, deterministic across runs.
+    let mut h: u64 = 14695981039346656037;
+    for b in seed.bytes() {
+        h ^= b as u64;
+        h = h.wrapping_mul(1099511628211);
+    }
+    variants[(h as usize) % variants.len()]
+}
+
+fn capabilities_response(input: &str) -> String {
+    // **Phase 20** — five paraphrased variants. Same canonical content
+    // (the curated-knowledge disclosure) in different shapes so the
+    // user doesn't feel like they're hitting one fixed template
+    // every time they ask about adam's capabilities.
+    let variants: &[&str] = &[
+        "Менің білім қорым curated деректерден тұрады. Жауап бере аламын: \
+         (1) Қазақстан туралы — география, тарих, әдебиет, танымал тұлғалар, \
+         мемлекеттік құрылым; (2) мектеп пәндері — математика, физика, химия, \
+         биология, тарих, ана тілі; (3) бағдарламалау тілдері және Rust; \
+         (4) дата / уақыт / апта күні (live clock); (5) қарапайым және күрделі \
+         математикалық есептеулер (қазақша / орысша / ASCII). LLM емеспін, \
+         curated деректерден тыс сұрақтарға «нақты дерек жоқ» деп шынайы \
+         жауап беремін.",
+        "Мен бірнеше тақырыпта көмектесе аламын: Қазақстанның географиясы, \
+         тарихы, әдебиеті мен танымал тұлғалары; мектеп пәндері — \
+         математика, физика, химия, биология, ана тілі; бағдарламалау \
+         (әсіресе Rust); ағымдағы күн, уақыт пен апта; қарапайым және \
+         көп қадамды математикалық есептеулер. Тыс тақырыпта «дерек жоқ» \
+         деп шынайы айтамын — LLM емеспін.",
+        "Қолымдағы білім аясы — curated facts. Жауап бере алатын тақырыптарым: \
+         Қазақстан туралы (география / тарих / әдебиет / тұлғалар / мемлекет); \
+         мектеп пәндері (физика, химия, биология, математика, тарих); \
+         бағдарламалау тілдері мен Rust; live уақыт-күн-апта; математикалық \
+         амалдар. Тыс сұрақтарға қалай ойдан жауап жасайтын LLM емеспін — \
+         «білмеймін» дегенді жасырмаймын.",
+        "Жауап бере алатын негізгі салаларым: Қазақстан жайында жалпы дерек \
+         (география, тарих, әдебиет, белгілі тұлғалар, мемлекеттік құрылым); \
+         мектеп бағдарламасы (математика, физика, химия, биология, тарих, \
+         ана тілі); бағдарламалау, әсіресе Rust; live дата / уақыт / апта \
+         күні; қазақша / орысша / ASCII форматтағы математикалық есептер. \
+         LLM емеспін — curated деректер шегінен шықпаймын.",
+        "Менің көмектесе алатын тақырыптарым: (1) Қазақстан туралы — \
+         география, тарих, әдебиет, белгілі адамдар, мемлекет құрылымы; \
+         (2) мектеп пәндері — математика, физика, химия, биология; \
+         (3) Rust пен бағдарламалау тілдері; (4) уақыт, күн, апта (live); \
+         (5) математикалық есептеулер. Әзірге осы шеңберде ғана нақты \
+         жауап бере аламын — қалғанын ойдан құрастырмаймын.",
+    ];
+    pick_variant(variants, input).to_string()
 }
 
 /// Detect «how did you determine my gender?» kind of meta-query.
@@ -744,13 +888,102 @@ fn looks_like_time_query(s: &str) -> bool {
         "неделя",
         "какая дата",
         "какой день",
+        // Phase 21 (2026-06-02) — relative-day anchors + Phase 21.A
+        // STT-drift aliases (Whisper hears «ертең» as «еркең» etc.).
+        "кеше",
+        "кешее",
+        "кешеу",
+        "ертең",
+        "еркең",
+        "ертен",
+        "эртен",
+        "бүрсігүні",
+        "бүрсүгүні",
+        "бірсүгіне",
+        "бір сүгіне",
+        "бірсүгіні",
+        "бір сүгіні",
+        "бір сігүні",
+        "бірсігүні",
+        "алдыңғы күн",
+        "вчера",
+        "завтра",
     ];
     markers.iter().any(|m| lower.contains(m))
+}
+
+/// **Phase 21 (2026-06-02)** — detect relative-day anchor in the
+/// input. Returns the day-offset (−2…+2) and `None` if the input
+/// has no relative-day marker (caller should treat it as «today»).
+///
+/// **Phase 21.A** — STT-drift aliases for each marker. The 2026-06-02
+/// live REPL showed Whisper hears «ертең» as «еркең» (т→к) and
+/// «бүрсігүні» as «бірсүгіне» / «бір сүгіні» (ү→і + word split).
+/// Adding the drifted forms keeps the calendar handler from falling
+/// through to substring fact lookup on a recognisable utterance.
+fn relative_day_offset(lower: &str) -> Option<i64> {
+    for marker in [
+        "бүрсігүні",
+        "бүрсүгүні",
+        "бірсүгіне",
+        "бір сүгіне",
+        "бірсүгіні",
+        "бір сүгіні",
+        "бір сігүні",
+        "бірсігүні",
+    ] {
+        if lower.contains(marker) {
+            return Some(2);
+        }
+    }
+    for marker in ["ертең", "еркең", "ертен", "эртен", "завтра"] {
+        if lower.contains(marker) {
+            return Some(1);
+        }
+    }
+    for marker in ["алдыңғы күн", "алдыңғы күні", "позавчера"] {
+        if lower.contains(marker) {
+            return Some(-2);
+        }
+    }
+    for marker in ["кеше", "кешее", "кешеу", "вчера"] {
+        if lower.contains(marker) {
+            return Some(-1);
+        }
+    }
+    None
 }
 
 fn emit_clock_answer(input: &str) -> String {
     let c = system_clock::now();
     let lower = input.to_lowercase();
+    // **Phase 21** — handle relative-day questions before the
+    // generic «today» path. If the user says «Кеше / Ертең …»,
+    // shift the clock reading and render with the matching prefix.
+    if let Some(offset) = relative_day_offset(&lower) {
+        let rc = system_clock::now_offset(offset);
+        let label = system_clock::relative_day_label_kk(offset);
+        let copula = system_clock::relative_day_copula_kk(offset);
+        // Weekday-only ask: «Кеше қай күн болды?» / «Ертең қай күн?»
+        if lower.contains("апта")
+            || lower.contains("неделя")
+            || (lower.contains("күн") && (lower.contains("қай") || lower.contains("қандай")))
+        {
+            return format!("{label} — {} {copula}.", rc.weekday_kk());
+        }
+        // Day-of-month ask: «Кеше нешесі еді?» / «Ертең нешесі?»
+        if lower.contains("нешесі") || lower.contains("число") {
+            return format!("{label} {} {} {copula}.", rc.day, rc.month_kk());
+        }
+        // Generic relative-day date.
+        return format!(
+            "{label} — {} {} {} жыл, {} {copula}.",
+            rc.day,
+            rc.month_kk(),
+            rc.year,
+            rc.weekday_kk()
+        );
+    }
     if lower.contains("сағат") || lower.contains("часов") || lower.contains("уақыт")
     {
         return format!("Қазір сағат {}.", c.time_hhmm());
@@ -1307,6 +1540,78 @@ mod tests {
         let r = answer_with_corpus("Қазір сағат неше?", &idx);
         assert!(r.is_some());
         assert!(r.unwrap().contains(":"));
+    }
+
+    /// **Phase 21 (2026-06-02)** — relative-day queries route to the
+    /// clock handler instead of the substring fact lookup.  Without
+    /// the «кеше» / «ертең» markers the router previously fell into
+    /// `Күн IsA дөңгелек` (live REPL 2026-06-02 retest).
+    #[test]
+    fn yesterday_query_routes_to_clock_with_past_copula() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Кеше қай күн болды?", &idx);
+        let s = r.expect("yesterday query should answer");
+        assert!(s.starts_with("Кеше"), "expected «Кеше …» prefix, got: {s}");
+        assert!(
+            s.contains("болды"),
+            "expected past copula «болды», got: {s}"
+        );
+        // Must NOT be the «Күн — дөңгелек» substring misroute.
+        assert!(
+            !s.contains("дөңгелек"),
+            "regression: routed to fact, got: {s}"
+        );
+    }
+
+    #[test]
+    fn tomorrow_query_routes_to_clock_with_future_copula() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Ертең қандай күн?", &idx);
+        let s = r.expect("tomorrow query should answer");
+        assert!(s.starts_with("Ертең"), "got: {s}");
+        assert!(s.contains("болады"), "got: {s}");
+    }
+
+    #[test]
+    fn day_after_tomorrow_query_routes_to_clock() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Бүрсігүні нешесі болады?", &idx);
+        let s = r.expect("day-after-tomorrow query should answer");
+        assert!(s.starts_with("Бүрсігүні"), "got: {s}");
+        assert!(s.contains("болады"), "got: {s}");
+    }
+
+    /// **Phase 21.A (2026-06-02)** — Whisper-drift aliases recover the
+    /// calendar handler when STT mishears the marker. 2026-06-02 live
+    /// REPL: «ертең» → «еркең», «бүрсігүні» → «бірсүгіне» / «бір сүгіні».
+    #[test]
+    fn whisper_drift_yerken_routes_to_tomorrow() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Еркең қай күн болады?", &idx);
+        let s = r.expect("еркең drift should still route to tomorrow");
+        assert!(s.starts_with("Ертең"), "got: {s}");
+        assert!(s.contains("болады"), "got: {s}");
+        assert!(
+            !s.contains("дөңгелек"),
+            "regression: fell through, got: {s}"
+        );
+    }
+
+    #[test]
+    fn whisper_drift_birsugine_routes_to_day_after_tomorrow() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Бірсүгіне нешесі болады?", &idx);
+        let s = r.expect("бірсүгіне drift should route to day-after");
+        assert!(s.starts_with("Бүрсігүні"), "got: {s}");
+        assert!(s.contains("болады"), "got: {s}");
+    }
+
+    #[test]
+    fn whisper_drift_bir_sugini_routes_to_day_after_tomorrow() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Бір сүгіні нешесі болады.", &idx);
+        let s = r.expect("space-split бір сүгіні should still route");
+        assert!(s.starts_with("Бүрсігүні"), "got: {s}");
     }
 
     /// Real biographical question → realised Kazakh sentence.

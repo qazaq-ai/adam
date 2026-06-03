@@ -1,0 +1,11 @@
+[package]
+name = "adam-phoneme"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Phoneme alphabet (Layer 0a of the v6.3 phonemic-foundation arc). The 37-unit typed inventory for Kazakh — 10 vowels + 27 consonants — each carrying place / manner / voicing / harmony class / height / rounding / length / native-vs-loan attributes. Includes the bidirectional Cyrillic ↔ Phoneme renderer with the «ы»/«і» epenthetic rule from docs/v6_3_phonemic_foundation.md §9 OQ4."
+
+[dependencies]
+
+[lints]
+workspace = true

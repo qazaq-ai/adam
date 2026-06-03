@@ -1,0 +1,60 @@
+[package]
+name = "adam-voice-repl-v6-3"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Full v6.3 voice loop demonstrator — mic → STT (Whisper.cpp default, in-tree DTW fallback) → fuzzy + neural LM rescoring → BPE intent classifier (parallel-log) → deterministic v6.2 dialog router → Piper TTS → speaker. Honest hybrid: deterministic core (v6.2), controlled neural boundaries at STT / TTS / rescoring (v6.3). Standalone tool for sanity-checking the v6.3 stack before wiring it into `adam_chat`."
+
+[[bin]]
+name = "voice_repl_v6_3"
+path = "src/main.rs"
+
+[dependencies]
+adam-audio = { path = "../../crates/adam-audio" }
+adam-phoneme = { path = "../../crates/adam-phoneme" }
+adam-stt-phoneme = { path = "../../crates/adam-stt-phoneme" }
+adam-tts-phoneme = { path = "../../crates/adam-tts-phoneme" }
+# Phase 16: dialog engine — turns recognised text into a response
+# instead of echoing it back through TTS.
+adam-dialog = { path = "../../crates/adam-dialog" }
+adam-kernel-fst = { path = "../../crates/adam-kernel-fst" }
+# Phase 17: voice-derived gender hint (F0 → male/female/child)
+# so the dialog engine can address an unnamed speaker with the
+# right Kazakh honorific («Ағай» / «Апай» / «Балам»).
+adam-voice = { path = "../../crates/adam-voice" }
+# Phase 15f: KB retrieval — load morpheme_index.json + world_core
+# facts so factual queries like «Қазақстан туралы», «Абай кім»,
+# «Алматы туралы» answer with curated knowledge instead of
+# deflecting to «Бәлкім, X туралы айтасыз ба».
+adam-retrieval = { path = "../../crates/adam-retrieval" }
+adam-reasoning = { path = "../../crates/adam-reasoning" }
+# **Phase 15g.C.2 step 3 (2026-06-01)** — neural contextual rescorer.
+# `adam-agg-model`: tiny Burn-based transformer (the one trained by
+# `train_contextual_lm` on the 63 362-sequence BPE corpus). Used at
+# voice-REPL runtime as a sanity check: score the raw Whisper output
+# AND the fuzzy-normalised version, keep whichever has the higher
+# LM log-likelihood. Catches fuzzy regressions like «даулет → сәулет»
+# without needing manual vocab curation.
+# `adam-tokenizer`: BPE encoder (vocab=5188, the same vocab the LM
+# was trained on) — converts Cyrillic surface text into id streams
+# the model can score.
+adam-agg-model = { path = "../../crates/adam-agg-model" }
+adam-tokenizer = { path = "../../crates/adam-tokenizer" }
+adam-kernel = { path = "../../crates/adam-kernel" }
+# **Phase 15g.J (2026-06-01)** — large canonical wordlist for the
+# fuzzy candidate pool. The Phase 15g.B.2 vocab held only ~82
+# overrides; with the v4 LM safety net now reliable (perplexity
+# 1.16, validates every proposed rewrite) we can extend the pool
+# to the full ~3000 frequency-extracted curated lexicon without
+# the «даулет → сәулет» false positives from Phase 15g.B.
+adam-lexicon-curated = { path = "../../crates/adam-lexicon-curated" }
+burn = { version = "0.17", default-features = false, features = ["std", "ndarray"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+# cpal for probing the output device's preferred sample rate
+# (we resample Piper output before playback — see synthesise_via_piper).
+cpal = "0.15"
+clap = { version = "4.5", features = ["derive"] }
+
+[lints]
+workspace = true

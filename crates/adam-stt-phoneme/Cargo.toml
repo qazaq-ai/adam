@@ -1,0 +1,17 @@
+[package]
+name = "adam-stt-phoneme"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Phoneme-level speech-to-text via Dynamic Time Warping over MFCC sequences. The v6.3 alternative to Whisper: a pure-Rust template-matching recogniser. Phase 6 of the phonemic-foundation arc — builds on adam-audio (MFCC primitives) + adam-phoneme (Phoneme enum) + adam-phonotactics (Layer C rescoring). Real per-phoneme MFCC templates arrive with Phase 2d corpus extraction; this crate is the recognition infrastructure that consumes them."
+
+[dependencies]
+adam-phoneme = { path = "../adam-phoneme" }
+adam-audio = { path = "../adam-audio" }
+# Phase 6 Layer C: phonotactic rescoring uses the validator's
+# MAX_ONSET / MAX_CODA constants + check_harmony to clean up
+# the DTW-only recognition stream.
+adam-phonotactics = { path = "../adam-phonotactics" }
+
+[lints]
+workspace = true

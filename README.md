@@ -12,11 +12,37 @@
 
 <p align="center">
   <b>Why this project exists →</b> <a href="docs/MANIFESTO.md"><code>docs/MANIFESTO.md</code></a><br>
-  <b>v6.2 architecture →</b> <a href="docs/v6_2_architectural_redesign.md"><code>docs/v6_2_architectural_redesign.md</code></a>
+  <b>v6.2 architecture →</b> <a href="docs/v6_2_architectural_redesign.md"><code>docs/v6_2_architectural_redesign.md</code></a><br>
+  <b>Due-diligence pack →</b> <a href="DUE_DILIGENCE.md"><code>DUE_DILIGENCE.md</code></a>
 </p>
 
+<!-- ─────────────────────────────────────────────────────────────
+     v6.3 honest split (2026-06-02 codex audit follow-up).
+     Production = v6.2 on `main` (numbers below).
+     Research-demo = v6.3 on experimental/v6_3_phonemic_foundation.
+     ───────────────────────────────────────────────────────────── -->
+
+> **Two tracks, on purpose.**
+>
+> - **`main` — v6.2 deterministic core.** Rule-based dialog kernel:
+>   morph → frame → QueryIR → retrieval → realiser. **0 MB models, 0
+>   GPU, byte-deterministic.** This is the production narrative below.
+>
+> - **`experimental/v6_3_phonemic_foundation` — v6.3 voice surface.**
+>   Wraps the v6.2 core in a microphone → STT → fuzzy / LM rescoring →
+>   intent classifier → router → TTS loop. **Honest hybrid:** the
+>   dialog core stays 100 % deterministic; neural components (Whisper.cpp
+>   STT, Piper TTS, ~1 M-param BPE LM, ~1 M-param intent classifier)
+>   live only at the speech surface and never invent facts. Standalone
+>   binary at <code>tools/voice_repl_v6_3</code>. Research-demo
+>   maturity; not yet on <code>main</code>.
+>
+> See <a href="DUE_DILIGENCE.md"><code>DUE_DILIGENCE.md</code></a>
+> for current test totals, repo state, known limitations and
+> reproducibility commands across both tracks.
+
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.2.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.3.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -26,14 +52,14 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/tests-1904%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-1477%20passing%20%2F%201%20red-FBC02D?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/dialog%20battery-79%2F79%20must--pass-2EA44F?style=flat-square" alt="dialog battery">
-  <img src="https://img.shields.io/badge/warm%20p50-791%20ns-2EA44F?style=flat-square" alt="warm latency">
-  <img src="https://img.shields.io/badge/GPU-0%25-2EA44F?style=flat-square" alt="gpu">
-  <img src="https://img.shields.io/badge/model%20size-0%20MB-2EA44F?style=flat-square" alt="model size">
-  <img src="https://img.shields.io/badge/world%20core-3461%20curated%20/%204116%20facts%20/%2066%20domains-9CCC65?style=flat-square" alt="world core">
+  <img src="https://img.shields.io/badge/v6.2%20warm%20p50-917%20ns-2EA44F?style=flat-square" alt="warm latency">
+  <img src="https://img.shields.io/badge/v6.2%20core-0%20MB%20%2F%200%20GPU-2EA44F?style=flat-square" alt="v6.2 core">
+  <img src="https://img.shields.io/badge/v6.3%20voice%20surface-Whisper%20%2B%20Piper%20%2B%20tiny%20LM-9CCC65?style=flat-square" alt="v6.3 voice">
+  <img src="https://img.shields.io/badge/world%20core-3444%20curated%20/%204116%20facts-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/lexicon-25.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
-  <img src="https://img.shields.io/badge/intents-41-2EA44F?style=flat-square" alt="intents">
+  <img src="https://img.shields.io/badge/intents-41%20router%20%2F%2052%20neural%20classifier-2EA44F?style=flat-square" alt="intents">
   <img src="https://img.shields.io/badge/hallucinations%20within%20curated%20domains-0-2EA44F?style=flat-square" alt="hallucinations within curated domains">
 </p>
 

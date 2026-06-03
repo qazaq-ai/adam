@@ -10,7 +10,10 @@ adam-kernel = { path = "../adam-kernel" }
 adam-kernel-fst = { path = "../adam-kernel-fst" }
 adam-agg-tokenizer = { path = "../adam-agg-tokenizer" }
 adam-agg-synth = { path = "../adam-agg-synth" }
-burn = { version = "0.17", default-features = false, features = ["std", "train", "autodiff", "ndarray"] }
+# Phase 19 step C — intent classifier trainer needs BPE encoding
+# at training time, same tokenizer the v6 LM uses.
+adam-tokenizer = { path = "../adam-tokenizer" }
+burn = { version = "0.17", default-features = false, features = ["std", "train", "autodiff", "ndarray", "wgpu"] }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
@@ -23,6 +26,30 @@ path = "src/bin/poc_kazakh_train.rs"
 [[bin]]
 name = "verifier_demo"
 path = "src/bin/verifier_demo.rs"
+
+# Phase 15g.C.2 (2026-06-01) — contextual LM trainer on BPE
+# pretokenized natural-language pack. Replaces the static fuzzy
+# vocabulary loop with a learned rescorer; consumed by voice_repl_v6_3.
+[[bin]]
+name = "train_contextual_lm"
+path = "src/bin/train_contextual_lm.rs"
+
+# Phase 15g.F (2026-06-01) — GPU variant of train_contextual_lm.
+# Uses burn-wgpu backend, which selects Metal automatically on
+# Apple Silicon. Same training pipeline; faster matmul throughput
+# at larger batch sizes.
+[[bin]]
+name = "train_contextual_lm_gpu"
+path = "src/bin/train_contextual_lm_gpu.rs"
+
+# Phase 19 step C (2026-06-02) — train the pooled-embedding
+# intent classifier on `adam_intent_training_pack.json`.
+[[bin]]
+name = "train_intent_classifier_gpu"
+path = "src/bin/train_intent_classifier_gpu.rs"
+# Phase 19 — neural intent classifier as a Burn module — also needs
+# the BPE tokenizer + kernel segmentation types for encoding the
+# training pack at training time.
 
 [dev-dependencies]
 criterion = { version = "0.5", default-features = false, features = ["cargo_bench_support"] }

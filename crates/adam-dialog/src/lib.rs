@@ -61,6 +61,7 @@ pub mod language_core;
 pub mod nlg;
 pub mod pedagogical;
 pub mod phoneme;
+pub mod phonetic_match;
 pub mod planner;
 pub mod predicate_focus;
 pub mod proof_object;

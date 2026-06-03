@@ -1,8 +1,24 @@
-# v6.3.0 — Phonemic Foundation (design)
+# v6.3.0 — Phonemic Foundation
 
-**Status.** ⚙️ **Design started 2026-05-26.** No code yet. Branch
-`experimental/v6_3_phonemic_foundation` will be cut from `main`
-at commit `b04ea732` once this doc is signed off.
+**Status.** 🚧 **Implementation in progress on
+`experimental/v6_3_phonemic_foundation`** (cut from `main` at
+`b04ea732`). As of 2026-05-27 the arc has shipped phases 1-7, 9
+and 10 plus Phase 11 steps 1-3; see the phase table in § 5 for
+per-phase status. New crates landed: `adam-phoneme`,
+`adam-phonotactics`, `adam-audio`, `adam-stt-phoneme`,
+`adam-tts-phoneme`, `adam-kernel-phoneme`, `adam-forced-aligner`,
+plus the `voice_repl_v6_3` demonstrator. The full audio path
+(audio → MFCC → CMVN → phonemes → Cyrillic → dialog → phoneme
+TTS) builds without whisper.cpp or macOS `say`.
+
+**Open risks (2026-05-27 external audit).** STT phoneme accuracy
+is not yet measured on a held-out set — only smoke-tested on two
+Wikimedia probes (see § 5 Phase 11). A PER/WER report over the
+FLEURS test split is the next deliverable. The `data/
+v6_3_phoneme_bank` derived corpus (~2.2 GB) is `.gitignore`d and
+regenerable; `data/v6_3_corpus/MANIFEST.jsonl` provenance is
+still to be reconciled. The workspace `Cargo.toml` version stays
+`6.2.0` until the branch merges to `main`.
 
 **Origin.** Voice REPL session-5 (2026-05-26 demo-prep) closed
 yet another batch of STT-mishear / listing-fallback bugs. User
@@ -326,31 +342,46 @@ C dependencies):
 
 ## 5. Implementation phases
 
-| phase | scope                                                   | gate / acceptance                          |
-|-------|---------------------------------------------------------|--------------------------------------------|
-| 1     | Layer 0a + binary phoneme format                        | inventory frozen + round-trip tests pass    |
-| 2a    | Corpus collection (see § 6)                              | manifest tracks every source                |
-| 2b    | Text normalisation (transcripts → phonetic Cyrillic)     | normalised corpus dump                      |
-| 2c    | MFA bootstrap forced alignment                           | per-phoneme timestamps with confidence ≥ 0.7|
-| 2d    | MFCC template + diphone bank extraction                  | binary bank files (~5–10 MB total)          |
-| 2e    | Bank serialisation in pure-Rust format                   | runtime can load bank without MFA / Python  |
-| 3     | Layer 0c — phonotactic FST                               | rejects synthetic ill-formed, accepts corpus|
-| 4     | Layer 0d — bidirectional renderer (Cyrillic / Latin)     | corpus round-trip ≥ 99%                     |
-| 5     | Pure-Rust audio I/O (cpal-based)                         | replaces `voice` feature                    |
-| 6     | Phoneme-level STT (DTW + Viterbi)                        | ≥ 70% phoneme-level accuracy on clean Kk    |
-| 7     | Phoneme-level TTS (concatenative + PSOLA)                | MOS within 0.5 of macOS `say`               |
-| 8     | Wire `adam_chat` to phoneme STT/TTS                      | v6.3 demo viable; voice-REPL audits pass    |
-| 9     | Lift `adam-kernel-fst` to phoneme input                  | morphology on phonemes; world_core lifted   |
-| 10    | Pure-Rust forced aligner (replaces MFA bootstrap)        | re-alignment matches MFA within tolerance   |
+| phase | scope                                                   | gate / acceptance                          | status      |
+|-------|---------------------------------------------------------|--------------------------------------------|-------------|
+| 1     | Layer 0a + binary phoneme format                        | inventory frozen + round-trip tests pass    | **shipped** |
+| 2a    | Corpus collection (see § 6)                              | manifest tracks every source                | **shipped** |
+| 2b    | FLEURS-kk_kz ingest (text normalisation built-in)        | 5441 entries, 21.6 h, 40/40 native Cyr     | **shipped** |
+| 2c    | Forced alignment for per-phoneme timestamps              | Viterbi DP via Phase 10's aligner           | **shipped** |
+| 2d    | MFCC template + diphone bank extraction                  | binary bank files (~12 KB MFCC + 1.8 MB PCM)| **shipped** |
+| 2e    | Bank serialisation in pure-Rust format                   | runtime loads bank without MFA / Python     | **shipped** |
+| 3     | Layer 0c — phonotactic FST                               | rejects synthetic ill-formed, accepts corpus| **shipped** |
+| 4     | Layer 0d — bidirectional renderer (Cyrillic / Latin)     | corpus round-trip ≥ 99%                     | **shipped** |
+| 5     | Pure-Rust audio I/O (cpal-based)                         | replaces `voice` feature                    | **shipped** |
+| 6     | Phoneme-level STT (DTW + Viterbi)                        | ≥ 70% phoneme-level accuracy on clean Kk    | **infra shipped, accuracy gate NOT met** (PER 76.6% on FLEURS test with human bank v4 + lexicon sp=25; 84.0% original synth/stream baseline; see § 7 Phase 6 status) |
+| 7     | Phoneme-level TTS (concatenative + PSOLA)                | MOS within 0.5 of macOS `say`               | **shipped** |
+| 8     | Wire `adam_chat` to phoneme STT/TTS                      | v6.3 demo viable; voice-REPL audits pass    | partial     |
+| 9     | Lift `adam-kernel-fst` to phoneme input                  | morphology on phonemes; world_core lifted   | **shipped** |
+| 10    | Pure-Rust forced aligner (replaces MFA bootstrap)        | T×N Viterbi DP with self-loops              | **shipped** |
+| 11    | Speaker normalisation (CMVN / VTLN / per-speaker bank)   | qazaq Wikimedia-probe recovers Q phoneme    | next        |
 
 **Sizing.** No calendar estimates. Each phase ships when its
 acceptance gate is met; the order can be shuffled if a phase
 blocks (e.g. a corpus source is slow to acquire).
 
-**MFA policy.** MFA is a **build-time tool**, not a runtime
-dependency. It exists in the pipeline only for Phase 2c and is
-fully replaced by Phase 10's pure-Rust aligner. The model
-itself never invokes MFA.
+**Phase 11 backlog.** The Phase 10 commit identified speaker
+mismatch — not alignment — as the residual blocker on the
+`qazaq_pipeline_with_rescore` test. The Wikimedia probe is one
+voice; the FLEURS-trained bank is means over 2773 F + 2653 M
+speakers, and the probe's Q frames land closer to FLEURS-Z in
+cepstral distance than to FLEURS-Q. Three candidate fixes:
+cepstral mean/variance normalisation (CMVN — cheapest), vocal-
+tract-length normalisation (VTLN), or a per-speaker bank
+selected by speaker-ID at recognition time.
+
+**MFA policy.** MFA was originally planned as a Phase 2c
+build-time tool, never as a runtime dependency. **Phase 10 has
+shipped the pure-Rust replacement** ([adam-forced-aligner](
+../crates/adam-forced-aligner/)) — Viterbi DP over a T × N
+state machine with self-loops, six unit tests, zero external
+deps. The pipeline never installed MFA; the bootstrap path
+went straight from equipartition baseline to the pure-Rust
+aligner.
 
 ## 6. Corpus
 
@@ -433,6 +464,150 @@ the Phase 2c forced-alignment confidence filter
 - **Phase 6:** phoneme STT achieves ≥ 70% phoneme-level
   accuracy on a 100-utterance clean-speech test set. (Whisper
   baseline for reference, not as competitor.)
+  - **Status 2026-05-29: gate NOT met.** Infrastructure
+    shipped (`tools/stt_eval` PER harness; multi-template
+    bank with K=50 exemplars; CMVN, forced aligner,
+    sonorant-nucleus phonotactics, formant synthesiser, 312-
+    entry curated lexicon). Measured PER on FLEURS test
+    --max 100 = **84.0 %** (target ≤ 30 %), `hyp/ref` ratio
+    0.58 (under-segments). On the homogeneous synth-on-synth
+    corpus PER = 61.0 % (also short of 30 %). Two
+    architectural negative results recorded: diagonal-
+    Gaussian scoring ties Euclidean, K > 50 over-fits synth
+    without lifting FLEURS. **Branch should be read as
+    "phonemic foundation + STT research" until PER ≤ 30 %.**
+    Next planned lever per codex review (2026-05-29):
+    lexicon-constrained decoding + phonotactic transition
+    mask + duration priors; only fall back to a small
+    CTC/Conformer (output: phoneme lattice + confidence)
+    if the pure-template path plateaus above 50 % PER.
+  - **Phase 6 step 5 (2026-05-30): 332h OpenSLR KSC ingest +
+    3 bank-rebuild experiments — none beat v4 on FLEURS test;
+    architectural plateau confirmed.** New `corpus_acquire
+    open-slr-ksc` subcommand pulled the ISSAI Kazakh Speech
+    Corpus (332h FLAC, CC BY 4.0) via a disk-cached two-pass
+    streaming pipeline: download → pass-1 collect transcripts →
+    pass-2 decode + resample + MFCC + quality gate. Result:
+    153,826 utterances, 27 quality-rejected (0.018%), 0 decode
+    failures. Corpus grew 17h → 348.9h (20×).
+    `build_human_bank` refactored to streaming with three
+    `--selection` modes (legacy-greedy / cost-top / reservoir)
+    bounded to ~50 MB peak RAM regardless of corpus size.
+    Three bank rebuilds on the 157k-utt pool, all worse than
+    v4 (3397-utt FLEURS+Wikimedia, lex sp=25 = 76.6%):
+    - v5 (cost-top, cap=1000)     : stream 89.4 / lex25 80.7  (+7.7/+4.1 pp WORSE)
+    - v6 (legacy-greedy, cap=1000): stream 82.4 / lex25 77.3  (+0.7/+0.7 pp WORSE)
+    - v7 (reservoir, cap=1000)    : stream 84.9 / lex25 …     (+3.2 pp WORSE on stream)
+    Root-cause analysis: **the FLEURS test split is sourced
+    from the same recording conditions as the FLEURS train
+    split**. v4's bank is FLEURS-train-derived (legacy-greedy
+    on a manifest whose first 3397 rows were FLEURS+Wikimedia).
+    KSC was recorded under different conditions (mic, room,
+    speaker pool) — mixing it into the bank dilutes the
+    FLEURS-test centroid even when the bank itself is larger.
+    This makes the 76.6% PER an **in-domain (FLEURS-only)
+    ceiling for the monophone-DTW architecture**, not a
+    capacity ceiling. The 30k templates / 34 phonemes / single-
+    centroid-per-phoneme structure cannot exploit a 20×
+    corpus growth for a same-distribution eval. The lever
+    that *would* exploit a 332h corpus is **triphone-aware
+    modelling** (~50k context-dependent templates) — major
+    architectural change, out of scope for this step. Bank v4
+    stays as `templates.bin`; v5/v6/v7 dropped. Infrastructure
+    (streaming builder, selection modes, KSC subcommand) is
+    retained for the inevitable cross-domain eval and future
+    triphone work.
+  - **Phase 6 step 2 (2026-05-29): human-derived phoneme
+    bank — first time the bank beats synth on FLEURS.**
+    The synth bank's formant-based templates lived in a
+    different MFCC subspace from real human speech (root
+    cause user identified by ear: «звучание похоже на
+    робота восмидесятых годов»). New tool
+    `tools/build_human_bank` forced-aligns every human
+    utterance in the manifest (Wikimedia + FLEURS train/dev,
+    FLEURS test excluded to keep the eval honest) against
+    its transcript and extracts one MFCC sub-sequence per
+    phoneme segment. CMVN-normalises the loaded audio
+    in-place before alignment — corpus_acquire writes RAW
+    MFCC to disk while the recogniser CMVN-normalises every
+    query, so without the in-tool normalisation, bank and
+    query live in different feature spaces (round-1 result
+    was 85 % stream / 83 % lexicon, +1..+4 pp worse than
+    synth; fix swung the picture). Three EM rounds:
+    - v1 (cap = 50, bootstrap = synth): 1616 templates /
+      34 phonemes — round 1 baseline.
+    - v2 (cap = 200, bootstrap = v1): 6378 templates / 34
+      phonemes — ties synth (stream 84.2 / lex sp=25 78.7).
+    - v3 (cap = 500, bootstrap = v2): 15678 templates / 34
+      phonemes — first sweep where human bank beats synth.
+    - **v4 (cap = 1000, bootstrap = v3): 30362 templates /
+      34 phonemes — current active `templates.bin`.**
+    Measurement (FLEURS test --max 50, lexicon vocab 3082):
+    - stream sp= 3 : synth 84.0 → v3 83.0 → **v4 81.7** (−2.3 pp vs synth)
+    - lex sp=25    : synth 78.8 → v3 77.2 → **v4 76.6** (−2.2 pp vs synth) ← best
+    Combined arc from the v6.3 stream baseline (`recognise_stream`
+    at sp=3 over the synth bank, 84.0 %): **76.6 % = −7.4 pp
+    absolute**. Bank covers 34/37 phonemes — three
+    low-frequency phonemes never appeared in 3397
+    utterances of FLEURS train/dev + Wikimedia. Synth bank
+    archived as `templates_synth.bin`; active `templates.bin`
+    is now human v3. Iteration ceiling not yet hit — v4 at
+    cap = 1000 and v5 with cost-weighted segment filtering
+    are the obvious next levers. Tool keeps the bootstrap
+    bank a CLI flag so any subsequent EM round is one
+    invocation.
+  - **Phase 14 step 2 (2026-05-29): lexicon expansion +
+    switch_penalty re-tune — first FLEURS PER win.**
+    Extracted the top-3000 unigram frequencies from
+    `data/curated/{wikipedia_kz,cc100_kk,kazakh_textbooks}_pack.json`
+    (318k clean Cyrillic sentences, 228k distinct native-
+    letter tokens; loanword filter drops «ё ц щ ъ ь э»).
+    Deduplicated against the original 303-entry curated set
+    → 2804 net new entries shipped as
+    `adam_lexicon_curated::frequency::FREQUENCY`. Combined
+    `full_lexicon()` now exposes 3082 distinct real words to
+    the lexicon decoder (alphabet excluded as before).
+    Re-measured on FLEURS test --max 50 across sp = 3..100:
+    - sp =  3 → PER 184.1 %, ratio 2.31 (boundary spam)
+    - sp = 15 → PER 83.6 %, ratio 0.91
+    - sp = 20 → PER 79.6 %, ratio 0.71
+    - **sp = 25 → PER 78.8 %, ratio 0.61 ← best**
+    - sp = 30 → PER 79.2 %, ratio 0.51
+    - sp = 60 → PER 85.3 %, ratio 0.25 (under-segments)
+    First decoder to beat the `recognise_stream` baseline
+    (84.0 %) on FLEURS — net **−5.2 pp PER**. Synth-on-synth
+    stays at PER 215.6 % across the whole sweep because the
+    synth corpus was generated from the original 312-entry
+    curated lexicon, not the frequency-extension words — its
+    transcripts are now an even smaller subset of vocabulary,
+    so the decoder picks longer (wrong) words. Synth gain
+    requires regenerating that corpus from the combined
+    lexicon; tracked separately.
+  - **Phase 14 step 1 (2026-05-29): lexicon-constrained
+    Viterbi decoder shipped, current-corpus PER no-win.**
+    `adam_stt_phoneme::recognise_lexicon_constrained` —
+    phoneme trie + frame-synchronous Viterbi DP with a root-
+    less state machine (every frame consumes exactly one
+    phoneme emission; word-boundary is a direct
+    terminal→first-phoneme transition between frames,
+    paying `switch_penalty`). Wired into `stt_eval` as
+    `--recogniser lexicon`. Measured on the 278-real-word
+    curated lexicon (35 alphabet entries excluded to prevent
+    "any phoneme is its own one-letter word" collapse):
+    FLEURS test --max 50 PER 137.8 %, synth-on-synth --max
+    100 PER 156.4 %–194.7 % across switch_penalty 3–80
+    (plateaus above sp=20). Even at sp=∞ (one word per
+    utterance) PER stays at 156 % on synth, which proves the
+    bottleneck is **lexical coverage**, not word-boundary
+    overuse: the 278-word vocabulary cannot approximate the
+    test transcripts well enough for the constraint to pay
+    off, so the decoder is forced into the closest-but-wrong
+    legal word rather than the right free-decoded phoneme
+    sequence. The trie + DP is correct (4/4 unit tests on
+    constructed cases pass); the lever needs a much larger
+    lexicon (thousands of words) or word-level language
+    modelling to outperform `recognise_stream`. Filed as
+    Phase 14 step 2 backlog.
 - **Phase 7:** in a blind subjective MOS test (5 listeners),
   the concatenative TTS scores within 0.5 MOS points of macOS
   `say` with the Aru voice on 10 representative Kazakh
@@ -495,31 +670,40 @@ the Phase 2c forced-alignment confidence filter
    Conformer trained on the aligned corpus, guarded by the
    phonotactic FST so output remains type-safe.
 4. ~~What does «ы» do in dictionary-form lookup?~~ **Resolved
-   2026-05-26.** Decision: **«ы» (and «і» symmetrically) is
-   classified epenthetic** by the Cyrillic→Phoneme renderer
-   **iff all three conditions hold**:
-   - position is non-initial in the word
-   - both adjacent segments are consonants
-   - the host word is a native Kazakh root (not a Russian /
-     European loan as flagged by lexicon metadata)
+   2026-05-26, tightened 2026-05-29.** The original 2026-05-26
+   resolution drew a three-clause line (non-initial + between
+   consonants + native root). Implementation hit a 2026-05-29
+   user pushback that the carve-out for initial-syllable «ы»
+   was the same orthographic illusion native speakers actually
+   collapse — «қыз» is articulated as `/qz/`, with a fleeting
+   schwa-ish glide if any, and «қызыл» as `/qzl/`. The Renault
+   analogy (7 letters, 4 phonemes) applies symmetrically: «ы»
+   and «і» are **orthographic markers, not phonemes**, and the
+   parser must not emit them.
 
-   In all other positions, «ы» realises as full `/ɯ/` (id `Ǝ`
-   with `is_epenthetic = false` at instance level) and «і» as
-   full `/ɪ/` (`Ɨ`, full). Examples:
+   **Final v6.3 rule (this is what the code does):** for any
+   native Kazakh root, **every** «ы» and «і» drops from the
+   phonemic stream, regardless of syllable position. Loan
+   words (`is_native_root = false`) keep both glyphs because
+   the loan source language treats them as full vowels.
 
-   | word         | analysis                          | «ы»/«і» status |
-   |--------------|-----------------------------------|----------------|
-   | қыз          | initial syllable, CVC             | full           |
-   | жұмыс        | non-initial, between C's, native  | **epenthetic** |
-   | жұмыссыз     | both «ы» non-initial between C's  | **both epenthetic** |
-   | тым (loan)   | initial syllable                  | full           |
-   | бизнес (loan)| loan flag set                     | full           |
+   | word         | analysis                          | parsed phonemes      |
+   |--------------|-----------------------------------|----------------------|
+   | қыз          | native                            | `[Q, Z]`             |
+   | қызыл        | native                            | `[Q, Z, L]`          |
+   | жұмыс        | native                            | `[Zh, U, M, S]`      |
+   | жұмыссыз     | native, two «ы»s                  | `[Zh, U, M, S, S, Z]`|
+   | білім        | native, two «і»s                  | `[B, L, M]`          |
+   | байтұрсынұлы | native, two «ы»s incl. final      | `[B, A, J, T, U, R, S, N, U, L]` |
+   | бизнес       | loan                              | `[B, I, Z, N, E, S]` |
 
-   This is a deterministic rule with a single corpus-evidenced
-   parameter (the lexicon's native/loan flag). Refinement of
-   edge cases (compound boundaries, fossilised forms) happens
-   in Phase 4 round-trip evaluation; the rule above is the
-   v6.3 starting contract.
+   `Phoneme::Y` / `Phoneme::Yi` stay in the inventory enum (for
+   loan-word parsing and back-compat with suffix tables in
+   `adam-kernel-phoneme`), but the Cyrillic→Phoneme and Latin→
+   Phoneme parsers never emit them in native mode. Consonant-
+   only words like `[Q, Z]` validate via the **sonorant /
+   last-consonant nucleus fallback** added in the same change
+   (see `adam-phonotactics::syllable::nucleus_indices`).
 
 ## 10. References
 

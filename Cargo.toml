@@ -3,6 +3,15 @@ members = [
   "crates/adam-algebra",
   "crates/adam-kernel",
   "crates/adam-kernel-fst",
+  "crates/adam-phoneme",
+  "crates/adam-phonotactics",
+  "crates/adam-audio",
+  "crates/adam-stt-phoneme",
+  "crates/adam-tts-phoneme",
+  "crates/adam-kernel-phoneme",
+  "crates/adam-forced-aligner",
+  "crates/adam-formant-synth",
+  "crates/adam-lexicon-curated",
   "crates/adam-dialog",
   "crates/adam-tokenizer",
   "crates/adam-corpus",
@@ -20,11 +29,24 @@ members = [
   "crates/adam-slot-extractor",
   "crates/adam-retrieval-ranker",
   "tools/intent_dataset",
+  "tools/corpus_acquire",
+  "tools/voice_repl_v6_3",
+  "tools/stt_eval",
+  "tools/lexicon_gen",
+  "tools/build_human_bank",
+  "tools/ingest_kaz_tili",
+  "tools/build_pcm_bank",
+  "tools/build_morpheme_bank",
 ]
 resolver = "2"
 
 [workspace.package]
-version = "6.2.0"
+# 2026-06-02 — bump to v6.3.0 to match the experimental/v6_3_phonemic_foundation
+# arc (voice REPL, BPE tokenizer, contextual LM, neural intent classifier,
+# Phase 21 relative-day handler). v6.2 deterministic core stays the
+# bedrock; v6.3 wraps it in a voice surface with controlled neural
+# boundaries (Whisper STT + Piper TTS + tiny LM rescoring).
+version = "6.3.0"
 edition = "2024"
 license = "BUSL-1.1"
 

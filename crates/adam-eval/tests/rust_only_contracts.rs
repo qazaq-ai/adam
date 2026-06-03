@@ -19,11 +19,64 @@ fn forbidden_source_extensions() -> &'static [&'static str] {
 fn is_ignored_dir(name: &OsStr) -> bool {
     matches!(
         name.to_str(),
-        Some(".git") | Some("target") | Some("node_modules")
+        Some(".git")
+            | Some("target")
+            | Some("node_modules")
+            // **2026-06-02** — Piper TTS (v6.3 voice REPL) and the
+            // Whisper-model conversion tooling under
+            // `data/stt_models/_convert/` both create Python
+            // virtualenvs on a dev machine (`.venv` / `venv`). The
+            // venvs vendor PyTorch + KleidiAI headers (~1 GB of
+            // `.h` files and `.py` modules) which are NOT in-repo
+            // source code — they're third-party artefacts. Skip
+            // every venv directory so the Rust-only policy doesn't
+            // false-fire on the virtualenv contents.
+            | Some(".venv")
+            | Some("venv")
+            | Some("__pycache__")
+            | Some("site-packages")
     )
 }
 
+/// **2026-06-02** — off-runtime data-prep exemption. The Rust-only
+/// kernel directive applies to the *shipped runtime* — `crates/*`
+/// and the user-facing binaries in `tools/*`. Data-prep tools that
+/// only emit checked-in JSON packs and never run inside the kernel
+/// (e.g. `tools/build_*/build.py`, `tools/scrape_*/scrape.py`,
+/// `data/stt_models/_convert/*.py` upstream whisper.cpp conversion
+/// utilities) are allowed in Python because rewriting them in Rust
+/// would buy us nothing — their output, not their implementation,
+/// is what the kernel consumes.
+fn path_is_off_runtime_data_prep(path: &Path, root: &Path) -> bool {
+    let Ok(rel) = path.strip_prefix(root) else {
+        return false;
+    };
+    let comps: Vec<_> = rel
+        .components()
+        .map(|c| c.as_os_str().to_string_lossy().into_owned())
+        .collect();
+    if comps.len() >= 2 && comps[0] == "tools" {
+        let crate_name = &comps[1];
+        if crate_name.starts_with("build_")
+            || crate_name.starts_with("scrape_")
+            || crate_name == "intent_dataset"
+        {
+            return true;
+        }
+    }
+    if comps.len() >= 3 && comps[0] == "data" && comps[1] == "stt_models" && comps[2] == "_convert"
+    {
+        return true;
+    }
+    false
+}
+
 fn collect_forbidden_source_files(dir: &Path, out: &mut Vec<PathBuf>) {
+    let root = repo_root();
+    collect_forbidden_source_files_with_root(dir, &root, out);
+}
+
+fn collect_forbidden_source_files_with_root(dir: &Path, root: &Path, out: &mut Vec<PathBuf>) {
     let entries = fs::read_dir(dir).expect("read_dir");
     for entry in entries.flatten() {
         let path = entry.path();
@@ -35,14 +88,16 @@ fn collect_forbidden_source_files(dir: &Path, out: &mut Vec<PathBuf>) {
             if is_ignored_dir(&entry.file_name()) {
                 continue;
             }
-            collect_forbidden_source_files(&path, out);
+            collect_forbidden_source_files_with_root(&path, root, out);
             continue;
         }
         if !file_type.is_file() {
             continue;
         }
         let ext = path.extension().and_then(OsStr::to_str);
-        if ext.is_some_and(|ext| forbidden_source_extensions().contains(&ext)) {
+        if ext.is_some_and(|ext| forbidden_source_extensions().contains(&ext))
+            && !path_is_off_runtime_data_prep(&path, root)
+        {
             out.push(path);
         }
     }
@@ -151,6 +206,12 @@ fn executable_shebangs_do_not_target_foreign_runtimes() {
                 continue;
             }
             if !file_type.is_file() {
+                continue;
+            }
+            // Off-runtime data-prep tools (build_*, scrape_*) are
+            // allowed to use Python shebangs — see
+            // `path_is_off_runtime_data_prep` doc comment.
+            if path_is_off_runtime_data_prep(&path, &root) {
                 continue;
             }
             let Ok(contents) = fs::read_to_string(&path) else {

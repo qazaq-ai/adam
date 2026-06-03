@@ -1060,24 +1060,25 @@ fn detect_user_disagreement(joined: &str) -> bool {
 }
 
 fn detect_ask_how_are_you(joined: &str) -> bool {
-    joined.contains("қалайсың")
-        || joined.contains("қалайсыз")
-        || joined.contains("жағдайың қалай")
-        || joined.contains("жағдайыңыз қалай")
-        || joined.contains("халің қалай")
-        || joined.contains("халіңіз қалай")
-        || joined.contains("қалдарың қалай")
-        || joined.contains("қалдарыңыз қалай")
-        || joined == "қалың қалай"
-        // **v4.6.12** — polite singular/plural forms surfaced by a
-        // 2026-04-29 real-REPL transcript: «Қалыңыз қалай?». Maps
-        // to «How is your state?» / «How are you (polite)?» —
-        // standard Kazakh greeting-inquiry. Also covers the bare
-        // 2sg-informal «қалың қалай» that was already there as an
-        // exact-match (now matched as substring for robustness in
-        // sentences like «Айтшы, қалың қалай?»).
-        || joined.contains("қалыңыз қалай")
-        || joined.contains("қалың қалай")
+    // **Phase 18 (2026-06-01)** — `phonetic_contains` collapses the
+    // four-consonant Whisper-drift classes (Қ↔К, Ғ↔Г, Ң↔Н, Һ↔Х)
+    // so transcripts like «Калыңыз қалай» (К instead of Қ) match
+    // the canonical pattern. Kazakh vowels stay distinct — see
+    // `phonetic_match::canonicalize`.
+    use crate::phonetic_match::phonetic_contains;
+    phonetic_contains(joined, "қалайсың")
+        || phonetic_contains(joined, "қалайсыз")
+        || phonetic_contains(joined, "жағдайың қалай")
+        || phonetic_contains(joined, "жағдайыңыз қалай")
+        || phonetic_contains(joined, "халің қалай")
+        || phonetic_contains(joined, "халіңіз қалай")
+        || phonetic_contains(joined, "қалдарың қалай")
+        || phonetic_contains(joined, "қалдарыңыз қалай")
+        // **v4.6.12** — polite forms «Қалыңыз қалай?». Substring
+        // matching (via canonical form) — also catches «Айтшы,
+        // қалың қалай?».
+        || phonetic_contains(joined, "қалыңыз қалай")
+        || phonetic_contains(joined, "қалың қалай")
 }
 
 /// **v4.3.3** — match identity-question phrasings clearly addressed
@@ -1962,6 +1963,23 @@ fn detect_ask_about_system(
         || joined.contains("өзіңіз кімсіз")
         || joined.contains("өзің кімсін")
         || joined.contains("сен кімсін")
+        // **v6.3 Phase 15d follow-up (2026-05-31)** — when the
+        // speaker uses the analytic «бол-» auxiliary instead of
+        // the synthetic copula («кім боласың» = «who are you»
+        // lit. «who will you be / who do you turn out to be»),
+        // the same identity intent applies. Live REPL log:
+        //   you said: «Сен өзің кім боласын.» (STT got it
+        //   perfectly — that's grammatical Kazakh) but the
+        //   intent fell through to the generic «бәлкім…
+        //   туралы айтасыз ба» clarification.
+        // Final «-ң» often comes back from Whisper as «-н», so
+        // accept both spellings — same pattern as «кімсің /
+        // кімсін» above.
+        || joined.contains("кім боласың")
+        || joined.contains("кім боласын")
+        || joined.contains("кім боласыз")
+        || joined.contains("кім екенсің")
+        || joined.contains("кім екенсіз")
         || joined.contains("өзіңіз туралы")
         || joined.contains("өзің туралы")
         || joined.contains("не екен");
@@ -2548,11 +2566,40 @@ fn detect_ask_about_system(
         || joined.contains("сіздің кімсің")
         || joined.contains("сең кімсің")
         || joined.contains("сең кімсіз")
-        || joined.contains("сең кімсін");
+        || joined.contains("сең кімсін")
+        // **v6.3 Phase 15d follow-up (2026-05-31)** — analytic
+        // «бол-» / «екен-» phrasings of the identity question.
+        // Live REPL log:
+        //   you said: «Сен өзің кім боласын.»
+        //   adam → «Бәлкім, өзің туралы айтасыз ба.»  (fall-through)
+        // STT was perfect — «Сен өзің кім боласың» is grammatical
+        // Kazakh for «Who are you?» using the «бол-» auxiliary
+        // instead of the synthetic copula. Final «-ң» often
+        // collapses to «-н» on voice STT (see -ң→-н comments
+        // above), so accept both spellings.
+        || joined.contains("өзің кім боласың")
+        || joined.contains("өзіңіз кім боласыз")
+        || joined.contains("өзің кім боласын")
+        || joined.contains("сен кім боласың")
+        || joined.contains("сен кім боласын")
+        || joined.contains("сіз кім боласыз")
+        || joined.contains("сіз кім боласын")
+        || joined.contains("өзің кім екенсің")
+        || joined.contains("өзіңіз кім екенсіз")
+        || joined.contains("сен кім екенсің")
+        || joined.contains("сіз кім екенсіз");
     if pronoun
         && (joined.contains("кімсің")
             || joined.contains("кімсіз")
             || joined.contains("кімсін")  // v6.0 — Whisper -ң→-н variant
+            // v6.3 Phase 15d — «бол-» / «екен-» analytic identity
+            // forms (see reflexive_pronoun_identity comment).
+            || joined.contains("кім боласың")
+            || joined.contains("кім боласыз")
+            || joined.contains("кім боласын")  // -ң→-н variant
+            || joined.contains("кім екенсің")
+            || joined.contains("кім екенсіз")
+            || joined.contains("кім екенсін")  // -ң→-н variant
             || joined.contains("қандай моделсің")
             || joined.contains("қандай моделсіз")
             || joined.contains("қандай ботсың")
@@ -4425,6 +4472,15 @@ fn detect_statement_of_weather(tokens: &[String], joined: &str) -> bool {
 ///    markers present)
 fn detect_ask_time(joined: &str) -> Option<crate::intent::TimeAspect> {
     use crate::intent::TimeAspect;
+    use crate::phonetic_match::canonicalize;
+    // **Phase 18 (2026-06-01)** — canonicalise the joined input
+    // once at the top so the consonant-drift classes (Қ↔К, Ғ↔Г,
+    // Ң↔Н, Һ↔Х) collapse. All `joined.contains(...)` checks below
+    // run against `j` (canonical form); patterns are also
+    // canonicalised at the call site via the local `c` macro so
+    // the source stays readable in real Kazakh orthography.
+    let j = canonicalize(joined);
+    let c = |s: &str| canonicalize(s);
     // **v6.0.0-rc4 factual_eval hardening** — block known
     // mis-routings surfaced by `factual_eval_100`:
     //   • duration queries («неше сағат тәулікте бар?») contain
@@ -4436,64 +4492,64 @@ fn detect_ask_time(joined: &str) -> Option<crate::intent::TimeAspect> {
     //   • definitional queries («Қаңтар деген қандай ай?») use
     //     «деген қандай» — these ask for a definition of a
     //     calendar unit, not the current month.
-    if joined.contains("тәулікте")
-        || joined.contains("жылда")
-        || joined.contains("айда")
-        || joined.contains("аптада")
-        || joined.contains("минутта")
-        || joined.contains("секундта")
+    if j.contains(&c("тәулікте"))
+        || j.contains(&c("жылда"))
+        || j.contains(&c("айда"))
+        || j.contains(&c("аптада"))
+        || j.contains(&c("минутта"))
+        || j.contains(&c("секундта"))
     {
         return None;
     }
-    if joined.contains("деген қандай")
-        || joined.contains("нені білдіреді")
-        || joined.contains("дегеніміз")
+    if j.contains(&c("деген қандай"))
+        || j.contains(&c("нені білдіреді"))
+        || j.contains(&c("дегеніміз"))
     {
         return None;
     }
-    if joined.contains("қай аймақ")
-        || joined.contains("қай елде")
-        || joined.contains("қай жерде")
-        || joined.contains("қай облыс")
-        || joined.contains("қай қалада")
+    if j.contains(&c("қай аймақ"))
+        || j.contains(&c("қай елде"))
+        || j.contains(&c("қай жерде"))
+        || j.contains(&c("қай облыс"))
+        || j.contains(&c("қай қалада"))
     {
         return None;
     }
-    let year_marker = (joined.contains("қай жыл") || joined.contains("қандай жыл"))
-        && !joined.contains("қай жылы")  // «қай жылы туған»: a different historical question
-        && !joined.contains("қандай жылы");
-    let month_marker = joined.contains("қай ай")
-        || joined.contains("қандай ай")
-        || (joined.contains("ай") && joined.contains("неше") && joined.contains("қазір"));
-    let weekday_marker = joined.contains("аптаның қай күні")
-        || joined.contains("аптаның қандай күні")
-        || joined.contains("апта күні");
+    let year_marker = (j.contains(&c("қай жыл")) || j.contains(&c("қандай жыл")))
+        && !j.contains(&c("қай жылы"))
+        && !j.contains(&c("қандай жылы"));
+    let month_marker = j.contains(&c("қай ай"))
+        || j.contains(&c("қандай ай"))
+        || (j.contains(&c("ай")) && j.contains(&c("неше")) && j.contains(&c("қазір")));
+    let weekday_marker = j.contains(&c("аптаның қай күні"))
+        || j.contains(&c("аптаның қандай күні"))
+        || j.contains(&c("апта күні"));
     // **v6.0.0-rc3 (live voice 2026-05-19)** — Whisper systematically
     // confuses Kazakh `е/і` in the «нешесі ↔ нешісі» pair. Both
     // forms now route the same way.
-    let date_marker = joined.contains("айдың нешесі")
-        || joined.contains("айдың нешісі")
-        || joined.contains("айдың нешеуінде")
-        || (joined.contains("бүгін")
-            && (joined.contains("қандай күн")
-                || joined.contains("қай күн")
-                || joined.contains("нешесі")
-                || joined.contains("нешісі")));
+    let date_marker = j.contains(&c("айдың нешесі"))
+        || j.contains(&c("айдың нешісі"))
+        || j.contains(&c("айдың нешеуінде"))
+        || (j.contains(&c("бүгін"))
+            && (j.contains(&c("қандай күн"))
+                || j.contains(&c("қай күн"))
+                || j.contains(&c("нешесі"))
+                || j.contains(&c("нешісі"))));
     // **v6.0.0-rc5 voice REPL round 4** — Whisper-turbo transcribes
     // «сағат» as «сақат» (final voiceless drift) and «неше» as
     // «нишы» / «ниши» on slurred articulation. Accept both surfaces
     // here so the live-clock branch fires on diction-impaired
     // speakers / non-broadcast voice input.
-    let time_marker = ((joined.contains("сағат") || joined.contains("сақат"))
-        && (joined.contains("неше")
-            || joined.contains("неші")
-            || joined.contains("нишы")
-            || joined.contains("ниши")
-            || joined.contains("қанша")))
-        || joined.contains("қазір уақыт")
-        || joined.contains("қазір неші")
-        || joined.contains("уақыт неше")
-        || joined.contains("уақыт қанша");
+    let time_marker = ((j.contains(&c("сағат")) || j.contains(&c("сақат")))
+        && (j.contains(&c("неше"))
+            || j.contains(&c("неші"))
+            || j.contains(&c("нишы"))
+            || j.contains(&c("ниши"))
+            || j.contains(&c("қанша"))))
+        || j.contains(&c("қазір уақыт"))
+        || j.contains(&c("қазір неші"))
+        || j.contains(&c("уақыт неше"))
+        || j.contains(&c("уақыт қанша"));
     // Composite: explicit time-marker AND explicit date-marker.
     if time_marker && (date_marker || weekday_marker) {
         return Some(TimeAspect::DateTime);
@@ -4526,6 +4582,10 @@ fn detect_compliment(tokens: &[String], joined: &str) -> bool {
     // follow-up question. Now: a `бірақ` + 2nd-person yes/no
     // question (`дайынсыз ба` etc.) downstream of `өте жақсы`
     // means this isn't a compliment turn.
+    // **Phase 18 (2026-06-01)** — phonetic-tolerant matching so
+    // Whisper drift like «жарайсын» (Ң→Н) or «КЕРЕМЕТ» (CAPS)
+    // still catches compliments.
+    use crate::phonetic_match::{phonetic_contains, tokens_have_any};
     let has_followup_question =
         joined.contains("бірақ") && (joined.contains("ма?") || joined.contains("ба?"));
     if has_followup_question {
@@ -4538,12 +4598,38 @@ fn detect_compliment(tokens: &[String], joined: &str) -> bool {
     if joined.contains("дайынсыз ба") || joined.contains("дайынсың ба") {
         return false;
     }
-    tokens.iter().any(|t| {
-        matches!(
-            t.as_str(),
-            "жарайсың" | "жарайсыз" | "керемет" | "тамаша" | "мықты"
-        )
-    }) || joined.contains("өте жақсы")
+    // **2026-06-02** — definitional question shapes («X деген не?»,
+    // «X дегеніміз не?», «X деген сөз», «X деген ұғым») use adjectives
+    // like «ақылды» / «білімді» attributively, NOT as compliments
+    // (e.g. «Ақылды сілтеме деген не?» = «what is a smart pointer?»).
+    // The Rust Book chapter 15 holdout uses exactly this pattern;
+    // pre-fix, «ақылды» triggered Compliment → adam said «рахмет».
+    if joined.contains("деген не")
+        || joined.contains("дегеніміз не")
+        || joined.contains("деген сөз")
+        || joined.contains("деген ұғым")
+    {
+        return false;
+    }
+    let triggers = &[
+        "жарайсың",
+        "жарайсыз",
+        "керемет",
+        "тамаша",
+        "мықты",
+        "мықтысың",
+        "ақылды",
+        "ақылдысың",
+        "білімді",
+        "білімдісің",
+        "адал",
+        "адалсың",
+    ];
+    tokens_have_any(tokens, triggers)
+        || phonetic_contains(joined, "өте жақсы")
+        || phonetic_contains(joined, "өте дұрыс")
+        || phonetic_contains(joined, "сен керемет")
+        || phonetic_contains(joined, "сіз керемет")
 }
 
 fn detect_request(tokens: &[String], joined: &str) -> bool {
@@ -4564,20 +4650,49 @@ fn detect_well_wishes(joined: &str) -> bool {
 
 /// Insult / rudeness — polite non-engagement (v1.1.0).
 /// The model doesn't escalate or retaliate; responds with dignity.
+///
+/// **Phase 18 (2026-06-01)** — token list expanded with the
+/// «ақмақ» (no -ы-) family that the user used in live REPL and
+/// the original detector missed. `tokens_have_any` is phonetic-
+/// tolerant so «АҚМАҚСЫҢ» (Whisper CAPS) → matches.
 fn detect_insult(tokens: &[String], joined: &str) -> bool {
-    tokens.iter().any(|t| {
-        matches!(
-            t.as_str(),
-            "ақымақ"
-                | "ақымақсың"
-                | "ақымақсыз"
-                | "надан"
-                | "наданмын"
-                | "надансың"
-                | "өтірік"
-        )
-    }) || joined.contains("ақылсыз")
-        || joined.contains("түкке тұрмайсың")
+    use crate::phonetic_match::{phonetic_contains, tokens_have_any};
+    let triggers = &[
+        "ақымақ",
+        "ақымақсың",
+        "ақымақсыз",
+        "ақмақ",
+        "ақмақсың",
+        "ақмақсыз",
+        "надан",
+        "наданмын",
+        "надансың",
+        "өтірік",
+        "өтірікші",
+        "топас",
+        "топассың",
+        "ессіз",
+        "ессізсің",
+    ];
+    if tokens_have_any(tokens, triggers) {
+        return true;
+    }
+    // **Phase 18.1 (2026-06-01)** — Whisper sometimes splits the
+    // bare insult «ақмақсың» into two tokens «ақ» + «мақсын» (or
+    // «мақсың»), losing the matchable surface. Detect the joined
+    // bigram via `phonetic_contains` so the split case still
+    // routes to Insult.
+    if phonetic_contains(joined, "ақ мақсың")
+        || phonetic_contains(joined, "ақ мақсын")
+        || phonetic_contains(joined, "ақы мақсың")
+        || phonetic_contains(joined, "ақы мақсын")
+    {
+        return true;
+    }
+    phonetic_contains(joined, "ақылсыз")
+        || phonetic_contains(joined, "түкке тұрмайсың")
+        || phonetic_contains(joined, "пайдасыз")
+        || phonetic_contains(joined, "жарамайсың")
 }
 
 #[cfg(test)]

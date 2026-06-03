@@ -28,6 +28,125 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.3.0] — 2026-06-02 — voice surface arc (Whisper + Piper + tiny LM + neural intent classifier)
+
+**Honest hybrid release.** The v6.2 deterministic core (`adam-algebra`,
+v6.2 router, `ADAM_V6_2`-gated) stays the production narrative. v6.3
+wraps it in a microphone-to-speaker voice loop that closes the
+«deterministic kernel, controlled neural boundaries at speech surface»
+positioning earlier drafts of the README promised but did not yet
+implement.
+
+See [DUE_DILIGENCE.md](DUE_DILIGENCE.md) for verifiable test totals,
+data assets posture, and known limitations of this release.
+
+### What ships
+
+- **`tools/voice_repl_v6_3`** — standalone binary. mic →
+  Whisper.cpp STT (multilingual ggml default, in-tree DTW phoneme
+  recogniser fallback) → token-split merge → Zipf fuzzy + neural
+  LM rescoring → BPE-tokenised neural intent classifier (parallel
+  log) → v6.2 dialog router (`ADAM_V6_2=1` inside the binary) →
+  Piper TTS (`kk_KZ-issai-high`) → speaker. The dialog core itself
+  remains 100 % rule-based.
+- **`adam-tokenizer`** — pure-Rust BPE (vocab 5 188, merges
+  committed). Shared between the contextual LM, the rescorer and
+  the intent classifier.
+- **`adam-agg-model::contextual_lm`** — ~1 M-param next-token
+  model (loss 1.12 → 0.138 across v1-v6). Used only as a
+  rescoring head on the fuzzy candidate list; never invents text.
+- **`adam-agg-model::intent_classifier`** — pooled-embedding +
+  MLP, 52 intent labels, val accuracy 81.5 % over 2 914 labelled
+  samples with Whisper-drift augmentation. Trained in 14 s on M2
+  via burn / wgpu (Metal). Runs in parallel-log mode in the voice
+  REPL: predictions appear alongside the substring router's
+  decisions for observability without overriding production
+  routing.
+- **`adam-stt-phoneme`** + **`adam-tts-phoneme`** — DTW
+  phoneme-bank STT and concatenative TTS, kept as the
+  Whisper-free fallback path.
+- **Phase 17** — pitch-derived gender hint for Kazakh honorific
+  vocatives (Ағай / Апай / Балам) with two-consecutive-estimate
+  lock against per-turn flapping.
+- **Phase 19 step G** — high-confidence neural intent override.
+  When the classifier is strongly sure the utterance is
+  `AskAboutTopic` (conf ≥ 0.85) and the surface form has a known
+  substring misroute trigger (`туралы` + `не білесің`, or
+  `rust/раст` + `тіл/бағдарлама`), rewrite the input to nudge the
+  substring router into the right branch. Conservative: never
+  applies outside the high-confidence + known-trigger window.
+- **Phase 20** — paraphrase variants for high-frequency static
+  responses. 13 paraphrases across 4 hot handlers (capabilities,
+  self-identity, live-data refusal, pitch-detection explanation)
+  selected by FNV-1a input hash so the same query returns the
+  same variant and different queries return different variants.
+  Closes the «заученность» feedback from the 2026-06-02 live REPL.
+- **Phase 21 + 21.A** — relative-day calendar handler (кеше /
+  ертең / бүрсігүні / алдыңғы күні) with STT-drift aliases
+  (еркең, бірсүгіне, бір сүгіні, etc.) so Whisper mishears still
+  hit the calendar route instead of falling into the «Күн —
+  дөңгелек» substring fact lookup. Past / future copula selected
+  per offset sign.
+
+### Documentation
+
+- **`DUE_DILIGENCE.md`** — flat list of verifiable facts about
+  the project: build commands, test totals, data assets origin,
+  known limitations, license posture. Closes codex audit
+  recommendation 4.
+- **README v6.2 / v6.3 honest split** — explicit «Two tracks, on
+  purpose» callout. Production = v6.2 on `main` (deterministic,
+  0 MB, 0 GPU). Research-demo = v6.3 on this branch (honest
+  hybrid). Closes codex audit recommendation 2.
+- **`tools/voice_repl_v6_3` Cargo.toml + main.rs docstring** —
+  rewritten to disclose the Whisper / Piper / LM stack instead
+  of the pre-Phase-15 «No Whisper, pure Rust end-to-end» claim
+  the earlier doc was still carrying.
+
+### Test discipline
+
+- 2 339 passing tests, 0 red, 27 ignored (each with documented
+  reason) across the workspace at this release.
+- The `crates/adam-dialog/tests/replayed_voice_repl.rs` battery
+  pins 27 real Whisper-transcript cases from the audit sessions;
+  new finding → new permanent regression case.
+- `cargo clippy --all-targets -- -D warnings` clean (closes the
+  ~20-warning backlog from the voice-REPL binaries).
+- `cargo fmt --all --check` clean.
+- `scripts/check_metrics_currency.sh` clean — README numeric
+  claims match the live counts.
+- `scripts/validate_foundation.sh` — kernel-only fallback for
+  clean CI checkouts (corpus pipeline still runs on dev machines
+  with the source manifest; see § 6 of DUE_DILIGENCE.md).
+
+### Dialog router fix (regression closed)
+
+- **`detect_compliment`** now defers when the input contains a
+  definitional question shape («X деген не?», «X дегеніміз не?»,
+  «X деген сөз», «X деген ұғым»). Pre-fix, «Ақылды сілтеме деген
+  не?» («What is a smart pointer?») triggered the `ақылды`
+  compliment marker and routed to a thank-you response. The
+  Rust Book chapter 15 holdout that surfaced this in v4.85.5 is
+  green again on v6.3.
+
+### Known limitations of this release
+
+Disclosed up front so reviewers don't have to dig:
+
+- Voice STT word-error rate on natural Kazakh remains high.
+  Whisper.cpp without the Shirali fine-tune mishears Қ / Ғ / Ң;
+  the fuzzy + LM rescoring layer recovers the common cases but
+  not all.
+- Voice REPL bugs still on the backlog: name resilience (Whisper
+  hears «Дәулет» as «Дауыл» / «Дауылед» / «Атом»), topic-aware
+  responses for `AskAboutTopic` (currently terse multi-fact
+  lists), chemistry / school formulas (`Судың формуласы` →
+  curated fact lookup misroute).
+- `validate_foundation.sh` falls back to kernel-only mode on a
+  clean checkout because the corpus source manifest was pulled
+  out of git in commit `17e7fce1` (-11 GB). Dev machines with
+  the full corpus still get the deep validation.
+
 ## [6.2.0] — 2026-05-25 — neurosymbolic agglutinative algebra (8 stages, env-gated)
 
 **The architectural redesign promised at v6.1.50.** Lands the

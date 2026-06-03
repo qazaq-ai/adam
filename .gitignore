@@ -59,3 +59,85 @@ data/training/*.safetensors.bak2
 # -p adam-agg-model --bin poc_kazakh_train`). Each run writes a fresh
 # timestamped directory; sizes 3–30 MB depending on hyperparameters.
 data/checkpoints/
+
+# v6.3 audio corpus (Phase 2a+). The raw audio and large transcripts
+# are local-only; only data/v6_3_corpus/MANIFEST.jsonl and
+# data/v6_3_corpus/README.md ship in git. The derived phoneme bank
+# (Phase 2d output) lives at data/v6_3_phoneme_bank/ and ships
+# (~5–10 MB, well under the 50 MB threshold).
+data/v6_3_corpus/audio/
+data/v6_3_corpus/transcripts/
+
+# v6.3 phoneme bank: in-flight downloads (deleted after each
+# acquisition cycle by corpus_acquire). The committed artefacts
+# (audio/*.wav, mfcc/*.bin, MANIFEST.jsonl) are tiny derivatives
+# and DO ship.
+data/v6_3_phoneme_bank/tmp/
+# FLEURS-ingested artefacts (kk_kz subset, ~5400 utterances ≈
+# 2.2 GB on disk). Fully regeneratable via:
+#   cargo run --release -p adam-corpus-acquire -- fleurs --splits dev,test,train
+# MANIFEST.jsonl carries full provenance + transcripts; templates.bin
+# / pcm_templates.bin are the actual derived banks that DO ship.
+# Curated Wikimedia entries (15 small files, hand-curated transcripts)
+# DO ship — they are not regeneratable from FLEURS.
+data/v6_3_phoneme_bank/audio/fleurs_*.wav
+data/v6_3_phoneme_bank/mfcc/fleurs_*.bin
+# Formant-synth-generated WAVs (deterministic from lexicon ×
+# voice profile via `corpus_acquire synth` — bit-exact
+# regenerable, no need to ship).
+data/v6_3_phoneme_bank/audio/synth_*.wav
+data/v6_3_phoneme_bank/mfcc/synth_*.bin
+# Quarantine dirs produced by `corpus_acquire audit --apply` —
+# failing FLEURS WAVs / MFCCs are moved here instead of deleted
+# so the user can listen to them and adjust thresholds. Same
+# regenerable status as the active audio/ + mfcc/ entries.
+data/v6_3_phoneme_bank/audio/quarantine/
+data/v6_3_phoneme_bank/mfcc/quarantine/
+
+# OpenSLR 102 KSC (Kazakh Speech Corpus, ISSAI NU, ~332h / 153 k
+# utterances, CC BY 4.0) — 6.4 GB of derived MFCC across 153 k
+# files. Tracking 153 k tiny files in git is operationally
+# painful even though each file is well under the 50 MB
+# threshold. Fully regenerable via:
+#   cargo run --release -p adam-corpus-acquire -- open-slr-ksc
+# MANIFEST.jsonl carries the full provenance + transcripts so
+# the rest of the toolchain can audit / re-process from the URL.
+data/v6_3_phoneme_bank/audio/ksc_*.wav
+data/v6_3_phoneme_bank/mfcc/ksc_*.bin
+data/audiobooks/
+
+# Phase 13 (2026-05-31) Piper neural TTS asset:
+# kk_KZ-issai-high.onnx is 128 MB (over the 50 MB git threshold),
+# regenerable via:
+#   curl -L -o data/tts_models/kk_KZ-issai-high.onnx \
+#     "https://huggingface.co/rhasspy/piper-voices/resolve/main/kk/kk_KZ/issai/high/kk_KZ-issai-high.onnx"
+# Trained on the ISSAI KazakhTTS2 corpus (271h / 5 speakers), CC BY 4.0.
+# The .onnx.json config + MODEL_CARD ship in git — they are tiny.
+data/tts_models/kk_KZ-issai-high.onnx
+# Python venv for the Piper CLI (146 MB). Reproducible via the README
+# in tools/synthesize_piper/.
+data/tts_models/.venv/
+
+# Phase 15+15b (2026-05-31) whisper.cpp STT models:
+# ggml-small.bin  (488 MB) and ggml-medium.bin (1.5 GB), regenerable via:
+#   curl -L -o data/stt_models/ggml-small.bin \
+#     https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.bin
+#   curl -L -o data/stt_models/ggml-medium.bin \
+#     https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin
+# Both multilingual. Medium handles Kazakh-specific letters
+# (Қ/Ғ/Ң/Ө/Ұ/Ү/Һ/І/Ә) measurably better than small. Phase 15c will
+# convert Shirali/whisper-small-ISSAI_KSC_335RS_v2 (HF format,
+# needs vocab.json synthesis) for production-grade KZ accuracy.
+data/stt_models/*.bin
+data/stt_models/_convert/
+
+# Listening-test artefacts that are NOT a committed reference set:
+# untracked listening_tests/* are local probes. Phase 13's curated
+# 9-word reference set under phase13_neural_piper/ IS committed
+# (small, audio-validated). Use a glob exclude + double-star
+# negation so individual files re-include cleanly.
+data/listening_tests/*
+!data/listening_tests/phase13_neural_piper/
+!data/listening_tests/phase13_neural_piper/**
+!data/listening_tests/phase14_sentences/
+!data/listening_tests/phase14_sentences/**

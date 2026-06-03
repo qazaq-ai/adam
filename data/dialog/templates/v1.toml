@@ -26,13 +26,19 @@ templates = [
     "сәлем, {name_respect}, {city|ablative} бәрі жақсы ма",
 ]
 
+# **v6.3 phase 15g.H (2026-06-01)** — like the muslim greeting
+# (15f.2), put the honorific-bearing variants FIRST so that with
+# the default seed=42 the planner's `idx = 42 % len = 0` lands on
+# a vocative response. Pre-15g.H the polite greeting returned
+# bare «Сәлеметсіз бе» even when `voice_gender_hint` was set,
+# missing the «Ағай» / «Апай» honorific the speaker expects.
 [[families]]
 key = "greeting.polite"
 templates = [
-    "сәлеметсіз бе",
-    "армысыз",
     "сәлеметсіз бе, {name_respect}",
     "сәлеметсіз бе, {name_respect}, {city|ablative} бәрі аман ба",
+    "сәлеметсіз бе",
+    "армысыз",
 ]
 
 # **v6.1.30 — 2026-05-23 voice REPL audit round 4.** Islamic
@@ -40,12 +46,19 @@ templates = [
 # fell to `greeting.polite` and replied «Сәлеметсіз бе, Ағай.» —
 # culturally wrong: the Islamic greeting expects «Уағалайкум-ас-
 # салам», not a secular Kazakh polite form.
+# v6.3 phase 15f.2 (2026-05-31): honorific-bearing variants moved to
+# the head of the list so that when `name_respect` is present
+# (voice REPL with pitch-gender hint set, or text REPL with a
+# captured name), the seed=42 default of `idx = 42 % 3 = 0` picks
+# a vocative reply ("Уағалайкум-ас-салам, Ағай") instead of the
+# bare greeting. The bare form is kept last as a fallback for
+# sessions with no `name_respect` slot.
 [[families]]
 key = "greeting.muslim"
 templates = [
-    "уағалайкум-ас-салам",
     "уағалайкум-ас-салам, {name_respect}",
     "уағалайкум-ас-салам, {name_respect}, қалыңыз қалай",
+    "уағалайкум-ас-салам",
 ]
 
 [[families]]
@@ -93,12 +106,20 @@ templates = [
 # ---------- Farewell ----------
 
 [[families]]
+# **Phase 15g.C.3 (2026-06-02)** — polite forms first. Previous
+# order `["сау бол", "кездескенше", "аман бол", "сау болыңыз"]`
+# put informal forms at index 0 and 2, so the default-seed 42
+# (42 % 4 = 2) always landed on bare informal «аман бол». User
+# expects the polite -ыз forms when addressing adam. Polite
+# variants moved to front; informal kept as last fallback.
 key = "farewell"
 templates = [
-    "сау бол",
-    "кездескенше",
-    "аман бол",
     "сау болыңыз",
+    "аман болыңыз",
+    "қош сау болыңыз",
+    "кездескенше",
+    "сау бол",
+    "аман бол",
 ]
 
 # ---------- Affirmation / Negation ----------

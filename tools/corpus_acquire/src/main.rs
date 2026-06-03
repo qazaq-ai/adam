@@ -1,0 +1,2195 @@
+// SPDX-License-Identifier: BUSL-1.1
+// Part of: adam · ARK (Agglutinative Reasoning Kernel) · github.com/qazaq-ai/adam
+//! `corpus_acquire` — disk-constrained Kazakh-audio acquisition.
+//!
+//! Three subcommands:
+//!
+//! 1. **`pull`** — download + decode + extract + delete one
+//!    URL. The original disk-bounded primitive.
+//! 2. **`discover`** — query Wikimedia Commons category API for
+//!    Kazakh pronunciation files, write a curatable
+//!    `sources.toml`.
+//! 3. **`batch`** — read a `sources.toml` and process every
+//!    entry through the `pull` pipeline. Skips entries already
+//!    present in the manifest (idempotent re-runs).
+//!
+//! Per the user directive (2026-05-26):
+//!
+//! > «Скачай одну, переработай её, удали скаченный файл,
+//! >  перейди к следующей. Не засоряя диск.»
+//!
+//! Each acquisition cycle: download → decode → resample to
+//! 16 kHz mono → extract MFCC → persist WAV+MFCC+manifest
+//! line → delete original.
+
+use clap::{Parser, Subcommand};
+use std::collections::HashSet;
+use std::fs;
+use std::io::{BufRead, BufReader, Read, Write};
+use std::path::{Path, PathBuf};
+
+mod decode;
+mod manifest;
+mod quality;
+mod resample;
+
+use manifest::{ManifestEntry, append_manifest};
+
+// ─── CLI ──────────────────────────────────────────────────────
+
+#[derive(Debug, Parser)]
+#[command(
+    name = "corpus_acquire",
+    about = "Disk-bounded Kazakh-audio acquisition + extraction pipeline.",
+    version
+)]
+struct Cli {
+    #[command(subcommand)]
+    cmd: Cmd,
+}
+
+#[derive(Debug, Subcommand)]
+enum Cmd {
+    /// Download one URL, decode, extract MFCC, persist
+    /// (audio+mfcc+manifest), delete original.
+    Pull(PullArgs),
+    /// Query Wikimedia Commons category for files, write a
+    /// curatable `sources.toml`.
+    Discover(DiscoverArgs),
+    /// Read a sources.toml and process every entry through the
+    /// pull pipeline. Idempotent: existing manifest labels are
+    /// skipped.
+    Batch(BatchArgs),
+    /// Sync the curated `sources.toml` transcripts back into
+    /// `MANIFEST.jsonl`. Used after manually curating
+    /// discover-output transcripts (filename stubs → Cyrillic).
+    FixManifestTranscripts(FixArgs),
+    /// Build a real-data phoneme bank from the manifest.
+    /// Equipartitions each word's MFCC across its phoneme
+    /// sequence; per phoneme, keeps the longest collected
+    /// chunk as the template. Writes to `templates.bin`.
+    BuildBank(BuildBankArgs),
+    /// Stream-ingest the FLEURS Kazakh (kk_kz) subset from
+    /// Google's xtreme_translations bucket. Pipes the .tar.gz
+    /// through gunzip + tar in memory; never materialises the
+    /// archive on disk. Each utterance lands as one manifest
+    /// entry (16 kHz WAV + MFCC + transcript + gender).
+    Fleurs(FleursArgs),
+    /// Audit every manifest entry against the acoustic-quality
+    /// gate (RMS / duration / clipping / non-finite). Reports
+    /// the verdict for each entry and a rollup; optionally
+    /// prunes failed entries from the manifest.
+    Audit(AuditArgs),
+    /// Generate the v6.3 audio corpus from the hand-curated
+    /// Kazakh lexicon × every voice profile, using the pure-
+    /// Rust formant synthesiser. No external recordings — every
+    /// WAV is produced from physics on the fly.
+    Synth(SynthArgs),
+    /// Stream-ingest the **OpenSLR 102 Kazakh Speech Corpus**
+    /// (ISSAI NU, ~332h, FLAC). Pipes the .tar.gz through
+    /// gunzip + tar in memory; per FLAC entry: decode → resample
+    /// 16 kHz mono → MFCC + (optional) WAV → manifest. Default
+    /// `--save-wav=false` keeps the disk footprint tractable
+    /// (FLAC 19 GB compressed; 16 kHz mono WAV would inflate to
+    /// 38 GB).
+    OpenSlrKsc(OpenSlrKscArgs),
+}
+
+#[derive(Debug, clap::Args)]
+struct PullArgs {
+    /// Direct URL to download.
+    #[arg(long)]
+    url: String,
+    /// Human-readable label (filename root for derived files).
+    #[arg(long)]
+    label: String,
+    /// Cyrillic transcript of the spoken content.
+    #[arg(long)]
+    transcript: String,
+    /// Speaker gender: "male" / "female" / "mixed" / "unknown".
+    #[arg(long, default_value = "unknown")]
+    gender: String,
+    /// Provenance class.
+    #[arg(long, default_value = "wikimedia")]
+    source_class: String,
+    /// Output directory.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank")]
+    out_dir: PathBuf,
+}
+
+#[derive(Debug, clap::Args)]
+struct DiscoverArgs {
+    /// Wikimedia Commons category title (without "Category:"
+    /// prefix; we prepend it).
+    #[arg(long, default_value = "Kazakh pronunciation")]
+    category: String,
+    /// Output sources.toml file.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank/sources.toml")]
+    output: PathBuf,
+    /// Maximum number of files to include (the API paginates
+    /// 500 at a time; this caps total).
+    #[arg(long, default_value = "500")]
+    limit: usize,
+}
+
+#[derive(Debug, clap::Args)]
+struct BatchArgs {
+    /// Sources file produced by `discover` (or hand-curated).
+    #[arg(long, default_value = "data/v6_3_phoneme_bank/sources.toml")]
+    sources: PathBuf,
+    /// Output directory.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank")]
+    out_dir: PathBuf,
+    /// Stop after this many successful acquisitions (0 = no
+    /// limit). Useful for incremental runs that respect disk
+    /// pressure.
+    #[arg(long, default_value = "0")]
+    max: usize,
+}
+
+#[derive(Debug, clap::Args)]
+struct FixArgs {
+    /// Curated sources.toml (source of truth for transcripts).
+    #[arg(long, default_value = "data/v6_3_phoneme_bank/sources.toml")]
+    sources: PathBuf,
+    /// Manifest file to update in place.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank/MANIFEST.jsonl")]
+    manifest: PathBuf,
+}
+
+#[derive(Debug, clap::Args)]
+struct FleursArgs {
+    /// FLEURS tarball URL. Defaults to the Kazakh subset from
+    /// Google's xtreme_translations bucket (FLEURS-102, CC BY 4.0).
+    #[arg(
+        long,
+        default_value = "https://storage.googleapis.com/xtreme_translations/FLEURS102/kk_kz.tar.gz"
+    )]
+    url: String,
+    /// Output directory (re-uses the existing manifest +
+    /// audio/mfcc layout).
+    #[arg(long, default_value = "data/v6_3_phoneme_bank")]
+    out_dir: PathBuf,
+    /// Which splits to ingest. Comma-separated subset of
+    /// `dev,test,train`. The smaller the split the faster the
+    /// first useful corpus increment.
+    #[arg(long, default_value = "dev,test")]
+    splits: String,
+    /// Stop after this many successful utterances per split
+    /// (0 = no limit). FLEURS dev/test are ~370 each; train is
+    /// ~2300. `--max 100` is a reasonable first probe.
+    #[arg(long, default_value = "0")]
+    max: usize,
+    /// Source-class label written to the manifest.
+    #[arg(long, default_value = "fleurs")]
+    source_class: String,
+}
+
+#[derive(Debug, clap::Args)]
+struct SynthArgs {
+    /// Output bank directory.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank")]
+    out_dir: PathBuf,
+    /// Comma-separated voice presets to render, or `all` for the
+    /// full 12-voice typology (bass→soprano + youth + child +
+    /// elderly).
+    #[arg(long, default_value = "all")]
+    voices: String,
+    /// Per-phoneme synthesis duration, seconds. Default 0.12
+    /// matches the formant-synth crate default.
+    #[arg(long, default_value = "0.12")]
+    phoneme_duration_s: f32,
+    /// Cap on lexicon entries (0 = all).
+    #[arg(long, default_value = "0")]
+    max: usize,
+    /// Source-class label written to the manifest.
+    #[arg(long, default_value = "synth")]
+    source_class: String,
+}
+
+#[derive(Debug, clap::Args)]
+struct OpenSlrKscArgs {
+    /// OpenSLR 102 (Kazakh Speech Corpus / KSC) tarball URL.
+    /// Defaults to the canonical openslr.org host. Only used
+    /// when `--tarball-path` does not yet exist.
+    #[arg(
+        long,
+        default_value = "https://openslr.org/resources/102/ISSAI_KSC_335RS_v1.1_flac.tar.gz"
+    )]
+    url: String,
+    /// On-disk path for the tarball. If it already exists we
+    /// skip the network download (so reruns are cheap). After
+    /// processing the file is **kept** by default — use
+    /// `--cleanup-tarball` to delete it once ingest succeeds.
+    #[arg(long, default_value = "/tmp/openslr_102_ksc.tar.gz")]
+    tarball_path: PathBuf,
+    /// Output directory (re-uses the existing v6.3 bank layout).
+    #[arg(long, default_value = "data/v6_3_phoneme_bank")]
+    out_dir: PathBuf,
+    /// Stop after this many successful utterances (0 = no limit).
+    /// First probe = small (e.g. 200) to verify the pipeline
+    /// before a multi-hour full run.
+    #[arg(long, default_value = "0")]
+    max: usize,
+    /// Persist the 16 kHz mono WAV alongside the MFCC bin.
+    /// Default `false`: KSC at 332h would inflate to ~38 GB of
+    /// WAV which exceeds typical free disk. MFCC-only keeps the
+    /// derived footprint at ~6.6 GB.
+    #[arg(long, default_value_t = false)]
+    save_wav: bool,
+    /// Delete the on-disk tarball after a successful ingest.
+    /// Default false — keep the archive so a restart with a
+    /// different `--max` or `--save-wav` skips the download.
+    #[arg(long, default_value_t = false)]
+    cleanup_tarball: bool,
+    /// Source-class label written to the manifest.
+    #[arg(long, default_value = "openslr_ksc")]
+    source_class: String,
+}
+
+#[derive(Debug, clap::Args)]
+struct AuditArgs {
+    /// Bank directory containing MANIFEST.jsonl + audio/.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank")]
+    bank_dir: PathBuf,
+    /// Apply the audit results: rewrite MANIFEST.jsonl with only
+    /// passing entries, move failing WAV / MFCC pairs aside
+    /// under audio/quarantine/ and mfcc/quarantine/.
+    /// Without `--apply` the run is read-only and just reports.
+    #[arg(long)]
+    apply: bool,
+    /// Optional per-class breakdown — show how many entries
+    /// failed per `source_class` (wikimedia / fleurs / …).
+    #[arg(long)]
+    by_source_class: bool,
+}
+
+#[derive(Debug, clap::Args)]
+struct BuildBankArgs {
+    /// Manifest with (label, transcript, mfcc_path) entries.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank/MANIFEST.jsonl")]
+    manifest: PathBuf,
+    /// Root directory for the manifest's mfcc_path entries.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank")]
+    bank_dir: PathBuf,
+    /// Output MFCC template-bank file (STT side).
+    #[arg(long, default_value = "data/v6_3_phoneme_bank/templates.bin")]
+    output: PathBuf,
+    /// Output PCM template-bank file (TTS side). Same per-
+    /// phoneme alignment regions, but stores the raw PCM
+    /// segments instead of MFCC vectors.
+    #[arg(long, default_value = "data/v6_3_phoneme_bank/pcm_templates.bin")]
+    pcm_output: PathBuf,
+    /// Number of bootstrap iterations. Iteration 0 = naive
+    /// equipartition; subsequent iterations DTW-realign each
+    /// word against the current bank to refine per-phoneme
+    /// chunk boundaries. Default 2 = one equipartition pass +
+    /// one DTW pass.
+    #[arg(long, default_value = "2")]
+    iterations: usize,
+    /// Multi-template `K` — how many exemplars to keep per
+    /// phoneme (Phase 13). 1 = single-centroid (legacy).
+    /// Default 50: tuned by the Phase 13 step 2 sweep on synth-
+    /// only (K=1: 85.4% PER → K=50: 61.0% PER, -24.4 pp) and
+    /// validated on FLEURS test (K=5: 88.1% → K=50: 84.0%,
+    /// -4.1 pp). Diminishing returns past 50; K=100 left as
+    /// future experiment if disk cost stays acceptable.
+    #[arg(long, default_value = "50")]
+    templates_per_phoneme: usize,
+}
+
+// ─── main ──────────────────────────────────────────────────────
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    match Cli::parse().cmd {
+        Cmd::Pull(args) => run_pull(args),
+        Cmd::Discover(args) => run_discover(args),
+        Cmd::Batch(args) => run_batch(args),
+        Cmd::FixManifestTranscripts(args) => run_fix_transcripts(args),
+        Cmd::BuildBank(args) => run_build_bank(args),
+        Cmd::OpenSlrKsc(args) => run_openslr_ksc(args),
+        Cmd::Fleurs(args) => run_fleurs(args),
+        Cmd::Audit(args) => run_audit(args),
+        Cmd::Synth(args) => run_synth(args),
+    }
+}
+
+// ─── pull ──────────────────────────────────────────────────────
+
+fn run_pull(args: PullArgs) -> Result<(), Box<dyn std::error::Error>> {
+    fs::create_dir_all(args.out_dir.join("audio"))?;
+    fs::create_dir_all(args.out_dir.join("mfcc"))?;
+    fs::create_dir_all(args.out_dir.join("tmp"))?;
+    pull_one(
+        &args.url,
+        &args.label,
+        &args.transcript,
+        &args.gender,
+        &args.source_class,
+        &args.out_dir,
+    )
+}
+
+fn pull_one(
+    url: &str,
+    label: &str,
+    transcript: &str,
+    gender: &str,
+    source_class: &str,
+    out_dir: &Path,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let tmp_path = out_dir.join("tmp").join(format!("{label}.dl"));
+    let wav_path = out_dir.join("audio").join(format!("{label}.wav"));
+    let mfcc_path = out_dir.join("mfcc").join(format!("{label}.bin"));
+    let manifest_path = out_dir.join("MANIFEST.jsonl");
+
+    println!("[acquire] {url} → {label}");
+
+    // 1. Download.
+    let dl_start = std::time::Instant::now();
+    let original_bytes = download_to(url, &tmp_path)?;
+    println!(
+        "[acquire]   downloaded {} bytes in {:.2}s",
+        original_bytes,
+        dl_start.elapsed().as_secs_f32(),
+    );
+
+    // 2 + 3. Decode + resample.
+    let pcm = decode::decode_file(&tmp_path)?;
+    let pcm_mono = if pcm.channels > 1 { pcm.to_mono() } else { pcm };
+    let pcm_16k = if pcm_mono.sample_rate != 16_000 {
+        resample::to_16khz(&pcm_mono)?
+    } else {
+        pcm_mono
+    };
+
+    // 3b. Quality gate — reject silent / clipped / truncated /
+    // non-finite clips BEFORE they reach the manifest. User
+    // directive 2026-05-28: «при скачивании сразу проверять на
+    // качество аудио файлов, чтобы потом не искать причину
+    // неудачь».
+    let (verdict, stats) = quality::check(&pcm_16k, &quality::QualityConfig::default());
+    if verdict != quality::QualityVerdict::Pass {
+        // Clean up tmp + don't persist anything else.
+        let _ = fs::remove_file(&tmp_path);
+        eprintln!(
+            "[acquire]   REJECT {label}: {verdict} (rms={:.4} peak={:.3} dur={:.2}s)",
+            stats.rms, stats.peak, stats.duration_s,
+        );
+        return Err(format!("quality gate failed for {label}: {verdict}").into());
+    }
+
+    // 4. MFCC.
+    let mfcc_seq = adam_audio::mfcc::mfcc(
+        &pcm_16k.data,
+        pcm_16k.sample_rate,
+        &adam_audio::mfcc::MfccConfig::default(),
+    );
+
+    // 5. Persist.
+    adam_audio::wav::write_wav(&wav_path, &pcm_16k)?;
+    write_mfcc_binary(&mfcc_path, &mfcc_seq)?;
+    let wav_size = fs::metadata(&wav_path)?.len();
+    let mfcc_size = fs::metadata(&mfcc_path)?.len();
+
+    // 6. Manifest.
+    let entry = ManifestEntry {
+        label: label.to_string(),
+        source_url: url.to_string(),
+        transcript: transcript.to_string(),
+        gender: gender.to_string(),
+        source_class: source_class.to_string(),
+        original_bytes,
+        duration_s: pcm_16k.duration_s(),
+        wav_path: wav_path
+            .strip_prefix(out_dir)
+            .unwrap_or(&wav_path)
+            .to_string_lossy()
+            .to_string(),
+        wav_bytes: wav_size,
+        mfcc_path: mfcc_path
+            .strip_prefix(out_dir)
+            .unwrap_or(&mfcc_path)
+            .to_string_lossy()
+            .to_string(),
+        mfcc_frames: mfcc_seq.num_frames(),
+        mfcc_bytes: mfcc_size,
+        collected_at: chrono_date(),
+        used_in_bank: false,
+    };
+    append_manifest(&manifest_path, &entry)?;
+
+    // 7. Delete original.
+    fs::remove_file(&tmp_path)?;
+
+    println!(
+        "[acquire]   persisted {label} ({:.1} KB derived; source was {:.1} KB)",
+        (wav_size + mfcc_size) as f32 / 1024.0,
+        original_bytes as f32 / 1024.0,
+    );
+    Ok(())
+}
+
+fn download_to(url: &str, path: &Path) -> Result<u64, Box<dyn std::error::Error>> {
+    let client = reqwest::blocking::Client::builder()
+        .user_agent("adam-corpus-acquire/0.1 (https://github.com/qazaq-ai/adam)")
+        .timeout(std::time::Duration::from_secs(120))
+        .build()?;
+    let mut resp = client.get(url).send()?.error_for_status()?;
+    let mut out = fs::File::create(path)?;
+    let mut buf = [0u8; 8192];
+    let mut total = 0_u64;
+    loop {
+        let n = resp.read(&mut buf)?;
+        if n == 0 {
+            break;
+        }
+        out.write_all(&buf[..n])?;
+        total += n as u64;
+    }
+    Ok(total)
+}
+
+fn write_mfcc_binary(
+    path: &Path,
+    seq: &adam_audio::mfcc::MfccSequence,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let mut out = fs::File::create(path)?;
+    out.write_all(b"MFCC")?;
+    out.write_all(&[0x01])?;
+    out.write_all(&(seq.num_frames() as u32).to_le_bytes())?;
+    out.write_all(&(seq.dim() as u32).to_le_bytes())?;
+    out.write_all(&seq.sample_rate.to_le_bytes())?;
+    out.write_all(&(seq.hop_length as u32).to_le_bytes())?;
+    for frame in &seq.frames {
+        for &c in frame {
+            out.write_all(&c.to_le_bytes())?;
+        }
+    }
+    Ok(())
+}
+
+// ─── discover ─────────────────────────────────────────────────
+
+#[derive(Debug, serde::Deserialize)]
+struct CmResponse {
+    query: CmQuery,
+    #[serde(default)]
+    #[serde(rename = "continue")]
+    cont: Option<CmContinue>,
+}
+#[derive(Debug, serde::Deserialize)]
+struct CmQuery {
+    categorymembers: Vec<CmMember>,
+}
+#[derive(Debug, serde::Deserialize)]
+struct CmMember {
+    title: String,
+    ns: i32,
+}
+#[derive(Debug, serde::Deserialize)]
+struct CmContinue {
+    cmcontinue: Option<String>,
+}
+
+#[derive(Debug, serde::Deserialize)]
+struct IiResponse {
+    query: IiQuery,
+}
+#[derive(Debug, serde::Deserialize)]
+struct IiQuery {
+    pages: std::collections::HashMap<String, IiPage>,
+}
+#[derive(Debug, serde::Deserialize)]
+struct IiPage {
+    title: String,
+    #[serde(default)]
+    imageinfo: Vec<IiInfo>,
+}
+#[derive(Debug, serde::Deserialize)]
+#[allow(dead_code)] // size/duration kept for future curation pass
+struct IiInfo {
+    url: String,
+    #[serde(default)]
+    size: u64,
+    #[serde(default)]
+    duration: f32,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+struct SourcesFile {
+    source: Vec<SourceEntry>,
+}
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+struct SourceEntry {
+    label: String,
+    url: String,
+    transcript: String,
+    #[serde(default = "default_gender")]
+    gender: String,
+    #[serde(default = "default_class")]
+    source_class: String,
+}
+fn default_gender() -> String {
+    "unknown".into()
+}
+fn default_class() -> String {
+    "wikimedia".into()
+}
+
+fn run_discover(args: DiscoverArgs) -> Result<(), Box<dyn std::error::Error>> {
+    let client = reqwest::blocking::Client::builder()
+        .user_agent("adam-corpus-acquire/0.1 (https://github.com/qazaq-ai/adam)")
+        .timeout(std::time::Duration::from_secs(60))
+        .build()?;
+
+    let cat_title = format!("Category:{}", args.category);
+    println!("[discover] enumerating files in «{cat_title}»");
+
+    // 1. Walk category members (paginated) to collect file titles.
+    let mut file_titles: Vec<String> = Vec::new();
+    let mut cmcontinue: Option<String> = None;
+    while file_titles.len() < args.limit {
+        let mut url = format!(
+            "https://commons.wikimedia.org/w/api.php?action=query&list=categorymembers&\
+             cmtitle={}&cmtype=file&cmlimit=500&format=json",
+            urlencode(&cat_title),
+        );
+        if let Some(c) = &cmcontinue {
+            url.push_str(&format!("&cmcontinue={}", urlencode(c)));
+        }
+        let resp: CmResponse = client.get(&url).send()?.error_for_status()?.json()?;
+        for m in resp.query.categorymembers {
+            if m.ns == 6 {
+                // File namespace.
+                file_titles.push(m.title);
+            }
+        }
+        match resp.cont.and_then(|c| c.cmcontinue) {
+            Some(c) => cmcontinue = Some(c),
+            None => break,
+        }
+    }
+    file_titles.truncate(args.limit);
+    println!("[discover] {} files found", file_titles.len());
+
+    // 2. Look up imageinfo (URL + size + duration) for each file.
+    // The API accepts up to 50 titles per call.
+    let mut entries: Vec<SourceEntry> = Vec::new();
+    for chunk in file_titles.chunks(50) {
+        let titles = chunk.join("|");
+        let url = format!(
+            "https://commons.wikimedia.org/w/api.php?action=query&titles={}\
+             &prop=imageinfo&iiprop=url|size|duration&format=json",
+            urlencode(&titles),
+        );
+        let resp: IiResponse = client.get(&url).send()?.error_for_status()?.json()?;
+        for page in resp.query.pages.values() {
+            if let Some(info) = page.imageinfo.first() {
+                let label = label_from_title(&page.title);
+                let transcript = transcript_placeholder(&page.title);
+                entries.push(SourceEntry {
+                    label,
+                    url: info.url.clone(),
+                    transcript,
+                    gender: "unknown".into(),
+                    source_class: "wikimedia".into(),
+                });
+            }
+        }
+    }
+
+    // 3. Sort by label for stable output.
+    entries.sort_by(|a, b| a.label.cmp(&b.label));
+
+    // 4. Write sources.toml.
+    if let Some(parent) = args.output.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    let serialised = toml::to_string_pretty(&SourcesFile { source: entries })?;
+    fs::write(&args.output, serialised)?;
+    println!("[discover] wrote {}", args.output.display());
+    Ok(())
+}
+
+fn urlencode(s: &str) -> String {
+    // Minimal percent-encoding for query-string values. Avoids
+    // pulling another dep just for this.
+    let mut out = String::with_capacity(s.len() * 3);
+    for b in s.bytes() {
+        match b {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => {
+                out.push(b as char)
+            }
+            _ => out.push_str(&format!("%{b:02X}")),
+        }
+    }
+    out
+}
+
+/// Extract a stable filename-root label from a Wikimedia title
+/// like `File:Kk-kazakh.ogg` → `kk_kazakh`.
+fn label_from_title(title: &str) -> String {
+    let no_ns = title.strip_prefix("File:").unwrap_or(title);
+    let no_ext = no_ns
+        .rsplit_once('.')
+        .map(|(stem, _)| stem)
+        .unwrap_or(no_ns);
+    no_ext
+        .chars()
+        .map(|c| {
+            if c.is_ascii_alphanumeric() {
+                c.to_ascii_lowercase()
+            } else {
+                '_'
+            }
+        })
+        .collect::<String>()
+        .trim_matches('_')
+        .to_string()
+}
+
+/// Best-effort transcript placeholder. Without an explicit
+/// transcript field, we put the filename stem here; the user
+/// curates the sources.toml before running `batch`.
+fn transcript_placeholder(title: &str) -> String {
+    let no_ns = title.strip_prefix("File:").unwrap_or(title);
+    no_ns
+        .rsplit_once('.')
+        .map(|(s, _)| s)
+        .unwrap_or(no_ns)
+        .strip_prefix("Kk-")
+        .unwrap_or(no_ns)
+        .to_string()
+}
+
+// ─── fix-manifest-transcripts ─────────────────────────────────
+
+fn run_fix_transcripts(args: FixArgs) -> Result<(), Box<dyn std::error::Error>> {
+    let contents = fs::read_to_string(&args.sources)?;
+    let parsed: SourcesFile = toml::from_str(&contents)?;
+    let by_label: std::collections::HashMap<String, String> = parsed
+        .source
+        .into_iter()
+        .map(|s| (s.label, s.transcript))
+        .collect();
+
+    if !args.manifest.exists() {
+        return Err(format!("manifest not found: {}", args.manifest.display()).into());
+    }
+
+    let file = fs::File::open(&args.manifest)?;
+    let mut updated: Vec<ManifestEntry> = Vec::new();
+    let mut changed = 0_usize;
+    let mut unchanged = 0_usize;
+    let mut unmatched = 0_usize;
+    for line in BufReader::new(file).lines() {
+        let line = line?;
+        let mut entry: ManifestEntry = match serde_json::from_str(&line) {
+            Ok(e) => e,
+            Err(_) => {
+                eprintln!("[fix] skipping malformed line");
+                continue;
+            }
+        };
+        if let Some(new_transcript) = by_label.get(&entry.label) {
+            if &entry.transcript == new_transcript {
+                unchanged += 1;
+            } else {
+                println!(
+                    "[fix] {}: «{}» → «{}»",
+                    entry.label, entry.transcript, new_transcript
+                );
+                entry.transcript = new_transcript.clone();
+                changed += 1;
+            }
+        } else {
+            eprintln!(
+                "[fix] {} not found in sources.toml — leaving transcript unchanged",
+                entry.label
+            );
+            unmatched += 1;
+        }
+        updated.push(entry);
+    }
+
+    // Rewrite manifest atomically.
+    let tmp_path = args.manifest.with_extension("jsonl.tmp");
+    {
+        let mut tmp = fs::File::create(&tmp_path)?;
+        for e in &updated {
+            writeln!(tmp, "{}", serde_json::to_string(e)?)?;
+        }
+    }
+    fs::rename(&tmp_path, &args.manifest)?;
+    println!(
+        "[fix] done: {changed} updated, {unchanged} already current, {unmatched} no source entry"
+    );
+    Ok(())
+}
+
+// ─── batch ────────────────────────────────────────────────────
+
+fn run_batch(args: BatchArgs) -> Result<(), Box<dyn std::error::Error>> {
+    let contents = fs::read_to_string(&args.sources)?;
+    let parsed: SourcesFile = toml::from_str(&contents)?;
+    println!(
+        "[batch] {} sources in {}",
+        parsed.source.len(),
+        args.sources.display()
+    );
+
+    fs::create_dir_all(args.out_dir.join("audio"))?;
+    fs::create_dir_all(args.out_dir.join("mfcc"))?;
+    fs::create_dir_all(args.out_dir.join("tmp"))?;
+
+    let manifest_path = args.out_dir.join("MANIFEST.jsonl");
+    let acquired_labels = read_manifest_labels(&manifest_path)?;
+    println!(
+        "[batch] {} labels already in manifest, will skip",
+        acquired_labels.len()
+    );
+
+    let mut ok = 0_usize;
+    let mut skipped = 0_usize;
+    let mut failed = 0_usize;
+    for src in &parsed.source {
+        if acquired_labels.contains(&src.label) {
+            skipped += 1;
+            continue;
+        }
+        match pull_one(
+            &src.url,
+            &src.label,
+            &src.transcript,
+            &src.gender,
+            &src.source_class,
+            &args.out_dir,
+        ) {
+            Ok(()) => {
+                ok += 1;
+                if args.max > 0 && ok >= args.max {
+                    println!("[batch] reached --max {} — stopping", args.max);
+                    break;
+                }
+            }
+            Err(e) => {
+                eprintln!("[batch] FAILED «{}»: {}", src.label, e);
+                failed += 1;
+            }
+        }
+    }
+    println!("[batch] done: {ok} acquired, {skipped} skipped, {failed} failed");
+    Ok(())
+}
+
+// ─── build-bank ───────────────────────────────────────────────
+
+/// One usable source preloaded for reuse across bootstrap
+/// iterations. Holds both the PCM samples (for TTS PCM
+/// extraction) and their derived MFCC (for STT alignment).
+#[allow(dead_code)] // label is for diagnostics
+struct BankSource {
+    label: String,
+    phonemes: Vec<adam_phoneme::Phoneme>,
+    mfcc: adam_audio::mfcc::MfccSequence,
+    /// Mono PCM samples at `pcm_sample_rate`. Same audio the
+    /// MFCC was derived from. Used by Phase 7b for PCM-template
+    /// extraction.
+    pcm: Vec<f32>,
+    pcm_sample_rate: u32,
+}
+
+// ─── audit ────────────────────────────────────────────────────
+
+fn run_audit(args: AuditArgs) -> Result<(), Box<dyn std::error::Error>> {
+    use std::collections::BTreeMap;
+
+    let manifest_path = args.bank_dir.join("MANIFEST.jsonl");
+    if !manifest_path.exists() {
+        return Err(format!("manifest not found: {}", manifest_path.display()).into());
+    }
+    let cfg = quality::QualityConfig::default();
+
+    let file = fs::File::open(&manifest_path)?;
+    let mut entries: Vec<ManifestEntry> = Vec::new();
+    for line in BufReader::new(file).lines() {
+        if let Ok(e) = serde_json::from_str::<ManifestEntry>(&line?) {
+            entries.push(e);
+        }
+    }
+    println!("[audit] {} manifest entries", entries.len());
+
+    let mut verdicts: Vec<(usize, quality::QualityVerdict, quality::AudioStats)> = Vec::new();
+    let mut rollup: BTreeMap<String, usize> = BTreeMap::new();
+    let mut per_class: BTreeMap<(String, String), usize> = BTreeMap::new();
+    let mut io_errors = 0_usize;
+
+    for (idx, e) in entries.iter().enumerate() {
+        let wav = args.bank_dir.join(&e.wav_path);
+        let pcm = match adam_audio::wav::read_wav(&wav) {
+            Ok(p) => p,
+            Err(_) => {
+                io_errors += 1;
+                continue;
+            }
+        };
+        let pcm_mono = if pcm.channels > 1 { pcm.to_mono() } else { pcm };
+        let (v, s) = quality::check(&pcm_mono, &cfg);
+        *rollup.entry(v.to_string()).or_insert(0) += 1;
+        if args.by_source_class {
+            *per_class
+                .entry((e.source_class.clone(), v.to_string()))
+                .or_insert(0) += 1;
+        }
+        verdicts.push((idx, v, s));
+    }
+
+    println!("\n[audit] ===== Quality verdict rollup =====");
+    let total = verdicts.len();
+    for (verdict, n) in &rollup {
+        let pct = 100.0 * (*n as f32) / (total as f32);
+        println!("  {verdict:<18} {n:>5}  ({pct:>5.1}%)");
+    }
+    if io_errors > 0 {
+        println!(
+            "  (note: {io_errors} entries had no readable WAV on disk — likely .gitignored / not regenerated locally)"
+        );
+    }
+
+    if args.by_source_class {
+        println!("\n[audit] ===== Per source_class =====");
+        for ((cls, v), n) in &per_class {
+            println!("  {cls:<10} {v:<18} {n}");
+        }
+    }
+
+    // Surface a few examples of each failure mode for manual
+    // listening / triage.
+    println!("\n[audit] ===== Sample failing labels (up to 5 each) =====");
+    let mut shown: BTreeMap<quality::QualityVerdict, usize> = BTreeMap::new();
+    for (idx, v, s) in &verdicts {
+        if *v == quality::QualityVerdict::Pass {
+            continue;
+        }
+        let cnt = shown.entry(*v).or_insert(0);
+        if *cnt < 5 {
+            println!(
+                "  {:<18} {} (rms={:.4} peak={:.3} dur={:.2}s) — {}",
+                v.to_string(),
+                entries[*idx].label,
+                s.rms,
+                s.peak,
+                s.duration_s,
+                entries[*idx].wav_path,
+            );
+            *cnt += 1;
+        }
+    }
+
+    if !args.apply {
+        println!("\n[audit] read-only run; pass --apply to prune failing entries");
+        return Ok(());
+    }
+
+    // ─── --apply: rewrite manifest, quarantine failed files ──
+    let quarantine_audio = args.bank_dir.join("audio").join("quarantine");
+    let quarantine_mfcc = args.bank_dir.join("mfcc").join("quarantine");
+    fs::create_dir_all(&quarantine_audio)?;
+    fs::create_dir_all(&quarantine_mfcc)?;
+
+    let mut keep: Vec<&ManifestEntry> = Vec::new();
+    let mut moved = 0_usize;
+    let mut io_missing_kept = 0_usize;
+    let mut idx_to_verdict: std::collections::HashMap<usize, quality::QualityVerdict> =
+        std::collections::HashMap::new();
+    for (idx, v, _) in &verdicts {
+        idx_to_verdict.insert(*idx, *v);
+    }
+    for (idx, e) in entries.iter().enumerate() {
+        match idx_to_verdict.get(&idx) {
+            Some(quality::QualityVerdict::Pass) => keep.push(e),
+            Some(_) => {
+                // Move WAV + MFCC into the quarantine dir.
+                let wav_src = args.bank_dir.join(&e.wav_path);
+                let mfcc_src = args.bank_dir.join(&e.mfcc_path);
+                let wav_basename = std::path::Path::new(&e.wav_path)
+                    .file_name()
+                    .unwrap_or_default();
+                let mfcc_basename = std::path::Path::new(&e.mfcc_path)
+                    .file_name()
+                    .unwrap_or_default();
+                let _ = fs::rename(&wav_src, quarantine_audio.join(wav_basename));
+                let _ = fs::rename(&mfcc_src, quarantine_mfcc.join(mfcc_basename));
+                moved += 1;
+            }
+            None => {
+                // No verdict means we couldn't even read the WAV
+                // (gitignored FLEURS file not regenerated). Keep
+                // the manifest row so a future `fleurs` pass can
+                // restore it; report the count.
+                io_missing_kept += 1;
+                keep.push(e);
+            }
+        }
+    }
+
+    // Atomic rewrite of the manifest.
+    let tmp = manifest_path.with_extension("jsonl.tmp");
+    {
+        let mut f = fs::File::create(&tmp)?;
+        for e in &keep {
+            writeln!(f, "{}", serde_json::to_string(e)?)?;
+        }
+    }
+    fs::rename(&tmp, &manifest_path)?;
+    println!(
+        "[audit] applied: kept {} entries (incl. {} with no readable WAV), quarantined {}",
+        keep.len(),
+        io_missing_kept,
+        moved
+    );
+    Ok(())
+}
+
+// ─── synth (formant-synth corpus generation) ──────────────────
+
+fn run_synth(args: SynthArgs) -> Result<(), Box<dyn std::error::Error>> {
+    use adam_formant_synth::{ALL_VOICES, SynthConfig, VoiceProfile, synth_word};
+
+    let voices: Vec<&'static VoiceProfile> = if args.voices == "all" {
+        ALL_VOICES.iter().collect()
+    } else {
+        let wanted: std::collections::HashSet<&str> =
+            args.voices.split(',').map(str::trim).collect();
+        ALL_VOICES
+            .iter()
+            .filter(|v| wanted.contains(v.name))
+            .collect()
+    };
+    if voices.is_empty() {
+        return Err(format!("no matching voice presets in --voices {}", args.voices).into());
+    }
+    println!(
+        "[synth] {} voices × {} lexicon entries",
+        voices.len(),
+        adam_lexicon_curated::full_lexicon().len()
+    );
+
+    fs::create_dir_all(args.out_dir.join("audio"))?;
+    fs::create_dir_all(args.out_dir.join("mfcc"))?;
+    let manifest_path = args.out_dir.join("MANIFEST.jsonl");
+    let already = read_manifest_labels(&manifest_path)?;
+    // Synth path: relaxed `min_duration_s` because we control
+    // the source — short single-phoneme clips (e.g. an alphabet
+    // entry at 0.18 s) aren't truncated downloads, they're
+    // intentionally brief. RMS / clipping / NaN checks still
+    // run with the usual thresholds.
+    let qcfg = quality::QualityConfig {
+        min_duration_s: 0.05,
+        ..quality::QualityConfig::default()
+    };
+
+    let lex = adam_lexicon_curated::full_lexicon();
+    let mut ok = 0_usize;
+    let mut skipped = 0_usize;
+    let mut rejected = 0_usize;
+
+    'voices: for voice in &voices {
+        for entry in &lex {
+            if args.max > 0 && ok >= args.max {
+                break 'voices;
+            }
+            let label = format!("synth_{}_{}", voice.name, entry.label);
+            if already.contains(&label) {
+                skipped += 1;
+                continue;
+            }
+            let cfg = SynthConfig {
+                voice: **voice,
+                phoneme_duration_s: args.phoneme_duration_s,
+                ..SynthConfig::default()
+            };
+            let pcm_data = synth_word(entry.phonemes, &cfg);
+            let pcm_16k = adam_audio::PcmSamples {
+                sample_rate: cfg.sample_rate,
+                channels: 1,
+                data: pcm_data,
+            };
+
+            // Quality gate (same as ingest paths).
+            let (v, st) = quality::check(&pcm_16k, &qcfg);
+            if v != quality::QualityVerdict::Pass {
+                eprintln!(
+                    "[synth]   REJECT {label}: {v} (rms={:.4} peak={:.3} dur={:.2}s)",
+                    st.rms, st.peak, st.duration_s,
+                );
+                rejected += 1;
+                continue;
+            }
+
+            let mfcc_seq = adam_audio::mfcc::mfcc(
+                &pcm_16k.data,
+                pcm_16k.sample_rate,
+                &adam_audio::mfcc::MfccConfig::default(),
+            );
+
+            let wav_path = args.out_dir.join("audio").join(format!("{label}.wav"));
+            let mfcc_path = args.out_dir.join("mfcc").join(format!("{label}.bin"));
+            adam_audio::wav::write_wav(&wav_path, &pcm_16k)?;
+            write_mfcc_binary(&mfcc_path, &mfcc_seq)?;
+            let wav_size = fs::metadata(&wav_path)?.len();
+            let mfcc_size = fs::metadata(&mfcc_path)?.len();
+
+            // Map our preset → manifest gender field (best-effort).
+            let gender = match voice.name {
+                "bass" | "baritone" | "tenor" | "youth_male" | "elderly_male" => "male",
+                "contralto" | "mezzo" | "soprano" | "youth_female" | "elderly_female" => "female",
+                _ => "unknown",
+            };
+
+            let manifest_entry = ManifestEntry {
+                label: label.clone(),
+                source_url: format!(
+                    "formant-synth://{}/{}?dur={:.3}",
+                    voice.name, entry.label, args.phoneme_duration_s
+                ),
+                transcript: entry.cyrillic.to_string(),
+                gender: gender.to_string(),
+                source_class: args.source_class.clone(),
+                original_bytes: wav_size,
+                duration_s: pcm_16k.duration_s(),
+                wav_path: wav_path
+                    .strip_prefix(&args.out_dir)
+                    .unwrap_or(&wav_path)
+                    .to_string_lossy()
+                    .to_string(),
+                wav_bytes: wav_size,
+                mfcc_path: mfcc_path
+                    .strip_prefix(&args.out_dir)
+                    .unwrap_or(&mfcc_path)
+                    .to_string_lossy()
+                    .to_string(),
+                mfcc_frames: mfcc_seq.num_frames(),
+                mfcc_bytes: mfcc_size,
+                collected_at: chrono_date(),
+                used_in_bank: false,
+            };
+            append_manifest(&manifest_path, &manifest_entry)?;
+            ok += 1;
+        }
+    }
+
+    println!("[synth] done: {ok} acquired, {skipped} skipped, {rejected} rejected");
+    Ok(())
+}
+
+fn run_build_bank(args: BuildBankArgs) -> Result<(), Box<dyn std::error::Error>> {
+    use adam_phoneme::Phoneme;
+    use adam_phoneme::cyrillic::cyrillic_to_phonemes_prayer_aware;
+
+    if !args.manifest.exists() {
+        return Err(format!("manifest not found: {}", args.manifest.display()).into());
+    }
+
+    // Pre-load all usable entries so each iteration can re-use
+    // them without re-reading + re-parsing. Multi-word entries
+    // are split via energy-based word segmentation; each word
+    // becomes its own source.
+    let mut sources: Vec<BankSource> = Vec::new();
+    let mut skipped = 0_usize;
+    let file = fs::File::open(&args.manifest)?;
+    for line in BufReader::new(file).lines() {
+        let entry: ManifestEntry = match serde_json::from_str(&line?) {
+            Ok(e) => e,
+            Err(_) => continue,
+        };
+
+        let words: Vec<&str> = entry.transcript.split_whitespace().collect();
+        if words.is_empty() {
+            skipped += 1;
+            continue;
+        }
+
+        if words.len() == 1 {
+            // Single-word path: load the WAV (so we have PCM for
+            // Phase 7b PCM-bank extraction) and compute MFCC
+            // inline. Phase 11 prayer-aware variant — secular
+            // transcripts hit the no-spans early return.
+            let phonemes = cyrillic_to_phonemes_prayer_aware(&entry.transcript, true);
+            if phonemes.is_empty() {
+                skipped += 1;
+                continue;
+            }
+            let wav_path = args.bank_dir.join(&entry.wav_path);
+            let pcm = match adam_audio::wav::read_wav(&wav_path) {
+                Ok(p) => p,
+                Err(e) => {
+                    eprintln!("[build-bank] cannot read {}: {}", wav_path.display(), e);
+                    skipped += 1;
+                    continue;
+                }
+            };
+            let pcm_mono = if pcm.channels > 1 { pcm.to_mono() } else { pcm };
+            let mut mfcc_seq = adam_audio::mfcc::mfcc(
+                &pcm_mono.data,
+                pcm_mono.sample_rate,
+                &adam_audio::mfcc::MfccConfig::default(),
+            );
+            // Phase 11: CMVN — remove the per-utterance speaker /
+            // channel offset before storing. Bank centroids will
+            // live in normalised space; recognition queries are
+            // CMVN'd with their own stats to match.
+            adam_audio::cmvn::normalise_in_place(&mut mfcc_seq);
+            if mfcc_seq.num_frames() < phonemes.len() {
+                skipped += 1;
+                continue;
+            }
+            sources.push(BankSource {
+                label: entry.label,
+                phonemes,
+                mfcc: mfcc_seq,
+                pcm: pcm_mono.data,
+                pcm_sample_rate: pcm_mono.sample_rate,
+            });
+        } else {
+            // Multi-word path: load the WAV, split at silent
+            // gaps, compute per-word MFCC, generate one source
+            // per word. Skip the whole entry if word count
+            // doesn't match the splitter's output.
+            let wav_path = args.bank_dir.join(&entry.wav_path);
+            let pcm = match adam_audio::wav::read_wav(&wav_path) {
+                Ok(p) => p,
+                Err(e) => {
+                    eprintln!("[build-bank] cannot read {}: {}", wav_path.display(), e);
+                    skipped += 1;
+                    continue;
+                }
+            };
+            let pcm_mono = if pcm.channels > 1 { pcm.to_mono() } else { pcm };
+            let segs = adam_audio::word_split::split_words(
+                &pcm_mono.data,
+                pcm_mono.sample_rate,
+                &adam_audio::word_split::WordSplitConfig::default(),
+            );
+            if segs.len() != words.len() {
+                println!(
+                    "[build-bank] skipping «{}» — splitter found {} segments, transcript has {} words",
+                    entry.label,
+                    segs.len(),
+                    words.len(),
+                );
+                skipped += 1;
+                continue;
+            }
+            for (w_idx, (word_txt, (start, end))) in words.iter().zip(segs.iter()).enumerate() {
+                let phonemes = cyrillic_to_phonemes_prayer_aware(word_txt, true);
+                if phonemes.is_empty() {
+                    continue;
+                }
+                let word_samples = &pcm_mono.data[*start..*end];
+                let mut word_mfcc = adam_audio::mfcc::mfcc(
+                    word_samples,
+                    pcm_mono.sample_rate,
+                    &adam_audio::mfcc::MfccConfig::default(),
+                );
+                // Phase 11: CMVN per word. Each word is treated
+                // as its own "utterance" for normalisation —
+                // same statistics scope as the source-level path.
+                adam_audio::cmvn::normalise_in_place(&mut word_mfcc);
+                if word_mfcc.num_frames() < phonemes.len() {
+                    continue;
+                }
+                sources.push(BankSource {
+                    label: format!("{}_w{w_idx}", entry.label),
+                    phonemes,
+                    mfcc: word_mfcc,
+                    pcm: word_samples.to_vec(),
+                    pcm_sample_rate: pcm_mono.sample_rate,
+                });
+            }
+        }
+    }
+
+    println!(
+        "[build-bank] loaded {} usable sources, {skipped} skipped",
+        sources.len()
+    );
+    println!(
+        "[build-bank] running {} bootstrap iterations",
+        args.iterations
+    );
+
+    // Iteration 0: equipartition.
+    let mut bank = build_pass_equipartition(&sources);
+    println!(
+        "[build-bank] iter 0 (equipartition): {} phonemes",
+        bank.len()
+    );
+
+    // Iterations 1+: forced-aligner re-alignment against the
+    // current bank. Replaces the v1 DTW-realign pass that used
+    // a concatenation of templates as the "expected" length —
+    // that approach starved long phonemes on multi-word FLEURS
+    // utterances. The forced aligner runs Viterbi over a
+    // T × N DP table with self-loops, so each phoneme can own
+    // an arbitrary frame range.
+    for iter in 1..args.iterations {
+        bank = build_pass_forced_align(&sources, &bank, args.templates_per_phoneme);
+        println!(
+            "[build-bank] iter {iter} (forced-align, K={}): {} phonemes / {} templates",
+            args.templates_per_phoneme,
+            bank.len(),
+            bank.template_count(),
+        );
+    }
+
+    // Final coverage report.
+    let mut report: Vec<(Phoneme, usize)> = bank
+        .iter()
+        .map(|(p, t)| (*p, t.mfcc.num_frames()))
+        .collect();
+    report.sort_by_key(|(p, _)| p.to_byte());
+    println!("\n[build-bank] final per-phoneme template lengths:");
+    for (p, n_frames) in &report {
+        println!("  {p:?} → {n_frames} frames");
+    }
+
+    bank.save_to_file(&args.output)?;
+    println!("\n[build-bank] wrote {}", args.output.display());
+
+    // Phase 7b: extract per-phoneme PCM chunks using the
+    // converged bank's alignment and write the PCM bank.
+    let pcm_bank = extract_pcm_bank(&sources, &bank);
+    pcm_bank.save_to_file(&args.pcm_output)?;
+    println!(
+        "[build-bank] wrote {} ({} phonemes covered)",
+        args.pcm_output.display(),
+        pcm_bank.len()
+    );
+    Ok(())
+}
+
+/// After the MFCC bank converges, run one more DTW alignment
+/// pass per source — but this time keep the PCM samples that
+/// align to each phoneme's range, not the MFCC frames. For
+/// each phoneme, store the LONGEST collected PCM chunk as
+/// its template (proper averaging across PCM segments needs
+/// formant-aware alignment; "longest chunk" is the simplest
+/// representative for Phase 7b first iteration).
+fn extract_pcm_bank(
+    sources: &[BankSource],
+    bank: &adam_stt_phoneme::PhonemeBank,
+) -> adam_tts_phoneme::PcmBank {
+    use adam_phoneme::Phoneme;
+    use adam_stt_phoneme::{dtw, euclidean_distance};
+    use adam_tts_phoneme::{PcmBank, PcmTemplate};
+    use std::collections::HashMap;
+
+    let mut per_phoneme: HashMap<Phoneme, Vec<(Vec<f32>, u32)>> = HashMap::new();
+    let stft_cfg = adam_audio::spectrogram::StftConfig::speech_16khz();
+    let hop = stft_cfg.hop_length;
+    let window = stft_cfg.window_length;
+
+    for src in sources {
+        let templates: Vec<&adam_audio::mfcc::MfccSequence> = src
+            .phonemes
+            .iter()
+            .filter_map(|p| bank.get(*p).map(|t| &t.mfcc))
+            .collect();
+        if templates.len() != src.phonemes.len() {
+            continue;
+        }
+        let mut expected_frames: Vec<Vec<f32>> = Vec::new();
+        let mut phoneme_ranges: Vec<(usize, usize)> = Vec::with_capacity(templates.len());
+        for t in &templates {
+            let start = expected_frames.len();
+            expected_frames.extend_from_slice(&t.frames);
+            phoneme_ranges.push((start, expected_frames.len()));
+        }
+        let Some(result) =
+            dtw::dtw_with_distance(&src.mfcc.frames, &expected_frames, euclidean_distance)
+        else {
+            continue;
+        };
+
+        for (p_idx, &(rng_start, rng_end)) in phoneme_ranges.iter().enumerate() {
+            let phoneme = src.phonemes[p_idx];
+            let mut frame_indices: Vec<usize> = Vec::new();
+            for &(qi, ti) in &result.path {
+                if ti >= rng_start && ti < rng_end {
+                    frame_indices.push(qi);
+                }
+            }
+            frame_indices.sort_unstable();
+            frame_indices.dedup();
+            if frame_indices.is_empty() {
+                continue;
+            }
+            // MFCC frame range → PCM sample range:
+            //   first sample = frame * hop
+            //   last  sample = last_frame * hop + window_length
+            let first_frame = *frame_indices.first().unwrap();
+            let last_frame = *frame_indices.last().unwrap();
+            let pcm_start = first_frame * hop;
+            let pcm_end = (last_frame * hop + window).min(src.pcm.len());
+            if pcm_end <= pcm_start {
+                continue;
+            }
+            per_phoneme
+                .entry(phoneme)
+                .or_default()
+                .push((src.pcm[pcm_start..pcm_end].to_vec(), src.pcm_sample_rate));
+        }
+    }
+
+    // For each phoneme: pick the LONGEST collected PCM chunk
+    // (proper PCM averaging is a Phase 7c concern — needs
+    // formant-aware time-domain averaging or spectral
+    // averaging via STFT inverse).
+    let mut pcm_bank = PcmBank::new();
+    for (phoneme, chunks) in per_phoneme {
+        let (longest, sr) = chunks
+            .into_iter()
+            .max_by_key(|(c, _)| c.len())
+            .expect("non-empty bucket");
+        pcm_bank.insert(PcmTemplate {
+            phoneme,
+            sample_rate: sr,
+            samples: longest,
+        });
+    }
+    pcm_bank
+}
+
+/// Bootstrap iteration 0: equipartition each source's MFCC
+/// across its phoneme sequence, collect per-phoneme chunks,
+/// DBA-average per phoneme → bank.
+fn build_pass_equipartition(sources: &[BankSource]) -> adam_stt_phoneme::PhonemeBank {
+    use adam_phoneme::Phoneme;
+    use adam_stt_phoneme::{PhonemeBank, PhonemeTemplate};
+    use std::collections::HashMap;
+
+    let mut per_phoneme: HashMap<Phoneme, Vec<adam_audio::mfcc::MfccSequence>> = HashMap::new();
+    for src in sources {
+        let n_frames = src.mfcc.num_frames();
+        let chunk = n_frames / src.phonemes.len();
+        for (i, &phoneme) in src.phonemes.iter().enumerate() {
+            let start = i * chunk;
+            let end = if i + 1 == src.phonemes.len() {
+                n_frames
+            } else {
+                (i + 1) * chunk
+            };
+            let frames: Vec<Vec<f32>> = src.mfcc.frames[start..end].to_vec();
+            if frames.is_empty() {
+                continue;
+            }
+            per_phoneme
+                .entry(phoneme)
+                .or_default()
+                .push(adam_audio::mfcc::MfccSequence {
+                    frames,
+                    sample_rate: src.mfcc.sample_rate,
+                    hop_length: src.mfcc.hop_length,
+                    n_mfcc: src.mfcc.n_mfcc,
+                });
+        }
+    }
+    let mut bank = PhonemeBank::new();
+    for (phoneme, chunks) in per_phoneme {
+        bank.insert(PhonemeTemplate {
+            phoneme,
+            mfcc: average_chunks(&chunks),
+        });
+    }
+    bank
+}
+
+/// Bootstrap iteration N>0 **using the Phase 10 forced
+/// aligner**. For each source, Viterbi-align its MFCC against
+/// its phoneme sequence using the current bank's per-phoneme
+/// centroids; the alignment partitions the source frames into
+/// strictly monotonic per-phoneme ranges. Average each
+/// phoneme's contributed chunks → new bank.
+///
+/// This replaces `build_pass_dtw_realign` for the FLEURS-scale
+/// corpus: long phonemes can absorb many source frames via
+/// self-loops, the issue that crippled the DTW-concat approach.
+fn build_pass_forced_align(
+    sources: &[BankSource],
+    current: &adam_stt_phoneme::PhonemeBank,
+    templates_per_phoneme: usize,
+) -> adam_stt_phoneme::PhonemeBank {
+    use adam_phoneme::Phoneme;
+    use adam_stt_phoneme::PhonemeTemplate;
+    use std::collections::HashMap;
+
+    let mut per_phoneme: HashMap<Phoneme, Vec<adam_audio::mfcc::MfccSequence>> = HashMap::new();
+    let mut aligned = 0_usize;
+    let mut uncovered = 0_usize;
+    let mut too_short = 0_usize;
+
+    for src in sources {
+        let result = match adam_forced_aligner::align(&src.mfcc, &src.phonemes, current) {
+            Ok(r) => r,
+            Err(adam_forced_aligner::AlignError::UncoveredPhoneme(_)) => {
+                uncovered += 1;
+                continue;
+            }
+            Err(adam_forced_aligner::AlignError::PhonemesExceedFrames { .. }) => {
+                too_short += 1;
+                continue;
+            }
+            Err(_) => continue,
+        };
+        for seg in &result.segments {
+            let chunk_frames: Vec<Vec<f32>> = src.mfcc.frames[seg.start..seg.end].to_vec();
+            per_phoneme
+                .entry(seg.phoneme)
+                .or_default()
+                .push(adam_audio::mfcc::MfccSequence {
+                    frames: chunk_frames,
+                    sample_rate: src.mfcc.sample_rate,
+                    hop_length: src.mfcc.hop_length,
+                    n_mfcc: src.mfcc.n_mfcc,
+                });
+        }
+        aligned += 1;
+    }
+
+    eprintln!(
+        "[build-bank]   forced-aligned {aligned} sources, {uncovered} uncovered, {too_short} too-short (skipped)"
+    );
+
+    // Phase 13 step 1: multi-template acoustic model. Per
+    // phoneme we keep up to `NUM_TEMPLATES_PER_PHONEME` distinct
+    // exemplars instead of a single centroid. The recogniser
+    // scores a frame by taking the minimum cepstral distance
+    // across all exemplars — capturing speaker / context variety
+    // the single-centroid model cannot. Exemplar selection is
+    // top-K-by-length (descending); each is centre-cropped to
+    // the same class-specific cap that single-template used.
+    //
+    //   • Vowels: 35 frames (~350 ms) per template
+    //   • Consonants: 18 frames (~180 ms)
+    //   • K = 5 templates per phoneme
+    //
+    // Sources below `NUM_TEMPLATES_PER_PHONEME` chunks for a
+    // given phoneme contribute everything they have; no padding.
+    const VOWEL_CAP_FRAMES: usize = 35;
+    const CONSONANT_CAP_FRAMES: usize = 18;
+    let k = templates_per_phoneme.max(1);
+
+    let mut bank = adam_stt_phoneme::PhonemeBank::new();
+    for (phoneme, chunks) in per_phoneme {
+        let template_cap = if phoneme.is_vowel() {
+            VOWEL_CAP_FRAMES
+        } else {
+            CONSONANT_CAP_FRAMES
+        };
+        // Sort by length descending; take top-K.
+        let mut sorted: Vec<_> = chunks;
+        sorted.sort_by(|a, b| b.num_frames().cmp(&a.num_frames()));
+        for chunk in sorted.into_iter().take(k) {
+            let capped = if chunk.num_frames() > template_cap {
+                let skip = (chunk.num_frames() - template_cap) / 2;
+                adam_audio::mfcc::MfccSequence {
+                    frames: chunk.frames[skip..skip + template_cap].to_vec(),
+                    sample_rate: chunk.sample_rate,
+                    hop_length: chunk.hop_length,
+                    n_mfcc: chunk.n_mfcc,
+                }
+            } else {
+                chunk
+            };
+            bank.insert(PhonemeTemplate {
+                phoneme,
+                mfcc: capped,
+            });
+        }
+    }
+    // Fallback: phonemes the alignment didn't see this iteration
+    // keep their previous-iteration templates.
+    for (phoneme, exemplars) in current.iter_all() {
+        if bank.all(*phoneme).is_empty() {
+            for t in exemplars {
+                bank.insert(t.clone());
+            }
+        }
+    }
+    bank
+}
+
+/// Pseudo-DBA averaging across a bucket of MFCC chunks: pick
+/// the mean chunk length, linearly resample each chunk to
+/// that length, frame-wise average. Returns one averaged
+/// MfccSequence representing the bucket.
+fn average_chunks(chunks: &[adam_audio::mfcc::MfccSequence]) -> adam_audio::mfcc::MfccSequence {
+    assert!(!chunks.is_empty(), "average_chunks needs ≥1 chunk");
+    let n_mfcc = chunks[0].dim();
+    let target_len = (chunks.iter().map(|c| c.num_frames()).sum::<usize>() / chunks.len()).max(1);
+
+    let mut acc: Vec<Vec<f32>> = vec![vec![0.0_f32; n_mfcc]; target_len];
+    for chunk in chunks {
+        let resampled = resample_frames(&chunk.frames, target_len);
+        for (a, r) in acc.iter_mut().zip(resampled.iter()) {
+            for (ac, rc) in a.iter_mut().zip(r.iter()) {
+                *ac += rc;
+            }
+        }
+    }
+    for frame in &mut acc {
+        for c in frame.iter_mut() {
+            *c /= chunks.len() as f32;
+        }
+    }
+    adam_audio::mfcc::MfccSequence {
+        frames: acc,
+        sample_rate: chunks[0].sample_rate,
+        hop_length: chunks[0].hop_length,
+        n_mfcc,
+    }
+}
+
+/// Linearly resample a frame sequence to `target_len` frames
+/// by nearest-neighbour pick. (For MFCC, simpler than interp
+/// — each coefficient is already smooth across frames.)
+fn resample_frames(frames: &[Vec<f32>], target_len: usize) -> Vec<Vec<f32>> {
+    let src_len = frames.len().max(1);
+    (0..target_len)
+        .map(|i| {
+            let src_i = i * src_len / target_len;
+            frames[src_i.min(src_len - 1)].clone()
+        })
+        .collect()
+}
+
+// ─── helpers ──────────────────────────────────────────────────
+
+fn read_manifest_labels(path: &Path) -> std::io::Result<HashSet<String>> {
+    let mut out = HashSet::new();
+    if !path.exists() {
+        return Ok(out);
+    }
+    let file = fs::File::open(path)?;
+    for line in BufReader::new(file).lines() {
+        let line = line?;
+        if let Ok(entry) = serde_json::from_str::<ManifestEntry>(&line) {
+            out.insert(entry.label);
+        }
+    }
+    Ok(out)
+}
+
+// ─── date util ────────────────────────────────────────────────
+
+fn chrono_date() -> String {
+    use std::time::{SystemTime, UNIX_EPOCH};
+    let secs = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
+    let days = secs / 86_400;
+    let (y, m, d) = days_to_ymd(days as i64);
+    format!("{y:04}-{m:02}-{d:02}")
+}
+
+fn days_to_ymd(mut days: i64) -> (i32, u32, u32) {
+    days += 719468;
+    let era = if days >= 0 { days } else { days - 146_096 } / 146_097;
+    let doe = (days - era * 146_097) as u64;
+    let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365;
+    let y = yoe as i64 + era * 400;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let d = (doy - (153 * mp + 2) / 5 + 1) as u32;
+    let m = (if mp < 10 { mp + 3 } else { mp - 9 }) as u32;
+    let y = if m <= 2 { y + 1 } else { y };
+    (y as i32, m, d)
+}
+
+// ─── fleurs (streaming tar.gz ingest) ─────────────────────────
+
+/// Per-utterance row from a FLEURS `<split>.tsv` file.
+///
+/// FLEURS TSV columns (tab-separated):
+/// `id    audio_filename    transcript_with_punct    transcript_clean    phoneme_segmentation    sample_count    gender`
+struct FleursMeta {
+    transcript: String,
+    gender: String,
+    split: String,
+}
+
+fn run_fleurs(args: FleursArgs) -> Result<(), Box<dyn std::error::Error>> {
+    use flate2::read::GzDecoder;
+    use std::collections::HashMap;
+    use std::io::Read as _;
+
+    let wanted_splits: std::collections::HashSet<String> = args
+        .splits
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect();
+    if wanted_splits.is_empty() {
+        return Err("no splits requested (--splits dev,test,train …)".into());
+    }
+    println!(
+        "[fleurs] splits={:?} max={} out_dir={}",
+        wanted_splits,
+        args.max,
+        args.out_dir.display(),
+    );
+
+    fs::create_dir_all(args.out_dir.join("audio"))?;
+    fs::create_dir_all(args.out_dir.join("mfcc"))?;
+    let manifest_path = args.out_dir.join("MANIFEST.jsonl");
+    let already = read_manifest_labels(&manifest_path)?;
+
+    // Open the tarball as a streaming HTTP body. Symphonia takes
+    // a MediaSource, but tar wants a Read — pipe the response
+    // straight through GzDecoder → tar::Archive without any
+    // temporary file. The archive stays a stream end-to-end.
+    let client = reqwest::blocking::Client::builder()
+        .user_agent("adam-corpus-acquire/0.1 (https://github.com/qazaq-ai/adam)")
+        .timeout(std::time::Duration::from_secs(60 * 60))
+        .build()?;
+    let resp = client.get(&args.url).send()?.error_for_status()?;
+    let gz = GzDecoder::new(resp);
+    let mut archive = tar::Archive::new(gz);
+
+    // Per-split transcript map. Filled as TSV entries are
+    // encountered; consulted when WAV entries are processed.
+    let mut transcripts: HashMap<String, FleursMeta> = HashMap::new();
+    // Audio entries that arrived before their TSV did. Keyed by
+    // basename (e.g. "8861332316175673768.wav") → in-memory bytes.
+    let mut pending_audio: HashMap<String, (Vec<u8>, String)> = HashMap::new();
+
+    let mut counts: HashMap<String, usize> = HashMap::new();
+    let mut ok = 0_usize;
+    let mut skipped = 0_usize;
+    let mut failed = 0_usize;
+
+    for entry in archive.entries()? {
+        let mut entry = entry?;
+        let path = entry.path()?.into_owned();
+        let path_str = path.to_string_lossy().to_string();
+        if entry.header().entry_type().is_dir() {
+            continue;
+        }
+
+        // Classify entry: TSV (transcripts) or WAV (audio).
+        // FLEURS uses `kk_kz/<split>.tsv` and
+        // `kk_kz/audio/<split>/<id>.wav`.
+        if path_str.ends_with(".tsv") {
+            let split = match path
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .map(|s| s.to_string())
+            {
+                Some(s) => s,
+                None => continue,
+            };
+            if !wanted_splits.contains(&split) {
+                continue;
+            }
+            let mut buf = String::new();
+            entry.read_to_string(&mut buf)?;
+            for line in buf.lines() {
+                let cols: Vec<&str> = line.split('\t').collect();
+                if cols.len() < 6 {
+                    continue;
+                }
+                let basename = cols[1].to_string();
+                let transcript = cols[3].to_string(); // cleaned, no punctuation
+                let gender = cols.get(6).unwrap_or(&"unknown").to_lowercase();
+                transcripts.insert(
+                    basename.clone(),
+                    FleursMeta {
+                        transcript,
+                        gender,
+                        split: split.clone(),
+                    },
+                );
+            }
+            // Drain any pending audio that now has a transcript.
+            let basenames: Vec<String> = pending_audio.keys().cloned().collect();
+            for bn in basenames {
+                if let Some(meta) = transcripts.get(&bn) {
+                    if !wanted_splits.contains(&meta.split) {
+                        pending_audio.remove(&bn);
+                        continue;
+                    }
+                    let (bytes, _ext) = pending_audio.remove(&bn).unwrap();
+                    match process_fleurs_entry(
+                        &bn,
+                        bytes,
+                        meta,
+                        &args.source_class,
+                        &args.out_dir,
+                        &manifest_path,
+                        &already,
+                    ) {
+                        Ok(Some(())) => {
+                            ok += 1;
+                            *counts.entry(meta.split.clone()).or_insert(0) += 1;
+                        }
+                        Ok(None) => skipped += 1,
+                        Err(e) => {
+                            eprintln!("[fleurs] FAILED {bn}: {e}");
+                            failed += 1;
+                        }
+                    }
+                }
+            }
+            continue;
+        }
+
+        // Audio path: only .wav / .ogg matter.
+        let ext = path
+            .extension()
+            .and_then(|s| s.to_str())
+            .unwrap_or("")
+            .to_ascii_lowercase();
+        if ext != "wav" && ext != "ogg" {
+            continue;
+        }
+        let basename = match path.file_name().and_then(|s| s.to_str()) {
+            Some(s) => s.to_string(),
+            None => continue,
+        };
+
+        // If this split's TSV hasn't been seen yet, we don't
+        // know if we want this file. Stash it and try again on
+        // the next TSV pass. (Bounded by what fits per split.)
+        let meta = match transcripts.get(&basename) {
+            Some(m) => m,
+            None => {
+                let mut bytes = Vec::new();
+                entry.read_to_end(&mut bytes)?;
+                pending_audio.insert(basename, (bytes, ext));
+                continue;
+            }
+        };
+        if !wanted_splits.contains(&meta.split) {
+            continue;
+        }
+        if args.max > 0 && counts.get(&meta.split).copied().unwrap_or(0) >= args.max {
+            continue;
+        }
+
+        let mut bytes = Vec::new();
+        entry.read_to_end(&mut bytes)?;
+        match process_fleurs_entry(
+            &basename,
+            bytes,
+            meta,
+            &args.source_class,
+            &args.out_dir,
+            &manifest_path,
+            &already,
+        ) {
+            Ok(Some(())) => {
+                ok += 1;
+                *counts.entry(meta.split.clone()).or_insert(0) += 1;
+            }
+            Ok(None) => skipped += 1,
+            Err(e) => {
+                eprintln!("[fleurs] FAILED {basename}: {e}");
+                failed += 1;
+            }
+        }
+
+        // Per-split budget reached? If all wanted splits are
+        // full, bail out of the stream.
+        if args.max > 0
+            && wanted_splits
+                .iter()
+                .all(|s| counts.get(s).copied().unwrap_or(0) >= args.max)
+        {
+            println!(
+                "[fleurs] per-split budget {} reached for all splits",
+                args.max
+            );
+            break;
+        }
+    }
+
+    println!(
+        "[fleurs] done: {ok} acquired, {skipped} skipped, {failed} failed; per-split counts: {:?}",
+        counts,
+    );
+    if !pending_audio.is_empty() {
+        eprintln!(
+            "[fleurs] WARNING: {} audio entries had no matching TSV row (FLEURS upstream inconsistency?)",
+            pending_audio.len()
+        );
+    }
+    Ok(())
+}
+
+fn process_fleurs_entry(
+    basename: &str,
+    bytes: Vec<u8>,
+    meta: &FleursMeta,
+    source_class: &str,
+    out_dir: &Path,
+    manifest_path: &Path,
+    already: &HashSet<String>,
+) -> Result<Option<()>, Box<dyn std::error::Error>> {
+    let stem = basename.trim_end_matches(".wav").trim_end_matches(".ogg");
+    let label = format!("fleurs_{}_{}", meta.split, stem);
+    if already.contains(&label) {
+        return Ok(None);
+    }
+    // Defensive: if a previous call within this same run already
+    // wrote `label` (e.g. the same basename re-emitted from the
+    // pending_audio buffer after a later TSV pass), don't dup.
+    // The boot-time `already` only covers labels that pre-existed
+    // before the run started.
+    if std::path::Path::new(out_dir)
+        .join("audio")
+        .join(format!("{label}.wav"))
+        .exists()
+    {
+        return Ok(None);
+    }
+
+    let ext = basename
+        .rsplit_once('.')
+        .map(|(_, e)| e)
+        .unwrap_or("wav")
+        .to_string();
+    let pcm = decode::decode_bytes(bytes, &ext)?;
+    let pcm_mono = if pcm.channels > 1 { pcm.to_mono() } else { pcm };
+    let pcm_16k = if pcm_mono.sample_rate != 16_000 {
+        resample::to_16khz(&pcm_mono)?
+    } else {
+        pcm_mono
+    };
+
+    // Quality gate (Phase 11+): reject silent / clipped /
+    // truncated / non-finite FLEURS clips before they reach the
+    // manifest. User directive 2026-05-28.
+    let (verdict, stats) = quality::check(&pcm_16k, &quality::QualityConfig::default());
+    if verdict != quality::QualityVerdict::Pass {
+        eprintln!(
+            "[fleurs]   REJECT {label}: {verdict} (rms={:.4} peak={:.3} dur={:.2}s)",
+            stats.rms, stats.peak, stats.duration_s,
+        );
+        return Ok(None);
+    }
+
+    let mfcc_seq = adam_audio::mfcc::mfcc(
+        &pcm_16k.data,
+        pcm_16k.sample_rate,
+        &adam_audio::mfcc::MfccConfig::default(),
+    );
+
+    let wav_path = out_dir.join("audio").join(format!("{label}.wav"));
+    let mfcc_path = out_dir.join("mfcc").join(format!("{label}.bin"));
+    adam_audio::wav::write_wav(&wav_path, &pcm_16k)?;
+    write_mfcc_binary(&mfcc_path, &mfcc_seq)?;
+    let wav_size = fs::metadata(&wav_path)?.len();
+    let mfcc_size = fs::metadata(&mfcc_path)?.len();
+
+    let entry = ManifestEntry {
+        label: label.clone(),
+        source_url: format!("FLEURS102/kk_kz/{}/{basename}", meta.split),
+        transcript: meta.transcript.clone(),
+        gender: meta.gender.clone(),
+        source_class: source_class.to_string(),
+        original_bytes: wav_size, // upstream byte count not retained
+        duration_s: pcm_16k.duration_s(),
+        wav_path: wav_path
+            .strip_prefix(out_dir)
+            .unwrap_or(&wav_path)
+            .to_string_lossy()
+            .to_string(),
+        wav_bytes: wav_size,
+        mfcc_path: mfcc_path
+            .strip_prefix(out_dir)
+            .unwrap_or(&mfcc_path)
+            .to_string_lossy()
+            .to_string(),
+        mfcc_frames: mfcc_seq.num_frames(),
+        mfcc_bytes: mfcc_size,
+        collected_at: chrono_date(),
+        used_in_bank: false,
+    };
+    append_manifest(manifest_path, &entry)?;
+    println!(
+        "[fleurs]   {} ({:.1}s, {:.1} KB derived)",
+        label,
+        pcm_16k.duration_s(),
+        (wav_size + mfcc_size) as f32 / 1024.0
+    );
+    Ok(Some(()))
+}
+
+// ─── openslr 102 / KSC (streaming tar.gz ingest) ──────────────
+
+fn run_openslr_ksc(args: OpenSlrKscArgs) -> Result<(), Box<dyn std::error::Error>> {
+    use flate2::read::GzDecoder;
+    use std::collections::HashMap;
+    use std::io::Read as _;
+
+    println!(
+        "[ksc] url={} tarball={} out_dir={} max={} save_wav={}",
+        args.url,
+        args.tarball_path.display(),
+        args.out_dir.display(),
+        args.max,
+        args.save_wav,
+    );
+    fs::create_dir_all(args.out_dir.join("audio"))?;
+    fs::create_dir_all(args.out_dir.join("mfcc"))?;
+    let manifest_path = args.out_dir.join("MANIFEST.jsonl");
+    let already = read_manifest_labels(&manifest_path)?;
+
+    // KSC layout (probed 2026-05-30):
+    //   ISSAI_KSC_335RS_v1.1_flac/Audios_flac/<id>.flac   (~19 GB)
+    //   ISSAI_KSC_335RS_v1.1_flac/Meta/<id>.txt           (transcripts; arrive AFTER audio in the tarball)
+    //
+    // A naive single-pass stream → in-RAM `pending_audio` map
+    // blows up to >15 GB (153k FLAC × ~100 KB) before any
+    // transcript arrives. To avoid that we materialise the
+    // tarball to disk once, then make TWO passes from the disk
+    // file: pass 1 collects transcripts only, pass 2 processes
+    // audio with the full transcript map in hand.
+
+    // 1. fetch tarball if not already cached on disk
+    if !args.tarball_path.exists() {
+        if let Some(parent) = args.tarball_path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        println!(
+            "[ksc] downloading tarball to {} (~19 GB; this can take 30..90 min)",
+            args.tarball_path.display()
+        );
+        let t0 = std::time::Instant::now();
+        let client = reqwest::blocking::Client::builder()
+            .user_agent("adam-corpus-acquire/0.1 (https://github.com/qazaq-ai/adam)")
+            .timeout(std::time::Duration::from_secs(60 * 60 * 6))
+            .build()?;
+        let mut resp = client.get(&args.url).send()?.error_for_status()?;
+        let mut tmp = fs::File::create(&args.tarball_path)?;
+        let bytes = std::io::copy(&mut resp, &mut tmp)?;
+        let secs = t0.elapsed().as_secs_f32().max(0.001);
+        println!(
+            "[ksc] downloaded {:.2} GB in {:.1} min ({:.1} MB/s)",
+            bytes as f32 / 1e9,
+            secs / 60.0,
+            (bytes as f32 / 1e6) / secs,
+        );
+    } else {
+        let sz = fs::metadata(&args.tarball_path)?.len();
+        println!("[ksc] using cached tarball ({:.2} GB)", sz as f32 / 1e9);
+    }
+
+    // 2. pass 1 — collect every transcript from .txt entries
+    let mut transcripts: HashMap<String, String> = HashMap::new();
+    {
+        let f = fs::File::open(&args.tarball_path)?;
+        let gz = GzDecoder::new(f);
+        let mut archive = tar::Archive::new(gz);
+        let mut t_count = 0_usize;
+        let mut last_log = std::time::Instant::now();
+        for entry in archive.entries()? {
+            let mut entry = entry?;
+            let path = entry.path()?.into_owned();
+            if entry.header().entry_type().is_dir() {
+                continue;
+            }
+            if !path.to_string_lossy().ends_with(".txt") {
+                continue;
+            }
+            let stem = match path.file_stem().and_then(|s| s.to_str()) {
+                Some(s) => s.to_string(),
+                None => continue,
+            };
+            let mut buf = String::new();
+            entry.read_to_string(&mut buf)?;
+            let transcript = buf.trim().to_string();
+            if transcript.is_empty() {
+                continue;
+            }
+            transcripts.insert(stem, transcript);
+            t_count += 1;
+            if last_log.elapsed().as_secs() >= 30 {
+                println!("[ksc pass 1] {t_count} transcripts collected");
+                last_log = std::time::Instant::now();
+            }
+        }
+        println!("[ksc pass 1] total transcripts: {t_count}");
+    }
+
+    if transcripts.is_empty() {
+        return Err(
+            "ksc: pass 1 found no transcripts (.txt entries) — archive layout may have changed"
+                .into(),
+        );
+    }
+
+    // 3. pass 2 — process audio entries with full transcript map
+    let mut ok = 0_usize;
+    let mut skipped = 0_usize;
+    let mut failed = 0_usize;
+    let mut no_transcript = 0_usize;
+    {
+        let f = fs::File::open(&args.tarball_path)?;
+        let gz = GzDecoder::new(f);
+        let mut archive = tar::Archive::new(gz);
+        let mut last_log = std::time::Instant::now();
+        for entry in archive.entries()? {
+            let mut entry = entry?;
+            let path = entry.path()?.into_owned();
+            if entry.header().entry_type().is_dir() {
+                continue;
+            }
+            if !path.to_string_lossy().ends_with(".flac") {
+                continue;
+            }
+            if args.max > 0 && ok >= args.max {
+                break;
+            }
+            let stem = match path.file_stem().and_then(|s| s.to_str()) {
+                Some(s) => s.to_string(),
+                None => continue,
+            };
+            let label = format!("ksc_{stem}");
+            if already.contains(&label) {
+                skipped += 1;
+                continue;
+            }
+            let transcript = match transcripts.get(&stem) {
+                Some(t) => t.clone(),
+                None => {
+                    no_transcript += 1;
+                    continue;
+                }
+            };
+            let mut bytes = Vec::new();
+            entry.read_to_end(&mut bytes)?;
+            match process_ksc_entry(
+                &stem,
+                bytes,
+                &transcript,
+                &args.source_class,
+                &args.out_dir,
+                &manifest_path,
+                &already,
+                args.save_wav,
+            ) {
+                Ok(Some(())) => ok += 1,
+                Ok(None) => skipped += 1,
+                Err(e) => {
+                    eprintln!("[ksc] FAILED {stem}: {e}");
+                    failed += 1;
+                }
+            }
+            if last_log.elapsed().as_secs() >= 30 {
+                println!(
+                    "[ksc pass 2] {ok} acquired, {skipped} skipped, {failed} failed, {no_transcript} no-transcript"
+                );
+                last_log = std::time::Instant::now();
+            }
+        }
+    }
+    println!(
+        "[ksc] done: {ok} acquired, {skipped} skipped, {failed} failed, {no_transcript} no-transcript"
+    );
+
+    if args.cleanup_tarball {
+        let _ = fs::remove_file(&args.tarball_path);
+        println!(
+            "[ksc] removed cached tarball {}",
+            args.tarball_path.display()
+        );
+    }
+    Ok(())
+}
+
+#[allow(clippy::too_many_arguments)]
+fn process_ksc_entry(
+    stem: &str,
+    bytes: Vec<u8>,
+    transcript: &str,
+    source_class: &str,
+    out_dir: &Path,
+    manifest_path: &Path,
+    already: &HashSet<String>,
+    save_wav: bool,
+) -> Result<Option<()>, Box<dyn std::error::Error>> {
+    let label = format!("ksc_{stem}");
+    if already.contains(&label) {
+        return Ok(None);
+    }
+    let original_bytes = bytes.len() as u64;
+    let pcm = decode::decode_bytes(bytes, "flac")?;
+    let pcm_mono = if pcm.channels > 1 { pcm.to_mono() } else { pcm };
+    let pcm_16k = if pcm_mono.sample_rate != 16_000 {
+        resample::to_16khz(&pcm_mono)?
+    } else {
+        pcm_mono
+    };
+    let (verdict, stats) = quality::check(&pcm_16k, &quality::QualityConfig::default());
+    if verdict != quality::QualityVerdict::Pass {
+        eprintln!(
+            "[ksc]   REJECT {label}: {verdict} (rms={:.4} peak={:.3} dur={:.2}s)",
+            stats.rms, stats.peak, stats.duration_s,
+        );
+        return Ok(None);
+    }
+    let mfcc_seq = adam_audio::mfcc::mfcc(
+        &pcm_16k.data,
+        pcm_16k.sample_rate,
+        &adam_audio::mfcc::MfccConfig::default(),
+    );
+
+    let mfcc_path = out_dir.join("mfcc").join(format!("{label}.bin"));
+    write_mfcc_binary(&mfcc_path, &mfcc_seq)?;
+    let mfcc_size = fs::metadata(&mfcc_path)?.len();
+
+    let (wav_rel, wav_size) = if save_wav {
+        let wav_path = out_dir.join("audio").join(format!("{label}.wav"));
+        adam_audio::wav::write_wav(&wav_path, &pcm_16k)?;
+        let size = fs::metadata(&wav_path)?.len();
+        (
+            wav_path
+                .strip_prefix(out_dir)
+                .unwrap_or(&wav_path)
+                .to_string_lossy()
+                .to_string(),
+            size,
+        )
+    } else {
+        // No WAV — manifest still expects a wav_path string; emit
+        // an empty marker so the absence is explicit.
+        (String::new(), 0)
+    };
+
+    let entry = ManifestEntry {
+        label: label.clone(),
+        source_url: format!("OpenSLR/102/{stem}.flac"),
+        transcript: transcript.to_string(),
+        gender: "unknown".to_string(),
+        source_class: source_class.to_string(),
+        original_bytes,
+        duration_s: pcm_16k.duration_s(),
+        wav_path: wav_rel,
+        wav_bytes: wav_size,
+        mfcc_path: mfcc_path
+            .strip_prefix(out_dir)
+            .unwrap_or(&mfcc_path)
+            .to_string_lossy()
+            .to_string(),
+        mfcc_frames: mfcc_seq.num_frames(),
+        mfcc_bytes: mfcc_size,
+        collected_at: chrono_date(),
+        used_in_bank: false,
+    };
+    append_manifest(manifest_path, &entry)?;
+    Ok(Some(()))
+}

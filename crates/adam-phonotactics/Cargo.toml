@@ -1,0 +1,12 @@
+[package]
+name = "adam-phonotactics"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Phonotactic rules for Kazakh (Layer 0c of the v6.3 phonemic-foundation arc). Vowel-harmony check, syllabification, and native-word validation over phoneme streams from adam-phoneme. The constraint surface for any constrained-decoding LM that will live above this layer."
+
+[dependencies]
+adam-phoneme = { path = "../adam-phoneme" }
+
+[lints]
+workspace = true
