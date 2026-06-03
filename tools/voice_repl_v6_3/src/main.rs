@@ -453,9 +453,26 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // valid and the original form is unambiguously a STT drift
         // (e.g. «менің атом X» → «менің атым X»). See
         // `context_corrections.rs` for the patch list.
-        let user_text_corrected = context_corrections::apply(&user_text_merged);
+        //
+        // **Phase 22 step B (2026-06-03)** — session-aware variant.
+        // When adam's previous reply was «Атыңызды айта аласыз ба?»
+        // (IntroProposal asking for name), we flip on a more
+        // aggressive name-extraction pass that catches a broader set
+        // of Whisper drifts. The flag is kept in `conv.session` so
+        // it survives across the iteration boundary.
+        let awaiting_name = conversation
+            .as_ref()
+            .and_then(|c| c.session.get("voice_awaiting_name"))
+            .is_some();
+        let user_text_corrected =
+            context_corrections::apply_with_context(&user_text_merged, awaiting_name);
         if user_text_corrected != user_text_merged {
-            println!("[voice-repl] context-fix → «{user_text_corrected}»");
+            let tag = if awaiting_name {
+                "context-fix (awaiting-name)"
+            } else {
+                "context-fix"
+            };
+            println!("[voice-repl] {tag} → «{user_text_corrected}»");
         }
         let user_text_merged = user_text_corrected;
 
@@ -605,6 +622,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             (Some(conv), Some((lex, repo)), "respond") => {
                 let reply = conv.turn(&normalised, lex, repo, args.seed);
                 println!("[voice-repl] adam → «{reply}»");
+
+                // **Phase 22 step B (2026-06-03)** — set / clear the
+                // `voice_awaiting_name` session flag based on whether
+                // THIS reply just asked for the user's name. The flag
+                // is read on the NEXT iteration before fuzzy/LM/intent
+                // to drive aggressive name-extraction in
+                // context_corrections::apply_with_context.
+                if context_corrections::reply_asks_for_name(&reply) {
+                    conv.session
+                        .insert("voice_awaiting_name".into(), "1".into());
+                } else {
+                    conv.session.remove("voice_awaiting_name");
+                }
+
                 reply
             }
             _ => user_text,
