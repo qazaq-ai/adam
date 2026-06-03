@@ -123,14 +123,8 @@ impl IntentClassifierRuntime {
                 return None;
             }
         };
-        let lexicon: SegmentationLexicon = match load_json(SEG_ROOTS) {
-            Some(l) => l,
-            None => return None,
-        };
-        let rules: SegmentationRuleSet = match load_json(SEG_RULES) {
-            Some(r) => r,
-            None => return None,
-        };
+        let lexicon: SegmentationLexicon = load_json(SEG_ROOTS)?;
+        let rules: SegmentationRuleSet = load_json(SEG_RULES)?;
 
         println!(
             "[voice-repl] intent classifier: ready (vocab={}, n_intents={}, ckpt={})",

@@ -94,6 +94,7 @@ struct Cli {
 }
 
 #[derive(Deserialize, Debug)]
+#[allow(dead_code)]
 struct ManifestRow {
     label: String,
     transcript: String,
@@ -102,6 +103,7 @@ struct ManifestRow {
     duration_s: f64,
 }
 
+#[allow(dead_code)]
 struct Candidate {
     samples: Vec<f32>,
     sample_rate: u32,
@@ -340,11 +342,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             cands.into_iter().min_by_key(|c| {
                 let n = c.samples.len();
                 if n < min_samples {
-                    min_samples - n
-                } else if n > max_samples {
-                    n - max_samples
+                    min_samples.saturating_sub(n)
                 } else {
-                    0
+                    n.saturating_sub(max_samples)
                 }
             })
         };

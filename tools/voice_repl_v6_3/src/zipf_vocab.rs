@@ -63,6 +63,7 @@ use std::path::Path;
 /// gender words, and explicit identity-markers. Each gets a synth
 /// count of `OVERRIDE_COUNT` so they tie against rank-1000 entries
 /// at most, never beating the genuine top-N.
+#[allow(dead_code)]
 const OVERRIDE_COUNT: u32 = 500;
 const OVERRIDES: &[&str] = &[
     // Honorifics + greetings that may be rare in written corpora
@@ -181,6 +182,7 @@ pub const NAMED_ENTITY_TRIGGERS: &[&str] = &[
 /// corpus-derived Zipf top-N anymore — that caused short-word
 /// regression). The Kazakh name DB is held separately so the
 /// caller can do a context-gated name pass.
+#[allow(dead_code)]
 pub struct ZipfVocab {
     pub entries: Vec<String>,
     pub names: KazakhNameIndex,

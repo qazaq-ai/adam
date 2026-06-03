@@ -101,6 +101,7 @@ struct ManifestRow {
 }
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 struct Candidate {
     samples: Vec<f32>,
     sample_rate: u32,
@@ -254,7 +255,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             if frame_end <= frame_start {
                 continue;
             }
-            let mut sample_start = frame_start * hop_length;
+            let sample_start = frame_start * hop_length;
             let mut sample_end = frame_end * hop_length;
             if sample_end > n_samples_total {
                 sample_end = n_samples_total;
@@ -362,18 +363,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Sample summary.
     eprintln!("[build_morpheme_bank] sample morphemes:");
-    let mut shown = 0_usize;
-    for (k, t) in bank.iter() {
-        if shown >= 25 {
-            break;
-        }
+    for (_shown, (k, t)) in bank.iter().enumerate().take(25) {
         eprintln!(
             "  {:30} samples={:>6} ({:>4}ms)",
             k,
             t.samples.len(),
             t.samples.len() * 1000 / t.sample_rate as usize
         );
-        shown += 1;
     }
 
     if let Some(parent) = cli.out.parent() {

@@ -9,7 +9,14 @@ name: Rust
 # the runner can never block the kernel pipeline.
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      # **2026-06-02** — also run CI on the v6.3 experimental branch
+      # so the merge-readiness state of the next-major arc is visible
+      # in GitHub Actions BEFORE the PR opens against main. Pattern
+      # matches `experimental/v6_*_*` so any future major-version
+      # experimental branch automatically gets CI too.
+      - "experimental/v6_*_*"
   pull_request:
     branches: [main]
   workflow_dispatch:

@@ -206,7 +206,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ingested += 1;
         known_labels.insert(row.label.clone());
 
-        if ingested % 50 == 0 {
+        if ingested.is_multiple_of(50) {
             eprintln!("[ingest_kaz_tili] {ingested} ingested");
         }
     }

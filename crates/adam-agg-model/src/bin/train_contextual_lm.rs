@@ -49,7 +49,6 @@ use adam_agg_model::checkpoint::{CheckpointMeta, load_checkpoint, save_checkpoin
 use adam_agg_model::train::{TrainConfig, train_next_token};
 use burn::backend::Autodiff;
 use burn::backend::ndarray::{NdArray, NdArrayDevice};
-use burn::prelude::*;
 use serde::Deserialize;
 
 type B = Autodiff<NdArray<f32>>;
@@ -58,6 +57,7 @@ const TRAIN_PACK: &str = "data/curated/adam_training_ids_pack.json";
 const VAL_PACK: &str = "data/curated/adam_validation_ids_pack.json";
 
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 struct Sample {
     #[serde(default)]
     id: String,
@@ -123,13 +123,12 @@ fn main() {
             std::fs::read(&path)
                 .ok()
                 .and_then(|b| serde_json::from_slice::<Pack>(&b).ok())
-                .map(|pack| {
+                .inspect(|pack| {
                     eprintln!(
                         "       Dialog pack: {} loaded ({} sequences)",
                         p,
                         pack.samples.len()
                     );
-                    pack
                 })
         })
         .collect();

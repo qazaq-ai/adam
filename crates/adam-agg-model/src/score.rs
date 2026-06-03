@@ -76,9 +76,10 @@ pub fn score_sequence<B: Backend>(
     // training-time padding convention.
     let mut input_buf = vec![0i64; max_seq_len];
     let mut target_buf = vec![0i64; max_seq_len];
-    for i in 0..take - 1 {
-        input_buf[i] = tokens[i];
-        target_buf[i] = tokens[i + 1];
+    if take > 1 {
+        let n = take - 1;
+        input_buf[..n].copy_from_slice(&tokens[..n]);
+        target_buf[..n].copy_from_slice(&tokens[1..take]);
     }
     let scored_positions = take - 1;
 

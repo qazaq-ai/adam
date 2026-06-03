@@ -76,6 +76,9 @@ pub struct NeuralRescorer {
     /// `vocab_size` from the loaded checkpoint config — used as a
     /// sanity check against the BPE vocab so a mis-paired checkpoint
     /// degrades cleanly instead of crashing on tensor shape mismatch.
+    /// Read at load time and validated against the BPE vocab; the
+    /// field is retained for diagnostic introspection.
+    #[allow(dead_code)]
     pub vocab_size: usize,
 }
 

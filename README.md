@@ -58,9 +58,9 @@
   <img src="https://img.shields.io/badge/v6.2%20warm%20p50-917%20ns-2EA44F?style=flat-square" alt="warm latency">
   <img src="https://img.shields.io/badge/v6.2%20core-0%20MB%20%2F%200%20GPU-2EA44F?style=flat-square" alt="v6.2 core">
   <img src="https://img.shields.io/badge/v6.3%20voice%20surface-Whisper%20%2B%20Piper%20%2B%20tiny%20LM-9CCC65?style=flat-square" alt="v6.3 voice">
-  <img src="https://img.shields.io/badge/world%20core-3444%20curated%20%2F%204116%20facts-9CCC65?style=flat-square" alt="world core">
+  <img src="https://img.shields.io/badge/world%20core-3444%20curated%20/%204116%20facts-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/lexicon-25.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
-  <img src="https://img.shields.io/badge/intents-52%20neural%20%2F%20deterministic%20router-2EA44F?style=flat-square" alt="intents">
+  <img src="https://img.shields.io/badge/intents-41%20router%20%2F%2052%20neural%20classifier-2EA44F?style=flat-square" alt="intents">
   <img src="https://img.shields.io/badge/hallucinations%20within%20curated%20domains-0-2EA44F?style=flat-square" alt="hallucinations within curated domains">
 </p>
 

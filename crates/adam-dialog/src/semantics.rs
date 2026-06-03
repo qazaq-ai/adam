@@ -4598,6 +4598,19 @@ fn detect_compliment(tokens: &[String], joined: &str) -> bool {
     if joined.contains("дайынсыз ба") || joined.contains("дайынсың ба") {
         return false;
     }
+    // **2026-06-02** — definitional question shapes («X деген не?»,
+    // «X дегеніміз не?», «X деген сөз», «X деген ұғым») use adjectives
+    // like «ақылды» / «білімді» attributively, NOT as compliments
+    // (e.g. «Ақылды сілтеме деген не?» = «what is a smart pointer?»).
+    // The Rust Book chapter 15 holdout uses exactly this pattern;
+    // pre-fix, «ақылды» triggered Compliment → adam said «рахмет».
+    if joined.contains("деген не")
+        || joined.contains("дегеніміз не")
+        || joined.contains("деген сөз")
+        || joined.contains("деген ұғым")
+    {
+        return false;
+    }
     let triggers = &[
         "жарайсың",
         "жарайсыз",
