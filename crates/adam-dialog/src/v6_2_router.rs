@@ -131,6 +131,24 @@ pub fn answer_with_corpus(input: &str, idx: &FrameIndex) -> Option<String> {
         return Some(r.render());
     }
 
+    // **2026-06-03 voice REPL regression** — «Мен Қостанай қалада
+    // тұрамын» (I live in the city of Қостанай) was being overridden
+    // by the v6_2_router's substring-IsA layer to one-word «Қала»
+    // (city). The v6.1 cascade upstream already detected
+    // StatementOfLocation, updated the session (`session["city"] =
+    // "Қостанай"`), and generated an acknowledgement reply — but
+    // v6_2_router.answer() returning Some("Қала") clobbered it.
+    //
+    // Fix: when the input is a first-person location statement
+    // («Мен … тұрамын / тұрамыз»), return None and let the v6.1
+    // acknowledgement stand. We DON'T need v6.2-side acknowledgement
+    // because the session is already populated; later recall queries
+    // («Мен қайда тұрамын») use that session state via the standard
+    // v6.2 location-recall handler.
+    if looks_like_first_person_location_statement(input) {
+        return None;
+    }
+
     // 1a. Occupation acknowledgement. «Мен X» / «Мен X-мын» —
     // user stating profession / role. The v6.1 cascade interpreted
     // this as a definition request («Бағдарламашы — кәсіп иесі.»),
@@ -872,6 +890,38 @@ fn needs_live_data_refusal(s: &str) -> bool {
         "ойын нәтижесі",
     ];
     markers.iter().any(|m| lower.contains(m))
+}
+
+/// **2026-06-03** — first-person location statement detector. Matches
+/// inputs like «Мен Қостанайда тұрамын» / «Мен Қостанай қалада
+/// тұрамын» / «Біз Алматыда тұрамыз». When this fires, v6_2_router
+/// returns None so the v6.1 cascade's acknowledgement reply stands
+/// (and the city slot in the session is preserved for later recall).
+///
+/// Required marker: a first-person verb form (тұрамын / тұрамыз /
+/// тұрып жатырмын etc.) together with a first-person pronoun
+/// (мен / біз) OR an inflected city (locative ‑да/‑де ‑та/‑те).
+/// This combination is unambiguous: it can only be the user
+/// telling adam where they live, never a query.
+fn looks_like_first_person_location_statement(s: &str) -> bool {
+    let lower = s.to_lowercase();
+    let has_first_person_pronoun = lower.starts_with("мен ")
+        || lower.starts_with("мен.")
+        || lower.starts_with("мен,")
+        || lower.starts_with("мың ")  // common Whisper drift «мен» → «мың»
+        || lower.starts_with("біз ");
+    if !has_first_person_pronoun {
+        return false;
+    }
+    // Look for first-person dwelling verb.
+    let dwelling_verbs = [
+        "тұрамын",
+        "тұрамыз",
+        "тұрам", // colloquial contraction
+        "тұрып жатырмын",
+        "тұрып жатырмыз",
+    ];
+    dwelling_verbs.iter().any(|v| lower.contains(v))
 }
 
 fn looks_like_time_query(s: &str) -> bool {
@@ -1630,6 +1680,62 @@ mod tests {
         let r = answer_with_corpus("Бір сүгіні нешесі болады.", &idx);
         let s = r.expect("space-split бір сүгіні should still route");
         assert!(s.starts_with("Бүрсігүні"), "got: {s}");
+    }
+
+    /// **2026-06-03** — first-person location statement MUST NOT be
+    /// answered by the v6.2 router (the v6.1 cascade upstream handles
+    /// the acknowledgement + session update). Earlier behaviour was
+    /// to return one-word «Қала» (IsA city) because the substring-IsA
+    /// layer caught «қала» before the cascade could acknowledge.
+    /// Multi-session live REPL regression — pinned here permanently.
+    #[test]
+    fn first_person_location_statement_defers_to_v61_cascade() {
+        let idx = dialog_battery::canonical_corpus();
+        // Canonical: «Мен Қостанайда тұрамын».
+        assert!(
+            answer_with_corpus("Мен Қостанайда тұрамын.", &idx).is_none(),
+            "v6.2 must defer to v6.1 cascade for location statements"
+        );
+        // Compound city form: «Мен Қостанай қалада тұрамын».
+        assert!(
+            answer_with_corpus("Мен Қостанай қалада тұрамын.", &idx).is_none(),
+            "compound «city қалада» must also defer"
+        );
+        // Whisper drift: «мен» → «мың».
+        assert!(
+            answer_with_corpus("Мың Қостанай қалада тұрамын.", &idx).is_none(),
+            "Whisper-drifted мен→мың must also defer"
+        );
+        // First-person plural: «Біз Алматыда тұрамыз».
+        assert!(
+            answer_with_corpus("Біз Алматыда тұрамыз.", &idx).is_none(),
+            "first-person plural тұрамыз must also defer"
+        );
+    }
+
+    /// Sanity: the defer rule fires only on first-person dwelling
+    /// verbs combined with мен / біз / мың. «Қала деген не?» (city
+    /// definition) lacks both → must NOT defer.
+    #[test]
+    fn city_definition_query_does_not_match_defer_rule() {
+        assert!(!looks_like_first_person_location_statement(
+            "Қала деген не?"
+        ));
+        assert!(!looks_like_first_person_location_statement(
+            "Қостанай қандай қала?"
+        ));
+        // First-person without dwelling verb → also no defer.
+        assert!(!looks_like_first_person_location_statement("Мен оқимын."));
+        // Positive control: the defer cases do match.
+        assert!(looks_like_first_person_location_statement(
+            "Мен Қостанайда тұрамын."
+        ));
+        assert!(looks_like_first_person_location_statement(
+            "Мың Қостанай қалада тұрамын."
+        ));
+        assert!(looks_like_first_person_location_statement(
+            "Біз Алматыда тұрамыз."
+        ));
     }
 
     /// Real biographical question → realised Kazakh sentence.

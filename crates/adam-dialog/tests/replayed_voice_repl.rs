@@ -227,6 +227,16 @@ const BATTERY: &[ReplayCase] = &[
         expects_substring: "назарбаев",
         session: 6,
     },
+    // ── Session 7 (2026-06-03, post-v6.3.0-rc4 live audit) ──
+    // Bug B-4: «Мен Қостанай қалада тұрамын» → adam returned the
+    // one-word «Қала» (IsA city). The fix lives in v6_2_router:
+    // `looks_like_first_person_location_statement` makes the router
+    // return None on these inputs so the upstream v6.1 cascade
+    // acknowledges. That defer is exercised by the dedicated unit
+    // test `first_person_location_statement_defers_to_v61_cascade`
+    // in v6_2_router.rs — adding it to this battery would test the
+    // wrong layer (replay battery hits v6_2_router::answer directly
+    // and expects Some(_), but defer means None).
 ];
 
 /// Replay battery — every case must produce an answer
