@@ -51,6 +51,7 @@
 //! and `pcm_templates.bin` (PCM for TTS) when present. Both
 //! are merged with synth fallback covering uncovered phonemes.
 
+mod context_corrections;
 mod intent_classifier_runtime;
 mod neural_override;
 mod neural_rescorer;
@@ -445,6 +446,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         if user_text_merged != user_text {
             println!("[voice-repl] split-merge → «{user_text_merged}»");
         }
+
+        // **Phase 22 step A (2026-06-03)** — context-aware STT
+        // corrections. Pre-step before fuzzy/LM/intent. Codifies live
+        // REPL findings where the corrected form is grammatically
+        // valid and the original form is unambiguously a STT drift
+        // (e.g. «менің атом X» → «менің атым X»). See
+        // `context_corrections.rs` for the patch list.
+        let user_text_corrected = context_corrections::apply(&user_text_merged);
+        if user_text_corrected != user_text_merged {
+            println!("[voice-repl] context-fix → «{user_text_corrected}»");
+        }
+        let user_text_merged = user_text_corrected;
 
         let fuzzy_out = if args.mode == "respond" {
             fuzzy_normalise(&user_text_merged, &zipf_vocab)

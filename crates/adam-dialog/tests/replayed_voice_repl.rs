@@ -206,6 +206,27 @@ const BATTERY: &[ReplayCase] = &[
         expects_substring: "90.5",
         session: 1,
     },
+    // ── Session 6 (2026-06-03, post-v6.3.0-rc2 live audit) ──
+    // Bug B-3: «Қазір қазақстанның президенті кім?» was routing to
+    // the clock handler because substring «қазір» fired
+    // looks_like_time_query before the president check. Fix:
+    // looks_like_time_query now defers when input contains a clear
+    // entity marker (президент / премьер / etc.).
+    ReplayCase {
+        input: "Қазір қазақстанның президенті кім?",
+        expects_substring: "тоқаев",
+        session: 6,
+    },
+    ReplayCase {
+        input: "Қазір кім қазақстанның президенті?",
+        expects_substring: "тоқаев",
+        session: 6,
+    },
+    ReplayCase {
+        input: "Қазақстанның бірінші президенті кім болды.",
+        expects_substring: "назарбаев",
+        session: 6,
+    },
 ];
 
 /// Replay battery — every case must produce an answer

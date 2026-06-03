@@ -876,6 +876,24 @@ fn needs_live_data_refusal(s: &str) -> bool {
 
 fn looks_like_time_query(s: &str) -> bool {
     let lower = s.to_lowercase();
+    // **2026-06-03 voice REPL regression** — «Қазір қазақстанның
+    // президенті кім?» was incorrectly routed to the clock handler
+    // because the leading «қазір» triggered this matcher BEFORE the
+    // president check downstream. When the input clearly names another
+    // entity (президент / премьер / спикер / etc.), the «now» word is
+    // a tense marker for that entity, not a time question. Defer.
+    let entity_markers = [
+        "президент",
+        "премьер",
+        "министр",
+        "спикер",
+        "әкім",
+        "elbasy",
+        "елбасы",
+    ];
+    if entity_markers.iter().any(|m| lower.contains(m)) {
+        return false;
+    }
     let markers = [
         "бүгін",
         "қазір",
