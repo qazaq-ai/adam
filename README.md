@@ -52,7 +52,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/tests-1477%20passing%20%2F%201%20red-FBC02D?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-2339%20passing%20%2F%200%20failed%20%2F%2027%20ignored-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/dialog%20battery-79%2F79%20must--pass-2EA44F?style=flat-square" alt="dialog battery">
   <img src="https://img.shields.io/badge/v6.2%20warm%20p50-917%20ns-2EA44F?style=flat-square" alt="warm latency">
   <img src="https://img.shields.io/badge/v6.2%20core-0%20MB%20%2F%200%20GPU-2EA44F?style=flat-square" alt="v6.2 core">
@@ -131,8 +131,8 @@ CPU core, with **0 MB model loaded**.
   language-tag filter for same-root same-domain ambiguity
   («гравитация» / «фотосинтез» / «днк» KZ vs RU).
 - **Stage 7.1 — `corpus_loader`** — `load_world_core(path)`
-  reads `data/world_core/*.jsonl`. **66 files → 3461 entries →
-  4044 frames → 0 dropped**.
+  reads `data/world_core/*.jsonl`. **65 files → 3 444 entries →
+  4 116 facts → 0 dropped** (v6.3.0-rc2 live counts).
 - **Stage 7.2 — `realiser`** — typed `Frame → Kazakh surface`.
   Pure function. Every v6.1 NLG rule family expressible.
 - **Stage 7.3 — `system_clock`** — OS wall-clock provider with
@@ -350,7 +350,7 @@ For a full evidence dump on any Kazakh root, run [`adam_inspect`](crates/adam-di
 
 | Metric | Value | Notes |
 |---|---|---|
-| Workspace tests | **1 904 passing** | default + `--features neural` builds both green; v6.2.0 adds 169 (algebra + router + integration); v5.x release-blocker invariants preserved |
+| Workspace tests | **2 339 passing / 0 failed / 27 ignored** | v6.3.0-rc2 on M2 (`cargo test --release --workspace --locked`); v6.2.0 had 1 904 passing — v6.3 added voice REPL + neural intent classifier + replay battery + Phase 21 calendar tests |
 | Release cadence | **540+ versioned releases since 2026-04-07** | every release CI-verified |
 | v6.2 dialog battery | **79/79 must-pass, 0 gaps** | 14 real-Kazakh domains; CI quality gate via `dialog_battery_meets_quality_gate` |
 | v6.2 warm p50 latency (release, M2 single core) | **791 ns** (full dialog) / **274 ns** (Stage 3) | vs LLM ~100ms — ≈ 126 000× faster |
@@ -465,7 +465,7 @@ See [`data/README.md`](data/README.md) for a top-level map of `data/`, and per-s
 
 - **Probabilistic / LLM-style free generation** — every response is a curated fact retrieved via `FrameIndex` (v6.2) or a template realisation / verbatim corpus quote / rule derivation (v6.1). Nothing invented.
 - **Multilingual input** — Russian queries work for terms whose surface differs from Kazakh (`«вода» / «скорость света» / «столица казахстана»`); same-root same-domain bilingual ambiguity is resolved via `language_filter`. Other languages are research-direction, not currently shipped.
-- **Trained neural LM components in the answer path** — small ML lives inside the kernel as inspectable layers (selection weights, suffix priors, PMI, E1 intent classifier); no transformer, no embeddings, no free generation. Stage 6 (closed-set neural components) is design-only as of v6.2.0.
+- **Trained neural LM components in the answer path** — the dialog core stays rule-based: selection weights, suffix priors, PMI, E1 intent classifier; no transformer in the answer path, no free generation. **v6.3 ships closed-set neural components at the speech surface only** (Whisper.cpp STT + Piper TTS + ~1 M-param contextual LM rescorer + ~1 M-param BPE intent classifier in `tools/voice_repl_v6_3`) — they normalise audio ↔ text around the deterministic core; they never invent facts. The Stage 6 in-kernel neural layer of the v6.0 design doc remains unshipped.
 - **Cloud platform work** — adam runs as a single offline binary.
 
 ### Graph-First Policy

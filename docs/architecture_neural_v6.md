@@ -1,12 +1,26 @@
 # adam v6.0 — neural-enabled architecture reference
 
-**Status:** SPECIFICATION (not yet implemented in `main`). Target
-release: v6.0.0. Branch of record: `experimental/agglutinative-neural`.
-**Implementation note for v6.0.0:** the neural stack is present as
+> ⚠️ **Historical design document (v6.0.0 spec).** Drafted before
+> v6.0.0 shipped. The L5.5 in-kernel neural composition layer it
+> describes was **never wired into the production dialog turn loop**
+> on `main`. v6.0.0 → v6.2.0 shipped the deterministic core only;
+> v6.3.0-rc2 ships closed-set neural components **at the speech
+> surface** (Whisper STT, Piper TTS, ~1 M-param contextual LM
+> rescorer, ~1 M-param BPE intent classifier — all in
+> `tools/voice_repl_v6_3`), NOT inside the answer path.
+> See [`../CHANGELOG.md`](../CHANGELOG.md) § 6.0.0 → 6.3.0 and
+> [`../DUE_DILIGENCE.md`](../DUE_DILIGENCE.md) for the actual
+> shipped state. This file remains as a record of the original
+> v6.0 design intent.
+
+**Status:** SPECIFICATION (in-kernel L5.5 never shipped to `main`).
+Original target release: v6.0.0. Original branch of record:
+`experimental/agglutinative-neural`.
+**Implementation note for v6.0.0:** the neural stack was present as
 an opt-in preview surface (`--features neural`, `--neural-model`, and
 the `/neural` slash command). Automatic L5.5 composition inside the
-normal dialog turn loop remains deferred to v6.0.5+; the deterministic
-v5.x path stays the default runtime path.
+normal dialog turn loop remains unimplemented; the deterministic
+v5.x → v6.2 path stays the default runtime path on `main`.
 **Audience:** every developer, partner, and downstream system that
 needs to know how the v6.0 neural layer fits into the deterministic
 kernel without breaking the v3.0–v5.x guarantees.
