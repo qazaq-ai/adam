@@ -970,12 +970,26 @@ fn lookup_chemical_formula(input: &str) -> Option<String> {
         ("аммиак", "Аммиактың", "NH₃"),
         ("озон", "Озонның", "O₃"),
         ("гипс", "Гипстің", "CaSO₄·2H₂O"),
+        // **Phase 23.A (2026-06-03)** — Whisper-drift compound names
+        // observed in live REPL. Listed BEFORE single-word elements
+        // so the drift form wins length-priority.
+        ("қуқырт қышқыл", "Күкірт қышқылының", "H₂SO₄"),
+        ("құрқырт қышқыл", "Күкірт қышқылының", "H₂SO₄"),
+        ("куркурт қышқыл", "Күкірт қышқылының", "H₂SO₄"),
         // ── Single-word substances / elements (shorter, lower priority) ──
         ("көмірқышқыл", "Көмірқышқыл газының", "CO₂"),
         ("сутегі", "Сутегінің", "H₂"),
         ("сутек", "Сутегінің", "H₂"),
         ("оттегі", "Оттегінің", "O₂"),
         ("оттек", "Оттегінің", "O₂"),
+        // **Phase 23.A** — Whisper drifts of «оттегі»: single-т
+        // «отегі», token-split «о тегі» / «ө тегі».
+        ("отегі", "Оттегінің", "O₂"),
+        ("о тегі", "Оттегінің", "O₂"),
+        ("ө тегі", "Оттегінің", "O₂"),
+        // **Phase 23.A** — sulfur element + Whisper drift.
+        ("күкірт", "Күкірттің", "S"),
+        ("қуқырт", "Күкірттің", "S"),
         ("азот", "Азоттың", "N₂"),
         ("алтын", "Алтынның", "Au"),
         ("күміс", "Күмістің", "Ag"),
@@ -1984,6 +1998,32 @@ mod tests {
             lookup_chemical_formula("Қышбылдықтың формуласы қандай?"),
             None
         );
+    }
+
+    /// **Phase 23.A (2026-06-03)** — Whisper-drift coverage for the
+    /// chemistry-formula table. Live REPL caught 3 drifts the rc7
+    /// table missed: single-т «отегі», token-split «о тегі» / «ө
+    /// тегі», and «қуқырт» for «күкірт». Pinned here.
+    #[test]
+    fn oxygen_drift_single_t() {
+        assert_eq!(
+            lookup_chemical_formula("Отегінің формулысы."),
+            Some("Оттегінің формуласы — O₂.".to_string())
+        );
+    }
+
+    #[test]
+    fn oxygen_drift_token_split() {
+        let r = lookup_chemical_formula("Ө тегінің формулысы.");
+        assert_eq!(r.as_deref(), Some("Оттегінің формуласы — O₂."));
+        let r = lookup_chemical_formula("О тегінің формулысы.");
+        assert_eq!(r.as_deref(), Some("Оттегінің формуласы — O₂."));
+    }
+
+    #[test]
+    fn sulfuric_acid_drift_qukyrt() {
+        let r = lookup_chemical_formula("Қуқырт қышқылының формулысы.");
+        assert_eq!(r.as_deref(), Some("Күкірт қышқылының формуласы — H₂SO₄."));
     }
 
     /// **rc5-followup (2026-06-03 evening)** — Whisper-drift fallback.

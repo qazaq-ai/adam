@@ -264,6 +264,25 @@ const BATTERY: &[ReplayCase] = &[
         expects_substring: "nacl",
         session: 8,
     },
+    // ── Session 9 (2026-06-03 evening, post-rc7 Phase 23.A audit) ──
+    // 3 new chemistry-formula Whisper drifts caught in live REPL.
+    // The rc7 table missed all three (single-т oxygen, token-split
+    // oxygen, sulfur-acid drift). Phase 23.A fills the gaps.
+    ReplayCase {
+        input: "Отегінің формулысы.",
+        expects_substring: "o₂",
+        session: 9,
+    },
+    ReplayCase {
+        input: "Ө тегінің формулысы.",
+        expects_substring: "o₂",
+        session: 9,
+    },
+    ReplayCase {
+        input: "Қуқырт қышқылының формулысы.",
+        expects_substring: "h₂so₄",
+        session: 9,
+    },
 ];
 
 /// Replay battery — every case must produce an answer
