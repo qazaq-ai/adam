@@ -898,30 +898,86 @@ fn needs_live_data_refusal(s: &str) -> bool {
 /// returns None so the v6.1 cascade's acknowledgement reply stands
 /// (and the city slot in the session is preserved for later recall).
 ///
-/// Required marker: a first-person verb form (тұрамын / тұрамыз /
-/// тұрып жатырмын etc.) together with a first-person pronoun
-/// (мен / біз) OR an inflected city (locative ‑да/‑де ‑та/‑те).
-/// This combination is unambiguous: it can only be the user
-/// telling adam where they live, never a query.
+/// **rc5-followup (2026-06-03 evening)** — initial implementation
+/// enumerated «тұрамын» / «тұрамыз» / «тұрам» literally. Live REPL
+/// caught «Мен қостанай атырамым» — Whisper drifted «тұрамын» to
+/// «атырамым» AND stripped the locative `‑да` from the city. Neither
+/// substring matched the canonical list, so the router fell through
+/// to the «Қала» IsA reply again. Fix: keep the canonical-verb fast
+/// path AND add a morphological fallback that pairs a 1sg/1pl verb
+/// suffix (`‑мын` / `‑мыз` / `‑мым` / `‑мім` / `‑міз`) with a city
+/// marker (either a known Kazakhstan oblast-centre stem or a
+/// locative-suffixed noun ≥ 5 chars).
 fn looks_like_first_person_location_statement(s: &str) -> bool {
     let lower = s.to_lowercase();
     let has_first_person_pronoun = lower.starts_with("мен ")
         || lower.starts_with("мен.")
         || lower.starts_with("мен,")
-        || lower.starts_with("мың ")  // common Whisper drift «мен» → «мың»
+        || lower.starts_with("мың ")
         || lower.starts_with("біз ");
     if !has_first_person_pronoun {
         return false;
     }
-    // Look for first-person dwelling verb.
-    let dwelling_verbs = [
+    // Fast path — canonical dwelling verbs that survived STT.
+    let canonical_verbs = [
         "тұрамын",
         "тұрамыз",
-        "тұрам", // colloquial contraction
+        "тұрам",
         "тұрып жатырмын",
         "тұрып жатырмыз",
     ];
-    dwelling_verbs.iter().any(|v| lower.contains(v))
+    if canonical_verbs.iter().any(|v| lower.contains(v)) {
+        return true;
+    }
+    // Whisper-drift fallback — 1p verb morphology + city marker.
+    let tokens: Vec<String> = lower
+        .split_whitespace()
+        .map(|t| t.trim_end_matches([',', '.', '!', '?']).to_string())
+        .collect();
+    let has_first_person_verb = tokens.iter().any(|t| {
+        t.len() >= 5
+            && (t.ends_with("мын")
+                || t.ends_with("мыз")
+                || t.ends_with("мым")
+                || t.ends_with("мім")
+                || t.ends_with("міз"))
+    });
+    if !has_first_person_verb {
+        return false;
+    }
+    // Recognised KZ oblast-centre stems (prefix-match catches every
+    // case-inflected form — `қостанайда`, `қостанайдан`, even the
+    // Whisper-drifted accusative «қостанайды»).
+    let known_city_stems = [
+        "алматы",
+        "астана",
+        "нұр-сұлтан",
+        "қостанай",
+        "костанай",
+        "шымкент",
+        "ақтөбе",
+        "тараз",
+        "өскемен",
+        "семей",
+        "павлодар",
+        "атырау",
+        "ақтау",
+        "орал",
+        "талдықорған",
+        "көкшетау",
+        "петропавл",
+        "қызылорда",
+        "жезқазған",
+        "темиртау",
+    ];
+    let has_known_city = tokens
+        .iter()
+        .any(|t| known_city_stems.iter().any(|c| t.starts_with(c)));
+    let has_locative_noun = tokens.iter().any(|t| {
+        t.len() >= 5
+            && (t.ends_with("да") || t.ends_with("де") || t.ends_with("та") || t.ends_with("те"))
+    });
+    has_known_city || has_locative_noun
 }
 
 fn looks_like_time_query(s: &str) -> bool {
@@ -1735,6 +1791,40 @@ mod tests {
         ));
         assert!(looks_like_first_person_location_statement(
             "Біз Алматыда тұрамыз."
+        ));
+    }
+
+    /// **rc5-followup (2026-06-03 evening)** — Whisper-drift fallback.
+    /// Live REPL hit «Мен қостанай атырамым» — the dwelling verb
+    /// «тұрамын» was mistranscribed as «атырамым» AND the locative
+    /// `‑да` was dropped from the city. Neither the canonical-verb
+    /// fast path nor the locative-noun marker matched. The fallback
+    /// must catch this via the 1p verb suffix + known-city stem.
+    #[test]
+    fn first_person_location_drift_via_morphology_fallback() {
+        // Live REPL transcript verbatim.
+        assert!(
+            looks_like_first_person_location_statement("Мен қостанай атырамым."),
+            "must catch «тұрамын» → «атырамым» drift"
+        );
+        // Same drift, with accusative city marker.
+        assert!(looks_like_first_person_location_statement(
+            "Мен қостанайды атырамым."
+        ));
+        // Drift in the verb only — locative survived.
+        assert!(looks_like_first_person_location_statement(
+            "Мен қостанайда атырамым."
+        ));
+        // First-person plural drift.
+        assert!(looks_like_first_person_location_statement(
+            "Біз алматыда атырамыз."
+        ));
+        // Negative control: 1p verb without any city marker is NOT
+        // a location statement (e.g. «I am thinking»).
+        assert!(!looks_like_first_person_location_statement("Мен ойлаймын."));
+        // Negative control: city mentioned but not a 1p statement.
+        assert!(!looks_like_first_person_location_statement(
+            "Қостанай қандай қала?"
         ));
     }
 
