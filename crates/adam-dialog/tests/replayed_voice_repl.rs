@@ -237,6 +237,33 @@ const BATTERY: &[ReplayCase] = &[
     // in v6_2_router.rs — adding it to this battery would test the
     // wrong layer (replay battery hits v6_2_router::answer directly
     // and expects Some(_), but defer means None).
+    //
+    // ── Session 8 (2026-06-03, post-v6.3.0-rc6 — Phase 23) ──
+    // Bug B-2: «Судың формуласын жазып бер» → adam returned «Жансыз
+    // табиғат» (IsA fallback on «су»).  Phase 23 added a chemistry-
+    // formula lookup table to v6_2_router that fires BEFORE the IsA
+    // fallback.  These cases pin the canonical school-curriculum
+    // formula queries.
+    ReplayCase {
+        input: "Судың формуласын жазып бер.",
+        expects_substring: "h₂o",
+        session: 8,
+    },
+    ReplayCase {
+        input: "Судың химия формуласын жаз.",
+        expects_substring: "h₂o",
+        session: 8,
+    },
+    ReplayCase {
+        input: "Көмірқышқыл газының формуласы қандай?",
+        expects_substring: "co₂",
+        session: 8,
+    },
+    ReplayCase {
+        input: "Ас тұзының формуласы қандай?",
+        expects_substring: "nacl",
+        session: 8,
+    },
 ];
 
 /// Replay battery — every case must produce an answer

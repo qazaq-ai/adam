@@ -149,6 +149,17 @@ pub fn answer_with_corpus(input: &str, idx: &FrameIndex) -> Option<String> {
         return None;
     }
 
+    // **Phase 23 (2026-06-03)** — chemistry-formula lookup. Live REPL
+    // (multi-session) caught «Судың формуласын жазып бер» falling
+    // through to the substring-IsA layer that returns «Жансыз табиғат»
+    // (the `Су IsA жансыз табиғат` fact wins over the chemistry-formula
+    // intent). Hardcoded school-level formula table fires BEFORE the
+    // IsA fallback. Requires the «формула» word in the input to avoid
+    // false positives on bare substance mentions.
+    if let Some(answer) = lookup_chemical_formula(input) {
+        return Some(answer);
+    }
+
     // 1a. Occupation acknowledgement. «Мен X» / «Мен X-мын» —
     // user stating profession / role. The v6.1 cascade interpreted
     // this as a definition request («Бағдарламашы — кәсіп иесі.»),
@@ -890,6 +901,114 @@ fn needs_live_data_refusal(s: &str) -> bool {
         "ойын нәтижесі",
     ];
     markers.iter().any(|m| lower.contains(m))
+}
+
+/// **Phase 23 (2026-06-03)** — school-level chemistry formula lookup.
+///
+/// Returns `Some("Cудың формуласы — H₂O.")` when the input matches
+/// «<substance> формуласы / формуласын / формула» pattern, where
+/// `<substance>` is one of ~40 hardcoded school-curriculum chemicals.
+/// Returns `None` otherwise.
+///
+/// Why hardcoded, not a `HasFormula` predicate in world_core:
+///   1. The Predicate enum is closed-set; adding one touches 5+ files
+///      and migrates none of the existing 138 chemistry_school.jsonl
+///      entries (they don't carry formulas).
+///   2. School-level formula set is closed (~30-50 substances).
+///      Hardcoded table is the right shape for this scope.
+///   3. False-positive risk minimal: the «формула» marker keyword is
+///      required, so bare substance mentions don't fire this handler.
+///
+/// Multi-session live REPL caught:
+///   - «Судың формуласын жазып бер.» (the canonical case)
+///   - «Судың химия формуласын жаз.» (with «химия» qualifier)
+///   - «Тұздың формуласы қандай?»
+fn lookup_chemical_formula(input: &str) -> Option<String> {
+    let lower = input.to_lowercase();
+    // Required marker: the word «формула» (or a Whisper drift of it).
+    // Without this, bare substance mentions like «су» would false-fire.
+    let has_formula_marker = lower.contains("формула")
+        || lower.contains("формуласы")
+        || lower.contains("формуласын")
+        || lower.contains("формуласыз")  // possessive case variants
+        || lower.contains("формулыс"); // common Whisper drift
+    if !has_formula_marker {
+        return None;
+    }
+
+    // (kazakh_stem, display_subject, formula).  Stems are prefix-matched
+    // so every case-inflected form (-ның / -нің / -дың / -дің) is
+    // caught without explicit enumeration.  Ordered longest-first so
+    // «көмірқышқыл газы» wins over bare «газ» etc.
+    let formulas: &[(&str, &str, &str)] = &[
+        // ── Compound names (must come BEFORE element single words) ──
+        ("көмірқышқыл газы", "Көмірқышқыл газының", "CO₂"),
+        ("көмір қышқыл газы", "Көмірқышқыл газының", "CO₂"),
+        ("күкірт қышқылы", "Күкірт қышқылының", "H₂SO₄"),
+        ("тұз қышқылы", "Тұз қышқылының", "HCl"),
+        ("азот қышқылы", "Азот қышқылының", "HNO₃"),
+        ("сірке қышқылы", "Сірке қышқылының", "CH₃COOH"),
+        ("лимон қышқылы", "Лимон қышқылының", "C₆H₈O₇"),
+        ("ас тұзы", "Ас тұзының", "NaCl"),
+        ("ас содасы", "Ас содасының", "NaHCO₃"),
+        ("асхана тұзы", "Асхана тұзының", "NaCl"),
+        ("кальций оксиді", "Кальций оксидінің", "CaO"),
+        ("кальций карбонаты", "Кальций карбонатының", "CaCO₃"),
+        ("натрий гидроксиді", "Натрий гидроксидінің", "NaOH"),
+        ("натрий бикарбонаты", "Натрий бикарбонатының", "NaHCO₃"),
+        ("мыс сульфаты", "Мыс сульфатының", "CuSO₄"),
+        ("көк тас", "Көк тастың", "CuSO₄"),
+        ("әк тас", "Әк тастың", "CaCO₃"),
+        ("аммоний хлориді", "Аммоний хлоридінің", "NH₄Cl"),
+        ("темір тотығы", "Темір тотығының", "Fe₂O₃"),
+        ("угар газ", "Угар газының", "CO"),
+        ("сахароза", "Сахарозаның", "C₁₂H₂₂O₁₁"),
+        ("глюкоза", "Глюкозаның", "C₆H₁₂O₆"),
+        ("этанол", "Этанолдың", "C₂H₅OH"),
+        ("этил спирті", "Этил спиртінің", "C₂H₅OH"),
+        ("метан", "Метанның", "CH₄"),
+        ("аммиак", "Аммиактың", "NH₃"),
+        ("озон", "Озонның", "O₃"),
+        ("гипс", "Гипстің", "CaSO₄·2H₂O"),
+        // ── Single-word substances / elements (shorter, lower priority) ──
+        ("көмірқышқыл", "Көмірқышқыл газының", "CO₂"),
+        ("сутегі", "Сутегінің", "H₂"),
+        ("сутек", "Сутегінің", "H₂"),
+        ("оттегі", "Оттегінің", "O₂"),
+        ("оттек", "Оттегінің", "O₂"),
+        ("азот", "Азоттың", "N₂"),
+        ("алтын", "Алтынның", "Au"),
+        ("күміс", "Күмістің", "Ag"),
+        ("сынап", "Сынаптың", "Hg"),
+        ("қорғасын", "Қорғасынның", "Pb"),
+        ("мырыш", "Мырыштың", "Zn"),
+        ("алюминий", "Алюминийдің", "Al"),
+        ("кальций", "Кальцийдің", "Ca"),
+        ("магний", "Магнийдің", "Mg"),
+        ("натрий", "Натрийдің", "Na"),
+        ("калий", "Калийдің", "K"),
+        ("темір", "Темірдің", "Fe"),
+        ("мыс", "Мыстың", "Cu"),
+        ("спирт", "Этил спиртінің", "C₂H₅OH"),
+        ("қант", "Сахарозаның", "C₁₂H₂₂O₁₁"),
+        ("тұз", "Ас тұзының", "NaCl"),
+        ("сода", "Ас содасының", "NaHCO₃"),
+        ("әк", "Кальций оксидінің", "CaO"),
+        // ── Water (lowest priority — «су» is so short it must lose
+        // to all longer matches above; placed last for stem search). ──
+        ("судың", "Судың", "H₂O"),
+        ("суды", "Судың", "H₂O"),
+        ("суға", "Судың", "H₂O"),
+        ("суда", "Судың", "H₂O"),
+        ("су ", "Судың", "H₂O"),
+    ];
+
+    for (stem, display, formula) in formulas {
+        if lower.contains(stem) {
+            return Some(format!("{display} формуласы — {formula}."));
+        }
+    }
+    None
 }
 
 /// **2026-06-03** — first-person location statement detector. Matches
@@ -1792,6 +1911,79 @@ mod tests {
         assert!(looks_like_first_person_location_statement(
             "Біз Алматыда тұрамыз."
         ));
+    }
+
+    /// **Phase 23 (2026-06-03)** — chemistry-formula lookup.  Pins
+    /// the school-curriculum formulas plus the live-REPL transcripts
+    /// that surfaced this gap.
+    #[test]
+    fn water_formula_lookup() {
+        assert_eq!(
+            lookup_chemical_formula("Судың формуласын жазып бер."),
+            Some("Судың формуласы — H₂O.".to_string())
+        );
+        assert_eq!(
+            lookup_chemical_formula("Судың химия формуласын жаз."),
+            Some("Судың формуласы — H₂O.".to_string())
+        );
+        assert_eq!(
+            lookup_chemical_formula("Су формуласы қандай?"),
+            Some("Судың формуласы — H₂O.".to_string())
+        );
+    }
+
+    #[test]
+    fn salt_formula_lookup() {
+        assert_eq!(
+            lookup_chemical_formula("Тұздың формуласы қандай?"),
+            Some("Ас тұзының формуласы — NaCl.".to_string())
+        );
+        assert_eq!(
+            lookup_chemical_formula("Ас тұзының формуласы қандай?"),
+            Some("Ас тұзының формуласы — NaCl.".to_string())
+        );
+    }
+
+    #[test]
+    fn longest_match_wins_for_compounds() {
+        // «көмірқышқыл газы» must win over bare «газ» / «көмірқышқыл».
+        let r = lookup_chemical_formula("Көмірқышқыл газының формуласы қандай?");
+        assert_eq!(r.as_deref(), Some("Көмірқышқыл газының формуласы — CO₂."));
+        // «күкірт қышқылы» must win over «күкірт» (if it were in the
+        // list separately).
+        let r = lookup_chemical_formula("Күкірт қышқылының формуласы қандай?");
+        assert_eq!(r.as_deref(), Some("Күкірт қышқылының формуласы — H₂SO₄."));
+    }
+
+    #[test]
+    fn element_formulas_oxygen_hydrogen() {
+        assert_eq!(
+            lookup_chemical_formula("Оттегінің формуласы қандай?"),
+            Some("Оттегінің формуласы — O₂.".to_string())
+        );
+        assert_eq!(
+            lookup_chemical_formula("Сутегінің формуласы қандай?"),
+            Some("Сутегінің формуласы — H₂.".to_string())
+        );
+    }
+
+    #[test]
+    fn no_formula_marker_no_fire() {
+        // Bare substance mention without «формула» must NOT fire.
+        // «Су ішемін» (I drink water) — no chemistry intent.
+        assert_eq!(lookup_chemical_formula("Су ішемін."), None);
+        assert_eq!(lookup_chemical_formula("Қаладан су әкел."), None);
+        // «Тұзды бер» (pass the salt) — no formula query.
+        assert_eq!(lookup_chemical_formula("Тұзды бер."), None);
+    }
+
+    #[test]
+    fn unknown_substance_returns_none() {
+        // Some substance the table doesn't cover.
+        assert_eq!(
+            lookup_chemical_formula("Қышбылдықтың формуласы қандай?"),
+            None
+        );
     }
 
     /// **rc5-followup (2026-06-03 evening)** — Whisper-drift fallback.
