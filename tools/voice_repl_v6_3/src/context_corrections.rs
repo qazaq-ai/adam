@@ -98,6 +98,49 @@ pub fn apply_with_context(input: &str, awaiting_name: bool) -> String {
         return rewrite_word(input, "атом ", "атың ");
     }
 
+    // **Phase 22.C (2026-06-03 evening)** — accusative→locative city
+    // case suffix normalization. Live REPL caught «Мен Қостанайды
+    // тұрамын» — Whisper drifted the locative `‑да` to accusative
+    // `‑ды` («Where in X I live» → «X-acc I live»). The v6.1
+    // StatementOfLocation parser only recognises the locative form,
+    // so the accusative-drifted input fell through to the generic
+    // clarification fallback («Сұрағыңызды толық түсінбедім»).
+    //
+    // When the input clearly looks like a first-person dwelling
+    // statement (мен/менің + known KZ city + тұрамын) AND the city
+    // carries the accusative suffix, rewrite the suffix to locative.
+    // Same length, preserves casing for the rest of the input.
+    if (lower.starts_with("мен ") || lower.starts_with("менім ")) && lower.contains("тұрамын")
+    {
+        let cities = [
+            ("қостанайды", "қостанайда"),
+            ("алматыны", "алматыда"),
+            ("астананы", "астанада"),
+            ("шымкентті", "шымкентте"),
+            ("ақтөбені", "ақтөбеде"),
+            ("таразды", "таразда"),
+            ("өскеменді", "өскеменде"),
+            ("семейді", "семейде"),
+            ("павлодарды", "павлодарда"),
+            ("атырауды", "атырауда"),
+            ("ақтауды", "ақтауда"),
+            ("оралды", "оралда"),
+            ("қызылорданы", "қызылордада"),
+            ("көкшетауды", "көкшетауда"),
+            ("петропавлды", "петропавлда"),
+            ("жезқазғанды", "жезқазғанда"),
+            ("темиртауды", "темиртауда"),
+            ("талдықорғанды", "талдықорғанда"),
+        ];
+        for (acc_form, loc_form) in cities {
+            if lower.contains(acc_form) {
+                // Case-insensitive replace preserves the rest of the
+                // original input; we just normalise the city suffix.
+                return rewrite_word(input, acc_form, loc_form);
+            }
+        }
+    }
+
     input.to_string()
 }
 
@@ -299,5 +342,36 @@ mod tests {
         assert!(!reply_asks_for_name(
             "Қазақстанның бірінші Президенті — Назарбаев."
         ));
+    }
+
+    // ── Phase 22.C — accusative → locative city rewrite ──
+
+    #[test]
+    fn rewrites_accusative_kostanay_to_locative() {
+        // Live REPL transcript: «Мен қостанайды тұрамын.» — Whisper
+        // drifted -да (locative) to -ды (accusative). The v6.1
+        // StatementOfLocation parser only recognises locative;
+        // rewriting here lets it acknowledge.
+        let out = apply("Мен қостанайды тұрамын.");
+        assert_eq!(out, "Мен қостанайда тұрамын.");
+    }
+
+    #[test]
+    fn rewrites_accusative_almaty_to_locative() {
+        let out = apply("Мен алматыны тұрамын.");
+        assert_eq!(out, "Мен алматыда тұрамын.");
+    }
+
+    #[test]
+    fn does_not_rewrite_canonical_locative() {
+        let input = "Мен қостанайда тұрамын.";
+        assert_eq!(apply(input), input);
+    }
+
+    #[test]
+    fn does_not_rewrite_outside_first_person_frame() {
+        // No «мен/менім» prefix → not our pattern.
+        let input = "Қостанайды көрдім.";
+        assert_eq!(apply(input), input);
     }
 }

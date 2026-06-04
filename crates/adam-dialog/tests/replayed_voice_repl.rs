@@ -283,6 +283,32 @@ const BATTERY: &[ReplayCase] = &[
         expects_substring: "h₂so₄",
         session: 9,
     },
+    // ── Session 10 (2026-06-03 late evening, post-rc8 audit) ──
+    // 3 more live-REPL gaps caught:
+    //   - B-13: «Еркен қай күн болады» (single -н vs -ң) fell into
+    //           «Күн — дөңгелек» IsA.  Fixed by Phase 21.B.
+    //   - B-15: «Ө, тегеннің формулысы» (comma mid-token) fell into
+    //           the letter «Ө» definition.  Fixed by Phase 23.B
+    //           punctuation normalisation in `lookup_chemical_formula`.
+    //   - B-12 (accusative city) is fixed in voice_repl's
+    //           context_corrections::apply, not in v6_2_router; the
+    //           replay battery hits the router directly so we can't
+    //           pin it here.  Covered by context_corrections tests.
+    ReplayCase {
+        input: "Еркен қай күн болады?",
+        expects_substring: "ертең",
+        session: 10,
+    },
+    ReplayCase {
+        input: "Ө, тегеннің формулысы.",
+        expects_substring: "o₂",
+        session: 10,
+    },
+    ReplayCase {
+        input: "О, тегеннің формулысы.",
+        expects_substring: "o₂",
+        session: 10,
+    },
 ];
 
 /// Replay battery — every case must produce an answer

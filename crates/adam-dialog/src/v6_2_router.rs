@@ -924,7 +924,24 @@ fn needs_live_data_refusal(s: &str) -> bool {
 ///   - «Судың химия формуласын жаз.» (with «химия» qualifier)
 ///   - «Тұздың формуласы қандай?»
 fn lookup_chemical_formula(input: &str) -> Option<String> {
-    let lower = input.to_lowercase();
+    // **Phase 23.B (2026-06-03 evening)** — strip punctuation BEFORE
+    // stem matching. Live REPL caught Whisper inserting commas mid-
+    // word: «Ө, тегеннің формулысы.» — the substring «ө тегі» didn't
+    // match because of the comma. Normalising punctuation → space
+    // (and collapsing runs of whitespace) lets the existing stem
+    // table catch comma-splits without enumerating every variant.
+    let lower_normalised: String = input
+        .to_lowercase()
+        .chars()
+        .map(|c| match c {
+            ',' | '.' | '!' | '?' | ';' | ':' | '—' | '–' | '-' => ' ',
+            other => other,
+        })
+        .collect::<String>()
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ");
+    let lower = lower_normalised.as_str();
     // Required marker: the word «формула» (or a Whisper drift of it).
     // Without this, bare substance mentions like «су» would false-fire.
     let has_formula_marker = lower.contains("формула")
@@ -984,9 +1001,16 @@ fn lookup_chemical_formula(input: &str) -> Option<String> {
         ("оттек", "Оттегінің", "O₂"),
         // **Phase 23.A** — Whisper drifts of «оттегі»: single-т
         // «отегі», token-split «о тегі» / «ө тегі».
+        // **Phase 23.B (2026-06-03 evening)** — additional drift
+        // «тегенн-» (Whisper produces «тегеннің» instead of
+        // «тегінің» when the leading «о»/«ө» is split off).
         ("отегі", "Оттегінің", "O₂"),
         ("о тегі", "Оттегінің", "O₂"),
         ("ө тегі", "Оттегінің", "O₂"),
+        ("о тегенн", "Оттегінің", "O₂"),
+        ("ө тегенн", "Оттегінің", "O₂"),
+        ("отегенн", "Оттегінің", "O₂"),
+        ("өтегенн", "Оттегінің", "O₂"),
         // **Phase 23.A** — sulfur element + Whisper drift.
         ("күкірт", "Күкірттің", "S"),
         ("қуқырт", "Күкірттің", "S"),
@@ -1152,7 +1176,9 @@ fn looks_like_time_query(s: &str) -> bool {
         "кешеу",
         "ертең",
         "еркең",
+        "еркен",
         "ертен",
+        "ерткен",
         "эртен",
         "бүрсігүні",
         "бүрсүгүні",
@@ -1193,7 +1219,18 @@ fn relative_day_offset(lower: &str) -> Option<i64> {
             return Some(2);
         }
     }
-    for marker in ["ертең", "еркең", "ертен", "эртен", "завтра"] {
+    // **Phase 21.B (2026-06-03 evening)** — added «еркен» (single -н
+    // instead of -ң) caught in live REPL: «Еркен қай күн болады»
+    // fell through to «Күн — дөңгелек» substring IsA.
+    for marker in [
+        "ертең",
+        "еркең",
+        "еркен",
+        "ертен",
+        "ерткен",
+        "эртен",
+        "завтра",
+    ] {
         if lower.contains(marker) {
             return Some(1);
         }
@@ -1997,6 +2034,33 @@ mod tests {
         assert_eq!(
             lookup_chemical_formula("Қышбылдықтың формуласы қандай?"),
             None
+        );
+    }
+
+    /// **Phase 21.B (2026-06-03 evening)** — «еркен» drift (single
+    /// -н instead of -ң) caught in live REPL: «Еркен қай күн болады.»
+    #[test]
+    fn yerken_single_n_routes_to_tomorrow() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Еркен қай күн болады?", &idx);
+        let s = r.expect("еркен drift must route to tomorrow");
+        assert!(s.starts_with("Ертең"), "got: {s}");
+        assert!(s.contains("болады"), "got: {s}");
+    }
+
+    /// **Phase 23.B (2026-06-03 evening)** — comma-split substance
+    /// names. Live REPL caught «Ө, тегеннің формулысы.» — Whisper
+    /// inserted a comma mid-token; the rc8 stem table didn't match.
+    /// Pre-normalise punctuation → space so the stem catches.
+    #[test]
+    fn chemistry_formula_handles_comma_split() {
+        assert_eq!(
+            lookup_chemical_formula("Ө, тегеннің формулысы."),
+            Some("Оттегінің формуласы — O₂.".to_string())
+        );
+        assert_eq!(
+            lookup_chemical_formula("О, тегеннің формулысы."),
+            Some("Оттегінің формуласы — O₂.".to_string())
         );
     }
 
