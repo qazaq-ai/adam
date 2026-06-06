@@ -1067,13 +1067,20 @@ fn lookup_chemical_formula(input: &str) -> Option<String> {
 /// locative-suffixed noun ≥ 5 chars).
 fn looks_like_first_person_location_statement(s: &str) -> bool {
     let lower = s.to_lowercase();
-    // **Phase 26.A (2026-06-04 — post-rc10 audit)** — compound
-    // utterance support. Live REPL caught «Менің атым Дәулет, мен
-    // қостанайда тұрамын» — the input STARTS with «менің», so the
-    // strict «мен »-at-start check missed the second clause.  Now
-    // the second-clause marker «, мен » / «. мен » also triggers
-    // the defer rule, so the v6.1 cascade gets to acknowledge BOTH
-    // clauses (the name from the first, the city from the second).
+    // **Phase 26.A (2026-06-04)** — compound utterance support.
+    // Live REPL caught «Менің атым Дәулет, мен қостанайда тұрамын» —
+    // the input STARTS with «менің», so the strict «мен »-at-start
+    // check missed the second clause.  Phase 26.A added the comma /
+    // period clause boundary («, мен » / «. мен »).
+    //
+    // **Phase 26.C (2026-06-04 evening — post-rc11 audit)** —
+    // sometimes the user runs both clauses together without ANY
+    // separator: «Менім атын дәулет мен қазақстанда тұрамын».
+    // Detect «мен» as a standalone token followed by a city +
+    // dwelling-verb pattern anywhere in the input.  Risk of false
+    // positive on «X мен Y тұрамыз» (X and Y live together) is
+    // mitigated by requiring the verb to be SINGULAR («тұрамын»),
+    // since the conjunction reading needs plural «тұрамыз».
     let has_first_person_pronoun = lower.starts_with("мен ")
         || lower.starts_with("мен.")
         || lower.starts_with("мен,")
@@ -1082,7 +1089,9 @@ fn looks_like_first_person_location_statement(s: &str) -> bool {
         || lower.contains(", мен ")
         || lower.contains(". мен ")
         || lower.contains(",мен ")  // missing space after comma
-        || lower.contains(".мен ");
+        || lower.contains(".мен ")
+        // Phase 26.C — standalone-token «мен» with 1sg dwelling verb.
+        || (lower.contains(" мен ") && lower.contains("тұрамын"));
     if !has_first_person_pronoun {
         return false;
     }
@@ -2106,6 +2115,33 @@ mod tests {
         // upstream substring noise.
         assert_eq!(relative_day_offset("Ерден келді."), None);
         assert_eq!(relative_day_offset("Ерденнен сәлем."), None);
+    }
+
+    /// **Phase 26.C (2026-06-04 evening)** — compound utterance
+    /// support extended to inputs WITHOUT any clause separator.
+    /// Live REPL: «Менім атын дәулет мен қазақстанда тұрамын» — no
+    /// comma, no period, both clauses run together.  The standalone
+    /// «мен» token between two clauses + the 1sg dwelling verb
+    /// «тұрамын» now triggers the defer.
+    #[test]
+    fn compound_without_separator_defers_to_v61() {
+        assert!(looks_like_first_person_location_statement(
+            "Менім атын дәулет мен қазақстанда тұрамын."
+        ));
+        assert!(looks_like_first_person_location_statement(
+            "Менің атым Дәулет мен Қостанайда тұрамын."
+        ));
+    }
+
+    /// Negative control for Phase 26.C: «X мен Y тұрамыз» (X AND Y
+    /// live together — plural verb) must NOT trigger location defer
+    /// because «мен» here is a conjunction, not a 1sg pronoun.
+    #[test]
+    fn compound_without_separator_does_not_misfire_on_conjunction_mеn() {
+        // Plural verb — should NOT trigger our defer.
+        assert!(!looks_like_first_person_location_statement(
+            "Дәулет мен Болат Қостанайда тұрамыз."
+        ));
     }
 
     /// **Phase 26.A (2026-06-04)** — compound utterance defer.  Live

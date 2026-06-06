@@ -97,6 +97,14 @@ pub fn looks_like_common_noun_not_a_place(token: &str) -> bool {
         // Drift sources caught in live REPL (2026-06-03):
         "қайық", // boat
         "ең",    // most / particle
+        // **Phase 26.B (2026-06-04 — post-rc11 audit)** — more
+        // Whisper drifts of «қайда» / «қай жерде» (interrogative
+        // "where") that the rc10 blocklist missed.  All map to
+        // a recall-query slip the user makes when asking "where
+        // do I live", not a statement of location:
+        "қажер", // «қай жер» (which place) compressed
+        "қаж",   // partial of «қайжер»
+        "қажерде",
         // Generic place descriptors (already filtered by
         // generic_place_root, but listed here for defense-in-depth):
         "қала",
@@ -119,6 +127,12 @@ pub fn looks_like_common_noun_not_a_place(token: &str) -> bool {
         "мынау",
         "бұл",
         "соған",
+        // Additional question/recall words that should never be
+        // a city slot fill:
+        "қайда",
+        "қайдан",
+        "қалай",
+        "неге",
     ];
     // Exact match OR exact match + Kazakh case suffix (locative -да/-де,
     // accusative -ды/-ді, etc.).  Refuses naive prefix-match that would
@@ -1150,6 +1164,20 @@ mod tests {
         // suffixes only.
         assert!(!looks_like_common_noun_not_a_place("суыл"));
         assert!(!looks_like_common_noun_not_a_place("ауыр"));
+    }
+
+    /// **Phase 26.B (2026-06-04 evening)** — Whisper-drift compressions
+    /// of «қайда» / «қай жерде» (interrogative "where") that the rc10
+    /// blocklist missed.  Live REPL: «Мен қажерде тұрамын» →
+    /// adam said «Қажер екен, түсіндім» — exactly the kind of phantom
+    /// city acknowledgement that slot validation is meant to prevent.
+    #[test]
+    fn common_noun_guard_rejects_qazher_drift() {
+        assert!(looks_like_common_noun_not_a_place("қажер"));
+        assert!(looks_like_common_noun_not_a_place("қажерде"));
+        // Same family — «қайда» itself in case-inflected form:
+        assert!(looks_like_common_noun_not_a_place("қайда"));
+        assert!(looks_like_common_noun_not_a_place("қайдан"));
     }
 
     #[test]
