@@ -1067,11 +1067,22 @@ fn lookup_chemical_formula(input: &str) -> Option<String> {
 /// locative-suffixed noun ≥ 5 chars).
 fn looks_like_first_person_location_statement(s: &str) -> bool {
     let lower = s.to_lowercase();
+    // **Phase 26.A (2026-06-04 — post-rc10 audit)** — compound
+    // utterance support. Live REPL caught «Менің атым Дәулет, мен
+    // қостанайда тұрамын» — the input STARTS with «менің», so the
+    // strict «мен »-at-start check missed the second clause.  Now
+    // the second-clause marker «, мен » / «. мен » also triggers
+    // the defer rule, so the v6.1 cascade gets to acknowledge BOTH
+    // clauses (the name from the first, the city from the second).
     let has_first_person_pronoun = lower.starts_with("мен ")
         || lower.starts_with("мен.")
         || lower.starts_with("мен,")
         || lower.starts_with("мың ")
-        || lower.starts_with("біз ");
+        || lower.starts_with("біз ")
+        || lower.contains(", мен ")
+        || lower.contains(". мен ")
+        || lower.contains(",мен ")  // missing space after comma
+        || lower.contains(".мен ");
     if !has_first_person_pronoun {
         return false;
     }
@@ -1181,6 +1192,8 @@ fn looks_like_time_query(s: &str) -> bool {
         "ерткен",
         "эртен",
         "бүрсігүні",
+        // Phase 21.C — «ерден» as time marker only when paired with
+        // «күн» day marker (handled as a multi-token check below).
         "бүрсүгүні",
         "бірсүгіне",
         "бір сүгіне",
@@ -1192,7 +1205,18 @@ fn looks_like_time_query(s: &str) -> bool {
         "вчера",
         "завтра",
     ];
-    markers.iter().any(|m| lower.contains(m))
+    if markers.iter().any(|m| lower.contains(m)) {
+        return true;
+    }
+    // Phase 21.C — multi-token «ерден» + «күн» pair (ambiguous on
+    // its own — could be a person name in ablative case — so we
+    // require BOTH tokens to be present).
+    if lower.contains("күн")
+        && (lower.contains("ерден") || lower.contains("эрден") || lower.contains("ердін"))
+    {
+        return true;
+    }
+    false
 }
 
 /// **Phase 21 (2026-06-02)** — detect relative-day anchor in the
@@ -1233,6 +1257,19 @@ fn relative_day_offset(lower: &str) -> Option<i64> {
     ] {
         if lower.contains(marker) {
             return Some(1);
+        }
+    }
+    // **Phase 21.C (2026-06-04 — post-rc10 audit)** — «ерден» drift
+    // caught in live REPL: «Ерден қай күн болады» yielded an Abai
+    // citation about «ер» (man).  Since «ерден» can also be the
+    // genuine name «Ерден» + ablative case («from Erden»), this
+    // drift only counts when the input is clearly a calendar
+    // question (the bare day marker «күн» is present).
+    if lower.contains("күн") {
+        for marker in ["ерден", "эрден", "ердін"] {
+            if lower.contains(marker) {
+                return Some(1);
+            }
         }
     }
     for marker in ["алдыңғы күн", "алдыңғы күні", "позавчера"] {
@@ -2046,6 +2083,51 @@ mod tests {
         let s = r.expect("еркен drift must route to tomorrow");
         assert!(s.starts_with("Ертең"), "got: {s}");
         assert!(s.contains("болады"), "got: {s}");
+    }
+
+    /// **Phase 21.C (2026-06-04)** — «ерден» drift, GATED by the
+    /// «күн» day marker.  Live REPL: «Ерден қай күн болады»
+    /// returned an Abai citation about «ер» (man) — fell through to
+    /// the Abai-quote handler.
+    #[test]
+    fn yerden_in_day_context_routes_to_tomorrow() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Ерден қай күн болады?", &idx);
+        let s = r.expect("ерден + күн must route to tomorrow");
+        assert!(s.starts_with("Ертең"), "got: {s}");
+    }
+
+    /// **Phase 21.C** — «ерден» WITHOUT «күн» must NOT trigger
+    /// tomorrow.  «Ерден» can be a genuine personal name + ablative.
+    #[test]
+    fn yerden_without_day_marker_does_not_route_to_tomorrow() {
+        // `relative_day_offset` should return None on plain «Ерден»
+        // mentions.  We test the function directly to avoid the
+        // upstream substring noise.
+        assert_eq!(relative_day_offset("Ерден келді."), None);
+        assert_eq!(relative_day_offset("Ерденнен сәлем."), None);
+    }
+
+    /// **Phase 26.A (2026-06-04)** — compound utterance defer.  Live
+    /// REPL caught «Менің атым Дәулет, мен қостанайда тұрамын» —
+    /// the input STARTS with «менің», so the strict «мен »-at-start
+    /// check missed the second clause.  The router fell through to
+    /// the «Қостанай → Қала» IsA reply.
+    #[test]
+    fn compound_name_then_location_defers_to_v61() {
+        // After the fix, this returns None so the v6.1 cascade
+        // (which acknowledges both name AND location) stands.
+        assert!(looks_like_first_person_location_statement(
+            "Менің атым Дәулет, мен қостанайда тұрамын."
+        ));
+        // Same with period separator instead of comma.
+        assert!(looks_like_first_person_location_statement(
+            "Менің атым Дәулет. Мен қостанайда тұрамын."
+        ));
+        // And with missing space after comma (common typo / STT).
+        assert!(looks_like_first_person_location_statement(
+            "Менің атым Дәулет,мен қостанайда тұрамын."
+        ));
     }
 
     /// **Phase 23.B (2026-06-03 evening)** — comma-split substance
