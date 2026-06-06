@@ -59,6 +59,90 @@ pub fn looks_like_named_place_candidate(token: &str) -> bool {
                 .all(|c| c.is_alphabetic() || matches!(c, '-' | '\'' | '’'))
 }
 
+/// **2026-06-03 evening** — slot validation guard.
+///
+/// `looks_like_named_place_candidate` accepts any alphabetic word
+/// >1 character so that brand-new cities not yet in the geo
+/// registry still parse.  The fallback became dangerous on voice
+/// REPL — Whisper-drifted noise tokens like «қайық» (boat) or «ең»
+/// (most / particle) entered the city slot and adam acknowledged
+/// «Қайық екен, түсіндім» as if a real city were named.
+///
+/// This guard says: reject a candidate that is a **known common
+/// noun** AND is **not** in the geo registry.  Two sources are
+/// consulted:
+///
+///   1. The closed-set «not-a-topic» list (interrogatives,
+///      demonstratives, function words) — same list the existing
+///      detect_statement_of_location uses to filter `Қай` etc.
+///   2. A small but high-recall common-noun blocklist of the
+///      tokens we've seen Whisper-drift into the city slot.
+///
+/// Returns `true` if the candidate should be REJECTED (i.e. it's
+/// noise, not a real place name).  Used by location / origin
+/// detectors before emitting `StatementOfLocation { city }`.
+pub fn looks_like_common_noun_not_a_place(token: &str) -> bool {
+    // Genuine geo registry entries are never «common nouns» — short-
+    // circuit so user-added cities (e.g. «Жетісай») don't get blocked.
+    if canonical_geo_name(token).is_some() {
+        return false;
+    }
+    let lower = token.to_lowercase();
+    let lower = lower.trim_end_matches(|c: char| !c.is_alphabetic());
+    // Closed-set common nouns we've seen in voice-REPL drift.
+    // Listed as bare nouns; the locative / accusative / etc.
+    // case-stripping that happens upstream should leave us with
+    // the bare stem.
+    let common_nouns: &[&str] = &[
+        // Drift sources caught in live REPL (2026-06-03):
+        "қайық", // boat
+        "ең",    // most / particle
+        // Generic place descriptors (already filtered by
+        // generic_place_root, but listed here for defense-in-depth):
+        "қала",
+        "ауыл",
+        "аудан",
+        "облыс",
+        "өңір",
+        "кент",
+        "ел",
+        // Pronouns / function words that the FST sometimes parses
+        // as nouns under drift:
+        "қай",
+        "қандай",
+        "қашан",
+        "не",
+        "кім",
+        "осы",
+        "сол",
+        "анау",
+        "мынау",
+        "бұл",
+        "соған",
+    ];
+    // Exact match OR exact match + Kazakh case suffix (locative -да/-де,
+    // accusative -ды/-ді, etc.).  Refuses naive prefix-match that would
+    // false-fire on «суыл» (starts with «су»).
+    common_nouns.iter().any(|n| {
+        if lower == *n {
+            return true;
+        }
+        if !lower.starts_with(n) {
+            return false;
+        }
+        let suffix = &lower[n.len()..];
+        matches!(
+            suffix,
+            "да" | "де" | "та" | "те"  // locative
+                | "ды" | "ді" | "ты" | "ті"  // accusative
+                | "дан" | "ден" | "тан" | "тен"  // ablative
+                | "ға" | "ге" | "қа" | "ке"  // dative
+                | "мын" | "мін" | "сың" | "сің"  // 1/2sg copula
+                | "тың" | "тің" | "дың" | "дің" // genitive
+        )
+    })
+}
+
 pub fn normalize_place_name(token: &str) -> String {
     canonical_geo_name(token).unwrap_or_else(|| normalize_proper_noun(token))
 }
@@ -1016,6 +1100,56 @@ mod tests {
         assert!(looks_like_named_place_candidate("сарыағаш"));
         assert!(!looks_like_named_place_candidate("1"));
         assert!(!looks_like_named_place_candidate("a1"));
+    }
+
+    /// **2026-06-03 evening** — slot validation guard.
+    ///
+    /// Live REPL: «Мен қайық қалада тұрамын» (Whisper drift) yielded
+    /// «Қайық екен, түсіндім».  The detector must reject «қайық»
+    /// (boat) as a city candidate.
+    #[test]
+    fn common_noun_guard_rejects_qaiyq() {
+        assert!(looks_like_common_noun_not_a_place("қайық"));
+        assert!(looks_like_common_noun_not_a_place("қайықта"));
+        assert!(looks_like_common_noun_not_a_place("қайыққа"));
+    }
+
+    #[test]
+    fn common_noun_guard_rejects_yenq() {
+        // «ең» = "most" (particle).  Live REPL: «Ең екен, түсіндім».
+        assert!(looks_like_common_noun_not_a_place("ең"));
+        assert!(looks_like_common_noun_not_a_place("еңде"));
+    }
+
+    #[test]
+    fn common_noun_guard_rejects_pronouns() {
+        // «қай» / «қашан» / «не» / «кім» — these are interrogatives
+        // / pronouns that the FST sometimes parses as nouns under
+        // Whisper drift.
+        assert!(looks_like_common_noun_not_a_place("қай"));
+        assert!(looks_like_common_noun_not_a_place("қандай"));
+        assert!(looks_like_common_noun_not_a_place("не"));
+        assert!(looks_like_common_noun_not_a_place("кім"));
+    }
+
+    #[test]
+    fn common_noun_guard_accepts_real_cities() {
+        // Real cities in the geo registry must pass through
+        // (short-circuit at top of the function).
+        assert!(!looks_like_common_noun_not_a_place("Алматы"));
+        assert!(!looks_like_common_noun_not_a_place("Қостанай"));
+        assert!(!looks_like_common_noun_not_a_place("Астана"));
+        assert!(!looks_like_common_noun_not_a_place("қостанай"));
+    }
+
+    #[test]
+    fn common_noun_guard_does_not_false_positive_on_prefix_match() {
+        // «суыл» starts with «су» but is NOT the common noun «су»
+        // (water).  Without the suffix gate, the prefix-match would
+        // incorrectly flag it.  The accepted suffixes are case
+        // suffixes only.
+        assert!(!looks_like_common_noun_not_a_place("суыл"));
+        assert!(!looks_like_common_noun_not_a_place("ауыр"));
     }
 
     #[test]

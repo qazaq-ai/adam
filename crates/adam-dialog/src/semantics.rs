@@ -3636,12 +3636,28 @@ fn detect_statement_of_location_rule_based(
     if let Some(verb_idx) = tokens.iter().position(|t| t == "тұрамын" || t == "тұрамыз")
     {
         if let Some(name) = recover_named_place_before_generic_location(tokens, raw_tokens) {
-            return Some(Some(name));
+            // **2026-06-03 evening slot validation** — reject if the
+            // recovered name is a common noun (e.g. «қайық» = boat)
+            // that Whisper drifted into a real-place slot.
+            if !crate::language_core::looks_like_common_noun_not_a_place(&name) {
+                return Some(Some(name));
+            }
         }
         let city = (0..verb_idx)
             .rev()
             .find_map(|i| strip_locative(&tokens[i]).map(|_| raw_tokens[i].clone()))
             .map(|raw| strip_locative_preserving(&raw));
+        // **2026-06-03 evening slot validation** — same guard on
+        // the locative-stripped candidate.  Live REPL produced
+        // «Мен қайық қалада тұрамын» → city = «қайық» (boat).
+        if let Some(ref c) = city
+            && crate::language_core::looks_like_common_noun_not_a_place(c)
+        {
+            // Reject so the upstream caller falls through to the
+            // generic clarification reply rather than acknowledging
+            // a phantom city.
+            return Some(None);
+        }
         return Some(city);
     }
     // Ablative + 1sg copula: "Алматыданмын" → "Алматы".
