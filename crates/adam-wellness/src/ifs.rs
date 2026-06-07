@@ -286,6 +286,20 @@ pub fn step(input: &str, session: &mut WellnessSession) -> WellnessReply {
         };
     }
 
+    // ── 2.6. Frustration-at-adam redirect (rc4) ──
+    //
+    // Live audit transcript: user said «Сен ақымақсың, түсінбейсің»
+    // after adam misunderstood several turns.  rc3 routed this
+    // through the generic check-in template, which felt
+    // disrespectful.  rc4 acknowledges the frustration explicitly
+    // and asks the user to repeat in different words.
+    if matches_any_lower(input, FRUSTRATION_AT_ADAM_PHRASES) {
+        return WellnessReply {
+            text: FRUSTRATION_REDIRECT_TEMPLATE.to_string(),
+            action: ReplyAction::Continue,
+        };
+    }
+
     // ── 3. Stage-driven response ──
     let current_stage = session.stage.unwrap_or(WellnessStage::AskingName);
     let reply_text = match current_stage {
@@ -317,14 +331,14 @@ pub fn step(input: &str, session: &mut WellnessSession) -> WellnessReply {
                 session.user_age = Some(age);
                 session.stage = Some(WellnessStage::AskingProblem);
                 session.turns_at_stage = 0;
-                asking_problem_template(&session.honorific_address())
+                asking_problem_template(&session.honorific_address(), session.user_age)
             } else {
                 session.turns_at_stage = session.turns_at_stage.saturating_add(1);
                 if session.turns_at_stage >= 2 {
                     // Give up on age, move on.
                     session.stage = Some(WellnessStage::AskingProblem);
                     session.turns_at_stage = 0;
-                    asking_problem_template(&session.honorific_address())
+                    asking_problem_template(&session.honorific_address(), session.user_age)
                 } else {
                     AGE_RETRY_TEMPLATE.to_string()
                 }
@@ -551,11 +565,21 @@ fn asking_age_template_no_name() -> String {
 }
 
 /// rc3 — `AskingProblem` template using the honorific address.
-fn asking_problem_template(address: &str) -> String {
-    format!(
-        "Рахмет, {address}. Бүгін мені іздеп келуіңізге не себеп болды? \
-         Сізді не алаңдатып, не ауырлатып жүр?"
-    )
+///
+/// **rc4 (2026-06-04 live audit):** also echo the user's age so
+/// they hear that adam understood it.  Live audit said «когда я
+/// говорил возраст, не подтверждал, что понял сколько мне лет».
+fn asking_problem_template(address: &str, age: Option<u32>) -> String {
+    match age {
+        Some(a) => format!(
+            "Рахмет, {address}. {a} жаста екенсіз — естідім. Бүгін мені іздеп келуіңізге не \
+             себеп болды? Сізді не алаңдатып, не ауырлатып жүр?"
+        ),
+        None => format!(
+            "Рахмет, {address}. Бүгін мені іздеп келуіңізге не себеп болды? \
+             Сізді не алаңдатып, не ауырлатып жүр?"
+        ),
+    }
 }
 
 /// rc2 — emitted at `EmotionCheckIn` after the soft-probe array is
@@ -573,6 +597,42 @@ const SOMATIC_REDIRECT_TEMPLATE: &str = "Сіз сипаттаған белгі 
      (мысалы, ЛОР маман немесе терапевт) барып, тексеру дұрыс. Мен эмоциялық \
      тақырыпта — реніш, ашу, қорқыныш — отырып қарай аламын; ауырсыну, дыбыс, \
      ұйқы сияқты дене белгілерін шеше алмаймын.";
+
+/// rc4 — phrases indicating the user is frustrated with adam
+/// itself (not with their inner experience).  Live audit had
+/// «Сен ақымақсың, түсінбейсің».  These signal that the dialog
+/// has miscarried and we should re-listen rather than push another
+/// IFS template.
+///
+/// Keep substrings DISTINCTIVE — avoid generic stems like «айтпа»
+/// (substring of «айтпаймын» = "I won't say") or «сорлы» (too
+/// broad).  The cost of a false positive here is a needless
+/// apology — survivable.  The cost of a false negative is the
+/// user feeling unheard.
+const FRUSTRATION_AT_ADAM_PHRASES: &[&str] = &[
+    "ақымақсың",
+    "ақымақ сың",
+    "ақымақ сын",
+    "ақымақсың ба",
+    "атымақсың",
+    "ат мақсың",
+    "түсінбейсің",
+    "түсінбей жатыр",
+    "не айтып тұрсың",
+    "не сандырақтап",
+    // Russian
+    "ты дурак",
+    "ты тупой",
+    "тупой ты",
+    "ты не понимаешь",
+    "ты глупый",
+];
+
+/// rc4 — emitted on `FRUSTRATION_AT_ADAM_PHRASES`.  Acknowledges
+/// the mis-hearing explicitly, asks the user to retry in different
+/// words.  Does NOT defend adam, does NOT proceed with IFS.
+const FRUSTRATION_REDIRECT_TEMPLATE: &str = "Сізді дұрыс ести алмай жатсам, кешіріңіз. Микрофон арқылы кейде сөздер шатасады. \
+     Маңыздысын қайта айтып көріңізші — басқа сөздермен, асықпай. Тыңдап тұрмын.";
 
 /// rc2 — non-acute somatic / medical symptom phrases that route to
 /// the medical-redirect template instead of IFS dialog.  Audited
@@ -758,7 +818,13 @@ fn extract_user_age(input: &str) -> Option<u32> {
         }
     }
     // Kazakh numeral parser.  Recognises a single numeral or a
-    // tens-plus-units combo («жиырма бес» = 25).
+    // tens-plus-units combo («жиырма бес» = 25), with common
+    // case-suffix tolerance («алтыға толды» = "turned six").
+    //
+    // **rc4 (2026-06-04 live-audit fix).**  rc3 missed «алпыс
+    // алтыға толды» (66) — it parsed «алпыс» = 60 but skipped
+    // «алтыға» because the strict-eq match didn't see the
+    // dative-suffixed form.
     let alpha_cleaned: String = lower
         .chars()
         .map(|c| if c.is_alphabetic() { c } else { ' ' })
@@ -769,28 +835,16 @@ fn extract_user_age(input: &str) -> Option<u32> {
     let mut i = 0;
     while i < tokens.len() {
         let tok = tokens[i];
-        if let Some(&n) = KZ_NUMERALS_TENS
-            .iter()
-            .find(|(w, _)| *w == tok)
-            .map(|(_, n)| n)
-        {
+        if let Some(n) = match_kazakh_numeral(tok, KZ_NUMERALS_TENS) {
             total = total.saturating_add(n);
             found_any = true;
-            // Look ahead for a unit digit.
             if let Some(next) = tokens.get(i + 1)
-                && let Some(&u) = KZ_NUMERALS_UNITS
-                    .iter()
-                    .find(|(w, _)| w == next)
-                    .map(|(_, u)| u)
+                && let Some(u) = match_kazakh_numeral(next, KZ_NUMERALS_UNITS)
             {
                 total = total.saturating_add(u);
                 i += 1;
             }
-        } else if let Some(&n) = KZ_NUMERALS_UNITS
-            .iter()
-            .find(|(w, _)| *w == tok)
-            .map(|(_, n)| n)
-        {
+        } else if let Some(n) = match_kazakh_numeral(tok, KZ_NUMERALS_UNITS) {
             total = total.saturating_add(n);
             found_any = true;
         }
@@ -832,6 +886,35 @@ const KZ_NUMERALS_UNITS: &[(&str, u32)] = &[
 
 /// Title-case helper — capitalise the first character, keep
 /// the rest as-is.  Used for displaying the user's name.
+/// rc4 — match a Kazakh numeral allowing common case suffixes.
+/// Returns the numerical value if `tok` equals a numeral in `table`
+/// (possibly followed by one of the common Kazakh case endings).
+///
+/// We require EXACT length match (numeral + suffix), not prefix
+/// match, so «алты» matches but «алтын» (gold) and «алтай»
+/// (mountains) don't false-positive.
+fn match_kazakh_numeral(tok: &str, table: &[(&str, u32)]) -> Option<u32> {
+    const CASE_SUFFIXES: &[&str] = &[
+        // bare
+        "", // dative
+        "ға", "ге", "қа", "ке", // locative
+        "да", "де", "та", "те", // accusative
+        "ны", "ні", "ды", "ді", "ты", "ті", // ablative
+        "дан", "ден", "тан", "тен", "нан", "нен", // genitive
+        "ның", "нің", "дың", "дің", "тың", "тің", // possessive 3sg
+        "сы", "сі", // plural
+        "лар", "лер", "дар", "дер", "тар", "тер",
+    ];
+    for &(word, n) in table {
+        for suf in CASE_SUFFIXES {
+            if tok.len() == word.len() + suf.len() && tok.starts_with(word) && tok.ends_with(suf) {
+                return Some(n);
+            }
+        }
+    }
+    None
+}
+
 fn title_case(s: &str) -> String {
     let mut chars = s.chars();
     match chars.next() {
@@ -1189,6 +1272,56 @@ mod tests {
             ..Default::default()
         };
         assert_eq!(s.honorific_address(), "Дәулет");
+    }
+
+    // ── rc4 live-audit fixes ──
+
+    #[test]
+    fn age_extraction_handles_dative_suffix() {
+        // rc3 missed «алпыс алтыға толды» → returned 60 because
+        // «алтыға» wasn't recognised as «алты» + dative «-ға».
+        assert_eq!(extract_user_age("Жасым алпыс алтыға толды."), Some(66));
+        assert_eq!(extract_user_age("Маған отыз бесте."), Some(35));
+        assert_eq!(extract_user_age("Жасым алтыда."), Some(6));
+    }
+
+    #[test]
+    fn age_extraction_does_not_false_positive_on_gold_or_mountains() {
+        // «алтын» (gold) and «алтай» (Altai mountains) both
+        // contain the prefix «алт» but are NOT the numeral.
+        // Strict-length match must reject them.
+        assert_eq!(extract_user_age("Менде алтын сақина бар."), None);
+        assert_eq!(extract_user_age("Алтай тауларынан."), None);
+    }
+
+    #[test]
+    fn problem_template_echoes_age_when_known() {
+        let s = asking_problem_template("Ағай Дәулет", Some(66));
+        assert!(s.contains("66"), "should echo age: {s}");
+        assert!(s.contains("Ағай Дәулет"));
+    }
+
+    #[test]
+    fn problem_template_omits_age_when_unknown() {
+        let s = asking_problem_template("Ағай Дәулет", None);
+        assert!(!s.chars().any(|c| c.is_ascii_digit()));
+        assert!(s.contains("Ағай Дәулет"));
+    }
+
+    #[test]
+    fn frustration_at_adam_emits_apology_redirect() {
+        // Live audit: «Сен ақымақсың, түсінбейсің» got the generic
+        // check-in template. rc4 acknowledges and asks for retry.
+        let mut s = intake_through_to_checkin();
+        let r = step("Сен ақымақсың, түсінбейсің.", &mut s);
+        assert!(
+            r.text.contains("кешір") || r.text.contains("қайта айтып"),
+            "should apologise + ask retry: {}",
+            r.text
+        );
+        // Must NOT push the user further into IFS material.
+        assert!(!r.text.contains("тыныс алайық"));
+        assert!(!r.text.contains("сезім ең күшті"));
     }
 
     // ── Somatic redirect (carried from rc2) ──

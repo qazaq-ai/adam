@@ -42,7 +42,7 @@
 > reproducibility commands across both tracks.
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.4.0--rc3-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.4.0--rc4-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -52,7 +52,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/tests-2445%20passing%20%2F%200%20failed%20%2F%2027%20ignored-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-2451%20passing%20%2F%200%20failed%20%2F%2027%20ignored-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/dialog%20battery-79%2F79%20must--pass-2EA44F?style=flat-square" alt="dialog battery">
   <img src="https://img.shields.io/badge/v6.2%20warm%20p50-917%20ns-2EA44F?style=flat-square" alt="warm latency">
   <img src="https://img.shields.io/badge/v6.2%20core-0%20MB%20%2F%200%20GPU-2EA44F?style=flat-square" alt="v6.2 core">

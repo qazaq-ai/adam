@@ -97,7 +97,7 @@ pub enum RedFlag {
 pub fn detect(input: &str) -> Option<RedFlag> {
     let lower = input.to_lowercase();
 
-    if matches_any(&lower, SUICIDAL_PHRASES) {
+    if matches_any(&lower, SUICIDAL_PHRASES) || matches_suicidal_phonetic_anchors(&lower) {
         return Some(RedFlag::SuicidalIdeation);
     }
     if matches_any(&lower, ACUTE_MEDICAL_PHRASES) {
@@ -113,6 +113,38 @@ pub fn detect(input: &str) -> Option<RedFlag> {
         return Some(RedFlag::Psychosis);
     }
     None
+}
+
+/// **rc4 (2026-06-04 live-audit safety fix).** Catches STT-mangled
+/// variants of «өмір сүргім келмейді» (the canonical Kazakh
+/// "I don't want to live" phrase).  Live audit caught Whisper
+/// transcribing this as «Ө мөрі сүргім келмейді» / «Өмор сүргім
+/// келмейді» / «Өмірі сүргім келмейді» / «Өмер сүргім келмейді» /
+/// «Өмір сүргін келмейді» — none of which matched the literal
+/// substring in `SUICIDAL_PHRASES`, so adam continued the IFS
+/// dialog through nine consecutive crisis statements.
+///
+/// We detect by triple anchor — three short stems that survive
+/// most STT noise on this phrase.  We match against the BARE
+/// CONCATENATED letter sequence (whitespace + punctuation
+/// stripped), not against split tokens, because Whisper often
+/// inserts spurious spaces into «өмір» — splitting it to «ө мір»
+/// or «ө мөрі», which would otherwise hide the «өм» anchor.
+///
+///   - «өм» or «ом» (life-root)
+///   - «сүрг» (live-verb stem)
+///   - «келм» (negation stem)
+///
+/// All three must appear; order doesn't matter.  False-positive
+/// risk: discussing someone else's death wish.  We accept that
+/// risk — falsely escalating to a hotline is recoverable;
+/// missing a real crisis isn't.
+fn matches_suicidal_phonetic_anchors(lower: &str) -> bool {
+    let concat: String = lower.chars().filter(|c| c.is_alphabetic()).collect();
+    let life_root = concat.contains("өм") || concat.contains("ом");
+    let live_verb = concat.contains("сүрг");
+    let negation = concat.contains("келм");
+    life_root && live_verb && negation
 }
 
 /// Return the scripted Kazakh-language reply that adam must
@@ -289,6 +321,33 @@ mod tests {
             detect("Менің өмір сүргім келмейді."),
             Some(RedFlag::SuicidalIdeation)
         );
+    }
+
+    /// **rc4 regression — live-audit STT variants.**  Whisper
+    /// distorts «өмір сүргім келмейді» in many ways under noise;
+    /// each variant below was observed in the rc3 live audit and
+    /// every single one MUST escalate.
+    #[test]
+    fn detects_stt_noise_variants_of_canonical_suicidal_phrase() {
+        for variant in [
+            // Audit transcript variants:
+            "Ө мөрі сүргім келмейді.",
+            "Өмор сүргім келмейді.",
+            "Өмор сүргің келмейді.",
+            "Өмірі сүргім келмейді.",
+            "Өмер сүргім келмейді.",
+            "Өмір сүргін келмейді.",
+            // Plausible adjacent variants (compound rage + crisis):
+            "Сен ақымақсың, түсінбейсің, өмір сүргін келмейді.",
+            // Split-word edge: Whisper sometimes inserts spaces.
+            "Ө мір сүргім келмейді.",
+        ] {
+            assert_eq!(
+                detect(variant),
+                Some(RedFlag::SuicidalIdeation),
+                "must escalate STT variant: {variant}"
+            );
+        }
     }
 
     #[test]
