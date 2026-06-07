@@ -28,6 +28,7 @@ members = [
   "crates/adam-intent-classifier",
   "crates/adam-slot-extractor",
   "crates/adam-retrieval-ranker",
+  "crates/adam-wellness",
   "tools/intent_dataset",
   "tools/corpus_acquire",
   "tools/voice_repl_v6_3",
