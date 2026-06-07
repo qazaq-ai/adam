@@ -3580,6 +3580,23 @@ impl Conversation {
                 self.session
                     .insert("pending_clarification_noun".into(), canonical);
             }
+        } else if let Some(noun) = extract_belkim_clarification_noun(&final_output) {
+            // **Phase 27 (2026-06-04 — post-rc13 audit)** — fallback
+            // pending-clarification capture.  Some intents (e.g.
+            // AskAboutTopic with low-confidence routing) reach a
+            // «Бәлкім, X туралы айтасыз ба» reply WITHOUT going
+            // through the `Intent::Unknown { noun_hint }` branch
+            // above.  The user's «иә» on the next turn was then left
+            // stranded because `pending_clarification_noun` was never
+            // set, causing adam to re-emit the SAME clarification
+            // reply and loop.  Live REPL: «Бәлкім, Органикалық туралы
+            // айтасыз ба.» → «иә.» → adam re-asked instead of
+            // answering about organic chemistry.  Phase 27 extracts
+            // the noun directly from the output template so the
+            // pending slot is set regardless of the upstream intent.
+            let canonical = russian_to_kazakh_canonical(&noun).unwrap_or(noun);
+            self.session
+                .insert("pending_clarification_noun".into(), canonical);
         }
         // **v6.1.40 — 2026-05-24 voice audit round 2.** Record whether
         // THIS turn emitted the name-derived diminutive («Дәке») so
@@ -3612,6 +3629,12 @@ impl Conversation {
         } else {
             final_output
         };
+        // **Phase 28 (2026-06-04 — post-rc13 audit)** — proper-noun
+        // capitalization for the `Бәлкім, X туралы айтасыз ба`
+        // clarification slot.  See `capitalize_belkim_noun_in_output`
+        // for rationale.  Idempotent: when X is already capitalised
+        // the output is returned unchanged.
+        let final_output = capitalize_belkim_noun_in_output(&final_output);
         (final_output, trace)
     }
 
@@ -5355,6 +5378,71 @@ fn capitalise_first_char(s: &str) -> String {
 /// `None` otherwise (caller uses the original noun unchanged).
 ///
 /// **Scope discipline.** Only entries observed in real REPL
+/// **Phase 27 (2026-06-04 — post-rc13 audit)** — extract the noun
+/// from a «Бәлкім, X туралы айтасыз ба» clarification reply so the
+/// next turn's «иә» can fulfil it.
+///
+/// Returns `Some(noun)` when the output contains the recognisable
+/// pattern; `None` otherwise.  Match is on the literal Kazakh
+/// template; case-insensitive on the «Бәлкім» / «туралы» keywords.
+fn extract_belkim_clarification_noun(output: &str) -> Option<String> {
+    let start = output.find("Бәлкім")?;
+    let rest = &output[start..];
+    let turaly_pos = rest.find(" туралы")?;
+    let between = &rest[..turaly_pos];
+    let noun = between
+        .trim_start_matches("Бәлкім")
+        .trim_start_matches(',')
+        .trim();
+    if noun.is_empty() {
+        return None;
+    }
+    Some(noun.to_string())
+}
+
+/// **Phase 28 (2026-06-04 — post-rc13 audit)** — proper-noun
+/// capitalization post-processor.
+///
+/// User insight: «Я давно говорил, что имена собственные необходимо
+/// писать с большой буквы. А он все имена пишет с маленкой буквы.»
+///
+/// adam's realiser is mostly correct on names (`Дәулет`), cities
+/// (`Қостанай`) and elements (`Алтын`, `Күміс`) — these are
+/// upper-cased by the canonical-geo / proper-noun normalisers
+/// upstream.  But the `Бәлкім, X туралы айтасыз ба` clarification
+/// template fills X directly from the user's input noun_hint or
+/// from session state.  If the source happened to be lowercase
+/// (Whisper output, or session value from an earlier lowercase
+/// transcript), the displayed clarification reads as
+/// «Бәлкім, роза туралы айтасыз ба» — wrong: the topic title in
+/// this template position is always a proper noun reference.
+///
+/// This post-processor rewrites the noun inside the
+/// `Бәлкім, … туралы` slot to title case so the output reads
+/// «Бәлкім, Роза туралы айтасыз ба».  Multi-word noun phrases
+/// («Қазақ әдебиеті») get only the first word capitalised — the
+/// rest retains its original casing.  Idempotent on already-
+/// capitalised inputs.
+fn capitalize_belkim_noun_in_output(output: &str) -> String {
+    let Some(noun) = extract_belkim_clarification_noun(output) else {
+        return output.to_string();
+    };
+    let Some(first_char) = noun.chars().next() else {
+        return output.to_string();
+    };
+    if first_char.is_uppercase() {
+        return output.to_string();
+    }
+    let uppercased_first: String = first_char.to_uppercase().collect();
+    let mut capitalised = uppercased_first;
+    capitalised.push_str(&noun[first_char.len_utf8()..]);
+    // Rebuild the noun-in-context exactly once so we don't touch
+    // unrelated occurrences elsewhere in the output.
+    let original_segment = format!("Бәлкім, {noun} туралы");
+    let replacement_segment = format!("Бәлкім, {capitalised} туралы");
+    output.replacen(&original_segment, &replacement_segment, 1)
+}
+
 /// audits — no speculative aliases. Grows as the voice + text
 /// audits surface new pairs.
 fn russian_to_kazakh_canonical(noun: &str) -> Option<String> {
@@ -5596,5 +5684,88 @@ mod phonetic_normalize_v6_0_5_tests {
         let mut conv = Conversation::new();
         let out = conv.phonetic_normalize("Сәлем!", &lex());
         assert!(out.contains("Сәлем"), "got: {out}");
+    }
+}
+
+#[cfg(test)]
+mod phase_27_tests {
+    //! **Phase 27 (2026-06-04 — post-rc13 audit)** — extraction of the
+    //! noun from a `Бәлкім, X туралы айтасыз ба` clarification reply
+    //! so the next-turn `иә` affirmation can fulfil it.
+
+    use super::extract_belkim_clarification_noun;
+
+    #[test]
+    fn extracts_capitalised_noun() {
+        let noun = extract_belkim_clarification_noun("Бәлкім, Органикалық туралы айтасыз ба.")
+            .expect("must extract noun");
+        assert_eq!(noun, "Органикалық");
+    }
+
+    #[test]
+    fn extracts_lowercase_noun() {
+        let noun = extract_belkim_clarification_noun("Бәлкім, аншілер туралы айтасыз ба.")
+            .expect("must extract noun");
+        assert_eq!(noun, "аншілер");
+    }
+
+    #[test]
+    fn extracts_multi_word_noun() {
+        // «Қазақ әдебиеті» — two-word noun phrase.
+        let noun = extract_belkim_clarification_noun("Бәлкім, Қазақ әдебиеті туралы айтасыз ба.")
+            .expect("must extract noun");
+        assert_eq!(noun, "Қазақ әдебиеті");
+    }
+
+    #[test]
+    fn returns_none_when_no_belkim() {
+        assert!(extract_belkim_clarification_noun("Сау болыңыз.").is_none());
+        assert!(extract_belkim_clarification_noun("Қазір сағат 09:07.").is_none());
+    }
+
+    #[test]
+    fn returns_none_when_no_turaly() {
+        // «Бәлкім» but no «туралы» pattern — not a clarification.
+        assert!(extract_belkim_clarification_noun("Бәлкім, осы жауап дұрыс шығар.").is_none());
+    }
+}
+
+#[cfg(test)]
+mod phase_28_tests {
+    //! **Phase 28 (2026-06-04 — post-rc13 audit)** — proper-noun
+    //! capitalization for the `Бәлкім, X туралы айтасыз ба`
+    //! clarification template.  User insight: «Имена собственные
+    //! необходимо писать с большой буквы.»
+
+    use super::capitalize_belkim_noun_in_output;
+
+    #[test]
+    fn capitalises_lowercase_noun() {
+        let out = capitalize_belkim_noun_in_output("Бәлкім, роза туралы айтасыз ба.");
+        assert_eq!(out, "Бәлкім, Роза туралы айтасыз ба.");
+    }
+
+    #[test]
+    fn capitalises_lowercase_kazakh_noun() {
+        let out = capitalize_belkim_noun_in_output("Бәлкім, құдайберген туралы айтасыз ба.");
+        assert_eq!(out, "Бәлкім, Құдайберген туралы айтасыз ба.");
+    }
+
+    #[test]
+    fn idempotent_on_already_capitalised() {
+        let already = "Бәлкім, Органикалық туралы айтасыз ба.";
+        assert_eq!(capitalize_belkim_noun_in_output(already), already);
+    }
+
+    #[test]
+    fn capitalises_only_first_word_in_multi_word_noun() {
+        let out = capitalize_belkim_noun_in_output("Бәлкім, қазақ әдебиеті туралы айтасыз ба.");
+        assert_eq!(out, "Бәлкім, Қазақ әдебиеті туралы айтасыз ба.");
+    }
+
+    #[test]
+    fn leaves_output_alone_when_no_belkim_pattern() {
+        let unrelated = "Қазақстанның тұңғыш Президенті — Назарбаев.";
+        assert_eq!(capitalize_belkim_noun_in_output(unrelated), unrelated);
     }
 }
