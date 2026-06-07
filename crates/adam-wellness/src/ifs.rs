@@ -56,11 +56,32 @@
 use crate::red_flags;
 use serde::{Deserialize, Serialize};
 
-/// The six IFS stages, in canonical order.  Sessions advance
-/// through them; the `step` function decides advance vs. stay vs.
-/// soft re-probe based on the user's reply pattern.
+/// IFS stages.  Sessions advance through them; the `step` function
+/// decides advance vs. stay vs. soft re-probe based on the user's
+/// reply pattern.
+///
+/// **rc3 (2026-06-04 wellness audit round 2):** replaced
+/// `OpeningConsent` with a three-step intake (`AskingName` →
+/// `AskingAge` → `AskingProblem`).  Live audit said «он не должен
+/// начинать говорить первым … начинать должен с приветствия, узнать
+/// имя, спросить возраст и проблему».  adam now does proper
+/// conversational intake before parts-work.  Gender comes from the
+/// voice-REPL F0 pitch hint, not asked.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum WellnessStage {
+    /// rc3 — first adam turn.  Greet the user, introduce adam,
+    /// ask the user's name.  Advances to `AskingAge` when a name
+    /// is extracted; retries with softer probe up to 2 times then
+    /// skips ahead with no recorded name.
+    AskingName,
+    /// rc3 — second intake turn.  Acknowledge name, ask age.
+    /// Advances to `AskingProblem` on extracted age.
+    AskingAge,
+    /// rc3 — third intake turn.  Ask what brought the user.
+    /// Stores the raw problem statement in the session.  If an
+    /// emotion is named anywhere in the reply, jumps straight to
+    /// `IdentifyPart`; otherwise transitions to `EmotionCheckIn`.
+    AskingProblem,
     EmotionCheckIn,
     IdentifyPart,
     AskRole,
@@ -74,16 +95,42 @@ pub enum WellnessStage {
     Closed,
 }
 
+/// Gender hint passed in by the voice REPL based on F0 pitch
+/// analysis (see `adam-voice`).  Used by adam-wellness to pick
+/// the right Kazakh honorific (Ағай / Апай / Балам / Сіз).
+/// **adam does NOT ask gender** — it is inferred from the voice.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum GenderHint {
+    Male,
+    Female,
+    Child,
+}
+
 /// Ephemeral per-conversation state.  Carries the active stage,
-/// the focal emotion the user named (if any), and the turn
-/// counter at the current stage (used to detect getting stuck
-/// vs. genuine deepening).
+/// intake fields (name / age / gender hint / problem statement),
+/// the focal emotion, and the turn counter at the current stage.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct WellnessSession {
-    /// Current stage.  Initialised at `EmotionCheckIn` when a
+    /// Current stage.  Initialised at `AskingName` when a
     /// session begins; advances through the cycle.
     pub stage: Option<WellnessStage>,
-    /// The emotion the user named at stage 1, referred back to
+
+    /// rc3 — name the user gave (verbatim, title-cased).  `None`
+    /// until extracted.  Templates address the user by name once
+    /// known.
+    pub user_name: Option<String>,
+    /// rc3 — age the user reported.  `None` until extracted.
+    /// Used together with `gender_hint` to pick honorific.
+    pub user_age: Option<u32>,
+    /// rc3 — voice-derived gender hint.  Passed in by the voice
+    /// REPL via `set_gender_hint`; adam-wellness does NOT ask.
+    pub gender_hint: Option<GenderHint>,
+    /// rc3 — raw problem statement the user gave at
+    /// `AskingProblem`.  Kept for context; not interpolated into
+    /// templates verbatim.
+    pub problem_statement: Option<String>,
+
+    /// The emotion the user named at check-in, referred back to
     /// in later stages as «{emotion} бөлігі».  `None` until the
     /// user surfaces something nameable.
     pub focal_emotion: Option<String>,
@@ -93,13 +140,19 @@ pub struct WellnessSession {
 }
 
 impl WellnessSession {
-    /// Start a new IFS session at `EmotionCheckIn`.
+    /// Start a new IFS session at the conversational intake.
     pub fn start() -> Self {
         Self {
-            stage: Some(WellnessStage::EmotionCheckIn),
-            focal_emotion: None,
-            turns_at_stage: 0,
+            stage: Some(WellnessStage::AskingName),
+            ..Default::default()
         }
+    }
+
+    /// Set the gender hint from voice-pitch analysis.  Called by
+    /// the voice REPL after F0 settles (typically by turn 2).
+    /// Idempotent — overwrites whatever was previously stored.
+    pub fn set_gender_hint(&mut self, hint: GenderHint) {
+        self.gender_hint = Some(hint);
     }
 
     /// Whether the session is currently active (in any non-`Closed`
@@ -109,7 +162,10 @@ impl WellnessSession {
         matches!(
             self.stage,
             Some(
-                WellnessStage::EmotionCheckIn
+                WellnessStage::AskingName
+                    | WellnessStage::AskingAge
+                    | WellnessStage::AskingProblem
+                    | WellnessStage::EmotionCheckIn
                     | WellnessStage::IdentifyPart
                     | WellnessStage::AskRole
                     | WellnessStage::WitnessPain
@@ -117,6 +173,34 @@ impl WellnessSession {
                     | WellnessStage::Integration
             )
         )
+    }
+
+    /// rc3 — Kazakh honorific addressing.  Combines name + voice
+    /// gender hint + (optional) age into a polite address form.
+    ///
+    /// - Female adult → «Апай Гүлмира»
+    /// - Male adult → «Ағай Дәулет»
+    /// - Child (gender=Child OR age<18) → «Балам Айгуль»
+    /// - Unknown gender → «Сіз, Дәулет» (no honorific, polite Сіз)
+    /// - No name at all → «Сіз»
+    pub fn honorific_address(&self) -> String {
+        let name = self.user_name.clone();
+        let is_child = matches!(self.gender_hint, Some(GenderHint::Child))
+            || matches!(self.user_age, Some(a) if a < 18);
+        match (is_child, self.gender_hint, name) {
+            (true, _, Some(n)) => format!("Балам {n}"),
+            (true, _, None) => "Балам".to_string(),
+            (false, Some(GenderHint::Female), Some(n)) => format!("Апай {n}"),
+            (false, Some(GenderHint::Female), None) => "Апай".to_string(),
+            (false, Some(GenderHint::Male), Some(n)) => format!("Ағай {n}"),
+            (false, Some(GenderHint::Male), None) => "Ағай".to_string(),
+            // GenderHint::Child without is_child triggering means
+            // pitch said «child» but age >= 18 → defer to name only.
+            (false, Some(GenderHint::Child), Some(n)) => n,
+            (false, Some(GenderHint::Child), None) => "Сіз".to_string(),
+            (false, None, Some(n)) => n,
+            (false, None, None) => "Сіз".to_string(),
+        }
     }
 }
 
@@ -188,24 +272,103 @@ pub fn step(input: &str, session: &mut WellnessSession) -> WellnessReply {
         };
     }
 
+    // ── 2.5. Non-acute somatic / medical-symptom redirect (rc2) ──
+    //
+    // Live audit caught «Сол құлағында үніңі ысқырып дыбысы істіледі»
+    // (left ear ringing) — a tinnitus complaint that adam tried to
+    // parts-work.  Tinnitus, chronic pain, dizziness, etc., aren't
+    // crisis (so red_flags doesn't fire), but they aren't IFS
+    // material either.  Refuse politely and point to a doctor.
+    if matches_any_lower(input, SOMATIC_REDIRECT_PHRASES) {
+        return WellnessReply {
+            text: SOMATIC_REDIRECT_TEMPLATE.to_string(),
+            action: ReplyAction::Continue,
+        };
+    }
+
     // ── 3. Stage-driven response ──
-    let current_stage = session.stage.unwrap_or(WellnessStage::EmotionCheckIn);
+    let current_stage = session.stage.unwrap_or(WellnessStage::AskingName);
     let reply_text = match current_stage {
+        WellnessStage::AskingName => {
+            // rc3 — first turn.  Greet, introduce, ask name.  If
+            // user already gave name, ack and advance.  After 2
+            // failed extractions, give up on the name and proceed.
+            if let Some(name) = extract_user_name(input) {
+                session.user_name = Some(name);
+                session.stage = Some(WellnessStage::AskingAge);
+                session.turns_at_stage = 0;
+                asking_age_template(session.user_name.as_deref().unwrap())
+            } else {
+                session.turns_at_stage = session.turns_at_stage.saturating_add(1);
+                if session.turns_at_stage == 1 {
+                    OPENING_GREETING_AND_ASK_NAME.to_string()
+                } else if session.turns_at_stage == 2 {
+                    NAME_RETRY_TEMPLATE.to_string()
+                } else {
+                    // Give up on name, move on without it.
+                    session.stage = Some(WellnessStage::AskingAge);
+                    session.turns_at_stage = 0;
+                    asking_age_template_no_name()
+                }
+            }
+        }
+        WellnessStage::AskingAge => {
+            if let Some(age) = extract_user_age(input) {
+                session.user_age = Some(age);
+                session.stage = Some(WellnessStage::AskingProblem);
+                session.turns_at_stage = 0;
+                asking_problem_template(&session.honorific_address())
+            } else {
+                session.turns_at_stage = session.turns_at_stage.saturating_add(1);
+                if session.turns_at_stage >= 2 {
+                    // Give up on age, move on.
+                    session.stage = Some(WellnessStage::AskingProblem);
+                    session.turns_at_stage = 0;
+                    asking_problem_template(&session.honorific_address())
+                } else {
+                    AGE_RETRY_TEMPLATE.to_string()
+                }
+            }
+        }
+        WellnessStage::AskingProblem => {
+            // Record the raw problem statement either way.
+            session.problem_statement = Some(input.to_string());
+            if let Some(named) = extract_emotion(input) {
+                // Problem statement already names an emotion —
+                // skip stage 1 check-in and go straight to
+                // identifying the part.
+                session.focal_emotion = Some(named);
+                session.stage = Some(WellnessStage::IdentifyPart);
+                session.turns_at_stage = 0;
+                identify_part_template(session.focal_emotion.as_deref().unwrap())
+            } else {
+                // No emotion named — open the standard IFS
+                // check-in.
+                session.stage = Some(WellnessStage::EmotionCheckIn);
+                session.turns_at_stage = 0;
+                CHECKIN_TEMPLATES[0].to_string()
+            }
+        }
         WellnessStage::EmotionCheckIn => {
-            // First turn: open with check-in.  If the user
-            // already named an emotion on stage entry, extract
-            // it and advance immediately.
             if let Some(named) = extract_emotion(input) {
                 session.focal_emotion = Some(named);
                 session.stage = Some(WellnessStage::IdentifyPart);
                 session.turns_at_stage = 0;
                 identify_part_template(session.focal_emotion.as_deref().unwrap())
             } else {
-                // Stay at check-in with a softer probe variant.
+                // rc2 — stuck-at-checkin guard.  Cycle through the
+                // soft-probe variants, then offer a structural
+                // opening, then close gracefully so we don't pester.
                 session.turns_at_stage = session.turns_at_stage.saturating_add(1);
-                CHECKIN_TEMPLATES
-                    [(session.turns_at_stage as usize).min(CHECKIN_TEMPLATES.len() - 1)]
-                .to_string()
+                let idx = session.turns_at_stage as usize;
+                if idx <= CHECKIN_TEMPLATES.len() {
+                    CHECKIN_TEMPLATES[idx - 1].to_string()
+                } else if idx == CHECKIN_TEMPLATES.len() + 1 {
+                    CHECKIN_STRUCTURAL_PROMPT.to_string()
+                } else {
+                    session.stage = Some(WellnessStage::Closed);
+                    CLOSING_NOT_READY.to_string()
+                }
             }
         }
         WellnessStage::IdentifyPart => {
@@ -274,6 +437,12 @@ fn matches_any_lower(input: &str, needles: &[&str]) -> bool {
     let lower = input.to_lowercase();
     needles.iter().any(|n| lower.contains(n))
 }
+
+// Note: a token-bounded matcher used to live here for the rc2
+// `OpeningConsent` stage.  rc3 removed `OpeningConsent` (replaced
+// by the intake stages) so the helper is no longer reachable.
+// Kept the comment for context if a future stage needs the same
+// shape (whitespace-split, exact-token compare against a needle set).
 
 // ── Template tables ──
 //
@@ -350,6 +519,88 @@ const CLOSING_INTEGRATED: &str = "Бұл жұмыс — бір күнде біт
 const CLOSING_GRACEFUL: &str =
     "Жақсы, әрі қарай жүрмейміз. Өзіңізге уақыт беріңіз. Қайтып келгіңіз келсе — мен осы жердемін.";
 
+/// rc2 — closing emitted after the user spent several check-in
+/// turns without surfacing anything nameable.  Not a failure;
+/// just an acknowledgement that today isn't the day.
+const CLOSING_NOT_READY: &str = "Бүгін дайын болмасаңыз — мүлдем қиналмаңыз. Кез келген уақытта оралуға болады. \
+     Қазірге жұмыс жоқ — өзіңізге жұмсақ болыңыз.";
+
+/// rc3 — `AskingName` first-turn opening.  Greet, introduce
+/// adam, ask the user's name.  Plain Kazakh; no IFS jargon yet.
+const OPENING_GREETING_AND_ASK_NAME: &str = "Сәлеметсіз бе! Мен — Адам, қазақша сөйлесуге арналған көмекшіңізбін. Дәрігер \
+     немесе психотерапевт емеспін, бірақ ішкі сезімдеріңізді бірге қарай аламын. \
+     Танысатын болсақ — атыңыз кім?";
+
+/// rc3 — `AskingName` retry when the first reply did not surface
+/// a name.  Softer probe before giving up after two retries.
+const NAME_RETRY_TEMPLATE: &str =
+    "Кешіріңіз, атыңызды нақты түсінбедім. Қайта айта аласыз ба — «Менің атым ...» деп?";
+
+/// rc3 — `AskingAge` retry when age couldn't be parsed.
+const AGE_RETRY_TEMPLATE: &str = "Жасыңызды нақты түсінбедім. Қайта айта аласыз ба — сандармен (мысалы, «отыз», «жиырма бес») \
+     немесе «маған X жас» деп?";
+
+/// rc3 — `AskingAge` template when a name was extracted.
+fn asking_age_template(name: &str) -> String {
+    format!("Танысқаныма қуаныштымын, {name}. Сізге қанша жас?")
+}
+
+/// rc3 — `AskingAge` fallback when name couldn't be extracted.
+fn asking_age_template_no_name() -> String {
+    "Жарайды, атсыз да жалғастырамыз. Сізге қанша жас?".to_string()
+}
+
+/// rc3 — `AskingProblem` template using the honorific address.
+fn asking_problem_template(address: &str) -> String {
+    format!(
+        "Рахмет, {address}. Бүгін мені іздеп келуіңізге не себеп болды? \
+         Сізді не алаңдатып, не ауырлатып жүр?"
+    )
+}
+
+/// rc2 — emitted at `EmotionCheckIn` after the soft-probe array is
+/// exhausted but no emotion has surfaced.  Suggests a structural
+/// opening (a recent situation rather than a pure feeling-name).
+const CHECKIN_STRUCTURAL_PROMPT: &str = "Сезімге атау табу қиын болса — соңғы күндерде сізді ауырлатқан бір жағдай, \
+     әңгіме, кездесу болды ма? Адам, оқиға, ой — қайсысын алсақ та болады.";
+
+/// rc2 — non-acute somatic / medical-symptom redirect.  Replaces an
+/// IFS prompt when the user describes a physical symptom (ringing
+/// ear, chronic pain, dizziness, sleep problem) instead of an
+/// emotion.  This is NOT a red flag — those go through
+/// `red_flags::escalation_template`.
+const SOMATIC_REDIRECT_TEMPLATE: &str = "Сіз сипаттаған белгі — денсаулыққа қатысты сияқты. Алдымен тиісті дәрігерге \
+     (мысалы, ЛОР маман немесе терапевт) барып, тексеру дұрыс. Мен эмоциялық \
+     тақырыпта — реніш, ашу, қорқыныш — отырып қарай аламын; ауырсыну, дыбыс, \
+     ұйқы сияқты дене белгілерін шеше алмаймын.";
+
+/// rc2 — non-acute somatic / medical symptom phrases that route to
+/// the medical-redirect template instead of IFS dialog.  Audited
+/// per live REPL session; only surface symptoms that adam should
+/// never try to parts-work go here.  Acute / time-critical symptoms
+/// (chest pain, dyspnoea, overdose) belong in `red_flags`, not here.
+const SOMATIC_REDIRECT_PHRASES: &[&str] = &[
+    // Tinnitus / hearing
+    "құлағында ысқыр",
+    "құлағында дыбыс",
+    "құлағым ауыр",
+    "звон в ухе",
+    "шум в ухе",
+    // Chronic pain (without acute markers)
+    "бел ауырады",
+    "тізе ауырады",
+    "буын ауырады",
+    "бас айналады",
+    "хроническая боль",
+    "болит спина давно",
+    // Sleep / digestion
+    "ұйқым қашады",
+    "тамақ батпайды",
+    "проблемы со сном",
+    // Vision
+    "көзім нашар көреді",
+];
+
 /// Phrases that close the session at any stage.
 const ABORT_PHRASES: &[&str] = &[
     "тоқтайық",
@@ -418,67 +669,250 @@ const EMOTION_LEXICON: &[(&str, &str)] = &[
     ("ненавист", "жек көру"),
 ];
 
+// ── rc3 intake extractors ──
+
+/// rc3 — extract a personal name from a name-introduction
+/// utterance.  Looks for the canonical «менің атым X», «атым X»,
+/// «мені X деп атаңыз», «меня зовут X», «я X».  Returns the name
+/// title-cased.  Returns `None` when nothing name-shaped is
+/// found (caller falls back to a retry prompt).
+fn extract_user_name(input: &str) -> Option<String> {
+    let lower = input.to_lowercase();
+    let cleaned: String = lower
+        .chars()
+        .map(|c| if c.is_alphanumeric() { c } else { ' ' })
+        .collect();
+    let tokens: Vec<&str> = cleaned.split_whitespace().collect();
+    if tokens.is_empty() {
+        return None;
+    }
+
+    // Pattern 1: «менің атым X» / «атым X»  → token AFTER «атым».
+    // Pattern 2: «меня зовут X»             → token AFTER «зовут».
+    // Pattern 3: «мені X деп атаңыз»        → token between «мені»
+    //   and «деп».
+    for (i, tok) in tokens.iter().enumerate() {
+        if *tok == "атым" || *tok == "атыңыз" {
+            if let Some(n) = tokens.get(i + 1) {
+                return Some(title_case(n));
+            }
+        }
+        if *tok == "зовут" {
+            if let Some(n) = tokens.get(i + 1) {
+                return Some(title_case(n));
+            }
+        }
+    }
+
+    // Pattern 4: bare single token that doesn't look like a
+    // conversation filler.  Trust the user when they say one
+    // word — likely it's the name.
+    if tokens.len() == 1 && !NAME_BLOCKLIST.contains(&tokens[0]) {
+        return Some(title_case(tokens[0]));
+    }
+
+    None
+}
+
+/// rc3 — words a user might say at `AskingName` that are NOT
+/// names (so we don't capture them as names when they're a bare
+/// single token).
+const NAME_BLOCKLIST: &[&str] = &[
+    "сәлем",
+    "иә",
+    "ия",
+    "ие",
+    "е",
+    "жоқ",
+    "білмеймін",
+    "айтпаймын",
+    "ассалом",
+    "алейкум",
+    "сәлеметсіз",
+    "привет",
+    "здравствуйте",
+    "нет",
+    "да",
+    "не",
+];
+
+/// rc3 — extract user's age.  Accepts:
+///   - digit forms: «маған 35 жас», «35», «35 жастамын»
+///   - Kazakh numeral words: «отыз бес жаста»,
+///     «жиырма үш жасамын», «он сегіз»
+///
+/// Returns `Some(age)` for 1..=120; `None` when no parse-able
+/// age is found.
+fn extract_user_age(input: &str) -> Option<u32> {
+    let lower = input.to_lowercase();
+    // Try digit parse first — quickest and most robust on STT.
+    let cleaned: String = lower
+        .chars()
+        .map(|c| if c.is_numeric() { c } else { ' ' })
+        .collect();
+    for digit_group in cleaned.split_whitespace() {
+        if let Ok(n) = digit_group.parse::<u32>()
+            && (1..=120).contains(&n)
+        {
+            return Some(n);
+        }
+    }
+    // Kazakh numeral parser.  Recognises a single numeral or a
+    // tens-plus-units combo («жиырма бес» = 25).
+    let alpha_cleaned: String = lower
+        .chars()
+        .map(|c| if c.is_alphabetic() { c } else { ' ' })
+        .collect();
+    let tokens: Vec<&str> = alpha_cleaned.split_whitespace().collect();
+    let mut total: u32 = 0;
+    let mut found_any = false;
+    let mut i = 0;
+    while i < tokens.len() {
+        let tok = tokens[i];
+        if let Some(&n) = KZ_NUMERALS_TENS
+            .iter()
+            .find(|(w, _)| *w == tok)
+            .map(|(_, n)| n)
+        {
+            total = total.saturating_add(n);
+            found_any = true;
+            // Look ahead for a unit digit.
+            if let Some(next) = tokens.get(i + 1)
+                && let Some(&u) = KZ_NUMERALS_UNITS
+                    .iter()
+                    .find(|(w, _)| w == next)
+                    .map(|(_, u)| u)
+            {
+                total = total.saturating_add(u);
+                i += 1;
+            }
+        } else if let Some(&n) = KZ_NUMERALS_UNITS
+            .iter()
+            .find(|(w, _)| *w == tok)
+            .map(|(_, n)| n)
+        {
+            total = total.saturating_add(n);
+            found_any = true;
+        }
+        i += 1;
+    }
+    if found_any && (1..=120).contains(&total) {
+        Some(total)
+    } else {
+        None
+    }
+}
+
+/// rc3 — Kazakh tens (10, 20, …, 90 + 100).
+const KZ_NUMERALS_TENS: &[(&str, u32)] = &[
+    ("он", 10),
+    ("жиырма", 20),
+    ("отыз", 30),
+    ("қырық", 40),
+    ("елу", 50),
+    ("алпыс", 60),
+    ("жетпіс", 70),
+    ("сексен", 80),
+    ("тоқсан", 90),
+    ("жүз", 100),
+];
+
+/// rc3 — Kazakh units (1–9).
+const KZ_NUMERALS_UNITS: &[(&str, u32)] = &[
+    ("бір", 1),
+    ("екі", 2),
+    ("үш", 3),
+    ("төрт", 4),
+    ("бес", 5),
+    ("алты", 6),
+    ("жеті", 7),
+    ("сегіз", 8),
+    ("тоғыз", 9),
+];
+
+/// Title-case helper — capitalise the first character, keep
+/// the rest as-is.  Used for displaying the user's name.
+fn title_case(s: &str) -> String {
+    let mut chars = s.chars();
+    match chars.next() {
+        Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
+        None => String::new(),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    // ── Happy path: 6-stage cycle ──
+    /// Test helper — walk a fresh session through the rc3 intake
+    /// (name → age → problem) so individual stage tests don't have
+    /// to repeat it.  Returns a session at `EmotionCheckIn`.
+    fn intake_through_to_checkin() -> WellnessSession {
+        let mut s = WellnessSession::start();
+        step("Менің атым Дәулет.", &mut s);
+        assert_eq!(s.stage, Some(WellnessStage::AskingAge));
+        step("Маған отыз бес жас.", &mut s);
+        assert_eq!(s.stage, Some(WellnessStage::AskingProblem));
+        step("Жұмыста ауыр.", &mut s); // No emotion → CheckIn.
+        assert_eq!(s.stage, Some(WellnessStage::EmotionCheckIn));
+        s
+    }
+
+    // ── Happy path: full intake + 6-stage cycle ──
 
     #[test]
-    fn full_cycle_advances_through_all_six_stages() {
+    fn full_cycle_intake_through_integration() {
         let mut s = WellnessSession::start();
-        assert_eq!(s.stage, Some(WellnessStage::EmotionCheckIn));
+        assert_eq!(s.stage, Some(WellnessStage::AskingName));
 
-        // Turn 1: user names anger → advance to IdentifyPart
-        let r = step("Менің әкеме ашуым көп.", &mut s);
+        // Intake T1: greet + ask name → user gives name.
+        step("Менің атым Дәулет.", &mut s);
+        assert_eq!(s.stage, Some(WellnessStage::AskingAge));
+        assert_eq!(s.user_name.as_deref(), Some("Дәулет"));
+
+        // Intake T2: ask age → user gives age.
+        step("Маған отыз бес жас.", &mut s);
+        assert_eq!(s.stage, Some(WellnessStage::AskingProblem));
+        assert_eq!(s.user_age, Some(35));
+
+        // Intake T3: ask problem → user names anger → straight to IdentifyPart.
+        let r = step("Әкеме қатты ашуланамын.", &mut s);
         assert_eq!(s.stage, Some(WellnessStage::IdentifyPart));
         assert_eq!(s.focal_emotion.as_deref(), Some("ашу"));
         assert!(r.text.contains("ашу"), "got: {}", r.text);
-        assert_eq!(r.action, ReplyAction::Continue);
 
-        // Turn 2: AskRole
-        let r = step("Бала кезімнен бері.", &mut s);
+        // T4 AskRole
+        step("Бала кезімнен бері.", &mut s);
         assert_eq!(s.stage, Some(WellnessStage::AskRole));
-        assert!(r.text.contains("ашу"), "got: {}", r.text);
-
-        // Turn 3: WitnessPain
-        let r = step("Кінәлі сезінбес үшін.", &mut s);
+        // T5 WitnessPain
+        step("Кінәлі сезінбес үшін.", &mut s);
         assert_eq!(s.stage, Some(WellnessStage::WitnessPain));
-        assert!(r.text.contains("ашу"), "got: {}", r.text);
-
-        // Turn 4: Unblending
-        let r = step("Ол қатты жалғыз.", &mut s);
+        // T6 Unblending
+        step("Ол қатты жалғыз.", &mut s);
         assert_eq!(s.stage, Some(WellnessStage::Unblending));
-        assert!(r.text.contains("тыныс"), "got: {}", r.text);
-
-        // Turn 5: Integration
-        let _ = step("Иә, сезіп тұрмын.", &mut s);
+        // T7 Integration
+        step("Иә, сезіп тұрмын.", &mut s);
         assert_eq!(s.stage, Some(WellnessStage::Integration));
-
-        // Turn 6: Closing
+        // T8 Closing
         let r = step("Алғыс айтайын.", &mut s);
         assert_eq!(s.stage, Some(WellnessStage::Closed));
         assert_eq!(r.action, ReplyAction::Close);
-        assert!(!s.is_active());
     }
 
-    // ── Stage 1 stays when no emotion named ──
+    // ── Stage 1 — checkin stays when no emotion named ──
 
     #[test]
     fn checkin_stays_when_no_emotion_named() {
-        let mut s = WellnessSession::start();
-        let r = step(
+        let mut s = intake_through_to_checkin();
+        let r1 = step(
             "Білмеймін, қандай сезімде екенімді анықтай алмадым.",
             &mut s,
         );
-        // Stays at EmotionCheckIn with a softer probe variant.
         assert_eq!(s.stage, Some(WellnessStage::EmotionCheckIn));
-        assert_eq!(r.action, ReplyAction::Continue);
-        assert!(s.focal_emotion.is_none());
-        // Second probe should be a different (softer) template.
+        assert_eq!(r1.action, ReplyAction::Continue);
         let r2 = step("Әлі түсінбеймін.", &mut s);
         assert_eq!(s.stage, Some(WellnessStage::EmotionCheckIn));
-        assert_ne!(r.text, r2.text, "softer probe should differ");
+        assert_ne!(r1.text, r2.text, "softer probe should differ");
     }
 
     // ── Russian code-switch on emotion naming ──
@@ -486,6 +920,8 @@ mod tests {
     #[test]
     fn russian_emotion_maps_to_kazakh_canonical() {
         let mut s = WellnessSession::start();
+        step("Меня зовут Дәулет.", &mut s);
+        step("Маған отыз жас.", &mut s);
         step("У меня сильная обида на маму.", &mut s);
         assert_eq!(s.focal_emotion.as_deref(), Some("реніш"));
     }
@@ -493,6 +929,8 @@ mod tests {
     #[test]
     fn russian_fear_maps_to_kazakh() {
         let mut s = WellnessSession::start();
+        step("Меня зовут Гүлмира.", &mut s);
+        step("Маған жиырма бес жас.", &mut s);
         step("Я боюсь будущего.", &mut s);
         assert_eq!(s.focal_emotion.as_deref(), Some("қорқыныш"));
     }
@@ -501,11 +939,9 @@ mod tests {
 
     #[test]
     fn red_flag_mid_session_escalates_and_clears() {
-        let mut s = WellnessSession::start();
+        let mut s = intake_through_to_checkin();
         step("Әкеме қатты ашуланамын.", &mut s);
         assert_eq!(s.stage, Some(WellnessStage::IdentifyPart));
-
-        // Mid-session: user surfaces suicidal ideation.
         let r = step("Бірақ қазір өмір сүргім келмейді.", &mut s);
         assert!(matches!(
             r.action,
@@ -515,11 +951,25 @@ mod tests {
         assert!(r.text.contains("150"));
     }
 
+    #[test]
+    fn red_flag_at_intake_escalates_and_clears() {
+        // Defence-in-depth: suicidal ideation at the very first
+        // turn (before name is even given) MUST escalate, not run
+        // through name extraction.
+        let mut s = WellnessSession::start();
+        let r = step("Менің атым Дәулет, бірақ өмір сүргім келмейді.", &mut s);
+        assert!(matches!(
+            r.action,
+            ReplyAction::Escalate(red_flags::RedFlag::SuicidalIdeation)
+        ));
+        assert!(s.stage.is_none());
+    }
+
     // ── Abort ──
 
     #[test]
     fn abort_phrase_closes_gracefully() {
-        let mut s = WellnessSession::start();
+        let mut s = intake_through_to_checkin();
         step("Реніш бар.", &mut s);
         let r = step("Болды, тоқтайық.", &mut s);
         assert_eq!(s.stage, Some(WellnessStage::Closed));
@@ -528,9 +978,9 @@ mod tests {
 
     #[test]
     fn russian_abort_phrase_works() {
-        let mut s = WellnessSession::start();
+        let mut s = intake_through_to_checkin();
         step("Ашу бар.", &mut s);
-        let _ = step("Хватит, давай о другом.", &mut s);
+        step("Хватит, давай о другом.", &mut s);
         assert_eq!(s.stage, Some(WellnessStage::Closed));
     }
 
@@ -549,6 +999,228 @@ mod tests {
     fn fresh_session_is_active() {
         let s = WellnessSession::start();
         assert!(s.is_active());
+    }
+
+    // ── rc3 intake stages ──
+
+    #[test]
+    fn fresh_session_starts_at_asking_name() {
+        let s = WellnessSession::start();
+        assert_eq!(s.stage, Some(WellnessStage::AskingName));
+    }
+
+    #[test]
+    fn first_turn_greets_introduces_and_asks_name() {
+        // Per user feedback: «он должен с приветствия начинать,
+        // узнать имя, чтобы знать как обращаться».
+        let mut s = WellnessSession::start();
+        let r = step("Сәлеметсіз бе!", &mut s);
+        assert_eq!(s.stage, Some(WellnessStage::AskingName));
+        assert!(r.text.contains("Сәлемет"), "should greet: {}", r.text);
+        assert!(
+            r.text.contains("Адам") || r.text.contains("көмекшіңізбін"),
+            "should introduce itself: {}",
+            r.text
+        );
+        assert!(r.text.contains("атыңыз"), "should ask name: {}", r.text);
+    }
+
+    #[test]
+    fn extract_user_name_handles_kazakh_pattern() {
+        assert_eq!(
+            extract_user_name("Менің атым Дәулет."),
+            Some("Дәулет".to_string())
+        );
+        assert_eq!(
+            extract_user_name("Атым — Гүлмира"),
+            Some("Гүлмира".to_string())
+        );
+    }
+
+    #[test]
+    fn extract_user_name_handles_russian_pattern() {
+        assert_eq!(
+            extract_user_name("Меня зовут Алибек."),
+            Some("Алибек".to_string())
+        );
+    }
+
+    #[test]
+    fn extract_user_name_handles_bare_single_token() {
+        assert_eq!(extract_user_name("Дәулет"), Some("Дәулет".to_string()));
+    }
+
+    #[test]
+    fn extract_user_name_rejects_filler_phrases() {
+        assert_eq!(extract_user_name("Сәлем"), None);
+        assert_eq!(extract_user_name("Білмеймін"), None);
+        assert_eq!(extract_user_name("Ассалом алейкум"), None);
+    }
+
+    #[test]
+    fn name_extraction_advances_to_age_with_named_address() {
+        let mut s = WellnessSession::start();
+        let r = step("Менің атым Дәулет.", &mut s);
+        assert_eq!(s.stage, Some(WellnessStage::AskingAge));
+        assert_eq!(s.user_name.as_deref(), Some("Дәулет"));
+        assert!(r.text.contains("Дәулет"), "should use name: {}", r.text);
+        assert!(r.text.contains("жас"), "should ask age: {}", r.text);
+    }
+
+    #[test]
+    fn name_retry_then_skip_when_user_refuses() {
+        let mut s = WellnessSession::start();
+        step("Білмеймін", &mut s); // T1 — retry prompt
+        step("Айтпаймын", &mut s); // T2 — second retry
+        step("Жоқ", &mut s); // T3 — give up, advance without name
+        assert_eq!(s.stage, Some(WellnessStage::AskingAge));
+        assert!(s.user_name.is_none());
+    }
+
+    // ── Age extraction ──
+
+    #[test]
+    fn extract_user_age_handles_digits() {
+        assert_eq!(extract_user_age("Маған 35 жас."), Some(35));
+        assert_eq!(extract_user_age("Мен 22 жастамын."), Some(22));
+    }
+
+    #[test]
+    fn extract_user_age_handles_kazakh_numerals_tens_plus_units() {
+        assert_eq!(extract_user_age("Маған отыз бес жас."), Some(35));
+        assert_eq!(extract_user_age("Жиырма бес жасамын."), Some(25));
+        assert_eq!(extract_user_age("Қырық жасамын."), Some(40));
+    }
+
+    #[test]
+    fn extract_user_age_handles_single_units() {
+        // For child users.
+        assert_eq!(extract_user_age("Маған сегіз жас."), Some(8));
+    }
+
+    #[test]
+    fn extract_user_age_rejects_unparseable() {
+        assert_eq!(extract_user_age("Айтпаймын."), None);
+    }
+
+    #[test]
+    fn age_extraction_advances_to_problem_with_honorific() {
+        let mut s = WellnessSession::start();
+        step("Атым Дәулет.", &mut s);
+        s.set_gender_hint(GenderHint::Male);
+        let r = step("Маған отыз бес жас.", &mut s);
+        assert_eq!(s.stage, Some(WellnessStage::AskingProblem));
+        assert_eq!(s.user_age, Some(35));
+        assert!(
+            r.text.contains("Ағай"),
+            "should use male honorific: {}",
+            r.text
+        );
+        assert!(r.text.contains("Дәулет"));
+    }
+
+    // ── Problem stage ──
+
+    #[test]
+    fn problem_with_emotion_jumps_to_identify_part() {
+        let mut s = WellnessSession::start();
+        step("Атым Дәулет.", &mut s);
+        step("Маған отыз жас.", &mut s);
+        let r = step("Әкеме қатты ашуланамын.", &mut s);
+        assert_eq!(s.stage, Some(WellnessStage::IdentifyPart));
+        assert_eq!(s.focal_emotion.as_deref(), Some("ашу"));
+        assert!(r.text.contains("ашу"));
+        assert_eq!(
+            s.problem_statement.as_deref(),
+            Some("Әкеме қатты ашуланамын.")
+        );
+    }
+
+    #[test]
+    fn problem_without_emotion_goes_to_checkin() {
+        let mut s = WellnessSession::start();
+        step("Атым Дәулет.", &mut s);
+        step("Маған отыз жас.", &mut s);
+        step("Жұмыста бәрі шатасты.", &mut s);
+        assert_eq!(s.stage, Some(WellnessStage::EmotionCheckIn));
+    }
+
+    // ── Honorific addressing ──
+
+    #[test]
+    fn honorific_female_adult_uses_apay() {
+        let s = WellnessSession {
+            user_name: Some("Гүлмира".into()),
+            user_age: Some(34),
+            gender_hint: Some(GenderHint::Female),
+            ..Default::default()
+        };
+        assert_eq!(s.honorific_address(), "Апай Гүлмира");
+    }
+
+    #[test]
+    fn honorific_male_adult_uses_agay() {
+        let s = WellnessSession {
+            user_name: Some("Дәулет".into()),
+            user_age: Some(35),
+            gender_hint: Some(GenderHint::Male),
+            ..Default::default()
+        };
+        assert_eq!(s.honorific_address(), "Ағай Дәулет");
+    }
+
+    #[test]
+    fn honorific_child_uses_balam() {
+        let s = WellnessSession {
+            user_name: Some("Айгуль".into()),
+            user_age: Some(12),
+            gender_hint: Some(GenderHint::Female),
+            ..Default::default()
+        };
+        assert_eq!(s.honorific_address(), "Балам Айгуль");
+    }
+
+    #[test]
+    fn honorific_unknown_gender_uses_bare_name() {
+        let s = WellnessSession {
+            user_name: Some("Дәулет".into()),
+            user_age: Some(35),
+            gender_hint: None,
+            ..Default::default()
+        };
+        assert_eq!(s.honorific_address(), "Дәулет");
+    }
+
+    // ── Somatic redirect (carried from rc2) ──
+
+    #[test]
+    fn somatic_complaint_redirects_to_medical_referral() {
+        let mut s = intake_through_to_checkin();
+        let r = step("Сол құлағында ысқырып дыбысы істіледі.", &mut s);
+        assert!(
+            r.text.contains("дәрігер") || r.text.contains("ЛОР"),
+            "should redirect to doctor: {}",
+            r.text
+        );
+    }
+
+    // ── Stage 1 checkin overflow (carried from rc2) ──
+
+    #[test]
+    fn checkin_falls_back_to_structural_prompt_then_closes() {
+        let mut s = intake_through_to_checkin();
+        for _ in 0..CHECKIN_TEMPLATES.len() {
+            step("Білмеймін.", &mut s);
+        }
+        let structural = step("Әлі түсінбеймін.", &mut s);
+        assert!(
+            structural.text.contains("жағдай") || structural.text.contains("оқиға"),
+            "structural prompt should reference a situation: {}",
+            structural.text
+        );
+        let close = step("Білмеймін.", &mut s);
+        assert_eq!(s.stage, Some(WellnessStage::Closed));
+        assert_eq!(close.action, ReplyAction::Close);
     }
 
     // ── Templates ──

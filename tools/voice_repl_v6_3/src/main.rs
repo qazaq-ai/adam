@@ -607,20 +607,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // straddles the male/female boundary (~165 Hz). After two
         // consecutive estimates pick the same label, the session
         // becomes immutable for the rest of the run.
-        if let Some(conv) = conversation.as_mut() {
-            let i16_samples: Vec<i16> = pcm
-                .data
-                .iter()
-                .map(|s| (s.clamp(-1.0, 1.0) * 32767.0) as i16)
-                .collect();
-            if let Some(g) = adam_voice::pitch::estimate_pitch_hz(&i16_samples, pcm.sample_rate)
-                .and_then(adam_voice::pitch::classify_gender)
-            {
-                let label = match g {
-                    adam_voice::pitch::PitchGender::Male => "male",
-                    adam_voice::pitch::PitchGender::Female => "female",
-                    adam_voice::pitch::PitchGender::Child => "child",
-                };
+        // **v6.4 rc3** — pitch-gender estimation now fires in BOTH
+        // `respond` and `wellness` modes, since wellness uses the
+        // hint to pick the right honorific (Ағай / Апай / Балам)
+        // even though it has no `Conversation` instance.
+        let i16_samples: Vec<i16> = pcm
+            .data
+            .iter()
+            .map(|s| (s.clamp(-1.0, 1.0) * 32767.0) as i16)
+            .collect();
+        let pitch_gender = adam_voice::pitch::estimate_pitch_hz(&i16_samples, pcm.sample_rate)
+            .and_then(adam_voice::pitch::classify_gender);
+        if let Some(g) = pitch_gender {
+            let label = match g {
+                adam_voice::pitch::PitchGender::Male => "male",
+                adam_voice::pitch::PitchGender::Female => "female",
+                adam_voice::pitch::PitchGender::Child => "child",
+            };
+            // Respond-mode path: write into the Conversation session.
+            if let Some(conv) = conversation.as_mut() {
                 let locked = conv.session.get("voice_gender_locked").is_some();
                 if !locked {
                     let counter_key = format!("voice_gender_count_{label}");
@@ -641,6 +646,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         println!("[voice-repl] pitch-gender hint = {label} ({new_count}/2)");
                     }
                 }
+            }
+            // Wellness-mode path: push the hint into the IFS
+            // session.  Idempotent — overwrite each turn so the
+            // lock-stability logic isn't needed here.
+            if let Some(session) = wellness_session.as_mut() {
+                let hint = match g {
+                    adam_voice::pitch::PitchGender::Male => adam_wellness::ifs::GenderHint::Male,
+                    adam_voice::pitch::PitchGender::Female => {
+                        adam_wellness::ifs::GenderHint::Female
+                    }
+                    adam_voice::pitch::PitchGender::Child => adam_wellness::ifs::GenderHint::Child,
+                };
+                session.set_gender_hint(hint);
+                println!("[voice-repl] wellness gender hint = {label}");
             }
         }
 
