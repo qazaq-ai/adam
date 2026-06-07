@@ -98,10 +98,70 @@ pub fn apply_with_context(input: &str, awaiting_name: bool) -> String {
         return rewrite_word(input, "атом ", "атың ");
     }
 
+    // **Phase 22.D (2026-06-04 — post-rc12 audit)** — context-aware
+    // verb correction.  User insight: «Он должен понимать, что
+    // скорее всего не правильно расшлышал «Мен қостанай да
+    // отырамын», так как 'Мен қостанай да' + 'отырамын' не подходит,
+    // а подходит 'тұрамын'.»
+    //
+    // When the input has the unambiguous «мен + known KZ city +
+    // <verb>-мын» shape, the verb MUST be the dwelling verb «тұрамын»
+    // — anything else is a Whisper drift.  Common drifts observed in
+    // live REPL:
+    //   «отырамын» (Whisper hears extra leading «о»)
+    //   «турамын»  (Russian-style «т» instead of «тұ»)
+    //   «турам»    (short colloquial)
+    //
+    // Rewrite to the canonical «тұрамын» so the rest of the pipeline
+    // (defer rule + v6.1 StatementOfLocation parser) handles it
+    // correctly.  Tight gate — only applies in the «мен ... city ...
+    // <drifted-verb>» frame, so genuine «Мен үстелде отырамын» (I sit
+    // at the table) without a city marker is left alone.
+    if lower.starts_with("мен ") || lower.starts_with("менің ") || lower.starts_with("менім ")
+    {
+        let known_city_stems = [
+            "алматы",
+            "астана",
+            "қостанай",
+            "костанай",
+            "шымкент",
+            "ақтөбе",
+            "тараз",
+            "өскемен",
+            "семей",
+            "павлодар",
+            "атырау",
+            "ақтау",
+            "орал",
+            "талдықорған",
+            "көкшетау",
+            "петропавл",
+            "қызылорда",
+            "жезқазған",
+            "темиртау",
+        ];
+        let has_city = known_city_stems.iter().any(|c| lower.contains(c));
+        let dwelling_verb_drifts = ["отырамын", "отырамыз", "турамын", "турамыз", "турам"];
+        if has_city {
+            for drift in dwelling_verb_drifts {
+                if lower.contains(drift) {
+                    // Determine the canonical replacement based on
+                    // the singular / plural ending of the drift.
+                    let replacement = if drift.ends_with("мыз") {
+                        "тұрамыз"
+                    } else {
+                        "тұрамын"
+                    };
+                    return rewrite_word(input, drift, replacement);
+                }
+            }
+        }
+    }
+
     // **Phase 22.C (2026-06-03 evening)** — accusative→locative city
     // case suffix normalization. Live REPL caught «Мен Қостанайды
     // тұрамын» — Whisper drifted the locative `‑да` to accusative
-    // `‑ды` («Where in X I live» → «X-acc I live»). The v6.1
+    // `‑ды» («Where in X I live» → «X-acc I live»). The v6.1
     // StatementOfLocation parser only recognises the locative form,
     // so the accusative-drifted input fell through to the generic
     // clarification fallback («Сұрағыңызды толық түсінбедім»).
@@ -373,5 +433,44 @@ mod tests {
         // No «мен/менім» prefix → not our pattern.
         let input = "Қостанайды көрдім.";
         assert_eq!(apply(input), input);
+    }
+
+    // ── Phase 22.D — context-aware verb correction ──
+
+    #[test]
+    fn rewrites_otyramyn_to_canonical_dwelling_verb() {
+        // Live REPL: «Мен қостанай да отырамын.» — adam said
+        // «Қостанай — қала.»  Phase 22.D rewrites the drifted
+        // verb to canonical «тұрамын» so the rest of the pipeline
+        // recognises the location statement.
+        let out = apply("Мен қостанай да отырамын.");
+        assert!(out.contains("тұрамын"), "got: {out}");
+        assert!(!out.contains("отырамын"), "got: {out}");
+    }
+
+    #[test]
+    fn rewrites_turamyn_russian_t_to_canonical() {
+        // Whisper sometimes drops the Kazakh «тұ» onset and writes
+        // the Russian-style «ту»: «турамын».
+        let out = apply("Мен қостанайда турамын.");
+        assert!(out.contains("тұрамын"), "got: {out}");
+    }
+
+    #[test]
+    fn does_not_rewrite_otyramyn_without_city_context() {
+        // «Мен үстелде отырамын.» (I sit at the table) — no city
+        // marker, so this is a genuine «sit» statement.  Don't
+        // touch it.
+        let input = "Мен үстелде отырамын.";
+        assert_eq!(apply(input), input);
+    }
+
+    #[test]
+    fn plural_drift_rewrites_to_plural_canonical() {
+        let out = apply("Біз қостанайда отырамыз.");
+        // First-person plural «біз» isn't in our gate; we only fire
+        // on «мен/менің/менім».  So this stays unchanged.  This
+        // negative case documents the scope.
+        assert_eq!(out, "Біз қостанайда отырамыз.");
     }
 }
