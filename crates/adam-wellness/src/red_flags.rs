@@ -131,9 +131,12 @@ pub fn detect(input: &str) -> Option<RedFlag> {
 /// inserts spurious spaces into «өмір» — splitting it to «ө мір»
 /// or «ө мөрі», which would otherwise hide the «өм» anchor.
 ///
-///   - «өм» or «ом» (life-root)
-///   - «сүрг» (live-verb stem)
-///   - «келм» (negation stem)
+///   - life-root:  «өм» / «ом»
+///   - live-verb stem:  «сүрг» / «серг» / «сірг» / «сорг» / «сұрг»
+///     (Whisper routinely substitutes the «ү» vowel — rc4 audit
+///     transcript had «сергім» and «сіргім» variants that the
+///     bare «сүрг» check missed.)
+///   - negation:  «келм»
 ///
 /// All three must appear; order doesn't matter.  False-positive
 /// risk: discussing someone else's death wish.  We accept that
@@ -142,7 +145,9 @@ pub fn detect(input: &str) -> Option<RedFlag> {
 fn matches_suicidal_phonetic_anchors(lower: &str) -> bool {
     let concat: String = lower.chars().filter(|c| c.is_alphabetic()).collect();
     let life_root = concat.contains("өм") || concat.contains("ом");
-    let live_verb = concat.contains("сүрг");
+    let live_verb = ["сүрг", "серг", "сірг", "сорг", "сұрг", "сэрг"]
+        .iter()
+        .any(|s| concat.contains(s));
     let negation = concat.contains("келм");
     life_root && live_verb && negation
 }

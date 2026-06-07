@@ -88,6 +88,13 @@ pub enum WellnessStage {
     WitnessPain,
     Unblending,
     Integration,
+    /// **rc5** — emitted after a red-flag escalation cleared
+    /// the prior session.  Holds intake info (name / age / gender)
+    /// but refuses to run parts-work prompts.  The user must
+    /// explicitly signal they want to continue («дайынмын»,
+    /// «жалғастырайық», «бастайық») before any new IFS turn.
+    /// Any further red-flag re-emits the escalation template.
+    PostEscalation,
     /// Terminal state — the user has completed the cycle (or
     /// gracefully aborted).  Sessions in `Closed` do not produce
     /// more IFS replies; the orchestration layer can start a new
@@ -148,6 +155,44 @@ impl WellnessSession {
         }
     }
 
+    /// **rc5 — resume after an Escalate or graceful Close.**
+    ///
+    /// Live audit feedback: «adam doesn't remember name and age
+    /// across the dialog from beginning to end».  Cause: after
+    /// the crisis-clearance step zeroed the session, the REPL
+    /// auto-restarted with `WellnessSession::start()` — losing
+    /// name, age, gender, and the previous escalation history.
+    ///
+    /// `resume_after_clearance` preserves identifying info
+    /// (name / age / gender hint) from the prior session while
+    /// resetting the IFS-state machinery (stage, focal emotion,
+    /// turn counter, problem statement).  The new stage is
+    /// `PostEscalation` if `was_escalation` is true — which
+    /// blocks fresh parts-work prompts until the user explicitly
+    /// signals they want to continue.  Otherwise the new stage
+    /// is `AskingName` when no name is known, else it skips
+    /// straight to `AskingProblem` since intake is already done.
+    pub fn resume_after_clearance(prior: &WellnessSession, was_escalation: bool) -> Self {
+        let stage = if was_escalation {
+            WellnessStage::PostEscalation
+        } else if prior.user_name.is_some() && prior.user_age.is_some() {
+            WellnessStage::AskingProblem
+        } else if prior.user_name.is_some() {
+            WellnessStage::AskingAge
+        } else {
+            WellnessStage::AskingName
+        };
+        Self {
+            stage: Some(stage),
+            user_name: prior.user_name.clone(),
+            user_age: prior.user_age,
+            gender_hint: prior.gender_hint,
+            problem_statement: None,
+            focal_emotion: None,
+            turns_at_stage: 0,
+        }
+    }
+
     /// Set the gender hint from voice-pitch analysis.  Called by
     /// the voice REPL after F0 settles (typically by turn 2).
     /// Idempotent — overwrites whatever was previously stored.
@@ -171,6 +216,7 @@ impl WellnessSession {
                     | WellnessStage::WitnessPain
                     | WellnessStage::Unblending
                     | WellnessStage::Integration
+                    | WellnessStage::PostEscalation
             )
         )
     }
@@ -253,9 +299,18 @@ pub enum ReplyAction {
 /// from `turns_at_stage` indexing into a fixed array, not RNG.
 pub fn step(input: &str, session: &mut WellnessSession) -> WellnessReply {
     // ── 1. Defence-in-depth red-flag check ──
+    //
+    // **rc5 (2026-06-04 audit round 3):** stage moves to
+    // `PostEscalation` instead of being cleared to `None`.  This
+    // preserves the user's identifying intake (name / age /
+    // gender) so adam can address them by name if they choose to
+    // come back later, and the next utterance enters
+    // `PostEscalation` logic rather than auto-restarting at
+    // `AskingName` and re-asking for a name.
     if let Some(flag) = red_flags::detect(input) {
-        session.stage = None;
+        session.stage = Some(WellnessStage::PostEscalation);
         session.focal_emotion = None;
+        session.problem_statement = None;
         session.turns_at_stage = 0;
         return WellnessReply {
             text: red_flags::escalation_template(flag).to_string(),
@@ -410,6 +465,38 @@ pub fn step(input: &str, session: &mut WellnessSession) -> WellnessReply {
             session.stage = Some(WellnessStage::Closed);
             session.turns_at_stage = 0;
             CLOSING_INTEGRATED.to_string()
+        }
+        WellnessStage::PostEscalation => {
+            // rc5 — sitting after a red-flag escalation.  Three
+            // possibilities:
+            //   1. User explicitly wants to continue → reset to
+            //      AskingProblem (we already know name/age) or
+            //      AskingName / AskingAge if intake was partial.
+            //   2. User makes another concerning statement →
+            //      already caught by the red_flag check at top.
+            //   3. Anything else → re-emit the post-escalation
+            //      template (calm, name explicit, names the
+            //      hotline again).
+            if matches_any_lower(input, POST_ESCALATION_RESUME_PHRASES) {
+                let next_stage = if session.user_name.is_some() && session.user_age.is_some() {
+                    WellnessStage::AskingProblem
+                } else if session.user_name.is_some() {
+                    WellnessStage::AskingAge
+                } else {
+                    WellnessStage::AskingName
+                };
+                session.stage = Some(next_stage);
+                session.turns_at_stage = 0;
+                match next_stage {
+                    WellnessStage::AskingProblem => {
+                        asking_problem_template(&session.honorific_address(), session.user_age)
+                    }
+                    WellnessStage::AskingAge => asking_age_template_no_name(),
+                    _ => OPENING_GREETING_AND_ASK_NAME.to_string(),
+                }
+            } else {
+                post_escalation_template(&session.user_name)
+            }
         }
         WellnessStage::Closed => {
             // Session already closed — orchestrator shouldn't be
@@ -628,6 +715,44 @@ const FRUSTRATION_AT_ADAM_PHRASES: &[&str] = &[
     "ты глупый",
 ];
 
+/// rc5 — phrases the user must explicitly say at `PostEscalation`
+/// to indicate they have called the hotline and want to continue
+/// talking.  Anything else stays at `PostEscalation`.
+const POST_ESCALATION_RESUME_PHRASES: &[&str] = &[
+    "жалғастырайық",
+    "жалғастыр",
+    "дайынмын",
+    "дайын",
+    "бастайық",
+    "сөйлесейік",
+    "сөйлесе",
+    "қайтып келдім",
+    "қайтып",
+    // Russian
+    "продолжим",
+    "готов",
+    "готова",
+    "вернулся",
+    "вернулась",
+    "давай",
+    "поговорим",
+];
+
+/// rc5 — post-escalation template.  Names the user when known,
+/// names the hotline again, makes the boundary explicit, invites
+/// re-entry only on explicit signal.
+fn post_escalation_template(name: &Option<String>) -> String {
+    let address = match name {
+        Some(n) => format!(", {n}"),
+        None => String::new(),
+    };
+    format!(
+        "Әлі осы жердемін{address}. Бірақ алдымен 150 телефонға қоңырау маңызды — мен оның \
+         орнын баса алмаймын. Дайын болсаңыз — «жалғастырайық» немесе «дайынмын» деп \
+         айтыңыз. Қазірге өзіңізге уақыт беріңіз."
+    )
+}
+
 /// rc4 — emitted on `FRUSTRATION_AT_ADAM_PHRASES`.  Acknowledges
 /// the mis-hearing explicitly, asks the user to retry in different
 /// words.  Does NOT defend adam, does NOT proceed with IFS.
@@ -747,37 +872,76 @@ fn extract_user_name(input: &str) -> Option<String> {
         return None;
     }
 
+    // **rc5 (2026-06-04 live audit round 3).**  Apply the
+    // blocklist to ALL extraction patterns, not just bare tokens.
+    // rc4 took «кім» (= "who") as a name when the user said
+    // «Менің атым кім?» (= "What is my name?") because Pattern 1
+    // returned tokens[i+1] without filtering.  rc5 also rejects
+    // merged Whisper greeting forms («ассаламуалейкум») whose
+    // separate-word entries («ассалом», «алейкум») didn't catch.
+    let take_if_name_like = |tok: &str| -> Option<String> {
+        if is_namelike(tok) {
+            Some(title_case(tok))
+        } else {
+            None
+        }
+    };
+
     // Pattern 1: «менің атым X» / «атым X»  → token AFTER «атым».
     // Pattern 2: «меня зовут X»             → token AFTER «зовут».
-    // Pattern 3: «мені X деп атаңыз»        → token between «мені»
-    //   and «деп».
     for (i, tok) in tokens.iter().enumerate() {
         if *tok == "атым" || *tok == "атыңыз" {
-            if let Some(n) = tokens.get(i + 1) {
-                return Some(title_case(n));
+            if let Some(n) = tokens.get(i + 1).and_then(|n| take_if_name_like(n)) {
+                return Some(n);
             }
         }
         if *tok == "зовут" {
-            if let Some(n) = tokens.get(i + 1) {
-                return Some(title_case(n));
+            if let Some(n) = tokens.get(i + 1).and_then(|n| take_if_name_like(n)) {
+                return Some(n);
             }
         }
     }
 
-    // Pattern 4: bare single token that doesn't look like a
-    // conversation filler.  Trust the user when they say one
-    // word — likely it's the name.
-    if tokens.len() == 1 && !NAME_BLOCKLIST.contains(&tokens[0]) {
-        return Some(title_case(tokens[0]));
+    // Pattern 4: bare single token that passes the name-like
+    // filter.
+    if tokens.len() == 1 {
+        return take_if_name_like(tokens[0]);
     }
 
     None
 }
 
-/// rc3 — words a user might say at `AskingName` that are NOT
-/// names (so we don't capture them as names when they're a bare
-/// single token).
+/// rc5 — guard that filters out tokens that LOOK like names but
+/// aren't — greetings, wh-words, fillers, merged Whisper artefacts.
+/// Used both for bare-single-token extraction and for the «атым X»
+/// pattern.  Conservative: when uncertain, return false so we
+/// prompt the user to repeat rather than capture noise.
+fn is_namelike(tok: &str) -> bool {
+    // Exact-match against the blocklist.
+    if NAME_BLOCKLIST.contains(&tok) {
+        return false;
+    }
+    // Substring contains check for merged Whisper forms.  Token
+    // «ассаламуалейкум» contains «ассал» and «алейк»; reject.
+    for fragment in NAME_BLOCKLIST_SUBSTRINGS {
+        if tok.contains(fragment) {
+            return false;
+        }
+    }
+    // Reject too-short tokens (likely fillers).
+    if tok.chars().count() < 2 {
+        return false;
+    }
+    true
+}
+
+/// rc3 — exact-match tokens that are NOT names.  Greetings,
+/// affirmations, fillers, wh-words.
+/// **rc5 additions:** wh-words «кім», «не», «қайда», «қалай»,
+/// «қашан», «қанша» — live audit took «кім» as a name from
+/// «Менің атым кім?» (= "What is my name?").
 const NAME_BLOCKLIST: &[&str] = &[
+    // Greetings
     "сәлем",
     "иә",
     "ия",
@@ -794,6 +958,45 @@ const NAME_BLOCKLIST: &[&str] = &[
     "нет",
     "да",
     "не",
+    // Wh-words and meta-questions (rc5)
+    "кім",
+    "кімде",
+    "кімдер",
+    "не",
+    "неге",
+    "немене",
+    "қайда",
+    "қалай",
+    "қашан",
+    "қанша",
+    "қандай",
+    "қайсысы",
+    "кто",
+    "что",
+    "почему",
+    "когда",
+    "сколько",
+    "какой",
+    "какая",
+];
+
+/// rc5 — substring fragments that, if PRESENT inside the candidate
+/// token, disqualify it from being a name.  Catches Whisper's
+/// merged-word artefacts that exact-match misses.  Example:
+/// «Ассаламуалейкум» merged as one token by Whisper — contains
+/// «ассал» and «алейк», so reject.
+const NAME_BLOCKLIST_SUBSTRINGS: &[&str] = &[
+    "ассал",
+    "алейк",
+    "уалейк",
+    "сәлемет",
+    "білмей",
+    "айтпай",
+    "айтпам",
+    "здравств",
+    "приве",
+    "ақымақ",
+    "түсінбей",
 ];
 
 /// rc3 — extract user's age.  Accepts:
@@ -1030,7 +1233,11 @@ mod tests {
             r.action,
             ReplyAction::Escalate(red_flags::RedFlag::SuicidalIdeation)
         ));
-        assert!(s.stage.is_none(), "session must be cleared on escalation");
+        // rc5: stage moves to PostEscalation (not None) so the
+        // user's identifying intake survives.  IFS-internal state
+        // (focal_emotion, problem_statement) is still cleared.
+        assert_eq!(s.stage, Some(WellnessStage::PostEscalation));
+        assert!(s.focal_emotion.is_none());
         assert!(r.text.contains("150"));
     }
 
@@ -1045,7 +1252,7 @@ mod tests {
             r.action,
             ReplyAction::Escalate(red_flags::RedFlag::SuicidalIdeation)
         ));
-        assert!(s.stage.is_none());
+        assert_eq!(s.stage, Some(WellnessStage::PostEscalation));
     }
 
     // ── Abort ──
@@ -1272,6 +1479,129 @@ mod tests {
             ..Default::default()
         };
         assert_eq!(s.honorific_address(), "Дәулет");
+    }
+
+    // ── rc5 live-audit round 3 fixes ──
+
+    #[test]
+    fn name_extractor_rejects_merged_greeting_form() {
+        // Live audit: Whisper merged «Ассалом алейкум» into one
+        // token «Ассаламуалейкум» — separate-word blocklist
+        // entries didn't catch it.  rc5 uses substring fragments.
+        assert_eq!(extract_user_name("Ассаламуалейкум."), None);
+        assert_eq!(extract_user_name("Уалейкум ассалом."), None);
+        assert_eq!(extract_user_name("Сәлеметсіз бе."), None);
+    }
+
+    #[test]
+    fn name_extractor_rejects_wh_word_after_atym_pattern() {
+        // Live audit: «Менің атым кім?» (What is my name?) → rc4
+        // returned «Кім» (= "who") as the user's name.  rc5 filters
+        // wh-words out of all extraction paths.
+        assert_eq!(extract_user_name("Менің атым кім?"), None);
+        assert_eq!(extract_user_name("Атым не?"), None);
+        assert_eq!(extract_user_name("Меня зовут кто?"), None);
+    }
+
+    #[test]
+    fn name_extractor_still_takes_real_names() {
+        // Regression — don't over-block legitimate names.
+        assert_eq!(
+            extract_user_name("Менің атым Дәулет."),
+            Some("Дәулет".into())
+        );
+        assert_eq!(extract_user_name("Атым Гүлмира."), Some("Гүлмира".into()));
+        assert_eq!(
+            extract_user_name("Меня зовут Алибек."),
+            Some("Алибек".into())
+        );
+        assert_eq!(extract_user_name("Айгуль"), Some("Айгуль".into()));
+    }
+
+    #[test]
+    fn escalation_preserves_intake_and_moves_to_post_escalation() {
+        // After a red flag, the session must remember the user's
+        // name + age + gender, and the new stage is PostEscalation
+        // (not None / not auto-restart).
+        let mut s = WellnessSession::start();
+        step("Атым Дәулет.", &mut s);
+        s.set_gender_hint(GenderHint::Male);
+        step("Маған отыз бес жас.", &mut s);
+        let r = step("Өмір сүргім келмейді.", &mut s);
+        assert!(matches!(r.action, ReplyAction::Escalate(_)));
+        assert_eq!(s.stage, Some(WellnessStage::PostEscalation));
+        assert_eq!(s.user_name.as_deref(), Some("Дәулет"));
+        assert_eq!(s.user_age, Some(35));
+        assert_eq!(s.gender_hint, Some(GenderHint::Male));
+    }
+
+    #[test]
+    fn post_escalation_blocks_random_input() {
+        let mut s = WellnessSession::start();
+        step("Атым Дәулет.", &mut s);
+        step("Маған отыз бес жас.", &mut s);
+        step("Өмір сүргім келмейді.", &mut s);
+        // Next utterance is unrelated — must NOT resume IFS.
+        let r = step("Білмеймін не айтайын.", &mut s);
+        assert_eq!(s.stage, Some(WellnessStage::PostEscalation));
+        assert!(
+            r.text.contains("150")
+                || r.text.contains("әлі осы жердемін")
+                || r.text.contains("Әлі осы жердемін"),
+            "should re-anchor hotline: {}",
+            r.text
+        );
+        // Must NOT push parts-work prompts at PostEscalation.
+        assert!(!r.text.contains("бөлік"));
+    }
+
+    #[test]
+    fn post_escalation_exits_only_on_explicit_resume_phrase() {
+        let mut s = WellnessSession::start();
+        step("Атым Дәулет.", &mut s);
+        step("Маған отыз бес жас.", &mut s);
+        step("Өмір сүргім келмейді.", &mut s);
+        // Explicit resume signal — now adam should advance to
+        // AskingProblem (since name + age already known).
+        let r = step("Жалғастырайық.", &mut s);
+        assert_eq!(s.stage, Some(WellnessStage::AskingProblem));
+        assert!(
+            r.text.contains("Дәулет"),
+            "should re-address by name: {}",
+            r.text
+        );
+    }
+
+    #[test]
+    fn post_escalation_re_escalates_on_repeated_crisis() {
+        let mut s = WellnessSession::start();
+        step("Атым Дәулет.", &mut s);
+        step("Маған отыз бес жас.", &mut s);
+        step("Өмір сүргім келмейді.", &mut s);
+        // Crisis statement again — must escalate, not just stay
+        // silent at PostEscalation.
+        let r = step("Өмір сүргім келмейді.", &mut s);
+        assert!(matches!(r.action, ReplyAction::Escalate(_)));
+    }
+
+    #[test]
+    fn resume_after_clearance_preserves_identifiers() {
+        let mut prior = WellnessSession::start();
+        prior.user_name = Some("Дәулет".into());
+        prior.user_age = Some(35);
+        prior.gender_hint = Some(GenderHint::Male);
+        prior.focal_emotion = Some("ашу".into());
+        prior.problem_statement = Some("шу".into());
+        let new = WellnessSession::resume_after_clearance(&prior, false);
+        // Identifying info preserved.
+        assert_eq!(new.user_name.as_deref(), Some("Дәулет"));
+        assert_eq!(new.user_age, Some(35));
+        assert_eq!(new.gender_hint, Some(GenderHint::Male));
+        // IFS state cleared.
+        assert!(new.focal_emotion.is_none());
+        assert!(new.problem_statement.is_none());
+        // With name+age, skip intake to AskingProblem.
+        assert_eq!(new.stage, Some(WellnessStage::AskingProblem));
     }
 
     // ── rc4 live-audit fixes ──

@@ -719,8 +719,32 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 println!("[voice-repl] adam → «{}»", reply.text);
                 // After Close/Escalate, prime a fresh session so the
                 // next user utterance starts a new cycle.
+                //
+                // **rc5 (2026-06-04 audit round 3).**  Preserve
+                // identifying intake (name / age / gender) into
+                // the new session via `resume_after_clearance` —
+                // the live audit said adam «doesn't remember name
+                // and age across the full dialog».  Cause: prior
+                // `WellnessSession::start()` blew away everything
+                // including intake.  Now the prior session's
+                // identifiers carry into the new one; if the
+                // closure was an `Escalate`, the new session
+                // opens at `PostEscalation` instead of re-greeting.
                 if !matches!(reply.action, adam_wellness::ifs::ReplyAction::Continue) {
-                    *session = adam_wellness::ifs::WellnessSession::start();
+                    let was_escalation =
+                        matches!(reply.action, adam_wellness::ifs::ReplyAction::Escalate(_));
+                    // `step` has already set the session's stage
+                    // (PostEscalation for Escalate, Closed for
+                    // Close).  For Close we DO want a clean
+                    // restart — the user finished a cycle and
+                    // can begin a new one, but with name/age
+                    // remembered.  For Escalate the session is
+                    // already at PostEscalation; do nothing.
+                    if !was_escalation {
+                        *session = adam_wellness::ifs::WellnessSession::resume_after_clearance(
+                            session, false,
+                        );
+                    }
                 }
                 reply.text
             }
