@@ -172,7 +172,11 @@ struct Args {
     /// Dialog mode. `echo` (default for now) = TTS re-speaks the
     /// STT output (Phase 13/15 loopback validation). `respond` =
     /// route the recognised text through `adam_dialog::Conversation`
-    /// so the system answers instead of echoing.
+    /// so the system answers instead of echoing. **`wellness`**
+    /// (v6.4) = route through the `adam-wellness` IFS state machine
+    /// — Kazakh-language reflective companion grounded in evidence-
+    /// based therapy frameworks.  NOT a medical treatment system;
+    /// see crates/adam-wellness/src/lib.rs for the safety contract.
     #[arg(long, default_value = "respond")]
     mode: String,
     /// Per-session RNG seed for dialog response selection.
@@ -355,6 +359,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // neural-first routing.
     let intent_classifier = intent_classifier_runtime::IntentClassifierRuntime::load_default();
 
+    // **v6.4 (2026-06-04)** — wellness arc.  When launched with
+    // `--mode wellness`, the REPL skips the `respond` cascade
+    // entirely and routes user utterances through the IFS state
+    // machine in `adam-wellness`.  Session state lives across
+    // turns (current stage, focal emotion, turn counter).  When a
+    // session closes (graceful abort or final integration) a
+    // fresh one is started on the next utterance so the user can
+    // do another cycle.  Red-flag escalation inside `ifs::step`
+    // clears the session — the next utterance is the user's
+    // chance to opt back in.
+    let mut wellness_session = if args.mode == "wellness" {
+        println!(
+            "[voice-repl] mode=wellness — IFS-grounded reflective \
+             companion. Безопасность: red-flag detector активен на \
+             каждый turn; кризисный сигнал → KZ номер вместо диалога. \
+             Это НЕ замена врачу."
+        );
+        Some(adam_wellness::ifs::WellnessSession::start())
+    } else {
+        None
+    };
+
     let single = !args.loop_mode;
     loop {
         if args.loop_mode {
@@ -476,7 +502,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         let user_text_merged = user_text_corrected;
 
-        let fuzzy_out = if args.mode == "respond" {
+        let fuzzy_out = if args.mode == "respond" || args.mode == "wellness" {
             fuzzy_normalise(&user_text_merged, &zipf_vocab)
         } else {
             user_text_merged.clone()
@@ -618,8 +644,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
 
-        let cyrillic = match (&mut conversation, dialog_state.as_ref(), args.mode.as_str()) {
-            (Some(conv), Some((lex, repo)), "respond") => {
+        let cyrillic = match (
+            &mut conversation,
+            dialog_state.as_ref(),
+            wellness_session.as_mut(),
+            args.mode.as_str(),
+        ) {
+            (Some(conv), Some((lex, repo)), _, "respond") => {
                 let reply = conv.turn(&normalised, lex, repo, args.seed);
                 println!("[voice-repl] adam → «{reply}»");
 
@@ -638,6 +669,42 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 reply
             }
+            (_, _, Some(session), "wellness") => {
+                // **v6.4** — wellness IFS branch.  Pass the
+                // normalised user text into the state machine; emit
+                // the scripted Kazakh reply.  When the session
+                // returns `Close` (graceful end or escalation), we
+                // start a fresh session on the next turn so the
+                // user can opt back in to another cycle.
+                let reply = adam_wellness::ifs::step(&normalised, session);
+                let action_tag = match reply.action {
+                    adam_wellness::ifs::ReplyAction::Continue => "continue",
+                    adam_wellness::ifs::ReplyAction::Escalate(flag) => match flag {
+                        adam_wellness::red_flags::RedFlag::SuicidalIdeation => "escalate:suicidal",
+                        adam_wellness::red_flags::RedFlag::AcuteMedicalSymptom => {
+                            "escalate:medical"
+                        }
+                        adam_wellness::red_flags::RedFlag::ChildAbuse => "escalate:child-abuse",
+                        adam_wellness::red_flags::RedFlag::DomesticViolenceImmediate => {
+                            "escalate:dv"
+                        }
+                        adam_wellness::red_flags::RedFlag::Psychosis => "escalate:psychosis",
+                    },
+                    adam_wellness::ifs::ReplyAction::Close => "close",
+                };
+                let stage = session
+                    .stage
+                    .map(|s| format!("{s:?}"))
+                    .unwrap_or_else(|| "cleared".into());
+                println!("[voice-repl] wellness → stage={stage} action={action_tag}",);
+                println!("[voice-repl] adam → «{}»", reply.text);
+                // After Close/Escalate, prime a fresh session so the
+                // next user utterance starts a new cycle.
+                if !matches!(reply.action, adam_wellness::ifs::ReplyAction::Continue) {
+                    *session = adam_wellness::ifs::WellnessSession::start();
+                }
+                reply.text
+            }
             _ => user_text,
         };
 
@@ -645,7 +712,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // REPL is a voice dialog, not a STT tester — a silent reply
         // makes no sense. Force speak ON whenever we're responding.
         // `--speak` still works for --mode=echo (loopback debugging).
-        let should_speak = args.speak || args.mode == "respond";
+        let should_speak = args.speak || args.mode == "respond" || args.mode == "wellness";
         if should_speak {
             let tts_out = match args.tts_backend.as_str() {
                 "piper" => {

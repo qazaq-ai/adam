@@ -48,6 +48,14 @@ adam-kernel = { path = "../../crates/adam-kernel" }
 # to the full ~3000 frequency-extracted curated lexicon without
 # the «даулет → сәулет» false positives from Phase 15g.B.
 adam-lexicon-curated = { path = "../../crates/adam-lexicon-curated" }
+# **v6.4 (2026-06-04)** — wellness arc.  Kazakh reflective companion
+# grounded in evidence-based therapy frameworks (IFS-first).  Used
+# only when the voice REPL is launched with `--mode wellness`; the
+# default `--mode respond` path does not touch this crate.  Hard
+# red-flag escalation is enforced inside `ifs::step` regardless of
+# orchestration; see crates/adam-wellness/src/red_flags.rs for the
+# safety contract.
+adam-wellness = { path = "../../crates/adam-wellness" }
 burn = { version = "0.17", default-features = false, features = ["std", "ndarray"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
