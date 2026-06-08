@@ -89,6 +89,7 @@ pub mod uncertainty;
 pub mod v6_2_router;
 pub mod verifier;
 pub mod weather;
+pub mod wellness;
 
 // **v6.0.0-rc1** — opt-in L5.5 neural composer preview. Compiled
 // only with `--features neural` so the burn-runtime dependencies

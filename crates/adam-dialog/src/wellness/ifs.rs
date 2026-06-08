@@ -53,7 +53,7 @@
 //! IFS session is paused, escalation reply emitted, and the
 //! session resumes only if the user explicitly returns.
 
-use crate::red_flags;
+use super::red_flags;
 use serde::{Deserialize, Serialize};
 
 /// IFS stages.  Sessions advance through them; the `step` function
@@ -854,214 +854,108 @@ const EMOTION_LEXICON: &[(&str, &str)] = &[
     ("ненавист", "жек көру"),
 ];
 
-// ── rc3 intake extractors ──
+// ── rc6 intake extractors — DELEGATE TO v6.2 PRIMITIVES ──
+//
+// User pushback 2026-06-08 on rc5 audit: don't reinvent name
+// capture and Kazakh numeral parsing — adam-dialog already
+// has both, with proper STT-fuzzy + case-suffix support.
+// See [[feedback_no_parallel_cascades]].
 
-/// rc3 — extract a personal name from a name-introduction
-/// utterance.  Looks for the canonical «менің атым X», «атым X»,
-/// «мені X деп атаңыз», «меня зовут X», «я X».  Returns the name
-/// title-cased.  Returns `None` when nothing name-shaped is
-/// found (caller falls back to a retry prompt).
+/// Extract a personal name.  rc6 delegates to
+/// `semantics::interpret_text` → `Intent::StatementOfName`,
+/// which already handles «менің атым X» / «есімім X» / «мені
+/// X деп атайды» plus question / pronoun / patronymic guards
+/// the rc1-rc5 ad-hoc extractor kept missing.
 fn extract_user_name(input: &str) -> Option<String> {
-    let lower = input.to_lowercase();
-    let cleaned: String = lower
-        .chars()
-        .map(|c| if c.is_alphanumeric() { c } else { ' ' })
-        .collect();
-    let tokens: Vec<&str> = cleaned.split_whitespace().collect();
-    if tokens.is_empty() {
-        return None;
+    use crate::intent::Intent;
+    use crate::semantics::interpret_text;
+    match interpret_text(input, &[]) {
+        Intent::StatementOfName { name } if !name.trim().is_empty() => Some(name),
+        _ => None,
     }
-
-    // **rc5 (2026-06-04 live audit round 3).**  Apply the
-    // blocklist to ALL extraction patterns, not just bare tokens.
-    // rc4 took «кім» (= "who") as a name when the user said
-    // «Менің атым кім?» (= "What is my name?") because Pattern 1
-    // returned tokens[i+1] without filtering.  rc5 also rejects
-    // merged Whisper greeting forms («ассаламуалейкум») whose
-    // separate-word entries («ассалом», «алейкум») didn't catch.
-    let take_if_name_like = |tok: &str| -> Option<String> {
-        if is_namelike(tok) {
-            Some(title_case(tok))
-        } else {
-            None
-        }
-    };
-
-    // Pattern 1: «менің атым X» / «атым X»  → token AFTER «атым».
-    // Pattern 2: «меня зовут X»             → token AFTER «зовут».
-    for (i, tok) in tokens.iter().enumerate() {
-        if *tok == "атым" || *tok == "атыңыз" {
-            if let Some(n) = tokens.get(i + 1).and_then(|n| take_if_name_like(n)) {
-                return Some(n);
-            }
-        }
-        if *tok == "зовут" {
-            if let Some(n) = tokens.get(i + 1).and_then(|n| take_if_name_like(n)) {
-                return Some(n);
-            }
-        }
-    }
-
-    // Pattern 4: bare single token that passes the name-like
-    // filter.
-    if tokens.len() == 1 {
-        return take_if_name_like(tokens[0]);
-    }
-
-    None
 }
 
-/// rc5 — guard that filters out tokens that LOOK like names but
-/// aren't — greetings, wh-words, fillers, merged Whisper artefacts.
-/// Used both for bare-single-token extraction and for the «атым X»
-/// pattern.  Conservative: when uncertain, return false so we
-/// prompt the user to repeat rather than capture noise.
-fn is_namelike(tok: &str) -> bool {
-    // Exact-match against the blocklist.
-    if NAME_BLOCKLIST.contains(&tok) {
-        return false;
-    }
-    // Substring contains check for merged Whisper forms.  Token
-    // «ассаламуалейкум» contains «ассал» and «алейк»; reject.
-    for fragment in NAME_BLOCKLIST_SUBSTRINGS {
-        if tok.contains(fragment) {
-            return false;
-        }
-    }
-    // Reject too-short tokens (likely fillers).
-    if tok.chars().count() < 2 {
-        return false;
-    }
-    true
-}
-
-/// rc3 — exact-match tokens that are NOT names.  Greetings,
-/// affirmations, fillers, wh-words.
-/// **rc5 additions:** wh-words «кім», «не», «қайда», «қалай»,
-/// «қашан», «қанша» — live audit took «кім» as a name from
-/// «Менің атым кім?» (= "What is my name?").
-const NAME_BLOCKLIST: &[&str] = &[
-    // Greetings
-    "сәлем",
-    "иә",
-    "ия",
-    "ие",
-    "е",
-    "жоқ",
-    "білмеймін",
-    "айтпаймын",
-    "ассалом",
-    "алейкум",
-    "сәлеметсіз",
-    "привет",
-    "здравствуйте",
-    "нет",
-    "да",
-    "не",
-    // Wh-words and meta-questions (rc5)
-    "кім",
-    "кімде",
-    "кімдер",
-    "не",
-    "неге",
-    "немене",
-    "қайда",
-    "қалай",
-    "қашан",
-    "қанша",
-    "қандай",
-    "қайсысы",
-    "кто",
-    "что",
-    "почему",
-    "когда",
-    "сколько",
-    "какой",
-    "какая",
-];
-
-/// rc5 — substring fragments that, if PRESENT inside the candidate
-/// token, disqualify it from being a name.  Catches Whisper's
-/// merged-word artefacts that exact-match misses.  Example:
-/// «Ассаламуалейкум» merged as one token by Whisper — contains
-/// «ассал» and «алейк», so reject.
-const NAME_BLOCKLIST_SUBSTRINGS: &[&str] = &[
-    "ассал",
-    "алейк",
-    "уалейк",
-    "сәлемет",
-    "білмей",
-    "айтпай",
-    "айтпам",
-    "здравств",
-    "приве",
-    "ақымақ",
-    "түсінбей",
-];
-
-/// rc3 — extract user's age.  Accepts:
-///   - digit forms: «маған 35 жас», «35», «35 жастамын»
-///   - Kazakh numeral words: «отыз бес жаста»,
-///     «жиырма үш жасамын», «он сегіз»
-///
-/// Returns `Some(age)` for 1..=120; `None` when no parse-able
-/// age is found.
+/// Extract user's age (1..=120).  rc6 delegates to
+/// `semantics::interpret_text` → `Intent::StatementOfAge`,
+/// which routes Kazakh numerals (with case suffixes — dative
+/// «алтыға», locative «алтыда», etc.) through the canonical
+/// path.  Falls back to a wellness-stage-aware bare-numeral
+/// parse when the canonical detector misses — at `AskingAge`
+/// we have strong context («adam just asked for age»), so a
+/// reply like «отыз бесте» (literally "at 35", no «жас»
+/// keyword) should be treated as the age answer.
 fn extract_user_age(input: &str) -> Option<u32> {
+    use crate::intent::Intent;
+    use crate::semantics::interpret_text;
+    if let Intent::StatementOfAge { years: Some(n) } = interpret_text(input, &[]) {
+        if (1..=120).contains(&n) {
+            return Some(n);
+        }
+    }
+    extract_bare_numeral(input).filter(|n| (1..=120).contains(n))
+}
+
+/// rc6 — bare-numeral parse for wellness `AskingAge` stage.
+/// Handles digit forms («35»), single Kazakh numerals («отыз»),
+/// and compound tens+units («жиырма бес»), with common case
+/// suffixes («алтыға», «бесте», «отыздамын» digit form).
+/// Returns the FIRST numeral encountered.
+///
+/// We use small inline tables rather than calling into
+/// `adam_algebra::math_solver` because that crate doesn't
+/// expose its strip helper publicly; the cost is duplication
+/// of ~30 lines, but the alternative is an inverse dep that
+/// would harm the workspace dep graph.  See
+/// [[feedback_no_parallel_cascades]] for the broader principle.
+fn extract_bare_numeral(input: &str) -> Option<u32> {
     let lower = input.to_lowercase();
-    // Try digit parse first — quickest and most robust on STT.
-    let cleaned: String = lower
-        .chars()
-        .map(|c| if c.is_numeric() { c } else { ' ' })
-        .collect();
-    for digit_group in cleaned.split_whitespace() {
-        if let Ok(n) = digit_group.parse::<u32>()
-            && (1..=120).contains(&n)
+    // Digit pass first.
+    for chunk in lower.split(|c: char| !c.is_ascii_digit()) {
+        if !chunk.is_empty()
+            && let Ok(n) = chunk.parse::<u32>()
         {
             return Some(n);
         }
     }
-    // Kazakh numeral parser.  Recognises a single numeral or a
-    // tens-plus-units combo («жиырма бес» = 25), with common
-    // case-suffix tolerance («алтыға толды» = "turned six").
-    //
-    // **rc4 (2026-06-04 live-audit fix).**  rc3 missed «алпыс
-    // алтыға толды» (66) — it parsed «алпыс» = 60 but skipped
-    // «алтыға» because the strict-eq match didn't see the
-    // dative-suffixed form.
-    let alpha_cleaned: String = lower
+    // Kazakh-word pass with case-suffix tolerance.
+    let alpha: String = lower
         .chars()
         .map(|c| if c.is_alphabetic() { c } else { ' ' })
         .collect();
-    let tokens: Vec<&str> = alpha_cleaned.split_whitespace().collect();
-    let mut total: u32 = 0;
-    let mut found_any = false;
-    let mut i = 0;
-    while i < tokens.len() {
-        let tok = tokens[i];
-        if let Some(n) = match_kazakh_numeral(tok, KZ_NUMERALS_TENS) {
-            total = total.saturating_add(n);
-            found_any = true;
-            if let Some(next) = tokens.get(i + 1)
-                && let Some(u) = match_kazakh_numeral(next, KZ_NUMERALS_UNITS)
+    let tokens: Vec<&str> = alpha.split_whitespace().collect();
+    fn strip(t: &str) -> &str {
+        for suf in [
+            "ға", "ге", "қа", "ке", "да", "де", "та", "те", "ны", "ні", "ды", "ді", "ты", "ті",
+            "дан", "ден", "тан", "тен",
+        ] {
+            if let Some(stem) = t.strip_suffix(suf)
+                && (KZ_TENS.iter().any(|(w, _)| *w == stem)
+                    || KZ_UNITS.iter().any(|(w, _)| *w == stem))
             {
-                total = total.saturating_add(u);
-                i += 1;
+                return stem;
             }
-        } else if let Some(n) = match_kazakh_numeral(tok, KZ_NUMERALS_UNITS) {
-            total = total.saturating_add(n);
-            found_any = true;
         }
-        i += 1;
+        t
     }
-    if found_any && (1..=120).contains(&total) {
-        Some(total)
-    } else {
-        None
+    for (i, t) in tokens.iter().enumerate() {
+        let s = strip(t);
+        if let Some(&(_, tens)) = KZ_TENS.iter().find(|(w, _)| *w == s) {
+            if let Some(next) = tokens.get(i + 1) {
+                let sn = strip(next);
+                if let Some(&(_, units)) = KZ_UNITS.iter().find(|(w, _)| *w == sn) {
+                    return Some(tens + units);
+                }
+            }
+            return Some(tens);
+        }
+        if let Some(&(_, units)) = KZ_UNITS.iter().find(|(w, _)| *w == s) {
+            return Some(units);
+        }
     }
+    None
 }
 
-/// rc3 — Kazakh tens (10, 20, …, 90 + 100).
-const KZ_NUMERALS_TENS: &[(&str, u32)] = &[
+const KZ_TENS: &[(&str, u32)] = &[
     ("он", 10),
     ("жиырма", 20),
     ("отыз", 30),
@@ -1071,11 +965,9 @@ const KZ_NUMERALS_TENS: &[(&str, u32)] = &[
     ("жетпіс", 70),
     ("сексен", 80),
     ("тоқсан", 90),
-    ("жүз", 100),
 ];
 
-/// rc3 — Kazakh units (1–9).
-const KZ_NUMERALS_UNITS: &[(&str, u32)] = &[
+const KZ_UNITS: &[(&str, u32)] = &[
     ("бір", 1),
     ("екі", 2),
     ("үш", 3),
@@ -1086,45 +978,6 @@ const KZ_NUMERALS_UNITS: &[(&str, u32)] = &[
     ("сегіз", 8),
     ("тоғыз", 9),
 ];
-
-/// Title-case helper — capitalise the first character, keep
-/// the rest as-is.  Used for displaying the user's name.
-/// rc4 — match a Kazakh numeral allowing common case suffixes.
-/// Returns the numerical value if `tok` equals a numeral in `table`
-/// (possibly followed by one of the common Kazakh case endings).
-///
-/// We require EXACT length match (numeral + suffix), not prefix
-/// match, so «алты» matches but «алтын» (gold) and «алтай»
-/// (mountains) don't false-positive.
-fn match_kazakh_numeral(tok: &str, table: &[(&str, u32)]) -> Option<u32> {
-    const CASE_SUFFIXES: &[&str] = &[
-        // bare
-        "", // dative
-        "ға", "ге", "қа", "ке", // locative
-        "да", "де", "та", "те", // accusative
-        "ны", "ні", "ды", "ді", "ты", "ті", // ablative
-        "дан", "ден", "тан", "тен", "нан", "нен", // genitive
-        "ның", "нің", "дың", "дің", "тың", "тің", // possessive 3sg
-        "сы", "сі", // plural
-        "лар", "лер", "дар", "дер", "тар", "тер",
-    ];
-    for &(word, n) in table {
-        for suf in CASE_SUFFIXES {
-            if tok.len() == word.len() + suf.len() && tok.starts_with(word) && tok.ends_with(suf) {
-                return Some(n);
-            }
-        }
-    }
-    None
-}
-
-fn title_case(s: &str) -> String {
-    let mut chars = s.chars();
-    match chars.next() {
-        Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
-        None => String::new(),
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -1205,8 +1058,12 @@ mod tests {
 
     #[test]
     fn russian_emotion_maps_to_kazakh_canonical() {
+        // rc6 — name capture is Kazakh-only (delegates to v6.2
+        // `detect_statement_of_name`), but emotion lexicon still
+        // accepts Russian code-switching mid-session.  Intake uses
+        // Kazakh «менің атым X»; emotion uses Russian «обида».
         let mut s = WellnessSession::start();
-        step("Меня зовут Дәулет.", &mut s);
+        step("Менің атым Дәулет.", &mut s);
         step("Маған отыз жас.", &mut s);
         step("У меня сильная обида на маму.", &mut s);
         assert_eq!(s.focal_emotion.as_deref(), Some("реніш"));
@@ -1215,7 +1072,7 @@ mod tests {
     #[test]
     fn russian_fear_maps_to_kazakh() {
         let mut s = WellnessSession::start();
-        step("Меня зовут Гүлмира.", &mut s);
+        step("Менің атым Гүлмира.", &mut s);
         step("Маған жиырма бес жас.", &mut s);
         step("Я боюсь будущего.", &mut s);
         assert_eq!(s.focal_emotion.as_deref(), Some("қорқыныш"));
@@ -1327,18 +1184,11 @@ mod tests {
         );
     }
 
-    #[test]
-    fn extract_user_name_handles_russian_pattern() {
-        assert_eq!(
-            extract_user_name("Меня зовут Алибек."),
-            Some("Алибек".to_string())
-        );
-    }
-
-    #[test]
-    fn extract_user_name_handles_bare_single_token() {
-        assert_eq!(extract_user_name("Дәулет"), Some("Дәулет".to_string()));
-    }
+    // rc6 — name capture is Kazakh-only via v6.2
+    // `Intent::StatementOfName`.  Russian «меня зовут X» and bare
+    // single-token capture were rc1-rc5 features that we
+    // intentionally drop in the integration pass (parallel-cascade
+    // duplication; the Kazakh-only directive applies).
 
     #[test]
     fn extract_user_name_rejects_filler_phrases() {
@@ -1505,17 +1355,13 @@ mod tests {
 
     #[test]
     fn name_extractor_still_takes_real_names() {
-        // Regression — don't over-block legitimate names.
+        // Regression — Kazakh «менің атым X» / «атым X» patterns
+        // must still work after the rc6 v6.2-delegation pivot.
         assert_eq!(
             extract_user_name("Менің атым Дәулет."),
             Some("Дәулет".into())
         );
         assert_eq!(extract_user_name("Атым Гүлмира."), Some("Гүлмира".into()));
-        assert_eq!(
-            extract_user_name("Меня зовут Алибек."),
-            Some("Алибек".into())
-        );
-        assert_eq!(extract_user_name("Айгуль"), Some("Айгуль".into()));
     }
 
     #[test]

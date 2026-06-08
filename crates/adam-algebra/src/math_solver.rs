@@ -511,11 +511,20 @@ fn number_word_value(w: &str) -> Option<i64> {
 
 /// Strip common Kazakh case suffixes from a word so the number-word
 /// table can match it. «жетіге» → «жеті», «екіге» → «екі», «үшті»
-/// → «үш». Used by the tokenizer before number-word lookup.
+/// → «үш».  Used by the tokenizer before number-word lookup.
+///
+/// **v6.4.0-rc6 (2026-06-08 live-audit fix).**  Added dative
+/// «-ға / -қа» (back-vowel harmony — required for «алтыға» = 6
+/// dative).  Audit transcript: «жасым алпыс алтыға толды» (66)
+/// parsed as 60 because «алтыға» wasn't recognised as «алты»
+/// + dative.
 fn strip_kazakh_case(w: &str) -> &str {
     let cases = [
-        "-ге", "-ке", "-ні", "-нi", "-ні", "-ды", "-ді", "-ты", "-ті", "ге", "ке", "ні", "ды",
-        "ді", "ты", "ті",
+        // dative (back- and front-vowel harmony)
+        "-ға", "-ге", "-қа", "-ке", "ға", "ге", "қа", "ке", // accusative
+        "-ны", "-ні", "-ды", "-ді", "-ты", "-ті", "ны", "ні", "ды", "ді", "ты", "ті",
+        // locative
+        "-да", "-де", "-та", "-те", "да", "де", "та", "те",
     ];
     for suf in &cases {
         if let Some(stripped) = w.strip_suffix(suf) {

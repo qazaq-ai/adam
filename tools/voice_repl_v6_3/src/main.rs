@@ -376,7 +376,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
              каждый turn; кризисный сигнал → KZ номер вместо диалога. \
              Это НЕ замена врачу."
         );
-        Some(adam_wellness::ifs::WellnessSession::start())
+        Some(adam_dialog::wellness::ifs::WellnessSession::start())
     } else {
         None
     };
@@ -652,11 +652,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             // lock-stability logic isn't needed here.
             if let Some(session) = wellness_session.as_mut() {
                 let hint = match g {
-                    adam_voice::pitch::PitchGender::Male => adam_wellness::ifs::GenderHint::Male,
-                    adam_voice::pitch::PitchGender::Female => {
-                        adam_wellness::ifs::GenderHint::Female
+                    adam_voice::pitch::PitchGender::Male => {
+                        adam_dialog::wellness::ifs::GenderHint::Male
                     }
-                    adam_voice::pitch::PitchGender::Child => adam_wellness::ifs::GenderHint::Child,
+                    adam_voice::pitch::PitchGender::Female => {
+                        adam_dialog::wellness::ifs::GenderHint::Female
+                    }
+                    adam_voice::pitch::PitchGender::Child => {
+                        adam_dialog::wellness::ifs::GenderHint::Child
+                    }
                 };
                 session.set_gender_hint(hint);
                 println!("[voice-repl] wellness gender hint = {label}");
@@ -695,21 +699,27 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 // returns `Close` (graceful end or escalation), we
                 // start a fresh session on the next turn so the
                 // user can opt back in to another cycle.
-                let reply = adam_wellness::ifs::step(&normalised, session);
+                let reply = adam_dialog::wellness::ifs::step(&normalised, session);
                 let action_tag = match reply.action {
-                    adam_wellness::ifs::ReplyAction::Continue => "continue",
-                    adam_wellness::ifs::ReplyAction::Escalate(flag) => match flag {
-                        adam_wellness::red_flags::RedFlag::SuicidalIdeation => "escalate:suicidal",
-                        adam_wellness::red_flags::RedFlag::AcuteMedicalSymptom => {
+                    adam_dialog::wellness::ifs::ReplyAction::Continue => "continue",
+                    adam_dialog::wellness::ifs::ReplyAction::Escalate(flag) => match flag {
+                        adam_dialog::wellness::red_flags::RedFlag::SuicidalIdeation => {
+                            "escalate:suicidal"
+                        }
+                        adam_dialog::wellness::red_flags::RedFlag::AcuteMedicalSymptom => {
                             "escalate:medical"
                         }
-                        adam_wellness::red_flags::RedFlag::ChildAbuse => "escalate:child-abuse",
-                        adam_wellness::red_flags::RedFlag::DomesticViolenceImmediate => {
+                        adam_dialog::wellness::red_flags::RedFlag::ChildAbuse => {
+                            "escalate:child-abuse"
+                        }
+                        adam_dialog::wellness::red_flags::RedFlag::DomesticViolenceImmediate => {
                             "escalate:dv"
                         }
-                        adam_wellness::red_flags::RedFlag::Psychosis => "escalate:psychosis",
+                        adam_dialog::wellness::red_flags::RedFlag::Psychosis => {
+                            "escalate:psychosis"
+                        }
                     },
-                    adam_wellness::ifs::ReplyAction::Close => "close",
+                    adam_dialog::wellness::ifs::ReplyAction::Close => "close",
                 };
                 let stage = session
                     .stage
@@ -730,9 +740,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 // identifiers carry into the new one; if the
                 // closure was an `Escalate`, the new session
                 // opens at `PostEscalation` instead of re-greeting.
-                if !matches!(reply.action, adam_wellness::ifs::ReplyAction::Continue) {
-                    let was_escalation =
-                        matches!(reply.action, adam_wellness::ifs::ReplyAction::Escalate(_));
+                if !matches!(
+                    reply.action,
+                    adam_dialog::wellness::ifs::ReplyAction::Continue
+                ) {
+                    let was_escalation = matches!(
+                        reply.action,
+                        adam_dialog::wellness::ifs::ReplyAction::Escalate(_)
+                    );
                     // `step` has already set the session's stage
                     // (PostEscalation for Escalate, Closed for
                     // Close).  For Close we DO want a clean
@@ -741,9 +756,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     // remembered.  For Escalate the session is
                     // already at PostEscalation; do nothing.
                     if !was_escalation {
-                        *session = adam_wellness::ifs::WellnessSession::resume_after_clearance(
-                            session, false,
-                        );
+                        *session =
+                            adam_dialog::wellness::ifs::WellnessSession::resume_after_clearance(
+                                session, false,
+                            );
                     }
                 }
                 reply.text

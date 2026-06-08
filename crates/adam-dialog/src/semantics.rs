@@ -3167,21 +3167,50 @@ fn parse_kazakh_age(tokens: &[String]) -> Option<u32> {
                 return Some(n);
             }
         }
-        // Tens word, maybe followed by a unit word.
-        if let Some(tens) = kazakh_tens_value(t) {
+        // Tens word, maybe followed by a unit word.  rc6 — strip
+        // case suffix («алпысқа» → «алпыс», «алтыға» → «алты»)
+        // before lookup so dative/locative-marked ages parse.
+        // Audit transcript «жасым алпыс алтыға толды» (66) used
+        // to return 60 because the unit «алтыға» wasn't stripped.
+        let stripped_t = strip_kazakh_numeral_case(t);
+        if let Some(tens) = kazakh_tens_value(stripped_t) {
             if let Some(next) = tokens.get(i + 1) {
-                if let Some(units) = kazakh_units_value(next) {
+                let stripped_next = strip_kazakh_numeral_case(next);
+                if let Some(units) = kazakh_units_value(stripped_next) {
                     return Some(tens + units);
                 }
             }
             return Some(tens);
         }
         // Bare unit word (rare for ages but handle it).
-        if let Some(units) = kazakh_units_value(t) {
+        if let Some(units) = kazakh_units_value(stripped_t) {
             return Some(units);
         }
     }
     None
+}
+
+/// rc6 — strip a common Kazakh case suffix from a numeral so the
+/// strict-eq table lookup matches.  Returns the original token
+/// when no recognised suffix is present.  Suffix list mirrors
+/// `adam_algebra::math_solver::strip_kazakh_case` but kept local
+/// to avoid an inverse crate-dep on adam-algebra from adam-dialog.
+fn strip_kazakh_numeral_case(t: &str) -> &str {
+    const SUFFIXES: &[&str] = &[
+        // dative
+        "ға", "ге", "қа", "ке", // locative
+        "да", "де", "та", "те", // accusative
+        "ны", "ні", "ды", "ді", "ты", "ті", // ablative
+        "дан", "ден", "тан", "тен", "нан", "нен",
+    ];
+    for suf in SUFFIXES {
+        if let Some(stem) = t.strip_suffix(suf) {
+            if kazakh_tens_value(stem).is_some() || kazakh_units_value(stem).is_some() {
+                return stem;
+            }
+        }
+    }
+    t
 }
 
 fn kazakh_tens_value(token: &str) -> Option<u32> {
