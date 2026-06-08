@@ -524,7 +524,7 @@ pub fn step(input: &str, session: &mut WellnessSession) -> WellnessReply {
 ///
 /// Returns `None` when no recognised emotion appears — the
 /// caller stays at the check-in stage with a softer probe.
-fn extract_emotion(input: &str) -> Option<String> {
+pub fn extract_emotion(input: &str) -> Option<String> {
     let lower = input.to_lowercase();
     for &(needle, canonical) in EMOTION_LEXICON {
         if lower.contains(needle) {

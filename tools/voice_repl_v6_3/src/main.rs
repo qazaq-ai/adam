@@ -232,10 +232,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //
     // Each loader fails silently — missing files just disable that
     // capability, the REPL still runs.
+    // **v6.4.0-rc7 (2026-06-08).**  Load the v6.2 dialog engine for
+    // BOTH `respond` AND `wellness` modes.  Prior to rc7, wellness
+    // mode skipped the cascade entirely — so factual queries
+    // («Қазір сағат неше?», «Бүгін қай күн?», «Екі қосу екі»)
+    // got wellness templates even when the intent classifier
+    // labelled them with 1.00 confidence as factual.  User audit:
+    // «диалог должен быть простым и по запросу пользователя, а не
+    // по хотелке модели».  rc7 routes per-turn: factual intents
+    // go through the v6.2 cascade, emotion / distress intents go
+    // through the wellness arm.
     let (dialog_state, mut conversation): (
         Option<(LexiconV1, TemplateRepository)>,
         Option<Conversation>,
-    ) = if args.mode == "respond" {
+    ) = if args.mode == "respond" || args.mode == "wellness" {
         match (
             LexiconV1::load_default(),
             TemplateRepository::load_default(),
@@ -369,14 +379,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // do another cycle.  Red-flag escalation inside `ifs::step`
     // clears the session — the next utterance is the user's
     // chance to opt back in.
+    // **rc7** — `--mode wellness` no longer hard-locks every turn
+    // into the wellness arm.  Instead the session is DORMANT at
+    // boot (stage = None); each turn's intent classifier decides
+    // whether to route to wellness or fall through to the v6.2
+    // cascade.  The session only enters intake (AskingName) when
+    // the user surfaces emotion content or explicitly asks to do
+    // wellness work.  This matches the user contract from the rc6
+    // audit: «диалог по запросу пользователя, не по хотелке модели».
     let mut wellness_session = if args.mode == "wellness" {
         println!(
-            "[voice-repl] mode=wellness — IFS-grounded reflective \
-             companion. Безопасность: red-flag detector активен на \
-             каждый turn; кризисный сигнал → KZ номер вместо диалога. \
-             Это НЕ замена врачу."
+            "[voice-repl] mode=wellness — wellness arm available on \
+             demand.  Factual queries (time, math, name recall) still \
+             route through the v6.2 cascade.  Red-flag detector active \
+             on every turn regardless of route."
         );
-        Some(adam_dialog::wellness::ifs::WellnessSession::start())
+        Some(adam_dialog::wellness::ifs::WellnessSession::default())
     } else {
         None
     };
@@ -667,38 +685,40 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
 
+        // **v6.4.0-rc7 (2026-06-08).**  Per-turn router.  Both
+        // `respond` and `wellness` modes go through the v6.2
+        // `Conversation` cascade by default — adam answers time
+        // / math / factual queries normally.  The wellness arm
+        // is consulted ONLY when:
+        //   - red_flag fires on the input (always wins);
+        //   - the session is already mid-IFS work (continuation);
+        //   - the input surfaces emotion content (extract_emotion).
+        // No more `--mode wellness` lock that forced parts-work
+        // templates on AskTime / MathExpression / Greeting.  See
+        // [[project_v6_4_wellness_opening_flow]] for the contract.
+        let want_wellness = wellness_session.as_ref().is_some_and(|s| {
+            adam_dialog::wellness::red_flags::detect(&normalised).is_some()
+                || s.is_active()
+                || adam_dialog::wellness::ifs::extract_emotion(&normalised).is_some()
+        });
+
         let cyrillic = match (
             &mut conversation,
             dialog_state.as_ref(),
             wellness_session.as_mut(),
             args.mode.as_str(),
+            want_wellness,
         ) {
-            (Some(conv), Some((lex, repo)), _, "respond") => {
-                let reply = conv.turn(&normalised, lex, repo, args.seed);
-                println!("[voice-repl] adam → «{reply}»");
-
-                // **Phase 22 step B (2026-06-03)** — set / clear the
-                // `voice_awaiting_name` session flag based on whether
-                // THIS reply just asked for the user's name. The flag
-                // is read on the NEXT iteration before fuzzy/LM/intent
-                // to drive aggressive name-extraction in
-                // context_corrections::apply_with_context.
-                if context_corrections::reply_asks_for_name(&reply) {
-                    conv.session
-                        .insert("voice_awaiting_name".into(), "1".into());
-                } else {
-                    conv.session.remove("voice_awaiting_name");
+            (_, _, Some(session), "wellness", true) => {
+                // **wellness route** — red_flag, active session, or
+                // emotion content detected.  If session is dormant,
+                // bootstrap at AskingProblem (not AskingName) so
+                // we don't unilaterally interrogate the user for
+                // name + age when they just want to vent.
+                if session.stage.is_none() {
+                    session.stage = Some(adam_dialog::wellness::ifs::WellnessStage::AskingProblem);
+                    session.turns_at_stage = 0;
                 }
-
-                reply
-            }
-            (_, _, Some(session), "wellness") => {
-                // **v6.4** — wellness IFS branch.  Pass the
-                // normalised user text into the state machine; emit
-                // the scripted Kazakh reply.  When the session
-                // returns `Close` (graceful end or escalation), we
-                // start a fresh session on the next turn so the
-                // user can opt back in to another cycle.
                 let reply = adam_dialog::wellness::ifs::step(&normalised, session);
                 let action_tag = match reply.action {
                     adam_dialog::wellness::ifs::ReplyAction::Continue => "continue",
@@ -725,21 +745,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .stage
                     .map(|s| format!("{s:?}"))
                     .unwrap_or_else(|| "cleared".into());
-                println!("[voice-repl] wellness → stage={stage} action={action_tag}",);
+                println!("[voice-repl] wellness → stage={stage} action={action_tag}");
                 println!("[voice-repl] adam → «{}»", reply.text);
-                // After Close/Escalate, prime a fresh session so the
-                // next user utterance starts a new cycle.
-                //
-                // **rc5 (2026-06-04 audit round 3).**  Preserve
-                // identifying intake (name / age / gender) into
-                // the new session via `resume_after_clearance` —
-                // the live audit said adam «doesn't remember name
-                // and age across the full dialog».  Cause: prior
-                // `WellnessSession::start()` blew away everything
-                // including intake.  Now the prior session's
-                // identifiers carry into the new one; if the
-                // closure was an `Escalate`, the new session
-                // opens at `PostEscalation` instead of re-greeting.
                 if !matches!(
                     reply.action,
                     adam_dialog::wellness::ifs::ReplyAction::Continue
@@ -748,13 +755,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         reply.action,
                         adam_dialog::wellness::ifs::ReplyAction::Escalate(_)
                     );
-                    // `step` has already set the session's stage
-                    // (PostEscalation for Escalate, Closed for
-                    // Close).  For Close we DO want a clean
-                    // restart — the user finished a cycle and
-                    // can begin a new one, but with name/age
-                    // remembered.  For Escalate the session is
-                    // already at PostEscalation; do nothing.
                     if !was_escalation {
                         *session =
                             adam_dialog::wellness::ifs::WellnessSession::resume_after_clearance(
@@ -763,6 +763,26 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
                 reply.text
+            }
+            (Some(conv), Some((lex, repo)), _, "respond", _)
+            | (Some(conv), Some((lex, repo)), _, "wellness", false) => {
+                let reply = conv.turn(&normalised, lex, repo, args.seed);
+                println!("[voice-repl] adam → «{reply}»");
+
+                // **Phase 22 step B (2026-06-03)** — set / clear the
+                // `voice_awaiting_name` session flag based on whether
+                // THIS reply just asked for the user's name. The flag
+                // is read on the NEXT iteration before fuzzy/LM/intent
+                // to drive aggressive name-extraction in
+                // context_corrections::apply_with_context.
+                if context_corrections::reply_asks_for_name(&reply) {
+                    conv.session
+                        .insert("voice_awaiting_name".into(), "1".into());
+                } else {
+                    conv.session.remove("voice_awaiting_name");
+                }
+
+                reply
             }
             _ => user_text,
         };
