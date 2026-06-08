@@ -866,11 +866,33 @@ const EMOTION_LEXICON: &[(&str, &str)] = &[
 /// which already handles «менің атым X» / «есімім X» / «мені
 /// X деп атайды» plus question / pronoun / patronymic guards
 /// the rc1-rc5 ad-hoc extractor kept missing.
+///
+/// **rc8 (2026-06-08 audit).**  Additionally validate the
+/// captured name against the canonical Kazakh name DB in
+/// `language_core` (211 male + 141 female names + suffix
+/// heuristics).  Live audit found Whisper-noise tokens like
+/// «Да» / «Кім» / «Дауыледі» / «Өледі» passing through
+/// `Intent::StatementOfName` because they followed «атым»
+/// surface-syntactically — but they're not real names.  The DB
+/// check rejects them outright; the caller falls back to a
+/// retry prompt.
 fn extract_user_name(input: &str) -> Option<String> {
     use crate::intent::Intent;
+    use crate::language_core::kazakh_name_gender;
     use crate::semantics::interpret_text;
     match interpret_text(input, &[]) {
-        Intent::StatementOfName { name } if !name.trim().is_empty() => Some(name),
+        Intent::StatementOfName { name } if !name.trim().is_empty() => {
+            // First token of the captured string (handles
+            // multi-token patronymics — «Айгерім Сейітжанқызы»
+            // — by validating the FIRST name; the patronymic
+            // is kept attached if the first name validates).
+            let head = name.split_whitespace().next().unwrap_or(&name);
+            if kazakh_name_gender(head).is_some() {
+                Some(name)
+            } else {
+                None
+            }
+        }
         _ => None,
     }
 }
@@ -940,10 +962,19 @@ fn extract_bare_numeral(input: &str) -> Option<u32> {
     for (i, t) in tokens.iter().enumerate() {
         let s = strip(t);
         if let Some(&(_, tens)) = KZ_TENS.iter().find(|(w, _)| *w == s) {
-            if let Some(next) = tokens.get(i + 1) {
-                let sn = strip(next);
-                if let Some(&(_, units)) = KZ_UNITS.iter().find(|(w, _)| *w == sn) {
-                    return Some(tens + units);
+            // **rc8 (2026-06-08 audit).**  Look ahead UP TO 2
+            // tokens for a unit numeral.  rc7 only looked at the
+            // immediately-next token; Whisper noise («Мен алпыс
+            // а алтыға толдым») inserted a filler «а» between
+            // tens and units, so the units «алтыға» (= 6 dative)
+            // never composed with tens «алпыс» (= 60) → adam
+            // returned 60 instead of 66.
+            for look in 1..=2 {
+                if let Some(next) = tokens.get(i + look) {
+                    let sn = strip(next);
+                    if let Some(&(_, units)) = KZ_UNITS.iter().find(|(w, _)| *w == sn) {
+                        return Some(tens + units);
+                    }
                 }
             }
             return Some(tens);
@@ -1459,6 +1490,50 @@ mod tests {
         assert_eq!(extract_user_age("Жасым алпыс алтыға толды."), Some(66));
         assert_eq!(extract_user_age("Маған отыз бесте."), Some(35));
         assert_eq!(extract_user_age("Жасым алтыда."), Some(6));
+    }
+
+    #[test]
+    fn age_extraction_skips_whisper_filler_between_tens_and_units() {
+        // rc8 — live audit «Мен алпыс а алтыға толдым.» (= 66)
+        // had Whisper-noise filler «а» between tens «алпыс»
+        // and units «алтыға».  rc7 returned 60; rc8 looks
+        // ahead up to 2 tokens past the tens for a unit.
+        assert_eq!(extract_user_age("Мен алпыс а алтыға толдым."), Some(66));
+        assert_eq!(extract_user_age("Жиырма э бес жасамын."), Some(25));
+    }
+
+    #[test]
+    fn name_extraction_rejects_whisper_noise_via_kazakh_name_db() {
+        // rc8 — live audit captured «Да» / «Кім» / «Дауыледі» /
+        // «Өледі» as names because they followed «атым» surface-
+        // syntactically.  None of them are real Kazakh names;
+        // the DB check rejects them outright.
+        for noise in [
+            "Менім атым да өледі.",
+            "Менім атым дауыледі.",
+            "Атым кім?",
+            "Атым өледі.",
+        ] {
+            assert_eq!(
+                extract_user_name(noise),
+                None,
+                "should reject whisper-noise name: {noise}"
+            );
+        }
+    }
+
+    #[test]
+    fn name_extraction_still_accepts_canonical_kazakh_names() {
+        // Sanity — real names from the DB still pass.
+        assert_eq!(
+            extract_user_name("Менің атым Дәулет."),
+            Some("Дәулет".into())
+        );
+        assert_eq!(extract_user_name("Атым Гүлмира."), Some("Гүлмира".into()));
+        assert_eq!(
+            extract_user_name("Менің атым Айгерім."),
+            Some("Айгерім".into())
+        );
     }
 
     #[test]

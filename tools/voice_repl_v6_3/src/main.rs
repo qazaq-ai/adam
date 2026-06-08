@@ -685,21 +685,69 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
 
-        // **v6.4.0-rc7 (2026-06-08).**  Per-turn router.  Both
-        // `respond` and `wellness` modes go through the v6.2
-        // `Conversation` cascade by default — adam answers time
-        // / math / factual queries normally.  The wellness arm
-        // is consulted ONLY when:
-        //   - red_flag fires on the input (always wins);
-        //   - the session is already mid-IFS work (continuation);
-        //   - the input surfaces emotion content (extract_emotion).
-        // No more `--mode wellness` lock that forced parts-work
-        // templates on AskTime / MathExpression / Greeting.  See
-        // [[project_v6_4_wellness_opening_flow]] for the contract.
+        // **v6.4.0-rc8 (2026-06-08 audit).**  Intent-aware routing.
+        // rc7 made the router fire wellness whenever the session
+        // was active — but that meant once you started IFS work,
+        // every subsequent turn was hijacked.  Live audit caught
+        // «Биллион саны қанша?» (Math 0.72) and «Менім атым кім?»
+        // (AskName 0.97) routed through wellness because the
+        // session was sitting in IdentifyPart.
+        //
+        // rc8 — even mid-IFS, if THIS turn is a clearly-factual
+        // intent (Math / Time / Date / memory recall / etc.), let
+        // the v6.2 cascade answer.  The wellness session sits.
+        // The next emotion-content turn resumes the IFS work.
+        //
+        // Red-flag still always preempts — safety must not be
+        // gated by intent classifier confidence.
+        const FACTUAL_INTENTS: &[&str] = &[
+            "AskTime",
+            "AskDate",
+            "MathExpression",
+            "AskName",
+            "AskAge",
+            "AskAboutSystem",
+            "AskAboutTopic",
+            "AskLocation",
+            "AskFamily",
+            "AskOccupation",
+            "AskDefinition",
+            "AskExercise",
+            "AskWeather",
+            "AskCurrentProgress",
+            "AskCurriculumContent",
+            "AskNextTopic",
+            "AskPurpose",
+            "AskWillingness",
+            "CodeRequest",
+            "ExplainCompilerError",
+            "StatementOfName",
+            "StatementOfAge",
+            "StatementOfFamily",
+            "StatementOfLocation",
+            "StatementOfOccupation",
+            "StatementOfActivity",
+            "StatementOfWeather",
+            "Greeting",
+            "Farewell",
+            "Thanks",
+            "Apology",
+            "WellWishes",
+            "IntroProposal",
+        ];
+        let intent_is_clearly_factual = neural_intent.as_ref().is_some_and(|(label, conf)| {
+            *conf >= 0.60 && FACTUAL_INTENTS.contains(&label.as_str())
+        });
+
         let want_wellness = wellness_session.as_ref().is_some_and(|s| {
+            // Crisis always wins.
             adam_dialog::wellness::red_flags::detect(&normalised).is_some()
-                || s.is_active()
-                || adam_dialog::wellness::ifs::extract_emotion(&normalised).is_some()
+                // Otherwise wellness only fires when the turn is
+                // NOT factual AND the wellness arm has signal
+                // (active session OR emotion content in input).
+                || (!intent_is_clearly_factual
+                    && (s.is_active()
+                        || adam_dialog::wellness::ifs::extract_emotion(&normalised).is_some()))
         });
 
         let cyrillic = match (
