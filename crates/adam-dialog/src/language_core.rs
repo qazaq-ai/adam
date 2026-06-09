@@ -603,6 +603,24 @@ pub fn kazakh_name_gender(name: &str) -> Option<KazakhNameGender> {
     if KAZAKH_FEMALE_NAMES.iter().any(|n| *n == lower) {
         return Some(KazakhNameGender::Female);
     }
+    // **v6.4.0-rc11 (2026-06-08 audit).**  Fuzzy DB lookup.
+    // Whisper routinely substitutes Kazakh-specific characters
+    // for their nearest Russian-keyboard neighbours (ә→а, ң→н,
+    // қ→к, ғ→г, ө→о, ұ→у, ү→у, і→и, һ→х).  Exact-match against
+    // the DB then misses real names: «даулет» (Whisper) → DB
+    // has «дәулет» → rc9 strict check rejected the capture →
+    // cascade fell through to topic retrieval over «ат» (horse)
+    // and surfaced an Abai proverb instead of acknowledging
+    // the name.
+    //
+    // rc11 — if exact lookup misses, try a fuzzy match against
+    // the canonical DB entries using `kazakh_edit_distance`'s
+    // built-in cost-0.5 confusion pairs for the Kazakh-specific
+    // character set.  Threshold 0.83 = at most ~one character
+    // confusion in a 6-letter name.
+    if let Some(g) = fuzzy_match_kazakh_name_gender(&lower) {
+        return Some(g);
+    }
     // Suffix heuristics for unknown names. Strong female endings
     // first (гүл / гул / сім / сем / назым / айым are nearly
     // exclusively female in Kazakh onomastics).
@@ -621,6 +639,63 @@ pub fn kazakh_name_gender(name: &str) -> Option<KazakhNameGender> {
         }
     }
     None
+}
+
+/// rc11 — fuzzy DB lookup with Kazakh-character tolerance.
+/// Returns the gender of the canonical DB entry closest to the
+/// candidate token under [`crate::kazakh_fuzzy::kazakh_similarity`]
+/// (which uses 0.5-cost confusion pairs for ә↔а / ң↔н / қ↔к /
+/// ғ↔г / ө↔о / ұ↔у / ү↔у / і↔и / һ↔х).  Threshold 0.83 catches
+/// at most one Whisper-confusion-character in a 6-letter name.
+fn fuzzy_match_kazakh_name_gender(candidate: &str) -> Option<KazakhNameGender> {
+    use crate::kazakh_fuzzy::kazakh_similarity;
+    const THRESHOLD: f32 = 0.83;
+    let mut best_score: f32 = 0.0;
+    let mut best_gender: Option<KazakhNameGender> = None;
+    for &m in KAZAKH_MALE_NAMES {
+        let s = kazakh_similarity(candidate, m);
+        if s > best_score && s >= THRESHOLD {
+            best_score = s;
+            best_gender = Some(KazakhNameGender::Male);
+        }
+    }
+    for &f in KAZAKH_FEMALE_NAMES {
+        let s = kazakh_similarity(candidate, f);
+        if s > best_score && s >= THRESHOLD {
+            best_score = s;
+            best_gender = Some(KazakhNameGender::Female);
+        }
+    }
+    best_gender
+}
+
+/// rc11 — canonical-form lookup.  Returns the DB entry closest to
+/// the candidate (title-cased) when the fuzzy similarity is at
+/// least `threshold`.  Lets the caller replace a Whisper-noise
+/// spelling («даулет») with the canonical form («Дәулет»).
+pub fn kazakh_name_canonical(candidate: &str, threshold: f32) -> Option<String> {
+    use crate::kazakh_fuzzy::kazakh_similarity;
+    let lower = candidate.trim().to_lowercase();
+    if lower.is_empty() {
+        return None;
+    }
+    let mut best_score: f32 = 0.0;
+    let mut best_match: Option<&str> = None;
+    for &n in KAZAKH_MALE_NAMES.iter().chain(KAZAKH_FEMALE_NAMES.iter()) {
+        let s = kazakh_similarity(&lower, n);
+        if s > best_score && s >= threshold {
+            best_score = s;
+            best_match = Some(n);
+        }
+    }
+    best_match.map(|m| {
+        // Title-case first character (m is already lowercase).
+        let mut chars = m.chars();
+        match chars.next() {
+            Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
+            None => String::new(),
+        }
+    })
 }
 
 /// **v6.0.0-rc5 MOD voice REPL 2026-05-20** — Gender-aware

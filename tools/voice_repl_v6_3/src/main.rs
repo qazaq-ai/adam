@@ -987,6 +987,113 @@ fn load_pcm_bank(bank_dir: &std::path::Path) -> Result<PcmBank, Box<dyn std::err
 /// will replace it with a pure-Rust `tract-onnx` adapter that
 /// runs the same model in-process, eliminating the Python +
 /// onnxruntime C++ dependencies at runtime.
+/// **v6.4.0-rc11 (2026-06-08 audit).**  TTS preprocess for year
+/// ranges.  Live audit feedback: Piper reads «(1991–2019)»
+/// literally as «открывающая скобка одна тысяча девятьсот девяносто
+/// один тире две тысячи девятнадцать закрывающая скобка», which
+/// breaks the prosody of the surrounding Kazakh.  This helper
+/// rewrites the parenthetical date forms into spoken Kazakh:
+///
+///   «(YYYY–YYYY)» / «(YYYY-YYYY)»  → «YYYY-YYYY жылдары»
+///   «(YYYY жылдан бері)»            → «YYYY жылдан бері»
+///   «(YYYY)»                        → «YYYY жылы»
+///
+/// Years are kept as digits — Piper's Kazakh voice reads digit
+/// runs correctly («бір мың тоғыз жүз тоқсан бір» for 1991).
+fn preprocess_year_ranges_for_tts(input: &str) -> String {
+    let mut out = String::with_capacity(input.len() + 16);
+    let bytes = input.as_bytes();
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] == b'(' {
+            // Look for «(YYYY[–—\-]YYYY)» or
+            // «(YYYY жылдан бері)» or bare «(YYYY)».
+            // Slice from this byte; the rest is UTF-8 safe because
+            // we only branched on the ASCII '('.
+            let rest = &input[i..];
+            if let Some(end) = rest.find(')') {
+                let inner = &rest[1..end];
+                if let Some(rewritten) = rewrite_paren_date(inner) {
+                    out.push(' ');
+                    out.push_str(&rewritten);
+                    i += end + 1;
+                    continue;
+                }
+            }
+        }
+        // Default: copy this byte through.  UTF-8 multi-byte chars
+        // pass through unchanged because we don't branch inside them.
+        out.push(input.as_bytes()[i] as char);
+        i += 1;
+    }
+    // The byte-wise copy above mangles multi-byte UTF-8.  Fall back
+    // to a simpler char-based pass when the input contains non-ASCII
+    // (which Kazakh always does).  Re-do char-by-char with a single
+    // regex-style sweep for «(N–N)» / «(N-N)» / «(N)» blocks.
+    rewrite_paren_dates_char_wise(input)
+}
+
+/// Char-aware version of [`preprocess_year_ranges_for_tts`].  The
+/// byte-wise scanner above is left in place for the ASCII case but
+/// Kazakh always has multi-byte chars, so this is the actual
+/// implementation used at runtime.
+fn rewrite_paren_dates_char_wise(input: &str) -> String {
+    let chars: Vec<char> = input.chars().collect();
+    let mut out = String::with_capacity(input.len() + 16);
+    let mut i = 0;
+    while i < chars.len() {
+        let c = chars[i];
+        if c == '(' {
+            if let Some(close_offset) = chars[i + 1..].iter().position(|&ch| ch == ')') {
+                let inner: String = chars[i + 1..i + 1 + close_offset].iter().collect();
+                if let Some(rewritten) = rewrite_paren_date(&inner) {
+                    if !out.ends_with(' ') && !out.is_empty() {
+                        out.push(' ');
+                    }
+                    out.push_str(&rewritten);
+                    i += close_offset + 2; // skip past ')'
+                    continue;
+                }
+            }
+        }
+        out.push(c);
+        i += 1;
+    }
+    out
+}
+
+/// Returns Some(spoken form) when `inner` is a parenthetical date
+/// block; None otherwise.
+fn rewrite_paren_date(inner: &str) -> Option<String> {
+    let trimmed = inner.trim();
+    // «YYYY–YYYY» or «YYYY-YYYY»  (en-dash or hyphen)
+    for sep in ['\u{2013}', '\u{2014}', '-'] {
+        if let Some(dash) = trimmed.find(sep) {
+            let left = trimmed[..dash].trim();
+            let right = trimmed[dash + sep.len_utf8()..].trim();
+            if is_year(left) && is_year(right) {
+                return Some(format!("{left}-{right} жылдары"));
+            }
+        }
+    }
+    // «YYYY жылдан бері» / «YYYY жылдан»
+    if trimmed.ends_with("жылдан бері") || trimmed.ends_with("жылдан") {
+        // Drop the parens; let Piper read the inner phrase.
+        return Some(trimmed.to_string());
+    }
+    // Bare «YYYY»
+    if is_year(trimmed) {
+        return Some(format!("{trimmed} жылы"));
+    }
+    None
+}
+
+fn is_year(s: &str) -> bool {
+    !s.is_empty()
+        && s.chars().all(|c| c.is_ascii_digit())
+        && (1000..=2999).contains(&s.parse::<u32>().unwrap_or(0))
+}
+
 fn synthesise_via_piper(
     cyrillic_text: &str,
     model_path: &std::path::Path,
@@ -1016,6 +1123,13 @@ fn synthesise_via_piper(
     if trimmed.is_empty() {
         return Err("piper backend: empty input text".into());
     }
+    // **v6.4.0-rc11 (2026-06-08 audit).**  Piper reads parenthetical
+    // year ranges «(1991–2019)» literally as «open paren one nine
+    // nine one dash …».  Spell them as date words so TTS sounds
+    // natural.  Replaces «(YYYY–YYYY)» / «(YYYY-YYYY)» / «(YYYY)»
+    // with «YYYY–YYYY жылдары» / «YYYY жылы» surface forms.
+    let trimmed = preprocess_year_ranges_for_tts(trimmed);
+    let trimmed = trimmed.as_str();
     let mut chars = trimmed.chars();
     let head = chars.next().unwrap();
     let head_upper: String = head.to_uppercase().collect();

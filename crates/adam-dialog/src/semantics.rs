@@ -432,8 +432,29 @@ pub fn interpret_text_with_lexicon(
     // user gets a clarification prompt instead of a silent bad capture.
     if let Some(name) = detect_statement_of_name(&tokens, &raw_tokens, &joined) {
         let head = name.split_whitespace().next().unwrap_or(&name);
-        if crate::language_core::kazakh_name_gender(head).is_some() {
-            return Intent::StatementOfName { name };
+        // **v6.4.0-rc11 (2026-06-08 audit).**  Single DB lookup
+        // with built-in fuzzy tolerance.  Returns the CANONICAL
+        // DB spelling at similarity ≥ 0.85 — catches both exact
+        // hits (similarity 1.0) and Whisper-character-confusion
+        // hits (ә↔а, ң↔н, қ↔к, ғ↔г, ө↔о, ұ↔у, ү↔у, і↔и, һ↔х).
+        // Live audit: «даулет» (raw STT) fuzzy-matches «дәулет»
+        // (canonical) at ~0.91 and was previously rejected by the
+        // strict-eq check, falling through to topic retrieval on
+        // «ат» (= horse) and surfacing an Abai proverb.
+        if let Some(canonical) = crate::language_core::kazakh_name_canonical(head, 0.85) {
+            let rest: String = name
+                .split_whitespace()
+                .skip(1)
+                .collect::<Vec<_>>()
+                .join(" ");
+            let canonical_full = if rest.is_empty() {
+                canonical
+            } else {
+                format!("{canonical} {rest}")
+            };
+            return Intent::StatementOfName {
+                name: canonical_full,
+            };
         }
     }
     if detect_ask_how_are_you(&joined) {
@@ -4935,6 +4956,39 @@ mod tests {
         // → «атым есің деме» under Whisper noise.
         let intent = interpret_text("менің атым есің деме", &[]);
         assert_eq!(intent, Intent::AskName);
+    }
+
+    // ── rc11 fuzzy name DB ──
+
+    #[test]
+    fn rc11_whisper_noise_name_resolves_to_canonical_db_form() {
+        // Audit transcript: Whisper transcribed «Дәулет» (with ә)
+        // as «даулет» (with а) — fuzzy LM reverted to raw so the
+        // capture saw «даулет», which isn't in the DB.  rc11
+        // fuzzy lookup recognises the ә↔а confusion (one-char
+        // cost-0.5 in kazakh_edit_distance → similarity > 0.85)
+        // and surfaces the canonical «Дәулет».
+        let intent = interpret_text("менім атым даулет", &[]);
+        assert_eq!(
+            intent,
+            Intent::StatementOfName {
+                name: "Дәулет".to_string()
+            }
+        );
+    }
+
+    #[test]
+    fn rc11_fuzzy_name_db_rejects_unrelated_words() {
+        // Regression: fuzzy must NOT match arbitrary words that
+        // happen to start with a name prefix.  «құрбан»  (sacrifice)
+        // / «арыстан»  (lion) etc. shouldn't smuggle through as
+        // names.  We pick a token that fits the «атым X» pattern
+        // syntactically but has no DB neighbour ≥ 0.85.
+        let intent = interpret_text("менің атым көлік", &[]);
+        // «көлік» (= vehicle) isn't a name and isn't near any —
+        // expect fallthrough to non-name intent (Unknown or
+        // similar).  We just assert it's NOT a StatementOfName.
+        assert!(!matches!(intent, Intent::StatementOfName { .. }));
     }
 
     /// **v5.14.6 / v6.1.30** — extended greeting surfaces (Codex
