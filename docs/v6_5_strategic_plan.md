@@ -134,3 +134,42 @@ NOT deleted (production runtime depends on it):
 - **Move C** ships when WER on a held-out 1-hour Kazakh test set drops below 10%.
 
 These criteria are publicly declared so we don't slip into a new patching cycle disguised as a different arc.
+
+## Industry best practices we ARE adopting
+
+User asked (2026-06-08): «почему сами, когда индустрия уже сделала?» The honest answer is — we DO adopt industry tools at the peripheral layers (Whisper.cpp / Piper / Burn). The dialog core stays deterministic by project design — see `project_deterministic_directive_confirmed` (2026-05-11, user reconfirmed). What we missed and now add:
+
+### For Move C (STT corpus + retrain)
+
+- **Compare alternative Kazakh STT models** before commiting to fine-tuning Shirali: download MMS-Kazakh (Meta, 1107-lang) and NeMo Conformer if Kazakh checkpoints exist. Run identical 1-hour Kazakh test set through all three; pick the lowest WER as the base.
+- **Audio quality QA pipeline (NEW required gate)** — user feedback verbatim: «прежде чем скачивать аудио файлы, прослушай их с целью выяснения качества и пригодности».  
+  Pipeline:
+  1. Download 10 random samples per source.
+  2. Automated metrics: SNR (reject < 15 dB), voice-activity ratio (reject < 60 %), per-utterance duration (1–30 s window), sample rate ≥ 16 kHz.
+  3. Manual listen on 5 samples: reject if background music, multi-speaker overlap, heavy regional dialect (unless target), or any commercial / paywalled content.
+  4. Whisper test on the 10 samples — does the output read as plausible Kazakh?
+  5. If ≥ 30 % fail → discard the source entirely.
+  6. Only at ≥ 70 % pass → schedule bulk acquisition.
+- **SpecAugment** during fine-tuning — frequency + time masking for robustness. Standard NeMo / fairseq practice; ~5 % WER drop typical.
+
+### For Move B (intent classifier retrain)
+
+- **Sentence-transformers fallback** when our small classifier confidence < 0.5: run the input through a pre-trained multilingual encoder (LaBSE or `paraphrase-multilingual-MiniLM-L12-v2`), nearest-neighbour against the labeled training set, take the consensus.  This is a safety net for the long tail of intents the small classifier was never going to nail with 65 examples.
+- **WER-style metric** for intent classification: track macro-F1 and per-intent precision/recall in CI on a held-out 200-utterance test set.
+
+### For Move D (sentence coherence)
+
+- **Calibrate the threshold against a real audio batch**, not a heuristic guess. Method: collect 100 utterances; manually label each «coherent» / «noise»; pick the threshold that maximises F1.
+- **Standard signals** — perplexity from contextual_lm, max-class confidence from intent classifier, FST parse coverage. Industry would also add a length / OOV-word-ratio signal; consider for v6.6 if D leaves false negatives.
+
+## Why we DON'T just route everything through a frontier LLM
+
+The project's USP is BYTE-DETERMINISTIC dialog. A frontier LLM:
+
+- Hallucinates biographies of nonexistent Kazakh people; we return «нет данных».
+- Costs 20+ ms / call minimum; we run in 274 ns / call.
+- Requires 5–600 GB of model weights; we run with 0 MB models loaded (rule-based core).
+- Has no transparency — we can't show an auditor WHY a specific answer was given.
+- Treats Kazakh as < 0.01 % of training data; we treat it as 100 %.
+
+For peripheral perception tasks (STT, TTS) we DO use the best open models. For the dialog kernel, the deterministic kernel IS the product. See `project_deterministic_directive_confirmed`, `project_engineering_framing`, `project_retrieval_not_neural_v2` in memory for the full rationale.
