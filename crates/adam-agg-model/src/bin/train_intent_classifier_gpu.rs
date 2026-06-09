@@ -125,11 +125,35 @@ fn main() {
     let device = WgpuDevice::default();
 
     // ---- 1. Load labeled pack -----------------------------------
-    if !Path::new(TRAIN_PACK).exists() {
-        eprintln!("[icx] missing {TRAIN_PACK} — run intent-pack builder first");
+    //
+    // **v6.5.0-rc1 (Movement B)**: allow CLI override of the
+    // training pack path so we can A/B train on the STT-noise-
+    // augmented pack from `tools/intent_dataset/src/stt_augment.rs`
+    // without losing the ability to retrain on the canonical
+    // pack.  Usage:
+    //   cargo run --release --bin train_intent_classifier_gpu \
+    //     -- --pack data/curated/adam_intent_training_pack_stt_augmented.json
+    //
+    // Default keeps the historical behaviour — train on the
+    // canonical pack.
+    let pack_path = std::env::args()
+        .collect::<Vec<_>>()
+        .windows(2)
+        .find_map(|w| {
+            if w[0] == "--pack" {
+                Some(w[1].clone())
+            } else {
+                None
+            }
+        })
+        .unwrap_or_else(|| TRAIN_PACK.to_string());
+
+    if !Path::new(&pack_path).exists() {
+        eprintln!("[icx] missing {pack_path} — run intent-pack builder first");
         std::process::exit(2);
     }
-    let pack: Pack = load_json(TRAIN_PACK);
+    eprintln!("[icx] training pack: {pack_path}");
+    let pack: Pack = load_json(&pack_path);
     eprintln!(
         "[1/4] Pack: {} samples × {} intent labels",
         pack.samples.len(),

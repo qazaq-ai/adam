@@ -57,6 +57,14 @@ path = "src/ranker_train.rs"
 name = "ranker_eval_rung_a"
 path = "src/ranker_evaluate.rs"
 
+# v6.5 Movement B — synthetic STT-noise augmentation of the
+# intent training pack.  Different axis from `intent_dataset_synth`:
+# that one paraphrases semantically; this one corrupts surface
+# forms in the same way Whisper does on Kazakh production audio.
+[[bin]]
+name = "intent_dataset_stt_augment"
+path = "src/stt_augment.rs"
+
 [dependencies]
 adam-kernel-fst = { path = "../../crates/adam-kernel-fst" }
 adam-dialog = { path = "../../crates/adam-dialog" }
@@ -66,6 +74,7 @@ adam-retrieval-ranker = { path = "../../crates/adam-retrieval-ranker" }
 adam-reasoning = { path = "../../crates/adam-reasoning" }
 serde.workspace = true
 serde_json.workspace = true
+rand = { version = "0.9" }
 
 [lints]
 workspace = true
