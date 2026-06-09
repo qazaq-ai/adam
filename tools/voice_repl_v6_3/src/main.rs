@@ -700,27 +700,43 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         //
         // Red-flag still always preempts — safety must not be
         // gated by intent classifier confidence.
+        // **rc9 (2026-06-08 audit).**  Expanded factual whitelist
+        // — rc8 list missed AskActivity (audit hit «таулар бар»
+        // 1.00), InventoryQuery (1.00 on enumerations), Affirmation
+        // / Negation / StatementOfWellbeing.  User feedback:
+        // «пользователь не должен говорить специальное кодовое
+        // слово «Жалғастырайық» — это должно происходить по смыслу
+        // следующего предложения».
         const FACTUAL_INTENTS: &[&str] = &[
+            // Question intents
             "AskTime",
             "AskDate",
-            "MathExpression",
-            "AskName",
             "AskAge",
+            "AskName",
             "AskAboutSystem",
             "AskAboutTopic",
+            "AskActivity",
             "AskLocation",
             "AskFamily",
             "AskOccupation",
             "AskDefinition",
             "AskExercise",
             "AskWeather",
+            "AskHowAreYou",
             "AskCurrentProgress",
             "AskCurriculumContent",
             "AskNextTopic",
             "AskPurpose",
             "AskWillingness",
+            // Compute / code / lists
+            "MathExpression",
             "CodeRequest",
             "ExplainCompilerError",
+            "InventoryQuery",
+            "CrossLanguageContrast",
+            "SubmitSolution",
+            "Request",
+            // User identity / state statements
             "StatementOfName",
             "StatementOfAge",
             "StatementOfFamily",
@@ -728,27 +744,53 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "StatementOfOccupation",
             "StatementOfActivity",
             "StatementOfWeather",
+            "StatementOfWellbeing",
+            // Social / civility
             "Greeting",
             "Farewell",
             "Thanks",
             "Apology",
             "WellWishes",
             "IntroProposal",
+            "Affirmation",
+            "Negation",
         ];
         let intent_is_clearly_factual = neural_intent.as_ref().is_some_and(|(label, conf)| {
             *conf >= 0.60 && FACTUAL_INTENTS.contains(&label.as_str())
         });
 
-        let want_wellness = wellness_session.as_ref().is_some_and(|s| {
-            // Crisis always wins.
-            adam_dialog::wellness::red_flags::detect(&normalised).is_some()
-                // Otherwise wellness only fires when the turn is
-                // NOT factual AND the wellness arm has signal
-                // (active session OR emotion content in input).
-                || (!intent_is_clearly_factual
-                    && (s.is_active()
-                        || adam_dialog::wellness::ifs::extract_emotion(&normalised).is_some()))
+        // **rc9** — `PostEscalation` HOLDS intake memory but does
+        // NOT block routing.  Live audit: after a 150 escalation,
+        // user asked «Биллион саны қанша?», «Қазақстанда қандай
+        // таулар бар?» — purely factual — and adam re-emitted
+        // hotline reminder instead of answering.  In rc9 only
+        // ACTIVELY-engaged IFS stages bias routing toward wellness;
+        // PostEscalation / Closed / AskingName / AskingAge pass
+        // through to the v6.2 cascade (factual answers flow), with
+        // red_flag re-escalating on any fresh crisis input.  This
+        // is the «semantic resume» the user asked for — no magic
+        // code phrase needed.
+        let in_active_ifs_work = wellness_session.as_ref().is_some_and(|s| {
+            use adam_dialog::wellness::ifs::WellnessStage as Stage;
+            matches!(
+                s.stage,
+                Some(
+                    Stage::AskingProblem
+                        | Stage::EmotionCheckIn
+                        | Stage::IdentifyPart
+                        | Stage::AskRole
+                        | Stage::WitnessPain
+                        | Stage::Unblending
+                        | Stage::Integration
+                )
+            )
         });
+
+        let want_wellness = wellness_session.is_some()
+            && (adam_dialog::wellness::red_flags::detect(&normalised).is_some()
+                || (!intent_is_clearly_factual
+                    && (in_active_ifs_work
+                        || adam_dialog::wellness::ifs::extract_emotion(&normalised).is_some())));
 
         let cyrillic = match (
             &mut conversation,

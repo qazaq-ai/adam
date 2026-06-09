@@ -231,6 +231,72 @@ pub fn is_contrastive_farewell_rejection(input: &str) -> bool {
     apply_contrastive_farewell_rejection(input).is_some()
 }
 
+/// **v6.4.0-rc9 (2026-06-08).**  Strip a "no, you misheard me"
+/// correction prefix so the corrected content drives the intent.
+///
+/// Handles user-audit transcripts like:
+///   «Жоқ, сен дұрыс түсінбедің, менің атым Дәулет»
+///   «Жо, сен дұрыс сүмбедің, менің атым даулет»  (Whisper noise on «қ»)
+///   «Не, я сказал, меня зовут Алибек»
+///   «Жоқ, мен Дәулетпін»
+///
+/// Returns the substring starting at the first recognised
+/// **statement anchor** («менің атым» / «атым» / «есімім» /
+/// «менің жасым» / «жасым» / «маған» / «меня зовут» / «мне X»),
+/// effectively dropping the negation prefix + apology phrase.
+/// Returns `None` when no `жоқ` / `жо` / `не` start is present
+/// OR no recognised anchor follows.
+pub fn apply_kazakh_correction_prefix(input: &str) -> Option<String> {
+    let lower = input.to_lowercase();
+    let trimmed_start = lower.trim_start();
+
+    // Start-prefix patterns.  Comma is the canonical separator;
+    // Whisper sometimes drops it, so we also accept a bare-prefix
+    // followed by whitespace.  «жо» (without «қ») is a common
+    // Whisper drop on Kazakh recordings.
+    const START_NEGATIONS: &[&str] = &[
+        "жоқ, ", "жоқ,", "жо, ", "жо,", "жоқ ", "не, ", "не,", "не ", "нет, ", "нет,", "нет ",
+    ];
+    let starts_with_neg = START_NEGATIONS.iter().any(|p| trimmed_start.starts_with(p));
+    if !starts_with_neg {
+        return None;
+    }
+
+    // Statement anchors.  Search by SUBSTRING on the lowercase
+    // input; map to the corresponding byte position in the
+    // original (case-preserving) input.
+    const ANCHORS: &[&str] = &[
+        "менің атым",
+        "менім атым",
+        "атым ",
+        "есімім ",
+        "менің жасым",
+        "менім жасым",
+        "жасым ",
+        "маған ",
+        "меня зовут",
+        "мне ",
+    ];
+    let mut earliest: Option<usize> = None;
+    for anchor in ANCHORS {
+        if let Some(pos) = lower.find(anchor)
+            && earliest.map(|e| pos < e).unwrap_or(true)
+        {
+            earliest = Some(pos);
+        }
+    }
+    let pos = earliest?;
+    // pos is a byte position in `lower`, which has the same byte
+    // layout as `input` (lowercase doesn't change byte boundaries
+    // for ASCII; for Cyrillic our lowercase preserves byte length
+    // because the chars used here have the same UTF-8 length).
+    if input.is_char_boundary(pos) {
+        Some(input[pos..].trim().to_string())
+    } else {
+        None
+    }
+}
+
 /// **v6.1.5 — 2026-05-23 audit fix P0 #2.** Companion of
 /// [`is_contrastive_farewell_rejection`]. Returns the
 /// continuation clause stripped of the contrastive farewell head
@@ -299,6 +365,22 @@ pub fn interpret_text_with_lexicon(
     parses: &[Analysis],
     lexicon: Option<&LexiconV1>,
 ) -> Intent {
+    // **v6.4.0-rc9 (2026-06-08).**  Strip a correction prefix
+    // («Жоқ, дұрыс түсінбедің, менің атым Дәулет») so the actual
+    // correction (the trailing «менің атым Дәулет») drives the
+    // intent.  User audit feedback: «если он плохо расслышал
+    // имя и пользователь говорит «Жоқ, сен дұрыс түсінбедің,
+    // менің атым Дәулет», он должен понять что не правильно
+    // запомнил имя и сменить на то, которое произнесено».
+    let corrected_owned;
+    let input = match apply_kazakh_correction_prefix(input) {
+        Some(stripped) => {
+            corrected_owned = stripped;
+            corrected_owned.as_str()
+        }
+        None => input,
+    };
+
     // Keep two parallel token streams:
     //   `tokens`  — cleaned lowercase, used for keyword matching
     //   `raw_tokens` — case-preserving, used for PersonName extraction
@@ -338,8 +420,21 @@ pub fn interpret_text_with_lexicon(
     // statement-of-name rule requires an explicit pattern (атым/есімім/
     // зовут/my name is/call me/[greet] i am X) so false positives from
     // a bare greeting are ruled out.
+    //
+    // **v6.4.0-rc9 (2026-06-08 live-audit fix).**  Even when the
+    // pattern fires, validate the candidate name against the Kazakh
+    // name DB (211 male + 141 female canonical + suffix heuristics).
+    // Live audit caught Whisper-noise tokens like «Да» / «Кім» /
+    // «Дауыледі» / «Өледі» falling through `detect_statement_of_name`
+    // because they syntactically followed «атым», polluting
+    // `Conversation.session["name"]`.  The DB check rejects them →
+    // the cascade falls through to lower-priority detectors and the
+    // user gets a clarification prompt instead of a silent bad capture.
     if let Some(name) = detect_statement_of_name(&tokens, &raw_tokens, &joined) {
-        return Intent::StatementOfName { name };
+        let head = name.split_whitespace().next().unwrap_or(&name);
+        if crate::language_core::kazakh_name_gender(head).is_some() {
+            return Intent::StatementOfName { name };
+        }
     }
     if detect_ask_how_are_you(&joined) {
         return Intent::AskHowAreYou;
@@ -4743,6 +4838,48 @@ fn detect_insult(tokens: &[String], joined: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // ── rc9 correction-prefix tests ──
+
+    #[test]
+    fn correction_prefix_strips_kazakh_negation_and_apology() {
+        // Live audit transcripts the user flagged as «должен
+        // понять что не правильно запомнил имя и сменить».
+        let out = apply_kazakh_correction_prefix("Жоқ, сен дұрыс түсінбедің, менің атым Дәулет");
+        assert_eq!(out.as_deref(), Some("менің атым Дәулет"));
+
+        // Whisper drops the «қ» from «жоқ» → «жо».  We accept both.
+        let out2 = apply_kazakh_correction_prefix("Жо, сен дұрыс сүмбедің, менің атым Дәулет");
+        assert_eq!(out2.as_deref(), Some("менің атым Дәулет"));
+    }
+
+    #[test]
+    fn correction_prefix_returns_none_without_negation_start() {
+        // No «жоқ» / «жо» / «не» at start → no correction signal.
+        assert_eq!(apply_kazakh_correction_prefix("менің атым Дәулет"), None);
+    }
+
+    #[test]
+    fn correction_prefix_returns_none_when_negation_has_no_correction() {
+        // «Жоқ» alone with nothing else is just a refusal.
+        assert_eq!(apply_kazakh_correction_prefix("Жоқ"), None);
+        assert_eq!(apply_kazakh_correction_prefix("Жоқ, рахмет."), None);
+    }
+
+    #[test]
+    fn correction_prefix_drives_intent_to_new_name() {
+        // The full end-to-end: input includes correction prefix
+        // and a new name; interpret_text should land on
+        // StatementOfName { name: "Дәулет" } via the rc9
+        // prefix-stripping path.
+        let intent = interpret_text("Жоқ, сен дұрыс түсінбедің, менің атым Дәулет", &[]);
+        assert_eq!(
+            intent,
+            Intent::StatementOfName {
+                name: "Дәулет".to_string()
+            }
+        );
+    }
 
     /// **v5.14.6 / v6.1.30** — extended greeting surfaces (Codex
     /// live-test follow-up) + dedicated Muslim kind. Whisper-medium's

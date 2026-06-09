@@ -438,6 +438,22 @@ const KAZAKH_MALE_NAMES: &[&str] = &[
     "болат",
     "берік",
     "досжан",
+    // **v6.4.0-rc9 (2026-06-08) additions** — names surfaced by
+    // the end-to-end test suite that were missing from the
+    // earlier closed list.  Includes «Нұрсұлтан» (first president)
+    // and common Кazakh variants.
+    "нұрсұлтан",
+    "мәулет",
+    "дауыл",
+    "дауылбек",
+    "құрманбек",
+    "бекзат",
+    "арман",
+    "ержан",
+    "ерлан",
+    "айдос",
+    "адлет",
+    "айбек",
 ];
 
 /// Top-120 Kazakh female personal names (lowercased). Same
