@@ -51,6 +51,7 @@
 //! and `pcm_templates.bin` (PCM for TTS) when present. Both
 //! are merged with synth fallback covering uncovered phonemes.
 
+mod coherence;
 mod context_corrections;
 mod intent_classifier_runtime;
 mod neural_override;
@@ -803,25 +804,56 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 || has_emotion_content
                 || (in_active_ifs_work && !intent_is_clearly_factual));
 
-        let cyrillic = match (
-            &mut conversation,
-            dialog_state.as_ref(),
-            wellness_session.as_mut(),
-            args.mode.as_str(),
-            want_wellness,
-        ) {
-            (_, _, Some(session), "wellness", true) => {
-                // **wellness route** — red_flag, active session, or
-                // emotion content detected.  If session is dormant,
-                // bootstrap at AskingProblem (not AskingName) so
-                // we don't unilaterally interrogate the user for
-                // name + age when they just want to vent.
-                if session.stage.is_none() {
-                    session.stage = Some(adam_dialog::wellness::ifs::WellnessStage::AskingProblem);
-                    session.turns_at_stage = 0;
-                }
-                let reply = adam_dialog::wellness::ifs::step(&normalised, session);
-                let action_tag = match reply.action {
+        // **v6.5 Movement D (2026-06-08).**  Sentence-coherence
+        // gate — combine LM perplexity + intent confidence + FST
+        // morphology parse coverage.  When at least 2 of 3 vote
+        // "noise", refuse to route instead of guessing.  Red-flag
+        // is the only signal that bypasses this — safety preempts
+        // honesty.  See [[project_v6_5_strategic_plan]].
+        let coherence = coherence::CoherenceSignals::collect(
+            &normalised,
+            neural.as_ref(),
+            intent_classifier.as_ref(),
+            dialog_state.as_ref().map(|(lex, _)| lex),
+        );
+        println!("[voice-repl] coherence → {}", coherence.render_log());
+        let safety_bypass = wellness_session
+            .as_ref()
+            .is_some_and(|_| adam_dialog::wellness::red_flags::detect(&normalised).is_some());
+        let coherence_refuses = !safety_bypass && !coherence.is_coherent();
+
+        // **v6.5 Movement D**: coherence refusal pre-empts both
+        // routes (except red-flag safety which is checked above).
+        if coherence_refuses {
+            println!(
+                "[voice-repl] coherence refuse → adam → «{}»",
+                coherence::REFUSE_TEMPLATE
+            );
+        }
+
+        let cyrillic = if coherence_refuses {
+            coherence::REFUSE_TEMPLATE.to_string()
+        } else {
+            match (
+                &mut conversation,
+                dialog_state.as_ref(),
+                wellness_session.as_mut(),
+                args.mode.as_str(),
+                want_wellness,
+            ) {
+                (_, _, Some(session), "wellness", true) => {
+                    // **wellness route** — red_flag, active session, or
+                    // emotion content detected.  If session is dormant,
+                    // bootstrap at AskingProblem (not AskingName) so
+                    // we don't unilaterally interrogate the user for
+                    // name + age when they just want to vent.
+                    if session.stage.is_none() {
+                        session.stage =
+                            Some(adam_dialog::wellness::ifs::WellnessStage::AskingProblem);
+                        session.turns_at_stage = 0;
+                    }
+                    let reply = adam_dialog::wellness::ifs::step(&normalised, session);
+                    let action_tag = match reply.action {
                     adam_dialog::wellness::ifs::ReplyAction::Continue => "continue",
                     adam_dialog::wellness::ifs::ReplyAction::Escalate(flag) => match flag {
                         adam_dialog::wellness::red_flags::RedFlag::SuicidalIdeation => {
@@ -842,50 +874,51 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     },
                     adam_dialog::wellness::ifs::ReplyAction::Close => "close",
                 };
-                let stage = session
-                    .stage
-                    .map(|s| format!("{s:?}"))
-                    .unwrap_or_else(|| "cleared".into());
-                println!("[voice-repl] wellness → stage={stage} action={action_tag}");
-                println!("[voice-repl] adam → «{}»", reply.text);
-                if !matches!(
-                    reply.action,
-                    adam_dialog::wellness::ifs::ReplyAction::Continue
-                ) {
-                    let was_escalation = matches!(
+                    let stage = session
+                        .stage
+                        .map(|s| format!("{s:?}"))
+                        .unwrap_or_else(|| "cleared".into());
+                    println!("[voice-repl] wellness → stage={stage} action={action_tag}");
+                    println!("[voice-repl] adam → «{}»", reply.text);
+                    if !matches!(
                         reply.action,
-                        adam_dialog::wellness::ifs::ReplyAction::Escalate(_)
-                    );
-                    if !was_escalation {
-                        *session =
-                            adam_dialog::wellness::ifs::WellnessSession::resume_after_clearance(
-                                session, false,
-                            );
+                        adam_dialog::wellness::ifs::ReplyAction::Continue
+                    ) {
+                        let was_escalation = matches!(
+                            reply.action,
+                            adam_dialog::wellness::ifs::ReplyAction::Escalate(_)
+                        );
+                        if !was_escalation {
+                            *session =
+                                adam_dialog::wellness::ifs::WellnessSession::resume_after_clearance(
+                                    session, false,
+                                );
+                        }
                     }
+                    reply.text
                 }
-                reply.text
-            }
-            (Some(conv), Some((lex, repo)), _, "respond", _)
-            | (Some(conv), Some((lex, repo)), _, "wellness", false) => {
-                let reply = conv.turn(&normalised, lex, repo, args.seed);
-                println!("[voice-repl] adam → «{reply}»");
+                (Some(conv), Some((lex, repo)), _, "respond", _)
+                | (Some(conv), Some((lex, repo)), _, "wellness", false) => {
+                    let reply = conv.turn(&normalised, lex, repo, args.seed);
+                    println!("[voice-repl] adam → «{reply}»");
 
-                // **Phase 22 step B (2026-06-03)** — set / clear the
-                // `voice_awaiting_name` session flag based on whether
-                // THIS reply just asked for the user's name. The flag
-                // is read on the NEXT iteration before fuzzy/LM/intent
-                // to drive aggressive name-extraction in
-                // context_corrections::apply_with_context.
-                if context_corrections::reply_asks_for_name(&reply) {
-                    conv.session
-                        .insert("voice_awaiting_name".into(), "1".into());
-                } else {
-                    conv.session.remove("voice_awaiting_name");
+                    // **Phase 22 step B (2026-06-03)** — set / clear the
+                    // `voice_awaiting_name` session flag based on whether
+                    // THIS reply just asked for the user's name. The flag
+                    // is read on the NEXT iteration before fuzzy/LM/intent
+                    // to drive aggressive name-extraction in
+                    // context_corrections::apply_with_context.
+                    if context_corrections::reply_asks_for_name(&reply) {
+                        conv.session
+                            .insert("voice_awaiting_name".into(), "1".into());
+                    } else {
+                        conv.session.remove("voice_awaiting_name");
+                    }
+
+                    reply
                 }
-
-                reply
+                _ => user_text,
             }
-            _ => user_text,
         };
 
         // TTS playback. Phase 15f.1 (2026-05-31): in --mode=respond the
