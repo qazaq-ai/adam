@@ -2845,6 +2845,13 @@ fn detect_ask_name(joined: &str) -> bool {
             || joined.contains("аты-жөнімді"))
             && (joined.contains("есіңізде")
                 || joined.contains("есіңде")
+                // **v6.4.0-rc10 (2026-06-08 audit).**  Whisper-noise
+                // variant — STT shifts the «есіңде ме» boundary so
+                // the result tokenises as «есің деме» / «есіндеме».
+                || joined.contains("есің деме")
+                || joined.contains("есіңіз деме")
+                || joined.contains("есіндеме")
+                || joined.contains("есіңізіндеме")
                 // **v6.1.5 round-2.** 1sg-self-reflective memory
                 // probe: «Есімде ме, менің атым?» (= "is [it] in
                 // my memory, my name?"). Pre-fix the cascade
@@ -3118,6 +3125,27 @@ fn detect_statement_of_name(
 }
 
 fn detect_ask_age(joined: &str) -> bool {
+    // **v6.4.0-rc10 (2026-06-08 audit).**  Memory-recall surface
+    // form «менің жасым есіңде ме?» (= "do you remember my age?")
+    // plus Whisper-noise variants where the boundary between
+    // «есіңде» and «ме» gets shifted («есің деме», «есіндеме»).
+    // Audit found «Менің жасым есің деме» mislabelled as
+    // `Intent::StatementOfName` and the ack-template fired
+    // instead of the recall template.
+    let is_memory_recall =
+        (joined.contains("жасым") || joined.contains("жасың") || joined.contains("жасыңыз"))
+            && (joined.contains("есіңде ме")
+                || joined.contains("есіңізде ме")
+                || joined.contains("есің деме")
+                || joined.contains("есіңіз деме")
+                || joined.contains("есіндеме")
+                || joined.contains("есіңізіндеме")
+                || joined.contains("білесің бе")
+                || joined.contains("білесіз бе"));
+    if is_memory_recall {
+        return true;
+    }
+
     let has_q = joined.contains("неше") || joined.contains("қанша");
     ((joined.contains("жасың") || joined.contains("жасыңыз")) && has_q)
         || joined.contains("қанша жастасың")
@@ -4879,6 +4907,34 @@ mod tests {
                 name: "Дәулет".to_string()
             }
         );
+    }
+
+    // ── rc10 recall surface forms ──
+
+    #[test]
+    fn rc10_age_recall_handles_kazakh_memory_probe() {
+        // «менің жасым есіңде ме?» (= do you remember my age?)
+        // must route to AskAge (so the recall template fires),
+        // not StatementOfAge (which would emit the ack form).
+        let intent = interpret_text("менің жасым есіңде ме", &[]);
+        assert_eq!(intent, Intent::AskAge);
+    }
+
+    #[test]
+    fn rc10_age_recall_handles_whisper_noise_variant() {
+        // Audit transcript: Whisper transcribed «жасым есіңде ме»
+        // as «жасым есің деме» — boundary shift on «де ме».
+        // Same intent must surface.
+        let intent = interpret_text("менің жасым есің деме", &[]);
+        assert_eq!(intent, Intent::AskAge);
+    }
+
+    #[test]
+    fn rc10_name_recall_handles_whisper_noise_variant() {
+        // Mirror of the age fix for name recall.  «атым есіңде ме?»
+        // → «атым есің деме» under Whisper noise.
+        let intent = interpret_text("менің атым есің деме", &[]);
+        assert_eq!(intent, Intent::AskName);
     }
 
     /// **v5.14.6 / v6.1.30** — extended greeting surfaces (Codex

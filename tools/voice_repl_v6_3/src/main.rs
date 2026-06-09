@@ -786,11 +786,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             )
         });
 
+        // **rc10 (2026-06-08 audit).**  Emotion content is now a
+        // STRONGER signal than the factual whitelist.  rc9 audit
+        // caught «Мен әкеме ашуланып жүрмін» misclassified as
+        // AskWillingness (0.67, in factual whitelist) — wellness
+        // never engaged.  Several intent labels are noisy on
+        // emotion utterances (AskWillingness, AskActivity, even
+        // AskAboutTopic), so when the lexicon explicitly names
+        // an emotion («ашу», «реніш», «қорқыныш», etc.), wellness
+        // wins regardless of the classifier label.
+        let has_emotion_content =
+            adam_dialog::wellness::ifs::extract_emotion(&normalised).is_some();
+
         let want_wellness = wellness_session.is_some()
             && (adam_dialog::wellness::red_flags::detect(&normalised).is_some()
-                || (!intent_is_clearly_factual
-                    && (in_active_ifs_work
-                        || adam_dialog::wellness::ifs::extract_emotion(&normalised).is_some())));
+                || has_emotion_content
+                || (in_active_ifs_work && !intent_is_clearly_factual));
 
         let cyrillic = match (
             &mut conversation,
