@@ -347,51 +347,17 @@ fn pick_best_variant<'a>(
     best.map(|(h, f, _)| (h, f))
 }
 
+/// **v6.4.0-rc12 (2026-06-08 audit).**  Single source of truth —
+/// delegate to `math_solver::looks_like_math` which derives from
+/// the tokenizer's own vocabulary.  Prior to rc12, this function
+/// kept its own marker list that drifted out of sync with
+/// `math_solver::tokenize` — live audit caught «көбей» (clipped
+/// imperative) and «бөль» (Whisper soft-sign) failing to trigger
+/// the math route because the duplicate router list lacked them
+/// even after tokenize was updated.  See the documentation on
+/// [`math_solver::looks_like_math`] for the gate contract.
 fn looks_like_math(s: &str) -> bool {
-    let lower = s.to_lowercase();
-    let markers = [
-        // Russian.
-        "плюс",
-        "минус",
-        "умнож",
-        "раздели",
-        "помнож",
-        "подели",
-        "степени",
-        "корень",
-        "процент",
-        "остаток",
-        // Kazakh (core verbs).
-        "көбейт",
-        "бөл",
-        "қос",
-        "азайт",
-        "дәреже",
-        "түбірі",
-        "пайыз",
-        "қалдық",
-        // Voice-REPL STT variants (codex 2026-05-25 audit):
-        // «жұп» / «зұп» (heard for «қос»),
-        // «кубейт» / «кобейт» / «көбойт» (heard for «көбейт»).
-        "жұп",
-        "зұп",
-        "кубейт",
-        "кобейт",
-        "көбойт",
-        // English / functional.
-        "sin",
-        "cos",
-        "tan",
-        "log",
-        "ln",
-        "abs",
-        "mod",
-    ];
-    if markers.iter().any(|m| lower.contains(m)) {
-        return true;
-    }
-    s.chars()
-        .any(|c| matches!(c, '+' | '*' | '/' | '%' | '^' | '√' | '×' | '÷'))
+    math_solver::looks_like_math(s)
 }
 
 /// Detect «X туралы айтшы» / «X жайында айтшы» / «расскажи о X»

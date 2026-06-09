@@ -114,6 +114,33 @@ pub fn solve(input: &str) -> Option<MathResult> {
     evaluate(&tokens)
 }
 
+/// **v6.4.0-rc12 (2026-06-08 audit).**  Public predicate: does
+/// this input look like an arithmetic expression?  Single source
+/// of truth — derives from the [`tokenize`] vocabulary, so adding
+/// a new operator variant to the tokenizer automatically expands
+/// this gate too.
+///
+/// Returns `true` when the tokenizer found at least one operator
+/// (binary or unary) OR the input contains an ASCII arithmetic
+/// symbol (`+`, `*`, `/`, `%`, `^`, `√`, `×`, `÷`).
+///
+/// Prior to rc12 the router (`v6_2_router::looks_like_math`) kept
+/// its own marker list that drifted out of sync with the
+/// tokenizer — live audit caught «көбей» (clipped imperative) and
+/// «бөль» (Whisper soft-sign) fail to trigger the math route
+/// because the duplicate list wasn't updated.
+pub fn looks_like_math(input: &str) -> bool {
+    if input
+        .chars()
+        .any(|c| matches!(c, '+' | '*' | '/' | '%' | '^' | '√' | '×' | '÷'))
+    {
+        return true;
+    }
+    tokenize(input)
+        .iter()
+        .any(|t| matches!(t, Token::Op(_) | Token::Unary(_)))
+}
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum Op {
     Add,
@@ -339,12 +366,24 @@ fn parse_op(w: &str) -> Option<Op> {
         // Includes common Whisper-STT mishears (codex 2026-05-25):
         // «жұп» (heard for «қос»), «кубейт» / «кобейт» (heard for
         // «көбейт»).
-        "қос" | "қосу" | "жұп" | "зұп" => Op::Add,
-        "азайт" | "азайту" | "алып_таста" | "алу" => Op::Sub,
-        "көбейт" | "көбейту" | "кубейт" | "кобейт" | "көбойт" => {
+        "қос" | "қосу" | "жұп" | "зұп" | "кос" => Op::Add,
+        // **v6.4.0-rc12 (2026-06-08 audit).**  Whisper-noise
+        // variants on imperative «азайт» (= subtract).  Live audit:
+        // «тоқсан тоғыз ... азайыт үш» — adam couldn't parse the
+        // operator (transcribed with extra «ы»).
+        "азайт" | "азайту" | "азайыт" | "азай" | "алып_таста" | "алу" => {
+            Op::Sub
+        }
+        // **v6.4.0-rc12** — Whisper drops the «т» suffix on
+        // bare imperative «көбей» (= multiply); live audit:
+        // «Екі көбей үшке» went to dictionary lookup of «екі».
+        "көбейт" | "көбейту" | "кубейт" | "кобейт" | "көбойт" | "көбей" | "кубай" | "кобай" => {
             Op::Mul
         }
-        "бөл" | "бөлу" | "боль" => Op::Div,
+        // **v6.4.0-rc12** — Whisper inserts soft sign / drops
+        // case on «бөл» (= divide).  Live audit: «бес кубейт
+        // төртке бөль екіге» — adam refused.
+        "бөл" | "бөлу" | "боль" | "бөль" | "бел" | "бөлі" => Op::Div,
         "дәрежесі" | "дәреже" | "дәрежеге" => Op::Pow,
         "пайыз" | "пайызы" => Op::Percent,
         // Modulo.
@@ -720,6 +759,30 @@ mod tests {
     fn kazakh_multiplication() {
         let r = solve("Он көбейт он").unwrap();
         assert_eq!(r.value, 100.0);
+    }
+
+    /// **v6.4.0-rc12 (2026-06-08 audit).**  Whisper-noise variants
+    /// of the four basic operator words.  Live audit transcripts
+    /// where the original solver returned `?` (unparseable):
+    ///
+    ///   «тоқсан тоғыз көбейт беске сосын бөл екіге сосын азайыт үш»
+    ///   «бес кубейт төртке сосын бөль екіге»
+    ///   «Екі көбей үшке»
+    #[test]
+    fn rc12_whisper_noise_operator_variants_parse() {
+        // 99 × 5 ÷ 2 − 3 = 244.5  (left-to-right chained)
+        let r = solve("тоқсан тоғыз көбейт беске сосын бөл екіге сосын азайыт үш")
+            .expect("азайыт must parse as Sub");
+        assert_eq!(r.value, 244.5);
+
+        // 5 × 4 ÷ 2 + 3 = 13
+        let r = solve("бес кубейт төртке сосын бөль екіге сосын қос үш")
+            .expect("бөль must parse as Div");
+        assert_eq!(r.value, 13.0);
+
+        // 2 × 3 = 6  (clipped «көбей» without «т»)
+        let r = solve("Екі көбей үшке").expect("көбей must parse as Mul");
+        assert_eq!(r.value, 6.0);
     }
 
     #[test]
