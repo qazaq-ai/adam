@@ -1,4 +1,8 @@
 /target
+# Nested per-crate target dirs (e.g. when criterion benches are
+# run from a crate subdirectory).  Same Rust artefacts as the
+# root /target — never tracked.
+**/target/
 .DS_Store
 /.idea
 /.vscode
