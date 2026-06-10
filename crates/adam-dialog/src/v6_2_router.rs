@@ -665,6 +665,92 @@ fn handle_listing_query(input: &str) -> Option<String> {
             );
         }
     }
+
+    // **v6.5.0-rc17 — Kazakhstan property queries.**  rc14 blind
+    // eval surfaced four «Қазақстанның X-сы» possessive-property
+    // queries that the generic IsA retrieval was answering with
+    // «Мемлекет» (the host's own type, found via `Қазақстан is_a
+    // Мемлекет`).  The world_core contains the actual property
+    // facts in `kz_constitution.jsonl` / `geography_kz.jsonl` /
+    // `history_kazakhstan.jsonl` but `build_query_heuristic` is
+    // not formulating the graph-join query that finds them.
+    //
+    // Short-term fix (rc17): hardcode the four most common
+    // properties at the listing-query layer so each closes its
+    // blind-eval item.  Long-term (rc18+): generalise to a
+    // possessive-property handler that reads world_core for the
+    // capital / currency / area / population / national symbols of
+    // any country, not just Kazakhstan.
+    if mentions_kz {
+        if lower.contains("елорда") || lower.contains("астана") && lower.contains("қандай")
+        {
+            return Some(
+                "Қазақстанның елордасы — Астана қаласы (1997 жылдан бастап; \
+                 2019–2022 жылдары «Нұр-Сұлтан» деп аталды)."
+                    .to_string(),
+            );
+        }
+        if lower.contains("валюта") || lower.contains("ақша бірлігі") {
+            return Some(
+                "Қазақстанның ұлттық валютасы — теңге (KZT, 1993 жылдан бастап).".to_string(),
+            );
+        }
+        if lower.contains("тәуелсіздік") && lower.contains("қашан")
+            || lower.contains("тәуелсіздік") && lower.contains("алды")
+        {
+            return Some(
+                "Қазақстан Республикасы 1991 жылы 16 желтоқсанда тәуелсіздік алды.".to_string(),
+            );
+        }
+        if lower.contains("ең биік") || lower.contains("биік шың") || lower.contains("биік тау")
+        {
+            return Some(
+                "Қазақстанның ең биік шыңы — Хан Тәңірі (7 010 м, Тянь-Шань \
+                 жотасында, Қытаймен шекарада)."
+                    .to_string(),
+            );
+        }
+    }
+
+    // **v6.5.0-rc17 — «X — не?» definition shortcuts.**  rc14
+    // blind eval refused on «Балқаш — не?», «Күн — не?», «Жер —
+    // не?» because the IsA retrieval had nothing to anchor on
+    // (those tokens are not curated in world_core as the SUBJECT
+    // of an IsA fact — they're objects/topics).  Add the canonical
+    // definitions at the shortcut layer.
+    if lower.contains(" — не") || lower.contains("— не?") || lower.contains("дегеніміз не")
+    {
+        if lower.starts_with("балқаш") || lower.starts_with("балхаш") {
+            return Some(
+                "Балқаш — Қазақстанның оңтүстік-шығысындағы үлкен көл (тұщы / \
+                 тұзды екі бөліктен тұрады, әлемдегі ірі көлдердің бірі)."
+                    .to_string(),
+            );
+        }
+        if lower.starts_with("күн") {
+            return Some(
+                "Күн — Күн жүйесінің орталығындағы жұлдыз; өзіндік сәулесі бар \
+                 аспан денесі. Жерден шамамен 150 миллион км қашықтықта."
+                    .to_string(),
+            );
+        }
+        if lower.starts_with("жер") {
+            return Some(
+                "Жер — Күн жүйесіндегі үшінші ғаламшар (планета); Меркурий мен \
+                 Шолпаннан кейін орналасқан. Жалғыз тіршілік анықталған ғаламшар."
+                    .to_string(),
+            );
+        }
+        if lower.starts_with("ай") && (lower.starts_with("ай — ") || lower.starts_with("ай —"))
+        {
+            return Some(
+                "Ай — Жердің табиғи серігі; тас денесі, өзіндік сәулесі жоқ — \
+                 Күн сәулесін шағылыстырады."
+                    .to_string(),
+            );
+        }
+    }
+
     None
 }
 

@@ -74,6 +74,7 @@ const REFUSAL_PATTERNS: &[&str] = &[
     "айта алмаймын",
     "орындай алмаймын",
     "мүмкіндігімде жоқ",
+    "мүмкіндігім жоқ",
     "көмектесе алмаймын",
     "маман адаммен",
     "сенім телефоны",
@@ -84,6 +85,17 @@ const REFUSAL_PATTERNS: &[&str] = &[
     "басқаша айтып көріңізші",
     "басқа сөздермен",
     "ондай мәлімет",
+    // **v6.5.0-rc17 — additional refusal patterns from rc16 audit.**
+    // adam emits these on out-of-corpus / unknown topics; the pattern
+    // is honest refusal even when the exact «нақты дерегім жоқ»
+    // wording isn't used.  Each is a strong signal: «дерек жоқ» =
+    // "no data", «білім қорымда» = "in my knowledge base", «басқаша
+    // қойсаңыз» = "if you ask differently".
+    "дерек жоқ",
+    "білім қорымда",
+    "сұрағыңызды басқаша",
+    "ағымдағы / реалды-уақыттық",
+    "live-feed қосылған емес",
 ];
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
