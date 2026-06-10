@@ -56,6 +56,8 @@ mod context_corrections;
 mod intent_classifier_runtime;
 mod neural_override;
 mod neural_rescorer;
+mod rejection_detector;
+mod session_journal;
 mod zipf_vocab;
 
 use adam_audio::play::play_blocking;
@@ -400,6 +402,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         None
     };
 
+    // **v6.5.0-rc5 self-learning foundation.**  Session journal
+    // captures each completed turn so the rejection detector can
+    // spot, on the NEXT turn, that the user is rejecting / rephrasing
+    // / correcting the last reply.  rc5 ships detection + log only;
+    // rc6 wires this into a persisted `mistake_corrections.jsonl`
+    // and rc7 reads that file on the way IN to override the cascade.
+    let mut journal = session_journal::SessionJournal::new();
+
     let single = !args.loop_mode;
     loop {
         if args.loop_mode {
@@ -456,6 +466,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 match transcribe_via_whisper(&pcm, &args.whisper_model, &args.whisper_prompt) {
                     Ok(text) => {
                         println!("[voice-repl] you said: «{text}»");
+                        // **rc5 self-learning probe.**  Before any
+                        // downstream processing, ask the rejection
+                        // detector whether this turn looks like the
+                        // user is rejecting / rephrasing / correcting
+                        // adam's previous reply.  rc5 only logs the
+                        // observation; rc6 will persist it.
+                        if let Some(sig) = rejection_detector::detect(&text, &journal) {
+                            println!(
+                                "[voice-repl] [journal] REJECTION DETECTED — {}",
+                                rejection_detector::render_log(&sig)
+                            );
+                        }
                         text
                     }
                     Err(e) => {
@@ -917,9 +939,29 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                     reply
                 }
-                _ => user_text,
+                _ => user_text.clone(),
             }
         };
+
+        // **v6.5.0-rc5 self-learning journal.**  Record the
+        // completed turn AFTER the reply is finalised but BEFORE
+        // TTS playback.  The journal is consulted on the NEXT
+        // iteration (top of the loop) by `rejection_detector::detect`,
+        // so the order is: append now → next turn reads it.
+        let journal_turn_no = journal.append(
+            user_text.clone(),
+            normalised.clone(),
+            neural_intent.as_ref().map(|(lbl, _)| lbl.clone()),
+            neural_intent.as_ref().map(|(_, c)| *c),
+            cyrillic.clone(),
+        );
+        if args.loop_mode {
+            println!(
+                "[voice-repl] [journal] turn #{journal_turn_no} captured \
+                 (journal_len={})",
+                journal.len()
+            );
+        }
 
         // TTS playback. Phase 15f.1 (2026-05-31): in --mode=respond the
         // REPL is a voice dialog, not a STT tester — a silent reply
