@@ -1,0 +1,17 @@
+[package]
+name = "adam-synth-corrections-pack"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "v6.5.0-rc9 synthesis tool. Reads data/mistake_corrections.jsonl + data/mistake_corrections_labels.jsonl, augments each training-worthy record with paraphrase + STT-noise + inflection-drift variants, and emits an augmented intent training pack compatible with train_intent_classifier_gpu. The audit-to-training loop's synthesis stage."
+
+[[bin]]
+name = "synth_corrections_pack"
+path = "src/main.rs"
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true
