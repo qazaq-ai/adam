@@ -98,10 +98,24 @@ fn main() {
 
     for (intent, examples) in &by_intent {
         let n = examples.len();
+        // **v6.5.0-rc3 (2026-06-09) — rebalanced augmentation.**
+        //
+        // rc1/rc2 used 10×/5×/2× factors keyed on class size.  Live
+        // audit caught a regression: chemistry queries like «Темірдің
+        // формулысы» got mis-labelled as Greeting at 0.96 confidence
+        // because rare classes (N=40-50) flooded the training mix
+        // with 400+ synthetic copies, smearing decision boundaries
+        // across short-token patterns.
+        //
+        // rc3 caps the rare-class factor at 5× and the mid-class
+        // factor at 3×.  The classifier loses some long-tail
+        // robustness but gains correctness on the head intents.  The
+        // proper fix is more genuine examples; this is the safer
+        // synthetic-only knob.
         let factor = if n < 50 {
-            10
-        } else if n < 200 {
             5
+        } else if n < 200 {
+            3
         } else {
             2
         };

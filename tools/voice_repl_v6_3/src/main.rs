@@ -1630,8 +1630,16 @@ fn fuzzy_normalise(text: &str, vocab: &zipf_vocab::ZipfVocab) -> String {
         // speech, and /айт/→/айд/ voicing of final consonant.
         ("азаид", "азайт"),
         ("азайд", "азайт"),
-        // «бөл» (divide) — usually clean but Ө→О on slurred input.
-        ("бол", "бөл"),
+        // «бөл» (divide) — removed in v6.5.0-rc3 (2026-06-09).
+        // The "бол" → "бөл" alias was too aggressive: «сау бол» (= "be
+        // well", canonical Kazakh farewell) was rewritten to «сау бөл»,
+        // which the math router then interpreted as a divide operator.
+        // Live audit T36 (rc2) ended with adam answering "10" to a
+        // farewell.  The math vocab still has the canonical «бөл» plus
+        // «бөлу», «боль», «бөль», «бел», «бөлі» (since rc12) — users
+        // who actually want to divide can pronounce «бөл» clearly, but
+        // slurred «бол» now stays as the verb "to be" and routes to
+        // Farewell as intended.
         // «жиырма» (20) — drift /жи/→/же/.
         ("жерма", "жиырма"),
         // Dative «-ке/-қа» suffixed forms that Whisper sometimes
