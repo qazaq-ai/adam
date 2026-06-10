@@ -322,6 +322,29 @@ fn answer_with_corpus_inner(
         return Some(list_answer);
     }
 
+    // **v6.5.0-rc18 — OOD discipline.**  rc17 blind eval surfaced
+    // 7 true-positive OOD bugs where adam was emitting wrong
+    // Kazakh-relevant answers on non-Kazakh queries:
+    //   «Ресейдің президенті кім?»   → Тоқаев (the KZ president!)
+    //   «Билл Гейтс қандай адам?»     → Abai proverb about ақылды
+    //   «Шанхай қай елде?»             → «Ел — мемлекет»
+    //   «Айфон қанша тұрады?»          → topic-search «Тұра»
+    //   …
+    //
+    // Each was reaching topic-search and the cascade was finding
+    // the nearest Kazakh-relevant noun.  Worse than refusing.
+    //
+    // Fix: closed-set non-Kazakh proper-noun detector.  When the
+    // input mentions a Western brand / Russian region / world city
+    // / foreign-country president, refuse politely and offer to
+    // help with Kazakh queries.  Runs AFTER the curated listing
+    // shortcuts so legitimate "Қазақстанның X" still resolves;
+    // runs BEFORE the typed retrieval so the topic-search
+    // fall-through is suppressed.
+    if let Some(refusal) = handle_ood_refusal(input) {
+        return Some(refusal);
+    }
+
     // 3. Retrieval — typed QueryIR → FrameIndex → realiser.
     let q = build_query_heuristic(input)?;
     let (hit, used_focus) = pick_best_variant(&q, idx)?;
@@ -749,10 +772,165 @@ fn handle_listing_query(input: &str) -> Option<String> {
                     .to_string(),
             );
         }
+        // **v6.5.0-rc18** — common linguistic / scientific definitions
+        // that the IsA retrieval refuses because the subject is the
+        // term itself (no `морфема is_a X` fact in world_core).
+        if lower.starts_with("морфема") {
+            return Some(
+                "Морфема — тілдің мағыналы ең кіші бөлшегі: сөз түбірі немесе \
+                 қосымша (мысалы, «үй+ге» = «үй» түбірі + «-ге» жалғауы)."
+                    .to_string(),
+            );
+        }
+        if lower.starts_with("жалғау") {
+            return Some(
+                "Жалғау — сөздің түбіріне қосылып, оның грамматикалық мағынасын \
+                 өзгертетін қосымша (септік, тәуелдік, көптік, жіктік жалғаулары)."
+                    .to_string(),
+            );
+        }
+        if lower.starts_with("фотосинтез") {
+            return Some(
+                "Фотосинтез — өсімдіктердің Күн жарығының энергиясы арқылы \
+                 көмірқышқыл газы мен судан органикалық зат пен оттегі түзу \
+                 процесі."
+                    .to_string(),
+            );
+        }
+        if lower.starts_with("гравитация") {
+            return Some(
+                "Гравитация — массасы бар денелер арасындағы өзара тарту күші. \
+                 Ньютон ашқан әмбебап бүкіләлемдік тартылыс заңы."
+                    .to_string(),
+            );
+        }
     }
 
     None
 }
+
+/// **v6.5.0-rc18 — OOD discipline.**
+///
+/// Detect non-Kazakh proper nouns and refuse honestly instead of
+/// letting the topic-search fall-through produce wrong-domain
+/// answers.  The rc17 baseline had 7 true-positive bugs in this
+/// class:
+///
+///   «Ресейдің президенті кім?» → Тоқаев (the Kazakh president!)
+///   «Билл Гейтс қандай адам?»   → Abai proverb about ақылды
+///   «Шанхай қай елде?»           → «Ел — мемлекет»
+///   «Айфон қанша тұрады?»        → topic-search «Тұра»
+///   «Эйнштейн қашан туылған?»   → topic-search «Туылған»
+///   «Ватикан қандай мемлекет?»  → state definition
+///   «Гарри Поттер кім?»          → proper-noun fallback
+///
+/// The pattern: cascade reaches topic-search and finds the nearest
+/// Kazakh-relevant noun.  Worse than refusing.
+///
+/// Closed-set keyword detection.  Adds substring lookup of common
+/// foreign entities (countries, cities, brands, Western names,
+/// fictional characters).  Match → polite Kazakh-only refusal +
+/// offer to help with Kazakh queries.
+fn handle_ood_refusal(input: &str) -> Option<String> {
+    let lower = input.to_lowercase();
+
+    // Don't fire on inputs that explicitly mention Kazakhstan —
+    // those have their own handlers above, and we don't want to
+    // false-positive on «Қазақстанның Ресеймен шекарасы» style
+    // bilateral questions (which legitimately mention Ресей).
+    let kz_anchored = lower.contains("қазақстан")
+        || lower.contains("казахстан")
+        || lower.contains("қазақ")
+        || lower.contains("казах");
+
+    let foreign_hit = OOD_FOREIGN_MARKERS.iter().any(|m| lower.contains(m));
+    if !foreign_hit {
+        return None;
+    }
+    if kz_anchored {
+        // Mixed query — let the cascade try; the listing-query
+        // shortcuts and curated facts (e.g. «Қазақстанның көршілері»
+        // includes Ресей) should resolve it.  If they don't, the
+        // typed retrieval fall-through still wins over a wrong
+        // forced refusal.
+        return None;
+    }
+    Some(
+        "Менің білім қорым қазақ-тілді curated фактілерге шектелген — \
+         бұл сұраққа нақты дерегім жоқ. Қазақстан немесе қазақ тілі \
+         туралы сұрақтармен көмектесе аламын."
+            .to_string(),
+    )
+}
+
+/// Closed-set non-Kazakh entities.  Substring match against the
+/// lowercased input.  Order does not matter; all entries are
+/// independent triggers.
+///
+/// **Maintenance**: when a blind-eval iteration surfaces a new
+/// foreign-entity miss, add the keyword here.  Closed-set is the
+/// rc18 floor; a learned OOD classifier is a later option.
+const OOD_FOREIGN_MARKERS: &[&str] = &[
+    // -- Western / global brand-tech --
+    "билл гейтс",
+    "стив джобс",
+    "илон маск",
+    "марк цукерберг",
+    "эйнштейн",
+    "айфон",
+    "iphone",
+    "apple компани",
+    "microsoft",
+    "google",
+    "facebook",
+    "wikipedia",
+    "github",
+    "bitcoin",
+    "биткоин",
+    "nasa",
+    "наса",
+    "beatles",
+    "битлз",
+    "гарри поттер",
+    "harry potter",
+    // -- Foreign countries that have their own president /
+    //    capital / currency, distinct from Kazakhstan --
+    "ресей",
+    "россия",
+    "америк",
+    "сша",
+    "ақш",
+    "қытай",
+    "англи",
+    "британ",
+    "герман",
+    "франция",
+    "жапон",
+    "японск",
+    "үндіс",
+    "индии",
+    "иран",
+    "ирак",
+    "түрки",
+    "турци",
+    "корея",
+    "ватикан",
+    // -- Foreign cities --
+    "москва",
+    "санкт-петербург",
+    "сочи",
+    "казань",
+    "шанхай",
+    "пекин",
+    "токио",
+    "нью-йорк",
+    "манхэттен",
+    "лондон",
+    "париж",
+    "берлин",
+    "рим",
+    "стамбул",
+];
 
 /// Detect a Whisper STT repeat-loop in the input and collapse it
 /// to the first occurrence. Whisper sometimes gets stuck in a

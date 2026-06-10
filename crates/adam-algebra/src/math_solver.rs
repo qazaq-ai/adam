@@ -548,7 +548,7 @@ fn parse_op(w: &str) -> Option<Op> {
         // variants on imperative «азайт» (= subtract).  Live audit:
         // «тоқсан тоғыз ... азайыт үш» — adam couldn't parse the
         // operator (transcribed with extra «ы»).
-        "азайт" | "азайту" | "азайыт" | "азай" | "алып_таста" | "алу" => {
+        "азайт" | "азайту" | "азайыт" | "азай" | "алып_таста" | "алу" | "алыс" => {
             Op::Sub
         }
         // **v6.4.0-rc12** — Whisper drops the «т» suffix on

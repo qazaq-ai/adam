@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "adam-agg-model"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-agg-synth",
  "adam-agg-tokenizer",
@@ -22,7 +22,7 @@ dependencies = [
 
 [[package]]
 name = "adam-agg-synth"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-agg-tokenizer",
  "adam-kernel",
@@ -35,7 +35,7 @@ dependencies = [
 
 [[package]]
 name = "adam-agg-tokenizer"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-kernel",
  "adam-kernel-fst",
@@ -47,7 +47,7 @@ dependencies = [
 
 [[package]]
 name = "adam-algebra"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-kernel-fst",
  "serde",
@@ -57,7 +57,7 @@ dependencies = [
 
 [[package]]
 name = "adam-audio"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "cpal",
  "hound",
@@ -68,7 +68,7 @@ dependencies = [
 
 [[package]]
 name = "adam-build-human-bank"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-audio",
  "adam-forced-aligner",
@@ -81,7 +81,7 @@ dependencies = [
 
 [[package]]
 name = "adam-build-morpheme-bank"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-audio",
  "adam-forced-aligner",
@@ -95,7 +95,7 @@ dependencies = [
 
 [[package]]
 name = "adam-build-pcm-bank"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-audio",
  "adam-forced-aligner",
@@ -109,7 +109,7 @@ dependencies = [
 
 [[package]]
 name = "adam-corpus"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-kernel",
  "adam-kernel-fst",
@@ -121,7 +121,7 @@ dependencies = [
 
 [[package]]
 name = "adam-corpus-acquire"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-audio",
  "adam-forced-aligner",
@@ -144,7 +144,7 @@ dependencies = [
 
 [[package]]
 name = "adam-curriculum"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-agg-tokenizer",
  "adam-kernel",
@@ -156,7 +156,7 @@ dependencies = [
 
 [[package]]
 name = "adam-dialog"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-agg-model",
  "adam-agg-tokenizer",
@@ -178,7 +178,7 @@ dependencies = [
 
 [[package]]
 name = "adam-eval"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-corpus",
  "adam-tokenizer",
@@ -189,7 +189,7 @@ dependencies = [
 
 [[package]]
 name = "adam-forced-aligner"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-audio",
  "adam-phoneme",
@@ -198,7 +198,7 @@ dependencies = [
 
 [[package]]
 name = "adam-formant-synth"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-audio",
  "adam-phoneme",
@@ -206,7 +206,7 @@ dependencies = [
 
 [[package]]
 name = "adam-ingest-kaz-tili"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-audio",
  "clap",
@@ -216,7 +216,7 @@ dependencies = [
 
 [[package]]
 name = "adam-intent-classifier"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "serde",
  "serde_json",
@@ -225,7 +225,7 @@ dependencies = [
 
 [[package]]
 name = "adam-intent-dataset"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-dialog",
  "adam-intent-classifier",
@@ -240,7 +240,7 @@ dependencies = [
 
 [[package]]
 name = "adam-kernel"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "serde",
  "serde_json",
@@ -249,7 +249,7 @@ dependencies = [
 
 [[package]]
 name = "adam-kernel-fst"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-kernel",
  "serde",
@@ -259,7 +259,7 @@ dependencies = [
 
 [[package]]
 name = "adam-kernel-phoneme"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-phoneme",
  "adam-phonotactics",
@@ -267,32 +267,32 @@ dependencies = [
 
 [[package]]
 name = "adam-lexicon-curated"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-phoneme",
 ]
 
 [[package]]
 name = "adam-lexicon-gen"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-phoneme",
 ]
 
 [[package]]
 name = "adam-phoneme"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 
 [[package]]
 name = "adam-phonotactics"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-phoneme",
 ]
 
 [[package]]
 name = "adam-reasoning"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-kernel-fst",
  "ctrlc",
@@ -305,7 +305,7 @@ dependencies = [
 
 [[package]]
 name = "adam-retrieval"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-kernel-fst",
  "serde",
@@ -315,7 +315,7 @@ dependencies = [
 
 [[package]]
 name = "adam-retrieval-ranker"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "serde",
  "serde_json",
@@ -324,7 +324,7 @@ dependencies = [
 
 [[package]]
 name = "adam-scaling"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-kernel-fst",
  "adam-reasoning",
@@ -336,7 +336,7 @@ dependencies = [
 
 [[package]]
 name = "adam-slot-extractor"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "serde",
  "serde_json",
@@ -345,7 +345,7 @@ dependencies = [
 
 [[package]]
 name = "adam-stt-eval"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-audio",
  "adam-lexicon-curated",
@@ -358,7 +358,7 @@ dependencies = [
 
 [[package]]
 name = "adam-stt-phoneme"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-audio",
  "adam-phoneme",
@@ -367,7 +367,7 @@ dependencies = [
 
 [[package]]
 name = "adam-synth-corrections-pack"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "serde",
  "serde_json",
@@ -375,7 +375,7 @@ dependencies = [
 
 [[package]]
 name = "adam-tokenizer"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-kernel",
  "serde",
@@ -385,7 +385,7 @@ dependencies = [
 
 [[package]]
 name = "adam-train"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-corpus",
  "adam-eval",
@@ -399,7 +399,7 @@ dependencies = [
 
 [[package]]
 name = "adam-tts-phoneme"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-audio",
  "adam-phoneme",
@@ -407,7 +407,7 @@ dependencies = [
 
 [[package]]
 name = "adam-voice"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "aec3",
  "cpal",
@@ -419,7 +419,7 @@ dependencies = [
 
 [[package]]
 name = "adam-voice-repl-v6-3"
-version = "6.5.0-rc17"
+version = "6.5.0-rc18"
 dependencies = [
  "adam-agg-model",
  "adam-audio",

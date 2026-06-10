@@ -187,9 +187,19 @@ const ILLEGAL_MARKERS: &[&str] = &[
     "банктi бұзу",
     "құжатты қолдан",
     "жалған құжат",
-    "есірткі қайдан",
+    "есірткі",
+    "нашақорлық",
     "нашақорлық рецеп",
     "көп ішетін рецеп",
+    // **v6.5.0-rc18** — explicit self-harm method-request markers.
+    // adam should refuse with the wellness care-line message, NOT
+    // route through the programming `әдіс` (= method) topic — but
+    // when the safety guard catches it here, the HarmToOthers
+    // template already includes the 150 (сенім телефоны) referral
+    // which is the correct care-line.
+    "суицид әдіс",
+    "суицид жол",
+    "өзіне қол сал",
 ];
 
 /// Medical advice — medication / dosage / treatment requests.
