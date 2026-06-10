@@ -85,6 +85,23 @@ pub const LM_LOGPROB_FLOOR: f32 = -5.0;
 pub const INTENT_CONF_FLOOR: f32 = 0.30;
 pub const FST_COVERAGE_FLOOR: f32 = 0.40;
 
+/// **v6.5.0-rc6 (2026-06-09 live-audit fix).**  When the intent
+/// classifier is THIS confident on its top class, the gate trusts
+/// the classifier outright and refuses to refuse — even if the LM
+/// and FST signals both vote noise.
+///
+/// Rationale: rc5 audit T4 «Рақмет, аллаға шұқыр» was a perfectly
+/// recognisable Kazakh "thank God" expression (= "thanks, praise be
+/// to Allah").  Coherence saw lm=-6.17 (LM is unfamiliar with the
+/// religious vocabulary, scores it badly), fst=0.33 (Whisper's
+/// «шұқыр» drift didn't parse as «шүкір»), intent=1.00
+/// (classifier nailed it).  Old 2-of-3 rule refused.  New rule:
+/// when the classifier hits ≥0.85 confidence on a label, the
+/// utterance is communicatively coherent regardless of LM/FST
+/// disagreement — refusing it loses a turn that adam could have
+/// answered.
+pub const HIGH_INTENT_TRUST: f32 = 0.85;
+
 impl CoherenceSignals {
     /// Compute all three signals for `text`.  Each is taken at
     /// best-effort; missing signals collapse to `None` (treated
@@ -108,7 +125,22 @@ impl CoherenceSignals {
     /// Returns `false` when adam should refuse to route this
     /// turn.  Two-of-three vote: refuse only when at least two
     /// independent signals say "noise".
+    ///
+    /// **rc6 amendment (2026-06-09):** when the intent classifier is
+    /// very confident (≥ [`HIGH_INTENT_TRUST`]), this method always
+    /// returns `true` regardless of LM/FST.  The classifier is the
+    /// most reliable signal we have — it was trained on labelled
+    /// data — and refusing a label it nailed at ≥0.85 is more
+    /// expensive than the rare case of trusting a confident but
+    /// wrong label.
     pub fn is_coherent(&self) -> bool {
+        // rc6: high-confidence intent overrides LM/FST.
+        if let Some(c) = self.intent_confidence
+            && c >= HIGH_INTENT_TRUST
+        {
+            return true;
+        }
+
         let lm_says_noise = self
             .lm_logprob_per_token
             .map(|s| s < LM_LOGPROB_FLOOR)
@@ -188,6 +220,46 @@ mod tests {
             fst_parse_coverage: 0.70, // single-good-signal not enough
         };
         assert!(!s.is_coherent());
+    }
+
+    /// **v6.5.0-rc6 audit fix.**  Live audit T4: «Рақмет, аллаға
+    /// шұқыр» — LM bad (religious vocabulary unfamiliar to the
+    /// rescorer), FST bad (Whisper drift «шұқыр» didn't parse), but
+    /// intent classifier at 1.00 on AskAboutTopic.  Old rule
+    /// refused.  New rule trusts the classifier when confidence ≥
+    /// HIGH_INTENT_TRUST = 0.85.
+    #[test]
+    fn rc6_high_intent_confidence_overrides_lm_and_fst() {
+        let s = CoherenceSignals {
+            lm_logprob_per_token: Some(-6.17),
+            intent_confidence: Some(1.00),
+            fst_parse_coverage: 0.33,
+        };
+        assert!(
+            s.is_coherent(),
+            "intent=1.00 should override LM/FST noise votes"
+        );
+    }
+
+    /// Boundary: at exactly HIGH_INTENT_TRUST the override fires.
+    /// Just below it, the standard 2-of-3 rule applies again.
+    #[test]
+    fn rc6_high_intent_trust_boundary() {
+        let just_at = CoherenceSignals {
+            lm_logprob_per_token: Some(-7.0),
+            intent_confidence: Some(HIGH_INTENT_TRUST),
+            fst_parse_coverage: 0.10,
+        };
+        assert!(just_at.is_coherent());
+
+        let just_below = CoherenceSignals {
+            lm_logprob_per_token: Some(-7.0),
+            intent_confidence: Some(HIGH_INTENT_TRUST - 0.01),
+            fst_parse_coverage: 0.10,
+        };
+        // Two votes for noise (lm + fst) and intent isn't high
+        // enough to override → refuse.
+        assert!(!just_below.is_coherent());
     }
 
     #[test]
