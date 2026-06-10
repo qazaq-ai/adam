@@ -57,7 +57,7 @@
     "Question",
     "Unknown"
   ],
-  "sample_count": 2942,
+  "sample_count": 2952,
   "samples": [
     {
       "text": "сәлем",
@@ -14767,6 +14767,56 @@
     {
       "text": "Менің әтым күң.",
       "intent": "StatementOfName",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Мын қостанайда тұрамын.",
+      "intent": "AskLocation",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Мың қосанайда тұрамын.",
+      "intent": "AskLocation",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Мың қостанайда турамын.",
+      "intent": "AskLocation",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Мың қостанайда тұрамын",
+      "intent": "AskLocation",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Мың қостанайда тұрамын.",
+      "intent": "AskLocation",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Мың қостанайда тұрамын?",
+      "intent": "AskLocation",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Мың қостанайде тұрамын.",
+      "intent": "AskLocation",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Мың қостәнайда тұрамын.",
+      "intent": "AskLocation",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Мың қөстанайда тұрамын.",
+      "intent": "AskLocation",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Мің қостанайда тұрамын.",
+      "intent": "AskLocation",
       "source": "corrections_synth"
     }
   ]

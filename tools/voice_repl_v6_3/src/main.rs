@@ -55,6 +55,7 @@ mod coherence;
 mod context_corrections;
 mod correction_persist;
 mod intent_classifier_runtime;
+mod multi_act_splitter;
 mod neural_override;
 mod neural_rescorer;
 mod rejection_detector;
@@ -940,7 +941,31 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 (Some(conv), Some((lex, repo)), _, "respond", _)
                 | (Some(conv), Some((lex, repo)), _, "wellness", false) => {
-                    let reply = conv.turn(&normalised, lex, repo, args.seed);
+                    // **rc10 multi-act splitter.**  A trailing farewell
+                    // («сау бол / қош бол / көріскенше …») after a
+                    // substantive head means the user closed the turn
+                    // with a compound utterance (e.g. rc9 audit T36
+                    // «Өте жақсы аңгмелестік енді сау бол.»).  Route
+                    // only the head through the cascade, then append
+                    // the farewell acknowledgement to the reply.  When
+                    // the input has NO trailing farewell, this is a
+                    // no-op and the cascade runs on `normalised` as
+                    // before.
+                    let multi_act = multi_act_splitter::split_trailing_farewell(&normalised);
+                    let cascade_input: &str = multi_act
+                        .as_ref()
+                        .map(|s| s.head.as_str())
+                        .unwrap_or(&normalised);
+                    if let Some(s) = &multi_act {
+                        println!(
+                            "[voice-repl] multi-act split → head=«{}» tail=«{}»",
+                            s.head, s.tail
+                        );
+                    }
+                    let mut reply = conv.turn(cascade_input, lex, repo, args.seed);
+                    if multi_act.is_some() {
+                        reply = format!("{reply} {}", multi_act_splitter::FAREWELL_ACK);
+                    }
                     println!("[voice-repl] adam → «{reply}»");
 
                     // **Phase 22 step B (2026-06-03)** — set / clear the
