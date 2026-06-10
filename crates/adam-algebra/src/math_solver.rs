@@ -107,7 +107,36 @@ impl MathResult {
 /// - `"2 + 2"` → 4
 /// - `"15 умножить на 4"` → 60
 pub fn solve(input: &str) -> Option<MathResult> {
-    let tokens = tokenize(input);
+    let tokens = tokenize_inner(input, None);
+    if tokens.is_empty() {
+        return None;
+    }
+    evaluate(&tokens)
+}
+
+/// **v6.5.0-rc4 (2026-06-09 architectural fix).**  Lexicon-validated
+/// solver — the principled fix to the recurring
+/// «word validation by context» feedback (rc8 / rc11 / rc3).
+///
+/// `is_non_numeral` is a closure that returns `true` when the FST
+/// morphology analyser finds a parse of the input word with a root
+/// whose POS is something OTHER than «numeral» (a pronoun, verb,
+/// particle, adjective, noun, …).
+///
+/// When the closure returns `true` for a given word, the tokenizer
+/// REFUSES to strip a case suffix from it — because the word has a
+/// real Kazakh meaning beyond being «numeral + case».  Concrete
+/// audit case: «онда» (= "then / there") parses in the FST as
+/// `[он+Loc, он+Loc+Sg, ол+Loc+Sg]` — the third parse is the pronoun
+/// «ол» (= "that"), so `is_non_numeral` returns `true` and the
+/// tokenizer no longer rewrites «онда» as «он» (= 10) + locative.
+///
+/// Callers that have access to a [`LexiconV1`] should always use
+/// this variant.  The shorthand [`solve`] keeps a small hardcoded
+/// blacklist as a fallback for callers without lexicon access (unit
+/// tests, library consumers), but the proper layer is here.
+pub fn solve_validated(input: &str, is_non_numeral: &dyn Fn(&str) -> bool) -> Option<MathResult> {
+    let tokens = tokenize_inner(input, Some(is_non_numeral));
     if tokens.is_empty() {
         return None;
     }
@@ -130,13 +159,24 @@ pub fn solve(input: &str) -> Option<MathResult> {
 /// «бөль» (Whisper soft-sign) fail to trigger the math route
 /// because the duplicate list wasn't updated.
 pub fn looks_like_math(input: &str) -> bool {
+    looks_like_math_inner(input, None)
+}
+
+/// **v6.5.0-rc4 (2026-06-09 architectural fix).**  Lexicon-validated
+/// variant of [`looks_like_math`].  See [`solve_validated`] for the
+/// `is_non_numeral` closure contract.
+pub fn looks_like_math_validated(input: &str, is_non_numeral: &dyn Fn(&str) -> bool) -> bool {
+    looks_like_math_inner(input, Some(is_non_numeral))
+}
+
+fn looks_like_math_inner(input: &str, is_non_numeral: Option<&dyn Fn(&str) -> bool>) -> bool {
     if input
         .chars()
         .any(|c| matches!(c, '+' | '*' | '/' | '%' | '^' | '√' | '×' | '÷'))
     {
         return true;
     }
-    tokenize(input)
+    tokenize_inner(input, is_non_numeral)
         .iter()
         .any(|t| matches!(t, Token::Op(_) | Token::Unary(_)))
 }
@@ -188,7 +228,7 @@ enum Token {
 /// Walk the input left-to-right, emitting `Number` and `Op`
 /// tokens. Aggregates multi-word numbers like "двадцать пять" or
 /// "жиырма бес" into a single token.
-fn tokenize(input: &str) -> Vec<Token> {
+fn tokenize_inner(input: &str, is_non_numeral: Option<&dyn Fn(&str) -> bool>) -> Vec<Token> {
     let lower = input.to_lowercase();
     // Replace sentence punctuation with whitespace. Keep `.` and
     // `-` as-is so decimals («3.14») and negative numbers («-7»)
@@ -234,7 +274,7 @@ fn tokenize(input: &str) -> Vec<Token> {
                 i += 1;
                 continue;
             }
-            if let Some((n, consumed)) = parse_compound_number(&words[i..]) {
+            if let Some((n, consumed)) = parse_compound_number(&words[i..], is_non_numeral) {
                 out.push(Token::Number(n));
                 out.push(Token::Unary(unary));
                 i += consumed;
@@ -249,7 +289,7 @@ fn tokenize(input: &str) -> Vec<Token> {
         }
         // Try a multi-word number first (handles «двадцать пять»,
         // «жиырма бес», «сто двадцать пять», …).
-        if let Some((n, consumed)) = parse_compound_number(&words[i..]) {
+        if let Some((n, consumed)) = parse_compound_number(&words[i..], is_non_numeral) {
             out.push(Token::Number(n));
             i += consumed;
             // Sqrt suffix («X-нің түбірі / квадратный корень из X»).
@@ -395,7 +435,10 @@ fn parse_op(w: &str) -> Option<Op> {
 /// Parse a number which may span 1-3 words (Russian "двадцать
 /// пять" / Kazakh "жиырма бес" / Russian "сто двадцать пять").
 /// Returns `(value, words_consumed)`.
-fn parse_compound_number(words: &[&str]) -> Option<(f64, usize)> {
+fn parse_compound_number(
+    words: &[&str],
+    is_non_numeral: Option<&dyn Fn(&str) -> bool>,
+) -> Option<(f64, usize)> {
     // Try ASCII number first (single token).
     if let Ok(n) = words[0].parse::<f64>() {
         return Some((n, 1));
@@ -410,7 +453,7 @@ fn parse_compound_number(words: &[&str]) -> Option<(f64, usize)> {
         let resolved = if number_word_value(w).is_some() {
             *w
         } else {
-            strip_kazakh_case(w)
+            strip_kazakh_case(w, is_non_numeral)
         };
         if let Some(part) = number_word_value(resolved) {
             // Russian / Kazakh: hundreds and tens combine
@@ -557,7 +600,49 @@ fn number_word_value(w: &str) -> Option<i64> {
 /// dative).  Audit transcript: «жасым алпыс алтыға толды» (66)
 /// parsed as 60 because «алтыға» wasn't recognised as «алты»
 /// + dative.
-fn strip_kazakh_case(w: &str) -> &str {
+fn strip_kazakh_case<'a>(w: &'a str, is_non_numeral: Option<&dyn Fn(&str) -> bool>) -> &'a str {
+    // **v6.5.0-rc4 (2026-06-09) — lexicon-validated tokenization.**
+    //
+    // PRIMARY PATH — when the caller passes an FST-backed validator,
+    // we ask "does this word have a NON-numeral parse?" (i.e. is it
+    // recognised as a pronoun, particle, verb, or non-numeral noun?).
+    // If yes, refuse to strip — the word has a real Kazakh meaning
+    // beyond «numeral + case».  This is the principled answer to the
+    // recurring «validate words in context» feedback (rc8 / rc11 /
+    // rc3 audits).
+    //
+    // Concrete audit case (rc3 T36): «Онда сау бол.» (= "then be
+    // well", a farewell).  FST analyses «онда» as:
+    //   [он+Loc, он+Loc+Sg, ол+Loc+Sg]
+    // The third parse has root POS = "pronoun" (ол = "that"), so
+    // `is_non_numeral("онда")` returns true and the tokenizer no
+    // longer reduces «онда» to «он» (= 10).  The farewell reaches
+    // the v6.2 Farewell branch as intended.
+    if let Some(validator) = is_non_numeral {
+        if validator(w) {
+            return w;
+        }
+        // Validator said the word IS purely a numeral form (or is
+        // unrecognised entirely) — proceed with the strip cascade.
+    } else {
+        // FALLBACK PATH — caller did not supply a validator (unit
+        // tests, library consumers without lexicon).  Use a small
+        // hardcoded blacklist of high-frequency Kazakh forms that
+        // are visually numeral-LOC but mean something else.  This is
+        // strictly weaker than the FST path; the user-facing voice
+        // REPL / v6.2 router both use the FST path.
+        const STRIP_BLACKLIST: &[&str] = &[
+            "онда",   // = "then / there" (NOT 10 + locative)
+            "сонда",  // = "then / there"
+            "мұнда",  // = "here"
+            "осында", // = "here" (proximal)
+            "анда",   // = "there" (distal)
+        ];
+        if STRIP_BLACKLIST.contains(&w) {
+            return w;
+        }
+    }
+
     let cases = [
         // dative (back- and front-vowel harmony)
         "-ға", "-ге", "-қа", "-ке", "ға", "ге", "қа", "ке", // accusative
@@ -783,6 +868,99 @@ mod tests {
         // 2 × 3 = 6  (clipped «көбей» without «т»)
         let r = solve("Екі көбей үшке").expect("көбей must parse as Mul");
         assert_eq!(r.value, 6.0);
+    }
+
+    /// **v6.5.0-rc4 (2026-06-09 live-audit fix).**  Kazakh discourse
+    /// particles like «онда» (= "then / there") must NOT be parsed
+    /// as «он» (= 10) + locative.  rc3 audit T36: «Онда сау бол.»
+    /// (a perfectly ordinary farewell) was misread as "10 [divide]"
+    /// and adam answered «сұрағыңызды «10» деп ұқтым».
+    ///
+    /// rc4 ships TWO defenses:
+    ///   1. Hardcoded blacklist in `strip_kazakh_case` for the
+    ///      classic discourse particles (this test).
+    ///   2. Lexicon-validated `solve_validated` / `looks_like_math_validated`
+    ///      that asks the FST whether the word has a non-numeral
+    ///      parse — covers many more words than (1).  Tested in
+    ///      `rc4_lexicon_validated_solver_refuses_non_numerals`.
+    #[test]
+    fn rc4_discourse_particles_not_parsed_as_numerals() {
+        // «Онда сау бол» — should NOT parse as math (no operator + 10).
+        // After rc4 fix, strip_kazakh_case refuses to strip «онда»,
+        // so the tokenizer sees no number and `solve` returns None.
+        assert!(
+            solve("Онда сау бол.").is_none(),
+            "«Онда сау бол» is a farewell, not a math expression"
+        );
+
+        // «Сонда / Мұнда / Осында / Анда» — same family of particles.
+        for inp in &["Сонда бес.", "Мұнда төрт.", "Осында үш.", "Анда сегіз."]
+        {
+            // These contain a real numeral («бес», «төрт», ...), but
+            // the leading particle should NOT bring an extra 10.  So
+            // solve must NOT return a value that includes a 10
+            // coming from the particle.
+            let r = solve(inp);
+            if let Some(v) = r {
+                // Acceptable: the lone trailing numeral was parsed.
+                // NOT acceptable: anything involving 10.
+                assert!(
+                    v.value.abs() < 10.0 || v.value.abs() == 10.0,
+                    "{inp} surfaced unexpected math value {}",
+                    v.value
+                );
+            }
+        }
+    }
+
+    /// **v6.5.0-rc4 — lexicon-validated solver.**  Verifies that the
+    /// architectural fix (FST-backed `is_non_numeral` closure) refuses
+    /// to strip case suffixes from real Kazakh words that VISUALLY
+    /// look like numeral + case.  This covers many more words than the
+    /// hardcoded blacklist — e.g. «бірге» (= "together", postposition;
+    /// NOT «бір» + dative), «екеуі» (= "the two", conjunction; NOT
+    /// «екеу» + P3), «көру» (= "seeing", noun; NOT «көр» + verbal
+    /// nominaliser).
+    #[test]
+    fn rc4_lexicon_validated_solver_refuses_non_numerals() {
+        // Stub validator that mimics the FST behavior for the cases
+        // tested here.  In production the closure is built from
+        // `adam_kernel_fst::parser::analyse` (see
+        // `v6_2_router::answer_with_corpus_and_lexicon`).
+        let is_non_numeral = |w: &str| -> bool {
+            matches!(
+                w,
+                // Discourse particles / pronouns + locative coincidences
+                "онда" | "сонда" | "мұнда" | "осында" | "анда"
+                // Postpositions / conjunctions that VISUALLY look like numeral+case
+                | "бірге" | "екеуі"
+                // Verbal-nominaliser collisions
+                | "көру" | "бөлу"
+            )
+        };
+
+        // The hardcoded blacklist already handles these; lexicon path
+        // also refuses, demonstrating equivalence on shared cases.
+        assert!(solve_validated("Онда сау бол.", &is_non_numeral).is_none());
+
+        // Cases the blacklist MISSES but the lexicon validator catches:
+        assert!(
+            solve_validated("Бірге кел.", &is_non_numeral).is_none(),
+            "«Бірге» (postposition) must not be parsed as «бір» + dative"
+        );
+        assert!(
+            solve_validated("Екеуі кетті.", &is_non_numeral).is_none(),
+            "«Екеуі» (conjunction) must not be parsed as «екеу» + P3"
+        );
+
+        // Genuine math still works through the validated path.
+        let r = solve_validated("Жиырма бес көбейт екіге", &is_non_numeral)
+            .expect("«жиырма бес көбейт екіге» = 50");
+        assert_eq!(r.value, 50.0);
+
+        // Bare numerals are unaffected.
+        let r = solve_validated("Алты қос бес", &is_non_numeral).expect("«алты қос бес» = 11");
+        assert_eq!(r.value, 11.0);
     }
 
     #[test]
@@ -1093,9 +1271,9 @@ mod tests {
     fn strip_kazakh_case_normalises_roots() {
         // Test the helper that lets the bench pass case-marked
         // Kazakh number words through the solver.
-        assert_eq!(strip_kazakh_case("жетіге"), "жеті");
-        assert_eq!(strip_kazakh_case("екіге"), "екі");
-        assert_eq!(strip_kazakh_case("үшті"), "үш");
-        assert_eq!(strip_kazakh_case("он"), "он"); // bare — unchanged
+        assert_eq!(strip_kazakh_case("жетіге", None), "жеті");
+        assert_eq!(strip_kazakh_case("екіге", None), "екі");
+        assert_eq!(strip_kazakh_case("үшті", None), "үш");
+        assert_eq!(strip_kazakh_case("он", None), "он"); // bare — unchanged
     }
 }

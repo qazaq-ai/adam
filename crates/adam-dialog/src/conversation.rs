@@ -3639,7 +3639,17 @@ impl Conversation {
         // belief / honorific / topic tracking unbroken — Stage 8 will
         // fold those into a typed conversation state.
         let final_output = if crate::v6_2_router::is_v6_2_active() {
-            crate::v6_2_router::answer(input).unwrap_or(final_output)
+            // **rc4 architectural fix:** pass the lexicon so math_solver
+            // can validate Kazakh words in context.  «Онда сау бол» no
+            // longer reduces to «10» (= «он» numeral) because the FST
+            // has a non-numeral parse for «онда» (pronoun «ол» +
+            // locative).
+            crate::v6_2_router::answer_with_corpus_and_lexicon(
+                input,
+                crate::v6_2_router::shared_corpus(),
+                lexicon,
+            )
+            .unwrap_or(final_output)
         } else {
             final_output
         };

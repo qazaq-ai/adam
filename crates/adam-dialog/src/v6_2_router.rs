@@ -50,7 +50,7 @@ pub fn is_v6_2_active() -> bool {
 /// hand-curated `dialog_battery::canonical_corpus()` when the data
 /// directory is absent (e.g. cargo-published crate without bundled
 /// data).
-fn shared_corpus() -> &'static FrameIndex {
+pub(crate) fn shared_corpus() -> &'static FrameIndex {
     static CORPUS: OnceLock<FrameIndex> = OnceLock::new();
     CORPUS.get_or_init(|| {
         // Try several candidate paths so the loader works both
@@ -98,9 +98,31 @@ pub fn answer(input: &str) -> Option<String> {
     answer_with_corpus(input, shared_corpus())
 }
 
+/// **v6.5.0-rc4 (2026-06-09) — lexicon-validated variant.**  Same
+/// as [`answer_with_corpus`] but passes the lexicon to the math
+/// route so it can refuse to strip case suffixes from words that
+/// have a real Kazakh meaning beyond «numeral + case» (e.g. «онда»
+/// = "then", not «он» + locative).  See
+/// [`adam_algebra::math_solver::solve_validated`] for details.
+pub fn answer_with_corpus_and_lexicon(
+    input: &str,
+    idx: &FrameIndex,
+    lex: &adam_kernel_fst::lexicon::LexiconV1,
+) -> Option<String> {
+    answer_with_corpus_inner(input, idx, Some(lex))
+}
+
 /// Variant that lets callers supply their own [`FrameIndex`] (used
 /// in integration tests + the live REPL).
 pub fn answer_with_corpus(input: &str, idx: &FrameIndex) -> Option<String> {
+    answer_with_corpus_inner(input, idx, None)
+}
+
+fn answer_with_corpus_inner(
+    input: &str,
+    idx: &FrameIndex,
+    lex: Option<&adam_kernel_fst::lexicon::LexiconV1>,
+) -> Option<String> {
     // 0a. STT-loop dedupe. Whisper sometimes gets stuck in a
     // repeat-loop and emits «Сәлем. Сәлем. Сәлем.» × 30+. Collapse
     // to the first meaningful clause so adam answers ONCE, not 30×.
@@ -125,9 +147,34 @@ pub fn answer_with_corpus(input: &str, idx: &FrameIndex) -> Option<String> {
     let input: &str = &folded;
 
     // 1. Math first — procedural computation.
-    if looks_like_math(input)
-        && let Some(r) = math_solver::solve(input)
-    {
+    //
+    // **rc4 architectural fix:** when a lexicon is available, build
+    // an FST-backed "is_non_numeral" closure so math_solver refuses
+    // to strip case suffixes from words like «онда» (= "then") that
+    // have a real Kazakh meaning beyond «numeral + case».  Caller
+    // without lexicon (legacy `answer_with_corpus(input, idx)`) falls
+    // through to the hardcoded blacklist inside math_solver.
+    let math_hit = if let Some(lex) = lex {
+        let is_non_numeral = |w: &str| -> bool {
+            use adam_kernel_fst::parser::{Analysis, analyse};
+            analyse(w, lex).iter().any(|a| match a {
+                Analysis::Noun { root, .. } => root.part_of_speech != "numeral",
+                Analysis::Verb { .. } => true,
+            })
+        };
+        if math_solver::looks_like_math_validated(input, &is_non_numeral) {
+            math_solver::solve_validated(input, &is_non_numeral)
+        } else {
+            None
+        }
+    } else {
+        if looks_like_math(input) {
+            math_solver::solve(input)
+        } else {
+            None
+        }
+    };
+    if let Some(r) = math_hit {
         return Some(r.render());
     }
 
