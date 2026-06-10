@@ -57,7 +57,7 @@
     "Question",
     "Unknown"
   ],
-  "sample_count": 2952,
+  "sample_count": 2969,
   "samples": [
     {
       "text": "сәлем",
@@ -14817,6 +14817,91 @@
     {
       "text": "Мің қостанайда тұрамын.",
       "intent": "AskLocation",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Туқаевтан алдынан кім президент болды.",
+      "intent": "AskAboutTopic",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Тұкеевтан алдынан кім президент болды.",
+      "intent": "AskAboutTopic",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Тұқаевтан алдынан кым президент болды.",
+      "intent": "AskAboutTopic",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Тұқаевтан алдынан кім президант болды.",
+      "intent": "AskAboutTopic",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Тұқаевтан алдынан кім президент болды",
+      "intent": "AskAboutTopic",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Тұқаевтан алдынан кім президент болды.",
+      "intent": "AskAboutTopic",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Тұқаевтан алдынан кім президент болды?",
+      "intent": "AskAboutTopic",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Тұқаевтан алдынан кім президент болді.",
+      "intent": "AskAboutTopic",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Тұқаевтан алдынан кім президент бөлды.",
+      "intent": "AskAboutTopic",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Тұқаевтан алдінан кім президент болды.",
+      "intent": "AskAboutTopic",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Тұқәевтан алдынан кім президент болды.",
+      "intent": "AskAboutTopic",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Екынші даре жібеге бес.",
+      "intent": "MathExpression",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Екінші даре жібеге бес",
+      "intent": "MathExpression",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Екінші даре жібеге бес.",
+      "intent": "MathExpression",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Екінші даре жібеге бес?",
+      "intent": "MathExpression",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Екінші дере жібеге бес.",
+      "intent": "MathExpression",
+      "source": "corrections_synth"
+    },
+    {
+      "text": "Екінші дәре жібеге бес.",
+      "intent": "MathExpression",
       "source": "corrections_synth"
     }
   ]

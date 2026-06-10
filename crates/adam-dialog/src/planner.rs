@@ -2739,6 +2739,27 @@ fn is_specific_factual_query(joined: &str) -> bool {
     {
         return true;
     }
+    // **v6.5.0-rc11 — math-expression markers** that the math_solver
+    // OUGHT to handle but doesn't yet — e.g. «екінші дәрежеге бес»
+    // (5²), «төрттің түбірі» (√4).  rc10 audit T25 / T27 surfaced
+    // the failure mode: classifier correctly labels MathExpression
+    // with full confidence, math_solver returns None on the unhandled
+    // operator, and the cascade falls through to the corpus-sample
+    // route — which then returns a random sentence that happens to
+    // contain «дәрежесінде» / «түбір».  Treating these as factual
+    // queries forces the router into `unknown.with_noun` (an honest
+    // hedge) instead of the proverb-fallback so the user sees
+    // «нақты дерегім жоқ» rather than an off-topic Russian sentence
+    // about agroindustrial complexes.
+    if joined.contains("дәрежеге")
+        || joined.contains("дәрежесі")
+        || joined.contains("түбірі")
+        || joined.contains("көбейт")
+        || joined.contains("бөлшек")
+        || joined.contains("логарифм")
+    {
+        return true;
+    }
     // **Definitional shape «X қандай Y / X не Y»** where Y is a
     // generic-class noun. The corpus-sample fallback on this shape
     // surfaces an off-topic proverb mentioning Y (e.g. astro_003

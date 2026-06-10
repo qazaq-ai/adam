@@ -250,20 +250,26 @@ fn answer_with_corpus_inner(
     // «сен» / «өзің» and emits Abai poetry quotes (codex
     // 2026-05-25 audit caught this).
     if is_self_identity_query(input) {
-        // **Phase 20** — 3 paraphrases of the self-introduction.
+        // **Phase 20 + v6.5.0-rc11 (2026-06-10)** — 3 paraphrases of
+        // the self-introduction.  rc10 audit flagged the previous
+        // wording: the Piper Kazakh TTS voice mis-pronounces the
+        // English «Agglutinative Reasoning Kernel» and the bare
+        // «ARK» / «LLM» / «curated» tokens.  Replaced English-source
+        // brand names with their Kazakh equivalents so the TTS reads
+        // cleanly aloud.  The kernel itself is still ARK internally —
+        // only the user-facing self-description changes.
         let variants: &[&str] = &[
-            "Мен — адам, толық атауым Agglutinative Reasoning Kernel \
-             (ARK). Қазақ тіліне арналған детерминирленген тілдік \
-             модель. Тілдік модельмін, бірақ LLM емес — мен \
-             curated фактілер арқылы жауап беремін.",
-            "Менің атым — адам. Толық атауым Agglutinative Reasoning \
-             Kernel (ARK), қазақ тіліне арналған детерминирленген \
-             тілдік модель. LLM емеспін: жауаптарым тек curated \
-             деректерге сүйенеді.",
-            "Мен — ARK (Agglutinative Reasoning Kernel) атты тілдік \
-             модельмін, қысқаша «адам» деп аталамын. Қазақ тілінің \
-             морфологиясы бойынша құрастырылған детерминирленген \
-             жүйемін, әр сөзімді curated фактілермен растаймын.",
+            "Мен — адам, қазақ тіліне арналған детерминирленген тілдік \
+             жүйемін. Үлкен тілдік модель емеспін — жауаптарымды \
+             алдын ала тексерілген деректерден аламын.",
+            "Менің атым — адам. Қазақ тілінің морфологиясы бойынша \
+             құрастырылған детерминирленген тілдік жүйемін. \
+             Жауаптарым тек тексерілген деректерге сүйенеді, \
+             ойдан құрастырылмайды.",
+            "Мен — қазақ тіліне арналған агглютинативті ой жүйесімін, \
+             қысқаша «адам» деп аталамын. Әр сөзімді тексерілген \
+             деректермен растаймын; білмейтін нәрсемді «нақты дерегім \
+             жоқ» деп ашық айтамын.",
         ];
         return Some(pick_variant(variants, input).to_string());
     }
