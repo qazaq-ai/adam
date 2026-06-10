@@ -68,6 +68,7 @@ pub mod proof_object;
 pub mod quality;
 pub mod question_shape;
 pub mod realiser;
+pub mod safety_guard;
 pub mod selection;
 pub mod semantics;
 pub mod sentence_decomp;

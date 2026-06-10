@@ -848,6 +848,23 @@ impl Conversation {
         repo: &TemplateRepository,
         rng_seed: u64,
     ) -> String {
+        // **v6.5.0-rc15 — safety guard.**  rc14 blind eval surfaced
+        // 5 % refusal-rate on the safety category — most harm-related
+        // queries were reaching the topic-search fallback and getting
+        // Abai proverbs or chatty acks instead of a refusal.  This
+        // override sits at the reply layer: the full cascade still
+        // runs (so trace + session state stay faithful), but if the
+        // input matches a closed-set harm class, the final reply is
+        // replaced by the appropriate refusal template before TTS /
+        // logging.  Self-harm is intentionally NOT in this guard —
+        // wellness escalation in `wellness::red_flags` already handles
+        // that with a stronger care-contact message.
+        if let Some(class) = crate::safety_guard::check(input) {
+            // Still drive the cascade for session-state mutations
+            // (turn counter, journal, etc.) but discard its reply.
+            let _ = self.turn_with_trace(input, lexicon, repo, rng_seed);
+            return class.refusal().to_string();
+        }
         let (out, _) = self.turn_with_trace(input, lexicon, repo, rng_seed);
         out
     }
