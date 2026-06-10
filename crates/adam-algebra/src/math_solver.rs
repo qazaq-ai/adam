@@ -251,11 +251,32 @@ fn tokenize_inner(input: &str, is_non_numeral: Option<&dyn Fn(&str) -> bool>) ->
             }
         })
         .collect();
-    let words: Vec<String> = cleaned
+    let mut words: Vec<String> = cleaned
         .split_whitespace()
         .map(strip_trailing_punct)
         .filter(|w| !w.is_empty() && !is_connector(w))
         .collect();
+
+    // **v6.5.0-rc12 — Kazakh school-math preprocessing.**  Two
+    // word-order patterns that arose in the rc10/rc11 audits and
+    // that the user explicitly asked adam to COMPUTE (not refuse):
+    //
+    //   1. «<ordinal_kk> дәрежеге <base>» = base^ordinal
+    //      («екінші дәрежеге бес» = 5² = 25).
+    //   2. «<genitive_number> түбірі» = √number
+    //      («төрттің түбірі» = √4 = 2).
+    //
+    // Pattern 1 reverses operand order vs the already-supported
+    // «<base> дәрежесі <exp>» («екі дәрежесі он» = 2¹⁰).  Pattern
+    // 2 is a surface-form rewrite — strip the Kazakh genitive
+    // suffix off the number word so `parse_compound_number` finds
+    // the cardinal.
+    //
+    // Done as a word-level preprocess so the rest of the parser
+    // stays unchanged.
+    rewrite_kazakh_ordinal_power(&mut words);
+    rewrite_kazakh_genitive_sqrt(&mut words);
+
     let words: Vec<&str> = words.iter().map(String::as_str).collect();
 
     let mut out: Vec<Token> = Vec::new();
@@ -315,6 +336,122 @@ fn tokenize_inner(input: &str, is_non_numeral: Option<&dyn Fn(&str) -> bool>) ->
 /// previous number (Kazakh «X-нің түбірі»)?
 fn is_sqrt_suffix(w: &str) -> bool {
     matches!(w, "түбірі" | "квадратты_түбірі")
+}
+
+/// **v6.5.0-rc12.**  Map a Kazakh ordinal word to its cardinal
+/// value.  Closed small set — covers the school-math ordinals 1-10
+/// that arise in power-expressions («екінші дәрежеге …» = squared,
+/// «үшінші дәрежеге …» = cubed, …).  Returns `None` for anything
+/// else.
+fn parse_ordinal_kazakh(w: &str) -> Option<f64> {
+    match w {
+        "бірінші" => Some(1.0),
+        "екінші" => Some(2.0),
+        "үшінші" => Some(3.0),
+        "төртінші" => Some(4.0),
+        "бесінші" => Some(5.0),
+        "алтыншы" => Some(6.0),
+        "жетінші" => Some(7.0),
+        "сегізінші" => Some(8.0),
+        "тоғызыншы" => Some(9.0),
+        "оныншы" => Some(10.0),
+        _ => None,
+    }
+}
+
+/// Strip a Kazakh genitive suffix from the end of a word.  Returns
+/// `Some(root)` only when a known genitive ending was actually
+/// stripped, `None` otherwise.  Used to recover the cardinal from
+/// surface forms like «төрттің» (gen. of «төрт» = four).
+///
+/// The vowel-harmony quartet — тің/тың/дің/дың/нің/ның — is
+/// hand-listed; the Kazakh genitive paradigm is closed and small.
+fn strip_kazakh_genitive(w: &str) -> Option<&str> {
+    for suffix in ["тің", "дің", "нің", "тың", "дың", "ның"] {
+        if let Some(root) = w.strip_suffix(suffix) {
+            if !root.is_empty() {
+                return Some(root);
+            }
+        }
+    }
+    None
+}
+
+/// Rewrite the «<ordinal> дәрежеге <base>» pattern into the
+/// already-supported «<base> дәрежесі <exp>» form.  Mutates
+/// `words` in-place.  Idempotent — re-running is a no-op since
+/// the rewritten form does not match the input pattern.
+fn rewrite_kazakh_ordinal_power(words: &mut Vec<String>) {
+    let mut i = 0;
+    while i + 2 < words.len() {
+        if let Some(exp) = parse_ordinal_kazakh(&words[i])
+            && words[i + 1] == "дәрежеге"
+        {
+            // We need the base number to be at words[i + 2..].
+            // Don't try to parse it here — just swap:
+            //   [ordinal, "дәрежеге", BASE_TOKENS...]  →
+            //   [BASE_TOKENS..., "дәрежесі", ordinal_as_cardinal_word]
+            //
+            // But we can't easily know how many words the multi-word
+            // BASE consumes here.  Easier: swap to the BASE-first
+            // pattern by moving `ordinal` to AFTER all subsequent
+            // tokens.  Since the input is typically short
+            // («екінші дәрежеге бес» — 3 words), do the simplest
+            // case: assume the base spans to end-of-input or to the
+            // next operator.
+            let mut j = i + 2;
+            while j < words.len() && parse_op(&words[j]).is_none() {
+                j += 1;
+            }
+            // words[i+2..j] is the base.  Build the rewritten slice.
+            let base: Vec<String> = words[i + 2..j].to_vec();
+            let trailing: Vec<String> = words[j..].to_vec();
+            let exp_word = format_cardinal_kk(exp);
+            let mut rewritten: Vec<String> = Vec::with_capacity(base.len() + 2 + trailing.len());
+            rewritten.extend(base);
+            rewritten.push("дәрежесі".to_string());
+            rewritten.push(exp_word);
+            rewritten.extend(trailing);
+            // Replace the [i..j] range with the rewritten + tail.
+            words.splice(i.., rewritten);
+            // Continue scanning from the new position past dәрежесі.
+            i += 2;
+            continue;
+        }
+        i += 1;
+    }
+}
+
+/// Rewrite each «<WORD with Kazakh-genitive suffix> түбірі» so the
+/// number word is in its bare cardinal form for `parse_compound_number`.
+fn rewrite_kazakh_genitive_sqrt(words: &mut [String]) {
+    for i in 1..words.len() {
+        if is_sqrt_suffix(&words[i])
+            && let Some(root) = strip_kazakh_genitive(&words[i - 1])
+        {
+            words[i - 1] = root.to_string();
+        }
+    }
+}
+
+/// Render an integer cardinal (1-10) in Kazakh — used to inject the
+/// exponent-as-cardinal back into the rewritten power expression.
+/// Out-of-range values fall back to the ASCII digit form, which
+/// `parse_compound_number` also accepts.
+fn format_cardinal_kk(n: f64) -> String {
+    match n as i64 {
+        1 => "бір".into(),
+        2 => "екі".into(),
+        3 => "үш".into(),
+        4 => "төрт".into(),
+        5 => "бес".into(),
+        6 => "алты".into(),
+        7 => "жеті".into(),
+        8 => "сегіз".into(),
+        9 => "тоғыз".into(),
+        10 => "он".into(),
+        other => other.to_string(),
+    }
 }
 
 /// Strip trailing sentence punctuation from a single word so that
@@ -1082,6 +1219,45 @@ mod tests {
     fn power_kazakh() {
         let r = solve("Екі дәрежесі он").unwrap();
         assert_eq!(r.value, 1024.0);
+    }
+
+    /// **v6.5.0-rc12** — rc11 live audit user feedback:
+    ///
+    /// > Я эти вопросы задавал «Екінші дәрежеге бес»,
+    /// > «Төрттің түбірі», чтобы он сделал вычисление.
+    ///
+    /// Kazakh has TWO power-expression word-orders.  The classic
+    /// «BASE дәрежесі EXP» (= base to the exponent) was supported
+    /// from day one (`power_kazakh` above).  But school-style
+    /// arithmetic uses «EXP_ordinal дәрежеге BASE» (= "to the Nth
+    /// power, BASE") — «екінші дәрежеге бес» = 5².
+    /// Both must compute, not refuse.
+    #[test]
+    fn power_kazakh_ordinal_dative_form() {
+        let r = solve("Екінші дәрежеге бес").expect("must solve");
+        assert_eq!(r.value, 25.0, "5² = 25");
+
+        let r = solve("Үшінші дәрежеге екі").expect("must solve");
+        assert_eq!(r.value, 8.0, "2³ = 8");
+
+        let r = solve("Төртінші дәрежеге үш").expect("must solve");
+        assert_eq!(r.value, 81.0, "3⁴ = 81");
+    }
+
+    /// Genitive of a Kazakh cardinal followed by «түбірі» — square
+    /// root.  Existing test `sqrt_*` only covers ASCII / Russian
+    /// forms.  «Төрттің түбірі» (= √4) is school-curriculum and
+    /// must compute.
+    #[test]
+    fn sqrt_kazakh_genitive_form() {
+        let r = solve("Төрттің түбірі").expect("must solve");
+        assert_eq!(r.value, 2.0, "√4 = 2");
+
+        let r = solve("Тоғыздың түбірі").expect("must solve");
+        assert_eq!(r.value, 3.0, "√9 = 3");
+
+        let r = solve("Жиырма бестің түбірі").expect("must solve");
+        assert_eq!(r.value, 5.0, "√25 = 5");
     }
 
     #[test]
