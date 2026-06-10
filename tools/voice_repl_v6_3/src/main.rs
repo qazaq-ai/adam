@@ -53,6 +53,7 @@
 
 mod coherence;
 mod context_corrections;
+mod correction_persist;
 mod intent_classifier_runtime;
 mod neural_override;
 mod neural_rescorer;
@@ -477,6 +478,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 "[voice-repl] [journal] REJECTION DETECTED — {}",
                                 rejection_detector::render_log(&sig)
                             );
+                            // **rc7 self-learning persist.**  Save the
+                            // rejected turn + the user's clarifying
+                            // input to `data/mistake_corrections.jsonl`.
+                            // rc8 will load this file at startup to
+                            // override the cascade on matching inputs.
+                            // Failure to persist must NEVER crash the
+                            // REPL — log + continue.
+                            let record =
+                                correction_persist::CorrectionRecord::from_signal(&sig, &text);
+                            match correction_persist::append(&record) {
+                                Ok(()) => println!(
+                                    "[voice-repl] [journal] correction persisted → {}",
+                                    correction_persist::DEFAULT_CORRECTION_PATH
+                                ),
+                                Err(e) => eprintln!(
+                                    "[voice-repl] [journal] correction persist failed: {e}"
+                                ),
+                            }
                         }
                         text
                     }

@@ -61,5 +61,10 @@ serde_json = { workspace = true }
 cpal = "0.15"
 clap = { version = "4.5", features = ["derive"] }
 
+[dev-dependencies]
+# Used by `correction_persist` tests to write to a sandboxed dir
+# instead of polluting `data/mistake_corrections.jsonl` during CI.
+tempfile = "3.10"
+
 [lints]
 workspace = true

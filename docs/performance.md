@@ -1,4 +1,4 @@
-# Performance — adam v6.5.0-rc6 (v6.2 deterministic core unchanged; v6.3 wraps it in a voice surface — see DUE_DILIGENCE.md)
+# Performance — adam v6.5.0-rc7 (v6.2 deterministic core unchanged; v6.3 wraps it in a voice surface — see DUE_DILIGENCE.md)
 
 > **v6.1.50 note (originally drafted 2026-05-18 for rc1; the
 > 2026-05-22 GA merge held the numbers; v6.1.50 on 2026-05-23 adds

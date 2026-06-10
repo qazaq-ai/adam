@@ -56,6 +56,80 @@ pub struct RejectionSignal {
     pub rejected_turn: JournalTurn,
 }
 
+/// Question-marker tokens excluded from the rephrase overlap.
+///
+/// **v6.5.0-rc7 (2026-06-09 audit-T13/T14 fix).**  rc6 live audit
+/// surfaced two false-positive rephrase signals:
+///
+///   T12: «Бүгін — қай — күн.»        → AskDate ✓ «сәрсенбі»
+///   T13: «Кеше қай күн болды.»        → REPHRASE detected (wrong)
+///   T14: «Ертең қай күн болады.»      → REPHRASE detected (wrong)
+///
+/// All three are *different* date queries (today / yesterday /
+/// tomorrow), but they share the question-skeleton «қай күн».  Plain
+/// containment overlap fires because those tokens dominate the small
+/// set.  The fix: strip question-markers BEFORE computing overlap,
+/// so the comparison runs on the content tokens that actually
+/// distinguish the queries.
+///
+/// The list is closed and small — only words that carry no content
+/// information on their own.  Adding more risks under-flagging real
+/// rephrases.
+const STOPWORDS: &[&str] = &[
+    // Kazakh question-markers / interrogative particles
+    "қай",
+    "не",
+    "кім",
+    "қашан",
+    "қандай",
+    "қанша",
+    "неше",
+    "қайда",
+    "қалай",
+    "ма",
+    "ме",
+    "ба",
+    "бе",
+    // Kazakh copula / auxiliary that surfaces in most questions
+    "болды",
+    "болады",
+    "болсын",
+    "болса",
+    // Kazakh topic-skeleton nouns that appear in most queries of
+    // their family — sharing one of these is not enough signal to
+    // call a rephrase.  «бүгін / кеше / ертең» are the distinguishing
+    // tokens, «күн» is the shared skeleton.
+    "күн",
+    "күні",
+    "сағат",
+    "уақыт",
+    "жыл",
+    "жылы",
+    "ай",
+    // Russian temporal skeleton
+    "день",
+    "час",
+    "год",
+    "месяц",
+    // Russian — same families
+    "что",
+    "какой",
+    "какая",
+    "какое",
+    "какие",
+    "когда",
+    "где",
+    "куда",
+    "откуда",
+    "кто",
+    "как",
+    "ли",
+    "был",
+    "была",
+    "было",
+    "будет",
+];
+
 /// Default containment threshold for the rephrase signal.
 ///
 /// The metric is `|A ∩ B| / min(|A|, |B|)` — the fraction of the
@@ -205,10 +279,22 @@ fn is_correction_prefix(normalised: &str) -> bool {
 /// min(|A|, |B|)`.  Returns 0.0 for either side empty.  Range
 /// [0.0, 1.0].  See [`REPHRASE_OVERLAP_THRESHOLD`] for why we
 /// prefer containment to Jaccard here.
+///
+/// **rc7 — stopword filter.**  [`STOPWORDS`] tokens are removed
+/// from BOTH sides before counting.  If either side ends up empty
+/// after stopword removal, return 0.0 (no overlap signal — the
+/// utterance was entirely question-skeleton and carries no content
+/// to compare).
 fn token_overlap(a: &str, b: &str) -> f32 {
     use std::collections::HashSet;
-    let toks_a: HashSet<&str> = a.split_whitespace().collect();
-    let toks_b: HashSet<&str> = b.split_whitespace().collect();
+    let toks_a: HashSet<&str> = a
+        .split_whitespace()
+        .filter(|t| !STOPWORDS.contains(t))
+        .collect();
+    let toks_b: HashSet<&str> = b
+        .split_whitespace()
+        .filter(|t| !STOPWORDS.contains(t))
+        .collect();
     if toks_a.is_empty() || toks_b.is_empty() {
         return 0.0;
     }
@@ -296,6 +382,37 @@ mod tests {
         let j = jrn_with_prev("Қазақстандағы жазушылар", "AskAboutTopic", "Мемлекет");
         // Completely unrelated follow-up — should NOT fire.
         assert!(detect("Қазір сағат неше", &j).is_none());
+    }
+
+    /// **v6.5.0-rc7 audit fix.**  rc6 live audit T13/T14 falsely
+    /// fired rephrase on legitimately different date queries that
+    /// happened to share the «қай күн» skeleton.  rc7 stopword
+    /// filter strips the question-markers before overlap.
+    #[test]
+    fn rc7_question_skeleton_does_not_trigger_rephrase() {
+        let j = jrn_with_prev("Бүгін қай күн", "AskDate", "сәрсенбі");
+
+        // "Кеше қай күн болды" — different day, but the previous
+        // detector saw {қай, күн} ⊂ smaller → fired.  After rc7
+        // stopword filter, content tokens are {бүгін} vs {кеше} → 0.
+        assert!(
+            detect("Кеше қай күн болды.", &j).is_none(),
+            "{{бүгін}} vs {{кеше}} share zero content tokens"
+        );
+
+        // "Ертең қай күн болады" — same family, also a new question.
+        assert!(detect("Ертең қай күн болады.", &j).is_none());
+
+        // Sanity: the writers-rephrase case from rc5 still fires
+        // because the CONTENT token «жазушы» is shared.
+        let j = jrn_with_prev(
+            "Қазақстандағы жазушыларды білесің ба",
+            "AskAboutTopic",
+            "Мемлекет",
+        );
+        let sig = detect("Қазақстандағы жазушылар туралы білесің ба", &j)
+            .expect("legitimate rephrase must still fire");
+        assert_eq!(sig.kind, RejectionKind::Rephrase);
     }
 
     #[test]
