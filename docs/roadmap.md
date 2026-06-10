@@ -7,11 +7,15 @@ Version-by-version history of `adam`, grouped into architectural eras.
 > (8 modules, 195 lib tests) + `adam-dialog::v6_2_router`
 > integration bridge gated by `ADAM_V6_2=1`. The full typed
 > pipeline (Composition → Frame → QueryIR → FrameIndex → realiser)
-> runs as pure typed-data manipulation: **0 MB model, 0 % GPU,
-> 791 ns warm median latency** on one M2 core (~ 126 000× faster
-> than a 100 ms LLM call). Real-Kazakh dialog battery
-> **79/79 must-pass, 0 known gaps, 0 regressions**. v6.1 cascade
-> unchanged when the gate is off (default).
+> runs as pure typed-data manipulation: **0 % GPU, 0 network, 314 MB
+> peak RSS** on the production 30-query battery (M2 Air), with
+> production-cascade p50 ≈ **13.6 ms / p95 ≈ 19.6 ms** per query.
+> Stage 3 typed-kernel micro-path runs ~470 ns avg in isolation —
+> useful for comparing kernel versions but NOT a fair head-to-head
+> against LLMs (which are a different system class with 128K-1M
+> context).  Real-Kazakh dialog battery **79/79 must-pass, 0 known
+> gaps, 0 regressions**. v6.1 cascade unchanged when the gate is
+> off (default).
 >
 > The 11-release v6.1 patch cycle revealed that pattern-matching
 > cascades hit a ceiling on natural speech; v6.2 addressed it by

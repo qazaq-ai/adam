@@ -152,12 +152,26 @@ Startup log on a fully-configured machine prints:
 If models are missing the loaders print `missing checkpoint files` and
 the voice REPL runs without that subsystem (dialog still works).
 
-### Latency on the M2 reference machine
+### Latency on the M2 reference machine — three classes
 
-- v6.2 dialog router warm median: **917 ns** per turn (`cargo bench
-  -p adam-dialog --bench v6_2_router_bench`).
-- Voice REPL per-turn end-to-end: 3–8 s wall (Whisper + Piper dominate;
-  dialog router < 1 µs of that).
+Honest split — do not conflate when comparing to other systems.
+
+- **Stage 3 typed-kernel micro-path**: ~470 ns avg (`adam-algebra`
+  Stage 3 — algebraic Frame→Index→answer only; excludes router /
+  retrieval / reasoning / realiser).
+- **Production cascade** (the real number for text queries through
+  `adam_chat`): **13.6 ms p50 / 19.6 ms p95 / 314 MB peak RSS** on
+  the 30-query production battery (`adam_resource_bench`).
+- **Voice REPL** end-to-end: 3–8 s wall (Whisper STT + Piper TTS
+  dominate; the dialog cascade itself is the 13.6 ms number above).
+
+The Stage 3 micro-path latency is useful for comparing kernel
+versions to each other.  It is NOT a fair head-to-head against
+full NLP systems (Llama 3.1 / Claude / GPT) — those are a
+different system class (128K–1M context, broad open-domain).
+adam's narrow deterministic Kazakh scope is what makes the
+small footprint possible; same-task blind eval is the right
+comparison instrument, not raw latency.
 
 ## 6. Data assets and where they come from
 

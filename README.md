@@ -42,7 +42,7 @@
 > reproducibility commands across both tracks.
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.5.0--rc12-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.5.0--rc13-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -54,8 +54,10 @@
 <p align="center">
   <img src="https://img.shields.io/badge/tests-2500%20passing%20%2F%200%20failed%20%2F%2027%20ignored-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/dialog%20battery-79%2F79%20must--pass-2EA44F?style=flat-square" alt="dialog battery">
-  <img src="https://img.shields.io/badge/v6.2%20warm%20p50-917%20ns-2EA44F?style=flat-square" alt="warm latency">
-  <img src="https://img.shields.io/badge/v6.2%20core-0%20MB%20%2F%200%20GPU-2EA44F?style=flat-square" alt="v6.2 core">
+  <img src="https://img.shields.io/badge/production%20p50-13.6%20ms-2EA44F?style=flat-square" alt="production p50">
+  <img src="https://img.shields.io/badge/production%20p95-19.6%20ms-2EA44F?style=flat-square" alt="production p95">
+  <img src="https://img.shields.io/badge/peak%20RSS-314%20MB-2EA44F?style=flat-square" alt="peak RSS">
+  <img src="https://img.shields.io/badge/0%20GPU%20%2F%200%20network-2EA44F?style=flat-square" alt="0 GPU / 0 network">
   <img src="https://img.shields.io/badge/v6.3%20voice%20surface-Whisper%20%2B%20Piper%20%2B%20tiny%20LM-9CCC65?style=flat-square" alt="v6.3 voice">
   <img src="https://img.shields.io/badge/world%20core-3444%20curated%20/%204116%20facts-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/lexicon-25.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
@@ -83,19 +85,53 @@ input → morph lattice → Composition[] → Frame → QueryIR
                                        realiser → output
 ```
 
-### Headline numbers (release build, M2 Air, single CPU core)
+### Honest numbers (release build, M2 Air)
 
-| | adam ARK v6.2 | GPT-class LLM (one call) |
-|---|---|---|
-| Median warm latency | **274 ns** (Stage 3 pipeline) | ~100–500 ms |
-| Median full dialog battery | **791 ns / query** | (same) |
-| Throughput | **~1.26M qps / core** | ~2–10 qps |
-| Model size | **0 MB** | 5–600 GB |
-| GPU required | **No** | Yes |
-| Deterministic | **Yes** (byte-identical) | No |
+adam runs in three latency classes.  All numbers are real and
+reproducible from this repo; **don't conflate the classes** when
+comparing to other systems.
 
-**≈ 126 000× faster** than a fast (100 ms) LLM call on a single
-CPU core, with **0 MB model loaded**.
+| Class | What it measures | Median | p95 | Memory |
+|---|---|---|---|---|
+| **A. Typed kernel micro-path** | `adam-algebra` Stage 3: typed Frame → Index → answer.  Excludes STT, dialog router, NLG, anaphora resolution. | **~470 ns** | ~600 ns | <50 MB RSS |
+| **B. Production dialog cascade** | `adam-dialog` 30-query real battery: morph → semantics → router → retrieval → reasoning → realiser.  Excludes STT/TTS. | **13.6 ms** | 19.6 ms | **314 MB RSS** |
+| **C. Full voice loop** (v6.3 voice REPL) | Mic capture → Whisper STT → cascade → Piper TTS.  Hot path for the audio interactive flow. | not measured (interactive) | n/a | + 2.3 GB STT + 1.1 GB TTS on disk |
+
+Class A is the typed-algebra micro-benchmark — useful for comparing
+kernel versions to each other, **not** for comparing adam to a full
+NLP system.  Class B is the honest production number — what a real
+text query through `adam_chat` looks like.  Class C is the voice
+demonstrator and depends on Whisper / Piper sizes.
+
+#### How this compares to LLMs
+
+**Different system class — not a head-to-head replacement.**  Llama
+3.1 / Claude / GPT cover 128K–1M token context across hundreds of
+languages and broad open-domain dialogue.  adam covers a narrow
+deterministic Kazakh-first reasoning surface on curated facts.
+adam is faster, smaller, and 0-GPU **only because the problem
+scope is narrower**.
+
+What adam offers that LLMs cannot:
+- **Byte-deterministic answers** — same input → same output, no
+  sampling, no temperature, regression-testable in CI.
+- **0 GPU, 0 network** — runs offline on M2 Air, suitable for
+  airgapped / regulated / restricted environments.
+- **Auditable provenance** — every fact ships from
+  `data/world_core/` JSONL files; no hidden training corpus.
+- **Native Kazakh morphology** — FST-grounded analyses, not
+  byte-pair guessed.
+
+What adam does NOT offer (and is not trying to):
+- Broad open-domain general knowledge across many languages.
+- Long-context reasoning at LLM scale.
+- Creative / open-ended generation.
+
+For a fair comparison, a same-task blind eval (300–1000 Kazakh
+queries across factual / OOD / safety / tutor / multi-turn) is
+needed.  That eval is on the roadmap; see
+[v6.5 audit-to-training loop](docs/training_runbook.md) for the
+current evaluation methodology.
 
 ### What ships in `adam-algebra` (8 modules, 195 tests)
 
@@ -188,9 +224,12 @@ for the design doc that preceded the work.
 > 1. **Predictability** — every claim cites a curated `(pack,
 >    sample_id)` provenance; the cascade is byte-identical given
 >    `(input, seed, world_core)`.
-> 2. **Cheapness** — single Rust binary, **0 MB model**, **0 %
->    GPU**, **791 ns warm median latency** on one M2 core
->    (~1.26M qps). Watch-class deployable.
+> 2. **Cheapness** — single Rust binary, **314 MB peak RSS** on the
+>    full 30-query production cascade, **0 % GPU**, **0 network**.
+>    Runs offline on an M2 Air at **13.6 ms p50 / 19.6 ms p95**
+>    per query (production cascade — see *Honest numbers* section
+>    above for the three latency classes).  Voice loop adds STT
+>    (~2.3 GB) + TTS (~1.1 GB) on disk.
 > 3. **Architectural hallucination-freedom within curated domains** —
 >    every fact-bearing reply emits from a `FrameIndex` hit + Stage 7
 >    realiser, or falls through to v6.1 cascade / honest refusal. No
@@ -224,7 +263,7 @@ anywhere in the answer path.
 | The three diseases of probabilistic AI | adam's target | How v6.2 enforces it |
 |---|---|---|
 | **Black box** — opaque internals, no source attribution | **Predictability** — every claim traceable | `FrameIndex.query` returns a `RankedFrame` with `FrameId`; `world_core/*.jsonl` is the only fact source; every realised sentence is a function of `(Frame, focus, slot)` |
-| **Resource cost** — billions of params, GPU clusters | **Cheapness** — single binary | 0 MB model, 0 % GPU, 791 ns p50 dialog battery on M2 single core |
+| **Resource cost** — billions of params, GPU clusters | **Cheapness** — single binary | 314 MB RSS, 0 % GPU, 0 network, 13.6 ms p50 production cascade on M2 Air (full 30-query battery) |
 | **Hallucination risk** — confident generation of plausible-sounding wrong content | **Safety** — architectural impossibility | Realiser is a typed pure function over a curated Frame; if the index returns `None`, the router falls through to v6.1 cascade (no invention) |
 
 **Hypothesis:** agglutinative languages — Kazakh in particular —
@@ -353,7 +392,8 @@ For a full evidence dump on any Kazakh root, run [`adam_inspect`](crates/adam-di
 | Workspace tests | **2 339 passing / 0 failed / 27 ignored** | v6.3.0-rc2 on M2 (`cargo test --release --workspace --locked`); v6.2.0 had 1 904 passing — v6.3 added voice REPL + neural intent classifier + replay battery + Phase 21 calendar tests |
 | Release cadence | **540+ versioned releases since 2026-04-07** | every release CI-verified |
 | v6.2 dialog battery | **79/79 must-pass, 0 gaps** | 14 real-Kazakh domains; CI quality gate via `dialog_battery_meets_quality_gate` |
-| v6.2 warm p50 latency (release, M2 single core) | **791 ns** (full dialog) / **274 ns** (Stage 3) | vs LLM ~100ms — ≈ 126 000× faster |
+| Production cascade latency (M2 Air, 30-query battery) | **13.6 ms p50** / 19.6 ms p95 / 314 MB peak RSS | full `adam-dialog` cascade — morph → router → retrieval → reasoning → realiser; excludes STT/TTS |
+| Stage 3 typed-kernel micro-path | **~470 ns avg** | `adam-algebra` Stage 3 only — algebraic core; NOT a fair head-to-head against full NLP systems |
 | v6.2 throughput (single core) | **~1.26 M queries / sec** | scales linearly across cores |
 | v6.2 model size | **0 MB** | pure typed-data manipulation |
 | v6.1 cascade p50 turn latency | **~21 ms** | vs Llama-3 8B fp16 800–1500 ms; vs GPT-4 50–200 ms |
@@ -393,8 +433,9 @@ architectural redesign promised at v6.1.50. Lands the new
 `adam-algebra` crate (8 modules, 195 tests) + `adam-dialog::v6_2_router`
 integration bridge. v6.1 cascade unchanged when the gate is off.
 Workspace tests 1735 → 1904. Real-Kazakh dialog battery 79/79
-must-pass, 0 known gaps. Median warm latency 791 ns (release, M2
-single core). See [CHANGELOG.md § 6.2.0](CHANGELOG.md).
+must-pass, 0 known gaps. Stage 3 typed-kernel micro-path runs
+~470 ns avg; production cascade p50 ~13.6 ms (see *Honest numbers*
+above for the three latency classes). See [CHANGELOG.md § 6.2.0](CHANGELOG.md).
 
 **v6.1.50 — v6.1-series freeze.** Time-unit Count + Disagreement
 answer-shape + voice aliases + doc refresh. Final v6.1.x release;
