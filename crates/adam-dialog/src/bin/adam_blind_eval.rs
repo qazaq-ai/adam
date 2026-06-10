@@ -91,6 +91,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pack_path = args.next().unwrap_or_else(|| DEFAULT_PACK.to_string());
     let allow_failures = args.next().as_deref() == Some("--allow-failures");
 
+    // **v6.5.0-rc16 — measure what the voice REPL actually does.**
+    // The voice REPL sets `ADAM_V6_2=1` at startup (logs show
+    // `[voice-repl] ADAM_V6_2=1`), routing through the typed v6.2
+    // stack — including `math_solver` for queries like «Екінші
+    // дәрежеге бес».  Blind eval must mirror that, otherwise it
+    // measures a different cascade than users actually experience.
+    //
+    // This unblocks the rc12 / rc15 math preprocessing fixes —
+    // they live in `adam-algebra::math_solver`, which the v6.1
+    // cascade doesn't call.
+    //
+    // SAFETY: this is the only env-var mutation in the process and
+    // it happens before any thread spawns.
+    unsafe {
+        std::env::set_var("ADAM_V6_2", "1");
+    }
+
     eprintln!("[eval] pack: {pack_path}");
     let pack: Pack = serde_json::from_str(&std::fs::read_to_string(&pack_path)?)?;
     eprintln!(
