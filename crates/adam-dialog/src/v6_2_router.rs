@@ -33,12 +33,20 @@ use adam_algebra::{
     dialog_battery, math_solver, realiser, system_clock,
 };
 
-/// Read the `ADAM_V6_2` env var. Set to `1` / `true` / `on` to
-/// route the dialog cascade through the v6.2 stack instead of v6.1.
+/// Read the `ADAM_V6_2` env var.  Set to `1` / `true` / `on` to
+/// route the dialog cascade through the v6.2 stack (math_solver,
+/// FrameIndex, realiser, OOD discipline, safety guard).
 ///
-/// Stage 7 ships this as **opt-in** so existing CI / user setups
-/// see no regression. Stage 8 flips the default after
-/// HumanDialogEval ≥ 90 % on a curated battery.
+/// **Status (v6.5.0-rc19).**  The blind eval scoreboard
+/// (`adam_blind_eval`, rc14) crossed the ≥90 % bar at rc18 (**97 %**
+/// on 100 curated Kazakh queries) — the criterion the v6.2 doc
+/// originally cited for flipping the default.  But rc19 surfaced a
+/// handful of `tests/{cognitive_eval, adversarial_dialog_v1,
+/// curriculum_*}` regressions where v6.2 hasn't yet matched v6.1
+/// on adversarial / tutor / Latin-discipline cases.  Until those
+/// close (rc20+), the default remains OFF so library consumers see
+/// no regression; production binaries (voice REPL, `adam_chat`,
+/// `adam_blind_eval`) opt in via env-var set at startup.
 pub fn is_v6_2_active() -> bool {
     std::env::var("ADAM_V6_2")
         .map(|v| matches!(v.as_str(), "1" | "true" | "on" | "yes"))
@@ -834,14 +842,38 @@ fn handle_listing_query(input: &str) -> Option<String> {
 fn handle_ood_refusal(input: &str) -> Option<String> {
     let lower = input.to_lowercase();
 
-    // Don't fire on inputs that explicitly mention Kazakhstan —
-    // those have their own handlers above, and we don't want to
-    // false-positive on «Қазақстанның Ресеймен шекарасы» style
-    // bilateral questions (which legitimately mention Ресей).
-    let kz_anchored = lower.contains("қазақстан")
-        || lower.contains("казахстан")
-        || lower.contains("қазақ")
-        || lower.contains("казах");
+    // Don't fire on inputs that explicitly mention Kazakhstan in
+    // KAZAKH script.  «казахстан» (Russian / Latin) is intentionally
+    // NOT a bypass — it's a script-discipline signal, not an
+    // identity claim.
+    let kz_anchored = lower.contains("қазақстан") || lower.contains("қазақ");
+
+    // **v6.5.0-rc19 — substantive-English script discipline.**
+    // Refuse only on Latin input that contains a known English
+    // function word (what / is / how / about / …).  Random Latin
+    // gibberish like «xyz random 123» still falls through
+    // (`unknown_input_returns_none` regression).  Russian queries
+    // are NOT refused at the script layer — the v6.2 cascade has
+    // bilingual curated facts (e.g. «Что такое гравитация» →
+    // Russian definition).  v6.1 had its own Russian language
+    // guard; v6.2 keeps the bilingual capability.
+    let (latin, _kaz_specific, cyrillic_total) = count_scripts(&lower);
+    let alphabetic = latin + cyrillic_total;
+    if alphabetic >= 5 && latin * 2 > alphabetic && !kz_anchored {
+        let has_english_word = ENGLISH_FUNCTION_WORDS.iter().any(|w| {
+            lower
+                .split_whitespace()
+                .any(|t| t.trim_end_matches(['?', '.', '!', ',']) == *w)
+        });
+        if has_english_word {
+            return Some(
+                "Менің сұхбат тілім — қазақ тілі. Сұрағыңызды қазақша \
+                 қойсаңыз, қазақ-тілді curated білім қорымдағы фактілермен \
+                 жауап беруге тырысамын."
+                    .to_string(),
+            );
+        }
+    }
 
     let foreign_hit = OOD_FOREIGN_MARKERS.iter().any(|m| lower.contains(m));
     if !foreign_hit {
@@ -861,6 +893,34 @@ fn handle_ood_refusal(input: &str) -> Option<String> {
          туралы сұрақтармен көмектесе аламын."
             .to_string(),
     )
+}
+
+/// English function-word markers that distinguish substantive
+/// English input from random Latin tokens.  Closed list; matched
+/// as whole tokens (after punctuation trim).
+const ENGLISH_FUNCTION_WORDS: &[&str] = &[
+    "what", "who", "when", "where", "why", "how", "is", "are", "do", "does", "can", "could",
+    "should", "the", "a", "an", "about", "tell", "me", "i", "you", "in", "of", "to", "for",
+];
+
+/// Count Latin letters, Kazakh-specific Cyrillic letters
+/// (ұқғңөәүһі), and total Cyrillic letters in the input.  Used by
+/// the script-discipline branch of [`handle_ood_refusal`].
+fn count_scripts(s: &str) -> (usize, usize, usize) {
+    let mut latin = 0;
+    let mut kaz_specific = 0;
+    let mut cyrillic = 0;
+    for c in s.chars() {
+        if c.is_ascii_alphabetic() {
+            latin += 1;
+        } else if matches!(c, 'ұ' | 'қ' | 'ғ' | 'ң' | 'ө' | 'ә' | 'ү' | 'һ' | 'і') {
+            kaz_specific += 1;
+            cyrillic += 1;
+        } else if ('а'..='я').contains(&c) || c == 'ё' {
+            cyrillic += 1;
+        }
+    }
+    (latin, kaz_specific, cyrillic)
 }
 
 /// Closed-set non-Kazakh entities.  Substring match against the

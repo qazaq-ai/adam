@@ -1,9 +1,9 @@
 # adam — Due Diligence Pack
 
-**Last updated:** 2026-06-02
-**Branch:** `experimental/v6_3_phonemic_foundation`
-**HEAD commit:** `e419f118`
-**Workspace version:** `6.3.0`
+**Last updated:** 2026-06-11
+**Branch:** `main`
+**HEAD commit:** `cff98050+` (v6.5.0-rc19 in-flight)
+**Workspace version:** `6.5.0-rc19`
 
 This document is intentionally a flat list of facts. Numbers come from
 commands you can re-run yourself; everything labelled "limitation" or
@@ -30,11 +30,11 @@ at the audio ↔ text boundary; they never invent facts.
 
 | Metric | Value |
 | --- | --- |
-| HEAD branch | `experimental/v6_3_phonemic_foundation` |
-| HEAD commit | `e419f118` |
-| Commits ahead of `main` | 102 |
-| Largest crate (LOC) | `adam-dialog` — 76 411 |
-| Total Rust LOC (workspace) | 160 692 |
+| HEAD branch | `main` |
+| HEAD commit | v6.5.0-rc19 in-flight |
+| Blind eval (rc18 final) | **97 / 100** across factual / OOD / safety / tutor / conversational |
+| Workspace tests | 2 521 passing / 0 failed / 27 ignored (rc18) |
+| Largest crate (LOC) | `adam-dialog` (extended via rc15 safety guard + rc18 OOD discipline) |
 | World-core curated entries | 3 444 in `data/world_core/*.jsonl` |
 | Hand-curated corpus lines | 7 749 869 (`data/curated/`) |
 | `.git` directory size | 460 MB |

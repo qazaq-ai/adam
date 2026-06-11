@@ -166,10 +166,11 @@ User asked (2026-06-08): «почему сами, когда индустрия 
 
 The project's USP is BYTE-DETERMINISTIC dialog. A frontier LLM:
 
-- Hallucinates biographies of nonexistent Kazakh people; we return «нет данных».
-- Costs 20+ ms / call minimum; we run in 274 ns / call.
-- Requires 5–600 GB of model weights; we run with 0 MB models loaded (rule-based core).
+- Hallucinates biographies of nonexistent Kazakh people; we refuse with «нақты дерегім жоқ».
+- Runs at LLM-class latency (~100 ms+); we run the production cascade at **13.6 ms p50** / 19.6 ms p95 on M2 Air (text-only — voice loop adds STT/TTS on top).
+- Requires multi-GB weights + GPU; we run with **314 MB peak RSS, 0 % GPU, 0 network**.
 - Has no transparency — we can't show an auditor WHY a specific answer was given.
 - Treats Kazakh as < 0.01 % of training data; we treat it as 100 %.
+- We are NOT a general LLM replacement — narrow deterministic Kazakh reasoning surface with 97 % on the curated blind-eval battery (rc18). Different system class, fair comparison is the same-pack eval, not raw latency.
 
 For peripheral perception tasks (STT, TTS) we DO use the best open models. For the dialog kernel, the deterministic kernel IS the product. See `project_deterministic_directive_confirmed`, `project_engineering_framing`, `project_retrieval_not_neural_v2` in memory for the full rationale.

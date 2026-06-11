@@ -103,19 +103,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pack_path = args.next().unwrap_or_else(|| DEFAULT_PACK.to_string());
     let allow_failures = args.next().as_deref() == Some("--allow-failures");
 
-    // **v6.5.0-rc16 — measure what the voice REPL actually does.**
-    // The voice REPL sets `ADAM_V6_2=1` at startup (logs show
-    // `[voice-repl] ADAM_V6_2=1`), routing through the typed v6.2
-    // stack — including `math_solver` for queries like «Екінші
-    // дәрежеге бес».  Blind eval must mirror that, otherwise it
-    // measures a different cascade than users actually experience.
+    // **v6.5.0-rc19 — restore explicit env-var set.**  rc19 was
+    // going to flip the global default to ON, but the change
+    // exposed several v6.1→v6.2 regressions in
+    // `tests/{cognitive_eval, adversarial_dialog_v1, curriculum_*}`
+    // that need rc20+ to close.  Until then production binaries
+    // (this one, voice REPL, `adam_chat`) opt in explicitly; the
+    // library default stays OFF so test consumers see no
+    // regression.
     //
-    // This unblocks the rc12 / rc15 math preprocessing fixes —
-    // they live in `adam-algebra::math_solver`, which the v6.1
-    // cascade doesn't call.
-    //
-    // SAFETY: this is the only env-var mutation in the process and
-    // it happens before any thread spawns.
+    // SAFETY: only env-var mutation in the process, before any
+    // thread spawns.
     unsafe {
         std::env::set_var("ADAM_V6_2", "1");
     }

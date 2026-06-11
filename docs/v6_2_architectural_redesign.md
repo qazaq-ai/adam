@@ -13,9 +13,14 @@ commit `a4b64a76` and tagged `v6.2.0`. Implementation inventory:
   state (honest fallback when the router can't answer).
 - Real-Kazakh dialog battery: **79/79 must-pass, 0 known gaps,
   0 regressions**.
-- Workspace tests: 1735 → 1904. clippy `-D warnings` green.
-- Median warm latency (release, M2 single core): **791 ns**
-  full dialog battery; **274 ns** Stage 3 pipeline.
+- Workspace tests: 1735 → 1904 (v6.2.0 shipped). clippy `-D warnings` green.
+- Latency (three classes, M2 Air — see README *Honest numbers*):
+  - Stage 3 typed-kernel micro-path: ~470 ns avg (kernel-version
+    comparison metric; NOT a head-to-head against full NLP systems).
+  - Production dialog cascade (`adam-dialog` 30-query battery):
+    13.6 ms p50 / 19.6 ms p95 / 314 MB peak RSS.
+  - Voice loop: not measured (interactive; Whisper + Piper add
+    seconds on top of the cascade).
 
 This document remains as the **signed-off design contract** the
 implementation was held to. Read it for the architectural intent

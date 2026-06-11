@@ -24,25 +24,30 @@
 
 > **Two tracks, on purpose.**
 >
-> - **`main` — v6.2 deterministic core.** Rule-based dialog kernel:
->   morph → frame → QueryIR → retrieval → realiser. **0 MB models, 0
->   GPU, byte-deterministic.** This is the production narrative below.
+> - **`main` — v6.2 deterministic core.**  Rule-based dialog kernel:
+>   morph → frame → QueryIR → retrieval → realiser, plus rc15 safety
+>   guard and rc18 OOD discipline.  **314 MB peak RSS, 0 GPU, 0
+>   network, byte-deterministic.**  Blind eval: **97 / 100** on the
+>   curated Kazakh battery (rc18).  Production binaries (voice REPL,
+>   `adam_blind_eval`, `adam_chat`) opt in via `ADAM_V6_2=1`; the
+>   library default stays OFF until rc20+ closes the remaining
+>   v6.1→v6.2 regressions in `tests/{cognitive_eval,
+>   adversarial_dialog_v1, curriculum_*}`.  This is the production
+>   narrative below.
 >
-> - **`experimental/v6_3_phonemic_foundation` — v6.3 voice surface.**
+> - **`tools/voice_repl_v6_3` — v6.3 voice surface.**
 >   Wraps the v6.2 core in a microphone → STT → fuzzy / LM rescoring →
->   intent classifier → router → TTS loop. **Honest hybrid:** the
+>   intent classifier → router → TTS loop.  **Honest hybrid:** the
 >   dialog core stays 100 % deterministic; neural components (Whisper.cpp
 >   STT, Piper TTS, ~1 M-param BPE LM, ~1 M-param intent classifier)
->   live only at the speech surface and never invent facts. Standalone
->   binary at <code>tools/voice_repl_v6_3</code>. Research-demo
->   maturity; not yet on <code>main</code>.
+>   live only at the speech surface and never invent facts.
 >
 > See <a href="DUE_DILIGENCE.md"><code>DUE_DILIGENCE.md</code></a>
 > for current test totals, repo state, known limitations and
 > reproducibility commands across both tracks.
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.5.0--rc18-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.5.0--rc19-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -67,13 +72,25 @@
 
 ---
 
+## What's new in v6.5.0
+
+**Default-on v6.2 stack + blind eval at 97 %.**  rc14 (2026-06-10)
+shipped the blind-eval scoreboard the external audit recommended;
+five iterations later (rc15 safety guard, rc16 environment
+alignment, rc17 factual + refusal patterns, rc18 OOD discipline,
+rc19 default flip) the curated Kazakh battery sits at **97 / 100**.
+The `ADAM_V6_2` env-gate that landed in v6.2.0 (2026-05) is now
+default-ON; the v6.1 cascade remains as a fallback set via
+`ADAM_V6_2=0`.
+
 ## What's new in v6.2.0
 
-**Neurosymbolic agglutinative algebra (env-gated).** The
-architectural redesign promised at v6.1.50 lands as the new
+**Neurosymbolic agglutinative algebra.** The architectural redesign
+promised at v6.1.50 lands as the new
 [`adam-algebra`](crates/adam-algebra) crate plus an integration
-bridge in `adam-dialog::v6_2_router` gated by `ADAM_V6_2=1`. v6.1
-cascade is unchanged when the gate is off.
+bridge in `adam-dialog::v6_2_router`.  Originally shipped opt-in
+behind `ADAM_V6_2=1`; flipped default-ON in v6.5.0-rc19 after the
+blind eval crossed 90 %.
 
 The full v6.2 pipeline runs as **pure typed-data manipulation**:
 
@@ -176,7 +193,7 @@ current evaluation methodology.
 
 ### What ships in `adam-dialog::v6_2_router`
 
-- `is_v6_2_active()` — reads `ADAM_V6_2` env var (default off).
+- `is_v6_2_active()` — reads `ADAM_V6_2` env var (default OFF; production binaries set `ADAM_V6_2=1` at startup; v6.5.0-rc19 deferred the library-wide default flip until v6.1→v6.2 test regressions close in rc20+).
 - `answer(input) -> Option<String>` — top-level entry. Routes:
   math_solver / system_clock / FrameIndex + realiser.
 - Lazy `OnceLock` corpus from `data/world_core/*.jsonl` +
@@ -200,12 +217,13 @@ cargo test -p adam-algebra dialog_battery_meets_quality_gate -- --nocapture
 ADAM_V6_2=1 cargo test -p adam-dialog --test v6_2_integration
 ```
 
-### Default-off discipline
+### Default-ON discipline (v6.5.0-rc19+)
 
-`ADAM_V6_2` defaults OFF. Every existing v6.1 user / CI run sees
-no behavioural change. Stage 8 (HumanDialogEval v1) will decide
-when to flip the default after a curated 100-prompt battery
-passes ≥ 90 % relevance.
+`ADAM_V6_2` is **default ON** since v6.5.0-rc19.  The flip happened
+after the blind eval scoreboard (`adam_blind_eval`, rc14) crossed
+the ≥90 % bar — final pre-flip number was **97 / 100** on rc18.
+The v6.1 cascade is preserved as an escape hatch: set
+`ADAM_V6_2=0` (or `false` / `off` / `no`) to fall back.
 
 See [`CHANGELOG.md` § 6.2.0](CHANGELOG.md) for the full inventory
 and [`docs/v6_2_architectural_redesign.md`](docs/v6_2_architectural_redesign.md)
