@@ -54,6 +54,8 @@
 mod coherence;
 mod context_corrections;
 mod correction_persist;
+#[cfg(test)]
+mod drift_battery;
 mod intent_classifier_runtime;
 mod lexicon_validator;
 mod multi_act_splitter;
