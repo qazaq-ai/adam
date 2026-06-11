@@ -48,6 +48,8 @@
 use adam_kernel_fst::lexicon::LexiconV1;
 use adam_kernel_fst::parser::analyse;
 
+use crate::zipf_vocab::ZipfVocab;
+
 /// Cleaned input + a diagnostic list of substitutions made.
 /// The diagnostic is useful for the voice REPL's per-turn log
 /// («[voice-repl] lexicon-validator: Қалыңғыз → Қалыңыз»).
@@ -69,7 +71,32 @@ pub struct CleanedInput {
 ///   - Proper-noun-like tokens that start with an uppercase letter
 ///     AND have no Kazakh-specific glyphs (Whisper Latin spelling
 ///     of foreign names — leave for the OOD discipline downstream)
+#[cfg(test)]
 pub fn clean(input: &str, lex: &LexiconV1) -> CleanedInput {
+    clean_with_hot_vocab(input, lex, None)
+}
+
+/// Variant of [`clean`] that also consults a hot-vocab list.  When
+/// an FST-validated token has an edit-distance-1 neighbour PRESENT
+/// in `vocab.entries`, the hot-vocab neighbour wins.
+///
+/// **v6.5.0-rc24 — frequency-aware override.**  rc23 live audit
+/// T2 «Қалыңғыз қалай»: the FST happily parsed «Қалыңғыз» as
+/// some derivative of «қалың» («thick / dense») + a non-canonical
+/// suffix chain, so the rc23 validator kept it as-is.  But the
+/// REPL's `OVERRIDES` list includes «қалыңыз» (the high-frequency
+/// greeting) as a hot word.  Edit-distance 1 between «қалыңғыз»
+/// and «қалыңыз» — the hot-vocab word wins.
+///
+/// The hot list is closed (~80 entries: honorifics, greetings,
+/// identity-question triggers) and curated; it does NOT contain
+/// general-purpose Kazakh words, so the override is safe — it
+/// won't flip legitimately-distinct minimal pairs.
+pub fn clean_with_hot_vocab(
+    input: &str,
+    lex: &LexiconV1,
+    vocab: Option<&ZipfVocab>,
+) -> CleanedInput {
     let mut substitutions: Vec<(String, String)> = Vec::new();
     let mut out = String::with_capacity(input.len());
 
@@ -85,9 +112,27 @@ pub fn clean(input: &str, lex: &LexiconV1) -> CleanedInput {
             continue;
         }
 
-        // Lowercase for FST + edit-distance lookup; the FST is
-        // case-insensitive on input.
         let core_lower = core.to_lowercase();
+
+        // 0. Hot-vocab override.  Check FIRST: if there is an
+        //    edit-1 neighbour in the hot vocab, prefer it even if
+        //    the original token also parses through the FST.  This
+        //    closes Whisper phantom-letter cases on greetings /
+        //    identity-question triggers / honorifics where the
+        //    FST is permissive (T2 rc23 audit «Қалыңғыз»).
+        //    Skip the override when the original IS already in the
+        //    hot vocab (don't rewrite hot words).
+        if let Some(vocab) = vocab
+            && !vocab.contains(&core_lower)
+            && let Some(hot) = find_hot_vocab_edit1_neighbour(&core_lower, vocab)
+        {
+            let case_matched = match_case(core, &hot);
+            substitutions.push((core.to_string(), case_matched.clone()));
+            out.push_str(leading);
+            out.push_str(&case_matched);
+            out.push_str(trailing);
+            continue;
+        }
 
         // 1. Validator: is this already a valid Kazakh word?
         let parses = analyse(&core_lower, lex);
@@ -99,9 +144,6 @@ pub fn clean(input: &str, lex: &LexiconV1) -> CleanedInput {
         // 2. Fallback: find the unique edit-distance-1 neighbour
         //    in the lexicon.  Two-or-more candidates → no substitution.
         if let Some(substitute) = find_unique_edit1_neighbour(&core_lower, lex) {
-            // Preserve the original token's case pattern: if the
-            // first character of the original was uppercase, capitalize
-            // the substitute too.
             let case_matched = match_case(core, &substitute);
             substitutions.push((core.to_string(), case_matched.clone()));
             out.push_str(leading);
@@ -118,6 +160,22 @@ pub fn clean(input: &str, lex: &LexiconV1) -> CleanedInput {
         text: out,
         substitutions,
     }
+}
+
+/// Find an edit-distance-1 neighbour of `token` that is present in
+/// the hot vocab.  Returns the first hit; the hot vocab is small
+/// enough that uniqueness is rarely violated, and a wrong pick is
+/// recoverable downstream via the rejection detector.
+fn find_hot_vocab_edit1_neighbour(token: &str, vocab: &ZipfVocab) -> Option<String> {
+    for candidate in edit1_candidates(token) {
+        if candidate == token {
+            continue;
+        }
+        if vocab.contains(&candidate) {
+            return Some(candidate);
+        }
+    }
+    None
 }
 
 /// Skip tokens shorter than 4 chars (too noisy), tokens with
@@ -300,19 +358,37 @@ mod tests {
         LexiconV1::load_default().ok()
     }
 
-    /// «Қалыңғыз» → «Қалыңыз»: rc22 audit T2 — the exact case the
-    /// user flagged.  Whisper inserted a phantom «ғ».
+    /// **rc23 audit T2** — when we ran the rc23 validator on
+    /// «Қалыңғыз қалай», the validator **did not fire**: the FST
+    /// happily parses «Қалыңғыз» as some derivative form, so the
+    /// «validate-first» rule kept it.  rc24 adds a hot-vocab override
+    /// that catches this exact pattern.
     #[test]
-    fn rc22_audit_t2_phantom_letter_removed() {
+    fn rc23_audit_t2_hot_vocab_override_closes_phantom_letter() {
         let Some(lex) = lex() else { return };
-        let cleaned = clean("Қалыңғыз қалай", &lex);
-        // The substitution happened (either as a single phantom-letter
-        // delete, or the FST recognised «Қалыңыз» as the unique 1-edit
-        // neighbour).
+        let vocab = crate::zipf_vocab::ZipfVocab::load_or_overrides_only(".");
+        let cleaned = clean_with_hot_vocab("Қалыңғыз қалай", &lex, Some(&vocab));
         assert!(
-            !cleaned.substitutions.is_empty(),
-            "should have substituted Қалыңғыз → Қалыңыз; cleaned={:?}",
             cleaned
+                .substitutions
+                .iter()
+                .any(|(o, n)| o.to_lowercase() == "қалыңғыз" && n.to_lowercase() == "қалыңыз"),
+            "rc24 hot-vocab override must catch Қалыңғыз → Қалыңыз even when the FST parses Қалыңғыз; got={:?}",
+            cleaned
+        );
+    }
+
+    /// Hot-vocab override does NOT rewrite a word that is ITSELF
+    /// in the hot vocab.  «қалыңыз» stays «қалыңыз».
+    #[test]
+    fn rc24_hot_vocab_does_not_rewrite_itself() {
+        let Some(lex) = lex() else { return };
+        let vocab = crate::zipf_vocab::ZipfVocab::load_or_overrides_only(".");
+        let cleaned = clean_with_hot_vocab("Қалыңыз қалай", &lex, Some(&vocab));
+        assert!(
+            cleaned.substitutions.is_empty(),
+            "hot vocab must not rewrite its own entries; got={:?}",
+            cleaned.substitutions
         );
     }
 

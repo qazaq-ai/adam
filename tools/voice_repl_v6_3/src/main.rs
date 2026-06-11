@@ -577,7 +577,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Zipf-fuzzy only sees tokens that the FST itself couldn't
         // recover.  Logged per-turn for diagnostics.
         let user_text_merged = if let Some((lex, _)) = dialog_state.as_ref() {
-            let cleaned = lexicon_validator::clean(&user_text_merged, lex);
+            // **v6.5.0-rc24** — pass the ZipfVocab so the validator
+            // can override FST validation when a hot-vocab edit-1
+            // neighbour exists (closes rc23 audit T2 «Қалыңғыз» →
+            // «Қалыңыз»).
+            let cleaned =
+                lexicon_validator::clean_with_hot_vocab(&user_text_merged, lex, Some(&zipf_vocab));
             for (old, new) in &cleaned.substitutions {
                 println!("[voice-repl] lexicon-validator: «{old}» → «{new}»");
             }
