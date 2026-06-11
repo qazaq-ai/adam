@@ -1656,6 +1656,11 @@ fn realiser_synthesises_instrumental_for_name_slot() {
 
 #[test]
 fn realiser_synthesises_plural_for_occupation_slot() {
+    // **v6.5.0-rc20** — v6.1 cascade test (asserts pre-rc11 self-intro
+    // wording).  Pin until end_to_end_v2 covers v6.2 templates.
+    unsafe {
+        std::env::set_var("ADAM_V6_2", "0");
+    }
     let Some(lex) = load_lexicon() else { return };
     let repo = load_repo();
     let mut conv = Conversation::new();
@@ -1718,6 +1723,11 @@ fn cross_slot_age_mentions_remembered_name() {
 
 #[test]
 fn cross_slot_occupation_in_city_fires_with_all_three() {
+    // **v6.5.0-rc20** — v6.1 cascade test.  Pin until v6.2 covers
+    // cross-slot fire pattern.
+    unsafe {
+        std::env::set_var("ADAM_V6_2", "0");
+    }
     let Some(lex) = load_lexicon() else { return };
     let repo = load_repo();
     let mut conv = Conversation::new();
@@ -1856,6 +1866,12 @@ fn unknown_with_retrieval_cites_corpus_example() {
 fn unknown_with_grounded_fact_uses_nonquoted_verbalizer() {
     use adam_reasoning::{ConfidenceKind, Fact, FactSource, Predicate, SlotRef};
 
+    // **v6.5.0-rc20** — v6.1 cascade test (asserts non-quoted
+    // verbalizer wording).  Pin until v6.2 surfaces grounded-fact
+    // verbalizer.
+    unsafe {
+        std::env::set_var("ADAM_V6_2", "0");
+    }
     let Some(lex) = load_lexicon() else { return };
     let repo = load_repo();
 
@@ -1959,6 +1975,11 @@ fn quantity_question_prefers_has_quantity_graph_fact() {
 fn border_question_prefers_border_graph_fact() {
     use adam_reasoning::{ConfidenceKind, Fact, FactSource, Predicate, SlotRef};
 
+    // **v6.5.0-rc20** — v6.1 cascade test (border-graph predicate
+    // routing).  Pin until v6.2 surfaces border-fact path.
+    unsafe {
+        std::env::set_var("ADAM_V6_2", "0");
+    }
     let Some(lex) = load_lexicon() else { return };
     let repo = load_repo();
 
@@ -4060,6 +4081,13 @@ fn ask_about_system_does_not_swallow_statement_of_name() {
 /// rejected the reflexive form.
 #[test]
 fn ask_about_system_handles_reflexive_phrasings() {
+    // **v6.5.0-rc20** — v6.1 cascade test (pre-rc11 self-intro
+    // wording with «Agglutinative Reasoning Kernel» / «ARK»).
+    // Pin to v6.1 — v6.2 templates dropped the English brand
+    // names because Piper TTS could not pronounce them.
+    unsafe {
+        std::env::set_var("ADAM_V6_2", "0");
+    }
     let Some(lex) = load_lexicon() else { return };
     let repo = load_repo();
     for question in ["өзің кімсің", "өзіңіз кімсіз"] {
@@ -4084,6 +4112,13 @@ fn ask_about_system_handles_reflexive_phrasings() {
 /// the `ask_about_system` template family.
 #[test]
 fn ask_about_system_general_includes_name_and_full_name() {
+    // **v6.5.0-rc20** — v6.1 cascade test.  Pre-rc11 wording asserts
+    // «Agglutinative Reasoning Kernel» / «ARK» in the self-intro
+    // text.  v6.2 templates dropped those tokens for TTS hygiene;
+    // pin to v6.1 to keep the legacy regression assertion intact.
+    unsafe {
+        std::env::set_var("ADAM_V6_2", "0");
+    }
     let Some(lex) = load_lexicon() else { return };
     let repo = load_repo();
     let mut conv = Conversation::new();

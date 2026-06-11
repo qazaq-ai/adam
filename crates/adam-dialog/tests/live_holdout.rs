@@ -205,6 +205,12 @@ fn run_case(
 
 #[test]
 fn live_holdout_2026_05_01() {
+    // **v6.5.0-rc20** — v6.1 cascade regression battery from
+    // the 2026-05-01 live audit.  Asserts pre-v6.2 wording on
+    // several refusal / self-intro cases.  Pin to v6.1.
+    unsafe {
+        std::env::set_var("ADAM_V6_2", "0");
+    }
     let lex = load_lexicon();
     let repo = load_repo();
     let runtime = load_runtime();

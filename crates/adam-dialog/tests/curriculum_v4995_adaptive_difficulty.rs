@@ -166,6 +166,20 @@ fn askexercise_after_clean_pass_on_ownership_serves_hard_variant() {
 /// AskExercise should surface the Easy variant.
 #[test]
 fn askexercise_with_two_failures_serves_easy_variant() {
+    // **v6.5.0-rc20 — pin to v6.1 cascade.**  v6.2 router does not
+    // have the curriculum-aware AskExercise handler that selects
+    // Easy / Normal / Hard variants from `StageProgress`; that
+    // logic lives on the v6.1 path.  This test stays a v6.1
+    // regression battery until the v6.2 router gains a typed
+    // curriculum hook (separate arc).  Other binaries that hit
+    // this code path (`adam_chat --curriculum`) opt in via the
+    // existing v6.1 default.
+    //
+    // SAFETY: only env-var mutation in the test; before any thread
+    // spawns.
+    unsafe {
+        std::env::set_var("ADAM_V6_2", "0");
+    }
     let Some(lex) = lex() else { return };
     let repo = repo();
     let mut conv = Conversation::new();

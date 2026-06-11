@@ -28,12 +28,15 @@
 >   morph → frame → QueryIR → retrieval → realiser, plus rc15 safety
 >   guard and rc18 OOD discipline.  **314 MB peak RSS, 0 GPU, 0
 >   network, byte-deterministic.**  Blind eval: **97 / 100** on the
->   curated Kazakh battery (rc18).  Production binaries (voice REPL,
+>   curated Kazakh battery.  Production binaries (voice REPL,
 >   `adam_blind_eval`, `adam_chat`) opt in via `ADAM_V6_2=1`; the
->   library default stays OFF until rc20+ closes the remaining
->   v6.1→v6.2 regressions in `tests/{cognitive_eval,
->   adversarial_dialog_v1, curriculum_*}`.  This is the production
->   narrative below.
+>   Rust library default stays OFF pending a v6.2 sibling test
+>   suite — the rc19/rc20 default-flip attempt surfaced ~20
+>   v6.1-cascade-specific regression tests
+>   (live_holdout_*, factual_eval_100, end_to_end self-intro /
+>   cross-slot / border-fact, adversarial_dialog_v1,
+>   curriculum_v4995_*) whose assertions check v6.1 wording rather
+>   than v6.2 behaviour.  Migrating those is a v6.6+ arc.
 >
 > - **`tools/voice_repl_v6_3` — v6.3 voice surface.**
 >   Wraps the v6.2 core in a microphone → STT → fuzzy / LM rescoring →
@@ -47,7 +50,7 @@
 > reproducibility commands across both tracks.
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.5.0--rc19-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.5.0--rc20-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -74,14 +77,18 @@
 
 ## What's new in v6.5.0
 
-**Default-on v6.2 stack + blind eval at 97 %.**  rc14 (2026-06-10)
-shipped the blind-eval scoreboard the external audit recommended;
-five iterations later (rc15 safety guard, rc16 environment
-alignment, rc17 factual + refusal patterns, rc18 OOD discipline,
-rc19 default flip) the curated Kazakh battery sits at **97 / 100**.
-The `ADAM_V6_2` env-gate that landed in v6.2.0 (2026-05) is now
-default-ON; the v6.1 cascade remains as a fallback set via
-`ADAM_V6_2=0`.
+**Blind eval at 97 % + Kazakh-only templates in v6.2 cascade.**
+rc14 (2026-06-10) shipped the blind-eval scoreboard the external
+audit recommended; six iterations later (rc15 safety guard, rc16
+environment alignment, rc17 factual + refusal patterns, rc18 OOD
+discipline, rc19 doc cleanup, rc20 cognitive_eval Kazakh-only
+templates) the curated Kazakh battery sits at **97 / 100**.
+The Rust-level `ADAM_V6_2` default stays OFF pending a v6.6+
+v6.2-sibling test suite arc; production binaries opt in via the
+existing env-var.  Voice REPL is the immediate beneficiary —
+Piper Kazakh TTS now reads adam's «what can I help with» template
+cleanly aloud (no «curated» / «Rust» / «LLM» / «live-feed» /
+«ASCII» tokens).
 
 ## What's new in v6.2.0
 

@@ -37,16 +37,24 @@ use adam_algebra::{
 /// route the dialog cascade through the v6.2 stack (math_solver,
 /// FrameIndex, realiser, OOD discipline, safety guard).
 ///
-/// **Status (v6.5.0-rc19).**  The blind eval scoreboard
-/// (`adam_blind_eval`, rc14) crossed the ≥90 % bar at rc18 (**97 %**
-/// on 100 curated Kazakh queries) — the criterion the v6.2 doc
-/// originally cited for flipping the default.  But rc19 surfaced a
-/// handful of `tests/{cognitive_eval, adversarial_dialog_v1,
-/// curriculum_*}` regressions where v6.2 hasn't yet matched v6.1
-/// on adversarial / tutor / Latin-discipline cases.  Until those
-/// close (rc20+), the default remains OFF so library consumers see
-/// no regression; production binaries (voice REPL, `adam_chat`,
-/// `adam_blind_eval`) opt in via env-var set at startup.
+/// **Status (v6.5.0-rc20).**  Blind eval **97 / 100** on the
+/// curated Kazakh battery — well past the ≥90 % bar the v6.2 doc
+/// cited.  The Rust-level default flip would expose ~20 v6.1-
+/// cascade-specific regression tests (live_holdout_*,
+/// factual_eval_100, end_to_end self-intro / cross-slot, …) whose
+/// assertions check v6.1 wording rather than v6.2 behaviour.
+/// Migrating those to a v6.2 sibling suite is a separate v6.6+
+/// arc; until then the library default stays OFF.  Production
+/// binaries (voice REPL, `adam_blind_eval`, `adam_chat`) opt in
+/// via env-var set at startup.
+///
+/// rc20 ships the prep work — cognitive_eval Kazakh-only
+/// templates that drop English brand-name leaks
+/// («curated», «Rust», «LLM», «live-feed», «ASCII») in favour of
+/// «тексерілген деректер» / «бағдарламалау тілдері» /
+/// «ағымдағы уақыт» / «латын-таңбалы өрнек».  These pay off both
+/// in the future default flip AND in the voice REPL today
+/// (Piper TTS reads them cleanly aloud).
 pub fn is_v6_2_active() -> bool {
     std::env::var("ADAM_V6_2")
         .map(|v| matches!(v.as_str(), "1" | "true" | "on" | "yes"))
@@ -291,14 +299,14 @@ fn answer_with_corpus_inner(
         // **Phase 20** — 3 paraphrases for live-data refusal.
         let variants: &[&str] = &[
             "Бұл сұраққа жауап беру үшін менде нақты дерек жоқ. \
-             Менің білім қорым curated фактілерден тұрады, тікелей \
-             интернет немесе live-feed қосылған емес.",
+             Менің білім қорым тексерілген деректерден тұрады, \
+             тікелей интернет немесе ағымдағы мәлімет ағысы қосылған емес.",
             "Бұл сұраққа дерек бере алмаймын — менің білім қорымда \
-             ағымдағы / реалды-уақыттық мәлімет жоқ. Тек curated \
-             фактілермен жұмыс істеймін.",
-            "Кешіріңіз, бұл сұраққа жауап беретін live-дерек менде \
-             жоқ. Интернетке немесе сыртқы feed-ке қосылмаймын — \
-             curated тарихи фактілер ғана қолымда.",
+             ағымдағы немесе реалды-уақыттық мәлімет жоқ. Тек \
+             тексерілген тарихи деректермен жұмыс істеймін.",
+            "Кешіріңіз, бұл сұраққа жауап беретін ағымдағы дерек менде \
+             жоқ. Интернетке немесе сыртқы мәлімет көзіне қосылмаймын — \
+             тек тексерілген тарихи деректер қолымда.",
         ];
         return Some(pick_variant(variants, input).to_string());
     }
@@ -1069,9 +1077,8 @@ fn recognize_occupation_statement(input: &str) -> Option<String> {
             tok == *root || (tok.starts_with(root) && (2..=4).contains(&(tok_chars - root_chars)))
         }) {
             return Some(format!(
-                "Түсіндім, сіз {canonical}сыз. Бағдарламалау тілдері, \
-                 алгоритмдер, Rust туралы сұрағыңыз болса — көмектесуге \
-                 тырысамын."
+                "Түсіндім, сіз {canonical}сыз. Бағдарламалау тілдері мен \
+                 алгоритмдер туралы сұрағыңыз болса — көмектесуге тырысамын."
             ));
         }
     }
@@ -1123,37 +1130,47 @@ fn capabilities_response(input: &str) -> String {
     // (the curated-knowledge disclosure) in different shapes so the
     // user doesn't feel like they're hitting one fixed template
     // every time they ask about adam's capabilities.
+    // **v6.5.0-rc20 — Kazakh-only «what can I help with» templates.**
+    // The cognitive_eval `LatinCharactersForbidden` discipline rejects
+    // English tokens («Rust», «LLM», «curated», «live», «ASCII») in
+    // adam's replies.  Replaced with Kazakh equivalents that read
+    // naturally in the TTS layer as well: «тексерілген деректер»
+    // (= curated facts), «бағдарламалау тілдері» (= programming
+    // languages, including the Rust subdomain), «ағымдағы уақыт»
+    // (= live clock), «латын-таңбалы өрнектер» (= ASCII expressions),
+    // «үлкен тілдік модель емеспін» (= not an LLM).
     let variants: &[&str] = &[
-        "Менің білім қорым curated деректерден тұрады. Жауап бере аламын: \
+        "Менің білім қорым тексерілген деректерден тұрады. Жауап бере аламын: \
          (1) Қазақстан туралы — география, тарих, әдебиет, танымал тұлғалар, \
          мемлекеттік құрылым; (2) мектеп пәндері — математика, физика, химия, \
-         биология, тарих, ана тілі; (3) бағдарламалау тілдері және Rust; \
-         (4) дата / уақыт / апта күні (live clock); (5) қарапайым және күрделі \
-         математикалық есептеулер (қазақша / орысша / ASCII). LLM емеспін, \
-         curated деректерден тыс сұрақтарға «нақты дерек жоқ» деп шынайы \
-         жауап беремін.",
+         биология, тарих, ана тілі; (3) бағдарламалау тілдері; \
+         (4) ағымдағы күн / уақыт / апта; (5) қарапайым және күрделі \
+         математикалық есептеулер (қазақша / орысша / латын-таңбалы өрнек). \
+         Үлкен тілдік модель емеспін — тексерілген деректерден тыс \
+         сұрақтарға «нақты дерек жоқ» деп шынайы жауап беремін.",
         "Мен бірнеше тақырыпта көмектесе аламын: Қазақстанның географиясы, \
          тарихы, әдебиеті мен танымал тұлғалары; мектеп пәндері — \
          математика, физика, химия, биология, ана тілі; бағдарламалау \
-         (әсіресе Rust); ағымдағы күн, уақыт пен апта; қарапайым және \
+         тілдері; ағымдағы күн, уақыт пен апта; қарапайым және \
          көп қадамды математикалық есептеулер. Тыс тақырыпта «дерек жоқ» \
-         деп шынайы айтамын — LLM емеспін.",
-        "Қолымдағы білім аясы — curated facts. Жауап бере алатын тақырыптарым: \
-         Қазақстан туралы (география / тарих / әдебиет / тұлғалар / мемлекет); \
-         мектеп пәндері (физика, химия, биология, математика, тарих); \
-         бағдарламалау тілдері мен Rust; live уақыт-күн-апта; математикалық \
-         амалдар. Тыс сұрақтарға қалай ойдан жауап жасайтын LLM емеспін — \
-         «білмеймін» дегенді жасырмаймын.",
+         деп шынайы айтамын — үлкен тілдік модель емеспін.",
+        "Қолымдағы білім аясы — тексерілген деректер. Жауап бере алатын \
+         тақырыптарым: Қазақстан туралы (география / тарих / әдебиет / \
+         тұлғалар / мемлекет); мектеп пәндері (физика, химия, биология, \
+         математика, тарих); бағдарламалау тілдері; ағымдағы уақыт-күн-апта; \
+         математикалық амалдар. Тыс сұрақтарға ойдан жауап жасайтын \
+         үлкен тілдік модель емеспін — «білмеймін» дегенді жасырмаймын.",
         "Жауап бере алатын негізгі салаларым: Қазақстан жайында жалпы дерек \
          (география, тарих, әдебиет, белгілі тұлғалар, мемлекеттік құрылым); \
          мектеп бағдарламасы (математика, физика, химия, биология, тарих, \
-         ана тілі); бағдарламалау, әсіресе Rust; live дата / уақыт / апта \
-         күні; қазақша / орысша / ASCII форматтағы математикалық есептер. \
-         LLM емеспін — curated деректер шегінен шықпаймын.",
+         ана тілі); бағдарламалау тілдері; ағымдағы дата / уақыт / апта \
+         күні; қазақша / орысша / латын-таңбалы өрнек форматтағы математикалық \
+         есептер. Үлкен тілдік модель емеспін — тексерілген деректер шегінен \
+         шықпаймын.",
         "Менің көмектесе алатын тақырыптарым: (1) Қазақстан туралы — \
          география, тарих, әдебиет, белгілі адамдар, мемлекет құрылымы; \
          (2) мектеп пәндері — математика, физика, химия, биология; \
-         (3) Rust пен бағдарламалау тілдері; (4) уақыт, күн, апта (live); \
+         (3) бағдарламалау тілдері; (4) ағымдағы уақыт, күн, апта; \
          (5) математикалық есептеулер. Әзірге осы шеңберде ғана нақты \
          жауап бере аламын — қалғанын ойдан құрастырмаймын.",
     ];

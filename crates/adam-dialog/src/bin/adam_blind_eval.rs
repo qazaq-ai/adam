@@ -103,14 +103,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pack_path = args.next().unwrap_or_else(|| DEFAULT_PACK.to_string());
     let allow_failures = args.next().as_deref() == Some("--allow-failures");
 
-    // **v6.5.0-rc19 — restore explicit env-var set.**  rc19 was
-    // going to flip the global default to ON, but the change
-    // exposed several v6.1→v6.2 regressions in
-    // `tests/{cognitive_eval, adversarial_dialog_v1, curriculum_*}`
-    // that need rc20+ to close.  Until then production binaries
-    // (this one, voice REPL, `adam_chat`) opt in explicitly; the
-    // library default stays OFF so test consumers see no
-    // regression.
+    // **v6.5.0-rc20 — explicit env-var set, library default still OFF.**
+    // rc19 attempted the global default flip; the resulting
+    // ~20-test cascade regression made a clean flip infeasible
+    // before a v6.2 sibling test suite exists.  Until that arc
+    // (v6.6+), production binaries opt in here.
     //
     // SAFETY: only env-var mutation in the process, before any
     // thread spawns.
