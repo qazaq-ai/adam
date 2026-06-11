@@ -114,17 +114,21 @@ pub fn clean_with_hot_vocab(
 
         let core_lower = core.to_lowercase();
 
-        // 0. Hot-vocab override.  Check FIRST: if there is an
-        //    edit-1 neighbour in the hot vocab, prefer it even if
-        //    the original token also parses through the FST.  This
-        //    closes Whisper phantom-letter cases on greetings /
-        //    identity-question triggers / honorifics where the
-        //    FST is permissive (T2 rc23 audit «Қалыңғыз»).
-        //    Skip the override when the original IS already in the
-        //    hot vocab (don't rewrite hot words).
-        if let Some(vocab) = vocab
-            && !vocab.contains(&core_lower)
-            && let Some(hot) = find_hot_vocab_edit1_neighbour(&core_lower, vocab)
+        // 0. Hot-vocab override.  **rc26 fix.**  rc24/rc25 used
+        //    `vocab.contains()` which checks against the full
+        //    3 147-entry curated lexicon — far too broad.  Audit
+        //    rc25 caught the regression: «дәулет» was rewritten to
+        //    «сәулет», «жасым» to «жасы», «толды» to «толы»,
+        //    «тұрамын» to «тұратын» — all because each had an edit-1
+        //    neighbour SOMEWHERE in the 3 147-word vocab.  The
+        //    override is meant to ONLY catch Whisper drift on the
+        //    closed 82-entry `OVERRIDES` list (honorifics / greetings
+        //    / identity triggers), not arbitrary curated lexicon
+        //    overlaps.
+        //
+        //    Skip the override when the original IS in OVERRIDES.
+        if !crate::zipf_vocab::OVERRIDES.contains(&core_lower.as_str())
+            && let Some(hot) = find_hot_overrides_edit1_neighbour(&core_lower)
         {
             let case_matched = match_case(core, &hot);
             substitutions.push((core.to_string(), case_matched.clone()));
@@ -133,6 +137,9 @@ pub fn clean_with_hot_vocab(
             out.push_str(trailing);
             continue;
         }
+        // Suppress unused-param warning when no vocab is passed
+        // (the legacy `clean(input, lex)` path).
+        let _ = vocab;
 
         // 1. Validator: is this already a valid Kazakh word?
         let parses = analyse(&core_lower, lex);
@@ -162,16 +169,19 @@ pub fn clean_with_hot_vocab(
     }
 }
 
-/// Find an edit-distance-1 neighbour of `token` that is present in
-/// the hot vocab.  Returns the first hit; the hot vocab is small
-/// enough that uniqueness is rarely violated, and a wrong pick is
-/// recoverable downstream via the rejection detector.
-fn find_hot_vocab_edit1_neighbour(token: &str, vocab: &ZipfVocab) -> Option<String> {
+/// **rc26 — closed-set hot-override list.**  Find an edit-1
+/// neighbour of `token` that is in the curated `OVERRIDES` list
+/// (~82 entries: honorifics, greetings, identity triggers).  The
+/// `OVERRIDES` list is closed and small — rc25 audit showed that
+/// using the full 3 147-entry curated lexicon as the override
+/// target is too broad and causes false rewrites on common
+/// grammatical forms («дәулет» → «сәулет», «толды» → «толы»).
+fn find_hot_overrides_edit1_neighbour(token: &str) -> Option<String> {
     for candidate in edit1_candidates(token) {
         if candidate == token {
             continue;
         }
-        if vocab.contains(&candidate) {
+        if crate::zipf_vocab::OVERRIDES.contains(&candidate.as_str()) {
             return Some(candidate);
         }
     }
@@ -390,6 +400,41 @@ mod tests {
             "hot vocab must not rewrite its own entries; got={:?}",
             cleaned.substitutions
         );
+    }
+
+    /// **rc26 regression test.**  rc25 live audit caught false-positive
+    /// rewrites where the validator wrote common grammatical forms
+    /// to ANY edit-1 lexicon neighbour.  Each line below MUST stay
+    /// unchanged.
+    #[test]
+    fn rc26_audit_no_false_positive_rewrites_on_valid_forms() {
+        let Some(lex) = lex() else { return };
+        let vocab = crate::zipf_vocab::ZipfVocab::load_or_overrides_only(".");
+        for input in &[
+            // T5 — «Менің атым дәулет» was rewritten to «сәулет»
+            "Менің атым дәулет",
+            // T6, T28 — «тұрамын» (1sg present) was rewritten to «тұратын»
+            "Мен қостанайда тұрамын",
+            "Мен қай жерде тұрамын",
+            // T7, T9 — «жасым ... толды» both got mangled
+            "Жасым алпыс алтыға толды",
+            "Менің жасым алпыс алтыға толды",
+            // T12 — «нешеу» was being rewritten to «нені»
+            "Олай болса, қазір сағат нешеу",
+            // T15 — «Ерден» → «Жерден» on a date drift
+            "Ерден қай күн болады",
+            // T19 — «алдынан» → «алдына»
+            "Тоқаевтың алдынан кім болды",
+            // T26 — «Менім» → «Мені» (the genitive ı/і drift)
+            "Менім атым кім",
+        ] {
+            let cleaned = clean_with_hot_vocab(input, &lex, Some(&vocab));
+            assert!(
+                cleaned.substitutions.is_empty(),
+                "validator rewrote a valid form in «{input}»: {:?}",
+                cleaned.substitutions
+            );
+        }
     }
 
     /// Already-valid words are NEVER rewritten — the validator-first

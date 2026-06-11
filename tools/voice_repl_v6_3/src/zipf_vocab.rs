@@ -65,7 +65,7 @@ use std::path::Path;
 /// at most, never beating the genuine top-N.
 #[allow(dead_code)]
 const OVERRIDE_COUNT: u32 = 500;
-const OVERRIDES: &[&str] = &[
+pub const OVERRIDES: &[&str] = &[
     // Honorifics + greetings that may be rare in written corpora
     // but are critical on a voice path.
     "ассаламу",
