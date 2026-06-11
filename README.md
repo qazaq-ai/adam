@@ -13,6 +13,7 @@
 <p align="center">
   <b>Why this project exists →</b> <a href="docs/MANIFESTO.md"><code>docs/MANIFESTO.md</code></a><br>
   <b>v6.2 architecture →</b> <a href="docs/v6_2_architectural_redesign.md"><code>docs/v6_2_architectural_redesign.md</code></a><br>
+  <b>How adam compares to LLMs →</b> <a href="docs/COMPARISON.md"><code>docs/COMPARISON.md</code></a><br>
   <b>Due-diligence pack →</b> <a href="DUE_DILIGENCE.md"><code>DUE_DILIGENCE.md</code></a>
 </p>
 
@@ -50,7 +51,7 @@
 > reproducibility commands across both tracks.
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.5.0--rc20-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.5.0--rc21-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -95,9 +96,10 @@ cleanly aloud (no «curated» / «Rust» / «LLM» / «live-feed» /
 **Neurosymbolic agglutinative algebra.** The architectural redesign
 promised at v6.1.50 lands as the new
 [`adam-algebra`](crates/adam-algebra) crate plus an integration
-bridge in `adam-dialog::v6_2_router`.  Originally shipped opt-in
-behind `ADAM_V6_2=1`; flipped default-ON in v6.5.0-rc19 after the
-blind eval crossed 90 %.
+bridge in `adam-dialog::v6_2_router`.  Ships opt-in behind
+`ADAM_V6_2=1`; the production binaries (voice REPL, `adam_chat`,
+`adam_blind_eval`) set it at startup.  Library default flip is a
+v6.6+ arc — see the two-tracks note at the top of this file.
 
 The full v6.2 pipeline runs as **pure typed-data manipulation**:
 
@@ -153,9 +155,25 @@ What adam does NOT offer (and is not trying to):
 
 For a fair comparison, a same-task blind eval (300–1000 Kazakh
 queries across factual / OOD / safety / tutor / multi-turn) is
-needed.  That eval is on the roadmap; see
-[v6.5 audit-to-training loop](docs/training_runbook.md) for the
-current evaluation methodology.
+needed.  See [v6.5 audit-to-training loop](docs/training_runbook.md)
+for the current methodology.
+
+**Published-benchmark anchor (rc21 addition).**
+Most-cited Kazakh academic benchmark is **KazMMLU** ([arXiv:2502.12829](https://arxiv.org/abs/2502.12829),
+23 k Kazakh + Russian MCQ across STEM / humanities / social):
+
+| Model | KazMMLU avg | Resource cost |
+|---|---|---|
+| **adam** | not yet run on KazMMLU (97 / 100 on own 100-item battery) | **314 MB RSS, 0 GPU, $0 / query** |
+| GPT-4o | 76.6 % | API only; $2.50 / $10.00 per 1 M tok |
+| Llama 3.1 70B | 56.2 % | ~140 GB FP16, 2-4× H100 |
+| Llama 3.1 8B | 39.7 % | ~16 GB FP16, 1× A100 |
+| Claude (3.5 / 3.7 / 4) | **no Kazakh-specific score published** | API only; $3.00 / $15.00 per 1 M tok |
+
+See [`docs/COMPARISON.md`](docs/COMPARISON.md) for the full table
+(hallucination rate, FLORES coverage, Sherkala-tuned Llama, etc.)
+plus honest gaps — chiefly that **adam has not yet been run on
+KazMMLU itself**; that's the rc22+ apples-to-apples step.
 
 ### What ships in `adam-algebra` (8 modules, 195 tests)
 
