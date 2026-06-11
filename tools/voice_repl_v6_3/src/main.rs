@@ -55,6 +55,7 @@ mod coherence;
 mod context_corrections;
 mod correction_persist;
 mod intent_classifier_runtime;
+mod lexicon_validator;
 mod multi_act_splitter;
 mod neural_override;
 mod neural_rescorer;
@@ -562,6 +563,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("[voice-repl] {tag} → «{user_text_corrected}»");
         }
         let user_text_merged = user_text_corrected;
+
+        // **v6.5.0-rc23 — universal per-token lexicon validator.**
+        // Walks every word in the input through the FST/LexiconV1.
+        // Words that parse pass through unchanged.  Words that
+        // don't parse get a UNIQUE edit-distance-1 lexicon
+        // neighbour substituted in (e.g. «Қалыңғыз» → «Қалыңыз»,
+        // «бөль» → «бөл», «Гейц» → «Гейтс»).  Ambiguous fixes
+        // (multiple equidistant neighbours) are skipped to avoid
+        // the «қатым/қауын» minimal-pair trap.
+        //
+        // Runs BEFORE the legacy fuzzy_normalise so the heavier
+        // Zipf-fuzzy only sees tokens that the FST itself couldn't
+        // recover.  Logged per-turn for diagnostics.
+        let user_text_merged = if let Some((lex, _)) = dialog_state.as_ref() {
+            let cleaned = lexicon_validator::clean(&user_text_merged, lex);
+            for (old, new) in &cleaned.substitutions {
+                println!("[voice-repl] lexicon-validator: «{old}» → «{new}»");
+            }
+            cleaned.text
+        } else {
+            user_text_merged
+        };
 
         let fuzzy_out = if args.mode == "respond" || args.mode == "wellness" {
             fuzzy_normalise(&user_text_merged, &zipf_vocab)

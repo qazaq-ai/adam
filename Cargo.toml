@@ -28,7 +28,7 @@ members = [
   "crates/adam-intent-classifier",
   "crates/adam-slot-extractor",
   "crates/adam-retrieval-ranker",
-  # adam-wellness merged into adam-dialog/src/wellness/ at v6.5.0-rc22.
+  # adam-wellness merged into adam-dialog/src/wellness/ at v6.5.0-rc23.
   "tools/intent_dataset",
   "tools/synth_corrections_pack",
   "tools/corpus_acquire",
@@ -48,7 +48,7 @@ resolver = "2"
 # Phase 21 relative-day handler). v6.2 deterministic core stays the
 # bedrock; v6.3 wraps it in a voice surface with controlled neural
 # boundaries (Whisper STT + Piper TTS + tiny LM rescoring).
-version = "6.5.0-rc22"
+version = "6.5.0-rc23"
 edition = "2024"
 license = "BUSL-1.1"
 
