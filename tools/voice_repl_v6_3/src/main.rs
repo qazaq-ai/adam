@@ -991,6 +991,32 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         );
                     }
                     let mut reply = conv.turn(cascade_input, lex, repo, args.seed);
+
+                    // **v6.5.0-rc25 — StatementOfName routing safeguard.**
+                    // rc22 audit T9 «Менің атым - Дәулет» — the intent
+                    // classifier said StatementOfName(1.00) but the
+                    // cascade fell into topic search on «ат» (Kazakh
+                    // for "name" / "horse") and emitted an Abai poem
+                    // about horses arıḳtap.  When the neural intent is
+                    // confident on StatementOfName AND the reply
+                    // contains the known horse-poem fragment, override
+                    // with a generic name-acceptance acknowledgement.
+                    //
+                    // This is a SAFETY NET, not a fix.  The proper fix
+                    // is a cascade-side StatementOfName route that
+                    // bypasses topic search; this belt-and-suspenders
+                    // override catches the case until then.
+                    if let Some((label, conf)) = neural_intent.as_ref()
+                        && label == "StatementOfName"
+                        && *conf >= 0.85
+                        && (reply.contains("Әрі-бері айналса") || reply.contains("аты арықтап"))
+                    {
+                        reply = "Атыңызды есте сақтадым. Танысқанымызға қуаныштымын!".to_string();
+                        println!(
+                            "[voice-repl] StatementOfName guard → override topic-search reply"
+                        );
+                    }
+
                     if multi_act.is_some() {
                         reply = format!("{reply} {}", multi_act_splitter::FAREWELL_ACK);
                     }
