@@ -3913,6 +3913,18 @@ pub fn try_evaluate_kazakh_word_math(input: &str) -> Option<i64> {
     // single_clause_kazakh_math via the existing detect_kazakh_math_op
     // tests and don't typically appear in multi-clause chains.
     let lower = inject_gerund_clause_separators(&lower);
+    // **v6.5.0-rc22 — strip Whisper-inserted dashes / em-dashes.**
+    // The voice REPL audit T22 surfaced: «сексен бес - көбейт,
+    // алтыға - сосын, бөль - екіге - сосын, қос - отыз» where the
+    // user said «85 × 6 ÷ 2 + 30».  Whisper inserted hyphens
+    // between every pause; combined with the existing comma /
+    // «сосын» clause splitters they fragmented the multi-clause
+    // form so that the first clause carried only 1 number (85)
+    // instead of 2 (85, 6).  Stripping standalone hyphens to
+    // plain spaces lets the clause splitter group the words
+    // correctly.  Dashes INSIDE a token («15-ке») survive — only
+    // free-standing « - » between tokens is normalised.
+    let lower = lower.replace(" - ", " ").replace(" — ", " ");
     let normalized: String = lower
         .replace(',', " __CLAUSE_SEP__ ")
         .replace(" және ", " __CLAUSE_SEP__ ")

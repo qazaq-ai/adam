@@ -721,7 +721,27 @@ fn handle_listing_query(input: &str) -> Option<String> {
     // capital / currency / area / population / national symbols of
     // any country, not just Kazakhstan.
     if mentions_kz {
-        if lower.contains("елорда") || lower.contains("астана") && lower.contains("қандай")
+        // **v6.5.0-rc22 — voice-REPL Whisper drift normalisation.**
+        // Audit T30 «Қазақстанның ел, ордасы қандай» — Whisper
+        // inserted a comma INSIDE «елордасы», splitting it into
+        // two words.  rc17 handler checked substring «елорда», which
+        // was now absent (we had «ел орда» space-separated instead).
+        // Strip punctuation + glue back common compound nouns that
+        // Whisper has been seen to fragment.  Same for «тәуел
+        // елісіздік» (audit T33 Whisper drift of «тәуелсіздік»).
+        let lower_clean = lower
+            .replace([',', '.', ':', ';', '!', '?'], " ")
+            .split_whitespace()
+            .collect::<Vec<_>>()
+            .join(" ");
+        let lower_glued = lower_clean
+            .replace("ел ордасы", "елордасы")
+            .replace("ел орда", "елорда")
+            .replace("ел өрда", "елорда")
+            .replace("тәуел елісіздік", "тәуелсіздік")
+            .replace("тәуел сіздік", "тәуелсіздік");
+        let lc = &lower_glued;
+        if lc.contains("елорда") || (lc.contains("астана") && lc.contains("қандай"))
         {
             return Some(
                 "Қазақстанның елордасы — Астана қаласы (1997 жылдан бастап; \
@@ -729,19 +749,18 @@ fn handle_listing_query(input: &str) -> Option<String> {
                     .to_string(),
             );
         }
-        if lower.contains("валюта") || lower.contains("ақша бірлігі") {
+        if lc.contains("валюта") || lc.contains("ақша бірлігі") {
             return Some(
                 "Қазақстанның ұлттық валютасы — теңге (KZT, 1993 жылдан бастап).".to_string(),
             );
         }
-        if lower.contains("тәуелсіздік") && lower.contains("қашан")
-            || lower.contains("тәуелсіздік") && lower.contains("алды")
+        if lc.contains("тәуелсіздік") && (lc.contains("қашан") || lc.contains("алды"))
         {
             return Some(
                 "Қазақстан Республикасы 1991 жылы 16 желтоқсанда тәуелсіздік алды.".to_string(),
             );
         }
-        if lower.contains("ең биік") || lower.contains("биік шың") || lower.contains("биік тау")
+        if lc.contains("ең биік") || lc.contains("биік шың") || lc.contains("биік тау")
         {
             return Some(
                 "Қазақстанның ең биік шыңы — Хан Тәңірі (7 010 м, Тянь-Шань \
@@ -757,7 +776,22 @@ fn handle_listing_query(input: &str) -> Option<String> {
     // (those tokens are not curated in world_core as the SUBJECT
     // of an IsA fact — they're objects/topics).  Add the canonical
     // definitions at the shortcut layer.
-    if lower.contains(" — не") || lower.contains("— не?") || lower.contains("дегеніміз не")
+    //
+    // **v6.5.0-rc22** — broaden to recognise bare «X не», «X: не»,
+    // «X. не», «X, не» surface forms (Whisper sometimes emits a
+    // colon / comma / period between the topic and the question
+    // marker instead of an em-dash).  Strip the punctuation
+    // between the topic word and the trailing «не» / «не?» before
+    // matching.
+    if lower.contains(" — не")
+        || lower.contains("— не?")
+        || lower.contains("дегеніміз не")
+        || lower.ends_with(" не")
+        || lower.ends_with(" не.")
+        || lower.ends_with(" не?")
+        || lower.contains(": не")
+        || lower.contains(", не")
+        || lower.contains(". не")
     {
         if lower.starts_with("балқаш") || lower.starts_with("балхаш") {
             return Some(
@@ -940,7 +974,12 @@ fn count_scripts(s: &str) -> (usize, usize, usize) {
 /// rc18 floor; a learned OOD classifier is a later option.
 const OOD_FOREIGN_MARKERS: &[&str] = &[
     // -- Western / global brand-tech --
+    // **v6.5.0-rc22** — Whisper STT drift on «Гейтс» → «Гейц» /
+    // «Гейтц» (audit T49).  All three surface forms route to the
+    // same OOD refusal.
     "билл гейтс",
+    "билл гейц",
+    "билл гейтц",
     "стив джобс",
     "илон маск",
     "марк цукерберг",
