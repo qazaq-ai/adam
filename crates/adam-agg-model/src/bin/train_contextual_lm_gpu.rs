@@ -58,8 +58,12 @@ use serde::Deserialize;
 // throughput is the dominant cost on GPU.
 type B = Autodiff<Wgpu<f32, i32>>;
 
-const TRAIN_PACK: &str = "data/curated/adam_training_ids_pack.json";
-const VAL_PACK: &str = "data/curated/adam_validation_ids_pack.json";
+// **v6.6 generative pivot (2026-06-11)** — paths overridable via env
+// so we can train on the 18.7M-token merged 8-pack corpus without
+// renaming files. CLM_TRAIN_PACK / CLM_VAL_PACK fall back to the
+// rc27 baseline 759k-token pack when unset.
+const TRAIN_PACK_DEFAULT: &str = "data/curated/adam_training_ids_pack.json";
+const VAL_PACK_DEFAULT: &str = "data/curated/adam_validation_ids_pack.json";
 
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
@@ -99,11 +103,13 @@ fn main() {
     let device = WgpuDevice::default();
 
     // ---- 1. Load BPE-pretokenized data ----------------------------
-    if !PathBuf::from(TRAIN_PACK).exists() {
-        eprintln!("[clm-train] missing {TRAIN_PACK}; run from repo root");
+    let train_path = env_string("CLM_TRAIN_PACK", TRAIN_PACK_DEFAULT);
+    if !PathBuf::from(&train_path).exists() {
+        eprintln!("[clm-train] missing {train_path}; run from repo root");
         std::process::exit(2);
     }
-    let train_bytes = std::fs::read(TRAIN_PACK).expect("read train pack");
+    eprintln!("[clm-train] train pack: {train_path}");
+    let train_bytes = std::fs::read(&train_path).expect("read train pack");
     let train_pack: Pack = serde_json::from_slice(&train_bytes).expect("parse train pack");
     eprintln!(
         "[1/4] Train pack: {} sequences, vocab_size={}",
@@ -148,8 +154,10 @@ fn main() {
         );
     }
 
-    let val_pack: Option<Pack> = if PathBuf::from(VAL_PACK).exists() {
-        let bytes = std::fs::read(VAL_PACK).expect("read val pack");
+    let val_path = env_string("CLM_VAL_PACK", VAL_PACK_DEFAULT);
+    let val_pack: Option<Pack> = if PathBuf::from(&val_path).exists() {
+        eprintln!("[clm-train] val pack: {val_path}");
+        let bytes = std::fs::read(&val_path).expect("read val pack");
         Some(serde_json::from_slice(&bytes).expect("parse val pack"))
     } else {
         None

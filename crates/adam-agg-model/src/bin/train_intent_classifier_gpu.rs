@@ -60,7 +60,15 @@ use serde::Deserialize;
 
 type B = Autodiff<Wgpu<f32, i32>>;
 
-const TRAIN_PACK: &str = "data/curated/adam_intent_training_pack.json";
+// **v6.6 generative pivot (2026-06-11)** — switched from 2 914-sample
+// base pack to 11 602-sample STT-augmented pack. The augmented pack is
+// the same schema, same 49 in-use labels, but ×4 more training signal
+// covering Whisper-drift forms (apocope, single-letter substitutions,
+// vowel-harmony breakages) that the runtime sees but the base pack
+// never covered. First experiment of the v6.6 pivot: measure whether
+// scaling labelled data resolves the rc25-audit drift class without
+// any new hand-coded rules.
+const TRAIN_PACK: &str = "data/curated/adam_intent_training_pack_stt_augmented.json";
 const BPE_VOCAB: &str = "data/tokenizer/bpe_vocab.json";
 const BPE_MERGES: &str = "data/tokenizer/bpe_merges.json";
 const SEG_ROOTS: &str = "data/tokenizer/segmentation_roots.json";

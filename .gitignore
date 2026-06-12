@@ -145,3 +145,15 @@ data/listening_tests/*
 !data/listening_tests/phase13_neural_piper/**
 !data/listening_tests/phase14_sentences/
 !data/listening_tests/phase14_sentences/**
+
+# v6.6 generative pivot — large intermediate training packs.
+# Regenerable from sources in seconds:
+#   1. Merge 8 curated packs → adam_training_corpus_pack_v6_6.json (2 sec)
+#   2. pretokenize_corpus → adam_pretokenized_pack_v6_6.json (1 min)
+#   3. encode_corpus → adam_training_ids_pack_v6_6_drift.json (30 sec)
+# Validation pack stays committed for eval reproducibility.
+data/curated/adam_training_ids_pack_v6_6_drift.json
+data/curated/adam_training_corpus_pack_v6_6.json
+data/curated/adam_pretokenized_pack_v6_6.json
+data/curated/adam_training_ids_pack_v6_6.json
+data/curated/adam_validation_ids_pack_v6_6.json
