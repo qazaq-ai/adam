@@ -51,6 +51,12 @@ struct Responder {
     bpe: BpeTokenizer,
     lexicon: SegmentationLexicon,
     rules: SegmentationRuleSet,
+    /// Per-vocab-id flag: `true` means the token contains non-Cyrillic
+    /// alphabetic characters (English letters), code symbols, or other
+    /// glyphs that shouldn't appear in a clean Kazakh response. Set at
+    /// load time from the BPE vocab and used by
+    /// `generate_with_rep_penalty` as a hard mask.
+    block_mask: Vec<bool>,
 }
 
 impl Responder {
@@ -63,12 +69,35 @@ impl Responder {
             serde_json::from_str(&std::fs::read_to_string(SEG_ROOTS)?)?;
         let rules: SegmentationRuleSet =
             serde_json::from_str(&std::fs::read_to_string(SEG_RULES)?)?;
+
+        // **v6.7 audit fix 2026-06-13** — FST-lite mask: forbid any
+        // BPE token whose surface form contains English letters or
+        // common code glyphs. Built once at load time, applied per-
+        // step in the generator. Eliminates the "male" / "is" /
+        // backtick-code style leaks that the 1M-param LM picked up
+        // from the rust_book training corpus.
+        let vocab_size = bpe.vocab_size();
+        let mut block_mask = vec![false; vocab_size];
+        for id in 0..vocab_size as u32 {
+            if let Some(tok) = bpe.id_to_token(id) {
+                if tok.chars().any(|c| {
+                    c.is_ascii_alphabetic()
+                        || matches!(c, '`' | '{' | '}' | '\\' | '[' | ']' | '<' | '>')
+                }) {
+                    block_mask[id as usize] = true;
+                }
+            }
+        }
+        let blocked = block_mask.iter().filter(|&&x| x).count();
+        eprintln!("[respond] FST-lite mask: blocking {blocked}/{vocab_size} non-Cyrillic tokens");
+
         Ok(Self {
             model: ckpt.model,
             device,
             bpe,
             lexicon,
             rules,
+            block_mask,
         })
     }
 
@@ -87,14 +116,41 @@ impl Responder {
             REP_PENALTY,
             REP_WINDOW,
             self.bpe.eos_id as i64,
+            &self.block_mask,
             &self.device,
         );
-        // Decode only the generated suffix.
+        // Decode the generated suffix and STOP at the first occurrence
+        // of the "→→" separator the model emits — that's where it
+        // started a new turn (it learned from the pair-pack pattern
+        // "{prompt} →→ {response} <BOS> {next_prompt} →→ ...").
+        // **v6.7 audit fix 2026-06-13** — caps the rambling that
+        // FST-lite alone couldn't.
         let response_ids: Vec<u32> = out[prefix_len..]
             .iter()
             .filter_map(|&i| if i >= 0 { Some(i as u32) } else { None })
             .collect();
-        self.bpe.decode(&response_ids)
+        let mut text = self.bpe.decode(&response_ids);
+        // **v6.7 audit fix 2026-06-13** — natural sentence boundary
+        // stop. The model otherwise rambles past a perfectly good
+        // single-sentence reply. Truncate after the first sentence-
+        // terminating punctuation followed by whitespace.
+        let mut earliest: Option<usize> = None;
+        for stop in [". ", "! ", "? ", ".\n", "!\n", "?\n"] {
+            if let Some(idx) = text.find(stop) {
+                let end = idx + 1; // include the punct char (1 ASCII byte)
+                if earliest.map(|e| end < e).unwrap_or(true) {
+                    earliest = Some(end);
+                }
+            }
+        }
+        if let Some(end) = earliest {
+            text.truncate(end);
+        }
+        // Also stop at any future "→→" separator (next-turn artefact)
+        if let Some(idx) = text.find("→→") {
+            text.truncate(idx);
+        }
+        text.trim().to_string()
     }
 }
 
@@ -122,6 +178,7 @@ fn generate_with_rep_penalty<B: Backend>(
     rep_penalty: f32,
     rep_window: usize,
     eos_id: i64,
+    block_mask: &[bool],
     device: &B::Device,
 ) -> Vec<i64> {
     let mut tokens: Vec<i64> = prefix.to_vec();
@@ -138,6 +195,15 @@ fn generate_with_rep_penalty<B: Backend>(
         let probs = softmax(last_2d, 1);
         let mut probs_vec: Vec<f32> =
             probs.into_data().as_slice::<f32>().unwrap_or(&[]).to_vec();
+
+        // **v6.7 FST-lite mask** — hard-block any token that contains
+        // non-Cyrillic / code glyphs. Applied BEFORE repetition penalty
+        // so blocked tokens never compete.
+        for (id, blocked) in block_mask.iter().enumerate() {
+            if *blocked && id < probs_vec.len() {
+                probs_vec[id] = 0.0;
+            }
+        }
 
         // Repetition penalty over the last `rep_window` generated tokens.
         let look_start = tokens.len().saturating_sub(rep_window);
