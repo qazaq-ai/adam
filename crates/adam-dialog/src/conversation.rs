@@ -2941,7 +2941,6 @@ impl Conversation {
                 self.session.insert("last_math_unknown".into(), unknown);
                 self.session.insert("last_math_steps".into(), steps);
             } else {
-                extra_slots.insert("__math_input__".into(), "1".into());
                 // **v5.21.0 — math echo specificity.** Even when the
                 // evaluator can't compute a result, try to extract a
                 // summary of what was understood (numbers + operators).
@@ -2950,13 +2949,36 @@ impl Conversation {
                 // the user exactly which arithmetic form adam accepts.
                 // Prefer this over the generic `math_refusal` family
                 // when ≥ 2 numbers or ≥ 1 operator were recognised.
+                //
+                // **v6.6 audit fix 2026-06-13** — when the rendered
+                // partial IS valid arithmetic ("33 * 4 / 2 + 10"),
+                // evaluate it directly and route to the math-answer
+                // path. User feedback after the rc28 audit T19: «если
+                // все правильно расслышал, то надо вычислять и говорить
+                // результат, а не переспрашивать». The Kazakh word-math
+                // evaluator fails on hyphenated / multi-clause input
+                // ("отыз-үш-көбейт-төртке-..."), but the summary
+                // extractor + renderer still produce a clean
+                // arithmetic string the standard evaluator can solve.
                 if let Some(summary) =
                     crate::discourse::extract_kazakh_math_summary(resolved_input.as_ref())
                     && (summary.numbers.len() >= 2 || !summary.operators.is_empty())
                     && let Some(arithmetic) =
                         crate::discourse::render_math_summary_as_arithmetic(&summary)
                 {
-                    extra_slots.insert("__math_partial_summary__".into(), arithmetic);
+                    if let Some(value) = crate::discourse::try_evaluate_arithmetic(&arithmetic) {
+                        extra_slots.insert("__math_answer__".into(), value.to_string());
+                        if let Some(words) = crate::discourse::render_kazakh_number_words(value) {
+                            extra_slots.insert("__math_words__".into(), words);
+                        }
+                        self.session
+                            .insert("last_math_result".into(), value.to_string());
+                    } else {
+                        extra_slots.insert("__math_input__".into(), "1".into());
+                        extra_slots.insert("__math_partial_summary__".into(), arithmetic);
+                    }
+                } else {
+                    extra_slots.insert("__math_input__".into(), "1".into());
                 }
             }
         }

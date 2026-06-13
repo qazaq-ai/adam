@@ -81,7 +81,18 @@ pub struct CoherenceSignals {
 /// Default thresholds — conservative, chosen from rc11/rc12
 /// audit signal distributions.  TODO (v6.5.0 ship gate):
 /// re-calibrate against a labelled 100-utterance batch.
-pub const LM_LOGPROB_FLOOR: f32 = -5.0;
+// **v6.6 voice REPL audit 2026-06-13** — LM floor relaxed from -5.0
+// to -5.5. The rc28 audit T5 «Рақмет, аллаға шүкір» (a stock Kazakh
+// wellness response: "Thank you, glory to Allah") scored LM=-5.15 —
+// just above the noise threshold. The intent classifier read it
+// correctly (StatementOfWellbeing, conf=0.72) and FST coverage was
+// 0.33 (noise), so the old 2-of-3 vote refused. Religious / colloquial
+// wellness vocabulary is genuinely rare in the Wikipedia + cc100
+// training corpus of the LM, so its per-token logprob runs lower
+// than typical conversational Kazakh. Loosening the floor by 0.5
+// nats covers this class without admitting genuine noise inputs
+// (which score around -7 or lower in the same distribution).
+pub const LM_LOGPROB_FLOOR: f32 = -5.5;
 pub const INTENT_CONF_FLOOR: f32 = 0.30;
 pub const FST_COVERAGE_FLOOR: f32 = 0.40;
 
@@ -213,9 +224,12 @@ mod tests {
 
     #[test]
     fn refuse_when_two_of_three_signals_say_noise() {
-        // Audit case: «Менің атым да улет» — LM bad + intent bad
+        // Audit case: «Менің атым да улет» — LM bad + intent bad.
+        // v6.6 2026-06-13 — LM_LOGPROB_FLOOR loosened from -5.0 to -5.5
+        // so the LM-noise side of this test moved one notch down to
+        // keep the assertion exercising the same code path.
         let s = CoherenceSignals {
-            lm_logprob_per_token: Some(-5.5),
+            lm_logprob_per_token: Some(-6.0),
             intent_confidence: Some(0.20),
             fst_parse_coverage: 0.70, // single-good-signal not enough
         };

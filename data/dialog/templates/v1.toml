@@ -1291,7 +1291,7 @@ templates = [
     # instrumental-form fallback below.
     "Танысқаныма қуаныштымын, {name}! Сізді {name_respect_distinct} деп атаймын — қазақ дәстүрі бойынша",
     "{name_respect_distinct}, танысқаныма қуаныштымын",
-    "{name} деген атыңызды есте сақтап, сізді {name_respect_distinct} деп атаймын — қазақша",
+    "{name} деген атыңызды есте сақтап, сізді {name_respect_distinct} деп атаймын",
     # **v4.51.5** — instrumental fallback retained ONLY as the
     # vowel-no-consonant safety case (e.g. single-vowel names that
     # have no extractable diminutive). All real Kazakh names —
