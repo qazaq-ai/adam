@@ -177,3 +177,6 @@ data/curated/adam_finetune_validation_ids_pack_v3.json
 data/curated/adam_finetune_text_pack_v4_big.json
 data/curated/adam_finetune_training_ids_pack_v4.json
 data/curated/adam_finetune_validation_ids_pack_v4.json
+data/curated/adam_finetune_text_pack_v5_balanced.json
+data/curated/adam_finetune_training_ids_pack_v5.json
+data/curated/adam_finetune_validation_ids_pack_v5.json
