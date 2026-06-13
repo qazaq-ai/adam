@@ -157,3 +157,9 @@ data/curated/adam_training_corpus_pack_v6_6.json
 data/curated/adam_pretokenized_pack_v6_6.json
 data/curated/adam_training_ids_pack_v6_6.json
 data/curated/adam_validation_ids_pack_v6_6.json
+
+# v6.6 intent classifier experiments — large generated packs that
+# regressed accuracy vs baseline; build_diction_pack.py is kept for
+# future iterations.
+data/curated/adam_intent_training_pack_v6_6_diction.json
+data/curated/adam_intent_training_pack_real_audit.json

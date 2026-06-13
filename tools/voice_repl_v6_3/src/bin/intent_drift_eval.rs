@@ -27,9 +27,13 @@ use serde::Deserialize;
 type B = NdArray<f32>;
 
 const CHECKPOINT_DIR: &str = "data/checkpoints/intent_classifier";
-const BPE_VOCAB: &str = "data/tokenizer/bpe_vocab.json";
-const BPE_MERGES: &str = "data/tokenizer/bpe_merges.json";
-const SEG_ROOTS: &str = "data/tokenizer/segmentation_roots.json";
+// **v6.6 generative pivot (2026-06-13)** — mirrors the runtime path
+// choice in intent_classifier_runtime.rs: intent classifier loads the
+// pre-v6.6 BPE + FST because the 2914-sample training pack underfit
+// the larger v6.6 vocab. See that file for the full rationale.
+const BPE_VOCAB: &str = "data/tokenizer/bpe_vocab.baseline_v6_5.json";
+const BPE_MERGES: &str = "data/tokenizer/bpe_merges.baseline_v6_5.json";
+const SEG_ROOTS: &str = "data/tokenizer/segmentation_roots.baseline_v6_5.json";
 const SEG_RULES: &str = "data/tokenizer/segmentation_rules.json";
 
 #[derive(Debug, Deserialize)]
