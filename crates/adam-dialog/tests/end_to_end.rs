@@ -596,13 +596,21 @@ fn response_statement_of_age() {
     // bare; the v4.4.9 rewrite prepended the slot to make the
     // family seed-uniform on slot-echo. Promoted aspirational
     // dialog `age_statement_acknowledged` to canonical at v4.4.9.
+    //
+    // **v6.6 voice REPL audit 2026-06-13** — promoted the declarative
+    // «сіз {age} жастасыз» form to index 0 per user feedback after
+    // the rc28 audit: «он должен был сказать "Сіз 66 жастасыз.", а
+    // не "66 — Жақсы жас"». Allowed set now leads with the recall
+    // sentence; the acknowledgments stay reachable as later-index
+    // variants (seed-rotation still hits them on different turns).
     assert_response_with_toml(
         "менің жасым отыз",
         &[
+            "сіз 30 жастасыз",
+            "жасыңыз 30 екен",
             "30 — жақсы жас",
             "30 — қуатты кезеңіңіз",
             "30 жас — тамаша кезең",
-            "жасыңыз 30 екен",
         ],
     );
 }

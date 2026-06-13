@@ -1330,6 +1330,19 @@ pub fn plan_response_with_epistemic(
         (Intent::AskActivity, _) if session.contains_key("activity") => {
             Some("ask_activity.with_known_user")
         }
+        // **v6.6 voice REPL audit 2026-06-13** — vocative-bearing
+        // farewell when `name_respect` is populated, either by the
+        // personal honorific («Дәке» once name is introduced) or by
+        // the voice-gender fallback («Ағай»/«Апай»/«Балам» synthesised
+        // in conversation.rs:1051 from `voice_gender_hint`). User
+        // feedback after the rc28 voice audit: «было бы отлично, если
+        // бы он в конце говорил "Сау болыңыз, Ағай/Апай" в зависимости
+        // от пола собеседника». Falls back to bare `farewell` when
+        // neither name nor voice gender is captured (rare — first turn
+        // text-only sessions).
+        (Intent::Farewell, _) if session.contains_key("name_respect") => {
+            Some("farewell.with_known_user")
+        }
         _ => None,
     };
 
