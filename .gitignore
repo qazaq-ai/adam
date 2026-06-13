@@ -163,3 +163,14 @@ data/curated/adam_validation_ids_pack_v6_6.json
 # future iterations.
 data/curated/adam_intent_training_pack_v6_6_diction.json
 data/curated/adam_intent_training_pack_real_audit.json
+
+# v6.7 generative pivot — large generated training/eval data packs.
+# Regenerable from scripts/build_*.py:
+data/curated/adam_generative_finetune_pack_v1.json
+data/curated/adam_generative_finetune_pack_v2.json
+data/curated/adam_finetune_text_pack_v2.json
+data/curated/adam_finetune_text_pack_v3.json
+data/curated/adam_finetune_training_ids_pack_v2.json
+data/curated/adam_finetune_training_ids_pack_v3.json
+data/curated/adam_finetune_validation_ids_pack_v2.json
+data/curated/adam_finetune_validation_ids_pack_v3.json
