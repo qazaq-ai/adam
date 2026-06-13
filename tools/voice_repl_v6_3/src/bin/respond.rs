@@ -26,7 +26,7 @@ use std::env;
 
 type B = NdArray<f32>;
 
-const CHECKPOINT_DIR: &str = "data/checkpoints/contextual_lm_v6_7_stage2";
+const CHECKPOINT_DIR: &str = "data/checkpoints/contextual_lm_v6_7_stage2_pain";
 const BPE_VOCAB: &str = "data/tokenizer/bpe_vocab.json";
 const BPE_MERGES: &str = "data/tokenizer/bpe_merges.json";
 const SEG_ROOTS: &str = "data/tokenizer/segmentation_roots.json";

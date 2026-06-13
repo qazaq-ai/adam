@@ -188,3 +188,6 @@ data/curated/adam_stage1_val_ids.json
 data/curated/adam_stage2_conv_pack.json
 data/curated/adam_stage2_train_ids.json
 data/curated/adam_stage2_val_ids.json
+data/curated/adam_stage2_conv_pain_pack.json
+data/curated/adam_stage2_pain_train.json
+data/curated/adam_stage2_pain_val.json
