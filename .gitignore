@@ -180,3 +180,11 @@ data/curated/adam_finetune_validation_ids_pack_v4.json
 data/curated/adam_finetune_text_pack_v5_balanced.json
 data/curated/adam_finetune_training_ids_pack_v5.json
 data/curated/adam_finetune_validation_ids_pack_v5.json
+
+# v6.7 staged training data packs
+data/curated/adam_stage1_world_core_raw.json
+data/curated/adam_stage1_train_ids.json
+data/curated/adam_stage1_val_ids.json
+data/curated/adam_stage2_conv_pack.json
+data/curated/adam_stage2_train_ids.json
+data/curated/adam_stage2_val_ids.json
