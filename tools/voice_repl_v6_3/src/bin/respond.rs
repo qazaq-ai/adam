@@ -14,12 +14,14 @@
 //!   ./target/release/respond --eval  # run on data/eval/v6_7_real_audit_eval.json
 
 use adam_agg_model::checkpoint::load_checkpoint;
-use adam_agg_model::generate::generate_unconstrained;
 use adam_agg_model::{TinyAgt, TinyAgtConfig};
 use adam_kernel::{SegmentationLexicon, SegmentationRuleSet};
 use adam_tokenizer::bpe::BpeTokenizer;
 use burn::backend::ndarray::{NdArray, NdArrayDevice};
+use burn::prelude::*;
+use burn::tensor::activation::softmax;
 use serde::Deserialize;
+use std::collections::HashSet;
 use std::env;
 
 type B = NdArray<f32>;
@@ -32,6 +34,16 @@ const SEG_RULES: &str = "data/tokenizer/segmentation_rules.json";
 const EVAL_PATH: &str = "data/eval/v6_7_real_audit_eval.json";
 const SEPARATOR: &str = " →→ ";
 const MAX_NEW_TOKENS: usize = 64;
+
+/// CTRL-style repetition penalty. Lower values let the model echo
+/// itself more often; higher values push it into novel vocabulary.
+/// 1.2 is the literature default for ≤1B models on conversational data.
+const REP_PENALTY: f32 = 1.2;
+
+/// Penalty applies to tokens within the last N positions of generated
+/// output. Past this window, repeats are fine again (a long response
+/// is allowed to mention "Дәулет" twice in different clauses).
+const REP_WINDOW: usize = 24;
 
 struct Responder {
     model: TinyAgt<B>,
@@ -68,7 +80,15 @@ impl Responder {
             ids.push(id as i64);
         }
         let prefix_len = ids.len();
-        let out = generate_unconstrained(&self.model, &ids, MAX_NEW_TOKENS, &self.device);
+        let out = generate_with_rep_penalty(
+            &self.model,
+            &ids,
+            MAX_NEW_TOKENS,
+            REP_PENALTY,
+            REP_WINDOW,
+            self.bpe.eos_id as i64,
+            &self.device,
+        );
         // Decode only the generated suffix.
         let response_ids: Vec<u32> = out[prefix_len..]
             .iter()
@@ -76,6 +96,90 @@ impl Responder {
             .collect();
         self.bpe.decode(&response_ids)
     }
+}
+
+/// Greedy decoder with **repetition penalty + n-gram blocking**.
+///
+/// `rep_penalty` (>1.0) applies the CTRL-paper trick: every token in
+/// the last `rep_window` slots gets its raw logit divided by penalty
+/// (when positive) or multiplied (when negative) — making it
+/// progressively less likely to fire again. This breaks the
+/// «бірдей болатын бірдей болатын …» loop the v6.7 prototype showed.
+///
+/// `rep_window` bounds how far back we look — keeping the penalty
+/// local so legitimate repeats (numbers, names) elsewhere in long
+/// responses aren't punished.
+///
+/// Additional n-gram block: if the SAME 3-token sequence has already
+/// appeared in the generated text, that next token is forbidden.
+/// This catches the case where a phrase repeats verbatim — the per-
+/// token penalty alone isn't enough when each token is also common
+/// outside the loop ("бір", "дей", "болатын").
+fn generate_with_rep_penalty<B: Backend>(
+    model: &TinyAgt<B>,
+    prefix: &[i64],
+    max_new_tokens: usize,
+    rep_penalty: f32,
+    rep_window: usize,
+    eos_id: i64,
+    device: &B::Device,
+) -> Vec<i64> {
+    let mut tokens: Vec<i64> = prefix.to_vec();
+    let max_seq_len = model.max_seq_len();
+    for _ in 0..max_new_tokens {
+        let start = tokens.len().saturating_sub(max_seq_len);
+        let window: Vec<i64> = tokens[start..].to_vec();
+        let seq_len = window.len();
+        let input: Tensor<B, 2, Int> =
+            Tensor::from_data(burn::tensor::TensorData::new(window, [1, seq_len]), device);
+        let logits = model.forward(input);
+        let last = logits.slice([0..1, (seq_len - 1)..seq_len, 0..model.vocab_size()]);
+        let last_2d = last.squeeze::<2>(1);
+        let probs = softmax(last_2d, 1);
+        let mut probs_vec: Vec<f32> =
+            probs.into_data().as_slice::<f32>().unwrap_or(&[]).to_vec();
+
+        // Repetition penalty over the last `rep_window` generated tokens.
+        let look_start = tokens.len().saturating_sub(rep_window);
+        let recent: Vec<i64> = tokens[look_start..].to_vec();
+        for &tid in &recent {
+            if tid >= 0 && (tid as usize) < probs_vec.len() {
+                probs_vec[tid as usize] /= rep_penalty;
+            }
+        }
+
+        // 3-gram block: forbid any token that would complete an
+        // already-seen 3-gram in the generated suffix.
+        if tokens.len() >= 2 {
+            let prev2 = tokens[tokens.len() - 2];
+            let prev1 = tokens[tokens.len() - 1];
+            let mut seen: HashSet<i64> = HashSet::new();
+            for i in 0..tokens.len().saturating_sub(2) {
+                if tokens[i] == prev2 && tokens[i + 1] == prev1 {
+                    seen.insert(tokens[i + 2]);
+                }
+            }
+            for &blocked in &seen {
+                if blocked >= 0 && (blocked as usize) < probs_vec.len() {
+                    probs_vec[blocked as usize] = 0.0;
+                }
+            }
+        }
+
+        let mut best_id: usize = 0;
+        let mut best_p: f32 = f32::NEG_INFINITY;
+        for (id, &p) in probs_vec.iter().enumerate() {
+            if p > best_p {
+                best_p = p;
+                best_id = id;
+            }
+        }
+        tokens.push(best_id as i64);
+        if best_id as i64 == eos_id {
+            break;
+        }
+    }
+    tokens
 }
 
 #[derive(Debug, Deserialize)]
