@@ -191,3 +191,6 @@ data/curated/adam_stage2_val_ids.json
 data/curated/adam_stage2_conv_pain_pack.json
 data/curated/adam_stage2_pain_train.json
 data/curated/adam_stage2_pain_val.json
+data/curated/adam_phase15_corpus.json
+data/curated/adam_phase15_train_ids.json
+data/curated/adam_phase15_val_ids.json
