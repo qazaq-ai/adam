@@ -194,3 +194,9 @@ data/curated/adam_stage2_pain_val.json
 data/curated/adam_phase15_corpus.json
 data/curated/adam_phase15_train_ids.json
 data/curated/adam_phase15_val_ids.json
+data/curated/adam_v6_8_pure_corpus.json
+data/curated/adam_v6_8_pure_balanced.json
+data/curated/adam_v6_8_pure_train_ids.json
+data/curated/adam_v6_8_pure_val_ids.json
+data/curated/adam_v6_8_balanced_train.json
+data/curated/adam_v6_8_balanced_val.json
