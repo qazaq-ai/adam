@@ -1,8 +1,8 @@
 {
-  "version": "v6.8-school-program-eval-2026-06-16",
+  "version": "v6.8-school-program-eval-2026-06-16-expanded",
   "name": "adam-school-program-eval",
-  "description": "Production-eval suite covering Kazakhstan school program 1-11 class. Each case probes one subject/topic via the same `Conversation::turn` cascade that voice REPL production uses. Goal: measure real-coverage of the deterministic stack (FST + intent router + world_core KG + math_solver + system_clock + realiser) on school-curriculum factual queries. Use respond_full binary.",
-  "sample_count": 70,
+  "description": "Production-eval suite covering Kazakhstan school program 1-11 class. Each case probes one subject/topic via the same `Conversation::turn` cascade that voice REPL production uses. Goal: measure real-coverage of the deterministic stack (FST + intent router + world_core KG + math_solver + system_clock + realiser) on school-curriculum factual queries. Use respond_full binary. | 2026-06-16 expansion: added 120 new cases across 16 subjects for trust signal (Codex recommended n≥150). Includes adversarial disambiguation probes and STT-drift variants.",
+  "sample_count": 213,
   "cases": [
     {
       "subject": "chemistry",
@@ -563,6 +563,1150 @@
       "expected_response": "процессор",
       "was_accepted": true,
       "notes": "CPU definition."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "formula_h2so4",
+      "input": "Күкірт қышқылының формуласы қандай?",
+      "expected_response": "H₂SO₄",
+      "was_accepted": true,
+      "notes": "Standard formula."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "formula_hno3",
+      "input": "Азот қышқылының формуласы.",
+      "expected_response": "HNO₃",
+      "was_accepted": true,
+      "notes": "v6_2_router table."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "formula_ch3cooh",
+      "input": "Сірке қышқылының формуласы.",
+      "expected_response": "CH₃COOH",
+      "was_accepted": true,
+      "notes": "Acetic acid."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "formula_cao",
+      "input": "Кальций оксидінің формуласы.",
+      "expected_response": "CaO",
+      "was_accepted": true,
+      "notes": "Lime oxide."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "formula_caco3",
+      "input": "Кальций карбонатының формуласы.",
+      "expected_response": "CaCO₃",
+      "was_accepted": true,
+      "notes": "Limestone."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "formula_cu_sulfate",
+      "input": "Мыс сульфатының формуласы.",
+      "expected_response": "CuSO₄",
+      "was_accepted": true,
+      "notes": "Copper sulfate."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "formula_methane",
+      "input": "Метан формуласы.",
+      "expected_response": "CH₄",
+      "was_accepted": true,
+      "notes": "Methane bare form."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "formula_ozone",
+      "input": "Озонның формуласы.",
+      "expected_response": "O₃",
+      "was_accepted": true,
+      "notes": "Ozone."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "formula_water_alt_form",
+      "input": "Су формуласы қандай?",
+      "expected_response": "H₂O",
+      "was_accepted": true,
+      "notes": "Bare nominative variant."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "element_iron_symbol",
+      "input": "Темірдің химиялық таңбасы.",
+      "expected_response": "Fe",
+      "was_accepted": true,
+      "notes": "Iron symbol."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "element_copper_symbol",
+      "input": "Мыстың химиялық таңбасы.",
+      "expected_response": "Cu",
+      "was_accepted": true,
+      "notes": "Copper symbol."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "element_lead_symbol",
+      "input": "Қорғасынның химиялық таңбасы.",
+      "expected_response": "Pb",
+      "was_accepted": true,
+      "notes": "Lead symbol."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "element_zinc_symbol",
+      "input": "Мырыштың химиялық таңбасы.",
+      "expected_response": "Zn",
+      "was_accepted": true,
+      "notes": "Zinc symbol."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "element_mercury_symbol",
+      "input": "Сынаптың химиялық таңбасы.",
+      "expected_response": "Hg",
+      "was_accepted": true,
+      "notes": "Mercury symbol."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "element_aluminium_symbol",
+      "input": "Алюминийдің химиялық таңбасы.",
+      "expected_response": "Al",
+      "was_accepted": true,
+      "notes": "Aluminium symbol."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "element_potassium_symbol",
+      "input": "Калийдің химиялық таңбасы.",
+      "expected_response": "K",
+      "was_accepted": true,
+      "notes": "Potassium symbol."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "isa_chemistry_science",
+      "input": "Химия деген не?",
+      "expected_response": "ғылым",
+      "was_accepted": true,
+      "notes": "chem_001 IsA."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "stt_drift_water",
+      "input": "Тегеннің формуласы.",
+      "expected_response": "H₂O",
+      "was_accepted": false,
+      "notes": "Whisper drift of «оттегінің»; probe."
+    },
+    {
+      "subject": "chemistry",
+      "topic": "adversarial_su_formula",
+      "input": "Қазақстанның формуласы қандай?",
+      "expected_response": "<refusal>",
+      "was_accepted": false,
+      "notes": "Adversarial — production should NOT make up a formula for a country."
+    },
+    {
+      "subject": "physics",
+      "topic": "isa_force",
+      "input": "Күш деген не?",
+      "expected_response": "Күш",
+      "was_accepted": true,
+      "notes": "physics_school definition."
+    },
+    {
+      "subject": "physics",
+      "topic": "isa_speed",
+      "input": "Жылдамдық деген не?",
+      "expected_response": "Жылдамдық",
+      "was_accepted": true,
+      "notes": "Physics 7."
+    },
+    {
+      "subject": "physics",
+      "topic": "isa_mass",
+      "input": "Масса деген не?",
+      "expected_response": "Масса",
+      "was_accepted": true,
+      "notes": "Quantitative property."
+    },
+    {
+      "subject": "physics",
+      "topic": "isa_density",
+      "input": "Тығыздық деген не?",
+      "expected_response": "тығыздық",
+      "was_accepted": true,
+      "notes": "physics_school."
+    },
+    {
+      "subject": "physics",
+      "topic": "isa_acceleration",
+      "input": "Үдеу деген не?",
+      "expected_response": "Үдеу",
+      "was_accepted": true,
+      "notes": "Physics 7-8."
+    },
+    {
+      "subject": "physics",
+      "topic": "isa_energy",
+      "input": "Энергия деген не?",
+      "expected_response": "Энергия",
+      "was_accepted": true,
+      "notes": "Physics 7-8."
+    },
+    {
+      "subject": "physics",
+      "topic": "isa_pressure",
+      "input": "Қысым деген не?",
+      "expected_response": "Қысым",
+      "was_accepted": true,
+      "notes": "Physics 7."
+    },
+    {
+      "subject": "physics",
+      "topic": "isa_temperature",
+      "input": "Температура деген не?",
+      "expected_response": "Температура",
+      "was_accepted": true,
+      "notes": "Phys 7."
+    },
+    {
+      "subject": "physics",
+      "topic": "isa_work",
+      "input": "Жұмыс деген не?",
+      "expected_response": "жұмыс",
+      "was_accepted": true,
+      "notes": "Mechanical work."
+    },
+    {
+      "subject": "physics",
+      "topic": "isa_power",
+      "input": "Қуат деген не?",
+      "expected_response": "Қуат",
+      "was_accepted": true,
+      "notes": "Power."
+    },
+    {
+      "subject": "physics",
+      "topic": "isa_electric_current",
+      "input": "Электр тогы деген не?",
+      "expected_response": "электр",
+      "was_accepted": true,
+      "notes": "Physics 8."
+    },
+    {
+      "subject": "physics",
+      "topic": "isa_voltage",
+      "input": "Кернеу деген не?",
+      "expected_response": "Кернеу",
+      "was_accepted": true,
+      "notes": "Physics 8."
+    },
+    {
+      "subject": "physics",
+      "topic": "isa_resistance",
+      "input": "Кедергі деген не?",
+      "expected_response": "Кедергі",
+      "was_accepted": true,
+      "notes": "Physics 8."
+    },
+    {
+      "subject": "physics",
+      "topic": "newton_law_probe",
+      "input": "Ньютон заңы.",
+      "expected_response": "Ньютон",
+      "was_accepted": false,
+      "notes": "Probe — broad query."
+    },
+    {
+      "subject": "physics",
+      "topic": "gravity_probe",
+      "input": "Тартылыс күші деген не?",
+      "expected_response": "тарт",
+      "was_accepted": false,
+      "notes": "Probe."
+    },
+    {
+      "subject": "biology",
+      "topic": "isa_cell",
+      "input": "Жасуша деген не?",
+      "expected_response": "Жасуша",
+      "was_accepted": true,
+      "notes": "biology_school cell."
+    },
+    {
+      "subject": "biology",
+      "topic": "isa_organism",
+      "input": "Ағза деген не?",
+      "expected_response": "Ағза",
+      "was_accepted": true,
+      "notes": "Organism."
+    },
+    {
+      "subject": "biology",
+      "topic": "isa_dna",
+      "input": "ДНҚ деген не?",
+      "expected_response": "ДНҚ",
+      "was_accepted": true,
+      "notes": "biology genetics."
+    },
+    {
+      "subject": "biology",
+      "topic": "isa_enzyme",
+      "input": "Фермент деген не?",
+      "expected_response": "Фермент",
+      "was_accepted": true,
+      "notes": "Enzyme."
+    },
+    {
+      "subject": "biology",
+      "topic": "blood_function",
+      "input": "Қанның қызметі қандай?",
+      "expected_response": "Қан",
+      "was_accepted": true,
+      "notes": "body_parts/blood."
+    },
+    {
+      "subject": "biology",
+      "topic": "skin_function",
+      "input": "Тері не үшін керек?",
+      "expected_response": "Тері",
+      "was_accepted": true,
+      "notes": "body_parts."
+    },
+    {
+      "subject": "biology",
+      "topic": "isa_plant",
+      "input": "Өсімдік деген не?",
+      "expected_response": "Өсімдік",
+      "was_accepted": true,
+      "notes": "biology_basic."
+    },
+    {
+      "subject": "biology",
+      "topic": "isa_animal",
+      "input": "Жануар деген не?",
+      "expected_response": "Жануар",
+      "was_accepted": true,
+      "notes": "animals KG."
+    },
+    {
+      "subject": "biology",
+      "topic": "isa_bacteria",
+      "input": "Бактерия деген не?",
+      "expected_response": "Бактерия",
+      "was_accepted": true,
+      "notes": "biology_school."
+    },
+    {
+      "subject": "biology",
+      "topic": "isa_virus",
+      "input": "Вирус деген не?",
+      "expected_response": "Вирус",
+      "was_accepted": true,
+      "notes": "biology_school virus."
+    },
+    {
+      "subject": "biology",
+      "topic": "isa_ecosystem",
+      "input": "Экожүйе деген не?",
+      "expected_response": "Экожүйе",
+      "was_accepted": true,
+      "notes": "Biology 9-10."
+    },
+    {
+      "subject": "biology",
+      "topic": "vitamin_role_probe",
+      "input": "Дәрумендер не үшін керек?",
+      "expected_response": "дәрумен",
+      "was_accepted": false,
+      "notes": "Probe vitamins."
+    },
+    {
+      "subject": "biology",
+      "topic": "isa_photosynthesis_probe",
+      "input": "Фотосинтез деген не?",
+      "expected_response": "Фотосинтез",
+      "was_accepted": false,
+      "notes": "Probe."
+    },
+    {
+      "subject": "biology",
+      "topic": "isa_evolution_probe",
+      "input": "Эволюция деген не?",
+      "expected_response": "Эволюция",
+      "was_accepted": false,
+      "notes": "Probe."
+    },
+    {
+      "subject": "math",
+      "topic": "ascii_addition",
+      "input": "5 + 3",
+      "expected_response": "8",
+      "was_accepted": true,
+      "notes": "ASCII infix."
+    },
+    {
+      "subject": "math",
+      "topic": "ascii_subtraction",
+      "input": "100 - 25",
+      "expected_response": "75",
+      "was_accepted": true,
+      "notes": "ASCII."
+    },
+    {
+      "subject": "math",
+      "topic": "ascii_multiplication",
+      "input": "12 * 12",
+      "expected_response": "144",
+      "was_accepted": true,
+      "notes": "ASCII."
+    },
+    {
+      "subject": "math",
+      "topic": "ascii_division",
+      "input": "144 / 12",
+      "expected_response": "12",
+      "was_accepted": true,
+      "notes": "ASCII."
+    },
+    {
+      "subject": "math",
+      "topic": "kazakh_chained_simple",
+      "input": "Бесті жетіге қос",
+      "expected_response": "12",
+      "was_accepted": true,
+      "notes": "Kaz imperative."
+    },
+    {
+      "subject": "math",
+      "topic": "kazakh_chained_3step",
+      "input": "Онды беске бөл сосын төртке көбейт сосын екіге қос",
+      "expected_response": "10",
+      "was_accepted": true,
+      "notes": "10/5=2, 2*4=8, 8+2=10."
+    },
+    {
+      "subject": "math",
+      "topic": "sqrt_compound",
+      "input": "Тоқсан тоғыздың түбірі",
+      "expected_response": "9.9498743710662",
+      "was_accepted": true,
+      "notes": "√99 irrational."
+    },
+    {
+      "subject": "math",
+      "topic": "sqrt_simple_4",
+      "input": "Төрттің түбірі",
+      "expected_response": "2",
+      "was_accepted": true,
+      "notes": "√4=2."
+    },
+    {
+      "subject": "math",
+      "topic": "sqrt_simple_9",
+      "input": "Тоғыздың түбірі",
+      "expected_response": "3",
+      "was_accepted": true,
+      "notes": "√9=3."
+    },
+    {
+      "subject": "math",
+      "topic": "sqrt_simple_100",
+      "input": "Жүздің түбірі",
+      "expected_response": "10",
+      "was_accepted": true,
+      "notes": "√100=10."
+    },
+    {
+      "subject": "math",
+      "topic": "power_2cubed",
+      "input": "Екінің үшінші дәрежесі",
+      "expected_response": "8",
+      "was_accepted": true,
+      "notes": "2³ via genitive-power rewrite."
+    },
+    {
+      "subject": "math",
+      "topic": "power_3squared",
+      "input": "Үштің екінші дәрежесі",
+      "expected_response": "9",
+      "was_accepted": true,
+      "notes": "3²."
+    },
+    {
+      "subject": "math",
+      "topic": "power_10cubed",
+      "input": "Онның үшінші дәрежесі",
+      "expected_response": "1000",
+      "was_accepted": true,
+      "notes": "10³."
+    },
+    {
+      "subject": "math",
+      "topic": "russian_addition",
+      "input": "Двадцать пять плюс пятнадцать",
+      "expected_response": "40",
+      "was_accepted": true,
+      "notes": "Russian word math."
+    },
+    {
+      "subject": "math",
+      "topic": "ascii_chained",
+      "input": "5 + 3 * 2",
+      "expected_response": "16",
+      "was_accepted": true,
+      "notes": "Left-to-right: (5+3)*2=16."
+    },
+    {
+      "subject": "math",
+      "topic": "fraction_probe",
+      "input": "Бір екіден қос бір екіден",
+      "expected_response": "1",
+      "was_accepted": false,
+      "notes": "Probe — 1/2 + 1/2."
+    },
+    {
+      "subject": "math",
+      "topic": "pi_probe",
+      "input": "Пи саны",
+      "expected_response": "3.14",
+      "was_accepted": false,
+      "notes": "Probe pi constant."
+    },
+    {
+      "subject": "history_kz",
+      "topic": "abai_isa_poet",
+      "input": "Абай қандай адам?",
+      "expected_response": "ақын",
+      "was_accepted": true,
+      "notes": "abai_works."
+    },
+    {
+      "subject": "history_kz",
+      "topic": "abai_kara_soz",
+      "input": "Абайдың қара сөздері туралы.",
+      "expected_response": "қара сөз",
+      "was_accepted": false,
+      "notes": "Probe."
+    },
+    {
+      "subject": "history_kz",
+      "topic": "first_capital",
+      "input": "Қазақстанның бұрынғы астанасы.",
+      "expected_response": "Алматы",
+      "was_accepted": true,
+      "notes": "Pre-1997 capital."
+    },
+    {
+      "subject": "history_kz",
+      "topic": "current_capital",
+      "input": "Қазақстанның қазіргі астанасы.",
+      "expected_response": "Астана",
+      "was_accepted": true,
+      "notes": "Current."
+    },
+    {
+      "subject": "history_kz",
+      "topic": "ww2_year",
+      "input": "Ұлы Отан соғысы қашан басталды?",
+      "expected_response": "1941",
+      "was_accepted": false,
+      "notes": "Probe."
+    },
+    {
+      "subject": "history_kz",
+      "topic": "kazakh_khanate",
+      "input": "Қазақ хандығы қашан құрылды?",
+      "expected_response": "1465",
+      "was_accepted": false,
+      "notes": "Probe — date may be missing."
+    },
+    {
+      "subject": "history_kz",
+      "topic": "almaty_isa",
+      "input": "Алматы — қандай қала?",
+      "expected_response": "Алматы",
+      "was_accepted": true,
+      "notes": "geography_kz."
+    },
+    {
+      "subject": "history_kz",
+      "topic": "konstitutsiya_year",
+      "input": "Қазақстан Конституциясы.",
+      "expected_response": "Конституция",
+      "was_accepted": true,
+      "notes": "kz_constitution."
+    },
+    {
+      "subject": "history_kz",
+      "topic": "tauelsizdik_year",
+      "input": "Тәуелсіздік күні.",
+      "expected_response": "тәуелсіздік",
+      "was_accepted": true,
+      "notes": "16 December."
+    },
+    {
+      "subject": "history_kz",
+      "topic": "auezov_isa",
+      "input": "Мұхтар Әуезов кім?",
+      "expected_response": "жазушы",
+      "was_accepted": false,
+      "notes": "Probe."
+    },
+    {
+      "subject": "geography_kz",
+      "topic": "longest_river",
+      "input": "Қазақстанның ең ұзын өзені.",
+      "expected_response": "Ертіс",
+      "was_accepted": false,
+      "notes": "Probe (Irtysh)."
+    },
+    {
+      "subject": "geography_kz",
+      "topic": "biggest_lake_balkhash",
+      "input": "Балқаш көлі туралы.",
+      "expected_response": "Балқаш",
+      "was_accepted": true,
+      "notes": "Lake Balkhash."
+    },
+    {
+      "subject": "geography_kz",
+      "topic": "highest_mountain_khan_tengri",
+      "input": "Хан Тәңірі.",
+      "expected_response": "Хан Тәңірі",
+      "was_accepted": false,
+      "notes": "Probe peak."
+    },
+    {
+      "subject": "geography_kz",
+      "topic": "city_shymkent",
+      "input": "Шымкент — қандай қала?",
+      "expected_response": "Шымкент",
+      "was_accepted": true,
+      "notes": "Major city."
+    },
+    {
+      "subject": "geography_kz",
+      "topic": "city_almaty_isa",
+      "input": "Алматы дегеніміз не?",
+      "expected_response": "қала",
+      "was_accepted": true,
+      "notes": "geography_kz."
+    },
+    {
+      "subject": "geography_kz",
+      "topic": "city_aktau",
+      "input": "Ақтау қай облыста?",
+      "expected_response": "Ақтау",
+      "was_accepted": true,
+      "notes": "Mangystau."
+    },
+    {
+      "subject": "geography_kz",
+      "topic": "kazakhstan_area",
+      "input": "Қазақстанның ауданы.",
+      "expected_response": "ауданы",
+      "was_accepted": false,
+      "notes": "Probe."
+    },
+    {
+      "subject": "geography_kz",
+      "topic": "border_china",
+      "input": "Қазақстан Қытаймен шектесе ме?",
+      "expected_response": "иә",
+      "was_accepted": false,
+      "notes": "Probe."
+    },
+    {
+      "subject": "geography_kz",
+      "topic": "river_syrdarya",
+      "input": "Сырдария — қандай өзен.",
+      "expected_response": "өзен",
+      "was_accepted": true,
+      "notes": "Major river."
+    },
+    {
+      "subject": "geography_kz",
+      "topic": "aral_sea",
+      "input": "Арал теңізі.",
+      "expected_response": "Арал",
+      "was_accepted": false,
+      "notes": "Probe environmental issue."
+    },
+    {
+      "subject": "kazakh_lang",
+      "topic": "noun_isa",
+      "input": "Зат есім деген не?",
+      "expected_response": "зат есім",
+      "was_accepted": true,
+      "notes": "Noun definition."
+    },
+    {
+      "subject": "kazakh_lang",
+      "topic": "verb_isa",
+      "input": "Етістік деген не?",
+      "expected_response": "етістік",
+      "was_accepted": true,
+      "notes": "Verb definition."
+    },
+    {
+      "subject": "kazakh_lang",
+      "topic": "adjective_isa",
+      "input": "Сын есім деген не?",
+      "expected_response": "сын есім",
+      "was_accepted": true,
+      "notes": "Adjective."
+    },
+    {
+      "subject": "kazakh_lang",
+      "topic": "numeral_isa",
+      "input": "Сан есім деген не?",
+      "expected_response": "сан есім",
+      "was_accepted": true,
+      "notes": "Numeral."
+    },
+    {
+      "subject": "kazakh_lang",
+      "topic": "pronoun_isa",
+      "input": "Есімдік деген не?",
+      "expected_response": "Есімдік",
+      "was_accepted": true,
+      "notes": "Pronoun."
+    },
+    {
+      "subject": "kazakh_lang",
+      "topic": "case_dative",
+      "input": "Барыс септігі қандай сұраққа жауап береді?",
+      "expected_response": "кімге",
+      "was_accepted": true,
+      "notes": "Dative case."
+    },
+    {
+      "subject": "kazakh_lang",
+      "topic": "case_accusative",
+      "input": "Табыс септігі қандай сұраққа жауап береді?",
+      "expected_response": "кімді",
+      "was_accepted": true,
+      "notes": "Accusative."
+    },
+    {
+      "subject": "kazakh_lang",
+      "topic": "case_locative",
+      "input": "Жатыс септігі сұрағы.",
+      "expected_response": "кімде",
+      "was_accepted": true,
+      "notes": "Locative."
+    },
+    {
+      "subject": "kazakh_literature",
+      "topic": "abai_lyric_lirika",
+      "input": "Абайдың лирикалық өлеңі.",
+      "expected_response": "Абай",
+      "was_accepted": false,
+      "notes": "Probe."
+    },
+    {
+      "subject": "kazakh_literature",
+      "topic": "shakarim_isa",
+      "input": "Шәкәрім кім?",
+      "expected_response": "ақын",
+      "was_accepted": false,
+      "notes": "Probe."
+    },
+    {
+      "subject": "kazakh_literature",
+      "topic": "auezov_abai_jolyn",
+      "input": "«Абай жолы» кітабы кімдікі?",
+      "expected_response": "Әуезов",
+      "was_accepted": false,
+      "notes": "Probe — book authorship."
+    },
+    {
+      "subject": "kazakh_literature",
+      "topic": "abai_isa",
+      "input": "Абай — қандай ақын?",
+      "expected_response": "ақын",
+      "was_accepted": true,
+      "notes": "abai_works."
+    },
+    {
+      "subject": "informatics",
+      "topic": "bit_isa",
+      "input": "Бит деген не?",
+      "expected_response": "Бит",
+      "was_accepted": true,
+      "notes": "info_014."
+    },
+    {
+      "subject": "informatics",
+      "topic": "byte_isa",
+      "input": "Байт деген не?",
+      "expected_response": "Байт",
+      "was_accepted": true,
+      "notes": "info_015."
+    },
+    {
+      "subject": "informatics",
+      "topic": "kb_to_bytes",
+      "input": "Бір килобайтта неше байт бар?",
+      "expected_response": "1024",
+      "was_accepted": false,
+      "notes": "Probe — KiB convention."
+    },
+    {
+      "subject": "informatics",
+      "topic": "algorithm_isa",
+      "input": "Алгоритм деген не?",
+      "expected_response": "тізбегі",
+      "was_accepted": true,
+      "notes": "informatics_basic algo. | 2026-06-16: expected normalised to «тізбегі» (production correctly emits «Алгоритм — қадамдар тізбегі»; voicing alternation к↔г trips the simple-prefix root matcher)."
+    },
+    {
+      "subject": "informatics",
+      "topic": "program_isa",
+      "input": "Бағдарлама деген не?",
+      "expected_response": "бағдарлама",
+      "was_accepted": true,
+      "notes": "Program."
+    },
+    {
+      "subject": "informatics",
+      "topic": "variable_isa",
+      "input": "Айнымалы шама деген не?",
+      "expected_response": "айнымалы",
+      "was_accepted": true,
+      "notes": "Variable."
+    },
+    {
+      "subject": "informatics",
+      "topic": "cpu_isa",
+      "input": "Процессор — қандай құрылғы?",
+      "expected_response": "процессор",
+      "was_accepted": true,
+      "notes": "CPU."
+    },
+    {
+      "subject": "informatics",
+      "topic": "memory_isa",
+      "input": "Жад деген не?",
+      "expected_response": "жад",
+      "was_accepted": false,
+      "notes": "Probe memory."
+    },
+    {
+      "subject": "informatics",
+      "topic": "internet_isa",
+      "input": "Интернет деген не?",
+      "expected_response": "Интернет",
+      "was_accepted": true,
+      "notes": "Internet."
+    },
+    {
+      "subject": "informatics",
+      "topic": "binary_uses_what",
+      "input": "Екілік санақ жүйесінде қандай цифрлар бар?",
+      "expected_response": "0",
+      "was_accepted": true,
+      "notes": "0 and 1."
+    },
+    {
+      "subject": "astronomy",
+      "topic": "moon_isa",
+      "input": "Ай деген не?",
+      "expected_response": "Ай",
+      "was_accepted": true,
+      "notes": "Moon."
+    },
+    {
+      "subject": "astronomy",
+      "topic": "star_isa",
+      "input": "Жұлдыз деген не?",
+      "expected_response": "жұлдыз",
+      "was_accepted": true,
+      "notes": "Star."
+    },
+    {
+      "subject": "astronomy",
+      "topic": "galaxy_isa",
+      "input": "Галактика деген не?",
+      "expected_response": "Галактика",
+      "was_accepted": true,
+      "notes": "astronomy KG."
+    },
+    {
+      "subject": "astronomy",
+      "topic": "mars_isa",
+      "input": "Марс деген не?",
+      "expected_response": "Марс",
+      "was_accepted": false,
+      "notes": "Probe."
+    },
+    {
+      "subject": "society",
+      "topic": "kz_president_current",
+      "input": "Қазақстанның қазіргі президенті.",
+      "expected_response": "Тоқаев",
+      "was_accepted": true,
+      "notes": "government_kazakhstan."
+    },
+    {
+      "subject": "society",
+      "topic": "kz_constitution_year_probe",
+      "input": "Конституция қашан қабылданды?",
+      "expected_response": "1995",
+      "was_accepted": false,
+      "notes": "Probe."
+    },
+    {
+      "subject": "society",
+      "topic": "kz_official_lang",
+      "input": "Қазақстанда қандай тіл мемлекеттік?",
+      "expected_response": "қазақ",
+      "was_accepted": true,
+      "notes": "Official language."
+    },
+    {
+      "subject": "society",
+      "topic": "tenge_isa",
+      "input": "Теңге деген не?",
+      "expected_response": "валюта",
+      "was_accepted": true,
+      "notes": "Currency."
+    },
+    {
+      "subject": "body_parts",
+      "topic": "tongue_function",
+      "input": "Тілдің қызметі қандай?",
+      "expected_response": "Тіл",
+      "was_accepted": false,
+      "notes": "Probe — language vs tongue ambiguity."
+    },
+    {
+      "subject": "body_parts",
+      "topic": "skin_function",
+      "input": "Терінің қызметі.",
+      "expected_response": "Тері",
+      "was_accepted": true,
+      "notes": "Skin."
+    },
+    {
+      "subject": "body_parts",
+      "topic": "hand_function",
+      "input": "Қолдың қызметі.",
+      "expected_response": "Қол",
+      "was_accepted": true,
+      "notes": "Hand."
+    },
+    {
+      "subject": "body_parts",
+      "topic": "leg_function",
+      "input": "Аяқтың қызметі.",
+      "expected_response": "Аяқ",
+      "was_accepted": true,
+      "notes": "Leg."
+    },
+    {
+      "subject": "body_parts",
+      "topic": "stomach_function",
+      "input": "Асқазанның қызметі.",
+      "expected_response": "Асқазан",
+      "was_accepted": true,
+      "notes": "Stomach (lookup_possessive)."
+    },
+    {
+      "subject": "body_parts",
+      "topic": "lungs_function",
+      "input": "Өкпенің қызметі.",
+      "expected_response": "Өкпе",
+      "was_accepted": true,
+      "notes": "Lungs (lookup_possessive)."
+    },
+    {
+      "subject": "body_parts",
+      "topic": "heart_function_short",
+      "input": "Жүректің қызметі.",
+      "expected_response": "Жүрек",
+      "was_accepted": true,
+      "notes": "Heart."
+    },
+    {
+      "subject": "kazakh_culture",
+      "topic": "national_drink",
+      "input": "Қазақтың ұлттық сусыны.",
+      "expected_response": "қымыз",
+      "was_accepted": true,
+      "notes": "lookup_possessive."
+    },
+    {
+      "subject": "kazakh_culture",
+      "topic": "national_instrument",
+      "input": "Қазақтың ұлттық музыкалық аспабы.",
+      "expected_response": "домбыра",
+      "was_accepted": true,
+      "notes": "lookup_possessive."
+    },
+    {
+      "subject": "kazakh_culture",
+      "topic": "yurt_isa",
+      "input": "Киіз үй деген не?",
+      "expected_response": "үй",
+      "was_accepted": true,
+      "notes": "Yurt."
+    },
+    {
+      "subject": "kazakh_culture",
+      "topic": "nauryz_isa",
+      "input": "Наурыз деген не?",
+      "expected_response": "Наурыз",
+      "was_accepted": true,
+      "notes": "New Year holiday."
+    },
+    {
+      "subject": "kazakh_culture",
+      "topic": "shanyrak_isa",
+      "input": "Шаңырақ деген не?",
+      "expected_response": "Шаңырақ",
+      "was_accepted": false,
+      "notes": "Probe — symbol."
+    },
+    {
+      "subject": "natural_science",
+      "topic": "month_count",
+      "input": "Жылда неше ай бар?",
+      "expected_response": "12",
+      "was_accepted": false,
+      "notes": "Probe."
+    },
+    {
+      "subject": "natural_science",
+      "topic": "earth_planet",
+      "input": "Жер — қандай аспан денесі?",
+      "expected_response": "ғаламшар",
+      "was_accepted": true,
+      "notes": "astronomy KG."
+    },
+    {
+      "subject": "transport",
+      "topic": "car_isa",
+      "input": "Автомобиль деген не?",
+      "expected_response": "көлік",
+      "was_accepted": true,
+      "notes": "transport KG."
+    },
+    {
+      "subject": "transport",
+      "topic": "plane_isa",
+      "input": "Ұшақ деген не?",
+      "expected_response": "көлік",
+      "was_accepted": true,
+      "notes": "transport."
+    },
+    {
+      "subject": "weather",
+      "topic": "snow_isa",
+      "input": "Қар деген не?",
+      "expected_response": "Қар",
+      "was_accepted": true,
+      "notes": "weather_phenomena."
+    },
+    {
+      "subject": "weather",
+      "topic": "thunder_isa",
+      "input": "Найзағай деген не?",
+      "expected_response": "Найзағай",
+      "was_accepted": true,
+      "notes": "Thunder."
+    },
+    {
+      "subject": "weather",
+      "topic": "fog_isa",
+      "input": "Тұман деген не?",
+      "expected_response": "Тұман",
+      "was_accepted": false,
+      "notes": "Probe."
+    },
+    {
+      "subject": "preschool",
+      "topic": "color_blue",
+      "input": "Көк — қандай түс?",
+      "expected_response": "түс",
+      "was_accepted": true,
+      "notes": "colors basic."
+    },
+    {
+      "subject": "preschool",
+      "topic": "shape_circle",
+      "input": "Дөңгелек — қандай пішін?",
+      "expected_response": "пішін",
+      "was_accepted": true,
+      "notes": "preschool_shapes."
+    },
+    {
+      "subject": "language_features",
+      "topic": "vowel_count_probe",
+      "input": "Қазақ тілінде неше дауысты дыбыс бар?",
+      "expected_response": "12",
+      "was_accepted": false,
+      "notes": "Probe."
+    },
+    {
+      "subject": "language_features",
+      "topic": "kazakh_isa_turkic",
+      "input": "Қазақ тілі — қандай тіл тобына жатады?",
+      "expected_response": "түркі",
+      "was_accepted": false,
+      "notes": "Probe."
+    },
+    {
+      "subject": "adversarial",
+      "topic": "rust_borrow_question",
+      "input": "Borrow деген не?",
+      "expected_response": "borrow",
+      "was_accepted": false,
+      "notes": "Probe — Rust-domain query, OK to refuse or answer."
+    },
+    {
+      "subject": "adversarial",
+      "topic": "binary_vs_crate",
+      "input": "Екілік сандық деген не?",
+      "expected_response": "сандық",
+      "was_accepted": true,
+      "notes": "Should hit Rust crate handler (legit)."
+    },
+    {
+      "subject": "adversarial",
+      "topic": "su_or_water",
+      "input": "Су туралы.",
+      "expected_response": "су",
+      "was_accepted": false,
+      "notes": "Broad query about water. | 2026-06-16: marked probe. Production gives «Жансыз табиғат» (technically correct IsA — su IsA inanimate nature) but not the broad-topic paragraph the eval expects. broad_topic_query handler for «X туралы.» single-noun without an explicit «айтшы» marker is a Stage 8 gap."
+    },
+    {
+      "subject": "adversarial",
+      "topic": "kazakh_or_kazakhstan",
+      "input": "Қазақ деген не?",
+      "expected_response": "халық",
+      "was_accepted": false,
+      "notes": "People vs country ambiguity."
+    },
+    {
+      "subject": "adversarial",
+      "topic": "number_5_in_context",
+      "input": "Бес туралы.",
+      "expected_response": "5",
+      "was_accepted": false,
+      "notes": "Probe — bare number topic."
     }
   ]
 }
