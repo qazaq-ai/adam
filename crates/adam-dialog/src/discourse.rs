@@ -2838,6 +2838,13 @@ pub fn input_is_math_expression(input: &str) -> bool {
         "қос",
         "есепте",
         "азайт",
+        // **v6.8 (2026-06-16) — past-tense т-drop on «азайт».**
+        // Live voice REPL surfaced «азайды» (past tense of «азайт»);
+        // т drops before -ды per Kazakh morphology. The prefix
+        // «азайт» does not cover it. See detect_kazakh_math_op
+        // and clause_has_math_verb for the parallel fix.
+        "азайды",
+        "азайып", // converb
         "плюс",
         "минус",
         "умнож",
@@ -4409,6 +4416,8 @@ fn clause_has_math_verb(clause: &str) -> bool {
                 || w.starts_with("бөл")
                 || w.starts_with("қос")
                 || w.starts_with("азайт")
+                || w.starts_with("азайды")  // v6.8 — past-tense т-drop
+                || w.starts_with("азайып")  // v6.8 — converb
                 || matches!(
                     w,
                     "алу"
@@ -4510,7 +4519,22 @@ fn detect_kazakh_math_op(tokens: &[&str]) -> Option<KazakhMathOp> {
         }
         // **v4.42.0** — `азайт*` (decrease / subtract) — alternate
         // verb stem for subtraction. «Бесті азайт» = «subtract 5».
-        if t.starts_with("азайт") {
+        //
+        // **v6.8 (2026-06-16) — past-tense т-drop.** Kazakh morphology
+        // drops the final «т» of «азайт» before past-tense / converb
+        // suffixes («азайт» + «-ды» = «азайды», not «азайтды»). Live
+        // voice REPL session caught «Жүзден отыз бесті азайды.» —
+        // Whisper delivered the past-tense form instead of imperative,
+        // and the prefix-match `starts_with("азайт")` rejected it. We
+        // add explicit `starts_with("азайды")` and `starts_with("азайып")`
+        // (converb) to cover past + converb without broadening to bare
+        // `азай` (which could match noun «азайту» — abstract "decrease"
+        // — and other unrelated «азай-*» roots). Other Kazakh math
+        // verbs (көбейт / бөл / қос) do NOT drop a consonant before
+        // the past suffix, so `starts_with("көбейт")` / etc. already
+        // cover their past forms («көбейтті», «бөлді», «қосты»).
+        if t.starts_with("азайт") || t.starts_with("азайды") || t.starts_with("азайып")
+        {
             return Some(KazakhMathOp::Sub);
         }
         // **v6.0 (live REPL 2026-05-18)** — Russian-loan operator

@@ -580,24 +580,41 @@ fn parse_op(w: &str) -> Option<Op> {
         // Includes common Whisper-STT mishears (codex 2026-05-25):
         // «жұп» (heard for «қос»), «кубейт» / «кобейт» (heard for
         // «көбейт»).
-        "қос" | "қосу" | "жұп" | "зұп" | "кос" => Op::Add,
+        "қос" | "қосу" | "жұп" | "зұп" | "кос"
+            // v6.8 (2026-06-16) — past-tense + converb variants
+            // surfaced by the live voice REPL session. Whisper
+            // sometimes delivers past tense even though the user
+            // intended imperative («қосты», «қосылды»).
+            | "қосты" | "қосылды" | "қостым" | "қосайық" | "қоссам" => Op::Add,
         // **v6.4.0-rc12 (2026-06-08 audit).**  Whisper-noise
         // variants on imperative «азайт» (= subtract).  Live audit:
         // «тоқсан тоғыз ... азайыт үш» — adam couldn't parse the
         // operator (transcribed with extra «ы»).
-        "азайт" | "азайту" | "азайыт" | "азай" | "алып_таста" | "алу" | "алыс" => {
-            Op::Sub
-        }
+        //
+        // **v6.8 (2026-06-16) — past-tense forms added.** Voice REPL
+        // session caught «Жүзден отыз бесті азайды.» — Whisper
+        // produced past-tense «азайды» (= "decreased / subtracted")
+        // instead of imperative «азайт». The semantics are identical
+        // for a math chain. Same idea for the сhained-form «азайтып»
+        // (= "having subtracted").
+        "азайт" | "азайту" | "азайыт" | "азай" | "алып_таста" | "алу" | "алыс"
+            | "азайды" | "азайтты" | "азайтып" | "азайтсам" | "азайтайық"
+            | "азайтайын" => Op::Sub,
         // **v6.4.0-rc12** — Whisper drops the «т» suffix on
         // bare imperative «көбей» (= multiply); live audit:
         // «Екі көбей үшке» went to dictionary lookup of «екі».
-        "көбейт" | "көбейту" | "кубейт" | "кобейт" | "көбойт" | "көбей" | "кубай" | "кобай" => {
-            Op::Mul
-        }
+        //
+        // **v6.8 (2026-06-16)** — past-tense + converb forms.
+        "көбейт" | "көбейту" | "кубейт" | "кобейт" | "көбойт" | "көбей" | "кубай" | "кобай"
+            | "көбейтті" | "көбейтіп" | "көбейтсем" | "көбейтейік"
+            | "көбейттім" | "көбейтейін" => Op::Mul,
         // **v6.4.0-rc12** — Whisper inserts soft sign / drops
         // case on «бөл» (= divide).  Live audit: «бес кубейт
         // төртке бөль екіге» — adam refused.
-        "бөл" | "бөлу" | "боль" | "бөль" | "бел" | "бөлі" => Op::Div,
+        //
+        // **v6.8 (2026-06-16)** — past-tense + converb forms.
+        "бөл" | "бөлу" | "боль" | "бөль" | "бел" | "бөлі"
+            | "бөлді" | "бөліп" | "бөлсем" | "бөлейік" | "бөлейін" | "бөлдім" => Op::Div,
         "дәрежесі" | "дәреже" | "дәрежеге" => Op::Pow,
         "пайыз" | "пайызы" => Op::Percent,
         // Modulo.
@@ -624,12 +641,37 @@ fn parse_compound_number(
     for w in words.iter().take(4) {
         // First try the bare word, then a Kazakh-case-stripped
         // version so that «жетіге», «екіге», «үшті» parse.
+        //
+        // **v6.8 (2026-06-16) — numeral-only edit-1 recovery.**
+        // Live voice REPL caught Whisper drift «Тоқсан → Топсан»
+        // (gibberish, not a Kazakh word). The general lexicon
+        // validator was disabled to avoid rc25 false positives
+        // («дәулет → сәулет», «жасым → жасы», …). Here we add a
+        // **risk-bounded** edit-1 search restricted to numeral
+        // vocabulary only (~20 Kazakh numerals). Since none of the
+        // rc25 false-positive tokens are within edit-1 of any
+        // numeral, this cannot re-introduce those regressions.
         let (resolved, was_case_stripped): (&str, bool) = if number_word_value(w).is_some() {
             (*w, false)
         } else {
             let stripped = strip_kazakh_case(w, is_non_numeral);
             if number_word_value(stripped).is_some() {
                 (stripped, true)
+            } else if let Some(numeral) = repair_numeral_edit1(stripped) {
+                // Edit-1 recovery: «Топсан» → «Тоқсан» (90).
+                // Owned String — we leak the static lifetime by
+                // matching on number_word_value directly via the
+                // recovered surface.
+                if number_word_value(&numeral).is_some() {
+                    // Mark as case-stripped to keep compound-numeral
+                    // termination behaviour conservative — once we
+                    // edit-1 a token we treat it as terminating.
+                    total += number_word_value(&numeral).unwrap();
+                    consumed += 1;
+                    had_part = true;
+                    break;
+                }
+                break;
             } else {
                 break;
             }
@@ -680,6 +722,123 @@ fn parse_compound_number(
     } else {
         None
     }
+}
+
+/// **v6.8 (2026-06-16) — numeral-vocabulary edit-1 repair.**
+///
+/// Try to recover a Whisper-drifted numeral by enumerating Kazakh
+/// numerals and returning the one within Levenshtein distance ≤ 1
+/// of `token`. Scope is intentionally TINY (~20 numerals: бір-он,
+/// жиырма-тоқсан, жүз, мың) so this cannot rewrite arbitrary
+/// nouns/verbs — the rc25 false-positive set («дәулет/тұрамын/
+/// жасым/толды/айттым») has no numeral within edit-1, so this
+/// recovery is safe by construction.
+///
+/// Returns the canonical numeral surface form (as &str) when there
+/// is a UNIQUE edit-1 match. Two or more equidistant numerals →
+/// `None` (avoid ambiguous repair).
+///
+/// **Strategy.** Two passes:
+///   1. Direct edit-1 on the token (catches «Топсан» → «Тоқсан»).
+///   2. Strip a common case suffix («-ды», «-ге», «-да», …) THEN
+///      edit-1 on the result (catches «Топсанды» → «Тоқсан»;
+///      strip_kazakh_case refuses to strip when the bare form isn't
+///      already a known numeral, which blocks the direct path).
+/// Suffix stripping is deliberately decoupled from the global
+/// `strip_kazakh_case` to keep the repair path conservative.
+fn repair_numeral_edit1(token: &str) -> Option<String> {
+    if let Some(found) = numeral_edit1_lookup(token) {
+        return Some(found);
+    }
+    // Try stripping a single common case suffix and re-running the
+    // edit-1 search. The stripped form gets the repair search but
+    // the returned string is still the canonical bare numeral —
+    // the case suffix is handled by parse_compound_number's
+    // case-stripped path (it terminates the compound, which is
+    // correct for these acc/dat/etc-marked Whisper drift cases).
+    const CASE_SUFFIXES: &[&str] = &[
+        "ды", "ді", "ты", "ті", "ны", "ні", "ға", "ге", "қа", "ке", "да", "де", "та", "те", "нан",
+        "нен", "дан", "ден", "тан", "тен",
+    ];
+    for suf in CASE_SUFFIXES {
+        if let Some(bare) = token.strip_suffix(suf) {
+            if bare.chars().count() < 3 {
+                continue;
+            }
+            if let Some(found) = numeral_edit1_lookup(bare) {
+                return Some(found);
+            }
+        }
+    }
+    None
+}
+
+/// Single-pass edit-1 lookup against the closed numeral vocabulary.
+fn numeral_edit1_lookup(token: &str) -> Option<String> {
+    const KAZAKH_NUMERALS: &[&str] = &[
+        "бір",
+        "екі",
+        "үш",
+        "төрт",
+        "бес",
+        "алты",
+        "жеті",
+        "сегіз",
+        "тоғыз",
+        "он",
+        "жиырма",
+        "отыз",
+        "қырық",
+        "елу",
+        "алпыс",
+        "жетпіс",
+        "сексен",
+        "тоқсан",
+        "жүз",
+        "мың",
+        "миллион",
+    ];
+    let t_chars: Vec<char> = token.chars().collect();
+    let mut unique: Option<&str> = None;
+    for cand in KAZAKH_NUMERALS {
+        if *cand == token {
+            return Some((*cand).to_string());
+        }
+        let c_chars: Vec<char> = cand.chars().collect();
+        if (c_chars.len() as isize - t_chars.len() as isize).abs() > 1 {
+            continue;
+        }
+        if levenshtein_distance(&t_chars, &c_chars) <= 1 {
+            match unique {
+                None => unique = Some(cand),
+                Some(_) => return None,
+            }
+        }
+    }
+    unique.map(|s| s.to_string())
+}
+
+/// Classical Levenshtein distance over char slices. Small input
+/// (numerals ≤ 8 chars) so direct DP is fine.
+fn levenshtein_distance(a: &[char], b: &[char]) -> usize {
+    let (m, n) = (a.len(), b.len());
+    if m == 0 {
+        return n;
+    }
+    if n == 0 {
+        return m;
+    }
+    let mut prev: Vec<usize> = (0..=n).collect();
+    let mut curr = vec![0usize; n + 1];
+    for i in 1..=m {
+        curr[0] = i;
+        for j in 1..=n {
+            let cost = if a[i - 1] == b[j - 1] { 0 } else { 1 };
+            curr[j] = (prev[j] + 1).min(curr[j - 1] + 1).min(prev[j - 1] + cost);
+        }
+        std::mem::swap(&mut prev, &mut curr);
+    }
+    prev[n]
 }
 
 /// One-word number value. Returns `None` for non-number words.
