@@ -435,6 +435,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut accepted_total = 0;
     // per-subject roll-up: (strict_ok, semantic_ok, total_accepted)
     let mut by_subject: BTreeMap<String, (u32, u32, u32)> = BTreeMap::new();
+    // **v6.8 (2026-06-16) — per-topic roll-up.** Codex consultation
+    // #4 caught that subject-only aggregation is blind to per-defect
+    // breakdown on speech_defect_eval (subject=speech_defect for all
+    // 71 cases; topic distinguishes rhotacism / sigmatism / etc.).
+    let mut by_topic: BTreeMap<String, (u32, u32, u32)> = BTreeMap::new();
     for (i, c) in pack.cases.iter().enumerate() {
         // Phase 16 production calls Conversation::turn(input, lex, repo, seed).
         // Seed=42 matches the default --seed argument in the voice REPL.
@@ -469,6 +474,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             if semantic_pass {
                 entry.1 += 1;
+            }
+            // Also roll up per-topic when a topic field is present.
+            if let Some(topic) = c.topic.clone() {
+                let entry = by_topic.entry(topic).or_insert((0, 0, 0));
+                entry.2 += 1;
+                if strict_pass {
+                    entry.0 += 1;
+                }
+                if semantic_pass {
+                    entry.1 += 1;
+                }
             }
         }
         let tag = if !c.was_accepted {
@@ -514,6 +530,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!(
                 "{:<22} {:>8} {:>4}/{:<3} {:>4}/{:<3}",
                 subj, n, s_ok, n, sem_ok, n
+            );
+        }
+    }
+    // Per-topic breakdown — useful when subject is uniform across the
+    // pack but cases carry a finer-grained `topic` field (e.g. the
+    // speech_defect_eval suite where every case has subject=speech_defect
+    // and topic=rhotacism / sigmatism / lambdacism / etc.).
+    if !by_topic.is_empty() {
+        println!("\n[respond_full] by topic:");
+        println!(
+            "{:<22} {:>8} {:>10} {:>10}",
+            "topic", "n", "strict", "semantic"
+        );
+        println!("{}", "-".repeat(54));
+        for (topic, (s_ok, sem_ok, n)) in &by_topic {
+            println!(
+                "{:<22} {:>8} {:>4}/{:<3} {:>4}/{:<3}",
+                topic, n, s_ok, n, sem_ok, n
             );
         }
     }

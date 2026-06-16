@@ -1612,14 +1612,23 @@ fn lookup_chemical_formula(input: &str) -> Option<String> {
     // «Таңба» = "symbol / sign" — when a chemistry query asks for the
     // taңba of an element, it wants the same Ag / Au / Fe / etc.
     // that the formula lookup returns.
+    //
+    // **v6.8 hotfix 2026-06-16 evening — word-boundary check for «таңба».**
+    // Codex consultation #4 caught: bare `lower.contains("таңба")` ALSO
+    // matches «елтаңба» (state emblem) and «жол таңбасы» (road sign /
+    // mark), so «Қазақстанның елтаңбасында күміс бар ма?» wrongly
+    // routed to «Күмістің формуласы — Ag.». «Таңба» must be a
+    // standalone token (preceded by space / start / punctuation), not
+    // embedded as a suffix of another root. The «формула» marker is
+    // safe because no Kazakh word ends in «формула-» as a suffix.
     let has_formula_marker = lower.contains("формула")
         || lower.contains("формуласы")
         || lower.contains("формуласын")
         || lower.contains("формуласыз")  // possessive case variants
         || lower.contains("формулыс") // common Whisper drift
-        || lower.contains("таңба")
-        || lower.contains("таңбасы")
-        || lower.contains("таңбасын");
+        || token_contains(lower, "таңба")
+        || token_contains(lower, "таңбасы")
+        || token_contains(lower, "таңбасын");
     if !has_formula_marker {
         return None;
     }
@@ -1713,11 +1722,118 @@ fn lookup_chemical_formula(input: &str) -> Option<String> {
     ];
 
     for (stem, display, formula) in formulas {
-        if lower.contains(stem) {
+        // **v6.8 hotfix 2026-06-16 — word-boundary check.** Codex
+        // consultation #4 caught: bare `contains("темір")` matches
+        // «теміржол» (railroad), so «Теміржол таңбасы қандай?»
+        // wrongly routed to «Темірдің формуласы — Fe.». Apply the
+        // same standalone-token gate as the formula marker. Multi-
+        // word compound stems («көмір қышқыл газы», «ас тұзы»)
+        // still pass because they are space-separated phrases —
+        // token_contains treats each constituent as a token
+        // implicitly via word-boundary prefix match on the first
+        // letter of the stem.
+        if token_contains(lower, stem) {
             return Some(format!("{display} формуласы — {formula}."));
         }
     }
     None
+}
+
+/// Word-boundary substring check: returns `true` when `needle`
+/// appears in `haystack` as a standalone token — i.e. preceded by
+/// whitespace, start-of-string, or punctuation. Prevents false
+/// positives where the search term is embedded as a suffix of a
+/// longer Kazakh word («таңба» inside «елтаңба», «темір» inside
+/// «теміржол»). The trailing edge is unconstrained so case-inflected
+/// forms («таңбасы», «темірдің») still match.
+///
+/// UTF-8-safe: iterates by char boundaries via `find` (which only
+/// reports valid byte indices) and advances by `needle.len()` (which
+/// is a char boundary because needle is a substring of haystack at
+/// that position).
+fn token_contains(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    let mut search_from = 0;
+    while search_from < haystack.len() {
+        let Some(rel) = haystack[search_from..].find(needle) else {
+            return false;
+        };
+        let abs = search_from + rel;
+        // Leading boundary: char preceding the match must be
+        // non-alphabetic OR at start of haystack.
+        let prev_char = haystack[..abs].chars().next_back();
+        let leading_ok = match prev_char {
+            Some(c) => !c.is_alphabetic(),
+            None => true,
+        };
+        // Trailing boundary: what follows must be either a non-letter
+        // (end / whitespace / punct) OR a valid Kazakh inflection
+        // suffix initial. This is what catches «теміржол» — the «ж»
+        // following «темір» is NOT a Kazakh case/possessive suffix
+        // starter, so «темір» is rejected as a substring of a longer
+        // root.
+        //
+        // Skip the trailing-suffix gate when the needle itself ends
+        // with a non-alphabetic char (e.g. stem «су » with trailing
+        // space) — the needle already encodes its own right boundary,
+        // so we only need leading boundary + the needle to be a
+        // standalone token. Otherwise inputs like «су формуласы»
+        // would reject «су » because the char after the space («ф»)
+        // isn't a Kazakh suffix initial.
+        let needle_ends_with_boundary = needle
+            .chars()
+            .next_back()
+            .map(|c| !c.is_alphabetic())
+            .unwrap_or(true);
+        let end = abs + needle.len();
+        let next_char = haystack[end..].chars().next();
+        let trailing_ok = if needle_ends_with_boundary {
+            true
+        } else {
+            match next_char {
+                None => true,
+                Some(c) if !c.is_alphabetic() => true,
+                Some(c) => is_kazakh_suffix_initial(c),
+            }
+        };
+        if leading_ok && trailing_ok {
+            return true;
+        }
+        // Advance past the current match. Safe char-boundary
+        // arithmetic because needle matched at `abs`, so abs..abs+len
+        // is the substring needle and abs + needle.len() is a valid
+        // boundary.
+        search_from = abs + needle.len();
+    }
+    false
+}
+
+/// Letters that can start a Kazakh inflection suffix (case /
+/// possessive / plural / personal). When a stem match is followed by
+/// one of these, the stem is the root of an inflected form. When
+/// followed by anything else (and the next char is alphabetic),
+/// the stem is embedded in a longer DIFFERENT root and must not
+/// match. Kazakh-phonology informed; not exhaustive but covers all
+/// productive inflection suffix starters in the standard literary
+/// register.
+fn is_kazakh_suffix_initial(c: char) -> bool {
+    matches!(
+        c,
+        // Vowel-initial suffixes (possessive -ы/-і/-ым/-ім, -а/-е
+        // for some derivations, -у for verb stems).
+        'ы' | 'і' | 'а' | 'е' | 'у' | 'ә'
+            // Consonant-initial suffixes (case, plural, instrumental,
+            // possessive 2sg/2pl/1pl):
+            //   н/д/т   — genitive, accusative, locative, ablative
+            //   г/ғ/к/қ — dative
+            //   м/б/п   — instrumental, possessive
+            //   л       — plural
+            //   с       — possessive 3sg with vowel base («сы»)
+            | 'н' | 'д' | 'т' | 'г' | 'ғ' | 'к' | 'қ'
+            | 'м' | 'б' | 'п' | 'л' | 'с'
+    )
 }
 
 /// **2026-06-03** — first-person location statement detector. Matches

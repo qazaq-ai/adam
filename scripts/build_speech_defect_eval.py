@@ -108,7 +108,7 @@ CASES: list[tuple[str, str, str, str, str]] = [
     # ─────────────────────────────────────────────────────────────
     ("stuttering", "Сәлем.", "Са-сә-сәлем.", "сәлем", "tri-repeat onset"),
     ("stuttering", "Менің атым Дәулет.", "Ме-мен-менің атым Дә-Дәулет.", "Дәулет", "session name capture under stutter"),
-    ("stuttering", "Жүрек не үшін керек?", "Жү-жү-жүрек не үшін керек?", "ойлау", "wait — жүрек not ойлау. Fix expected"),
+    ("stuttering", "Жүрек не үшін керек?", "Жү-жү-жүрек не үшін керек?", "қан айналымы", "Codex consultation #4 audit: heart pumps blood, not «ойлау». Expected corrected 2026-06-16."),
     ("stuttering", "Қазақстанның астанасы.", "Қа-қа-қазақстанның астанасы.", "Астана", "country stutter"),
     ("stuttering", "Алты түбірі.", "Ал-ал-алты түбірі.", "2.449489742783178", "math survives stutter"),
     ("stuttering", "Бір байтта неше бит бар?", "Бі-бі-бір байтта неше бит бар?", "8", "stutter on numeral"),

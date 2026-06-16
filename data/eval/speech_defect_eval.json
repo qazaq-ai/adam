@@ -424,9 +424,9 @@
       "subject": "speech_defect",
       "topic": "stuttering",
       "input": "Жү-жү-жүрек не үшін керек?",
-      "expected_response": "ойлау",
+      "expected_response": "қан айналымы",
       "was_accepted": true,
-      "notes": "clean='Жүрек не үшін керек?' | wait — жүрек not ойлау. Fix expected"
+      "notes": "clean='Жүрек не үшін керек?' | Codex consultation #4 audit: heart pumps blood, not «ойлау». Expected corrected 2026-06-16."
     },
     {
       "subject": "speech_defect",
