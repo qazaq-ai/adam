@@ -1341,13 +1341,25 @@ fn lookup_chemical_formula(input: &str) -> Option<String> {
         .collect::<Vec<_>>()
         .join(" ");
     let lower = lower_normalised.as_str();
-    // Required marker: the word «формула» (or a Whisper drift of it).
-    // Without this, bare substance mentions like «су» would false-fire.
+    // Required marker: the word «формула» / «таңба» (chemical symbol)
+    // or a Whisper drift of either. Without this, bare substance
+    // mentions like «су» would false-fire.
+    //
+    // **v6.8 (2026-06-16) — «таңба» marker added.** School-eval case
+    // «Күмістің химиялық таңбасы қандай?» («what is silver's chemical
+    // symbol?») was missing this gate, so the substring-IsA fallback
+    // («Күміс — асыл ақшыл металл») won over the symbol-lookup table.
+    // «Таңба» = "symbol / sign" — when a chemistry query asks for the
+    // taңba of an element, it wants the same Ag / Au / Fe / etc.
+    // that the formula lookup returns.
     let has_formula_marker = lower.contains("формула")
         || lower.contains("формуласы")
         || lower.contains("формуласын")
         || lower.contains("формуласыз")  // possessive case variants
-        || lower.contains("формулыс"); // common Whisper drift
+        || lower.contains("формулыс") // common Whisper drift
+        || lower.contains("таңба")
+        || lower.contains("таңбасы")
+        || lower.contains("таңбасын");
     if !has_formula_marker {
         return None;
     }

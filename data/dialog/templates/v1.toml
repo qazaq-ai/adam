@@ -2079,7 +2079,15 @@ templates = [
 [[families]]
 key = "ask_purpose.no_topic"
 templates = [
-    "Қандай ұғымның мақсатын білгіңіз келеді? Мысалы: ownership, borrow, lifetimes, trait, future, pin.",
+    # **v6.8 (2026-06-16) — Rust example list removed.** The previous
+    # leading variant («Мысалы: ownership, borrow, lifetimes, …»)
+    # leaked Rust-domain examples into every topic-less «X не үшін
+    # керек?» question — e.g. «Ми не үшін керек?» (anatomy) routed
+    # here when topic-extraction couldn't pin «ми». Generic phrasing
+    # is correct for unknown domains; specific Rust-topic examples
+    # belong in a Rust-context-only variant if/when topic-extraction
+    # detects a Rust marker.
+    "Қандай ұғымның мақсатын білгіңіз келеді — нақтылап беріңізші.",
     "Қай тақырыптың мақсаты туралы сұрап тұрсыз — нақтылап беріңізші.",
     "Тура қай ұғымның мақсатын ашуымды қалайсыз? Атаңызшы — нақты түсіндіремін.",
 ]
