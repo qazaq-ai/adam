@@ -275,6 +275,7 @@ fn tokenize_inner(input: &str, is_non_numeral: Option<&dyn Fn(&str) -> bool>) ->
     // Done as a word-level preprocess so the rest of the parser
     // stays unchanged.
     rewrite_kazakh_ordinal_power(&mut words);
+    rewrite_kazakh_genitive_ordinal_power(&mut words);
     rewrite_kazakh_genitive_sqrt(&mut words);
 
     let words: Vec<&str> = words.iter().map(String::as_str).collect();
@@ -416,6 +417,42 @@ fn rewrite_kazakh_ordinal_power(words: &mut Vec<String>) {
             words.splice(i.., rewritten);
             // Continue scanning from the new position past dәрежесі.
             i += 2;
+            continue;
+        }
+        i += 1;
+    }
+}
+
+/// **v6.8 (2026-06-16) — natural-order ordinal-power rewrite.**
+///
+/// School-Kazakh book form for «X to the Y-th degree» is
+/// «<base-genitive> <ordinal> дәрежесі»: «Бестің екінші дәрежесі»
+/// = "the second power of five" = 5² = 25. The pre-v6.8 rewriter
+/// only handled the inverted form «<ordinal> дәрежеге <base>»
+/// («екінші дәрежеге бес»), which is grammatical but rare in
+/// printed exercises. School eval surfaced this gap on the most
+/// common form.
+///
+/// Strategy: scan for the trigger `<ordinal> дәрежесі` and back
+/// up one position — if the preceding word is a genitive-suffixed
+/// numeral, rewrite to the already-supported
+/// `<base> дәрежесі <ordinal-as-cardinal>` shape.
+fn rewrite_kazakh_genitive_ordinal_power(words: &mut Vec<String>) {
+    let mut i = 0;
+    while i + 2 < words.len() {
+        // Pattern: [GEN_BASE, ORDINAL, "дәрежесі"]
+        if words[i + 2] == "дәрежесі"
+            && let Some(exp) = parse_ordinal_kazakh(&words[i + 1])
+            && let Some(root) = strip_kazakh_genitive(&words[i])
+        {
+            let base = root.to_string();
+            let exp_word = format_cardinal_kk(exp);
+            // Rewrite [base+gen, ordinal, "дәрежесі"] to
+            //         [base, "дәрежесі", ordinal-as-cardinal].
+            words[i] = base;
+            words[i + 1] = "дәрежесі".to_string();
+            words[i + 2] = exp_word;
+            i += 3;
             continue;
         }
         i += 1;
@@ -587,10 +624,15 @@ fn parse_compound_number(
     for w in words.iter().take(4) {
         // First try the bare word, then a Kazakh-case-stripped
         // version so that «жетіге», «екіге», «үшті» parse.
-        let resolved = if number_word_value(w).is_some() {
-            *w
+        let (resolved, was_case_stripped): (&str, bool) = if number_word_value(w).is_some() {
+            (*w, false)
         } else {
-            strip_kazakh_case(w, is_non_numeral)
+            let stripped = strip_kazakh_case(w, is_non_numeral);
+            if number_word_value(stripped).is_some() {
+                (stripped, true)
+            } else {
+                break;
+            }
         };
         if let Some(part) = number_word_value(resolved) {
             // Russian / Kazakh: hundreds and tens combine
@@ -606,6 +648,29 @@ fn parse_compound_number(
             }
             consumed += 1;
             had_part = true;
+            // **v6.8 (2026-06-16) — case-suffix terminates the
+            // compound numeral.**
+            //
+            // «бесті отызға көбейт» ("multiply 5 by 30") was
+            // wrongly combining as 5+30 = 35 with the operator
+            // dangling, because the loop happily appended every
+            // case-stripped numeral. In Kazakh, a case marker
+            // («-ті», «-ға», «-нің», «-да», etc.) **closes** the
+            // numeral phrase: the marker assigns a syntactic role
+            // (accusative/dative/genitive/locative), and a fresh
+            // case marker on the next word signals a different
+            // role — i.e. a different operand. So once we see a
+            // case-stripped word, the compound number ends here.
+            //
+            // Bare-bare composition («жиырма бес» = 25) still
+            // works because was_case_stripped is false for both.
+            // Bare-case composition («жиырма бесті» = 25-ACC)
+            // also still works: the compound 20+5 = 25, then the
+            // accusative on «бесті» terminates the compound and
+            // the case applies to the whole.
+            if was_case_stripped {
+                break;
+            }
         } else {
             break;
         }
@@ -900,9 +965,64 @@ fn evaluate(tokens: &[Token]) -> Option<MathResult> {
                     i += 1;
                 }
             }
-            Token::Number(_) => {
-                // Two numbers in a row without an operator —
-                // malformed input.
+            Token::Number(rhs) => {
+                // **v6.8 (2026-06-16) — Kazakh imperative shape.**
+                //
+                // «Бесті отызға көбейт» = "multiply 5 by 30" tokenises
+                // as [Number(5), Number(30), Op(Mul)] — the verb sits
+                // at the end (postfix-like) instead of between the
+                // operands (infix). This is the canonical Kazakh
+                // imperative form for school-math expressions; school
+                // teachers write tests in exactly this shape.
+                //
+                // When the evaluator sees a second Number where it
+                // expected an Op, look one position further. If the
+                // next token is an Op (or Op followed by a Unary like
+                // `түбірі`), apply that Op binary between the
+                // accumulator (= the first number) and `rhs` (= the
+                // second number). This closes the school-eval gap on
+                // [N, N, V] shapes without changing standard-infix
+                // behaviour: that path doesn't reach this match arm.
+                //
+                // Pre-v6.8 this returned None and the input went to
+                // the v6.1 math-refusal template.
+                if i + 1 < tokens.len()
+                    && let Token::Op(op) = tokens[i + 1]
+                {
+                    acc = match op {
+                        Op::Add => acc + rhs,
+                        Op::Sub => acc - rhs,
+                        Op::Mul => acc * rhs,
+                        Op::Div => {
+                            if rhs == 0.0 {
+                                return None;
+                            }
+                            acc / rhs
+                        }
+                        Op::Pow => acc.powf(rhs),
+                        Op::Percent => (acc * rhs) / 100.0,
+                        Op::Mod => {
+                            if rhs == 0.0 {
+                                return None;
+                            }
+                            acc.rem_euclid(rhs)
+                        }
+                    };
+                    steps += 1;
+                    i += 2; // consume rhs + Op
+                    // Trailing unary on the result (rare but
+                    // possible): «Бесті отызға көбейт түбірі».
+                    if i < tokens.len()
+                        && let Token::Unary(u) = tokens[i]
+                    {
+                        acc = apply_unary(u, acc)?;
+                        steps += 1;
+                        i += 1;
+                    }
+                    continue;
+                }
+                // Genuine malformed input (two numbers with no
+                // trailing operator) — still reject.
                 return None;
             }
         }

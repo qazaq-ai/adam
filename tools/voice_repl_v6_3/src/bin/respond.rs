@@ -12,6 +12,27 @@
 //! Usage:
 //!   ./target/release/respond "{prompt text}"
 //!   ./target/release/respond --eval  # run on data/eval/v6_7_real_audit_eval.json
+//!
+//! ## ⚠️ NOT the production eval binary (2026-06-16)
+//!
+//! This binary loads only the LM + BPE tokenizer. It **bypasses**
+//! the entire production cascade — Conversation engine, world_core
+//! KG (3 444 curated facts across 65 domains), reasoning chains,
+//! morpheme retrieval, math_solver, system_clock, v6_2_router. Its
+//! eval mode reports the LM ceiling **alone**, not the production
+//! ceiling.
+//!
+//! **For production eval use `target/release/respond_full`** — it
+//! mirrors `main.rs` voice_repl_v6_3 startup (lexicon + retrieval
+//! index + reasoning chains + world_core domain index + ADAM_V6_2=1)
+//! and runs each case through `Conversation::turn`. Same `--eval`
+//! interface, additionally reports a strict + semantic score.
+//!
+//! Keep this binary for LM-only smoke testing: when iterating on
+//! the BPE vocab, decoder generation strategy, FST-lite mask, or
+//! checkpoint load path, it isolates the neural component. For any
+//! claim about the assistant's user-visible behaviour, use the
+//! production binary instead.
 
 use adam_agg_model::checkpoint::load_checkpoint;
 use adam_agg_model::{TinyAgt, TinyAgtConfig};
@@ -26,7 +47,7 @@ use std::env;
 
 type B = NdArray<f32>;
 
-const CHECKPOINT_DIR: &str = "data/checkpoints/contextual_lm_v6_7_stage2_pain";
+const CHECKPOINT_DIR: &str = "data/checkpoints/contextual_lm_v6_8_step_b_padfix_stage2";
 const BPE_VOCAB: &str = "data/tokenizer/bpe_vocab.json";
 const BPE_MERGES: &str = "data/tokenizer/bpe_merges.json";
 const SEG_ROOTS: &str = "data/tokenizer/segmentation_roots.json";
@@ -76,14 +97,25 @@ impl Responder {
         // step in the generator. Eliminates the "male" / "is" /
         // backtick-code style leaks that the 1M-param LM picked up
         // from the rust_book training corpus.
+        //
+        // **v6.8 chemistry whitelist 2026-06-15** — allow tokens with
+        // ≤1 ASCII letter (plus digits/marker chars) so the model can
+        // still emit chemical formulas like `h2o`, `co2`, `ag`, `fe`,
+        // `na`. The 60-token block (single English letters a–z plus
+        // their ▁-prefixed variants) was the reason real-audit cases
+        // #15 «Судың формуласы» and #16 «Күмістің формулысы» were
+        // unreachable regardless of training data. Multi-letter
+        // English tokens (`male`, `is`, `the`, …) stay blocked so
+        // rust_book corpus leaks don't return.
         let vocab_size = bpe.vocab_size();
         let mut block_mask = vec![false; vocab_size];
         for id in 0..vocab_size as u32 {
             if let Some(tok) = bpe.id_to_token(id) {
-                if tok.chars().any(|c| {
-                    c.is_ascii_alphabetic()
-                        || matches!(c, '`' | '{' | '}' | '\\' | '[' | ']' | '<' | '>')
-                }) {
+                let ascii_letters = tok.chars().filter(|c| c.is_ascii_alphabetic()).count();
+                let has_code_glyph = tok
+                    .chars()
+                    .any(|c| matches!(c, '`' | '{' | '}' | '\\' | '[' | ']' | '<' | '>'));
+                if ascii_letters > 1 || has_code_glyph {
                     block_mask[id as usize] = true;
                 }
             }
@@ -193,8 +225,7 @@ fn generate_with_rep_penalty<B: Backend>(
         let last = logits.slice([0..1, (seq_len - 1)..seq_len, 0..model.vocab_size()]);
         let last_2d = last.squeeze::<2>(1);
         let probs = softmax(last_2d, 1);
-        let mut probs_vec: Vec<f32> =
-            probs.into_data().as_slice::<f32>().unwrap_or(&[]).to_vec();
+        let mut probs_vec: Vec<f32> = probs.into_data().as_slice::<f32>().unwrap_or(&[]).to_vec();
 
         // **v6.7 FST-lite mask** — hard-block any token that contains
         // non-Cyrillic / code glyphs. Applied BEFORE repetition penalty
@@ -257,6 +288,35 @@ struct EvalCase {
     notes: String,
 }
 
+/// Eval-time normalisation: lowercase + flatten Unicode sub/super-script
+/// digits to plain ASCII so a model emitting `h2o` matches an expected
+/// response written as `H₂O`. The BPE vocab is lowercase-ASCII-only;
+/// subscripts (`₂`, `₃`, …) and superscripts (`²`, `³`, …) are NOT in
+/// the vocab, so the model can never produce them — comparison must
+/// normalise both sides to the same canonical form.
+fn normalize_for_eval(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for ch in s.chars() {
+        let mapped = match ch {
+            '₀' | '⁰' => '0',
+            '₁' | '¹' => '1',
+            '₂' | '²' => '2',
+            '₃' | '³' => '3',
+            '₄' | '⁴' => '4',
+            '₅' | '⁵' => '5',
+            '₆' | '⁶' => '6',
+            '₇' | '⁷' => '7',
+            '₈' | '⁸' => '8',
+            '₉' | '⁹' => '9',
+            '⁻' => '-',
+            '⁺' => '+',
+            other => other,
+        };
+        out.extend(mapped.to_lowercase());
+    }
+    out
+}
+
 #[derive(Debug, Deserialize)]
 struct EvalPack {
     #[allow(dead_code)]
@@ -275,11 +335,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let mut accepted_total = 0;
         for (i, c) in pack.cases.iter().enumerate() {
             let predicted = responder.respond(&c.input);
-            let expected = c.expected_response.clone().unwrap_or_else(|| "<none>".into());
+            let expected = c
+                .expected_response
+                .clone()
+                .unwrap_or_else(|| "<none>".into());
             let pass = c.was_accepted
                 && c.expected_response.as_ref().is_some_and(|e| {
-                    let p = predicted.to_lowercase();
-                    let e = e.to_lowercase();
+                    let p = normalize_for_eval(&predicted);
+                    let e = normalize_for_eval(e);
                     // simple normalised-substring match (lenient)
                     p == e || p.contains(&e) || e.contains(&p)
                 });
@@ -317,9 +380,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .skip(1)
         .find(|a| !a.starts_with("--"))
         .cloned()
-        .unwrap_or_else(|| {
-            "Сәлеметсіз бе?".into()
-        });
+        .unwrap_or_else(|| "Сәлеметсіз бе?".into());
     let response = responder.respond(&prompt);
     println!("prompt:   «{}»", prompt);
     println!("response: «{}»", response);
