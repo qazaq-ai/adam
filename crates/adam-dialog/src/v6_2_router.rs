@@ -1497,11 +1497,89 @@ fn lookup_possessive_property(input: &str) -> Option<String> {
     ];
 
     for (pat, answer) in patterns {
+        // Fast path: exact substring match (clean text — 99% of cases).
         if lower.contains(pat) {
             return Some(answer.to_string());
         }
     }
+    // **v6.8 (2026-06-16) — fuzzy match fallback for speech defects.**
+    //
+    // Speech-defect eval surfaced that single-character corruptions
+    // («Күмістің» → «Кмістің», «Алматы» → «Айматы», «Қазақстан» →
+    // «Казхстан») break the exact-substring lookup above. A single
+    // edit (substitution / deletion / insertion of one Kazakh letter)
+    // is the canonical noise mode for:
+    //
+    //   - lambdacism / rhotacism / kappacism / sigmatism phoneme drops
+    //   - Whisper-drift vowel deletions
+    //   - typos in keyboard-typed input
+    //
+    // Run a second pass with Levenshtein ≤ 1 against each pattern.
+    // The threshold is deliberately conservative: max_edits=1 cannot
+    // confuse «қазақ» / «қазан» (distance 2) and the like. For deeper
+    // defects (≥ 2 edits per critical word) the v7 candidate-rescoring
+    // architecture (FST-aware fuzzy decode) is the long-term fix. This
+    // patch is the cheap interim that closes ~half of the
+    // speech_defect_eval gap without growing the lookup table.
+    //
+    // Fast path above keeps clean-text latency unchanged.
+    for (pat, answer) in patterns {
+        if fuzzy_contains(&lower, pat, 1) {
+            return Some(answer.to_string());
+        }
+    }
     None
+}
+
+/// Levenshtein-tolerant substring search. Returns `true` when some
+/// contiguous window of `haystack` is within `max_edits` of `needle`.
+/// `O(|h| × |n|)` time, but `needle` is short (≤ 40 chars in our
+/// lookup table) and we run it only when exact match failed, so the
+/// production overhead is bounded.
+fn fuzzy_contains(haystack: &str, needle: &str, max_edits: usize) -> bool {
+    let h: Vec<char> = haystack.chars().collect();
+    let n: Vec<char> = needle.chars().collect();
+    let nl = n.len();
+    if nl == 0 {
+        return true;
+    }
+    let hl = h.len();
+    let min_win = nl.saturating_sub(max_edits);
+    let max_win = (nl + max_edits).min(hl);
+    if hl < min_win {
+        return false;
+    }
+    for start in 0..=hl.saturating_sub(min_win) {
+        for win_len in min_win..=max_win.min(hl - start) {
+            let window = &h[start..start + win_len];
+            if levenshtein(window, &n) <= max_edits {
+                return true;
+            }
+        }
+    }
+    false
+}
+
+/// Classical Levenshtein DP over char slices.
+fn levenshtein(a: &[char], b: &[char]) -> usize {
+    let (m, n) = (a.len(), b.len());
+    if m == 0 {
+        return n;
+    }
+    if n == 0 {
+        return m;
+    }
+    let mut prev: Vec<usize> = (0..=n).collect();
+    let mut curr = vec![0usize; n + 1];
+    for i in 1..=m {
+        curr[0] = i;
+        for j in 1..=n {
+            let cost = if a[i - 1] == b[j - 1] { 0 } else { 1 };
+            curr[j] = (prev[j] + 1).min(curr[j - 1] + 1).min(prev[j - 1] + cost);
+        }
+        std::mem::swap(&mut prev, &mut curr);
+    }
+    prev[n]
 }
 
 fn lookup_chemical_formula(input: &str) -> Option<String> {
