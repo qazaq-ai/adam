@@ -120,7 +120,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     println!("\n{:-^60}", " summary by category ");
-    println!("{:<14} {:>6}  {:>6}  {:>6}", "category", "ok", "total", "rate");
+    println!(
+        "{:<14} {:>6}  {:>6}  {:>6}",
+        "category", "ok", "total", "rate"
+    );
     for (cat, (ok, tot)) in &per_cat {
         println!(
             "{:<14} {:>6}  {:>6}  {:>5.0}%",

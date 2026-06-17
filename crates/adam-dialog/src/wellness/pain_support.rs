@@ -193,11 +193,13 @@ const MEDICATION_REFUSAL: &str = "Дәрі-дәрмек тағайындау, д
 
 const PAIN_INTAKE_PROMPT: &str = "Қазір қай жеріңіз ауырып тұр?  Қысқа айтыңыз — мысалы «арқам», «ту\u{0301}рген тізе», «бел тұсы».";
 
-const BASELINE_PROMPT: &str = "Қазір ауырсыну 0-ден 10-ға дейін қанша?  0 — мүлдем ауырмайды, 10 — шегі жоқ ауырсыну.";
+const BASELINE_PROMPT: &str =
+    "Қазір ауырсыну 0-ден 10-ға дейін қанша?  0 — мүлдем ауырмайды, 10 — шегі жоқ ауырсыну.";
 
 const POSTURE_PROMPT: &str = "Жайлап отырыңыз.  Иықты босатыңыз.  Алақаныңызды ауырған жерге жайлап қойыңыз.  Дайын болсаңыз — иә деп жауап беріңіз.";
 
-const EXHALE_CUE_TEXT: &str = "Мұрныңызбен жай дем алыңыз.  Енді ұзақ шығарыңыз: һуууу… жел сияқты, асықпай.";
+const EXHALE_CUE_TEXT: &str =
+    "Мұрныңызбен жай дем алыңыз.  Енді ұзақ шығарыңыз: һуууу… жел сияқты, асықпай.";
 
 const RETEST_PROMPT: &str = "Қазір қайта тексеріңіз: 0-ден 10-ға дейін ауырсыну қанша?  Қозғалғанда ауырсыну қалай — өзгерді ме?";
 
@@ -217,9 +219,7 @@ const FORBIDDEN_HEALING_CLAIMS: &[&str] = &[
 
 fn forbidden_phrase_present(text: &str) -> bool {
     let lower = text.to_lowercase();
-    FORBIDDEN_HEALING_CLAIMS
-        .iter()
-        .any(|p| lower.contains(*p))
+    FORBIDDEN_HEALING_CLAIMS.iter().any(|p| lower.contains(*p))
 }
 
 // ── Lightweight intent helpers ───────────────────────────────────
@@ -559,7 +559,10 @@ mod tests {
         let r = run(&mut s, "");
         assert_eq!(s.stage, Stage::PainIntake);
         assert!(!r.exit);
-        assert!(r.reply.contains("дәрігер емеспін"), "missing role disclaimer");
+        assert!(
+            r.reply.contains("дәрігер емеспін"),
+            "missing role disclaimer"
+        );
         assert!(r.reply.contains("қай жеріңіз"), "missing intake question");
     }
 
@@ -671,7 +674,10 @@ mod tests {
         s.stage = Stage::Retest;
         let r = run(&mut s, "6");
         assert!(r.exit);
-        assert!(r.reply.contains("Дәрігерге"), "must recommend doctor on no change");
+        assert!(
+            r.reply.contains("Дәрігерге"),
+            "must recommend doctor on no change"
+        );
     }
 
     #[test]
