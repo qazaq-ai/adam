@@ -47,6 +47,14 @@ fn is_ignored_dir(name: &OsStr) -> bool {
 /// utilities) are allowed in Python because rewriting them in Rust
 /// would buy us nothing — their output, not their implementation,
 /// is what the kernel consumes.
+///
+/// **2026-06-17 — v6.8 extension.** Eval-suite builders live under
+/// `scripts/build_*.py`, `scripts/export_*.py`, and
+/// `scripts/validate_*.py`. Same off-runtime contract as the
+/// `tools/build_*/` exemption: the JSON packs they emit (e.g.
+/// `data/eval/safety_eval.json`, `data/eval/conv_dialog_eval.json`,
+/// `data/eval/speech_defect_eval.json`) are the artefacts the
+/// kernel consumes; the builder script is checked-in tooling only.
 fn path_is_off_runtime_data_prep(path: &Path, root: &Path) -> bool {
     let Ok(rel) = path.strip_prefix(root) else {
         return false;
@@ -67,6 +75,15 @@ fn path_is_off_runtime_data_prep(path: &Path, root: &Path) -> bool {
     if comps.len() >= 3 && comps[0] == "data" && comps[1] == "stt_models" && comps[2] == "_convert"
     {
         return true;
+    }
+    if comps.len() == 2 && comps[0] == "scripts" {
+        let file_name = &comps[1];
+        if file_name.starts_with("build_")
+            || file_name.starts_with("export_")
+            || file_name.starts_with("validate_")
+        {
+            return true;
+        }
     }
     false
 }
