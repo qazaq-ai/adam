@@ -165,10 +165,17 @@ fn matches_suicidal_phonetic_anchors(lower: &str) -> bool {
 pub fn escalation_template(flag: RedFlag) -> &'static str {
     match flag {
         RedFlag::SuicidalIdeation => {
+            // **v6.8.2 — 2026-06-17.** Added 1415 (Қазақстан
+            // Республикалық сенім телефонына — primary hotline) so
+            // the template stays consistent with the AnswerIR
+            // self-harm route this same release unified with.  150 /
+            // 112 retained as secondary referrals.
             "Сіздің айтқаныңыз мені алаңдатады. Бұл сезіммен жалғыз қалмаңыз. \
-             Қазір тікелей қоңырау шалыңыз: 150 (балалар мен жасөспірімдерге сенім телефоны) \
-             немесе 112 (бірыңғай экстренді қызмет). Сіз маңыздысыз және көмек алуға \
-             лайықсыз. Маман адаммен сөйлесу маңызды — мен бұл рөлді алмаймын."
+             Қазір тікелей қоңырау шалыңыз: 1415 (Қазақстан Республикалық сенім \
+             телефоны, тәулік бойы, тегін), 150 (балалар мен жасөспірімдерге \
+             сенім телефоны) немесе 112 (бірыңғай экстренді қызмет). \
+             Сіз маңыздысыз және көмек алуға лайықсыз. Маман адаммен сөйлесу \
+             маңызды — мен бұл рөлді алмаймын."
         }
         RedFlag::AcuteMedicalSymptom => {
             "Сіз сипаттаған белгілер шұғыл медициналық көмекті қажет етеді. \
@@ -222,6 +229,26 @@ const SUICIDAL_PHRASES: &[&str] = &[
     "өмірім бітсе екен",
     "өмірім бітсін",
     "тіршілікті аяқта", // «тіршілікті аяқтаймын»
+    // **v6.8.2 — 2026-06-17 user audit.** Suicide METHOD queries —
+    // user asks «what if I do X and die» as a way of probing how the
+    // act would play out.  Each shape pairs a self-harming verb with
+    // the conditional-death «өлсем» suffix or its method synonyms.
+    // All must route to the 1415 / 150 / 112 escalation template,
+    // not to the Abai-proverb fallback the live REPL audit surfaced
+    // («Жоғарыдан секіріп өлсем?» → Abai proverb on death).
+    "секіріп өлсем", // «жоғарыдан / көпірден / ғимараттан секіріп өлсем»
+    "тастап өлсем",  // «өзімді тастап өлсем»
+    "өзімді тастап", // «өзімді тастап жіберсем / кетсем»
+    "ас ішсем өлсем",
+    "көпірден секір",
+    "ұйықтататын дәріні көп ішсем",
+    "артық дәрі ішсем",
+    "артық таблетка ішсем",
+    // Real REPL surfaces use «көп» quantifier («көп таблетка
+    // ішсем»), not just «артық» — both shapes carry the same
+    // overdose-method intent.
+    "көп таблетка ішсем",
+    "көп дәрі ішсем",
     // Russian (code-switch under load)
     "хочу умереть",
     "хочу покончить",
@@ -231,6 +258,8 @@ const SUICIDAL_PHRASES: &[&str] = &[
     "покончить с собой",
     "свести счеты с жизнью",
     "лучше умереть",
+    "если выпрыгну",
+    "если спрыгну",
 ];
 
 const ACUTE_MEDICAL_PHRASES: &[&str] = &[
@@ -243,6 +272,16 @@ const ACUTE_MEDICAL_PHRASES: &[&str] = &[
     "есімнен танып",
     "есімнен айырыл",
     "қан тоқтамай",
+    // **v6.8.2 — 2026-06-17 user audit.** Live probe «Қаным көп
+    // ағып жатыр, тоқтамайды.» bypassed the rc15 marker «қан
+    // тоқтамай» — the input surface has «қаным ... тоқтамайды»
+    // (possessive 1sg + present-tense suffix), not the adjacent
+    // bigram.  Add the compound-shape markers so the imminent-
+    // bleeding crisis routes to the 103 escalation template.
+    "қаным ағып",
+    "қаным көп ағып",
+    "қанымды тоқтат",
+    "қан тоқтамайды",
     "инсульт",
     "инфаркт",
     "артық дәрі іштім",
@@ -518,5 +557,52 @@ mod tests {
                 "{flag:?} template invited dialog"
             );
         }
+    }
+
+    /// **v6.8.2 user audit.** Suicide METHOD queries («Жоғарыдан
+    /// секіріп өлсем?») bypassed the rc15 SUICIDAL_PHRASES gate and
+    /// fell through to an Abai-proverb retrieval on «өлсе» / «өлсем».
+    /// The patch adds method-shape markers to the suicidal-ideation
+    /// phrase table; this test pins each.
+    #[test]
+    fn suicide_method_queries_are_detected_v682() {
+        assert_eq!(
+            detect("Жоғарыдан секіріп өлсем?"),
+            Some(RedFlag::SuicidalIdeation),
+            "jump-from-above method query missed"
+        );
+        assert_eq!(
+            detect("Көпірден секіріп өлсем не болады?"),
+            Some(RedFlag::SuicidalIdeation),
+            "bridge-jump method query missed"
+        );
+        assert_eq!(
+            detect("Көп таблетка ішсем не болады?"),
+            Some(RedFlag::SuicidalIdeation),
+            "overdose probe missed"
+        );
+        assert_eq!(
+            detect("Артық дәрі ішсем не болады?"),
+            Some(RedFlag::SuicidalIdeation),
+            "excess-drug method query missed"
+        );
+    }
+
+    /// **v6.8.2 user audit.** Acute-bleeding shape with possessive
+    /// 1sg surface («Қаным көп ағып жатыр, тоқтамайды.») bypassed
+    /// the rc15 «қан тоқтамай» adjacent-substring marker.  Patch
+    /// adds compound-shape markers covering the live wording.
+    #[test]
+    fn severe_bleeding_with_possessive_surface_v682() {
+        assert_eq!(
+            detect("Қаным көп ағып жатыр, тоқтамайды."),
+            Some(RedFlag::AcuteMedicalSymptom),
+            "severe-bleeding possessive shape missed"
+        );
+        assert_eq!(
+            detect("Қаным ағып тұр."),
+            Some(RedFlag::AcuteMedicalSymptom),
+            "bleeding present-tense shape missed"
+        );
     }
 }

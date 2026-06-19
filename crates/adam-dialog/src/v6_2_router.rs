@@ -1735,6 +1735,31 @@ fn lookup_chemical_formula(input: &str) -> Option<String> {
         ("су ", "Судың", "H₂O"),
     ];
 
+    // **v6.8.2 — 2026-06-17 user audit.** Compound surface forms
+    // where a chemistry-stem element is part of a multi-word phrase
+    // with a non-chemistry meaning. The pre-fix gate caught the
+    // no-space «теміржол» but not the space-separated «темір жол»
+    // (railway), so «Темір жол таңбасы қандай?» wrongly returned
+    // «Темірдің формуласы — Fe.». Add explicit early-exit list — if
+    // the input is recognisably about a non-chemistry compound,
+    // refuse to chemistry-resolve regardless of the formula marker.
+    //
+    // Kept minimal: each entry is an unambiguous compound (no
+    // chemistry sense exists for that bigram).  «алтын адам»
+    // (archaeological exhibit), «алтын сағат» (gold watch) etc. are
+    // intentionally NOT here — they can legitimately be paired with
+    // a formula question («алтын адамдағы алтын қандай?»).
+    const NON_CHEMISTRY_COMPOUNDS: &[&str] = &[
+        "темір жол",   // railway
+        "теміржол",    // railway (no-space variant)
+        "темір тор",   // grate / lattice
+        "темір қол",   // iron-hand (metaphor)
+        "темір жүрек", // iron-heart (metaphor)
+    ];
+    if NON_CHEMISTRY_COMPOUNDS.iter().any(|c| lower.contains(c)) {
+        return None;
+    }
+
     for (stem, display, formula) in formulas {
         // **v6.8 hotfix 2026-06-16 — word-boundary check.** Codex
         // consultation #4 caught: bare `contains("темір")` matches
@@ -3266,5 +3291,31 @@ mod tests {
             !response.contains("Қазақстанның елордасы — Астана"),
             "must not fire capital template on bare statement, got: {response}"
         );
+    }
+
+    /// **v6.8.2 user audit Bug #3.** Live probe «Темір жол таңбасы
+    /// қандай?» (= «what is the railway sign?») wrongly returned
+    /// «Темірдің формуласы — Fe.» because the pre-fix word-boundary
+    /// gate caught no-space «теміржол» but not the space-separated
+    /// «темір жол».  The NON_CHEMISTRY_COMPOUNDS early-exit list now
+    /// short-circuits before the formula loop.
+    #[test]
+    fn chemistry_lookup_skips_temir_zhol_compound_v682() {
+        let r = lookup_chemical_formula("Темір жол таңбасы қандай?");
+        assert!(
+            r.is_none(),
+            "railway compound must NOT chemistry-resolve, got: {r:?}"
+        );
+        // No-space variant also excluded.
+        let r = lookup_chemical_formula("Теміржол таңбасы қандай?");
+        assert!(r.is_none(), "no-space railway also excluded, got: {r:?}");
+    }
+
+    /// Companion: pure-chemistry «Темірдің формуласы» still resolves.
+    #[test]
+    fn chemistry_lookup_resolves_temir_genitive_v682() {
+        let r = lookup_chemical_formula("Темірдің формуласы қандай?");
+        assert!(r.is_some());
+        assert!(r.unwrap().contains("Fe"));
     }
 }

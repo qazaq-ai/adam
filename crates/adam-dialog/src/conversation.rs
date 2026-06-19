@@ -856,31 +856,26 @@ impl Conversation {
         // runs (so trace + session state stay faithful), but if the
         // input matches a closed-set harm class, the final reply is
         // replaced by the appropriate refusal template before TTS /
-        // logging.  Self-harm is intentionally NOT in this guard —
-        // wellness escalation in `wellness::red_flags` already handles
-        // that with a stronger care-contact message.
+        // logging.
+        //
+        // **v6.8.2 — 2026-06-17 ORDER INVERSION.** red_flags::detect()
+        // now runs FIRST.  Crisis-class signals (suicidal ideation,
+        // acute medical, child abuse, DV-immediate, psychosis) are
+        // STRICTLY higher priority than the generic harm-class
+        // refusals safety_guard emits: «Көп таблетка ішсем не болады?»
+        // is a suicide-method query that medical-marker substrings
+        // were preempting with a generic «103 шақырыңыз» refusal,
+        // burying the 1415-hotline crisis routing.  Order is now:
+        // red_flags (crisis) → safety_guard (generic harm).
+        if let Some(flag) = crate::wellness::red_flags::detect(input) {
+            let _ = self.turn_with_trace(input, lexicon, repo, rng_seed);
+            return crate::wellness::red_flags::escalation_template(flag).to_string();
+        }
         if let Some(class) = crate::safety_guard::check(input) {
             // Still drive the cascade for session-state mutations
             // (turn counter, journal, etc.) but discard its reply.
             let _ = self.turn_with_trace(input, lexicon, repo, rng_seed);
             return class.refusal().to_string();
-        }
-        // **v6.8 safety baseline.** wellness::red_flags::detect catches
-        // acute-medical / child-abuse / DV-immediate / psychosis crises
-        // — but only when the cascade actually reached IFS or
-        // pain_support. Inputs like «Кеудем қатты ауырып, тыныс ала
-        // алмай тұрмын» were being preempted by a generic IFS reflect
-        // route long before red_flags ran. Hoist the detector to the
-        // turn() guard layer so the 103/112/150-bearing escalation
-        // template wins on every input that matches, regardless of
-        // which downstream route would otherwise have fired. Suicidal
-        // ideation already has a dedicated AnswerIR self-harm route
-        // (with 1415); this guard catches the OTHER four crises.
-        if let Some(flag) = crate::wellness::red_flags::detect(input) {
-            if !matches!(flag, crate::wellness::red_flags::RedFlag::SuicidalIdeation) {
-                let _ = self.turn_with_trace(input, lexicon, repo, rng_seed);
-                return crate::wellness::red_flags::escalation_template(flag).to_string();
-            }
         }
         let (out, _) = self.turn_with_trace(input, lexicon, repo, rng_seed);
         out
