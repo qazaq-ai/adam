@@ -200,11 +200,14 @@ path forward.
   metrics by end of 12-month horizon, leading to seed round in 2027
 
 **Why now:**
-- Working demonstrator (adam) with 1 300+ tests, 487+ versioned
-  releases, public repo with green CI
+- Working demonstrator (adam v6.8.0) with 274 test files, 540+
+  versioned releases, public repo with green CI, five-suite
+  production eval dashboard (school program 159 / 159, conv dialog
+  52 / 52, safety 20 / 20, v6.7 real audit 25 / 26)
 - 30-language generalisation frontier already mapped
 - Clear measurable goals (predictability / cheapness / safety) with
-  current metrics (300 MB / 21 ms p50 / 0% GPU)
+  v6.8.0 metrics (**314 MB peak RSS · 13.6 ms p50 production cascade ·
+  0 % GPU**)
 - 5-month solo development pace demonstrates founder execution
   discipline
 
@@ -226,8 +229,8 @@ permission). Pull requests are welcome on:
 - **Rust performance optimisations** (we run on M2 8GB; tighter
   loops always welcome)
 - **CI / tooling** (GitHub Actions workflows, lint setups)
-- **Test coverage** (current: 1 300+ tests; we don't reject test-only
-  PRs)
+- **Test coverage** (current: 274 test files across 28 crates +
+  10 tools; we don't reject test-only PRs)
 - **Documentation** (typos, clarifications, examples)
 - **New language ports** (per linguist collaboration above)
 - **Bug fixes** (with regression tests)

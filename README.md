@@ -5,50 +5,10 @@
 <h1 align="center">adam</h1>
 
 <p align="center">
-  <i>Neurosymbolic agglutinative AI — typed, deterministic, watch-class fast.</i><br>
-  <i>Kazakh-first applied demonstrator of the Qazaq IR architecture.</i><br>
+  <i>Deterministic Kazakh-first AI kernel — typed, offline, watch-class fast.</i><br>
+  <i>An applied demonstrator of neurosymbolic agglutinative reasoning.</i><br>
   <i>Қазақ тіліне арналған, толық болжамды диалог жүйесі — таза Rust тілінде.</i>
 </p>
-
-<p align="center">
-  <b>Why this project exists →</b> <a href="docs/MANIFESTO.md"><code>docs/MANIFESTO.md</code></a><br>
-  <b>v6.2 architecture →</b> <a href="docs/v6_2_architectural_redesign.md"><code>docs/v6_2_architectural_redesign.md</code></a><br>
-  <b>How adam compares to LLMs →</b> <a href="docs/COMPARISON.md"><code>docs/COMPARISON.md</code></a><br>
-  <b>Due-diligence pack →</b> <a href="DUE_DILIGENCE.md"><code>DUE_DILIGENCE.md</code></a>
-</p>
-
-<!-- ─────────────────────────────────────────────────────────────
-     v6.3 honest split (2026-06-02 codex audit follow-up).
-     Production = v6.2 on `main` (numbers below).
-     Research-demo = v6.3 on experimental/v6_3_phonemic_foundation.
-     ───────────────────────────────────────────────────────────── -->
-
-> **Two tracks, on purpose.**
->
-> - **`main` — v6.2 deterministic core.**  Rule-based dialog kernel:
->   morph → frame → QueryIR → retrieval → realiser, plus rc15 safety
->   guard and rc18 OOD discipline.  **314 MB peak RSS, 0 GPU, 0
->   network, byte-deterministic.**  Blind eval: **97 / 100** on the
->   curated Kazakh battery.  Production binaries (voice REPL,
->   `adam_blind_eval`, `adam_chat`) opt in via `ADAM_V6_2=1`; the
->   Rust library default stays OFF pending a v6.2 sibling test
->   suite — the rc19/rc20 default-flip attempt surfaced ~20
->   v6.1-cascade-specific regression tests
->   (live_holdout_*, factual_eval_100, end_to_end self-intro /
->   cross-slot / border-fact, adversarial_dialog_v1,
->   curriculum_v4995_*) whose assertions check v6.1 wording rather
->   than v6.2 behaviour.  Migrating those is a v6.6+ arc.
->
-> - **`tools/voice_repl_v6_3` — v6.3 voice surface.**
->   Wraps the v6.2 core in a microphone → STT → fuzzy / LM rescoring →
->   intent classifier → router → TTS loop.  **Honest hybrid:** the
->   dialog core stays 100 % deterministic; neural components (Whisper.cpp
->   STT, Piper TTS, ~1 M-param BPE LM, ~1 M-param intent classifier)
->   live only at the speech surface and never invent facts.
->
-> See <a href="DUE_DILIGENCE.md"><code>DUE_DILIGENCE.md</code></a>
-> for current test totals, repo state, known limitations and
-> reproducibility commands across both tracks.
 
 <p align="center">
   <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.8.0-2EA44F?style=for-the-badge" alt="version"></a>
@@ -56,579 +16,275 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey?style=for-the-badge" alt="platform">
-  <a href="https://github.com/qazaq-ai/adam/commits/main"><img src="https://img.shields.io/github/last-commit/qazaq-ai/adam?style=for-the-badge" alt="last commit"></a>
   <a href="https://github.com/qazaq-ai/adam/stargazers"><img src="https://img.shields.io/github/stars/qazaq-ai/adam?style=for-the-badge" alt="stars"></a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/school%20program%20eval-159%2F159-2EA44F?style=flat-square" alt="school program eval 100%">
-  <img src="https://img.shields.io/badge/conv%20dialog%20eval-52%2F52-2EA44F?style=flat-square" alt="conv dialog eval 100%">
-  <img src="https://img.shields.io/badge/safety%20eval-16%2F16-2EA44F?style=flat-square" alt="safety eval 100%">
-  <img src="https://img.shields.io/badge/v6.7%20real%20audit-24%2F26-9CCC65?style=flat-square" alt="v6.7 real audit 92%">
+  <img src="https://img.shields.io/badge/school%20program%20eval-159%2F159-2EA44F?style=flat-square" alt="school program 100%">
+  <img src="https://img.shields.io/badge/conv%20dialog%20eval-52%2F52-2EA44F?style=flat-square" alt="conv dialog 100%">
+  <img src="https://img.shields.io/badge/safety%20eval-20%2F20-2EA44F?style=flat-square" alt="safety 100%">
+  <img src="https://img.shields.io/badge/v6.7%20real%20audit-25%2F26-2EA44F?style=flat-square" alt="real audit 96%">
   <img src="https://img.shields.io/badge/speech%20defect%20baseline-37%2F71-FBC02D?style=flat-square" alt="speech defect baseline 52%">
   <img src="https://img.shields.io/badge/production%20p50-13.6%20ms-2EA44F?style=flat-square" alt="production p50">
-  <img src="https://img.shields.io/badge/production%20p95-19.6%20ms-2EA44F?style=flat-square" alt="production p95">
   <img src="https://img.shields.io/badge/peak%20RSS-314%20MB-2EA44F?style=flat-square" alt="peak RSS">
   <img src="https://img.shields.io/badge/0%20GPU%20%2F%200%20network-2EA44F?style=flat-square" alt="0 GPU / 0 network">
-  <img src="https://img.shields.io/badge/v6.3%20voice%20surface-Whisper%20%2B%20Piper%20%2B%20tiny%20LM-9CCC65?style=flat-square" alt="v6.3 voice">
   <img src="https://img.shields.io/badge/world%20core-3444%20curated%20/%204116%20facts-9CCC65?style=flat-square" alt="world core">
-  <img src="https://img.shields.io/badge/lexicon-25.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
-  <img src="https://img.shields.io/badge/intents-41%20router%20%2F%2052%20neural%20classifier-2EA44F?style=flat-square" alt="intents">
+  <img src="https://img.shields.io/badge/intents-41%20router-2EA44F?style=flat-square" alt="intents">
   <img src="https://img.shields.io/badge/hallucinations%20within%20curated%20domains-0-2EA44F?style=flat-square" alt="hallucinations within curated domains">
 </p>
+
+<p align="center">
+  <b><a href="docs/MANIFESTO.md">Why</a></b> ·
+  <b><a href="DUE_DILIGENCE.md">Due diligence</a></b> ·
+  <b><a href="docs/COMPARISON.md">vs LLMs</a></b> ·
+  <b><a href="CHANGELOG.md">Changelog</a></b> ·
+  <b><a href="COLLABORATION.md">Collaborate</a></b>
+</p>
+
+---
+
+## TL;DR
+
+**adam is a deterministic Kazakh language AI kernel that fits on a watch.** Every reply traces to a curated source via a typed pipeline (Composition → Frame → QueryIR → FrameIndex → realiser). 314 MB peak RSS. 0 GPU. 0 network. 13.6 ms median production response. **0 hallucinations within curated-domain coverage** by construction — there is no free-text generator in the answer path.
+
+Built on the mathematically regular morphology of Kazakh. Designed to extend across ~30 catalogued agglutinative languages. Pure Rust. BUSL-1.1.
+
+```bash
+# Try it — 60 seconds, no GPU, no network:
+cargo build --release --bin adam_chat
+ADAM_V6_2=1 ./target/release/adam_chat
+# Қазақстанның астанасы қандай?
+# > Қазақстанның елордасы — Астана қаласы (1997 жылдан бастап).
+```
 
 ---
 
 ## What's new in v6.8.0
 
-**Production hybrid stack + five-suite eval infrastructure.**
-Consolidates the v6.6 generative pivot and v6.7 staged training
-breakthrough into a verifiable trust-signal release. The v6.2
-deterministic core stays the production narrative; v6.8 adds the
-eval discipline + cascade patches needed to publish honest
-capability numbers.
+**Production hybrid stack + five-suite eval infrastructure.** Consolidates the v6.6 generative pivot and v6.7 staged training breakthrough into a single shipped release with verifiable trust signals. Five production eval suites measured against the full `respond_full` cascade (`ADAM_V6_2=1`):
 
-Production cascade (`respond_full` binary, `ADAM_V6_2=1`):
-
-| Suite | Accepted | Probes | Semantic score |
-|---|---|---|---|
+| Suite | Accepted | Probes | Score |
+|---|---:|---:|---:|
 | `school_program_eval` (14 subjects) | 159 | 0 | **100 %** |
-| `conv_dialog_eval` (real voice REPL turns + scripted) | 52 | 31 | **100 %** |
-| `safety_eval` (13 categories, Codex #3 release gate) | 16 | 36 | **100 %** |
-| `v6_7_real_audit_eval` | 26 | 0 | 92 % |
+| `conv_dialog_eval` (real voice REPL + scripted) | 52 | 31 | **100 %** |
+| `safety_eval` (13 categories, Codex release gate) | 20 | 32 | **100 %** |
+| `v6_7_real_audit_eval` | 26 | 0 | **96 %** |
 | `speech_defect_eval` (8 defect categories) | 71 | 9 | 52 % honest baseline |
 
-The headline shift is **stack measurement honesty**: the LM-only
-`respond` binary reports the v6.7 generative head ceiling alone
-(school 78 %); the `respond_full` binary runs the full Phase 16
-deterministic cascade + Phase 17 world_core domain index (school
-**100 %** at v6.8 HEAD). All five eval suites are measured
-against `respond_full` — no LM-only scoring in the dashboard.
+The headline shift is **stack measurement honesty**: the LM-only `respond` binary reports the v6.7 generative head ceiling alone (school 78 %); the `respond_full` binary runs the full deterministic cascade + world_core domain index (school **100 %**). All five suites are measured against `respond_full` — no LM-only scoring in the dashboard.
 
-v6.8 also closes three production routing gaps surfaced by the
-new suites: global `wellness::red_flags::detect` hoist at
-`Conversation::turn()` (acute-medical 103/112 escalation
-reachable on every matching input); `safety_guard::WEAPON_MARKERS`
-extended with «пистолет» / «мылтық»; `HARM_OTHERS_MARKERS`
-tolerates the «қалай» connector between object and verb.
+v6.8 also closes three production routing gaps (global `red_flags::detect` hoist at `Conversation::turn()`, weapon / harm-other marker expansion, past-tense math verbs), surfaced by the new suites and patched in [c67b37b3](https://github.com/qazaq-ai/adam/commit/c67b37b3).
 
-## What's new in v6.7.0
-
-**Staged training breakthrough (real audit 24 % → 90 %) +
-`wellness::pain_support`.** Phase 1 pretrain on 28 k `world_core`
-RAW text → Phase 2 fine-tune on conv-only pack lifts the real
-audit eval from 24 % to **83 %**; iteration 4 adds FST-lite +
-sentence-boundary stop → **90 %**. Ships the
-`adam-dialog::wellness::pain_support` deterministic state machine
-(PainIntake → Baseline → Posture → ExhaleCue → Retest) with hard
-safety constraints (no medication advice, defers to доктор / 103
-on red flags).
-
-## What's new in v6.6.0
-
-**Drift-aware BPE + LM generative pivot.** Exit the rc25
-patching cycle. Disable `lexicon_validator` (false positives —
-`дәулет→сәулет`, `жасым→жасы` — outweighed the recall gain),
-retrain BPE + LM on a drift-augmented corpus, promote
-drift-aware tokenizer + LM to canonical paths. **TP 25 % → 75 %**
-on the rc25-audit eval; **95 %** on a 38-case wikipedia-mined
-broad eval (vs baseline 76 %). Tokenizer split: intent
-classifier reverted to pre-v6.6 BPE; generative head uses
-drift-aware vocab — two artefact paths, documented as canonical
-separation.
-
-## What's new in v6.5.0
-
-**Blind eval at 97 % + Kazakh-only templates in v6.2 cascade.**
-rc14 (2026-06-10) shipped the blind-eval scoreboard the external
-audit recommended; six iterations later (rc15 safety guard, rc16
-environment alignment, rc17 factual + refusal patterns, rc18 OOD
-discipline, rc19 doc cleanup, rc20 cognitive_eval Kazakh-only
-templates) the curated Kazakh battery sits at **97 / 100**.
-The Rust-level `ADAM_V6_2` default stays OFF pending a v6.6+
-v6.2-sibling test suite arc; production binaries opt in via the
-existing env-var.  Voice REPL is the immediate beneficiary —
-Piper Kazakh TTS now reads adam's «what can I help with» template
-cleanly aloud (no «curated» / «Rust» / «LLM» / «live-feed» /
-«ASCII» tokens).
-
-## What's new in v6.2.0
-
-**Neurosymbolic agglutinative algebra.** The architectural redesign
-promised at v6.1.50 lands as the new
-[`adam-algebra`](crates/adam-algebra) crate plus an integration
-bridge in `adam-dialog::v6_2_router`.  Ships opt-in behind
-`ADAM_V6_2=1`; the production binaries (voice REPL, `adam_chat`,
-`adam_blind_eval`) set it at startup.  Library default flip is a
-v6.6+ arc — see the two-tracks note at the top of this file.
-
-The full v6.2 pipeline runs as **pure typed-data manipulation**:
-
-```text
-input → morph lattice → Composition[] → Frame → QueryIR
-                                          ↓
-                              FrameIndex + math_solver + system_clock
-                                          ↓
-                                       realiser → output
-```
-
-### Honest numbers (release build, M2 Air)
-
-adam runs in three latency classes.  All numbers are real and
-reproducible from this repo; **don't conflate the classes** when
-comparing to other systems.
-
-| Class | What it measures | Median | p95 | Memory |
-|---|---|---|---|---|
-| **A. Typed kernel micro-path** | `adam-algebra` Stage 3: typed Frame → Index → answer.  Excludes STT, dialog router, NLG, anaphora resolution. | **~470 ns** | ~600 ns | <50 MB RSS |
-| **B. Production dialog cascade** | `adam-dialog` 30-query real battery: morph → semantics → router → retrieval → reasoning → realiser.  Excludes STT/TTS. | **13.6 ms** | 19.6 ms | **314 MB RSS** |
-| **C. Full voice loop** (v6.3 voice REPL) | Mic capture → Whisper STT → cascade → Piper TTS.  Hot path for the audio interactive flow. | not measured (interactive) | n/a | + 2.3 GB STT + 1.1 GB TTS on disk |
-
-Class A is the typed-algebra micro-benchmark — useful for comparing
-kernel versions to each other, **not** for comparing adam to a full
-NLP system.  Class B is the honest production number — what a real
-text query through `adam_chat` looks like.  Class C is the voice
-demonstrator and depends on Whisper / Piper sizes.
-
-#### How this compares to LLMs
-
-**Different system class — not a head-to-head replacement.**  Llama
-3.1 / Claude / GPT cover 128K–1M token context across hundreds of
-languages and broad open-domain dialogue.  adam covers a narrow
-deterministic Kazakh-first reasoning surface on curated facts.
-adam is faster, smaller, and 0-GPU **only because the problem
-scope is narrower**.
-
-What adam offers that LLMs cannot:
-- **Byte-deterministic answers** — same input → same output, no
-  sampling, no temperature, regression-testable in CI.
-- **0 GPU, 0 network** — runs offline on M2 Air, suitable for
-  airgapped / regulated / restricted environments.
-- **Auditable provenance** — every fact ships from
-  `data/world_core/` JSONL files; no hidden training corpus.
-- **Native Kazakh morphology** — FST-grounded analyses, not
-  byte-pair guessed.
-
-What adam does NOT offer (and is not trying to):
-- Broad open-domain general knowledge across many languages.
-- Long-context reasoning at LLM scale.
-- Creative / open-ended generation.
-
-For a fair comparison, a same-task blind eval (300–1000 Kazakh
-queries across factual / OOD / safety / tutor / multi-turn) is
-needed.  See [v6.5 audit-to-training loop](docs/training_runbook.md)
-for the current methodology.
-
-**Published-benchmark anchor (rc21 addition).**
-Most-cited Kazakh academic benchmark is **KazMMLU** ([arXiv:2502.12829](https://arxiv.org/abs/2502.12829),
-23 k Kazakh + Russian MCQ across STEM / humanities / social):
-
-| Model | KazMMLU avg | Resource cost |
-|---|---|---|
-| **adam** | not yet run on KazMMLU (97 / 100 on own 100-item battery) | **314 MB RSS, 0 GPU, $0 / query** |
-| GPT-4o | 76.6 % | API only; $2.50 / $10.00 per 1 M tok |
-| Llama 3.1 70B | 56.2 % | ~140 GB FP16, 2-4× H100 |
-| Llama 3.1 8B | 39.7 % | ~16 GB FP16, 1× A100 |
-| Claude (3.5 / 3.7 / 4) | **no Kazakh-specific score published** | API only; $3.00 / $15.00 per 1 M tok |
-
-See [`docs/COMPARISON.md`](docs/COMPARISON.md) for the full table
-(hallucination rate, FLORES coverage, Sherkala-tuned Llama, etc.)
-plus honest gaps — chiefly that **adam has not yet been run on
-KazMMLU itself**; that's the rc22+ apples-to-apples step.
-
-### What ships in `adam-algebra` (8 modules, 195 tests)
-
-- **Stage 1 — `operator` + `root` + `composition`** — typed
-  agglutinative algebra. `Root × SuffixOp[]` with slot bookkeeping
-  (case / number / possessive / tense / voice / negation / polite).
-  Round-trip with `adam_kernel_fst::Analysis` byte-stable.
-- **Stage 2 — `frame`** — `Frame { agent, predicate, object,
-  modifiers, modality, polarity, evidentiality, tense, aspect }`.
-  Subsumes v6.1's scattered `Fact` / `SentenceFrame` /
-  `SentenceDecomposition` / `Claim`. 22 typed predicates.
-- **Stage 3 — `query`** — typed «frame with a hole»:
-  `QueryIR { …, focus, form, answer_shape, sense_hints,
-  domain_filter, language_filter }`. Subsumes v6.1's
-  `PredicateFocus` + `QuestionShape` + `AnswerShape` + `Intent`
-  + slot_inventory.
-- **Stage 4 — `index`** — `FrameIndex` with 5 secondary indexes
-  (predicate / agent / object / modifier / domain / language).
-  Insert O(M), query O(min-index-size). Property-tested against
-  brute-force linear filter.
-- **Stage 4.5 — `dialog_battery`** — 79 real Kazakh / Russian
-  REPL questions across 14 domains (biographical / geographical /
-  institutional / legal / sense-ambiguous / МО РК / programming /
-  Rust / math / system-clock / Soviet+Kazakh historical dates).
-  **CI quality gate: 79/79 must-pass, 0 known gaps, 0 regressions.**
-- **Stage 4.6+ — `math_solver`** — pure-function deterministic
-  math in Russian + Kazakh + ASCII. Numbers 0-99 in both
-  languages, operators (+ − × ÷ × ÷ mod ^ %), trig (sin / cos /
-  tan / arcsin / arccos / arctan), constants π / e, square root,
-  decimals. Left-to-right chained-imperative semantics.
-- **Stage 5 — sense disambiguation** — cross-shape
-  `TimeAnchor::Year(N)` ↔ phrase «N жыл» matching; bilingual
-  language-tag filter for same-root same-domain ambiguity
-  («гравитация» / «фотосинтез» / «днк» KZ vs RU).
-- **Stage 7.1 — `corpus_loader`** — `load_world_core(path)`
-  reads `data/world_core/*.jsonl`. **65 files → 3 444 entries →
-  4 116 facts → 0 dropped** (v6.3.0-rc2 live counts).
-- **Stage 7.2 — `realiser`** — typed `Frame → Kazakh surface`.
-  Pure function. Every v6.1 NLG rule family expressible.
-- **Stage 7.3 — `system_clock`** — OS wall-clock provider with
-  hand-rolled Kazakh calendar (no chrono dep).
-
-### What ships in `adam-dialog::v6_2_router`
-
-- `is_v6_2_active()` — reads `ADAM_V6_2` env var (default OFF; production binaries set `ADAM_V6_2=1` at startup; v6.5.0-rc19 deferred the library-wide default flip until v6.1→v6.2 test regressions close in rc20+).
-- `answer(input) -> Option<String>` — top-level entry. Routes:
-  math_solver / system_clock / FrameIndex + realiser.
-- Lazy `OnceLock` corpus from `data/world_core/*.jsonl` +
-  battery-augmented Russian aliases.
-- `tests/v6_2_integration.rs`: 11 real Kazakh / Russian questions
-  end-to-end. All pass.
-
-### Live REPL demo
-
-```bash
-# Interactive (math, time, retrieval — all routed):
-cargo run --release --example chat -p adam-algebra
-
-# Latency bench + dialog battery report:
-cargo run --release --example bench_pipeline -p adam-algebra
-
-# Quality gate:
-cargo test -p adam-algebra dialog_battery_meets_quality_gate -- --nocapture
-
-# Integration through adam-dialog router (env-gated):
-ADAM_V6_2=1 cargo test -p adam-dialog --test v6_2_integration
-```
-
-### Default-ON discipline (v6.5.0-rc19+)
-
-`ADAM_V6_2` is **default ON** since v6.5.0-rc19.  The flip happened
-after the blind eval scoreboard (`adam_blind_eval`, rc14) crossed
-the ≥90 % bar — final pre-flip number was **97 / 100** on rc18.
-The v6.1 cascade is preserved as an escape hatch: set
-`ADAM_V6_2=0` (or `false` / `off` / `no`) to fall back.
-
-See [`CHANGELOG.md` § 6.2.0](CHANGELOG.md) for the full inventory
-and [`docs/v6_2_architectural_redesign.md`](docs/v6_2_architectural_redesign.md)
-for the design doc that preceded the work.
+Full release history: [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
-## 30-second pitch
+## Two product directions
 
-> **adam is a neurosymbolic AI research kernel** built on the
-> agglutinative morphology of Kazakh. Every output traces to a
-> curated source via a typed pipeline (Composition → Frame →
-> QueryIR → FrameIndex → realiser). Three structural advantages
-> over LLMs by **construction**:
->
-> 1. **Predictability** — every claim cites a curated `(pack,
->    sample_id)` provenance; the cascade is byte-identical given
->    `(input, seed, world_core)`.
-> 2. **Cheapness** — single Rust binary, **314 MB peak RSS** on the
->    full 30-query production cascade, **0 % GPU**, **0 network**.
->    Runs offline on an M2 Air at **13.6 ms p50 / 19.6 ms p95**
->    per query (production cascade — see *Honest numbers* section
->    above for the three latency classes).  Voice loop adds STT
->    (~2.3 GB) + TTS (~1.1 GB) on disk.
-> 3. **Architectural hallucination-freedom within curated domains** —
->    every fact-bearing reply emits from a `FrameIndex` hit + Stage 7
->    realiser, or falls through to v6.1 cascade / honest refusal. No
->    probabilistic free generation anywhere in the answer path.
->    *Scope caveat:* «0 hallucinations» holds for queries the
->    curated corpus covers; off-corpus queries route to v6.1
->    fallback (which can still misroute on edge cases — see the
->    open Stage 8 backlog) or to «нет данных».
->
-> Designed to extend across ~30 catalogued agglutinative
-> languages — currently demonstrated on Kazakh; cross-language
-> ports are a research goal, not a shipped capability. Pure Rust.
-> BUSL-1.1.
+The strategic focus for the post-v6.8 arc is **not** a Kazakh ChatGPT clone — adam's architecture wins where LLMs structurally lose:
 
-> **Reading order:** [MISSION.md](MISSION.md) (thesis) →
-> [v6.2 design doc](docs/v6_2_architectural_redesign.md) (current
-> architecture) → [RESEARCH.md](RESEARCH.md) (open questions) →
-> [COLLABORATION.md](COLLABORATION.md) (partner terms) →
-> [AGENTS.md](AGENTS.md) (orientation for automated scouts) →
-> [CHANGELOG.md](CHANGELOG.md) (full release history).
+### 1. Kazakh school tutor
 
-## Why neurosymbolic (not LLM)
+Curriculum-verified answers, offline, 0 hallucinations within the curated scope. The `school_program_eval` suite (14 subjects × 159 cases at 100 % semantic) is the trust foundation; the curriculum SQLite DB at [`data/curriculum/curriculum.db`](data/curriculum/curriculum.db) holds the productionised Q&A pipeline.
 
-Modern LLMs carry three structural problems we treat as **not
-inevitable**. v6.2's *neurosymbolic* architecture means: neural
-components produce **typed closed-set** outputs only (sense
-disambiguation candidates, focus detection, intent class); a
-deterministic verifier owns truth. No free text generation
-anywhere in the answer path.
+### 2. Industrial knowledge assistant (read-only, voice-first)
 
-| The three diseases of probabilistic AI | adam's target | How v6.2 enforces it |
+Target verticals: SOPs / охрана труда / training manuals / maintenance / incident reporting, with a voice interface for hands-occupied environments. Adam's deterministic core + auditable provenance + Kazakh-native morphology + 314 MB RSS + offline mode form a moat where general LLMs cannot follow:
+
+| Property | adam | General LLM |
 |---|---|---|
-| **Black box** — opaque internals, no source attribution | **Predictability** — every claim traceable | `FrameIndex.query` returns a `RankedFrame` with `FrameId`; `world_core/*.jsonl` is the only fact source; every realised sentence is a function of `(Frame, focus, slot)` |
-| **Resource cost** — billions of params, GPU clusters | **Cheapness** — single binary | 314 MB RSS, 0 % GPU, 0 network, 13.6 ms p50 production cascade on M2 Air (full 30-query battery) |
-| **Hallucination risk** — confident generation of plausible-sounding wrong content | **Safety** — architectural impossibility | Realiser is a typed pure function over a curated Frame; if the index returns `None`, the router falls through to v6.1 cascade (no invention) |
+| Per-answer traceability | ✓ ProofObject + world_core | ✗ |
+| Offline operation | ✓ 314 MB RSS · 0 GPU · 0 network | ✗ |
+| Byte-deterministic | ✓ rule-based core | ✗ |
+| Low-end hardware (M2 8 GB) | ✓ | ✗ |
+| Native Kazakh | ✓ FST + 3 444 facts | weak |
+| Closed-set safety control | ✓ red_flags + safety_guard | hard |
 
-**Hypothesis:** agglutinative languages — Kazakh in particular —
-exhibit unusually mathematical morphology. Every word decomposes
-into a root + a typed suffix chain (case, number, tense, person,
-possessive, polarity, modality). Composition is **rule-bound**.
-That structure becomes the substrate for a typed runtime: FST
-morphology produces `Composition`, the algebra layer lifts it
-into `Frame`, retrieval typed via `QueryIR`, output realised as
-pure-function `Frame → surface`. **No probabilistic free
-generation. No retrained-from-scratch behaviour per release.**
+---
 
 ## Quick start
 
 ```bash
-# v6.2 live REPL demo (math + clock + retrieval routed):
-cargo run --release --example chat -p adam-algebra
+# Build the production binaries (5–10 min on M2 Air):
+cargo build --release --bin adam_chat --bin voice_repl_v6_3 --bin respond_full
 
-# v6.2 latency bench + dialog battery quality report:
-cargo run --release --example bench_pipeline -p adam-algebra
+# 1) Text REPL — production dialog cascade:
+ADAM_V6_2=1 ./target/release/adam_chat
 
-# v6.2 integration test through adam-dialog router:
-ADAM_V6_2=1 cargo test -p adam-dialog --test v6_2_integration
+# 2) Voice REPL — Whisper STT → cascade → Piper TTS:
+ADAM_V6_2=1 ./target/release/voice_repl_v6_3 --loop-mode --mode respond
 
-# v6.1 cascade (default, unchanged):
-cargo build --release -p adam-dialog --bin adam_chat
-./target/release/adam_chat
-./target/release/adam_chat --once "Қасқыр — тірі ме?"
-./target/release/adam_chat --trace
-./target/release/adam_chat --tts
+# 3) Run any production eval suite:
+./target/release/respond_full data/eval/safety_eval.json
+./target/release/respond_full data/eval/school_program_eval.json
+./target/release/respond_full data/eval/conv_dialog_eval.json
 
-# FST synthesiser + analyser:
-cargo run --release -p adam-kernel-fst --bin adam_fst -- synth --root бала --plural --case dat
-# → балаларға
-
-# Full foundation validation (~30 s on M2):
+# 4) Full foundation validation (~30 s):
 bash ./scripts/validate_foundation.sh
 ```
 
-## Architecture — ARK (Agglutinative Reasoning Kernel)
+The voice loop auto-downloads no models. If `data/stt_models/ggml-shirali-kz.bin` (Shirali Kazakh-fine-tuned Whisper, 465 MB) is missing, voice REPL falls back to the in-tree DTW phoneme STT.
 
-Three pillars:
+---
 
-- **A**gglutinative — Kazakh morphology decomposes deterministically (root + typed suffixes); composition is rule-bound, not learned.
-- **R**easoning — a curated knowledge graph ([`data/world_core/*.jsonl`](data/world_core)) + a forward-chaining reasoner (10 active rules) produces every fact-bearing claim. Every output cites a source.
-- **K**ernel — system-runtime, not a probabilistic estimator. ARK has small trained components (selection-weights perceptron, suffix-chain priors, root-affinity PMI) but they sit inside the kernel as inspectable layers, not at the centre.
-
-### v6.2 typed pipeline (`adam-algebra`)
+## Architecture
 
 ```text
-input ─▶ FST lattice ─▶ Composition ─▶ Frame ─▶ QueryIR ─▶ FrameIndex ─▶ Realiser ─▶ output
-        (kernel-fst)    (operator +    (semantic  (frame    (typed       (Frame →
-                         root +         record)    with a    retrieval)   Kazakh)
-                         composition)              hole)
+                          ┌───────── voice REPL (optional) ─────────┐
+                          │                                          │
+mic ──cpal──▶ Whisper STT ──▶ fuzzy + LM rescore ──▶ intent classifier ─┐
+                          │                                          │ │
+                          └──── 100 % deterministic dialog core ─────┘ │
+                                                                      ▼
+                  ┌─── adam-kernel-fst ──────────────────────────────────┐
+input (text) ────▶│ FST morphology · 25 k-root Kazakh Lexicon            │
+                  └─── ▼ Analysis ───────────────────────────────────────┘
+                  ┌─── adam-algebra ─────────────────────────────────────┐
+                  │ Composition (root + typed suffix chain)              │
+                  │ ─▶ Frame (agent · predicate · object · modifiers)    │
+                  │ ─▶ QueryIR (frame with a hole + focus + shape)       │
+                  └─── ▼ ────────────────────────────────────────────────┘
+                  ┌─── adam-dialog::v6_2_router ─────────────────────────┐
+                  │ math_solver · system_clock · FrameIndex · realiser   │
+                  │  ↑                                                    │
+                  │  └── world_core (3 444 curated facts · 65 domains)   │
+                  └─── ▼ ────────────────────────────────────────────────┘
+                                                                      │
+output (Kazakh sentence) ────────────────────────────────────────────  ┘
+                                                                      ▼
+                  ┌─── voice loop: Piper TTS (Kazakh ISSAI voice) ───────┐
+                  └──────────────────────────────────────────────────────┘
 ```
 
-### v6.1 cascade (default, unchanged)
+**No transformer in the answer path. No embeddings. No probabilistic free generation.** For any input, a developer can dump every layer's state and audit why the kernel chose what it said. Neural components (Whisper STT, Piper TTS, ~1 M-param BPE LM rescorer, ~1 M-param intent classifier) live exclusively at the speech surface around the deterministic core; they never invent facts.
 
-```text
-input ─▶ parser ─▶ semantics ─▶ [ retrieval + compose ] ─▶ planner ─▶ realiser ─▶ FST synth ─▶ output
-        (Layer 1) (Layer 2)       (Layer 2.5–2.75)       (Layer 3)   (Layer 4)   (Layer 5)
-```
+Three latency classes (release build, M2 Air):
 
-No transformer. No embeddings. No probabilistic generation. For any input, a developer can dump every layer's state and audit why the model chose what it said.
+| Class | What it measures | Median | p95 | RSS |
+|---|---|---:|---:|---:|
+| **Typed kernel micro-path** | algebra-only Frame → Index → answer | ~470 ns | ~600 ns | < 50 MB |
+| **Production dialog cascade** | 30-query battery, morph → router → retrieval → reasoning → realiser | **13.6 ms** | 19.6 ms | **314 MB** |
+| **Full voice loop** | mic → Whisper → cascade → Piper | interactive | — | + 2.3 GB STT + 1.1 GB TTS on disk |
 
-### Crates
+---
 
-| Layer | Crate | Role |
+## Why neurosymbolic, not LLM
+
+Modern LLMs carry three structural problems we treat as **not inevitable**. adam's neurosymbolic stack means neural components — where they exist — produce **typed closed-set** outputs only (intent class, sense disambiguation candidates, retrieval ranker score). A deterministic verifier owns truth.
+
+| LLM disease | adam's target | How it is enforced |
 |---|---|---|
-| **L0** | [`adam-kernel`](crates/adam-kernel) | Core identity + foundation contracts |
-| **L0** | [`adam-kernel-fst`](crates/adam-kernel-fst) | FST morphology — phonology, morphotactics, synthesiser + parser, 25.5 k-entry Lexicon |
-| **L0.5** | [`adam-algebra`](crates/adam-algebra) | **v6.2** — typed neurosymbolic stack: agglutinative algebra (Composition / Frame / QueryIR), FrameIndex retrieval, realiser, math_solver, system_clock, corpus_loader. Source of the 79-case real-Kazakh dialog battery + CI quality gate. |
-| **L1** | [`adam-tokenizer`](crates/adam-tokenizer) | Pre-tokenizer + BPE trainer + encoder |
-| **L1** | [`adam-corpus`](crates/adam-corpus) | Source acceptance, streaming processors, synthetic generator, `corpus_audit`, `morpheme_coverage` |
-| **L1** | [`adam-eval`](crates/adam-eval) | Evaluation suite + benchmark reports |
-| **L1** | [`adam-dialog`](crates/adam-dialog) | Dialog pipeline — 41 intents, multi-turn session + DST, template planner, slot-expanding realiser, voice output transducer. **v6.2:** `v6_2_router` integration bridge (env-gated). |
-| **L1** | [`adam-retrieval`](crates/adam-retrieval) | Retrieval engine — morpheme inverted index, deterministic ranking, in-sample composition |
-| **L1** | [`adam-reasoning`](crates/adam-reasoning) | Reasoning engine — typed-fact graph, 10 active forward-chaining rules, `extract_facts` / `build_lexical_graph` / `run_reasoner` binaries |
-| **L1** | [`adam-scaling`](crates/adam-scaling) | Tier-by-tier scaling bench across the corpus |
-| **L1** | [`adam-train`](crates/adam-train) | Legacy transformer baseline, preserved as regression reference |
+| **Black box** — opaque internals, no source attribution | **Predictability** — every claim traceable | `FrameIndex.query` returns a `RankedFrame` with `FrameId`; `data/world_core/*.jsonl` is the only fact source |
+| **Resource cost** — billions of params, GPU clusters | **Cheapness** — single binary | 314 MB RSS · 0 % GPU · 0 network · 13.6 ms p50 on M2 Air |
+| **Hallucination risk** — confident plausible-sounding wrongness | **Architectural impossibility within curated coverage** | Realiser is a typed pure function over a curated Frame; index miss → honest «нет данных», never invention |
 
-Every layer outputs deterministic, regression-tested JSON artifacts. `bash ./scripts/validate_foundation.sh` runs the full foundation validation end-to-end. See [`docs/architecture_v3.md`](docs/architecture_v3.md) for the canonical v6.1 architecture reference and [`docs/v6_2_architectural_redesign.md`](docs/v6_2_architectural_redesign.md) for the v6.2 design.
+**Hypothesis:** agglutinative languages — Kazakh in particular — exhibit unusually mathematical morphology. Every word decomposes into a root + a typed suffix chain (case, number, tense, person, possessive, polarity, modality). Composition is **rule-bound**, not learned. That structure becomes the substrate for a typed runtime.
 
-## Demo — v6.2 live REPL
+---
 
-```
-$ cargo run --release --example chat -p adam-algebra
-=== adam ARK — live REPL ===
-(deterministic; CPU-only; 0 MB model; no LLM)
-Курс: 65 curated facts. Print a question on each line; type «exit» to quit.
+## How adam compares to LLMs
 
-? Ахмет Байтұрсынұлы қашан туылған?
-> 1872     (25 417 ns)
+KazMMLU ([arXiv:2502.12829](https://arxiv.org/abs/2502.12829), 23 k Kazakh + Russian MCQ across STEM / humanities / social science) is the most-cited Kazakh academic benchmark. adam has not yet been run on KazMMLU itself (that's a v7 deliverable); the table compares published scores and the resource envelope:
 
-? Двадцать пять умножь на 7 раздели на два прибавь три
-> 90.5     (15 667 ns)
+| Model | KazMMLU | Resource cost |
+|---|---|---|
+| **adam v6.8.0** | own 5-suite production dashboard (`school_program` 159 / 159 · `conv_dialog` 52 / 52 · `safety` 20 / 20 · `real_audit` 24 / 26 · `speech_defect` 37 / 71 honest baseline) | **314 MB RSS · 0 GPU · $0** |
+| GPT-4o | 76.6 % | API only · $2.50 / $10 per 1 M tok |
+| DeepSeek V3 | 76.9 % | self-host or API |
+| Llama 3.1 70B | 56.2 % | ~140 GB FP16 · 2–4× H100 |
+| Llama 3.1 8B | 39.7 % | ~16 GB FP16 · 1× A100 |
+| Claude (3.5 / 3.7 / 4) | not published per-language | API only · $3 / $15 per 1 M tok |
 
-? Корень из шестнадцати
-> 4        (5 334 ns)
+See [`docs/COMPARISON.md`](docs/COMPARISON.md) for the full table (hallucination rate, FLORES coverage, Sherkala-tuned Llama) plus honest gaps.
 
-? Что такое гравитация?
-> сила притяжения масс       (14 458 ns)        # Russian — language-filtered
-
-? Гравитация деген не?
-> массалардың бір-бірін тарту күші   (12 208 ns) # Kazakh — language-filtered
-
-? Бүгін айдың нешесі?
-> 25       (live clock)
-
-? Қазір қандай ай?
-> мамыр    (live clock)
-```
-
-**Every answer is typed-data manipulation** — no template, no
-free generation, no LLM call, no GPU. Bilingual disambiguation
-works on same-root words («гравитация» appears in both KZ and RU
-corpus with different definitions; `language_filter` resolves
-which surfaces).
-
-For a full evidence dump on any Kazakh root, run [`adam_inspect`](crates/adam-dialog/src/bin/adam_inspect.rs).
+---
 
 ## What's measurable
 
-| Metric | Value | Notes |
-|---|---|---|
-| Workspace test files | **259 across 37 crates + tools** | run `cargo test --release --workspace --locked` for the live pass/fail/ignored breakdown — the value floats with the suite and is verified per release |
-| Release cadence | **540+ versioned releases since 2026-04-07** | every release CI-verified; v6.6 / v6.7 / v6.8 developed on `experimental/v6_6_generative_pivot` and ship together as v6.8.0 |
-| `school_program_eval` (production) | **159 / 159 = 100 %** semantic | 14 subjects; via `respond_full` binary (`ADAM_V6_2=1`) |
-| `conv_dialog_eval` (production) | **52 / 52 = 100 %** semantic (31 probes) | 44 real voice REPL turns + 39 scripted; Codex consultation #1 trust-signal suite |
-| `safety_eval` (production) | **16 / 16 = 100 %** semantic (36 probes) | 13 categories; Codex consultation #3 release gate |
-| `v6_7_real_audit_eval` (production) | 24 / 26 = 92 % semantic | 2 known deviations remain |
-| `speech_defect_eval` (production) | 37 / 71 = 52 % semantic | honest baseline against 8 defect categories; v7 milestone closes the gap |
-| v6.2 dialog battery | **79/79 must-pass, 0 gaps** | 14 real-Kazakh domains; CI quality gate via `dialog_battery_meets_quality_gate` |
-| Production cascade latency (M2 Air, 30-query battery) | **13.6 ms p50** / 19.6 ms p95 / 314 MB peak RSS | full `adam-dialog` cascade — morph → router → retrieval → reasoning → realiser; excludes STT/TTS |
-| Stage 3 typed-kernel micro-path | **~470 ns avg** | `adam-algebra` Stage 3 only — algebraic core; NOT a fair head-to-head against full NLP systems |
-| v6.2 throughput (single core) | **~1.26 M queries / sec** | scales linearly across cores |
-| v6.2 model size | **0 MB** | pure typed-data manipulation |
-| v6.1 cascade p50 turn latency | **~21 ms** | vs Llama-3 8B fp16 800–1500 ms; vs GPT-4 50–200 ms |
-| Memory footprint | **~300 MB RSS** | both cascades; vs LLM 16+ GB VRAM |
-| GPU usage | **0 %** | vs LLM dedicated GPU |
-| Hallucination rate (curated-domain coverage) | **0 %** architectural | verified by graph admissibility tests + Stage 4 quality gate. Off-corpus queries fall through to v6.1 cascade or honest «нет данных» — they cannot invent facts, but they can misroute. Stage 8 (HumanDialogEval) measures the off-corpus surface |
-| Lexicon roots | **25.5 k** | 13.6 k pure Kazakh + 11.9 k Apertium imports |
-| Curated entries (`world_core/`) | **3 461 entries / 4 044 frames** | across 66 domains; `validate_world_core` enforced in CI |
-| Curated facts total (incl. v6.1 augmentation) | **4 116** | `world_core` + bilingual aliases + МО РК + historical |
-| Derived facts | **37 991** | from 10 forward-chaining rules over the curated graph |
-| Dialog intents (v6.1 cascade) | **41** | template planner with `{slot\|features}` FST-aware syntax |
+| Metric | Value |
+|---|---|
+| Workspace test files | 274 (across 28 crates + 10 tools; run `cargo test --release --workspace --locked` for live counts) |
+| `school_program_eval` | **159 / 159 = 100 %** semantic (14 subjects via `respond_full`) |
+| `conv_dialog_eval` | **52 / 52 = 100 %** semantic (44 real voice REPL turns + 39 scripted; 31 probes) |
+| `safety_eval` | **20 / 20 = 100 %** semantic (13 categories, Codex release gate; 32 probes) |
+| `v6_7_real_audit_eval` | 25 / 26 = 96 % semantic |
+| `speech_defect_eval` | 37 / 71 = 52 % semantic (honest baseline; 8 defect categories) |
+| v6.2 dialog battery | 79 / 79 must-pass, 0 gaps (CI quality gate `dialog_battery_meets_quality_gate`) |
+| Production cascade latency (M2 Air, 30-query battery) | **13.6 ms p50** · 19.6 ms p95 · **314 MB peak RSS** |
+| Algebra micro-path latency | ~470 ns avg · ~600 ns p95 (algebra core only — not a fair head-to-head against full NLP) |
+| Throughput (single core) | ~1.26 M queries / sec |
+| Model size | **0 MB** (pure typed-data manipulation) |
+| GPU usage | **0 %** |
+| Hallucination rate (curated-domain coverage) | **0 %** architectural |
+| Lexicon roots | 25 525 (13 606 pure Kazakh + 11 919 Apertium imports) |
+| Curated `world_core/` | 3 444 entries · 4 116 facts · 65 domains |
+| Derived facts | 37 991 from 10 forward-chaining rules |
+| Curriculum DB | 91 chemistry Q&A across 8 topics (`data/curriculum/curriculum.db`) — school-tutor foundation |
 
-See [`docs/performance.md`](docs/performance.md) for the full performance report and [`docs/scaling_report.md`](docs/scaling_report.md) for the per-tier scaling bench.
+See [`docs/performance.md`](docs/performance.md) for the full performance report.
 
-## FAQ
-
-**Is this a wrapper around an LLM?** No. There is no LLM, no neural network at the answer path, no API call to OpenAI / Anthropic / Google. v6.1 inference is FST + forward-chaining reasoner over a typed-fact graph; v6.2 inference is the typed Composition → Frame → QueryIR → FrameIndex → realiser pipeline.
-
-**Is it really deterministic?** Yes. In v6.1, the only source of randomness is `planner::choose_template` (pin the seed → byte-identical output). In v6.2, the answer path is entirely pure-function: `FrameIndex.query(QueryIR)` returns frames in `(score desc, frame_id asc)` order, `realiser::realise(frame, focus, slot)` is a pure mapping; same input → byte-identical surface.
-
-**What is "neurosymbolic" supposed to mean here?** Per the [v6.2 design doc](docs/v6_2_architectural_redesign.md): neural components — when they exist (Stage 6, not in v6.2.0) — produce **typed closed-set** outputs only (intent class, sense disambiguation candidates, retrieval ranker score). They never generate free text. The verifier owns truth and rejects any candidate without a `FrameIndex` provenance. v6.2.0 ships the **symbolic half** of the architecture (typed algebra + retrieval + realiser); Stage 6 will add learned closed-set components inside this scaffolding.
-
-**Why Kazakh?** Kazakh's agglutinative morphology is exceptionally regular: every word decomposes into root + typed suffixes (case, number, tense, person, possessive, polarity, modality), each contributing a known operator. Composition is rule-bound, not learned. This is the cleanest substrate we know of for a deterministic AI runtime.
-
-**Will it generalise to other languages?** The architecture is *designed* for it but not yet *demonstrated* on a second language. ~30 candidate agglutinative languages are catalogued in [MISSION.md](MISSION.md#agglutinative-languages--global-research-frontier); first port (Karakalpak or Kyrgyz) is on the v6 research roadmap with measured porting cost as a deliverable. Treat the multi-language story as a research goal, not a current product capability.
-
-**What is the funding model?** Two parallel tracks: angel pre-seed private capital ($200K–300K target) and state research grants from agglutinative-language country research agencies (Japan JST/JSPS, South Korea NRF, Finland Academy of Finland, Turkey TÜBİTAK, Hungary NKFIH, Estonia ETAg, Uzbekistan, Kyrgyzstan, Mongolia, Tatarstan). See [COLLABORATION.md](COLLABORATION.md).
-
-**Who built this?** [Daulet Baimurza](https://github.com/DauletBai), founder of Qazna Technologies. Solo development since 2026-04-07. Repository public since 2026-05-08. License: BUSL-1.1 (source-available; commercial use by permission).
-
-**How do I cite this work?** See [CITATION.cff](CITATION.cff) and [codemeta.json](codemeta.json). GitHub renders the citation file as a "Cite this repository" button on the right sidebar.
-
-## Recent releases
-
-**v6.2.0 — Neurosymbolic agglutinative algebra (env-gated).** The
-architectural redesign promised at v6.1.50. Lands the new
-`adam-algebra` crate (8 modules, 195 tests) + `adam-dialog::v6_2_router`
-integration bridge. v6.1 cascade unchanged when the gate is off.
-Workspace tests 1735 → 1904. Real-Kazakh dialog battery 79/79
-must-pass, 0 known gaps. Stage 3 typed-kernel micro-path runs
-~470 ns avg; production cascade p50 ~13.6 ms (see *Honest numbers*
-above for the three latency classes). See [CHANGELOG.md § 6.2.0](CHANGELOG.md).
-
-**v6.1.50 — v6.1-series freeze.** Time-unit Count + Disagreement
-answer-shape + voice aliases + doc refresh. Final v6.1.x release;
-patch strategy reached its ceiling after 11 releases across two days.
-
-**v6.1.0 — AnswerIR + predicate-aware retrieval (opt-in behind
-`ADAM_ANSWER_IR=1`).** Typed `PredicateFocus` enum + 11 new typed
-predicates (`BornIn` / `DiedIn` / `FoundedIn` / `EffectiveFrom` /
-`Classifies` / `LocatedIn` / `Authored` / etc.) — closes the
-2026-05-22 Codex audit relevance/completeness gap.
-
-**v6.0.0 — Technical GA.** L5.5 TinyAgt neural composer preview
-(opt-in), E1 discriminative intent classifier (95.95 % accuracy
-at 600× lower latency than full cascade), E2 slot extractor,
-Whisper.cpp voice input, KRU / Baitursynuly / AI-Law domain,
-seven rounds of user-driven audit fixes.
-
-**v5.0.0 – v5.4.0 — Voice, multimodal, World-Graph bridge data.**
-OS-native TTS (macOS `Aru`, Linux `espeak-ng`), optional Piper
-backend, Kazakh G2P. v5.4.0: 25+ dead-end abstract hubs closed,
-derived facts +4 577, bare yes/no IsA route.
-
-For full release history (540+ releases since 2026-04-07), see
-[CHANGELOG.md](CHANGELOG.md). For the phase-by-phase roadmap,
-see [`docs/roadmap.md`](docs/roadmap.md).
-
-## Open to collaboration
-
-We are open to collaboration in every direction:
-
-- **Linguists** — agglutinative morphology, formal phonology, computational semantics
-- **AI researchers** — deterministic / neurosymbolic alternatives to neural inference, formal verification of language models
-- **Educational institutions** — pilot deployments with Kazakh-language students (current focus: Almaty / Astana schools)
-- **National research agencies** — joint research grants from agglutinative-language country agencies
-- **Government / defence** — offline-capable, auditable language AI for Kazakh and related languages; aligned with Kazakhstan's [AI Law of 18 January 2026](data/world_core/kru_baitursynov.jsonl) for defense-relevant high-risk categories
-- **Investors** — angel pre-seed / seed stage who share the thesis that probabilistic AI is not the only path forward
-
-Contact: **baimurza.daulet@gmail.com** · [LinkedIn](https://www.linkedin.com/in/daulet-baimurza-4b3506211)
-
-See [COLLABORATION.md](COLLABORATION.md) for full per-class engagement terms.
+---
 
 ## Repository layout
 
 ```
-crates/                Rust workspace (11 crates, L0–L1)
-  adam-algebra/        v6.2 typed neurosymbolic stack (algebra / Frame / QueryIR / FrameIndex / realiser / math_solver / system_clock / corpus_loader)
-  adam-kernel-fst/     FST morphology — phonology, morphotactics, synthesiser + parser
-  adam-dialog/         Dialog pipeline (v6.1 cascade) + v6_2_router (integration bridge)
-  …                    (see Crates table above)
-data/world_core/       Curated typed-fact graph (jsonl, by domain)
-data/dialog/           Template repository + curriculum
-data/retrieval/        Morpheme index + extracted facts + derived facts
-data/eval/             Live holdouts + cognitive eval datasets
-data/lexicon_v1/       Apertium-imported roots
-data/tokenizer/        Curated segmentation roots
+crates/                Rust workspace (28 crates)
+  adam-algebra/        Typed neurosymbolic stack (Composition / Frame / QueryIR / FrameIndex / realiser / math_solver / system_clock / corpus_loader)
+  adam-dialog/         Dialog pipeline + v6_2_router + wellness::pain_support + safety_guard + red_flags
+  adam-kernel-fst/     FST morphology — phonology, morphotactics, synthesiser + parser, 25 k-root Lexicon
+  adam-reasoning/      Typed-fact graph + 10 forward-chaining rules
+  adam-retrieval/      Morpheme inverted index + deterministic ranking
+  adam-eval/           Evaluation suite + rust_only_contracts gate
+  …                    (24 more — see Cargo.toml workspace.members)
+tools/                 Binaries (10) — voice_repl_v6_3, intent_dataset, build_human_bank, …
+data/world_core/       65 .jsonl files · 3 444 typed-fact entries · CI-validated
+data/eval/             Five production suites + legacy holdouts
+data/curated/          Training packs (small in git; > 30 MB derived corpora gitignored)
+data/curriculum/       SQLite curriculum DB (school tutor foundation)
 docs/                  Architecture, roadmap, performance, foundation policies
-  v6_2_architectural_redesign.md  v6.2 design doc (signed off 2026-05-24)
-scripts/               validate_foundation.sh + release tooling
+scripts/               validate_foundation.sh + Python builders (off-runtime, gated)
 ```
 
-See [`data/README.md`](data/README.md) for a top-level map of `data/`, and per-subdirectory READMEs for details.
+See [`data/README.md`](data/README.md) for a top-level map of `data/`.
 
-## Foundation policies
+---
 
-[corpus](docs/corpus_policy.md) · [sources](docs/corpus_sources.md) · [curation](docs/curation_workflow.md) · [classification](docs/source_classification.md) · [scoring](docs/source_scoring.md) · [tokenizer](docs/tokenizer_policy.md) · [evaluation](docs/evaluation_policy.md) · [dialog architecture](docs/kazakh_grammar/07_dialog_architecture.md) · [Kazakh grammar reference](docs/kazakh_grammar/README.md)
+## FAQ
 
-## Out of scope
+**Is this a wrapper around an LLM?** No. No LLM, no neural network in the answer path, no API call to OpenAI / Anthropic / Google. Inference is FST + forward-chaining reasoner + typed Composition → Frame → QueryIR → FrameIndex → realiser.
 
-- **Probabilistic / LLM-style free generation** — every response is a curated fact retrieved via `FrameIndex` (v6.2) or a template realisation / verbatim corpus quote / rule derivation (v6.1). Nothing invented.
-- **Multilingual input** — Russian queries work for terms whose surface differs from Kazakh (`«вода» / «скорость света» / «столица казахстана»`); same-root same-domain bilingual ambiguity is resolved via `language_filter`. Other languages are research-direction, not currently shipped.
-- **Trained neural LM components in the answer path** — the dialog core stays rule-based: selection weights, suffix priors, PMI, E1 intent classifier; no transformer in the answer path, no free generation. **v6.3 ships closed-set neural components at the speech surface only** (Whisper.cpp STT + Piper TTS + ~1 M-param contextual LM rescorer + ~1 M-param BPE intent classifier in `tools/voice_repl_v6_3`) — they normalise audio ↔ text around the deterministic core; they never invent facts. The Stage 6 in-kernel neural layer of the v6.0 design doc remains unshipped.
-- **Cloud platform work** — adam runs as a single offline binary.
+**Is it really deterministic?** Yes. The answer path is pure-function: `FrameIndex.query(QueryIR)` returns frames in `(score desc, frame_id asc)` order, `realiser::realise(frame, focus, slot)` is a pure mapping. Same `(input, seed, world_core)` → byte-identical surface.
 
-### Graph-First Policy
+**Why Kazakh?** Kazakh's agglutinative morphology is exceptionally regular — every word decomposes into root + typed suffixes, each contributing a known operator. Composition is rule-bound. This is the cleanest substrate we know of for a deterministic AI runtime.
 
-The graph layer of `adam` is **Rust-native and repository-native**. No external graph database as a required runtime; no Cypher / Gremlin / SPARQL query layer in the core pipeline; no Python graph stack hidden behind scripts. The canonical graph representation, traversal, and artifact builders live in Rust crates inside this repository. Shell scripts may orchestrate graph builds only as thin wrappers around `cargo run`.
+**Will it generalise to other languages?** The architecture is *designed* for it but not yet *demonstrated* on a second language. ~30 candidate agglutinative languages are catalogued in [MISSION.md](MISSION.md). First port (Karakalpak or Kyrgyz) is on the v7 research roadmap with measured porting cost as a deliverable.
+
+**Who built this?** [Daulet Baimurza](https://github.com/DauletBai), founder of Qazna Technologies. Solo development since 2026-04-07. Repository public since 2026-05-08.
+
+**How do I cite this work?** See [CITATION.cff](CITATION.cff) and [codemeta.json](codemeta.json). GitHub renders the citation file as a «Cite this repository» button.
+
+---
+
+## Open to collaboration
+
+- **Linguists** — agglutinative morphology, formal phonology, computational semantics
+- **AI researchers** — deterministic / neurosymbolic alternatives, formal verification of language systems
+- **Educational institutions** — pilot deployments with Kazakh-language students (current focus: Almaty / Astana / Kostanay schools)
+- **Industrial partners** — read-only SOP / safety / training / maintenance assistants for production environments
+- **National research agencies** — joint grants from agglutinative-language country agencies (Japan JST/JSPS, South Korea NRF, Finland Academy of Finland, Turkey TÜBİTAK, Hungary NKFIH, Estonia ETAg)
+- **Investors** — angel pre-seed / seed who share the thesis that probabilistic AI is not the only path forward
+
+Contact: **baimurza.daulet@gmail.com** · [LinkedIn](https://www.linkedin.com/in/daulet-baimurza-4b3506211)
+
+See [COLLABORATION.md](COLLABORATION.md) for per-class engagement terms.
+
+---
 
 ## License
 
 [Business Source License 1.1](LICENSE). Converts automatically to Apache License 2.0 on **2029-01-01**.
 
-Non-commercial and research use is unrestricted today. Commercial use is permitted unless it competes directly with Qazna Technologies LLP products or services.
-
-For commercial licensing inquiries: **baimurza.daulet@gmail.com**
+Non-commercial and research use is unrestricted today. Commercial use is permitted unless it competes directly with Qazna Technologies LLP products or services. For commercial licensing inquiries: **baimurza.daulet@gmail.com**.
 
 Copyright © 2026 Qazna Technologies LLP.
 
@@ -636,11 +292,11 @@ Copyright © 2026 Qazna Technologies LLP.
 
 <p align="center">
   <a href="MISSION.md">MISSION</a> ·
-  <a href="docs/v6_2_architectural_redesign.md">v6.2 ARCH</a> ·
+  <a href="docs/v6_2_architectural_redesign.md">ARCHITECTURE</a> ·
   <a href="RESEARCH.md">RESEARCH</a> ·
   <a href="COLLABORATION.md">COLLABORATION</a> ·
-  <a href="AGENTS.md">AGENTS</a> ·
+  <a href="DUE_DILIGENCE.md">DUE DILIGENCE</a> ·
   <a href="CHANGELOG.md">CHANGELOG</a> ·
-  <a href="docs/roadmap.md">roadmap</a> ·
-  <a href="CITATION.cff">cite</a>
+  <a href="docs/roadmap_v6_v7.md">ROADMAP</a> ·
+  <a href="CITATION.cff">CITE</a>
 </p>

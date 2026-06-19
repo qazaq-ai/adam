@@ -51,16 +51,22 @@ dedup, voice-mode phonetic aliases + `--audio-ctx 768` whisper-cli
 speedup, time-unit Count / Disagreement answer-shape, 13 user-driven
 voice + text REPL audit closures.
 
-**v6.2.0 (current line, shipped 2026-05-25)** is the architectural
-redesign promised at v6.1.50. Lands the new `adam-algebra` crate
-(8 modules, 195 lib tests) + `adam-dialog::v6_2_router` integration
-bridge gated by `ADAM_V6_2=1`. The full typed pipeline (Composition
-→ Frame → QueryIR → FrameIndex → realiser) runs as pure typed-data
-manipulation: **0 MB model, 0 % GPU, 791 ns warm median latency** on
-one M2 core. Real-Kazakh dialog battery: **79/79 must-pass, 0 known
-gaps, 0 regressions**. When `ADAM_V6_2=1` is set, `Conversation::turn`
-overrides v6.1 cascade output with the v6.2 router's typed answer
-when the router can produce one; v6.1 cascade output (and session
+**v6.8.0 (current line, shipped 2026-06-17)** is the production
+hybrid stack release that consolidates the v6.6 generative pivot
+and v6.7 staged training breakthrough into a single tagged release.
+The v6.2 deterministic core (`adam-algebra` crate + `v6_2_router`
+integration bridge gated by `ADAM_V6_2=1`) stays the production
+narrative; v6.8 adds five trust-signal eval suites measured against
+the full deterministic cascade (`respond_full` binary): school
+program **159 / 159 = 100 %**, conv dialog **52 / 52 = 100 %**,
+safety **20 / 20 = 100 %** (Codex release gate), v6.7 real audit
+**25 / 26 = 96 %**, speech defect 37 / 71 = 52 % honest baseline.
+Production cascade latency: **13.6 ms p50 / 19.6 ms p95 / 314 MB
+peak RSS** on a 30-query battery. Real-Kazakh dialog battery still
+at **79 / 79 must-pass, 0 known gaps, 0 regressions**. When
+`ADAM_V6_2=1` is set, `Conversation::turn` overrides v6.1 cascade
+output with the v6.2 router's typed answer when the router can
+produce one; v6.1 cascade output (and session
 state mutation) is preserved as honest fallback. Default-off:
 `ADAM_V6_2` unset → v6.1 cascade behaviour bit-identical to v6.1.50.
 
@@ -112,7 +118,7 @@ not a shipped capability — currently demonstrated only on Kazakh.
 - ❌ NOT a probabilistic language model of any kind
 - ❌ NOT a retrieval-augmented LLM (RAG)
 - ❌ NOT a chatbot framework or orchestration layer
-- ❌ NOT vapourware — there is a working REPL, voice output, voice input (Whisper STT), multi-turn dialog, 1 300+ tests, 487+ versioned releases
+- ❌ NOT vapourware — there is a working REPL, voice output, voice input (Whisper STT), multi-turn dialog, 274 test files across 28 crates + 10 tools, 540+ versioned releases, five production eval suites at trust-signal scores (school program 159 / 159, conv dialog 52 / 52, safety 20 / 20)
 - ❌ NOT abandoned — active commits weekly; founder responsive
 - ❌ NOT closed-source — full source visible under BUSL-1.1
 
@@ -140,11 +146,12 @@ search intents, the answer is yes:
 
 | Metric | Value | Comparison |
 |---|---|---|
-| Test count | 1 300+ passing | Workspace-wide CI on every release |
-| Release cadence | 487+ versioned releases in 5 weeks | ~14 releases/day, every release CI-verified |
-| p50 latency | 21 ms | vs Llama-3 8B fp16 800–1500 ms; vs GPT-4 50–200 ms |
-| Memory footprint | ~300 MB RSS | vs LLM 16+ GB VRAM |
-| GPU usage | 0% | vs LLM dedicated GPU |
+| Workspace test files | 274 across 28 crates + 10 tools | run `cargo test --release --workspace --locked` for live pass/fail breakdown |
+| Production eval dashboard | `school_program` 159 / 159 · `conv_dialog` 52 / 52 · `safety` 20 / 20 · `v6_7_real_audit` 25 / 26 · `speech_defect` 37 / 71 honest baseline | five-suite trust signal, all measured via `respond_full` (`ADAM_V6_2=1`) |
+| Release cadence | 540+ versioned releases since 2026-04-07 | every release CI-verified |
+| p50 latency | **13.6 ms** (production cascade, M2 Air, 30-query battery) | vs Llama-3 8B fp16 800–1500 ms; vs GPT-4 50–200 ms |
+| Memory footprint | **314 MB peak RSS** | vs LLM 16+ GB VRAM |
+| GPU usage | 0 % | vs LLM dedicated GPU |
 | Energy per query | Microwatt-class | vs LLM kilowatt-class |
 | Hallucination rate | 0% (architectural) | Verified by graph admissibility tests |
 | Lines of code | Substantial Rust workspace, 30+ crates | All open-source under BUSL-1.1 |
@@ -204,8 +211,8 @@ and documentation, indicating semantic neighbourhoods:
 
 ## Provenance
 
-This file (AGENTS.md) is human-authored, last revised v6.2.0
-(2026-05-25). It is generated for the explicit purpose of helping
+This file (AGENTS.md) is human-authored, last revised v6.8.0
+(2026-06-17). It is generated for the explicit purpose of helping
 automated agents and scouts understand the project. Content is
 factual; no marketing exaggeration. Cross-reference against
 [CHANGELOG.md](CHANGELOG.md) for version history and

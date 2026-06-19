@@ -31,16 +31,16 @@ at the audio ↔ text boundary; they never invent facts.
 
 | Metric | Value |
 | --- | --- |
-| HEAD branch | `experimental/v6_6_generative_pivot` (v6.8.0 RC) |
-| HEAD commit | `fdf21456` |
+| HEAD branch | `main` (v6.8.0 merged 2026-06-17; post-release patches at HEAD) |
+| HEAD commit | `4595db45` |
 | `school_program_eval` (14 subjects, production) | **159 / 159 = 100 %** semantic |
 | `conv_dialog_eval` (44 real voice REPL + 39 scripted) | **52 / 52 = 100 %** semantic (31 probes document gaps) |
-| `safety_eval` (13 categories, Codex #3 release gate) | **16 / 16 = 100 %** semantic (36 probes) |
-| `v6_7_real_audit_eval` | 24 / 26 = 92 % semantic (2 known deviations) |
+| `safety_eval` (13 categories, Codex #3 release gate) | **20 / 20 = 100 %** semantic (34 probes; v6.8.0 shipped at 16 / 16, then v6.8.2 patches promoted 4 dangerous probes (suicide method, severe bleeding, account intrusion) — all now pass) |
+| `v6_7_real_audit_eval` | **25 / 26 = 96 %** semantic (v6.8.0 shipped at 24 / 26 = 92 %; v6.8.2 cascade-order inversion improved by 1) |
 | `speech_defect_eval` (8 defect categories) | 37 / 71 = 52 % semantic (honest baseline; v7 milestone) |
 | Voice REPL live session (45 turns, 2026-06-16 evening) | 43 / 45 ≈ 96 % |
 | Legacy `blind_eval_v1` (kept as historical reference) | 97 / 100 (rc18 baseline; no longer the production gate) |
-| Workspace test files | 259 (across 37 crates + tools) |
+| Workspace test files | 274 (across 28 crates + 10 tools) |
 | Largest crate (LOC) | `adam-dialog` (extended via v6.5 safety guard + v6.8 cascade patches + wellness::pain_support) |
 | World-core curated entries | 3 444 in `data/world_core/*.jsonl` (65 domains, unchanged since v6.3) |
 | Reasoning facts | 4 116 extracted + 37 991 derived |
@@ -70,7 +70,7 @@ cargo test --release --workspace
 
 ```
 cargo test --release --workspace
-# 259 test files across the workspace; run locally to get the
+# 274 test files across the workspace; run locally to get the
 # definitive pass/fail/ignored breakdown.
 ```
 
@@ -249,7 +249,7 @@ under codex review recommendation 5.
 
 ## 8. Known limitations / honest gaps
 
-### v6.8.0 release-candidate gaps (blocking `main` merge)
+### Open at HEAD (post-v6.8.0 patches)
 
 1. **`speech_defect_eval` at 52 %** (37 / 71 semantic). The eval
    establishes an honest baseline against eight defect categories
@@ -259,9 +259,10 @@ under codex review recommendation 5.
    `Conversation::turn`. `lookup_possessive_property` substring
    matching is the brittle surface; v6.8 added an edit-distance
    ≤ 1 fallback to recover the easy cases.
-2. **`v6_7_real_audit_eval` at 92 %** (24 / 26 semantic). Two
-   known deviations remain; closing them is the last item before
-   the merge.
+2. **`v6_7_real_audit_eval` at 96 %** (25 / 26 semantic, was 24 / 26
+   at v6.8.0 release; the cascade-order inversion in the v6.8.2
+   safety patches closed one of the three known deviations). One
+   deviation remains.
 3. **BTC live-data routing** — «Қазір BTC бағасы қанша?» — «қазір»
    triggers a date-query intent BEFORE `detect_safety_topic` runs;
    cascade-order hoisting is the fix. Documented as a probe in
@@ -269,6 +270,18 @@ under codex review recommendation 5.
 4. **Identity templating** — «Сен адамсың ба?» — production gives
    a `дерек жоқ` refusal. No identity-template family yet;
    ideal answer would be «мен тілдік модельмін».
+5. **Eval comparator `match_type` taxonomy** — current semantic
+   comparator can false-positive on fallback responses («дұрыс
+   түсінбедім» passes when expected substring overlaps with a
+   stop-word in the fallback). User audit 2026-06-17 flagged
+   this; a typed `match_type` (`exact_value` / `contains_answer`
+   / `safety_refusal` / `no_data` / `dialog_state` / `math_scalar`)
+   refactor is the v7 fix.
+6. **Fuzzy lock behind intent + entity parse** — current `fuzzy_normalise`
+   can run pre-cascade and rewrite a query before the disambiguator
+   sees it («Байтта неше біт **баланың аты** бар?» → «Бір байтта 8
+   бит бар» false win). Gating fuzzy behind a high-confidence
+   intent + entity parse is the v7 fix.
 
 ### v6.3-era gaps still open
 

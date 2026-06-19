@@ -92,17 +92,18 @@ Korean) — giving the research a global frontier.
 
 ## Three goals — and how we measure them
 
-| Goal | Metric | Current state (v6.2.0) |
+| Goal | Metric | Current state (v6.8.0) |
 |---|---|---|
-| **Predictability** | Reproducibility of every response from (input, seed, facts) | 100% deterministic — Stage 4 FrameIndex query + Stage 7 realiser are pure functions; v6.1 cascade preserved as fallback |
-| **Cheapness** | Memory + CPU + GPU per query | **0 MB model**, **0% GPU**, **791 ns** warm median (release, M2 single core) — Stage 3 pipeline ~274 ns, full dialog battery ~791 ns, v6.1 cascade ~21 ms |
-| **Safety** | Hallucination rate (claims without source attribution) | **0% architectural within curated-domain coverage** — every Frame in `FrameIndex` traces to a `FrameId` provenance; CI quality gate `dialog_battery_meets_quality_gate` enforces 79/79 real-Kazakh cases must-pass + 0 regressions. Off-corpus queries fall through to v6.1 cascade or honest «нет данных»; they cannot invent facts but can misroute on edge cases. Stage 8 (HumanDialogEval) measures the off-corpus surface separately. |
+| **Predictability** | Reproducibility of every response from (input, seed, facts) | 100 % deterministic — `FrameIndex.query` + `realiser::realise` are pure functions; same `(input, seed, world_core)` → byte-identical surface |
+| **Cheapness** | Memory + CPU + GPU per query | **0 MB model · 0 % GPU · 13.6 ms p50 / 19.6 ms p95 · 314 MB peak RSS** (production cascade, M2 Air, full 30-query battery). Algebra micro-path ~470 ns avg / ~600 ns p95 on Stage 3 alone (not a fair head-to-head with full NLP systems). |
+| **Safety** | Hallucination rate (claims without source attribution) | **0 % architectural within curated-domain coverage** — every Frame traces to a `FrameId` provenance. Production trust signals at v6.8.0 HEAD: `school_program_eval` 159 / 159 · `conv_dialog_eval` 52 / 52 · `safety_eval` 20 / 20 · `v6_7_real_audit_eval` 25 / 26 · `speech_defect_eval` 37 / 71 honest baseline. Off-corpus queries fall through to honest «нет данных» or refusal; they cannot invent facts. |
 
 For comparison: Llama-3 8B fp16 inference uses 800–1500 ms per query
 with 16 GB VRAM; GPT-4 uses 50–200 ms with hidden datacentre GPU.
 Both surface answers without source attribution by default. adam's
-v6.2 stack runs at **~126 000× the rate of a fast (100 ms) LLM call**
-on a single M2 core with **0 MB model loaded**.
+v6.8 stack delivers a Kazakh production answer at **13.6 ms p50** on
+a single M2 core with **0 MB model loaded** — ~37 × the rate of a
+typical (~500 ms) LLM call.
 
 ## Why Kazakh
 
@@ -180,8 +181,9 @@ What adam demonstrates:
 - The deterministic kernel can sustain **multi-turn dialog** with
   belief-state tracking, contradiction recovery, anaphora resolution,
   and curriculum progression.
-- The architecture **scales to a real codebase**: 30+ Rust crates,
-  1 300+ tests, 487+ versioned releases (each CI-verified).
+- The architecture **scales to a real codebase**: 28 Rust crates +
+  10 tools, **274 test files**, **540+ versioned releases** (each
+  CI-verified).
 - The voice surface — peripheral transducer for **both** directions
   (output via macOS `Aru` / Linux `espeak-ng` / optional Piper; input
   via Whisper STT shell-out + energy-VAD + confidence gate) — preserves

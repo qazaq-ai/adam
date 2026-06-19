@@ -23,13 +23,20 @@ below those documents.
 
 ### Q1. Can a deterministic kernel match LLMs on conversational coherence?
 
-**Status.** Partially answered. adam (v6.0.0) demonstrates multi-turn
+**Status.** Partially answered. adam (v6.8.0) demonstrates multi-turn
 dialog with belief-state tracking, contradiction recovery, anaphora
 resolution, predicate-keyword routing for KRU-domain answer
 relevance, and curriculum-aware self-recall — all without
-neural-style generation. The remaining gap is **scope**: adam covers
-41 intent variants and a curated `world_core` of 3 461 entries / 4 114
-facts across 66 domains, far narrower than what an LLM is trained on.
+neural-style generation. The current five-suite production dashboard
+(measured via `respond_full`) reports **159 / 159** on a 14-subject
+school-program eval, **52 / 52** on a real-voice-REPL conv-dialog
+eval, **20 / 20** on a 13-category safety release gate, **25 / 26**
+on the v6.7 real-audit eval, and **37 / 71** as the honest baseline
+against eight Kazakh speech-defect categories (the v7 candidate-
+rescoring milestone closes this gap).  Scope remains the bound: adam
+covers 41 intent variants and a curated `world_core` of 3 444 entries
+/ 4 116 facts across 65 domains, far narrower than what an LLM is
+trained on.
 
 **Open sub-questions:**
 - How does the curated-graph approach scale as the fact base grows
