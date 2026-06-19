@@ -43,12 +43,31 @@ members = [
 resolver = "2"
 
 [workspace.package]
-# 2026-06-02 — bump to v6.3.0 to match the experimental/v6_3_phonemic_foundation
-# arc (voice REPL, BPE tokenizer, contextual LM, neural intent classifier,
-# Phase 21 relative-day handler). v6.2 deterministic core stays the
-# bedrock; v6.3 wraps it in a voice surface with controlled neural
-# boundaries (Whisper STT + Piper TTS + tiny LM rescoring).
-version = "6.5.0-rc27"
+# 2026-06-17 — bump to v6.8.0 consolidating the
+# experimental/v6_6_generative_pivot research arc through three
+# capability releases (CHANGELOG.md carries the per-release detail):
+#   v6.6.0 — drift-aware BPE+LM (TP 25% → 75% on rc25-audit eval);
+#            promote drift-aware tokenizer + LM to canonical paths.
+#   v6.7.0 — staged training breakthrough (real audit 24% → 83% →
+#            90% via FST-lite + sentence-boundary stop) +
+#            wellness::pain_support deterministic soma-regulation
+#            state machine.
+#   v6.8.0 — production hybrid stack discovery (school 78% → 86%
+#            via respond_full vs LM-only); five new eval suites
+#            (school_program 159 / conv_dialog 52 / safety 16 /
+#            speech_defect 71 / real_audit 24); cascade patches —
+#            global red_flags::detect hoist at turn() guard layer,
+#            WEAPON / HARM_OTHERS marker expansion (пистолет/мылтық
+#            + қалай-connector variants), past-tense math verbs,
+#            risk-bounded numeral edit-1 repair.
+# Production eval dashboard at v6.8.0:
+#   school_program     159/159 = 100% (semantic)
+#   conv_dialog         52/52  = 100% (semantic, 31 probes)
+#   safety              16/16  = 100% (semantic, 36 probes)
+#   v6_7_real_audit     24/26  =  92% (semantic, 2 deviations)
+#   speech_defect       37/71  =  52% (semantic, honest baseline)
+#   voice REPL session  43/45  ≈  96% (single live session)
+version = "6.8.0"
 edition = "2024"
 license = "BUSL-1.1"
 

@@ -28,6 +28,193 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.8.0] — 2026-06-17 — production hybrid stack + eval infrastructure consolidation
+
+**Stripe — Deterministic AI research.** Consolidates the v6.6
+generative pivot and v6.7 staged training breakthrough into a
+production-ready hybrid stack with verifiable trust signals across
+five eval suites. The v6.2 deterministic core stays the production
+narrative; v6.8 adds the eval discipline + cascade patches needed
+to publish honest capability numbers.
+
+### Production discovery
+
+The `respond_full` binary (Phase 16 dialog engine + Phase 15f
+reasoning chains + Phase 17 world_core domain index, `ADAM_V6_2=1`
+inside) is the production pipeline. The LM-only `respond` binary
+exercises the v6.7 generative head and measures the LM ceiling
+alone — not the production ceiling. Headline shift: school-program
+score 78 % (LM-only) → **86 %** (production hybrid) → **100 %**
+after v6.8 router fixes.
+
+### What ships
+
+- **Eval suite consolidation** — five trust-signal suites,
+  measured against `respond_full`:
+  | Suite | Accepted | Probes | Semantic score |
+  |---|---|---|---|
+  | `school_program_eval` | 159 | 0 | **159/159 = 100 %** |
+  | `conv_dialog_eval` | 52 | 31 | **52/52 = 100 %** |
+  | `safety_eval` | 16 | 36 | **16/16 = 100 %** |
+  | `v6_7_real_audit_eval` | 26 | 0 | 24/26 = 92 % |
+  | `speech_defect_eval` | 71 | 9 | 37/71 = 52 % (honest baseline) |
+
+- **Cascade patches** (close production routing gaps):
+  - Global `wellness::red_flags::detect` hoist at
+    `Conversation::turn()` guard layer. Acute-medical inputs
+    («Кеудем қатты ауырып, тыныс ала алмай тұрмын») were being
+    preempted by generic IFS reflect before red_flags ran from
+    inside `pain_support` / `ifs`; the hoist makes 103/112
+    escalation reachable on every input that matches.
+  - `safety_guard::WEAPON_MARKERS` += «пистолет», «мылтық»
+    («автомат» intentionally omitted — too many benign senses).
+  - `safety_guard::HARM_OTHERS_MARKERS` += «өлтіруге болады» /
+    «улауға болады» / «өлтіруге қалай» / «улауға қалай» —
+    tolerates «қалай» connector between object and verb.
+  - `discourse::detect_kazakh_math_op` / `clause_has_math_verb`
+    / `MATH_VERB_STEMS` += past-tense «азайды» / «азайып»
+    (Kazakh т-drop assimilation т + ды → ды before past suffix;
+    «азайт» is the only one of {көбейт, бөл, қос, азайт} that
+    drops a consonant).
+  - `math_solver::repair_numeral_edit1` — risk-bounded
+    Levenshtein-1 search restricted to the closed 20-numeral
+    vocabulary. Catches Whisper drift («Тоқсан» → «Топсан»)
+    without re-introducing the rc25 false-positive surface that
+    forced the general lexicon_validator disable.
+  - `v6_2_router::lookup_possessive_property` — substring with
+    edit-distance ≤ 1 fallback, closing single-char speech
+    defects on the body-parts / property-query path.
+  - Chemistry lookup word-boundary fix for «таңба» marker (was
+    misfiring on «таңбасы» / «таңбасының» surface forms).
+
+- **`data/eval/conv_dialog_eval.json`** — 83 cases (44 real voice
+  REPL turns from the 2026-06-16 evening session + 39 scripted).
+  Codex consultation #1 missing trust-signal suite is now in
+  place.
+
+- **`data/eval/safety_eval.json`** — 54 cases × 13 categories
+  (crisis_suicidal / crisis_medical_acute / crisis_child_abuse /
+  crisis_dv_immediate / refusal_weapon / refusal_medical /
+  refusal_illegal / refusal_harm_other / refusal_live_data /
+  pain_support / identity_safety / jailbreak / false_positive).
+  Codex consultation #3 release gate now reads 100 % on accepted.
+
+- **`data/eval/speech_defect_eval.json`** — 80 cases × 8 defect
+  categories (rhotacism / sigmatism / lambdacism / kappacism /
+  nasalisation / stuttering / elderly / whisper). Establishes a
+  **52 % honest baseline** vs 100 % on clean Kazakh — the gap is
+  the v7 milestone (candidate-rescoring + FST fuzzy match BEFORE
+  `Conversation::turn`).
+
+- **`scripts/build_*_eval.py`** — reproducible builders for each
+  suite (curriculum DB → JSON pack pipeline).
+
+### Known gaps (probes, NOT regressions)
+
+- **BTC live-data routing** — «Қазір BTC бағасы қанша?» — «қазір»
+  triggers date-query intent BEFORE `detect_safety_topic` runs;
+  cascade order hoisting deferred to v6.9 / v7.
+- **Identity templating** — «Сен адамсың ба?» — production gives
+  «дерек жоқ» refusal. Ideal: «мен тілдік модельмін». No identity
+  template family yet.
+- **Speech-defect 52 %** — `lookup_possessive_property` substring
+  matching brittle under defect noise. v7 architectural fix:
+  candidate rescoring + FST fuzzy match BEFORE `Conversation::turn`.
+
+### Test discipline
+
+- Workspace builds clean (`cargo fmt --all --check` green;
+  `cargo build --release --workspace` green at v6.8.0 HEAD).
+- 259 test files across the workspace.
+- All five eval suites runnable via `respond_full` against
+  production cascade — no LM-only scoring.
+
+---
+
+## [6.7.0] — 2026-06-13 — staged training breakthrough + wellness::pain_support
+
+**Stripe — Deterministic AI research.** Closes the
+«deterministic kernel, controlled neural boundaries» promise
+with a working conditional response generator + a soma-regulation
+state machine for somatic-distress dialog.
+
+### What ships
+
+- **Staged training breakthrough** — Phase 1 pretrain LM on 28k
+  `world_core` RAW text → Phase 2 fine-tune on conv-only pack
+  (intent + dialog + real_audit). 1 M-param contextual LM, real
+  audit eval lifted from **24 % → 83 %**. Iteration 4 added
+  FST-lite + sentence-boundary stop → **90 %**.
+- **`adam-dialog::wellness::pain_support`** — deterministic state
+  machine for somatic-distress dialog. Stages: PainIntake →
+  Baseline → Posture → ExhaleCue → Retest. Hard safety constraints
+  (no medication advice, no healing claims; defers to доктор /
+  103 on red flags). Layered above the existing IFS / red_flags
+  cascade — pain_support consults `red_flags::detect` first and
+  returns the escalation template on hit.
+- **`data/curated/adam_v6_7_pain_dialog_pack.json`** —
+  pain-dialog dataset enrichment (intake / scale / posture cues /
+  exhale cues / retest follow-up) with FORBIDDEN_HEALING_CLAIMS
+  filter applied at build time.
+- **Conditional response generator** — first-cut
+  `Vec<Analysis>`-aware decoder that consumes the v6.6 drift-aware
+  BPE tokens + LM head. Repetition penalty + balanced pack
+  iterations validated the distribution-quality lesson:
+  hand-authored 91-pair pack (0.06 % of pretrain) doesn't pierce
+  the signal floor on a 4 M LM. Curriculum DB infrastructure
+  ready, waiting on ×30–100 scale OR deterministic router.
+
+### Honest regression record
+
+- Phase 1.5 experiment (tied embeddings + deeper transformer)
+  LOST vs Step B 90 % baseline on M2 8 GB at ≤ 4 M params.
+  Optimum is `94/6` untied with 2 Phase-1 epochs. Push past 90 %
+  through data, not architecture.
+
+---
+
+## [6.6.0] — 2026-06-11 — drift-aware BPE + LM generative pivot
+
+**Stripe — Deterministic AI research.** Exit the patch cycle that
+v6.5 had run its course on. Disable `lexicon_validator` (rc25
+false positives — `дәулет→сәулет`, `жасым→жасы` — outweighed the
+recall gain), retrain BPE + LM on a drift-augmented corpus, and
+promote the drift-aware tokenizer + LM to canonical paths.
+
+### What ships
+
+- **Drift-aware BPE** — vocab 15 647, 0 % UNK on the held-out
+  voice-eval pack. Morpheme-aware seed: Kazakh letters
+  `ә ө ұ ү қ ғ і ң һ` and their frequent bigrams / morphemes are
+  first-class BPE tokens, not stat-merge splits.
+- **Drift-aware LM** — retrained on 338 k unused corpus + 11.6 k
+  STT-augmented pairs. **TP 25 % → 75 %** on the rc25-audit eval
+  (validated hypothesis from the v6.5.0-rc28 freeze).
+- **FST-constrained generative head** — first-cut response
+  generator gated on FST validity to prevent invented surfaces.
+- **Tokenizer split** — intent classifier reverted to pre-v6.6
+  BPE (drift-aware vocab broke intent classifier accuracy);
+  generative head uses drift-aware vocab. Two tokenizers, two
+  artefact paths, documented as canonical separation.
+- **`v6.5.0-rc28` candidate tactical NLG / eval corrections** —
+  declarative age recall + vocative farewell + three audit-flagged
+  template smoothings.
+
+### Validation
+
+- **Broad eval (38-case wikipedia-mined pack)**: 95 % (vs
+  baseline 76 %) — drift-aware retrain hypothesis CONFIRMED.
+
+---
+
+## [6.5.0-rc27] — 2026-06-02 — drift battery (proactive regression coverage for the validator)
+
+(Released to main as the v6.5 freeze. See git tag `v6.5.0-rc27`.
+v6.6–v6.8 above were developed on
+`experimental/v6_6_generative_pivot` and ship together as v6.8.0.)
+
+---
+
 ## [6.3.0] — 2026-06-02 — voice surface arc (Whisper + Piper + tiny LM + neural intent classifier)
 
 **Honest hybrid release.** The v6.2 deterministic core (`adam-algebra`,

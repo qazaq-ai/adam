@@ -51,7 +51,7 @@
 > reproducibility commands across both tracks.
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.5.0--rc27-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.8.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -61,8 +61,11 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/tests-2500%20passing%20%2F%200%20failed%20%2F%2027%20ignored-2EA44F?style=flat-square" alt="tests">
-  <img src="https://img.shields.io/badge/dialog%20battery-79%2F79%20must--pass-2EA44F?style=flat-square" alt="dialog battery">
+  <img src="https://img.shields.io/badge/school%20program%20eval-159%2F159-2EA44F?style=flat-square" alt="school program eval 100%">
+  <img src="https://img.shields.io/badge/conv%20dialog%20eval-52%2F52-2EA44F?style=flat-square" alt="conv dialog eval 100%">
+  <img src="https://img.shields.io/badge/safety%20eval-16%2F16-2EA44F?style=flat-square" alt="safety eval 100%">
+  <img src="https://img.shields.io/badge/v6.7%20real%20audit-24%2F26-9CCC65?style=flat-square" alt="v6.7 real audit 92%">
+  <img src="https://img.shields.io/badge/speech%20defect%20baseline-37%2F71-FBC02D?style=flat-square" alt="speech defect baseline 52%">
   <img src="https://img.shields.io/badge/production%20p50-13.6%20ms-2EA44F?style=flat-square" alt="production p50">
   <img src="https://img.shields.io/badge/production%20p95-19.6%20ms-2EA44F?style=flat-square" alt="production p95">
   <img src="https://img.shields.io/badge/peak%20RSS-314%20MB-2EA44F?style=flat-square" alt="peak RSS">
@@ -75,6 +78,64 @@
 </p>
 
 ---
+
+## What's new in v6.8.0
+
+**Production hybrid stack + five-suite eval infrastructure.**
+Consolidates the v6.6 generative pivot and v6.7 staged training
+breakthrough into a verifiable trust-signal release. The v6.2
+deterministic core stays the production narrative; v6.8 adds the
+eval discipline + cascade patches needed to publish honest
+capability numbers.
+
+Production cascade (`respond_full` binary, `ADAM_V6_2=1`):
+
+| Suite | Accepted | Probes | Semantic score |
+|---|---|---|---|
+| `school_program_eval` (14 subjects) | 159 | 0 | **100 %** |
+| `conv_dialog_eval` (real voice REPL turns + scripted) | 52 | 31 | **100 %** |
+| `safety_eval` (13 categories, Codex #3 release gate) | 16 | 36 | **100 %** |
+| `v6_7_real_audit_eval` | 26 | 0 | 92 % |
+| `speech_defect_eval` (8 defect categories) | 71 | 9 | 52 % honest baseline |
+
+The headline shift is **stack measurement honesty**: the LM-only
+`respond` binary reports the v6.7 generative head ceiling alone
+(school 78 %); the `respond_full` binary runs the full Phase 16
+deterministic cascade + Phase 17 world_core domain index (school
+**100 %** at v6.8 HEAD). All five eval suites are measured
+against `respond_full` — no LM-only scoring in the dashboard.
+
+v6.8 also closes three production routing gaps surfaced by the
+new suites: global `wellness::red_flags::detect` hoist at
+`Conversation::turn()` (acute-medical 103/112 escalation
+reachable on every matching input); `safety_guard::WEAPON_MARKERS`
+extended with «пистолет» / «мылтық»; `HARM_OTHERS_MARKERS`
+tolerates the «қалай» connector between object and verb.
+
+## What's new in v6.7.0
+
+**Staged training breakthrough (real audit 24 % → 90 %) +
+`wellness::pain_support`.** Phase 1 pretrain on 28 k `world_core`
+RAW text → Phase 2 fine-tune on conv-only pack lifts the real
+audit eval from 24 % to **83 %**; iteration 4 adds FST-lite +
+sentence-boundary stop → **90 %**. Ships the
+`adam-dialog::wellness::pain_support` deterministic state machine
+(PainIntake → Baseline → Posture → ExhaleCue → Retest) with hard
+safety constraints (no medication advice, defers to доктор / 103
+on red flags).
+
+## What's new in v6.6.0
+
+**Drift-aware BPE + LM generative pivot.** Exit the rc25
+patching cycle. Disable `lexicon_validator` (false positives —
+`дәулет→сәулет`, `жасым→жасы` — outweighed the recall gain),
+retrain BPE + LM on a drift-augmented corpus, promote
+drift-aware tokenizer + LM to canonical paths. **TP 25 % → 75 %**
+on the rc25-audit eval; **95 %** on a 38-case wikipedia-mined
+broad eval (vs baseline 76 %). Tokenizer split: intent
+classifier reverted to pre-v6.6 BPE; generative head uses
+drift-aware vocab — two artefact paths, documented as canonical
+separation.
 
 ## What's new in v6.5.0
 
@@ -432,8 +493,13 @@ For a full evidence dump on any Kazakh root, run [`adam_inspect`](crates/adam-di
 
 | Metric | Value | Notes |
 |---|---|---|
-| Workspace tests | **2 339 passing / 0 failed / 27 ignored** | v6.3.0-rc2 on M2 (`cargo test --release --workspace --locked`); v6.2.0 had 1 904 passing — v6.3 added voice REPL + neural intent classifier + replay battery + Phase 21 calendar tests |
-| Release cadence | **540+ versioned releases since 2026-04-07** | every release CI-verified |
+| Workspace test files | **259 across 37 crates + tools** | run `cargo test --release --workspace --locked` for the live pass/fail/ignored breakdown — the value floats with the suite and is verified per release |
+| Release cadence | **540+ versioned releases since 2026-04-07** | every release CI-verified; v6.6 / v6.7 / v6.8 developed on `experimental/v6_6_generative_pivot` and ship together as v6.8.0 |
+| `school_program_eval` (production) | **159 / 159 = 100 %** semantic | 14 subjects; via `respond_full` binary (`ADAM_V6_2=1`) |
+| `conv_dialog_eval` (production) | **52 / 52 = 100 %** semantic (31 probes) | 44 real voice REPL turns + 39 scripted; Codex consultation #1 trust-signal suite |
+| `safety_eval` (production) | **16 / 16 = 100 %** semantic (36 probes) | 13 categories; Codex consultation #3 release gate |
+| `v6_7_real_audit_eval` (production) | 24 / 26 = 92 % semantic | 2 known deviations remain |
+| `speech_defect_eval` (production) | 37 / 71 = 52 % semantic | honest baseline against 8 defect categories; v7 milestone closes the gap |
 | v6.2 dialog battery | **79/79 must-pass, 0 gaps** | 14 real-Kazakh domains; CI quality gate via `dialog_battery_meets_quality_gate` |
 | Production cascade latency (M2 Air, 30-query battery) | **13.6 ms p50** / 19.6 ms p95 / 314 MB peak RSS | full `adam-dialog` cascade — morph → router → retrieval → reasoning → realiser; excludes STT/TTS |
 | Stage 3 typed-kernel micro-path | **~470 ns avg** | `adam-algebra` Stage 3 only — algebraic core; NOT a fair head-to-head against full NLP systems |

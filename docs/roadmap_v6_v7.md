@@ -1,8 +1,9 @@
 # Roadmap — v6.0.0 → v7.0.0
 
-**Status:** active, last updated 2026-05-16.
-**Branch of record:** `experimental/agglutinative-neural` until v6.0.0
-GA, then `main`.
+**Status:** active, last updated **2026-06-17** for v6.8.0.
+**Branch of record:** `main` for shipped versions;
+`experimental/v6_6_generative_pivot` for the v6.8.0 release-candidate
+(merge pending — see DUE_DILIGENCE.md §8).
 **Architecture spec:** [`architecture_neural_v6.md`](architecture_neural_v6.md)
 **Position / philosophy:** [`MANIFESTO.md`](MANIFESTO.md)
 **Empirical baseline:** [`research/results_real_mix_2026_05_16.md`](research/results_real_mix_2026_05_16.md)
@@ -11,6 +12,32 @@ This roadmap is the **public commitment** of what ships under each
 release tag from v6.0.0 through v7.0.0. Items inside a release block
 are release-blockers unless flagged otherwise; the release does not
 ship until they are all green.
+
+## What actually shipped (versus what this roadmap predicted)
+
+The original roadmap (drafted 2026-05-16, framing v6.0.0 as the
+algebra-anchored neural composition layer headline release) was
+overtaken by execution reality. Three corrections:
+
+1. The v6.0.0 → v6.5.0 arc shipped as the **deterministic-core
+   consolidation** sequence (`v6.2 neurosymbolic agglutinative
+   algebra` → `v6.3 voice surface` → `v6.4 wellness IFS/CBT/ACT`
+   → `v6.5 safety guard + drift battery`), not as one neural-layer
+   GA release.
+2. The **multi-Turkic extension** (Kyrgyz / Tatar / Uyghur)
+   originally scheduled for v6.1.x has been **deferred** — Kazakh
+   depth (school tutor + voice REPL) became the strategic anchor
+   instead.
+3. The **v6.6 generative pivot** (drift-aware BPE + LM, staged
+   training breakthrough, wellness::pain_support, five-suite eval
+   infrastructure) was not in the original roadmap and is the
+   actual v6.8.0 release content. Per-release detail is in
+   [CHANGELOG.md](../CHANGELOG.md); per-arc memory is in the
+   private memory store (not in the repo).
+
+The sections below are kept for historical context; the live
+release commitment is the CHANGELOG, not this file. A v7.0.0 +
+v7.x rewrite of this document is itself a v7.0.0 release item.
 
 For per-release history of v0.x–v5.x see [`roadmap.md`](roadmap.md).
 For the v6.0 architecture contract that every release here honours

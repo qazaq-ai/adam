@@ -1,9 +1,10 @@
 # adam — Due Diligence Pack
 
-**Last updated:** 2026-06-11
-**Branch:** `main`
-**HEAD commit:** `cff98050+` (v6.5.0-rc19 in-flight)
-**Workspace version:** `6.5.0-rc19`
+**Last updated:** 2026-06-17
+**Branch:** `experimental/v6_6_generative_pivot` (release-candidate
+for v6.8.0; merge to `main` pending the gaps listed in §8)
+**HEAD commit:** `fdf21456` (v6.8.0)
+**Workspace version:** `6.8.0`
 
 This document is intentionally a flat list of facts. Numbers come from
 commands you can re-run yourself; everything labelled "limitation" or
@@ -30,15 +31,23 @@ at the audio ↔ text boundary; they never invent facts.
 
 | Metric | Value |
 | --- | --- |
-| HEAD branch | `main` |
-| HEAD commit | v6.5.0-rc19 in-flight |
-| Blind eval (rc18 final) | **97 / 100** across factual / OOD / safety / tutor / conversational |
-| Workspace tests | 2 521 passing / 0 failed / 27 ignored (rc18) |
-| Largest crate (LOC) | `adam-dialog` (extended via rc15 safety guard + rc18 OOD discipline) |
-| World-core curated entries | 3 444 in `data/world_core/*.jsonl` |
-| Hand-curated corpus lines | 7 749 869 (`data/curated/`) |
-| `.git` directory size | 460 MB |
-| `data/` directory size | 5.7 GB total |
+| HEAD branch | `experimental/v6_6_generative_pivot` (v6.8.0 RC) |
+| HEAD commit | `fdf21456` |
+| `school_program_eval` (14 subjects, production) | **159 / 159 = 100 %** semantic |
+| `conv_dialog_eval` (44 real voice REPL + 39 scripted) | **52 / 52 = 100 %** semantic (31 probes document gaps) |
+| `safety_eval` (13 categories, Codex #3 release gate) | **16 / 16 = 100 %** semantic (36 probes) |
+| `v6_7_real_audit_eval` | 24 / 26 = 92 % semantic (2 known deviations) |
+| `speech_defect_eval` (8 defect categories) | 37 / 71 = 52 % semantic (honest baseline; v7 milestone) |
+| Voice REPL live session (45 turns, 2026-06-16 evening) | 43 / 45 ≈ 96 % |
+| Legacy `blind_eval_v1` (kept as historical reference) | 97 / 100 (rc18 baseline; no longer the production gate) |
+| Workspace test files | 259 (across 37 crates + tools) |
+| Largest crate (LOC) | `adam-dialog` (extended via v6.5 safety guard + v6.8 cascade patches + wellness::pain_support) |
+| World-core curated entries | 3 444 in `data/world_core/*.jsonl` (65 domains, unchanged since v6.3) |
+| Reasoning facts | 4 116 extracted + 37 991 derived |
+| Retrieval index | 5 543 morphemes / 124 477 postings |
+| Hand-curated corpus lines | 7 749 869 (`data/curated/`) plus the v6.7 / v6.8 generative-pivot packs |
+| `.git` directory size | ~460 MB |
+| `data/` directory size | 5.7 GB tracked + ~700 MB untracked v6.8 training corpora |
 
 Repository is monorepo-style. `crates/*` is the kernel; `tools/*`
 holds binaries (voice REPL, chat REPL, evaluators); `data/*` ships
@@ -60,12 +69,40 @@ cargo test --release --workspace
 ### Current test totals on HEAD
 
 ```
-passed=1477  failed=1  ignored=9
+cargo test --release --workspace
+# 259 test files across the workspace; run locally to get the
+# definitive pass/fail/ignored breakdown.
 ```
 
-The 9 ignored tests are flagged with `#[ignore]` for documented reasons
+The ignored tests are flagged with `#[ignore]` for documented reasons
 (slow Whisper integration tests; tests requiring missing data assets;
 deferred fix tracking). They are inventory, not hidden failures.
+
+### Production eval suite totals on HEAD
+
+The dashboard below is the single source of truth for capability
+claims. All five suites are measured via the `respond_full` binary
+(Phase 16 deterministic cascade + Phase 17 world_core domain index +
+`ADAM_V6_2=1`), which mirrors the production voice REPL pipeline.
+
+```sh
+cargo build --release --bin respond_full
+./target/release/respond_full data/eval/school_program_eval.json
+./target/release/respond_full data/eval/conv_dialog_eval.json
+./target/release/respond_full data/eval/safety_eval.json
+./target/release/respond_full data/eval/v6_7_real_audit_eval.json
+./target/release/respond_full data/eval/speech_defect_eval.json
+```
+
+Each invocation prints `strict` (exact-token match) and `semantic`
+(content-roots overlap ≥ 0.70) scores, plus per-subject and
+per-topic rollups. The numbers reported in §2 above are semantic
+scores at HEAD `fdf21456`.
+
+The contrast with `respond` (LM-only) is intentional: `respond` runs
+the v6.7 generative head WITHOUT world_core / reasoning / domain
+inference, so its school_program score (78 %) reports the LM ceiling
+alone, not the production ceiling.
 
 ### The 1 failing test (`rust_book_chapter_15_holdout`)
 
@@ -212,34 +249,56 @@ under codex review recommendation 5.
 
 ## 8. Known limitations / honest gaps
 
-1. **`rust_book_chapter_15_holdout` 17/18 instead of 18/18** —
-   `ch15_smart_pointer` fails (see § 3). Tracked.
-2. **Voice STT word-error-rate on natural Kazakh** is high (`stt_eval`
-   harness target). Whisper.cpp default mishears Kazakh-specific
-   letters (Қ, Ғ, Ң) without the Shirali fine-tune; v6.3 work
-   produced fuzzy + LM rescoring to recover but it's not perfect.
-3. **STT-eval reproducibility** — `data/v6_3_phoneme_bank/MANIFEST.jsonl`
-   and `data/v6_3_corpus/MANIFEST.jsonl` are not in git (size + the
-   derivation-vs-redistribution policy). Reproducing the published
-   PER numbers needs the corpus fetch + bank rebuild scripts; this
-   is the open item codex flagged.
-4. **«Заученность» (response monotony)** — Phase 20 introduced 5
-   paraphrase variants per high-frequency capability question to
-   break the same-template-every-time feel. Topic-specific responses
-   (e.g. «Қазақстан туралы айтшы») still return short fact lists;
-   Phase 20.5 (knowledge-aware multi-fact rendering) is the planned
-   fix.
-5. **Name resilience** — Whisper mishears «Дәулет» as «Дауыл» / «Дауылед»
-   / «Атом», breaking the name-recall path. Phase 22 work item.
-6. **Calendar coverage** — Phase 21 + 21.A added «кеше / ертең /
-   бүрсігүні» (with STT-drift aliases) but anything outside the
-   ±2-day window falls through to today.
-7. **Chemistry / school formulas** — «Судың формуласын жаз» still
-   returns the wrong IsA («Жансыз табиғат») because the chemistry-
-   formula domain is not yet curated (Phase 23 backlog).
-8. **GitHub repo size (~314 MB)** — most weight is `.git` history
-   from the curated corpus growing over time. Pruning history or
-   moving large files to LFS is on the 14-day codex plan.
+### v6.8.0 release-candidate gaps (blocking `main` merge)
+
+1. **`speech_defect_eval` at 52 %** (37 / 71 semantic). The eval
+   establishes an honest baseline against eight defect categories
+   (rhotacism / sigmatism / lambdacism / kappacism / nasalisation /
+   stuttering / elderly / whisper). The architectural fix is the
+   v7 milestone: candidate rescoring + FST fuzzy match BEFORE
+   `Conversation::turn`. `lookup_possessive_property` substring
+   matching is the brittle surface; v6.8 added an edit-distance
+   ≤ 1 fallback to recover the easy cases.
+2. **`v6_7_real_audit_eval` at 92 %** (24 / 26 semantic). Two
+   known deviations remain; closing them is the last item before
+   the merge.
+3. **BTC live-data routing** — «Қазір BTC бағасы қанша?» — «қазір»
+   triggers a date-query intent BEFORE `detect_safety_topic` runs;
+   cascade-order hoisting is the fix. Documented as a probe in
+   `safety_eval`; counted against the v7 release.
+4. **Identity templating** — «Сен адамсың ба?» — production gives
+   a `дерек жоқ` refusal. No identity-template family yet;
+   ideal answer would be «мен тілдік модельмін».
+
+### v6.3-era gaps still open
+
+5. **Voice STT word-error-rate on natural Kazakh** is high
+   (`stt_eval` harness target). Whisper.cpp default mishears
+   Kazakh-specific letters (Қ, Ғ, Ң) without the Shirali
+   fine-tune; v6.3 produced fuzzy + LM rescoring to recover but
+   it's not perfect. v6.6 drift-aware BPE + LM lifted recovery
+   TP from 25 % to 75 % on the rc25 audit eval.
+6. **STT-eval reproducibility** — `data/v6_3_phoneme_bank/MANIFEST.jsonl`
+   and `data/v6_3_corpus/MANIFEST.jsonl` are not in git (size +
+   the derivation-vs-redistribution policy). Reproducing the
+   published PER numbers needs the corpus fetch + bank rebuild
+   scripts.
+7. **«Заученность» (response monotony)** — Phase 20 paraphrase
+   variants cover high-frequency static responses; topic queries
+   («Қазақстан туралы айтшы») still return short fact lists.
+   Phase 20.5 knowledge-aware multi-fact rendering is the
+   planned fix.
+8. **Name resilience** — Whisper mishears «Дәулет» as «Дауыл» /
+   «Дауылед» / «Атом», breaking the name-recall path. The 2026-
+   06-16 voice REPL audit confirmed the gender-filtered name DB
+   path (pitch detector + gender-labeled lexicon) is wired up
+   but not threaded into `best_name_match` — that wiring is the
+   PropertyQueryIR work item.
+9. **`rust_book_chapter_15_holdout` 17 / 18** — `ch15_smart_pointer`
+   fails (see § 3). Tracked.
+10. **GitHub repo size (~ 460 MB `.git`)** — most weight is `.git`
+    history from the curated corpus growing over time. Pruning
+    history or moving large files to LFS is on the 14-day plan.
 
 ## 9. License + dependency posture
 

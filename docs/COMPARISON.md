@@ -1,8 +1,9 @@
 # adam vs LLMs — comparison instrument
 
-**v6.5.0-rc21 (2026-06-11).**  Built per external-audit
-recommendation #4 (2026-06-10): a same-task comparison instrument
-rather than raw latency claims.
+**v6.8.0 (2026-06-17).**  Built per external-audit recommendation
+#4 (2026-06-10) as a same-task comparison instrument rather than
+raw latency claims; refreshed for v6.8 with the five-suite eval
+dashboard.
 
 This document gathers **publicly available** benchmark scores for
 the major LLMs adam is often (incorrectly) compared against.  We
@@ -19,7 +20,7 @@ The table below frames where each system class wins.
 
 | Model | KazMMLU avg | MMLU-Kk | Belebele Kk | Source |
 |---|---|---|---|---|
-| **adam v6.5.0-rc18** | not run (see §5) | — | — | own 100-item blind eval: **97 / 100** [`data/eval/blind_eval_v1.json`](../data/eval/blind_eval_v1.json) |
+| **adam v6.8.0** | not run (see §5) | — | — | own five-suite production dashboard: `school_program` **159 / 159** • `conv_dialog` **52 / 52** • `safety` **16 / 16** • `v6_7_real_audit` 24 / 26 • `speech_defect` 37 / 71 (honest baseline) — `respond_full` binary, `ADAM_V6_2=1`; the legacy `blind_eval_v1` baseline (97 / 100 at rc18) is kept for trend continuity but is no longer the production gate |
 | GPT-4o | **76.6 %** | not published | not published | [KazMMLU paper, ACL 2025](https://arxiv.org/abs/2502.12829) |
 | DeepSeek V3 | 76.9 % | — | — | same |
 | Llama 3.1 70B | **56.2 %** | — | — | same |
@@ -40,7 +41,7 @@ humanities, social science, language, other.
 
 | Model | Params | RAM / VRAM (inference) | Hardware | API price ($/1M tok in/out) |
 |---|---|---|---|---|
-| **adam v6.5.0-rc20** | deterministic kernel; no params | **314 MB RSS** | CPU; M2 8 GB; **offline / 0 network** | **$0** |
+| **adam v6.8.0** | deterministic kernel; no params (v6.7 generative head adds ~ 1 M params at the speech surface, never in the truth path) | **314 MB RSS** | CPU; M2 8 GB; **offline / 0 network** | **$0** |
 | Llama 3.1 8B | 8 B | ~16 GB FP16 | 1× A100 / H100 | self-host |
 | Llama 3.1 70B | 70 B | ~140 GB FP16 | 2-4× H100 | self-host |
 | Llama 3.1 405B | 405 B | 972 GB FP16 / 486 GB FP8 / 243 GB INT4 | 8× H100 (FP8) | self-host |
