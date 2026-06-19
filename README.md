@@ -280,6 +280,14 @@ See [COLLABORATION.md](COLLABORATION.md) for per-class engagement terms.
 
 ---
 
+## Foundation policies
+
+### Graph-First Policy
+
+The graph layer of `adam` is **Rust-native and repository-native**. No external graph database as a required runtime; no Cypher / Gremlin / SPARQL query layer in the core pipeline; no Python graph stack hidden behind scripts. The canonical graph representation, traversal, and artifact builders live in Rust crates inside this repository. Shell scripts may orchestrate graph builds only as thin wrappers around `cargo run`.
+
+For the full policy set (corpus, sources, curation, classification, scoring, tokenizer, evaluation, dialog architecture), see [`docs/`](docs/) and the per-policy files referenced from [`docs/v6_2_architectural_redesign.md`](docs/v6_2_architectural_redesign.md).
+
 ## License
 
 [Business Source License 1.1](LICENSE). Converts automatically to Apache License 2.0 on **2029-01-01**.
