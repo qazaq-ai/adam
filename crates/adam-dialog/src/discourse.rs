@@ -735,6 +735,22 @@ mod user_self_location_tests {
         ));
         assert!(!is_user_self_location_query("Алматы қайда?"));
     }
+
+    /// **v6.8.1 voice REPL audit (Bug #30).** Live session turn #30
+    /// «Мен қай ауылда тұрамын?» triggered the assistant-self
+    /// template («Мен сандық әлемде тұрамын») because the pre-fix
+    /// locative-question gate only listed «қала / жер / аудан».
+    /// Extend coverage to every Kazakh settlement noun the eval-pack
+    /// uses without losing the 2nd-person system-probe rejection.
+    #[test]
+    fn accepts_user_self_location_with_village_noun_v681() {
+        assert!(is_user_self_location_query("Мен қай ауылда тұрамын?"));
+        assert!(is_user_self_location_query("Мен қай елде тұрамын?"));
+        assert!(is_user_self_location_query("Мен қай облыста тұрамын?"));
+        assert!(is_user_self_location_query("Менің мекенім қайда?"));
+        // 2nd-person ауыл probe still routes to assistant-self.
+        assert!(!is_user_self_location_query("Сен қай ауылда тұрасың?"));
+    }
 }
 
 #[cfg(test)]
@@ -2157,10 +2173,24 @@ pub fn is_user_self_location_query(input: &str) -> bool {
         .any(|p| tokens.contains(p))
         || lower.contains("тұрасыз")
         || lower.contains("тұрасың");
+    // **v6.8.1 — 2026-06-17 voice REPL audit (Bug #30).** Pre-fix the
+    // locative-question gate covered only «қала» / «жер» / «аудан».
+    // Live session «Мен қай ауылда тұрамын?» bypassed the user-self
+    // path and triggered the assistant-self template («Мен сандық
+    // әлемде тұрамын»).  Extend coverage to every Kazakh settlement
+    // noun the eval-pack uses: ауыл (village), село, ел (country),
+    // мекен (residence), облыс (oblast), республика (republic),
+    // отбасы (none — kept out, family is not a place).
     let has_locative_question = lower.contains("қайда")
         || lower.contains("қайдан")
         || lower.contains("қай жер")
         || lower.contains("қай қала")
+        || lower.contains("қай ауыл")
+        || lower.contains("қай село")
+        || lower.contains("қай ел")
+        || lower.contains("қай мекен")
+        || lower.contains("қай облыс")
+        || lower.contains("қай республика")
         || lower.contains("қай аудан");
     if has_2sg_marker {
         return false;

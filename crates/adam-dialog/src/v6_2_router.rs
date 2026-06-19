@@ -762,8 +762,22 @@ fn handle_listing_query(input: &str) -> Option<String> {
             .replace("тәуел елісіздік", "тәуелсіздік")
             .replace("тәуел сіздік", "тәуелсіздік");
         let lc = &lower_glued;
-        if lc.contains("елорда") || (lc.contains("астана") && lc.contains("қандай"))
-        {
+        // **v6.8.1 — 2026-06-17 voice REPL audit (Bug #17).** Pre-fix
+        // capital gate required `"астана" && "қандай"` adjacency.  Live
+        // session «Қазақстанның астанысы — қай қала» missed on TWO
+        // counts: Whisper drift «астанасы → астанысы» (а→ы at
+        // position 5) killed the «астана» substring (became «астаны»);
+        // interrogative was «қай қала» not «қандай».  Extensions ride
+        // on top of the existing `mentions_kz` gate so they fire only
+        // inside a Kazakhstan-scoped question — no false-positive
+        // surface on generic «астана» mentions.
+        let has_capital_interrogative = lc.contains("қандай")
+            || lc.contains("қай қала")
+            || lc.contains("қай қалада")
+            || lc.contains("қай қалалар");
+        let capital_match = lc.contains("елорда")
+            || ((lc.contains("астана") || lc.contains("астаны")) && has_capital_interrogative);
+        if capital_match {
             return Some(
                 "Қазақстанның елордасы — Астана қаласы (1997 жылдан бастап; \
                  2019–2022 жылдары «Нұр-Сұлтан» деп аталды)."
@@ -3204,6 +3218,53 @@ mod tests {
         assert!(
             s.contains("Ертіс") || s.contains("Сырдария"),
             "expected river list, got: {s}"
+        );
+    }
+
+    /// **v6.8.1 — 2026-06-17 voice REPL audit (Bug #17).** Live
+    /// session turn #17 «Қазақстанның астанысы — қай қала?» fell
+    /// back to a generic IsA («Мемлекет») because the pre-fix gate
+    /// required both `"астана"` (substring missed: Whisper drift
+    /// «астанасы → астанысы» replaces а→ы) and `"қандай"`
+    /// (interrogative was «қай қала», not «қандай»). The patch adds
+    /// the «астаны» surface form and the «қай қала / қалада /
+    /// қалалар» interrogative variants while keeping the existing
+    /// «елорда» standalone path.
+    #[test]
+    fn capital_query_with_whisper_drift_and_qaj_qala_v681() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Қазақстанның астанысы — қай қала?", &idx);
+        assert!(r.is_some(), "capital query must resolve, got None");
+        let s = r.unwrap();
+        assert!(s.contains("Астана"), "expected Astana in answer, got: {s}");
+    }
+
+    /// Companion: clean canonical form «астанасы» + «қандай» still
+    /// works after the gate refactor.
+    #[test]
+    fn capital_query_canonical_form_still_resolves_v681() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Қазақстанның астанасы қандай?", &idx);
+        assert!(r.is_some());
+        assert!(r.unwrap().contains("Астана"));
+    }
+
+    /// Negative control: «астана» alone without an interrogative
+    /// (e.g. «Астана — әдемі қала.») must NOT trigger the capital
+    /// template. The fix gates `астана`/`астаны` substrings on a
+    /// capital-shaped interrogative so the false-positive surface
+    /// stays bounded.
+    #[test]
+    fn capital_marker_without_interrogative_does_not_fire_v681() {
+        let idx = dialog_battery::canonical_corpus();
+        let r = answer_with_corpus("Астана — әдемі қала.", &idx);
+        // We don't pin a specific answer — the canonical corpus may
+        // surface another fact — only assert it isn't the capital
+        // template (which would be the false-positive).
+        let response = r.unwrap_or_default();
+        assert!(
+            !response.contains("Қазақстанның елордасы — Астана"),
+            "must not fire capital template on bare statement, got: {response}"
         );
     }
 }
