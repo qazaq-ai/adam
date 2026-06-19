@@ -122,6 +122,22 @@ templates = [
     "аман бол",
 ]
 
+# **v6.6 voice REPL audit 2026-06-13** — when the planner has either
+# a known personal honorific («Дәке») OR a voice-derived vocative
+# («Ағай» / «Апай» / «Балам») in `name_respect`, the cascade picks
+# this family instead of the bare `farewell` above so the leave-
+# taking carries a culturally-appropriate vocative. Planner switch
+# lives at `Intent::Farewell` in planner.rs:2216 (analogous to
+# `ask_name.with_known_user`).
+[[families]]
+key = "farewell.with_known_user"
+templates = [
+    "сау болыңыз, {name_respect}",
+    "{name_respect}, сау болыңыз",
+    "аман болыңыз, {name_respect}",
+    "кездескенше, {name_respect}",
+]
+
 # ---------- Affirmation / Negation ----------
 
 [[families]]
@@ -1275,7 +1291,7 @@ templates = [
     # instrumental-form fallback below.
     "Танысқаныма қуаныштымын, {name}! Сізді {name_respect_distinct} деп атаймын — қазақ дәстүрі бойынша",
     "{name_respect_distinct}, танысқаныма қуаныштымын",
-    "{name} деген атыңызды есте сақтап, сізді {name_respect_distinct} деп атаймын — қазақша",
+    "{name} деген атыңызды есте сақтап, сізді {name_respect_distinct} деп атаймын",
     # **v4.51.5** — instrumental fallback retained ONLY as the
     # vowel-no-consonant safety case (e.g. single-vowel names that
     # have no extractable diminutive). All real Kazakh names —
@@ -1313,15 +1329,24 @@ templates = [
 # just told the system a number, and the seed-0 reply came back
 # without echoing it. Promoted aspirational dialog
 # `age_statement_acknowledged` to canonical at v4.4.9.
+#
+# **v6.6 voice REPL audit 2026-06-13** — user feedback: «он должен
+# был сказать "Сіз 66 жастасыз.", а не "66 — Жақсы жас"». Promoted
+# the declarative «сіз {age} жастасыз» form to index 0 so the
+# seed-pick lands on a definitive recall sentence first, and the
+# colourful acknowledgments stay as later-index variants. Order
+# now mirrors `ask_age.with_known_user` where «сіз {age} жастасыз»
+# is already canonical.
 [[families]]
 key = "statement_of_age"
 templates = [
-    "{age} — жақсы жас",
-    "{age} — қуатты кезеңіңіз",
-    "{age} жас — тамаша кезең",
+    "сіз {age} жастасыз",
     "жасыңыз {age} екен",
     "{name_respect}, {age} жастасыз, тамаша",
     "{name_respect}, {age} жас — керемет кезең",
+    "{age} — жақсы жас",
+    "{age} — қуатты кезеңіңіз",
+    "{age} жас — тамаша кезең",
 ]
 
 [[families]]
@@ -2054,7 +2079,15 @@ templates = [
 [[families]]
 key = "ask_purpose.no_topic"
 templates = [
-    "Қандай ұғымның мақсатын білгіңіз келеді? Мысалы: ownership, borrow, lifetimes, trait, future, pin.",
+    # **v6.8 (2026-06-16) — Rust example list removed.** The previous
+    # leading variant («Мысалы: ownership, borrow, lifetimes, …»)
+    # leaked Rust-domain examples into every topic-less «X не үшін
+    # керек?» question — e.g. «Ми не үшін керек?» (anatomy) routed
+    # here when topic-extraction couldn't pin «ми». Generic phrasing
+    # is correct for unknown domains; specific Rust-topic examples
+    # belong in a Rust-context-only variant if/when topic-extraction
+    # detects a Rust marker.
+    "Қандай ұғымның мақсатын білгіңіз келеді — нақтылап беріңізші.",
     "Қай тақырыптың мақсаты туралы сұрап тұрсыз — нақтылап беріңізші.",
     "Тура қай ұғымның мақсатын ашуымды қалайсыз? Атаңызшы — нақты түсіндіремін.",
 ]

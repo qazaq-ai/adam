@@ -65,6 +65,16 @@ impl TinyAgtConfig {
 }
 
 /// Tiny agglutinative transformer.
+///
+/// ## Output projection: separate, not tied (v6.7 / Step B production)
+///
+/// v6.8 experiment briefly tied the lm-head with the token-embedding
+/// matrix to shift the parameter share away from "94 % embedding,
+/// 6 % transformer". On real-audit eval the tied variants regressed
+/// (-4 .. -7 pp vs Step B 90 %) — embedding capacity matters more
+/// than reasoning depth at this scale and with our 1-2 epoch Phase 1
+/// pretrain budget. The tied path is reverted; the separate
+/// `output_proj` is restored so Step B checkpoints reload correctly.
 #[derive(Module, Debug)]
 pub struct TinyAgt<B: Backend> {
     token_emb: Embedding<B>,
@@ -159,12 +169,24 @@ impl<B: Backend> TinyAgt<B> {
     ///
     /// `logits`: `[batch, seq_len, vocab_size]`.
     /// `targets`: `[batch, seq_len]`.
+    ///
+    /// **PAD masking (v6.8 fix, 2026-06-15)**: token id 0 = `<pad>` in
+    /// our BPE vocab. The trainer right-pads target tensors with 0
+    /// for positions past the real sequence end. On the Step B corpus
+    /// 48.9 % of positions are PAD — without masking, nearly half of
+    /// the gradient signal teaches the model to emit `<pad>`. That
+    /// dilutes the next-token objective and inflates loss curves.
+    /// The previous regime (94 % embedding, 6 % transformer) hid this:
+    /// the embedding lookup absorbed enough capacity to still give
+    /// 86–90 % on real-audit eval despite the half-broken signal.
+    /// Tied/deeper variants exposed it as a regression.
     pub fn loss(&self, logits: Tensor<B, 3>, targets: Tensor<B, 2, Int>) -> Tensor<B, 1> {
         let [batch, seq_len, vocab] = logits.dims();
         let device = logits.device();
         let flat_logits = logits.reshape([batch * seq_len, vocab]);
         let flat_targets = targets.reshape([batch * seq_len]);
         CrossEntropyLossConfig::new()
+            .with_pad_tokens(Some(vec![0]))
             .init(&device)
             .forward(flat_logits, flat_targets)
     }
@@ -236,8 +258,12 @@ mod tests {
             burn::tensor::TensorData::new(vec![0i64; 8], [1, 8]),
             &device,
         );
+        // Use non-PAD targets (token id 1+) so PAD-masking in
+        // `loss()` doesn't reduce the loss to 0 for the all-PAD
+        // baseline (which is the correct new behaviour after the
+        // v6.8 PAD-mask fix).
         let targets: Tensor<B, 2, Int> = Tensor::from_data(
-            burn::tensor::TensorData::new(vec![0i64; 8], [1, 8]),
+            burn::tensor::TensorData::new(vec![1i64; 8], [1, 8]),
             &device,
         );
         let logits = model.forward(tokens);

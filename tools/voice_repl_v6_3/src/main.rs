@@ -578,20 +578,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Runs BEFORE the legacy fuzzy_normalise so the heavier
         // Zipf-fuzzy only sees tokens that the FST itself couldn't
         // recover.  Logged per-turn for diagnostics.
-        let user_text_merged = if let Some((lex, _)) = dialog_state.as_ref() {
-            // **v6.5.0-rc24** — pass the ZipfVocab so the validator
-            // can override FST validation when a hot-vocab edit-1
-            // neighbour exists (closes rc23 audit T2 «Қалыңғыз» →
-            // «Қалыңыз»).
-            let cleaned =
-                lexicon_validator::clean_with_hot_vocab(&user_text_merged, lex, Some(&zipf_vocab));
-            for (old, new) in &cleaned.substitutions {
-                println!("[voice-repl] lexicon-validator: «{old}» → «{new}»");
-            }
-            cleaned.text
-        } else {
-            user_text_merged
-        };
+        // **v6.6 generative pivot (2026-06-11)** — lexicon_validator
+        // DISABLED. rc25-audit confirmed the edit-distance-1 +
+        // hot-vocab approach is net-negative: it rewrites valid
+        // tokens («дәулет→сәулет», «тұрамын→тұратын», «Жасым→Жасы»,
+        // «толды→толы», «айттым→айтты», «тұрам→тұра», «берші→бері»,
+        // «алаған→алған») more often than it repairs Whisper drift.
+        // The right place to recover from Whisper noise is a
+        // context-aware LM rescorer trained on the full 338k-sentence
+        // corpus, not a runtime edit-distance rule. Leaving the
+        // module in tree (`mod lexicon_validator;` above) so the
+        // tests still serve as a regression spec for any future
+        // contextual replacement.
 
         let fuzzy_out = if args.mode == "respond" || args.mode == "wellness" {
             fuzzy_normalise(&user_text_merged, &zipf_vocab)

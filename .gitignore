@@ -145,3 +145,58 @@ data/listening_tests/*
 !data/listening_tests/phase13_neural_piper/**
 !data/listening_tests/phase14_sentences/
 !data/listening_tests/phase14_sentences/**
+
+# v6.6 generative pivot — large intermediate training packs.
+# Regenerable from sources in seconds:
+#   1. Merge 8 curated packs → adam_training_corpus_pack_v6_6.json (2 sec)
+#   2. pretokenize_corpus → adam_pretokenized_pack_v6_6.json (1 min)
+#   3. encode_corpus → adam_training_ids_pack_v6_6_drift.json (30 sec)
+# Validation pack stays committed for eval reproducibility.
+data/curated/adam_training_ids_pack_v6_6_drift.json
+data/curated/adam_training_corpus_pack_v6_6.json
+data/curated/adam_pretokenized_pack_v6_6.json
+data/curated/adam_training_ids_pack_v6_6.json
+data/curated/adam_validation_ids_pack_v6_6.json
+
+# v6.6 intent classifier experiments — large generated packs that
+# regressed accuracy vs baseline; build_diction_pack.py is kept for
+# future iterations.
+data/curated/adam_intent_training_pack_v6_6_diction.json
+data/curated/adam_intent_training_pack_real_audit.json
+
+# v6.7 generative pivot — large generated training/eval data packs.
+# Regenerable from scripts/build_*.py:
+data/curated/adam_generative_finetune_pack_v1.json
+data/curated/adam_generative_finetune_pack_v2.json
+data/curated/adam_finetune_text_pack_v2.json
+data/curated/adam_finetune_text_pack_v3.json
+data/curated/adam_finetune_training_ids_pack_v2.json
+data/curated/adam_finetune_training_ids_pack_v3.json
+data/curated/adam_finetune_validation_ids_pack_v2.json
+data/curated/adam_finetune_validation_ids_pack_v3.json
+data/curated/adam_finetune_text_pack_v4_big.json
+data/curated/adam_finetune_training_ids_pack_v4.json
+data/curated/adam_finetune_validation_ids_pack_v4.json
+data/curated/adam_finetune_text_pack_v5_balanced.json
+data/curated/adam_finetune_training_ids_pack_v5.json
+data/curated/adam_finetune_validation_ids_pack_v5.json
+
+# v6.7 staged training data packs
+data/curated/adam_stage1_world_core_raw.json
+data/curated/adam_stage1_train_ids.json
+data/curated/adam_stage1_val_ids.json
+data/curated/adam_stage2_conv_pack.json
+data/curated/adam_stage2_train_ids.json
+data/curated/adam_stage2_val_ids.json
+data/curated/adam_stage2_conv_pain_pack.json
+data/curated/adam_stage2_pain_train.json
+data/curated/adam_stage2_pain_val.json
+data/curated/adam_phase15_corpus.json
+data/curated/adam_phase15_train_ids.json
+data/curated/adam_phase15_val_ids.json
+data/curated/adam_v6_8_pure_corpus.json
+data/curated/adam_v6_8_pure_balanced.json
+data/curated/adam_v6_8_pure_train_ids.json
+data/curated/adam_v6_8_pure_val_ids.json
+data/curated/adam_v6_8_balanced_train.json
+data/curated/adam_v6_8_balanced_val.json

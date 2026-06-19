@@ -1,0 +1,648 @@
+{
+  "version": "v6.8-speech-defect-eval-2026-06-16",
+  "name": "adam-speech-defect-eval",
+  "description": "Text-level NLU-stage speech-defect eval. Each case takes a clean Kazakh school-eval query that production answers correctly, applies a deterministic defect transform (per Codex consultation #3: rhotacism, sigmatism, lambdacism, kappacism, nasalisation, stuttering, elderly, whisper drift), and asserts the same expected_response. Pass = router/FST/lookup survives the corruption. Fail = router gap to document. Probe cases (expected='<probe>') are documented gaps that don't count toward score.",
+  "sample_count": 80,
+  "cases": [
+    {
+      "subject": "speech_defect",
+      "topic": "rhotacism",
+      "input": "Лақмет.",
+      "expected_response": "оқасы жоқ",
+      "was_accepted": true,
+      "notes": "clean='Рақмет.' | р→л at word start"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "rhotacism",
+      "input": "Ақмет.",
+      "expected_response": "оқасы жоқ",
+      "was_accepted": true,
+      "notes": "clean='Рақмет.' | р dropped at word start"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "rhotacism",
+      "input": "Жүйек не үшін керек?",
+      "expected_response": "жүрек",
+      "was_accepted": true,
+      "notes": "clean='Жүрек не үшін керек?' | р→й mid-word + missing organ name"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "rhotacism",
+      "input": "Жүлек не үшін керек?",
+      "expected_response": "жүрек",
+      "was_accepted": true,
+      "notes": "clean='Жүрек не үшін керек?' | р→л mid-word"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "rhotacism",
+      "input": "Теінің қызметі.",
+      "expected_response": "тері",
+      "was_accepted": true,
+      "notes": "clean='Терінің қызметі.' | р dropped"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "rhotacism",
+      "input": "Дұыс па?",
+      "expected_response": "дұрыс",
+      "was_accepted": true,
+      "notes": "clean='Дұрыс па?' | р dropped"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "rhotacism",
+      "input": "Біл байтта неше бит бал?",
+      "expected_response": "8",
+      "was_accepted": true,
+      "notes": "clean='Бір байтта неше бит бар?' | two р→л substitutions"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "rhotacism",
+      "input": "Күміс қандай зат?",
+      "expected_response": "металл",
+      "was_accepted": true,
+      "notes": "clean='Күміс қандай зат?' | control — no р, should still pass"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "rhotacism",
+      "input": "Қазақстанның мемлекеттік тілі.",
+      "expected_response": "қазақ",
+      "was_accepted": true,
+      "notes": "clean='Қазақстанның мемлекеттік тілі.' | control — passes through unchanged"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "rhotacism",
+      "input": "Төйттің түбійі.",
+      "expected_response": "2",
+      "was_accepted": true,
+      "notes": "clean='Төрттің түбірі.' | р→й on number word + sqrt marker"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "sigmatism",
+      "input": "Фәлем",
+      "expected_response": "сәлем",
+      "was_accepted": true,
+      "notes": "clean='Сәлем' | с→ф at word start"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "sigmatism",
+      "input": "Фудың формуласы.",
+      "expected_response": "h2o",
+      "was_accepted": true,
+      "notes": "clean='Судың формуласы.' | су→фу — chemistry lookup should still fire on formula marker"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "sigmatism",
+      "input": "Біл байтта неше біт бал?",
+      "expected_response": "8",
+      "was_accepted": true,
+      "notes": "clean='Бір байтта неше бит бар?' | rhotacism + lowercase drift"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "sigmatism",
+      "input": "Сас ұзындығы.",
+      "expected_response": "<probe>",
+      "was_accepted": false,
+      "notes": "clean='Шаш ұзындығы.' | ш→с — probe"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "sigmatism",
+      "input": "Зафым отыз екі.",
+      "expected_response": "<probe>",
+      "was_accepted": false,
+      "notes": "clean='Жасым отыз екі.' | ж→з + ш→ф stack"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "sigmatism",
+      "input": "Фегізді жетіге көбейт.",
+      "expected_response": "56",
+      "was_accepted": true,
+      "notes": "clean='Сегізді жетіге көбейт.' | math survives с→ф"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "sigmatism",
+      "input": "Күкіт қышқылының формулафы.",
+      "expected_response": "H₂SO₄",
+      "was_accepted": true,
+      "notes": "clean='Күкірт қышқылының формуласы.' | two-substitution chemistry"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "sigmatism",
+      "input": "Қанның қызметі қандай?",
+      "expected_response": "қан",
+      "was_accepted": true,
+      "notes": "clean='Қанның қызметі қандай?' | control"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "sigmatism",
+      "input": "Бефті жетіге қоф.",
+      "expected_response": "12",
+      "was_accepted": true,
+      "notes": "clean='Бесті жетіге қос.' | math с→ф"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "sigmatism",
+      "input": "Қазақтың ұлттық тағамы.",
+      "expected_response": "бесбармақ",
+      "was_accepted": true,
+      "notes": "clean='Қазақтың ұлттық тағамы.' | control"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "lambdacism",
+      "input": "Айматы дегеніміз не?",
+      "expected_response": "қала",
+      "was_accepted": true,
+      "notes": "clean='Алматы дегеніміз не?' | л→й Almaty"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "lambdacism",
+      "input": "Байқаш көйі туралы.",
+      "expected_response": "Балқаш",
+      "was_accepted": true,
+      "notes": "clean='Балқаш көлі туралы.' | two-place л→й"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "lambdacism",
+      "input": "Қазақстанда қандай тій мемйекеттік?",
+      "expected_response": "қазақ",
+      "was_accepted": true,
+      "notes": "clean='Қазақстанда қандай тіл мемлекеттік?' | language word inflected"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "lambdacism",
+      "input": "Жасуша деген не?",
+      "expected_response": "Жасуша",
+      "was_accepted": true,
+      "notes": "clean='Жасуша деген не?' | control"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "lambdacism",
+      "input": "Бая деген не?",
+      "expected_response": "<probe>",
+      "was_accepted": false,
+      "notes": "clean='Бала деген не?' | probe — word with no л context"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "lambdacism",
+      "input": "Қазақтың ұйттық тағамы.",
+      "expected_response": "бесбармақ",
+      "was_accepted": true,
+      "notes": "clean='Қазақтың ұлттық тағамы.' | ұлттық→ұйттық"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "lambdacism",
+      "input": "Эектр тогы деген не?",
+      "expected_response": "электр",
+      "was_accepted": true,
+      "notes": "clean='Электр тогы деген не?' | э+ле lost"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "lambdacism",
+      "input": "Айгоритм деген не?",
+      "expected_response": "тізбе",
+      "was_accepted": true,
+      "notes": "clean='Алгоритм деген не?' | ал→ай"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "lambdacism",
+      "input": "Көздің қызметі.",
+      "expected_response": "көру",
+      "was_accepted": true,
+      "notes": "clean='Көздің қызметі.' | control — л not in this case"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "lambdacism",
+      "input": "Тійдің қызметі.",
+      "expected_response": "<probe>",
+      "was_accepted": false,
+      "notes": "clean='Тілдің қызметі.' | tongue/lang ambiguity + л drift"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "kappacism",
+      "input": "Хазахстанның астанасы хай хала?",
+      "expected_response": "Астана",
+      "was_accepted": true,
+      "notes": "clean='Қазақстанның астанасы қай қала?' | qa→ha + multiple"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "kappacism",
+      "input": "Төмірқышқыл газының формуласы.",
+      "expected_response": "CO₂",
+      "was_accepted": true,
+      "notes": "clean='Көмірқышқыл газының формуласы.' | к→т"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "kappacism",
+      "input": "Түміс деген зат хандай?",
+      "expected_response": "металл",
+      "was_accepted": true,
+      "notes": "clean='Күміс деген зат қандай?' | к→т + қ→х"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "kappacism",
+      "input": "Хазах деген не?",
+      "expected_response": "<probe>",
+      "was_accepted": false,
+      "notes": "clean='Қазақ деген не?' | qa→ha"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "kappacism",
+      "input": "Хышхыл деген не?",
+      "expected_response": "<probe>",
+      "was_accepted": false,
+      "notes": "clean='Қышқыл деген не?' | all-қ word"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "kappacism",
+      "input": "Тітап деген не?",
+      "expected_response": "<probe>",
+      "was_accepted": false,
+      "notes": "clean='Кітап деген не?' | к→т probe"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "kappacism",
+      "input": "Ханша уаххыт хазір?",
+      "expected_response": "<probe>",
+      "was_accepted": false,
+      "notes": "clean='Қанша уақыт қазір?' | voice REPL clock query"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "kappacism",
+      "input": "Тальцийдің химиялық таңбасы.",
+      "expected_response": "Ca",
+      "was_accepted": true,
+      "notes": "clean='Кальцийдің химиялық таңбасы.' | к→т on element"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "kappacism",
+      "input": "Хазахстанның мемлекеттік тілі.",
+      "expected_response": "қазақ",
+      "was_accepted": true,
+      "notes": "clean='Қазақстанның мемлекеттік тілі.' | control passes? — country name should still resolve"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "kappacism",
+      "input": "Бір байтта неше біт бал?",
+      "expected_response": "8",
+      "was_accepted": true,
+      "notes": "clean='Бір байтта неше бит бар?' | no к but mild drift"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "nasalization",
+      "input": "Казхстан туралы.",
+      "expected_response": "Қазақстан",
+      "was_accepted": true,
+      "notes": "clean='Қазақстан туралы.' | ә→а + drop"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "nasalization",
+      "input": "Сәлмесіз бе.",
+      "expected_response": "сәлем",
+      "was_accepted": true,
+      "notes": "clean='Сәлеметсіз бе.' | compressed"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "nasalization",
+      "input": "Жүректң қызметі.",
+      "expected_response": "жүрек",
+      "was_accepted": true,
+      "notes": "clean='Жүректің қызметі.' | short vowel dropped"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "nasalization",
+      "input": "Беспармақ туралы.",
+      "expected_response": "бесбармақ",
+      "was_accepted": true,
+      "notes": "clean='Бесбармақ туралы.' | voicing"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "nasalization",
+      "input": "Қазақстнда қандай тіл мемлекетк?",
+      "expected_response": "қазақ",
+      "was_accepted": true,
+      "notes": "clean='Қазақстанда қандай тіл мемлекеттік?' | multi-drop"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "nasalization",
+      "input": "Атм дегеніміз не?",
+      "expected_response": "Атом",
+      "was_accepted": true,
+      "notes": "clean='Атом дегеніміз не?' | о dropped"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "nasalization",
+      "input": "Қзл түс.",
+      "expected_response": "<probe>",
+      "was_accepted": false,
+      "notes": "clean='Қызыл түс.' | extreme drop"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "nasalization",
+      "input": "Алгрітм.",
+      "expected_response": "тізбе",
+      "was_accepted": true,
+      "notes": "clean='Алгоритм.' | vowels collapsed"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "nasalization",
+      "input": "Жер — қандай аспан денесі?",
+      "expected_response": "ғаламшар",
+      "was_accepted": true,
+      "notes": "clean='Жер — қандай аспан денесі?' | control"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "nasalization",
+      "input": "Тмірдің химиялық таңбасы.",
+      "expected_response": "Fe",
+      "was_accepted": true,
+      "notes": "clean='Темірдің химиялық таңбасы.' | vowel dropped"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "stuttering",
+      "input": "Са-сә-сәлем.",
+      "expected_response": "сәлем",
+      "was_accepted": true,
+      "notes": "clean='Сәлем.' | tri-repeat onset"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "stuttering",
+      "input": "Ме-мен-менің атым Дә-Дәулет.",
+      "expected_response": "Дәулет",
+      "was_accepted": true,
+      "notes": "clean='Менің атым Дәулет.' | session name capture under stutter"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "stuttering",
+      "input": "Жү-жү-жүрек не үшін керек?",
+      "expected_response": "қан айналымы",
+      "was_accepted": true,
+      "notes": "clean='Жүрек не үшін керек?' | Codex consultation #4 audit: heart pumps blood, not «ойлау». Expected corrected 2026-06-16."
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "stuttering",
+      "input": "Қа-қа-қазақстанның астанасы.",
+      "expected_response": "Астана",
+      "was_accepted": true,
+      "notes": "clean='Қазақстанның астанасы.' | country stutter"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "stuttering",
+      "input": "Ал-ал-алты түбірі.",
+      "expected_response": "2.449489742783178",
+      "was_accepted": true,
+      "notes": "clean='Алты түбірі.' | math survives stutter"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "stuttering",
+      "input": "Бі-бі-бір байтта неше бит бар?",
+      "expected_response": "8",
+      "was_accepted": true,
+      "notes": "clean='Бір байтта неше бит бар?' | stutter on numeral"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "stuttering",
+      "input": "Кү-кү-күмістің формуласы.",
+      "expected_response": "Ag",
+      "was_accepted": true,
+      "notes": "clean='Күмістің формуласы.' | chemistry under stutter"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "stuttering",
+      "input": "А-а-атом дегеніміз не?",
+      "expected_response": "Атом",
+      "was_accepted": true,
+      "notes": "clean='Атом дегеніміз не?' | definition under stutter"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "stuttering",
+      "input": "Қа-қазақтың ұлттық тағамы.",
+      "expected_response": "бесбармақ",
+      "was_accepted": true,
+      "notes": "clean='Қазақтың ұлттық тағамы.' | double-onset stutter"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "stuttering",
+      "input": "Бе-бе-бесті жетіге қос.",
+      "expected_response": "12",
+      "was_accepted": true,
+      "notes": "clean='Бесті жетіге қос.' | math single-step stutter"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "elderly",
+      "input": "Казхстан Республикасы.",
+      "expected_response": "Қазақстан",
+      "was_accepted": true,
+      "notes": "clean='Қазақстан Республикасы.' | ә→а + drop"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "elderly",
+      "input": "Сәлмесіз бе.",
+      "expected_response": "сәлем",
+      "was_accepted": true,
+      "notes": "clean='Сәлеметсіз бе, Ағай.' | compressed greeting"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "elderly",
+      "input": "Казхстанның бұрынғы астанасы.",
+      "expected_response": "Алматы",
+      "was_accepted": true,
+      "notes": "clean='Қазақстанның бұрынғы астанасы.' | elderly drift on country"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "elderly",
+      "input": "Бесбармақ туралы.",
+      "expected_response": "бесбармақ",
+      "was_accepted": true,
+      "notes": "clean='Бесбармақ туралы.' | control"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "elderly",
+      "input": "Бі байтта неше бит бар?",
+      "expected_response": "8",
+      "was_accepted": true,
+      "notes": "clean='Бір байтта неше бит бар?' | vowel dropped from numeral"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "elderly",
+      "input": "Кмістің химиялық таңбасы.",
+      "expected_response": "Ag",
+      "was_accepted": true,
+      "notes": "clean='Күмістің химиялық таңбасы.' | vowel dropped"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "elderly",
+      "input": "Алгрітм деген не?",
+      "expected_response": "тізбе",
+      "was_accepted": true,
+      "notes": "clean='Алгоритм деген не?' | vowels lost"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "elderly",
+      "input": "Жер ғаламшар ма?",
+      "expected_response": "ғаламшар",
+      "was_accepted": true,
+      "notes": "clean='Жер ғаламшар ма?' | control"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "elderly",
+      "input": "Казхстнның мемлекеттік тілі.",
+      "expected_response": "қазақ",
+      "was_accepted": true,
+      "notes": "clean='Қазақстанның мемлекеттік тілі.' | extreme drop"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "elderly",
+      "input": "Тмірдің химиялық таңбасы.",
+      "expected_response": "Fe",
+      "was_accepted": true,
+      "notes": "clean='Темірдің химиялық таңбасы.' | vowel drop"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "whisper",
+      "input": "Сәлімі түсбе.",
+      "expected_response": "сәлем",
+      "was_accepted": true,
+      "notes": "clean='Сәлеметсіз бе?' | rc28 known drift"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "whisper",
+      "input": "Қалыңғыз қалай.",
+      "expected_response": "жақсы",
+      "was_accepted": true,
+      "notes": "clean='Қалыңыз қалай.' | rc28 known drift"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "whisper",
+      "input": "Алды мен таныс айық.",
+      "expected_response": "Дәулет",
+      "was_accepted": true,
+      "notes": "clean='Менің атым — Дәулет.' | rc28 — accepted as intro probe"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "whisper",
+      "input": "Күмістің формулысы.",
+      "expected_response": "Ag",
+      "was_accepted": true,
+      "notes": "clean='Күмістің формуласы.' | stable drift суффикс"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "whisper",
+      "input": "Оналты түбірі.",
+      "expected_response": "4",
+      "was_accepted": true,
+      "notes": "clean='Он алты түбірі.' | STT-fold known case"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "whisper",
+      "input": "Жасым, отыз екіде.",
+      "expected_response": "32",
+      "was_accepted": true,
+      "notes": "clean='Жасым отыз екіде.' | comma insertion"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "whisper",
+      "input": "Менімі атым кім.",
+      "expected_response": "Дәулет",
+      "was_accepted": true,
+      "notes": "clean='Менің атым кім?' | comma/typo drift"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "whisper",
+      "input": "Менің есімім даулет.",
+      "expected_response": "Дәулет",
+      "was_accepted": true,
+      "notes": "clean='Менің есімім Дәулет.' | case drop"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "whisper",
+      "input": "Менің жасым нише де.",
+      "expected_response": "32",
+      "was_accepted": true,
+      "notes": "clean='Менің жасым нешеде?' | phoneme drift in question word"
+    },
+    {
+      "subject": "speech_defect",
+      "topic": "whisper",
+      "input": "Менім атым - дәулет.",
+      "expected_response": "Дәулет",
+      "was_accepted": true,
+      "notes": "clean='Менің атым — Дәулет.' | double-drift"
+    }
+  ]
+}

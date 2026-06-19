@@ -140,6 +140,13 @@ impl BpeTokenizer {
 
     /// Decode ids back to text. Special tokens (<pad>/<bos>/<eos>) are skipped.
     /// Unknown tokens are emitted literally as "<unk>".
+    /// Look up the surface form of a single token id, including the
+    /// ▁ word-start marker if present. Returns `None` if the id is
+    /// outside the vocab.
+    pub fn id_to_token(&self, id: u32) -> Option<&str> {
+        self.id_to_token.get(id as usize).map(|s| s.as_str())
+    }
+
     pub fn decode(&self, ids: &[u32]) -> String {
         let mut result = String::new();
         for &id in ids {
