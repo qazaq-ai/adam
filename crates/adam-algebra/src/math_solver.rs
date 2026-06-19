@@ -437,7 +437,7 @@ fn rewrite_kazakh_ordinal_power(words: &mut Vec<String>) {
 /// up one position — if the preceding word is a genitive-suffixed
 /// numeral, rewrite to the already-supported
 /// `<base> дәрежесі <ordinal-as-cardinal>` shape.
-fn rewrite_kazakh_genitive_ordinal_power(words: &mut Vec<String>) {
+fn rewrite_kazakh_genitive_ordinal_power(words: &mut [String]) {
     let mut i = 0;
     while i + 2 < words.len() {
         // Pattern: [GEN_BASE, ORDINAL, "дәрежесі"]

@@ -1,5 +1,14 @@
 // SPDX-License-Identifier: BUSL-1.1
 // Part of: adam · ARK · github.com/qazaq-ai/adam
+//
+// **v6.6 status:** disabled at the main.rs call site (the rc25
+// false-positive surface — `дәулет→сәулет`, `жасым→жасы`, etc. —
+// outweighed the recall gain). The module is intentionally kept
+// in-tree so its test battery serves as a regression spec for
+// the v7 candidate-rescoring replacement; allow dead_code on the
+// whole file rather than re-route every helper through a runtime
+// gate just to satisfy clippy.
+#![allow(dead_code)]
 //! # Lexicon validator — v6.5.0-rc23
 //!
 //! Universal per-token input cleaner.  Walks every word in the

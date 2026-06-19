@@ -79,9 +79,10 @@ use crate::wellness::red_flags;
 /// before the session reaches [`Stage::CloseOrRefer`].  Red-flag
 /// detection happens at *every* turn regardless of stage and short-
 /// circuits to [`Stage::CloseOrRefer`].
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum Stage {
     /// Ask where it hurts and how long (intake).
+    #[default]
     PainIntake,
     /// Get a 0-10 score before the exercise.
     BaselineScale,
@@ -150,12 +151,6 @@ pub struct PainSupportSession {
     /// terminates at [`Stage::CloseOrRefer`] on the same turn that
     /// raises the flag.
     pub red_flag_detected: bool,
-}
-
-impl Default for Stage {
-    fn default() -> Self {
-        Stage::PainIntake
-    }
 }
 
 impl PainSupportSession {

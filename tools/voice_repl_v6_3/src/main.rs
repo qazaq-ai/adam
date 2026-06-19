@@ -590,7 +590,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // module in tree (`mod lexicon_validator;` above) so the
         // tests still serve as a regression spec for any future
         // contextual replacement.
-        let user_text_merged = user_text_merged;
 
         let fuzzy_out = if args.mode == "respond" || args.mode == "wellness" {
             fuzzy_normalise(&user_text_merged, &zipf_vocab)

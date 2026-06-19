@@ -1524,7 +1524,7 @@ fn lookup_possessive_property(input: &str) -> Option<String> {
     //
     // Fast path above keeps clean-text latency unchanged.
     for (pat, answer) in patterns {
-        if fuzzy_contains(&lower, pat, 1) {
+        if fuzzy_contains(lower, pat, 1) {
             return Some(answer.to_string());
         }
     }
