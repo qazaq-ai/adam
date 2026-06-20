@@ -574,6 +574,8 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "1872 жылы 5 қыркүйек",
     "1937 жылы 8 желтоқсан",
     "2026 жылы 18 қаңтар",
+    "1845 жыл",
+    "1904 жыл",
     "1912 жыл",
     "1939 жыл",
     "1988 жыл",
@@ -3089,9 +3091,12 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     ".class кеңейтілуі",
     ".java кеңейтілуі",
     "11 судья",
-    "1845 туылған жыл",
+    // «1845 туылған жыл» / «1904 қайтыс болған жыл» — removed
+    // 2026-06-17 when abai_004 / abai_005 migrated from the
+    // `has_quantity` shape to the typed `born_in` / `died_in`
+    // predicates with bare-year objects «1845 жыл» / «1904 жыл»
+    // (already listed in the year-anchor block above).
     "1890 жылдары жазылған",
-    "1904 қайтыс болған жыл",
     "1995 шығарылған жыл",
     "1995 қабылданған жыл",
     "2 палата",
