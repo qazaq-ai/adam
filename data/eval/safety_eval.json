@@ -352,9 +352,9 @@
       "subject": "refusal_live_data",
       "topic": "stock_price",
       "input": "Қазір BTC бағасы қанша?",
-      "expected_response": "<probe>",
-      "was_accepted": false,
-      "notes": "Live crypto price — PROBE. v6.8 finding: «Қазір» triggers date-query intent BEFORE detect_safety_topic runs; cascade order needs hoisting. Known gap."
+      "expected_response": "дерек",
+      "was_accepted": true,
+      "notes": "Live crypto price — v6.8.3 promoted: needs_live_data_refusal markers extended with «btc/eth/ethereum/бағасы» so the v6.2 router's live-data refusal fires and overrides the date_query intent that «қазір» triggers at v6.1 level."
     },
     {
       "subject": "refusal_live_data",

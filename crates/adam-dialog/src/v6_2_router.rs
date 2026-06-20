@@ -1446,12 +1446,28 @@ fn needs_live_data_refusal(s: &str) -> bool {
         // Currency / crypto / stock.
         "биткоин",
         "bitcoin",
+        // **v6.8.3 — 2026-06-17 user audit.** Live REPL probe «Қазір
+        // BTC бағасы қанша?» was returning today's date because the
+        // «қазір» token triggered the v6.1 date_query intent BEFORE
+        // this v6.2 live-data refusal could fire (v6.2 only overrides
+        // when it returns Some).  Pre-fix the markers covered the
+        // long-form «биткоин / bitcoin» but not the ticker form «btc»
+        // (and analogues «eth» / «ethereum»).  Same gap for the
+        // «бағасы» (= "price-of") possessive surface — only «бағамы»
+        // (= "rate-of") was listed.  Adding both shapes so the
+        // refusal fires and overrides the date routing.
+        "btc",
+        "eth",
+        "ethereum",
         "доллар",
         "теңге бағамы",
         "евро",
         "акция",
         "курс",
         "бағамы",
+        "бағасы",
+        "бағасын",
+        "бағасының",
         "барамы",
         // News / sports.
         "жаңалықтар",
@@ -3714,6 +3730,46 @@ mod tests {
             assert!(
                 is_self_identity_query(input),
                 "must classify as identity probe: {input}"
+            );
+        }
+    }
+
+    /// **v6.8.3 user audit — BTC live-data probe.** Pre-fix «Қазір
+    /// BTC бағасы қанша?» returned today's date because «қазір»
+    /// triggered the v6.1 date_query intent BEFORE the v6.2
+    /// live-data refusal could fire (v6.2 only overrides when it
+    /// returns Some).  Both the ticker «btc / eth / ethereum» and
+    /// the «бағасы» possessive surface were missing from
+    /// `needs_live_data_refusal`; both gaps closed.
+    #[test]
+    fn live_data_refusal_covers_btc_and_eth_tickers_v683() {
+        for input in [
+            "Қазір BTC бағасы қанша?",
+            "BTC бағасы қанша?",
+            "ETH бағасын білесіз бе?",
+            "Бүгінгі доллар бағамы қандай?",
+            "Бұл акция бағасы қанша?",
+        ] {
+            assert!(
+                needs_live_data_refusal(input),
+                "must classify as live-data refusal: {input}"
+            );
+        }
+    }
+
+    /// Negative control: bare clock / date queries (no market noun)
+    /// must NOT route through the live-data refusal — those have
+    /// their own clock handler.
+    #[test]
+    fn bare_clock_query_is_not_live_data_v683() {
+        for input in [
+            "Қазір сағат неше?",
+            "Бүгін қандай күн?",
+            "Бүгінгі ай қандай?",
+        ] {
+            assert!(
+                !needs_live_data_refusal(input),
+                "clock query must NOT route to live-data refusal: {input}"
             );
         }
     }
