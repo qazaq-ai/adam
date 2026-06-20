@@ -1392,7 +1392,42 @@ fn is_self_identity_query(s: &str) -> bool {
         "кто ты",
         "представься",
     ];
-    markers.iter().any(|m| lower.contains(m))
+    if markers.iter().any(|m| lower.contains(m)) {
+        return true;
+    }
+    // **v6.8.3 — 2026-06-17 user audit.** Yes/no presupposition
+    // probes about adam's nature: «Сен адамсың ба?» / «Сіз робот
+    // па?» / «Сен жасанды интеллектсің бе?».  Pre-fix these fell
+    // to a substring-IsA lookup that returned «дерек жоқ» because
+    // world_core has no fact «adam IsA человек».  The honest answer
+    // is the self-identification template — same one that handles
+    // «Сен кімсің?».  Detect 2nd-person address + identity-class
+    // noun.  Each identity_noun listed below already carries the
+    // 2nd-person predicative ending («адамсың / роботсыз»), so the
+    // 2nd-person token gate is implicit in the noun list; we still
+    // require it as a sanity gate for the looser shapes («робот
+    // па»).  The yes/no particle is not separately required —
+    // those identity nouns + a 2-person address don't surface in a
+    // declarative shape adam would otherwise generate.
+    let has_2nd_person = lower.contains("сен ")
+        || lower.contains("сіз ")
+        || lower.starts_with("сен")
+        || lower.starts_with("сіз");
+    let has_identity_noun = lower.contains("адамсың")
+        || lower.contains("адамсыз")
+        || lower.contains("роботсың")
+        || lower.contains("роботсыз")
+        || lower.contains("робот па")
+        || lower.contains("робот ба")
+        || lower.contains("робот ма")
+        || lower.contains("робот ме")
+        || lower.contains("жасанды интеллект")
+        || lower.contains("ии сің")
+        || lower.contains("программасың")
+        || lower.contains("бағдарламасың")
+        || lower.contains("тірісің")
+        || lower.contains("тірі ме");
+    has_2nd_person && has_identity_noun
 }
 
 /// Honest «no live data» gate. Returns true for queries about
@@ -3658,6 +3693,43 @@ mod tests {
             assert!(
                 !is_personal_experience_query(input),
                 "must NOT classify as personal-experience: {input}"
+            );
+        }
+    }
+
+    /// **v6.8.3 user audit — identity yes/no probes.** Pre-fix
+    /// «Сен адамсың ба?» fell to a substring-IsA lookup that
+    /// returned «дерек жоқ» because world_core carries no fact
+    /// «adam IsA человек».  Honest answer is the existing self-
+    /// identification template; we just had to expand the detector
+    /// to cover the 2nd-person + yes/no + identity-class noun shape.
+    #[test]
+    fn identity_yes_no_probes_route_to_self_identity_v683() {
+        for input in [
+            "Сен адамсың ба?",
+            "Сіз робот па?",
+            "Сен жасанды интеллектсің бе?",
+            "Сен программасың ба?",
+        ] {
+            assert!(
+                is_self_identity_query(input),
+                "must classify as identity probe: {input}"
+            );
+        }
+    }
+
+    /// Negative control: the broadened identity detector must NOT
+    /// fire on a generic yes/no question that mentions a person.
+    #[test]
+    fn generic_yes_no_about_other_person_is_not_self_identity_v683() {
+        for input in [
+            "Абай ұлы ақын ба?",
+            "Сіз қазақша білесіз бе?",  // capability, not identity
+            "Сен дәрігерге барасың ба?", // user-direction, not identity
+        ] {
+            assert!(
+                !is_self_identity_query(input),
+                "must NOT classify as identity probe: {input}"
             );
         }
     }
