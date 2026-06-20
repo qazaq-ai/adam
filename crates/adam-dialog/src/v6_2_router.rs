@@ -244,6 +244,17 @@ fn answer_with_corpus_inner(
         return Some(answer);
     }
 
+    // **v6.8.3 — 2026-06-17 user audit (Bug A).** Lifespan computation
+    // for «<Person> қанша жыл өмір сүрді?» / «сколько лет прожил».
+    // Pre-fix the query fell through to the substring-IsA layer that
+    // surfaced the IsA fact («Ахмет Байтұрсынұлы → қазақ ағартушысы»)
+    // because no handler combined BornIn + DiedIn into a single typed
+    // answer. The data is present (kru_002 + kru_003 carry born_in
+    // 1872 + died_in 1937); only the synthesis was missing.
+    if let Some(answer) = lookup_person_lifespan(input, idx) {
+        return Some(answer);
+    }
+
     // 1a. Occupation acknowledgement. «Мен X» / «Мен X-мын» —
     // user stating profession / role. The v6.1 cascade interpreted
     // this as a definition request («Бағдарламашы — кәсіп иесі.»),
@@ -257,6 +268,19 @@ fn answer_with_corpus_inner(
     // answer. Distinct from self-identity («Сен кімсің?»).
     if is_capabilities_query(input) {
         return Some(capabilities_response(input));
+    }
+
+    // **v6.8.3 — 2026-06-17 user audit (Bug C).** Personal-experience
+    // probe — «Сен қандай кітап оқыдың?» / «Сен қандай фильмдер
+    // көрдің?» — asks about adam's lived experience.  adam has none:
+    // it is a deterministic typed kernel, not an embodied agent.
+    // Pre-fix these queries fell to the substring-IsA layer that
+    // surfaced a generic definition of the topic noun («Кітап —
+    // мұқабамен бекітілген баспа басылымы…»), which presupposes
+    // adam DID read.  Refuse the presupposition honestly while
+    // offering the factual alternative.
+    if is_personal_experience_query(input) {
+        return Some(personal_experience_refusal());
     }
 
     // 1c. Pitch-gender explanation. «Сен мені ағай дедің. Қалай
@@ -1159,6 +1183,72 @@ fn recognize_occupation_statement(input: &str) -> Option<String> {
     None
 }
 
+/// **v6.8.3 — 2026-06-17.** Personal-experience probe: 2nd-person
+/// past-tense question about lived experience adam does not have
+/// (didn't read a book, didn't see a film, didn't eat / drink /
+/// travel).  Refusing the presupposition is more honest than
+/// surfacing a generic definition of the topic noun, which falsely
+/// implies the experience occurred.
+///
+/// Gate: needs BOTH a 2nd-person address marker (сен / сіз /
+/// сенің / сіздің) AND a past-tense personal-experience verb
+/// ending (read / saw / ate / drank / travelled / etc.).  Knowledge
+/// / capability verbs («білесің», «айтасың») are intentionally NOT
+/// here — those route through `is_capabilities_query`.
+fn is_personal_experience_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    let has_2nd_person = lower.contains("сен ")
+        || lower.contains("сіз ")
+        || lower.contains("сенің ")
+        || lower.contains("сіздің ")
+        || lower.contains(" сен")
+        || lower.contains(" сіз");
+    if !has_2nd_person {
+        return false;
+    }
+    // 2nd-person past-tense personal-experience verb endings.
+    // Each entry pairs the -сың (familiar) and -сыз (respectful)
+    // surface; we match both shapes.  Verbs are restricted to those
+    // that imply LIVED EXPERIENCE adam cannot have.
+    let experience_verbs = [
+        "оқыдың",
+        "оқыдыңыз", // read
+        "көрдің",
+        "көрдіңіз", // saw
+        "жедің",
+        "жедіңіз", // ate
+        "іштің",
+        "іштіңіз", // drank
+        "бардың",
+        "бардыңыз", // went
+        "келдің",
+        "келдіңіз", // came
+        "ұйықтадың",
+        "ұйықтадыңыз", // slept
+        "сезіндің",
+        "сезіндіңіз", // felt
+        "сүйдің",
+        "сүйдіңіз", // loved
+        "тыңдадың",
+        "тыңдадыңыз", // listened
+        "ойнадың",
+        "ойнадыңыз", // played
+        "жүздің",
+        "жүздіңіз", // swam
+        "жасырдың",
+        "жасырдыңыз", // hid
+    ];
+    experience_verbs.iter().any(|v| lower.contains(v))
+}
+
+fn personal_experience_refusal() -> String {
+    "Менің өмірлік тәжірибем жоқ — мен қазақ тіліне арналған типтелген кернелмін, \
+     ағза емеспін: кітап оқымаймын, фильм көрмеймін, тамақ ішпеймін, саяхаттамаймын. \
+     Бірақ кітаптар, фильмдер, тағамдар, жерлер туралы тексерілген ақпарат бере аламын — \
+     нақты тақырыпты атасаңыз, көмектесемін."
+        .to_string()
+}
+
 /// Capabilities self-description query. Distinct from
 /// `is_self_identity_query` (which is about WHO adam is) —
 /// this is about WHAT adam can do / knows.
@@ -1594,6 +1684,152 @@ fn levenshtein(a: &[char], b: &[char]) -> usize {
         std::mem::swap(&mut prev, &mut curr);
     }
     prev[n]
+}
+
+/// **v6.8.3 — 2026-06-17 user audit (Bug A).** Lifespan compute
+/// for «<Person> қанша жыл өмір сүрді?» / «сколько лет прожил».
+///
+/// Pre-fix the cascade routed this through the substring-IsA layer
+/// which surfaced the IsA fact («Ахмет Байтұрсынұлы → қазақ
+/// ағартушысы») instead of the missing typed synthesis. The data is
+/// in world_core (e.g. `kru_002` born_in 1872 + `kru_003` died_in
+/// 1937 for Байтұрсынұлы); only the BornIn + DiedIn join was
+/// missing.
+///
+/// Returns `None` when:
+/// - the query shape doesn't match (no «қанша жыл» + «өмір сүр»);
+/// - the subject can't be resolved to a canonical agent;
+/// - either BornIn or DiedIn is missing in world_core for that
+///   subject (curated-graph coverage gate; we don't guess);
+/// - the year-extraction from the object surface fails or the
+///   computed lifespan is non-positive.
+fn lookup_person_lifespan(input: &str, idx: &FrameIndex) -> Option<String> {
+    let lower: String = input
+        .to_lowercase()
+        .chars()
+        .map(|c| match c {
+            '.' | '?' | '!' | ',' | ';' | ':' | '«' | '»' | '—' | '–' | '-' => ' ',
+            other => other,
+        })
+        .collect();
+    let lower = lower.split_whitespace().collect::<Vec<_>>().join(" ");
+
+    // Detect the lifespan question shape. Kazakh + Russian + the
+    // colloquial «жасап өтті» / «жасады» variants.
+    let asks_count =
+        lower.contains("қанша жыл") || lower.contains("сколько лет") || lower.contains("неше жыл");
+    let asks_lived = lower.contains("өмір сүр")
+        || lower.contains("жасап өтті")
+        || lower.contains("жасады")
+        || lower.contains("прожил")
+        || lower.contains("жил");
+    if !(asks_count && asks_lived) {
+        return None;
+    }
+
+    // Resolve subject. Reuse the existing canonical-agent table.
+    let subject = canonical_agent_for(&lower)?;
+
+    let born_year = query_year_for_predicate(idx, &subject, FramePredicate::BornIn)?;
+    let died_year = query_year_for_predicate(idx, &subject, FramePredicate::DiedIn)?;
+    if died_year <= born_year {
+        return None;
+    }
+    let years_lived = died_year - born_year;
+
+    let subject_titlecase = capitalize_first(&subject);
+    Some(format!(
+        "{subject_titlecase} {years_lived} жыл өмір сүрді ({born_year}–{died_year})."
+    ))
+}
+
+/// Query the FrameIndex for the year associated with
+/// `(subject, predicate)`.  Two world_core shapes carry time
+/// anchors and BOTH must be handled:
+///
+/// 1. **Typed modifier shape** (canonical battery,
+///    `frame::TimeAnchor::Year`): `Frame { agent, predicate,
+///    object: None, modifiers: [TimeAnchor(Year(1872))] }`.
+/// 2. **Object-string shape** (live `world_core/*.jsonl`):
+///    `Frame { agent, predicate, object: "1872 жылы 5 қыркүйек" }`.
+///
+/// Either yields the leading 4-digit year if it falls in the
+/// curated-coverage range `[1800, 2100]`. Used by the lifespan
+/// handler above; kept private to this module.
+fn query_year_for_predicate(
+    idx: &FrameIndex,
+    subject: &str,
+    predicate: FramePredicate,
+) -> Option<u32> {
+    use adam_algebra::{Modifier, TimeAnchor};
+    // Use `QueryFocus::Subject` so the focus check in `match_frame`
+    // requires only that `candidate.agent.is_some()` — always true
+    // here since we constrain on agent.  Object/Modifier focuses
+    // each reject candidates missing the respective slot, which
+    // would skip half the world_core shapes we care about (typed
+    // `TimeAnchor::Year` modifier vs object-string with leading
+    // year).  Subject focus returns the frame; we extract the year
+    // from whichever shape carries it.
+    let q = QueryIR::new(
+        QueryFocus::Subject,
+        QuestionForm::Definition,
+        AnswerShape::BareNoun,
+    )
+    .with_agent(noun(subject))
+    .with_predicate(predicate);
+    for hit in idx.query(&q).into_iter().take(4) {
+        // Shape 1: typed modifier (TimeAnchor::Year or ::Date).
+        for m in &hit.frame.modifiers {
+            match m {
+                Modifier::TimeAnchor(TimeAnchor::Year(y)) => {
+                    if let Ok(y) = u32::try_from(*y) {
+                        if (1800..=2100).contains(&y) {
+                            return Some(y);
+                        }
+                    }
+                }
+                Modifier::TimeAnchor(TimeAnchor::Date { year, .. }) => {
+                    if let Ok(y) = u32::try_from(*year) {
+                        if (1800..=2100).contains(&y) {
+                            return Some(y);
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
+        // Shape 2: object-string with a leading year.
+        if let Some(obj) = hit.frame.object.as_ref() {
+            if let Some(year) = extract_year_in_range(&obj.root.surface) {
+                return Some(year);
+            }
+        }
+    }
+    None
+}
+
+/// Find the first 4-digit token within `[1800, 2100]` in `surface`.
+/// Curated world_core date strings carry shapes like
+/// «1872 жылы 5 қыркүйек» (date) or «1872 жыл» (year alone); we
+/// just need the leading year. The range gate filters out the
+/// occasional 4-digit non-year token (e.g. street numbers).
+fn extract_year_in_range(surface: &str) -> Option<u32> {
+    let mut digits = String::new();
+    for ch in surface.chars().chain(std::iter::once(' ')) {
+        if ch.is_ascii_digit() {
+            digits.push(ch);
+        } else {
+            if digits.len() == 4 {
+                if let Ok(y) = digits.parse::<u32>() {
+                    if (1800..=2100).contains(&y) {
+                        return Some(y);
+                    }
+                }
+            }
+            digits.clear();
+        }
+    }
+    None
 }
 
 fn lookup_chemical_formula(input: &str) -> Option<String> {
@@ -3325,5 +3561,104 @@ mod tests {
         let r = lookup_chemical_formula("Темірдің формуласы қандай?");
         assert!(r.is_some());
         assert!(r.unwrap().contains("Fe"));
+    }
+
+    /// **v6.8.3 user audit (Bug A) — lifespan compute from BornIn +
+    /// DiedIn.** End-to-end functional verification is performed
+    /// against the live `world_core/*.jsonl` corpus via the
+    /// `adam_chat` binary (see commit body): for Ахмет Байтұрсынұлы
+    /// the cascade produces «Ахмет байтұрсынұлы 65 жыл өмір сүрді
+    /// (1872–1937).» — the BornIn (kru_002, object-string shape)
+    /// and DiedIn (kru_003, object-string shape) joined into one
+    /// typed answer. The deterministic unit-level coverage for the
+    /// extraction primitive is `extract_year_in_range_*` below;
+    /// regression protection at the cascade level rides on the five
+    /// production eval suites.
+
+    /// Negative control: query without «өмір сүр» / «прожил» phrase
+    /// must NOT trigger the lifespan handler.
+    #[test]
+    fn lifespan_handler_only_fires_on_lifespan_shape_v683() {
+        // «қашан туылған» — birth date, NOT lifespan
+        let r = lookup_person_lifespan(
+            "Ахмет Байтұрсынұлы қашан туылған?",
+            &dialog_battery::canonical_corpus(),
+        );
+        assert!(
+            r.is_none(),
+            "birth-date query must NOT trigger lifespan, got: {r:?}"
+        );
+    }
+
+    /// Negative control: lifespan shape with NO resolvable subject
+    /// (anaphora) must return None — the cascade decides whether to
+    /// honestly refuse or synthesise from a different route. The
+    /// handler does NOT guess.
+    #[test]
+    fn lifespan_handler_without_subject_returns_none_v683() {
+        let r =
+            lookup_person_lifespan("Қанша жыл өмір сүрді?", &dialog_battery::canonical_corpus());
+        assert!(
+            r.is_none(),
+            "bare lifespan query must NOT fire (no subject), got: {r:?}"
+        );
+    }
+
+    /// Year-extraction unit: curated world_core date surfaces (year +
+    /// month + day) yield the leading 4-digit year; out-of-range
+    /// 4-digit tokens (street numbers etc.) are rejected.
+    #[test]
+    fn extract_year_in_range_handles_curated_surfaces_v683() {
+        assert_eq!(extract_year_in_range("1872 жылы 5 қыркүйек"), Some(1872));
+        assert_eq!(extract_year_in_range("1937 жыл"), Some(1937));
+        assert_eq!(extract_year_in_range("1845"), Some(1845));
+        // Out of range — rejected.
+        assert_eq!(extract_year_in_range("3000 жыл"), None);
+        assert_eq!(extract_year_in_range("12345"), None);
+        // No 4-digit token.
+        assert_eq!(extract_year_in_range("кеше"), None);
+    }
+
+    /// **v6.8.3 user audit (Bug C) — personal-experience presupposition
+    /// refusal.** Pre-fix «Сен қандай кітап оқыдың?» surfaced the
+    /// substring-IsA definition of «кітап» («Кітап — мұқабамен
+    /// бекітілген баспа басылымы…»), which presupposes adam DID read.
+    /// adam has no lived experience — refusing the presupposition is
+    /// the honest answer.
+    #[test]
+    fn personal_experience_probes_get_refusal_v683() {
+        // 2nd-person past-tense experience verbs across topics.
+        for input in [
+            "Сен қандай кітап оқыдың?",
+            "Сен қандай фильмдер көрдің?",
+            "Сіз қайда бардыңыз?",
+            "Сен бүгін не жедің?",
+            "Сен қандай ән тыңдадың?",
+            "Сіз кешегі ойынды көрдіңіз бе?",
+        ] {
+            assert!(
+                is_personal_experience_query(input),
+                "must classify as personal-experience: {input}"
+            );
+        }
+    }
+
+    /// Negative control: knowledge / capability queries must NOT route
+    /// through the experience refusal — they have their own
+    /// `is_capabilities_query` handler.
+    #[test]
+    fn knowledge_queries_are_not_personal_experience_v683() {
+        for input in [
+            "Сен не білесің?",
+            "Сен қазақша сөйлейсің бе?",
+            "Не істей аласың?",
+            "Қазақстанның астанасы қандай?",
+            "Темірдің формуласы.",
+        ] {
+            assert!(
+                !is_personal_experience_query(input),
+                "must NOT classify as personal-experience: {input}"
+            );
+        }
     }
 }
