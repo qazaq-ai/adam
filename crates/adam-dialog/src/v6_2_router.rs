@@ -1509,6 +1509,41 @@ fn needs_live_data_refusal(s: &str) -> bool {
 /// school-eval surfaces them; keep the list curated, since broader
 /// possessive disambiguation lives in the v6.2 typed query IR.
 fn lookup_possessive_property(input: &str) -> Option<String> {
+    // **v6.8.4 — 2026-06-17 L4.5 Phase 2.A.** Thin wrapper extracting
+    // the surface text from the typed
+    // `lookup_possessive_property_typed` sibling.
+    lookup_possessive_property_typed(input).map(|c| c.text)
+}
+
+/// **v6.8.4 — 2026-06-17 L4.5 Phase 2.A.** Typed sibling of
+/// [`lookup_possessive_property`].  Returns an
+/// [`crate::dialog_acts::AnswerCandidate`] with the pattern hit
+/// as `ProofObject::from_curated_fact("possessive_property", …)`
+/// and `RouteId::PossessiveProperty`.  Covers both the fast
+/// substring path and the edit-distance ≤ 1 fuzzy fallback —
+/// same `(pat, answer)` tuple builds the same candidate.
+fn lookup_possessive_property_typed(input: &str) -> Option<crate::dialog_acts::AnswerCandidate> {
+    use crate::dialog_acts::{AnswerCandidate, RouteId};
+    use crate::proof_object::ProofObject;
+    use adam_reasoning::FactSource;
+
+    fn build_candidate(pat: &str, answer: &str) -> AnswerCandidate {
+        let text = answer.to_string();
+        let proof = ProofObject::from_curated_fact(
+            pat.to_string(),
+            "possessive_property".to_string(),
+            answer.to_string(),
+            FactSource {
+                pack: "v6_2_router/possessive_property_table".into(),
+                sample_id: pat.to_string(),
+            },
+            text.clone(),
+        );
+        let candidate = AnswerCandidate::assert(text, proof, RouteId::PossessiveProperty);
+        debug_assert!(candidate.invariant_check().is_ok());
+        candidate
+    }
+
     let lower: String = input
         .to_lowercase()
         .chars()
@@ -1654,7 +1689,7 @@ fn lookup_possessive_property(input: &str) -> Option<String> {
     for (pat, answer) in patterns {
         // Fast path: exact substring match (clean text — 99% of cases).
         if lower.contains(pat) {
-            return Some(answer.to_string());
+            return Some(build_candidate(pat, answer));
         }
     }
     // **v6.8 (2026-06-16) — fuzzy match fallback for speech defects.**
@@ -1680,7 +1715,7 @@ fn lookup_possessive_property(input: &str) -> Option<String> {
     // Fast path above keeps clean-text latency unchanged.
     for (pat, answer) in patterns {
         if fuzzy_contains(lower, pat, 1) {
-            return Some(answer.to_string());
+            return Some(build_candidate(pat, answer));
         }
     }
     None
@@ -1930,6 +1965,22 @@ fn extract_year_in_range(surface: &str) -> Option<u32> {
 }
 
 fn lookup_chemical_formula(input: &str) -> Option<String> {
+    // **v6.8.4 — 2026-06-17 L4.5 Phase 2.A.** Thin wrapper extracting
+    // the surface text from the typed `lookup_chemical_formula_typed`
+    // sibling.  See that function's doc comment for the proof shape.
+    lookup_chemical_formula_typed(input).map(|c| c.text)
+}
+
+/// **v6.8.4 — 2026-06-17 L4.5 Phase 2.A.** Typed sibling of
+/// [`lookup_chemical_formula`].  Returns an
+/// [`crate::dialog_acts::AnswerCandidate`] carrying the formula
+/// text, a `ProofObject` whose `from_curated_fact("formula", …)`
+/// cites the in-code chemistry table, and `RouteId::ChemistryFormula`.
+fn lookup_chemical_formula_typed(input: &str) -> Option<crate::dialog_acts::AnswerCandidate> {
+    use crate::dialog_acts::{AnswerCandidate, RouteId};
+    use crate::proof_object::ProofObject;
+    use adam_reasoning::FactSource;
+
     // **Phase 23.B (2026-06-03 evening)** — strip punctuation BEFORE
     // stem matching. Live REPL caught Whisper inserting commas mid-
     // word: «Ө, тегеннің формулысы.» — the substring «ө тегі» didn't
@@ -2105,7 +2156,20 @@ fn lookup_chemical_formula(input: &str) -> Option<String> {
         // implicitly via word-boundary prefix match on the first
         // letter of the stem.
         if token_contains(lower, stem) {
-            return Some(format!("{display} формуласы — {formula}."));
+            let text = format!("{display} формуласы — {formula}.");
+            let proof = ProofObject::from_curated_fact(
+                (*display).to_string(),
+                "formula".to_string(),
+                (*formula).to_string(),
+                FactSource {
+                    pack: "v6_2_router/chemistry_table".into(),
+                    sample_id: format!("{display}/{formula}"),
+                },
+                text.clone(),
+            );
+            let candidate = AnswerCandidate::assert(text, proof, RouteId::ChemistryFormula);
+            debug_assert!(candidate.invariant_check().is_ok());
+            return Some(candidate);
         }
     }
     None
@@ -3671,6 +3735,52 @@ mod tests {
     /// extraction primitive is `extract_year_in_range_*` below;
     /// regression protection at the cascade level rides on the five
     /// production eval suites.
+
+    /// **v6.8.4 L4.5 Phase 2.A — chemistry route migration.** The
+    /// typed `lookup_chemical_formula_typed` returns an
+    /// `AnswerCandidate` whose proof cites the in-code chemistry
+    /// table (`v6_2_router/chemistry_table`).  The String-returning
+    /// wrapper is functionally unchanged.
+    #[test]
+    fn chemistry_typed_canary_returns_consistent_candidate_v684() {
+        use crate::dialog_acts::{DialogueMove, RouteId};
+        let candidate =
+            lookup_chemical_formula_typed("Темірдің формуласы қандай?").expect("must resolve");
+        assert_eq!(candidate.route, RouteId::ChemistryFormula);
+        assert!(candidate.text.contains("Fe"));
+        assert!(candidate.invariant_check().is_ok());
+        match &candidate.moves[0] {
+            DialogueMove::Assert { claim } => assert_eq!(claim, &candidate.text),
+            other => panic!("expected Assert, got {other:?}"),
+        }
+        // String wrapper byte-identical to typed text.
+        assert_eq!(
+            lookup_chemical_formula("Темірдің формуласы қандай?"),
+            Some(candidate.text.clone()),
+        );
+    }
+
+    /// **v6.8.4 L4.5 Phase 2.A — possessive-property route.** Same
+    /// invariant as chemistry: typed proof + wrapper byte-identical.
+    /// Tested on the body-parts «жүректің қызметі» pattern which
+    /// exercises the AskPurpose branch of the lookup table.
+    #[test]
+    fn possessive_property_typed_canary_returns_consistent_candidate_v684() {
+        use crate::dialog_acts::{DialogueMove, RouteId};
+        let candidate =
+            lookup_possessive_property_typed("Жүректің қызметі қандай?").expect("must resolve");
+        assert_eq!(candidate.route, RouteId::PossessiveProperty);
+        assert!(candidate.text.contains("қан айналымы"));
+        assert!(candidate.invariant_check().is_ok());
+        match &candidate.moves[0] {
+            DialogueMove::Assert { claim } => assert_eq!(claim, &candidate.text),
+            other => panic!("expected Assert, got {other:?}"),
+        }
+        assert_eq!(
+            lookup_possessive_property("Жүректің қызметі қандай?"),
+            Some(candidate.text.clone()),
+        );
+    }
 
     /// **v6.8.4 L4.5 Phase 1 — canary.** The typed
     /// `lookup_person_lifespan_typed` returns an `AnswerCandidate`
