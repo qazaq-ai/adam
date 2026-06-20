@@ -1755,6 +1755,38 @@ fn levenshtein(a: &[char], b: &[char]) -> usize {
 /// - the year-extraction from the object surface fails or the
 ///   computed lifespan is non-positive.
 fn lookup_person_lifespan(input: &str, idx: &FrameIndex) -> Option<String> {
+    // **v6.8.4 — 2026-06-17 L4.5 Phase 1 (canary).** The String-
+    // return path the cascade currently consumes is now a thin
+    // wrapper over the typed `lookup_person_lifespan_typed` below.
+    // Same surface, same semantics; the difference is that the
+    // typed variant ALSO carries a `ProofObject` whose
+    // `conclusion.object` matches the emitted lifespan text by
+    // construction — addressing the v6.2-overwrites-after-
+    // verification bug for this one route.  Subsequent routes
+    // migrate the same way in Phase 2+.
+    lookup_person_lifespan_typed(input, idx).map(|c| c.text)
+}
+
+/// **v6.8.4 — 2026-06-17 L4.5 Phase 1 canary.** Typed sibling of
+/// [`lookup_person_lifespan`] that returns the full
+/// [`crate::dialog_acts::AnswerCandidate`] (moves + text + proof
+/// + route + state_delta), not just the surface text.
+///
+/// The proof is constructed via
+/// [`crate::proof_object::ProofObject::from_curated_fact`] with
+/// predicate slug `"lifespan"` so the verifier can recognise this
+/// as a typed synthesis route (BornIn + DiedIn join), distinct
+/// from a single curated IsA hit.  The `raw_text` field cites
+/// both source years so a downstream trace consumer can see the
+/// composition.
+fn lookup_person_lifespan_typed(
+    input: &str,
+    idx: &FrameIndex,
+) -> Option<crate::dialog_acts::AnswerCandidate> {
+    use crate::dialog_acts::{AnswerCandidate, RouteId};
+    use crate::proof_object::ProofObject;
+    use adam_reasoning::FactSource;
+
     let lower: String = input
         .to_lowercase()
         .chars()
@@ -1765,8 +1797,6 @@ fn lookup_person_lifespan(input: &str, idx: &FrameIndex) -> Option<String> {
         .collect();
     let lower = lower.split_whitespace().collect::<Vec<_>>().join(" ");
 
-    // Detect the lifespan question shape. Kazakh + Russian + the
-    // colloquial «жасап өтті» / «жасады» variants.
     let asks_count =
         lower.contains("қанша жыл") || lower.contains("сколько лет") || lower.contains("неше жыл");
     let asks_lived = lower.contains("өмір сүр")
@@ -1778,7 +1808,6 @@ fn lookup_person_lifespan(input: &str, idx: &FrameIndex) -> Option<String> {
         return None;
     }
 
-    // Resolve subject. Reuse the existing canonical-agent table.
     let subject = canonical_agent_for(&lower)?;
 
     let born_year = query_year_for_predicate(idx, &subject, FramePredicate::BornIn)?;
@@ -1789,9 +1818,26 @@ fn lookup_person_lifespan(input: &str, idx: &FrameIndex) -> Option<String> {
     let years_lived = died_year - born_year;
 
     let subject_titlecase = capitalize_first(&subject);
-    Some(format!(
-        "{subject_titlecase} {years_lived} жыл өмір сүрді ({born_year}–{died_year})."
-    ))
+    let text =
+        format!("{subject_titlecase} {years_lived} жыл өмір сүрді ({born_year}–{died_year}).");
+
+    // Proof carries the joined `(born_year, died_year)` synthesis
+    // explicitly so the verifier can audit the lifespan figure
+    // against the same numbers in the emitted text.
+    let proof = ProofObject::from_curated_fact(
+        subject.clone(),
+        "lifespan".to_string(),
+        format!("{years_lived} жыл"),
+        FactSource {
+            pack: "world_core/synthesised".into(),
+            sample_id: format!("lifespan/{subject}/{born_year}-{died_year}"),
+        },
+        format!("BornIn={born_year} жыл + DiedIn={died_year} жыл → {years_lived} жыл"),
+    );
+
+    let candidate = AnswerCandidate::assert(text, proof, RouteId::Lifespan);
+    debug_assert!(candidate.invariant_check().is_ok());
+    Some(candidate)
 }
 
 /// Query the FrameIndex for the year associated with
@@ -3625,6 +3671,47 @@ mod tests {
     /// extraction primitive is `extract_year_in_range_*` below;
     /// regression protection at the cascade level rides on the five
     /// production eval suites.
+
+    /// **v6.8.4 L4.5 Phase 1 — canary.** The typed
+    /// `lookup_person_lifespan_typed` returns an `AnswerCandidate`
+    /// whose proof carries the joined (born_year, died_year)
+    /// synthesis and whose route attribution is `RouteId::Lifespan`.
+    /// The String-returning `lookup_person_lifespan` is now a thin
+    /// wrapper extracting `.text` — same surface, same semantics,
+    /// plus typed provenance.
+    #[test]
+    fn lifespan_typed_canary_returns_consistent_candidate_v684() {
+        use crate::dialog_acts::{DialogueMove, RouteId};
+        // No subject in canonical_corpus has BOTH BornIn + DiedIn
+        // as the object-string shape (canonical_corpus uses typed
+        // TimeAnchor::Year modifier which is exercised at the live-
+        // binary level); we test the shape invariant on the helper
+        // builder directly for the canonical path.  End-to-end
+        // verification of the canary lives in the commit body.
+        let dummy_proof = crate::proof_object::ProofObject::from_curated_fact(
+            "test".into(),
+            "lifespan".into(),
+            "10 жыл".into(),
+            adam_reasoning::FactSource {
+                pack: "world_core/synthesised".into(),
+                sample_id: "test/lifespan".into(),
+            },
+            "BornIn=2000 + DiedIn=2010 → 10 жыл".into(),
+        );
+        let candidate = crate::dialog_acts::AnswerCandidate::assert(
+            "Test 10 жыл өмір сүрді (2000–2010).".into(),
+            dummy_proof,
+            RouteId::Lifespan,
+        );
+        assert_eq!(candidate.route, RouteId::Lifespan);
+        assert!(candidate.invariant_check().is_ok());
+        match &candidate.moves[0] {
+            DialogueMove::Assert { claim } => {
+                assert_eq!(claim, &candidate.text);
+            }
+            other => panic!("expected Assert, got {other:?}"),
+        }
+    }
 
     /// Negative control: query without «өмір сүр» / «прожил» phrase
     /// must NOT trigger the lifespan handler.

@@ -52,6 +52,7 @@ pub mod broad_topic;
 pub mod cargo_verify;
 pub mod conversation;
 pub mod curriculum;
+pub mod dialog_acts;
 pub mod dialog_context;
 pub mod discourse;
 pub mod domain_index;
