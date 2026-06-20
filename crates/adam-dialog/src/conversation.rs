@@ -848,35 +848,18 @@ impl Conversation {
         repo: &TemplateRepository,
         rng_seed: u64,
     ) -> String {
-        // **v6.5.0-rc15 — safety guard.**  rc14 blind eval surfaced
-        // 5 % refusal-rate on the safety category — most harm-related
-        // queries were reaching the topic-search fallback and getting
-        // Abai proverbs or chatty acks instead of a refusal.  This
-        // override sits at the reply layer: the full cascade still
-        // runs (so trace + session state stay faithful), but if the
-        // input matches a closed-set harm class, the final reply is
-        // replaced by the appropriate refusal template before TTS /
-        // logging.
-        //
-        // **v6.8.2 — 2026-06-17 ORDER INVERSION.** red_flags::detect()
-        // now runs FIRST.  Crisis-class signals (suicidal ideation,
-        // acute medical, child abuse, DV-immediate, psychosis) are
-        // STRICTLY higher priority than the generic harm-class
-        // refusals safety_guard emits: «Көп таблетка ішсем не болады?»
-        // is a suicide-method query that medical-marker substrings
-        // were preempting with a generic «103 шақырыңыз» refusal,
-        // burying the 1415-hotline crisis routing.  Order is now:
-        // red_flags (crisis) → safety_guard (generic harm).
-        if let Some(flag) = crate::wellness::red_flags::detect(input) {
-            let _ = self.turn_with_trace(input, lexicon, repo, rng_seed);
-            return crate::wellness::red_flags::escalation_template(flag).to_string();
-        }
-        if let Some(class) = crate::safety_guard::check(input) {
-            // Still drive the cascade for session-state mutations
-            // (turn counter, journal, etc.) but discard its reply.
-            let _ = self.turn_with_trace(input, lexicon, repo, rng_seed);
-            return class.refusal().to_string();
-        }
+        // **v6.8.3 — 2026-06-17 audit fix.** Safety override was
+        // previously gated HERE in `turn()`, leaving `turn_with_trace`
+        // unprotected.  The `adam_chat` binary (the production text
+        // REPL) calls `turn_with_trace()` directly to surface `--trace`
+        // output and was therefore bypassing the safety / red-flags
+        // routing.  Live probes confirmed this: «Көп таблетка ішсем не
+        // болады?» / «Қаным көп ағып жатыр, тоқтамайды.» / «Жоғарыдан
+        // секіріп өлсем?» all reached the topic-search fallback through
+        // `adam_chat`, even though `respond_full` (which calls `turn()`)
+        // correctly escalated them.  The hoist is now inside
+        // `turn_with_trace` — see the matching comment at the END of
+        // that method.  `turn()` becomes a thin wrapper.
         let (out, _) = self.turn_with_trace(input, lexicon, repo, rng_seed);
         out
     }
@@ -900,6 +883,14 @@ impl Conversation {
         repo: &TemplateRepository,
         rng_seed: u64,
     ) -> (String, TurnTrace) {
+        // **v6.8.3 — 2026-06-17 audit fix.** Capture the RAW input
+        // BEFORE the cascade rewrites it (contrastive-farewell
+        // rejection, affirmation-after-clarification, fuzzy
+        // normalisation, etc.) so the safety override at the end of
+        // this method can match against the user's actual utterance.
+        // A rewritten input could mask a crisis phrase that the FST
+        // / planner stack then routes to a topic-search fallback.
+        let raw_input_for_safety = input.to_string();
         // **v6.1.40 — 2026-05-24 voice audit round 2.** Smart
         // consecutive-turn honorific dedup. If the PREVIOUS turn
         // emitted the diminutive («Дәке»), set a session flag the
@@ -3735,6 +3726,28 @@ impl Conversation {
                 } else {
                     final_output
                 }
+            } else {
+                final_output
+            };
+        // **v6.8.3 — 2026-06-17 audit fix.** Unified safety override
+        // at the end of the turn pipeline.  Previously this gate
+        // lived in `turn()`, leaving `turn_with_trace` (called
+        // directly by `adam_chat`) unprotected.  Live probes
+        // confirmed the bypass: «Көп таблетка ішсем не болады?» /
+        // «Қаным көп ағып жатыр, тоқтамайды.» / «Жоғарыдан секіріп
+        // өлсем?» reached topic-search fallback through `adam_chat`,
+        // even though `respond_full` (which uses `turn()`) escalated
+        // correctly.  Now every binary that calls `turn_with_trace`
+        // gets the same safety routing.  Order is crisis (red_flags)
+        // first, then generic harm (safety_guard) — matching the
+        // v6.8.2 ORDER INVERSION that the previous `turn()` carried.
+        // The full cascade still runs so the trace + session state
+        // stay faithful; only the emitted reply is replaced.
+        let final_output =
+            if let Some(flag) = crate::wellness::red_flags::detect(&raw_input_for_safety) {
+                crate::wellness::red_flags::escalation_template(flag).to_string()
+            } else if let Some(class) = crate::safety_guard::check(&raw_input_for_safety) {
+                class.refusal().to_string()
             } else {
                 final_output
             };

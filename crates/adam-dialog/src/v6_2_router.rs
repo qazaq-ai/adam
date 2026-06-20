@@ -2529,16 +2529,24 @@ fn canonical_agent_for(lower: &str) -> Option<String> {
     let mut best: Option<(&str, usize)> = None;
     for c in candidates {
         let len = c.chars().count();
-        // **Word-boundary required for short agents.** Codex
-        // 2026-05-25 voice REPL audit caught «ай» / «су» / «жер»
-        // matching as substrings of «қалайсың», «суық», «жерде» —
-        // producing wrong sense answers. Agents ≤ 3 chars must
-        // appear as a whole word.
+        // **Word-boundary required for short agents.**  Voice REPL
+        // audit caught «ай» / «су» / «жер» matching as substrings of
+        // «қалайсың», «суық», «жерде» — producing wrong-sense
+        // answers.  Agents ≤ 3 chars must appear as a whole word.
+        //
+        // **v6.8.3 — 2026-06-17 user audit fix (Bug C3).** The
+        // pre-fix code ALSO ran the short-agent word-boundary check
+        // against the case-stripped surfaces. That let
+        // `strip_kazakh_case_suffixes` turn the verb «айта» (= "to
+        // say") into the noun «ай» (= "moon / month") by stripping
+        // the locative-case-shaped `-та`, after which the stripped
+        // surface presented «ай» as a word boundary.  Live input
+        // «Сіз осы жауапты қысқаша **айта** аласыз ба?» was returning
+        // «Уақыт өлшемі».  Strip-derived word boundaries are not
+        // semantically reliable without POS confirmation; restrict
+        // short-agent matching to the raw `lower` + `folded` forms.
         let hit = if len <= 3 {
-            contains_word(lower, c)
-                || contains_word(&stripped, c)
-                || contains_word(&folded, c)
-                || contains_word(&folded_stripped, c)
+            contains_word(lower, c) || contains_word(&folded, c)
         } else {
             lower.contains(c)
                 || stripped.contains(c)
