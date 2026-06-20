@@ -3724,7 +3724,7 @@ mod tests {
     fn generic_yes_no_about_other_person_is_not_self_identity_v683() {
         for input in [
             "Абай ұлы ақын ба?",
-            "Сіз қазақша білесіз бе?",  // capability, not identity
+            "Сіз қазақша білесіз бе?",   // capability, not identity
             "Сен дәрігерге барасың ба?", // user-direction, not identity
         ] {
             assert!(
