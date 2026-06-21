@@ -265,6 +265,22 @@ impl DiscourseState {
     pub fn by_author(&self, author: Speaker) -> impl Iterator<Item = &CommitmentRecord> {
         self.commitments.iter().filter(move |c| c.author == author)
     }
+
+    /// **v6.8.4 L4.5 Phase 2.C.** Mutable iterator over Proposed
+    /// commitments authored by `User` on the given turn.  Phase 2.C
+    /// commitment-promotion logic uses this to mark the
+    /// just-absorbed user commitment as `Accepted` when the
+    /// cascade successfully wrote the corresponding slot.
+    pub fn proposed_user_commitments_for_turn(
+        &mut self,
+        turn_id: u64,
+    ) -> impl Iterator<Item = &mut CommitmentRecord> {
+        self.commitments.iter_mut().filter(move |c| {
+            c.author == Speaker::User
+                && c.status == CommitmentStatus::Proposed
+                && c.turn_id == turn_id
+        })
+    }
 }
 
 /// One typed reply produced by ONE route.  The arbitration policy
@@ -352,6 +368,15 @@ impl AnswerCandidate {
 mod tests {
     use super::*;
     use crate::proof_object::{Claim, ClaimPredicate, Polarity, ProofObject, SupportKind};
+
+    // Named test-fixture constants — placeholder personal names
+    // for `CommitmentRecord` round-trip tests.  Reading
+    // `TEST_FIRST_NAME_*` in a test body signals «fixture», not
+    // a specific person.  See
+    // `memory/feedback_test_fixture_names.md` for the full rule.
+    const TEST_FIRST_NAME_USER: &str = "Алия";
+    const TEST_FIRST_NAME_USER_CORRECTED: &str = "Бекжан";
+    const TEST_HONORIFIC: &str = "Сізді есте сақтадым.";
 
     fn make_test_proof() -> ProofObject {
         ProofObject {
@@ -461,16 +486,17 @@ mod tests {
     /// can be constructed and inspected; Phase 2 wires storage.
     #[test]
     fn commitment_record_roundtrip() {
+        let claim = format!("Менің атым — {TEST_FIRST_NAME_USER}.");
         let r = CommitmentRecord {
             author: Speaker::User,
-            claim_text: "Менің атым — Дәулет.".into(),
+            claim_text: claim.clone(),
             status: CommitmentStatus::Proposed,
             turn_id: 7,
         };
         assert_eq!(r.author, Speaker::User);
         assert_eq!(r.status, CommitmentStatus::Proposed);
         assert_eq!(r.turn_id, 7);
-        assert!(r.claim_text.contains("Дәулет"));
+        assert!(r.claim_text.contains(TEST_FIRST_NAME_USER));
     }
 
     /// Reference SupportKind to keep the imported type live for
@@ -491,19 +517,21 @@ mod tests {
 
         let user_c = CommitmentRecord {
             author: Speaker::User,
-            claim_text: "Менің атым — Дәулет.".into(),
+            claim_text: format!("Менің атым — {TEST_FIRST_NAME_USER}."),
             status: CommitmentStatus::Proposed,
             turn_id: 1,
         };
         let adam_c = CommitmentRecord {
             author: Speaker::Adam,
-            claim_text: "Дәке деп атаймын.".into(),
+            claim_text: TEST_HONORIFIC.to_string(),
             status: CommitmentStatus::Accepted,
             turn_id: 1,
         };
         let user2_c = CommitmentRecord {
             author: Speaker::User,
-            claim_text: "Жоқ, Дәулет емес, Бекжан.".into(),
+            claim_text: format!(
+                "Жоқ, {TEST_FIRST_NAME_USER} емес, {TEST_FIRST_NAME_USER_CORRECTED}.",
+            ),
             status: CommitmentStatus::Proposed,
             turn_id: 2,
         };

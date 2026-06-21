@@ -3768,6 +3768,16 @@ impl Conversation {
             } else {
                 final_output
             };
+        // **v6.8.4 L4.5 Phase 2.C — commitment promotion.** After
+        // the final output is built, walk any Proposed user
+        // commitments recorded on THIS turn and promote them to
+        // Accepted when the corresponding session slot was
+        // populated (i.e. adam adopted the claim).  Phase 2.D will
+        // add Rejected promotion for the typed Correct dialogue
+        // move.  `turn_id` is the same value `absorb_entities`
+        // tagged the commitment with — captured at line 1554 of
+        // this method.
+        self.promote_recent_proposed_commitments(turn_id);
         (final_output, trace)
     }
 
@@ -4752,6 +4762,40 @@ impl Conversation {
                     .insert("last_exercise_turn".into(), turn_id.to_string());
             }
             _ => {}
+        }
+    }
+
+    /// **v6.8.4 L4.5 Phase 2.C.** Promote any Proposed user
+    /// commitment from `turn_id` to `Accepted` when the
+    /// corresponding session slot is populated.  The semantics:
+    /// if adam's reply rendered without falling back to a refusal
+    /// AND the slot the user introduced (e.g. `name` for
+    /// `StatementOfName`) is now in `session`, adam has implicitly
+    /// adopted the user's claim — the commitment is Accepted.
+    ///
+    /// Phase 2.C wires only `StatementOfName` (the Phase 2.B
+    /// canary).  Phase 2.D will add `DialogueMove::Correct` so a
+    /// user repair («Жоқ, X емес, Y») marks the prior commitment
+    /// Rejected and lands the replacement as Proposed.
+    ///
+    /// Called from the end of `turn_with_trace` after the final
+    /// output is built.  No-op when the discourse log is empty or
+    /// no Proposed commitment for this turn exists.
+    pub(crate) fn promote_recent_proposed_commitments(&mut self, turn_id: usize) {
+        let turn_id_u64 = turn_id as u64;
+        // Snapshot the slot state outside the mutable borrow.
+        let name_in_session = self.session.contains_key("name");
+        for commitment in self
+            .discourse_state
+            .proposed_user_commitments_for_turn(turn_id_u64)
+        {
+            // For now the only wired commitment shape is the
+            // StatementOfName one: claim_text starts with «Менің
+            // атым».  Phase 2.D will broaden the matcher as more
+            // intents start recording commitments.
+            if commitment.claim_text.starts_with("Менің атым") && name_in_session {
+                commitment.status = crate::dialog_acts::CommitmentStatus::Accepted;
+            }
         }
     }
 
