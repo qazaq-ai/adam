@@ -3768,15 +3768,26 @@ impl Conversation {
             } else {
                 final_output
             };
+        // **v6.8.4 L4.5 Phase 2.D — commitment retraction.**
+        // Detect a repair pattern in the RAW input («Жоқ, X емес,
+        // Y» / «Нет, не X, а Y»).  When matched AND a prior user
+        // commitment mentions the rejected value X, mark that
+        // commitment `Rejected`.  Runs BEFORE the Phase 2.C
+        // promotion pass so an Accepted-then-Rejected lifecycle
+        // is visible in order on the discourse log.  The
+        // replacement value Y, if absorbed by the cascade as a
+        // new `Intent::StatementOfName` on the same turn, lands
+        // as a fresh `Proposed` commitment via the usual
+        // `absorb_entities` path.
+        let _ = self.apply_correction(&raw_input_for_safety);
+
         // **v6.8.4 L4.5 Phase 2.C — commitment promotion.** After
         // the final output is built, walk any Proposed user
         // commitments recorded on THIS turn and promote them to
         // Accepted when the corresponding session slot was
-        // populated (i.e. adam adopted the claim).  Phase 2.D will
-        // add Rejected promotion for the typed Correct dialogue
-        // move.  `turn_id` is the same value `absorb_entities`
-        // tagged the commitment with — captured at line 1554 of
-        // this method.
+        // populated (i.e. adam adopted the claim).  `turn_id` is
+        // the same value `absorb_entities` tagged the commitment
+        // with — captured at line 1554 of this method.
         self.promote_recent_proposed_commitments(turn_id);
         (final_output, trace)
     }
@@ -4762,6 +4773,60 @@ impl Conversation {
                     .insert("last_exercise_turn".into(), turn_id.to_string());
             }
             _ => {}
+        }
+    }
+
+    /// **v6.8.4 L4.5 Phase 2.D.** Detect a repair / correction
+    /// pattern in `raw_input` («Жоқ, X емес, Y» / «Нет, не X, а
+    /// Y») and, when found AND a prior user commitment matches
+    /// the rejected value, mark that prior commitment `Rejected`.
+    ///
+    /// Phase 2.D ships ONLY the discourse-state transition — the
+    /// replacement value is left for the v6.1 cascade's normal
+    /// `Intent::StatementOfName` path to absorb on this turn (if
+    /// it does), which in turn lands a new `Proposed` commitment
+    /// via `absorb_entities`.  Phase 2.E will broaden to add the
+    /// explicit acknowledgement template and the typed
+    /// arbitration that ensures both the Rejected mark AND the
+    /// new Proposed commitment always land together.
+    ///
+    /// Returns `Some((rejected, replacement))` when a match was
+    /// found AND a prior commitment was marked Rejected; `None`
+    /// otherwise.  The return value is informational — the
+    /// state mutation is the load-bearing effect.
+    pub(crate) fn apply_correction(&mut self, raw_input: &str) -> Option<(String, String)> {
+        let (rejected, replacement) = crate::dialog_acts::detect_correction_pattern(raw_input)?;
+        // Find the most-recent user commitment whose claim text
+        // mentions the rejected value.  We walk newest-first so a
+        // chain of repairs («X → Y → Z») marks only the most
+        // recent reachable commitment.
+        let rejected_lower = rejected.to_lowercase();
+        let mut marked = false;
+        for commitment in self.discourse_state.commitments.iter_mut().rev() {
+            if commitment.author != crate::dialog_acts::Speaker::User {
+                continue;
+            }
+            if !matches!(
+                commitment.status,
+                crate::dialog_acts::CommitmentStatus::Proposed
+                    | crate::dialog_acts::CommitmentStatus::Accepted
+            ) {
+                continue;
+            }
+            if commitment
+                .claim_text
+                .to_lowercase()
+                .contains(&rejected_lower)
+            {
+                commitment.status = crate::dialog_acts::CommitmentStatus::Rejected;
+                marked = true;
+                break;
+            }
+        }
+        if marked {
+            Some((rejected, replacement))
+        } else {
+            None
         }
     }
 

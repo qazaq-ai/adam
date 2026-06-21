@@ -137,6 +137,49 @@ fn reset_clears_discourse_state() {
     assert!(conv.discourse_state.commitments.is_empty());
 }
 
+/// **Phase 2.D — repair / correction.** When the user retracts
+/// a prior commitment with «Жоқ, X емес, Y», the prior
+/// commitment is marked `Rejected` on the discourse log.  The
+/// new value Y is absorbed by the v6.1 cascade as a fresh
+/// `Intent::StatementOfName` (when the cascade recognises that
+/// shape), landing as a new `Proposed` commitment via the same
+/// path Phase 2.B already wires.  Phase 2.E will broaden the
+/// cascade detection so adam's reply explicitly acknowledges
+/// the correction; for now we only assert the discourse-state
+/// transition is correct.
+#[test]
+fn correction_pattern_marks_prior_commitment_rejected() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    // Turn 1: user introduces the (eventually-rejected) name.
+    let first = format!("Менің атым — {TEST_FIRST_NAME_MALE}.");
+    let _ = conv.turn(&first, &lex, &repo, 0);
+
+    // Turn 2: user retracts with the Kazakh repair shape.
+    let correction = format!("Жоқ, {TEST_FIRST_NAME_MALE} емес, {TEST_FIRST_NAME_OTHER_MALE}.",);
+    let _reply = conv.turn(&correction, &lex, &repo, 1);
+
+    // The first commitment must now carry `Rejected` status.
+    let first_commitment = conv
+        .discourse_state
+        .commitments
+        .iter()
+        .find(|c| {
+            c.author == Speaker::User
+                && c.claim_text.contains(TEST_FIRST_NAME_MALE)
+                && c.turn_id == 0
+        })
+        .expect("first commitment must be present on log");
+    assert_eq!(
+        first_commitment.status,
+        CommitmentStatus::Rejected,
+        "first commitment must be marked Rejected after the repair turn, got {:?}",
+        first_commitment.status,
+    );
+}
+
 /// **Phase 2.C — commitment promotion.** After the full cascade
 /// processes a name statement, the recorded Proposed commitment
 /// is promoted to Accepted because `session["name"]` is populated

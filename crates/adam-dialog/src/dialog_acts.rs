@@ -190,6 +190,19 @@ pub enum DialogueMove {
     /// adam declines to answer for a typed policy reason.  The
     /// refusal surface lives in `AnswerCandidate::text`.
     Refuse(PolicyReason),
+    /// **Phase 2.D — repair move.**  User retracts a prior
+    /// commitment («Жоқ, X емес, Y») and replaces it.  The
+    /// `rejected_value` matches a substring of the prior
+    /// commitment's `claim_text`; the `replacement_value` becomes
+    /// the new Proposed commitment on the same turn.  Phase 2.D
+    /// detection lives in [`detect_correction_pattern`] +
+    /// [`crate::Conversation::apply_correction`]; Phase 2.E will
+    /// add the full intent-classifier path so adam's reply
+    /// explicitly acknowledges the correction.
+    Correct {
+        rejected_value: String,
+        replacement_value: String,
+    },
 }
 
 /// Session-slot mutations a route wants to apply atomically when
@@ -240,6 +253,107 @@ pub struct DiscourseState {
     /// A bounded ring-buffer is a future-phase optimisation if we
     /// need it.
     pub commitments: Vec<CommitmentRecord>,
+}
+
+/// **v6.8.4 L4.5 Phase 2.D.** Detect a repair / correction
+/// pattern in `input`.  Returns `Some((rejected_value,
+/// replacement_value))` when the input matches a recognised
+/// retraction shape.
+///
+/// ## Supported shapes
+///
+/// Kazakh:
+/// - «Жоқ, X емес, Y» / «жоқ, X емес, Y»
+/// - «Жоқ, X емес, Y дегенмін»
+/// - «Жоқ X емес Y» (no commas — Whisper STT drift)
+///
+/// Russian (code-switch under load):
+/// - «Нет, не X, а Y»
+/// - «Не X, а Y»
+///
+/// ## What this is NOT
+///
+/// Not a full intent classifier.  Returning `Some` here means the
+/// SHAPE matches; the caller must still consult
+/// `DiscourseState` to find a prior commitment whose claim
+/// references the `rejected_value` before treating this as a true
+/// repair turn.  The helper extracts the two value tokens
+/// only — no normalisation, no FST round-trip.  Phase 2.E will
+/// add the typed-intent classifier path.
+pub fn detect_correction_pattern(input: &str) -> Option<(String, String)> {
+    let lower = input.to_lowercase();
+
+    // ── Kazakh «Жоқ, X емес, Y» / «Жоқ X емес Y» ──────────────
+    // Markers: «жоқ» at start + «емес» somewhere later.  Locate
+    // both in the lowercase view, then extract the X and Y slices
+    // from the ORIGINAL input so the returned values preserve
+    // case (`Алия` not `алия`).  Punctuation around the tokens is
+    // tolerated.
+    let lower_starts_zhoq =
+        lower.starts_with("жоқ ") || lower.starts_with("жоқ,") || lower.starts_with("жоқ\n");
+    if lower_starts_zhoq {
+        // Slice past «жоқ» (5 bytes in UTF-8: ж=2 + о=1 + қ=2).
+        let after_zhoq_start = "жоқ".len();
+        // Find the «емес» marker (also 8 bytes: е=2+м=2+е=2+с=2).
+        if let Some(emes_idx) = lower[after_zhoq_start..].find(" емес") {
+            let emes_abs = after_zhoq_start + emes_idx;
+            let rejected_slice = input[after_zhoq_start..emes_abs].trim();
+            let rejected = rejected_slice
+                .trim_matches([',', '.', '?', '!', ' '])
+                .to_string();
+            // After «емес» (4 chars = 8 bytes for these Cyrillic
+            // letters), the replacement begins.
+            let after_emes = emes_abs + " емес".len();
+            let y_part = input[after_emes..].trim_start_matches([' ', ',', '\n']);
+            let replacement = y_part
+                .split(['.', '?', '!', ','])
+                .next()
+                .unwrap_or("")
+                .trim()
+                .trim_end_matches(" дегенмін")
+                .trim_end_matches(" деймін")
+                .trim()
+                .to_string();
+            if !rejected.is_empty() && !replacement.is_empty() {
+                return Some((rejected, replacement));
+            }
+        }
+    }
+
+    // ── Russian «Нет, не X, а Y» / «Не X, а Y» ────────────────
+    let net_ne_prefix_len = if lower.starts_with("нет, не ") {
+        Some("нет, не ".len())
+    } else if lower.starts_with("нет не ") {
+        Some("нет не ".len())
+    } else if lower.starts_with("не ") {
+        Some("не ".len())
+    } else {
+        None
+    };
+    if let Some(start) = net_ne_prefix_len {
+        let rest_lower = &lower[start..];
+        // Find «, а » or « а » separator.
+        let sep_match = rest_lower
+            .find(", а ")
+            .map(|i| (i, ", а ".len()))
+            .or_else(|| rest_lower.find(" а ").map(|i| (i, " а ".len())));
+        if let Some((sep_idx, sep_len)) = sep_match {
+            let x_slice = input[start..start + sep_idx].trim();
+            let rejected = x_slice.trim_matches([',', '.', '?', '!', ' ']).to_string();
+            let y_start = start + sep_idx + sep_len;
+            let replacement = input[y_start..]
+                .split(['.', '?', '!', ','])
+                .next()
+                .unwrap_or("")
+                .trim()
+                .to_string();
+            if !rejected.is_empty() && !replacement.is_empty() {
+                return Some((rejected, replacement));
+            }
+        }
+    }
+
+    None
 }
 
 impl DiscourseState {
@@ -561,5 +675,73 @@ mod tests {
         assert!(state.commitments.is_empty());
         assert!(state.by_author(Speaker::User).next().is_none());
         assert!(state.by_author(Speaker::Adam).next().is_none());
+    }
+
+    /// **Phase 2.D — correction-pattern detector.**  Kazakh
+    /// «Жоқ, X емес, Y» shape extracts both values.  Uses the
+    /// `TEST_FIRST_NAME_*` constants per the test-fixture
+    /// convention.
+    #[test]
+    fn detect_correction_kazakh_comma_form() {
+        let input = format!("Жоқ, {TEST_FIRST_NAME_USER} емес, {TEST_FIRST_NAME_USER_CORRECTED}.",);
+        let got = detect_correction_pattern(&input);
+        assert_eq!(
+            got,
+            Some((
+                TEST_FIRST_NAME_USER.to_string(),
+                TEST_FIRST_NAME_USER_CORRECTED.to_string(),
+            )),
+            "expected (rejected, replacement) tuple",
+        );
+    }
+
+    /// Whisper-drift shape with no commas — same extraction.
+    #[test]
+    fn detect_correction_kazakh_no_commas() {
+        let input = format!("жоқ {TEST_FIRST_NAME_USER} емес {TEST_FIRST_NAME_USER_CORRECTED}",);
+        let got = detect_correction_pattern(&input);
+        assert_eq!(
+            got,
+            Some((
+                TEST_FIRST_NAME_USER.to_string(),
+                TEST_FIRST_NAME_USER_CORRECTED.to_string(),
+            )),
+        );
+    }
+
+    /// Kazakh «Жоқ, X емес, Y дегенмін» trailing-tag — same
+    /// extraction (the «дегенмін» suffix is trimmed).
+    #[test]
+    fn detect_correction_kazakh_with_dеgenmin_suffix() {
+        let input = format!(
+            "Жоқ, {TEST_FIRST_NAME_USER} емес, {TEST_FIRST_NAME_USER_CORRECTED} дегенмін.",
+        );
+        let got = detect_correction_pattern(&input);
+        assert_eq!(
+            got.as_ref().map(|t| t.1.as_str()),
+            Some(TEST_FIRST_NAME_USER_CORRECTED),
+            "replacement must strip the «дегенмін» tag",
+        );
+    }
+
+    /// Russian «Нет, не X, а Y» shape.  The detector preserves
+    /// the case of the extracted values so downstream consumers
+    /// can do canonical name lookup against the curated DB.
+    #[test]
+    fn detect_correction_russian_full_form() {
+        let got = detect_correction_pattern("Нет, не Иван, а Пётр.");
+        assert_eq!(got, Some(("Иван".to_string(), "Пётр".to_string())));
+    }
+
+    /// Negative control: a non-correction input returns `None`.
+    #[test]
+    fn detect_correction_negative_controls() {
+        assert!(detect_correction_pattern("").is_none());
+        assert!(detect_correction_pattern("Сәлем!").is_none());
+        assert!(detect_correction_pattern("Менің атым — Айгүл.").is_none());
+        // «Жоқ» alone without the «емес» marker is just a no, not
+        // a repair.
+        assert!(detect_correction_pattern("Жоқ.").is_none());
+        assert!(detect_correction_pattern("Жоқ, рахмет.").is_none());
     }
 }
