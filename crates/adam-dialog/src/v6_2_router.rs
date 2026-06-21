@@ -266,21 +266,25 @@ fn answer_with_corpus_inner(
     // 1b. Capabilities query. «Сен не білесің?» / «Не істей
     // аласың?» — user wants a self-description of what adam can
     // answer. Distinct from self-identity («Сен кімсің?»).
-    if is_capabilities_query(input) {
-        return Some(capabilities_response(input));
+    //
+    // **v6.8.4 L4.5 Phase 2.A.2.** Goes through the typed
+    // `lookup_capabilities_typed` so the route carries a typed
+    // `system_self` proof + `RouteId::Capabilities` attribution.
+    // The cascade still consumes `Option<String>` — `.text` extracts
+    // the same surface the old callsite emitted.
+    if let Some(c) = lookup_capabilities_typed(input) {
+        return Some(c.text);
     }
 
     // **v6.8.3 — 2026-06-17 user audit (Bug C).** Personal-experience
     // probe — «Сен қандай кітап оқыдың?» / «Сен қандай фильмдер
     // көрдің?» — asks about adam's lived experience.  adam has none:
     // it is a deterministic typed kernel, not an embodied agent.
-    // Pre-fix these queries fell to the substring-IsA layer that
-    // surfaced a generic definition of the topic noun («Кітап —
-    // мұқабамен бекітілген баспа басылымы…»), which presupposes
-    // adam DID read.  Refuse the presupposition honestly while
-    // offering the factual alternative.
-    if is_personal_experience_query(input) {
-        return Some(personal_experience_refusal());
+    // **v6.8.4 L4.5 Phase 2.A.2** — typed via
+    // `lookup_personal_experience_typed`, refusal proof shape =
+    // `no_data_refusal("lived_experience")`.
+    if let Some(c) = lookup_personal_experience_typed(input) {
+        return Some(c.text);
     }
 
     // 1c. Pitch-gender explanation. «Сен мені ағай дедің. Қалай
@@ -310,29 +314,14 @@ fn answer_with_corpus_inner(
     // queries. Without this gate the cascade matches morpheme
     // «сен» / «өзің» and emits Abai poetry quotes (codex
     // 2026-05-25 audit caught this).
-    if is_self_identity_query(input) {
-        // **Phase 20 + v6.5.0-rc11 (2026-06-10)** — 3 paraphrases of
-        // the self-introduction.  rc10 audit flagged the previous
-        // wording: the Piper Kazakh TTS voice mis-pronounces the
-        // English «Agglutinative Reasoning Kernel» and the bare
-        // «ARK» / «LLM» / «curated» tokens.  Replaced English-source
-        // brand names with their Kazakh equivalents so the TTS reads
-        // cleanly aloud.  The kernel itself is still ARK internally —
-        // only the user-facing self-description changes.
-        let variants: &[&str] = &[
-            "Мен — адам, қазақ тіліне арналған детерминирленген тілдік \
-             жүйемін. Үлкен тілдік модель емеспін — жауаптарымды \
-             алдын ала тексерілген деректерден аламын.",
-            "Менің атым — адам. Қазақ тілінің морфологиясы бойынша \
-             құрастырылған детерминирленген тілдік жүйемін. \
-             Жауаптарым тек тексерілген деректерге сүйенеді, \
-             ойдан құрастырылмайды.",
-            "Мен — қазақ тіліне арналған агглютинативті ой жүйесімін, \
-             қысқаша «адам» деп аталамын. Әр сөзімді тексерілген \
-             деректермен растаймын; білмейтін нәрсемді «нақты дерегім \
-             жоқ» деп ашық айтамын.",
-        ];
-        return Some(pick_variant(variants, input).to_string());
+    //
+    // **v6.8.4 L4.5 Phase 2.A.2** — typed via
+    // `lookup_self_identity_typed`, proof shape =
+    // `system_self("identity", …)`.  The variant array previously
+    // inlined here lives in the extracted `self_identity_response`
+    // helper.
+    if let Some(c) = lookup_self_identity_typed(input) {
+        return Some(c.text);
     }
 
     // 3. Honest «no live data» refusals — weather, currency,
@@ -340,20 +329,14 @@ fn answer_with_corpus_inner(
     // for. **Runs BEFORE the system clock gate** so «Бүгін
     // Алматыда қандай ауа райы?» (which has «бүгін» trigger for
     // clock) routes correctly to the weather-refusal path.
-    if needs_live_data_refusal(input) {
-        // **Phase 20** — 3 paraphrases for live-data refusal.
-        let variants: &[&str] = &[
-            "Бұл сұраққа жауап беру үшін менде нақты дерек жоқ. \
-             Менің білім қорым тексерілген деректерден тұрады, \
-             тікелей интернет немесе ағымдағы мәлімет ағысы қосылған емес.",
-            "Бұл сұраққа дерек бере алмаймын — менің білім қорымда \
-             ағымдағы немесе реалды-уақыттық мәлімет жоқ. Тек \
-             тексерілген тарихи деректермен жұмыс істеймін.",
-            "Кешіріңіз, бұл сұраққа жауап беретін ағымдағы дерек менде \
-             жоқ. Интернетке немесе сыртқы мәлімет көзіне қосылмаймын — \
-             тек тексерілген тарихи деректер қолымда.",
-        ];
-        return Some(pick_variant(variants, input).to_string());
+    //
+    // **v6.8.4 L4.5 Phase 2.A.2** — typed via
+    // `lookup_live_data_refusal_typed`, proof shape =
+    // `safety_refusal(input, "live_data", CurrentData)`.  Variant
+    // array lives in the extracted `live_data_refusal_response`
+    // helper.
+    if let Some(c) = lookup_live_data_refusal_typed(input) {
+        return Some(c.text);
     }
 
     // 4. System clock — live state (date / month / weekday /
@@ -1476,6 +1459,153 @@ fn needs_live_data_refusal(s: &str) -> bool {
         "ойын нәтижесі",
     ];
     markers.iter().any(|m| lower.contains(m))
+}
+
+// ── L4.5 Phase 2.A.2 — typed migrations of bool-detector routes ──
+//
+// Each `lookup_X_typed` below combines:
+//   1. the existing bool detector (`is_X_query` / `needs_X_refusal`);
+//   2. the inline template / variant selection previously done at
+//      the cascade callsite;
+//   3. the proper `ProofObject` construction (`system_self` for
+//      self-description, `safety_refusal` for typed safety domains,
+//      `no_data_refusal` for honest-no-data refusals).
+//
+// The cascade still consumes `Option<String>`, so the callsites are
+// rewritten as `lookup_X_typed(input).map(|c| c.text)` — same
+// surface, same semantics, plus typed provenance and consistent
+// proof/emitted-text invariant by construction.  Phase 2.B / 2.C
+// will switch the cascade boundary to `Option<AnswerCandidate>`.
+
+/// **v6.8.4 L4.5 Phase 2.A.2.** Typed sibling of the capabilities
+/// detector.  Combines [`is_capabilities_query`] + the variant
+/// selection previously inlined at the cascade callsite into one
+/// route.  Proof shape: `ProofObject::system_self("capabilities", …)`.
+fn lookup_capabilities_typed(input: &str) -> Option<crate::dialog_acts::AnswerCandidate> {
+    use crate::dialog_acts::{AnswerCandidate, RouteId};
+    use crate::proof_object::ProofObject;
+
+    if !is_capabilities_query(input) {
+        return None;
+    }
+    let text = capabilities_response(input);
+    let proof = ProofObject::system_self("capabilities".into(), text.clone());
+    let candidate = AnswerCandidate::assert(text, proof, RouteId::Capabilities);
+    debug_assert!(candidate.invariant_check().is_ok());
+    Some(candidate)
+}
+
+/// **v6.8.4 L4.5 Phase 2.A.2.** Typed sibling of the personal-
+/// experience detector.  Refuses presupposition probes («Сен
+/// қандай кітап оқыдың?») with the existing
+/// [`personal_experience_refusal`] surface.  Proof shape:
+/// `ProofObject::no_data_refusal(subject, "lived_experience")` —
+/// adam genuinely lacks the data because it has no lived
+/// experience, not because of a safety policy.
+fn lookup_personal_experience_typed(input: &str) -> Option<crate::dialog_acts::AnswerCandidate> {
+    use crate::dialog_acts::{AnswerCandidate, PolicyReason, RouteId};
+    use crate::proof_object::ProofObject;
+
+    if !is_personal_experience_query(input) {
+        return None;
+    }
+    let text = personal_experience_refusal();
+    let proof = ProofObject::no_data_refusal(input.to_string(), "lived_experience".into());
+    let candidate = AnswerCandidate::refuse(
+        text,
+        proof,
+        RouteId::PersonalExperienceRefusal,
+        PolicyReason::PresuppositionFailure,
+    );
+    debug_assert!(candidate.invariant_check().is_ok());
+    Some(candidate)
+}
+
+/// **v6.8.4 L4.5 Phase 2.A.2.** Typed sibling of the self-identity
+/// detector.  Variant selection is delegated to
+/// [`self_identity_response`] (extracted helper below).  Proof
+/// shape: `ProofObject::system_self("identity", …)`.
+fn lookup_self_identity_typed(input: &str) -> Option<crate::dialog_acts::AnswerCandidate> {
+    use crate::dialog_acts::{AnswerCandidate, RouteId};
+    use crate::proof_object::ProofObject;
+
+    if !is_self_identity_query(input) {
+        return None;
+    }
+    let text = self_identity_response(input);
+    let proof = ProofObject::system_self("identity".into(), text.clone());
+    let candidate = AnswerCandidate::assert(text, proof, RouteId::SelfIdentity);
+    debug_assert!(candidate.invariant_check().is_ok());
+    Some(candidate)
+}
+
+/// **v6.8.4 L4.5 Phase 2.A.2.** Typed sibling of the live-data
+/// detector.  Variant selection is delegated to
+/// [`live_data_refusal_response`] (extracted helper below).  Proof
+/// shape: `ProofObject::safety_refusal(input, "live_data", CurrentData)`
+/// — adam has no live feed, by typed domain.
+fn lookup_live_data_refusal_typed(input: &str) -> Option<crate::dialog_acts::AnswerCandidate> {
+    use crate::dialog_acts::{AnswerCandidate, PolicyReason, RouteId};
+    use crate::proof_object::{ProofObject, SafetyDomain};
+
+    if !needs_live_data_refusal(input) {
+        return None;
+    }
+    let text = live_data_refusal_response(input);
+    let proof = ProofObject::safety_refusal(
+        input.to_string(),
+        "live_data".into(),
+        SafetyDomain::CurrentData,
+    );
+    let candidate = AnswerCandidate::refuse(
+        text,
+        proof,
+        RouteId::LiveDataRefusal,
+        PolicyReason::NoLiveData,
+    );
+    debug_assert!(candidate.invariant_check().is_ok());
+    Some(candidate)
+}
+
+/// **v6.8.4 L4.5 Phase 2.A.2.** Variant selector for the self-
+/// identity templates.  Three paraphrases (rc11 / rc20) chosen by
+/// stable hash of the input so the same query maps to the same
+/// variant.  Extracted from the cascade callsite to give the typed
+/// handler a single owner.
+fn self_identity_response(input: &str) -> String {
+    let variants: &[&str] = &[
+        "Мен — адам, қазақ тіліне арналған детерминирленген тілдік \
+         жүйемін. Үлкен тілдік модель емеспін — жауаптарымды \
+         алдын ала тексерілген деректерден аламын.",
+        "Менің атым — адам. Қазақ тілінің морфологиясы бойынша \
+         құрастырылған детерминирленген тілдік жүйемін. \
+         Жауаптарым тек тексерілген деректерге сүйенеді, \
+         ойдан құрастырылмайды.",
+        "Мен — қазақ тіліне арналған агглютинативті ой жүйесімін, \
+         қысқаша «адам» деп аталамын. Әр сөзімді тексерілген \
+         деректермен растаймын; білмейтін нәрсемді «нақты дерегім \
+         жоқ» деп ашық айтамын.",
+    ];
+    pick_variant(variants, input).to_string()
+}
+
+/// **v6.8.4 L4.5 Phase 2.A.2.** Variant selector for the live-
+/// data refusal templates.  Three Phase-20 paraphrases.  Extracted
+/// from the cascade callsite to give the typed handler a single
+/// owner.
+fn live_data_refusal_response(input: &str) -> String {
+    let variants: &[&str] = &[
+        "Бұл сұраққа жауап беру үшін менде нақты дерек жоқ. \
+         Менің білім қорым тексерілген деректерден тұрады, \
+         тікелей интернет немесе ағымдағы мәлімет ағысы қосылған емес.",
+        "Бұл сұраққа дерек бере алмаймын — менің білім қорымда \
+         ағымдағы немесе реалды-уақыттық мәлімет жоқ. Тек \
+         тексерілген тарихи деректермен жұмыс істеймін.",
+        "Кешіріңіз, бұл сұраққа жауап беретін ағымдағы дерек менде \
+         жоқ. Интернетке немесе сыртқы мәлімет көзіне қосылмаймын — \
+         тек тексерілген тарихи деректер қолымда.",
+    ];
+    pick_variant(variants, input).to_string()
 }
 
 /// **Phase 23 (2026-06-03)** — school-level chemistry formula lookup.
@@ -3735,6 +3865,69 @@ mod tests {
     /// extraction primitive is `extract_year_in_range_*` below;
     /// regression protection at the cascade level rides on the five
     /// production eval suites.
+
+    /// **v6.8.4 L4.5 Phase 2.A.2 — bool-detector routes migrated
+    /// to typed pipeline.**  Four routes (capabilities, personal-
+    /// experience, self-identity, live-data) now route through
+    /// `lookup_X_typed` siblings that construct the proper
+    /// `ProofObject` (`system_self` / `no_data_refusal` /
+    /// `safety_refusal`) and carry the right `RouteId`.  The
+    /// cascade callsites are `lookup_X_typed(input).map(|c| c.text)`
+    /// — same surface, plus typed provenance.
+    #[test]
+    fn capabilities_typed_canary_v684() {
+        use crate::dialog_acts::{DialogueMove, RouteId};
+        let c = lookup_capabilities_typed("Сен не білесің?").expect("must resolve");
+        assert_eq!(c.route, RouteId::Capabilities);
+        assert!(c.invariant_check().is_ok());
+        match &c.moves[0] {
+            DialogueMove::Assert { claim } => assert_eq!(claim, &c.text),
+            other => panic!("expected Assert, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn personal_experience_typed_canary_v684() {
+        use crate::dialog_acts::{DialogueMove, PolicyReason, RouteId};
+        let c = lookup_personal_experience_typed("Сен қандай кітап оқыдың?").expect("must resolve");
+        assert_eq!(c.route, RouteId::PersonalExperienceRefusal);
+        assert!(c.invariant_check().is_ok());
+        match &c.moves[0] {
+            DialogueMove::Refuse(reason) => {
+                assert_eq!(*reason, PolicyReason::PresuppositionFailure);
+            }
+            other => panic!("expected Refuse, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn self_identity_typed_canary_v684() {
+        use crate::dialog_acts::{DialogueMove, RouteId};
+        let c = lookup_self_identity_typed("Сен кімсің?").expect("must resolve");
+        assert_eq!(c.route, RouteId::SelfIdentity);
+        assert!(c.invariant_check().is_ok());
+        match &c.moves[0] {
+            DialogueMove::Assert { .. } => {}
+            other => panic!("expected Assert, got {other:?}"),
+        }
+        // The new yes/no identity probes also route here.
+        let c2 = lookup_self_identity_typed("Сен адамсың ба?").expect("must resolve");
+        assert_eq!(c2.route, RouteId::SelfIdentity);
+    }
+
+    #[test]
+    fn live_data_refusal_typed_canary_v684() {
+        use crate::dialog_acts::{DialogueMove, PolicyReason, RouteId};
+        let c = lookup_live_data_refusal_typed("Қазір BTC бағасы қанша?").expect("must resolve");
+        assert_eq!(c.route, RouteId::LiveDataRefusal);
+        assert!(c.invariant_check().is_ok());
+        match &c.moves[0] {
+            DialogueMove::Refuse(reason) => {
+                assert_eq!(*reason, PolicyReason::NoLiveData);
+            }
+            other => panic!("expected Refuse, got {other:?}"),
+        }
+    }
 
     /// **v6.8.4 L4.5 Phase 2.A — chemistry route migration.** The
     /// typed `lookup_chemical_formula_typed` returns an
