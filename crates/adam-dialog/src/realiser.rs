@@ -10,9 +10,9 @@
 //!
 //! Examples:
 //! ```text
-//!   "сәлем {name}"                    → "сәлем Дәулет"
-//!   "{city|locative} тұрасыз ба?"     → "Алматыда тұрасыз ба?"
-//!   "{occupation|plural} қажет"       → "мұғалімдер қажет"
+//!   "сәлем {name}"                    → "сәлем {value-of-name-slot}"
+//!   "{city|locative} тұрасыз ба?"     → "{city}да тұрасыз ба?"
+//!   "{occupation|plural} қажет"       → "{occupation}лар қажет"
 //! ```
 //!
 //! Unfilled placeholders stay visible as literal `{name}` / `{city|loc}`

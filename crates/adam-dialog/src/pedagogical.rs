@@ -314,7 +314,11 @@ pub fn code_snippet_for(topic: &str) -> Option<&'static str> {
             "```rust\nfn main() {\n    let mut s = String::from(\"Сәлем, \");\n    s.push_str(\"әлем!\");\n    println!(\"{s}\"); // Сәлем, әлем!\n}\n```",
         ),
         "struct" => Some(
-            "```rust\nstruct Person { name: String, age: u32 }\nfn main() {\n    let p = Person { name: \"Дәулет\".into(), age: 30 };\n    println!(\"{} — {} жаста\", p.name, p.age);\n}\n```",
+            // **v6.8.4 L4.5 Phase 2.F.** Generic placeholder `name`
+            // for the example instance instead of a specific person
+            // — production code shouldn't carry hardcoded
+            // particulars.  See `memory/feedback_test_fixture_names.md`.
+            "```rust\nstruct Person { name: String, age: u32 }\nfn main() {\n    let p = Person { name: \"name\".into(), age: 30 };\n    println!(\"{} — {} жаста\", p.name, p.age);\n}\n```",
         ),
         // **v4.94.5** — extension batch.
         "enum" => Some(
