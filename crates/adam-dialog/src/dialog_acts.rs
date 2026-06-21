@@ -213,6 +213,60 @@ impl StateDelta {
     }
 }
 
+/// Discourse-level state carried by [`crate::Conversation`].  Phase
+/// 2.B ships only the `commitments` field — the typed log of what
+/// each participant has asserted, with provenance and status.
+/// Future phases add `register` (TY / VY politeness), `referents`
+/// (typed anaphora stack), `last_user_move` / `last_system_move`,
+/// and `task`-state pointers.
+///
+/// **Why on `Conversation` and not inside `session: HashMap<String,
+/// String>`:** the stringly-typed session map cannot record (a) who
+/// authored a claim, (b) whether adam has confirmed it, (c) when it
+/// was introduced, or (d) when it was contested.  Codex flagged the
+/// failure mode where a user statement silently overwrites curated
+/// truth.  Statused commitments separate «User said X» (Proposed)
+/// from «adam echoes X» (Accepted) from «adam corrected X»
+/// (Rejected) from «unresolved» (Contested).
+///
+/// Phase 2.B does NOT yet read commitments anywhere — it only
+/// records them so Phase 2.C / 2.D have data to consume.  Behaviour
+/// is byte-identical for every existing route.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DiscourseState {
+    /// All commitments made by either speaker, in turn order.
+    /// Most recent at the end.  The default capacity is empty;
+    /// growth is unbounded for now (Phase 2 ships small dialogs).
+    /// A bounded ring-buffer is a future-phase optimisation if we
+    /// need it.
+    pub commitments: Vec<CommitmentRecord>,
+}
+
+impl DiscourseState {
+    /// Append a new commitment record.  Returns the index of the
+    /// newly-inserted commitment for downstream cross-references
+    /// (Phase 2.C arbitration will use these indices to relate
+    /// candidates to the commitments they verify or contradict).
+    pub fn record(&mut self, commitment: CommitmentRecord) -> usize {
+        self.commitments.push(commitment);
+        self.commitments.len() - 1
+    }
+
+    /// Most-recent commitment by `author`, if any.  Phase 2.D
+    /// repair-act detection ( «Жоқ, X емес, Y» ) consults this to
+    /// know which prior commitment to mark as Rejected.
+    pub fn last_by(&self, author: Speaker) -> Option<&CommitmentRecord> {
+        self.commitments.iter().rev().find(|c| c.author == author)
+    }
+
+    /// Filter view of all commitments by `author`.  Phase 2 readers
+    /// will use this for stance summaries; Phase 1 has no consumers
+    /// yet (this is the foundation pass).
+    pub fn by_author(&self, author: Speaker) -> impl Iterator<Item = &CommitmentRecord> {
+        self.commitments.iter().filter(move |c| c.author == author)
+    }
+}
+
 /// One typed reply produced by ONE route.  The arbitration policy
 /// (Phase 2) picks among competing candidates; the verifier
 /// audits the WINNER's proof against its text; the cascade
@@ -424,5 +478,60 @@ mod tests {
     #[test]
     fn support_kind_type_referenced() {
         let _kind = SupportKind::CuratedFact;
+    }
+
+    /// **Phase 2.B — DiscourseState ops.** `record` appends and
+    /// returns the new index; `last_by` finds the most-recent
+    /// commitment by author; `by_author` filters the full log.
+    #[test]
+    fn discourse_state_record_and_query() {
+        let mut state = DiscourseState::default();
+        assert!(state.commitments.is_empty());
+        assert!(state.last_by(Speaker::User).is_none());
+
+        let user_c = CommitmentRecord {
+            author: Speaker::User,
+            claim_text: "Менің атым — Дәулет.".into(),
+            status: CommitmentStatus::Proposed,
+            turn_id: 1,
+        };
+        let adam_c = CommitmentRecord {
+            author: Speaker::Adam,
+            claim_text: "Дәке деп атаймын.".into(),
+            status: CommitmentStatus::Accepted,
+            turn_id: 1,
+        };
+        let user2_c = CommitmentRecord {
+            author: Speaker::User,
+            claim_text: "Жоқ, Дәулет емес, Бекжан.".into(),
+            status: CommitmentStatus::Proposed,
+            turn_id: 2,
+        };
+
+        let i0 = state.record(user_c.clone());
+        let i1 = state.record(adam_c.clone());
+        let i2 = state.record(user2_c.clone());
+        assert_eq!((i0, i1, i2), (0, 1, 2));
+        assert_eq!(state.commitments.len(), 3);
+
+        // Most-recent by author honours insertion order.
+        assert_eq!(state.last_by(Speaker::User), Some(&user2_c));
+        assert_eq!(state.last_by(Speaker::Adam), Some(&adam_c));
+
+        // by_author filters cleanly.
+        let user_log: Vec<_> = state.by_author(Speaker::User).collect();
+        assert_eq!(user_log, vec![&user_c, &user2_c]);
+        let adam_log: Vec<_> = state.by_author(Speaker::Adam).collect();
+        assert_eq!(adam_log, vec![&adam_c]);
+    }
+
+    /// `DiscourseState::default()` produces an empty log — the
+    /// canonical starting point for a fresh `Conversation`.
+    #[test]
+    fn discourse_state_default_is_empty() {
+        let state = DiscourseState::default();
+        assert!(state.commitments.is_empty());
+        assert!(state.by_author(Speaker::User).next().is_none());
+        assert!(state.by_author(Speaker::Adam).next().is_none());
     }
 }

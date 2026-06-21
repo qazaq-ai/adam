@@ -242,6 +242,23 @@ pub struct Conversation {
     /// agree. When `None`, the cascade drives slot extraction
     /// unchanged — production default.
     pub neural_slot_extractor: Option<adam_slot_extractor::SlotExtractor>,
+    /// **v6.8.4 — L4.5 Phase 2.B.** Typed discourse state — the
+    /// log of every commitment either speaker has made, with
+    /// provenance + status (Proposed / Accepted / Rejected /
+    /// Contested).  Lives **alongside** the flat `session: HashMap`
+    /// (which stays the source of truth for template-slot
+    /// rendering); new typed handlers in Phase 2.C+ will arbitrate
+    /// over `discourse_state` to choose which user statements
+    /// should land in `session` and which should be flagged for
+    /// repair.
+    ///
+    /// Phase 2.B writes to this field on `StatementOfName`
+    /// recognition (the simplest user-introduces-fact pattern);
+    /// Phase 2.C broadens the write paths to every user
+    /// assertion and adds read paths for arbitration.  Default
+    /// is an empty discourse — fresh conversations carry no
+    /// commitments yet.
+    pub discourse_state: crate::dialog_acts::DiscourseState,
 }
 
 /// v4.0.25 — intermediate state captured by
@@ -4496,6 +4513,23 @@ impl Conversation {
 
     pub(crate) fn absorb_entities(&mut self, intent: &Intent, turn_id: usize) {
         use crate::belief::{EntityKind, USER_SELF_KEY};
+        // **v6.8.4 L4.5 Phase 2.B.** Record a `Proposed`
+        // commitment for the user-introduced fact BEFORE the
+        // slot-write path runs.  Phase 2.B wires only
+        // `StatementOfName` (the simplest case); Phase 2.C
+        // broadens to location / age / occupation / etc., and
+        // adds the arbitration pass that decides which Proposed
+        // commitments are promoted to Accepted (when adam echoes
+        // them) vs Rejected (when adam offers a correction).
+        if let Intent::StatementOfName { name } = intent {
+            let commitment = crate::dialog_acts::CommitmentRecord {
+                author: crate::dialog_acts::Speaker::User,
+                claim_text: format!("Менің атым — {name}."),
+                status: crate::dialog_acts::CommitmentStatus::Proposed,
+                turn_id: turn_id as u64,
+            };
+            self.discourse_state.record(commitment);
+        }
         match intent {
             Intent::StatementOfName { name } => {
                 // **v4.3.1** — route the surface name through
@@ -4742,6 +4776,11 @@ impl Conversation {
         self.belief = crate::belief::BeliefState::new();
         self.task = crate::task::TaskState::new();
         self.turn_counter = 0;
+        // **v6.8.4 L4.5 Phase 2.B.** Discourse log cleared on
+        // explicit reset — same semantics as `session` and
+        // `belief`: a reset starts a new conversation with empty
+        // commitments.
+        self.discourse_state = crate::dialog_acts::DiscourseState::default();
     }
 }
 
