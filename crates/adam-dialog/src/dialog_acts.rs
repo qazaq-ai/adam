@@ -257,6 +257,12 @@ pub enum ReferentKind {
     Place,
     /// Organisation (institution, company, agency).
     Organisation,
+    /// **v6.8.7 L4.8 C.2.** Procedure / SOP — token is the
+    /// procedure id (e.g. `"kk_labor_ppe_002"`) so anaphora-
+    /// aware procedure-attribute handlers (step count,
+    /// authority) can fetch the full record from
+    /// `procedure_loader::shared_procedures()` by id.
+    Procedure,
     /// Generic / unclassified — the producer couldn't (yet) pin
     /// the type but wants the surface logged.
     Generic,

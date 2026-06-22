@@ -3759,15 +3759,42 @@ impl Conversation {
                 .referents
                 .iter()
                 .rev()
-                .find(|r| r.turn_id < current_turn)
+                .find(|r| {
+                    r.turn_id < current_turn
+                        && r.kind != crate::dialog_acts::ReferentKind::Procedure
+                })
                 .map(|r| r.token.clone());
-            crate::v6_2_router::answer_with_corpus_and_anaphora(
+            // **v6.8.7 L4.8 C.2** — separately consult the most-
+            // recent Procedure referent so attribute follow-ups
+            // («Қанша қадам бар?», «Кім жауапты?») can fetch
+            // the prior procedure by id.
+            let anaphora_procedure_id = self
+                .discourse_state
+                .referents
+                .iter()
+                .rev()
+                .find(|r| {
+                    r.turn_id < current_turn
+                        && r.kind == crate::dialog_acts::ReferentKind::Procedure
+                })
+                .map(|r| r.token.clone());
+            let router_answer = crate::v6_2_router::answer_with_corpus_full(
                 input,
                 crate::v6_2_router::shared_corpus(),
                 lexicon,
                 anaphora_subject.as_deref(),
-            )
-            .unwrap_or(final_output)
+                anaphora_procedure_id.as_deref(),
+            );
+            if let Some(ans) = &router_answer {
+                if let Some(proc_id) = &ans.matched_procedure_id {
+                    self.discourse_state.push_referent(
+                        proc_id.clone(),
+                        crate::dialog_acts::ReferentKind::Procedure,
+                        current_turn,
+                    );
+                }
+            }
+            router_answer.map(|a| a.text).unwrap_or(final_output)
         } else {
             final_output
         };

@@ -133,16 +133,50 @@ pub fn answer_with_corpus_and_lexicon(
 /// `anaphora_subject` (e.g. the prior-turn Person referent from
 /// [`crate::dialog_acts::DiscourseState`]) so handlers that need
 /// a subject can resolve a bare follow-up like «Қанша жыл өмір
-/// сүрді?» against it.  Phase 2.E.2 consumers: the lifespan
-/// handler; future phases broaden to property-query / date-of-
-/// birth / etc.
+/// сүрді?» against it.
 pub fn answer_with_corpus_and_anaphora(
     input: &str,
     idx: &FrameIndex,
     lex: &adam_kernel_fst::lexicon::LexiconV1,
     anaphora_subject: Option<&str>,
 ) -> Option<String> {
-    answer_with_corpus_inner(input, idx, Some(lex), anaphora_subject)
+    answer_with_corpus_full(input, idx, lex, anaphora_subject, None).map(|a| a.text)
+}
+
+/// **v6.8.7 L4.8 C.2 — full router entry with procedure anaphora.**
+/// Carries an additional `anaphora_procedure_id` hint (the
+/// `ReferentKind::Procedure` token from
+/// [`crate::dialog_acts::DiscourseState`]) so bare follow-ups
+/// like «Қанша қадам бар?» / «Кім жауапты?» can fetch the prior
+/// procedure's `steps` / `authorization` fields.  Returns a
+/// [`RouterAnswer`] that carries the response text PLUS the id
+/// of any procedure that was matched on THIS turn — the caller
+/// uses that id to push a fresh `ReferentKind::Procedure`
+/// referent so the next turn's follow-ups can resolve.
+pub fn answer_with_corpus_full(
+    input: &str,
+    idx: &FrameIndex,
+    lex: &adam_kernel_fst::lexicon::LexiconV1,
+    anaphora_subject: Option<&str>,
+    anaphora_procedure_id: Option<&str>,
+) -> Option<RouterAnswer> {
+    answer_with_corpus_inner_full(
+        input,
+        idx,
+        Some(lex),
+        anaphora_subject,
+        anaphora_procedure_id,
+    )
+}
+
+/// Rich router result — response text plus the id of any
+/// procedure matched by the procedure-retrieval handler on this
+/// turn.  Caller pushes a `ReferentKind::Procedure` referent so
+/// subsequent turns' attribute follow-ups resolve.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RouterAnswer {
+    pub text: String,
+    pub matched_procedure_id: Option<String>,
 }
 
 /// Variant that lets callers supply their own [`FrameIndex`] (used
@@ -152,6 +186,56 @@ pub fn answer_with_corpus(input: &str, idx: &FrameIndex) -> Option<String> {
 }
 
 fn answer_with_corpus_inner(
+    input: &str,
+    idx: &FrameIndex,
+    lex: Option<&adam_kernel_fst::lexicon::LexiconV1>,
+    anaphora_subject: Option<&str>,
+) -> Option<String> {
+    answer_with_corpus_inner_full(input, idx, lex, anaphora_subject, None).map(|a| a.text)
+}
+
+/// **v6.8.7 L4.8 C.2 — full inner cascade.**  Same handler chain
+/// as [`answer_with_corpus_inner`] but threads the procedure
+/// anaphora hint to the new attribute handlers AND captures the
+/// matched procedure id from the procedure retrieval handler.
+/// The String-returning [`answer_with_corpus_inner`] wraps this
+/// and discards the procedure id.
+fn answer_with_corpus_inner_full(
+    input: &str,
+    idx: &FrameIndex,
+    lex: Option<&adam_kernel_fst::lexicon::LexiconV1>,
+    anaphora_subject: Option<&str>,
+    anaphora_procedure_id: Option<&str>,
+) -> Option<RouterAnswer> {
+    // Procedure attribute follow-ups need to fire BEFORE the
+    // main inner handler chain so a bare «Қанша қадам бар?» (no
+    // explicit subject) reaches them before the v6.1 broad-topic
+    // fallback gets a chance to emit a clarification.
+    if let Some(text) = lookup_procedure_step_count(input, anaphora_procedure_id) {
+        return Some(RouterAnswer {
+            text,
+            matched_procedure_id: None,
+        });
+    }
+    if let Some(text) = lookup_procedure_authority(input, anaphora_procedure_id) {
+        return Some(RouterAnswer {
+            text,
+            matched_procedure_id: None,
+        });
+    }
+    // Main cascade — String-returning chain.  When the procedure
+    // retrieval handler is the one that fires, we want to know
+    // which procedure it matched so the caller can record a
+    // referent; we rebuild the call here.
+    let text = answer_with_corpus_inner_legacy(input, idx, lex, anaphora_subject)?;
+    let matched_procedure_id = lookup_procedure_matched(input).map(|(_, id)| id);
+    Some(RouterAnswer {
+        text,
+        matched_procedure_id,
+    })
+}
+
+fn answer_with_corpus_inner_legacy(
     input: &str,
     idx: &FrameIndex,
     lex: Option<&adam_kernel_fst::lexicon::LexiconV1>,
@@ -2260,9 +2344,19 @@ fn query_isa_object(idx: &FrameIndex, subject: &str) -> Option<String> {
 /// ordered steps + hazards + source citation.  The voice layer
 /// reads the multi-line shape clause-by-clause.
 fn lookup_procedure(input: &str) -> Option<String> {
+    lookup_procedure_matched(input).map(|(text, _id)| text)
+}
+
+/// **v6.8.7 L4.8 C.2.** Same retrieval logic as
+/// [`lookup_procedure`] but ALSO returns the matched procedure's
+/// `id`.  Used by the cascade so [`crate::dialog_acts::
+/// DiscourseState`] can record a `ReferentKind::Procedure`
+/// referent, which a subsequent bare follow-up like «Қанша қадам
+/// бар?» / «Кім жауапты?» consults to fetch the procedure's
+/// `steps` / `authorization` fields by id.
+fn lookup_procedure_matched(input: &str) -> Option<(String, String)> {
     use crate::procedure_loader::shared_procedures;
 
-    // 1. Shape gate — must contain a procedure-query trigger.
     let lower = input.to_lowercase();
     let trigger_present = SHAPE_TRIGGERS_KK
         .iter()
@@ -2271,10 +2365,6 @@ fn lookup_procedure(input: &str) -> Option<String> {
     if !trigger_present {
         return None;
     }
-
-    // 2. Tokenise query for keyword scoring (≥ 4-byte tokens
-    //    avoids matching short grammatical particles in Kazakh
-    //    suffix chains).
     let query_tokens: Vec<&str> = lower
         .split(|c: char| !c.is_alphanumeric())
         .filter(|t| t.chars().count() >= 4)
@@ -2282,8 +2372,6 @@ fn lookup_procedure(input: &str) -> Option<String> {
     if query_tokens.is_empty() {
         return None;
     }
-
-    // 3. Score each fixture.
     let mut best: Option<(usize, i32)> = None;
     for (idx, proc) in shared_procedures().iter().enumerate() {
         let score = score_procedure(proc, &query_tokens);
@@ -2293,7 +2381,68 @@ fn lookup_procedure(input: &str) -> Option<String> {
     }
     let (best_idx, _) = best?;
     let proc = &shared_procedures()[best_idx];
-    Some(render_procedure(proc))
+    Some((render_procedure(proc), proc.id.clone()))
+}
+
+/// **v6.8.7 L4.8 C.2 — procedure attribute query (step count).**
+/// Detects «Қанша қадам бар?» / «Сколько шагов?» and, when a
+/// procedure referent is on the discourse stack, fetches the
+/// procedure by id and returns its step count.
+///
+/// Returns `None` when the shape doesn't match OR no procedure
+/// referent is available — the cascade then falls through to
+/// the v6.1 layer for the bare query.
+fn lookup_procedure_step_count(input: &str, anaphora_procedure_id: Option<&str>) -> Option<String> {
+    if !looks_like_procedure_step_count_query(input) {
+        return None;
+    }
+    let proc_id = anaphora_procedure_id?;
+    let proc = crate::procedure_loader::shared_procedures()
+        .iter()
+        .find(|p| p.id == proc_id)?;
+    Some(format!(
+        "«{}» рәсімінде {} қадам бар.",
+        proc.title_kk,
+        proc.steps.len(),
+    ))
+}
+
+fn looks_like_procedure_step_count_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    (lower.contains("қанша қадам") || lower.contains("неше қадам"))
+        || (lower.contains("сколько шаг") || lower.contains("число шаг"))
+}
+
+/// **v6.8.7 L4.8 C.2 — procedure attribute query (authority).**
+/// Detects «Кім жауапты?» / «Кто отвечает?» and, when a procedure
+/// referent is on the discourse stack, fetches the procedure by
+/// id and returns its `authorization` field as a comma-joined
+/// list.
+fn lookup_procedure_authority(input: &str, anaphora_procedure_id: Option<&str>) -> Option<String> {
+    if !looks_like_procedure_authority_query(input) {
+        return None;
+    }
+    let proc_id = anaphora_procedure_id?;
+    let proc = crate::procedure_loader::shared_procedures()
+        .iter()
+        .find(|p| p.id == proc_id)?;
+    if proc.authorization.is_empty() {
+        return None;
+    }
+    Some(format!(
+        "«{}» рәсіміне {} жауапты.",
+        proc.title_kk,
+        proc.authorization.join(", "),
+    ))
+}
+
+fn looks_like_procedure_authority_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    lower.contains("кім жауап")
+        || lower.contains("кім жасайды")
+        || lower.contains("кто отвечает")
+        || lower.contains("кто ответствен")
+        || lower.contains("чья ответствен")
 }
 
 const SHAPE_TRIGGERS_KK: &[&str] = &[
