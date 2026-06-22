@@ -105,6 +105,7 @@ pub mod frame;
 pub mod index;
 pub mod math_solver;
 pub mod operator;
+pub mod procedure;
 pub mod query;
 pub mod realiser;
 pub mod root;
@@ -117,6 +118,9 @@ pub use frame::{
 };
 pub use index::{FrameId, FrameIndex, IndexedFrame, RankedFrame};
 pub use operator::{SlotKind, SuffixOp};
+pub use procedure::{
+    Hazard, ProcedureDomain, ProcedureIR, ProcedureParseError, ProcedureSource, ProcedureStep,
+};
 pub use query::{
     AnswerShape, AnswerSlot, Domain, FrameMatch, Language, ModifierConstraint, ModifierRole,
     QueryFocus, QueryIR, QuestionForm, SenseHint,
