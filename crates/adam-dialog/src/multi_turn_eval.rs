@@ -59,8 +59,24 @@ pub struct MultiTurnCase {
     /// architectural property* this case exercises (not just
     /// what the input looks like).
     pub description: String,
+    /// **Production gate flag** — `true` (default) means the
+    /// case MUST pass under the current production cascade; the
+    /// CI test asserts this and a regression on any such case
+    /// fails the build.  `false` marks the case as a documented
+    /// probe — it captures a known gap (e.g. cross-turn
+    /// procedure anaphora, mixed-language code-switching) that
+    /// the framework can measure WITHOUT forcing the build red.
+    /// Mirrors the single-turn `was_accepted` flag in
+    /// `data/eval/*.json` so the two eval formats share
+    /// semantics.
+    #[serde(default = "default_true")]
+    pub expected_to_pass: bool,
     /// Ordered sequence of dialog turns.
     pub turns: Vec<EvalTurn>,
+}
+
+fn default_true() -> bool {
+    true
 }
 
 /// One turn of an authored multi-turn case.
@@ -273,6 +289,7 @@ mod tests {
         let case = MultiTurnCase {
             id: "round_trip".into(),
             description: "Smoke test that all assertion variants serialise cleanly.".into(),
+            expected_to_pass: true,
             turns: vec![EvalTurn {
                 input: "тест".into(),
                 expected_response: Some("ок".into()),

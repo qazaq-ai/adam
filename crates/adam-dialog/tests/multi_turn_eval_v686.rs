@@ -59,23 +59,72 @@ fn fixture_set_is_non_empty() {
     );
 }
 
+/// **Production gate.** Every case tagged
+/// `expected_to_pass=true` (the default) MUST pass.  A regression
+/// here fails the build.
 #[test]
-fn every_case_passes_under_current_production() {
+fn every_required_case_passes_under_current_production() {
     enable_v6_2();
     let Some(lex) = load_lexicon() else { return };
     let repo = TemplateRepository::load_default().expect("templates v1.toml must exist");
     let cases = load_all_cases();
     let mut all_failures = Vec::new();
+    let mut required = 0usize;
     for case in &cases {
+        if !case.expected_to_pass {
+            continue;
+        }
+        required += 1;
         let result = run_case(case, &lex, &repo);
         if !result.passed {
             all_failures.extend(result.failures);
         }
     }
+    assert!(required > 0, "no required cases in fixture set");
     assert!(
         all_failures.is_empty(),
-        "{} multi-turn assertion(s) failed:\n  - {}",
+        "{} required multi-turn assertion(s) failed (of {} required cases):\n  - {}",
         all_failures.len(),
+        required,
         all_failures.join("\n  - "),
+    );
+}
+
+/// **Probe diagnostics — non-failing.**  Cases tagged
+/// `expected_to_pass=false` capture known gaps.  This test
+/// counts them and prints which still fail so future work can
+/// see at-a-glance how many gaps are open without making the
+/// build red.  Asserts only that the diagnostic ran — never
+/// fails on a probe's failure.
+#[test]
+fn probes_diagnostic_count() {
+    enable_v6_2();
+    let Some(lex) = load_lexicon() else { return };
+    let repo = TemplateRepository::load_default().expect("templates v1.toml must exist");
+    let cases = load_all_cases();
+    let mut probe_total = 0usize;
+    let mut probe_pass = 0usize;
+    for case in &cases {
+        if case.expected_to_pass {
+            continue;
+        }
+        probe_total += 1;
+        let result = run_case(case, &lex, &repo);
+        if result.passed {
+            probe_pass += 1;
+            eprintln!(
+                "[probe-PASS] {} (gap may have closed — promote to required)",
+                case.id
+            );
+        } else {
+            eprintln!(
+                "[probe-OPEN] {} ({} assertion(s) failing)",
+                case.id,
+                result.failures.len()
+            );
+        }
+    }
+    eprintln!(
+        "[multi-turn probes] {probe_pass}/{probe_total} passing (gaps closing as work lands)",
     );
 }
