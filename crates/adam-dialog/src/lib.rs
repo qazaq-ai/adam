@@ -59,6 +59,7 @@ pub mod domain_index;
 pub mod intent;
 pub mod kazakh_fuzzy;
 pub mod language_core;
+pub mod multi_turn_eval;
 pub mod nlg;
 pub mod pedagogical;
 pub mod phoneme;
