@@ -77,5 +77,18 @@ fn fixtures_have_unique_ids() {
 
 fn is_gost_source(source: &ProcedureSource) -> bool {
     let id = source.regulation_id.to_uppercase();
-    id.starts_with("ГОСТ") || id.starts_with("GOST") || id.starts_with("СТ РК")
+    // Long-lived industry standards that survive across decades:
+    // - ГОСТ / GOST — state standards (USSR + post-Soviet
+    //   succession, still in force in Kazakhstan).
+    // - СТ РК — Kazakh state standards.
+    // - ПУЭ — Правила устройства электроустановок (Electrical
+    //   Installation Code), the canonical electrical-safety
+    //   rulebook used across CIS countries.  The 7th edition
+    //   (2002-2003) is the current reference; not superseded.
+    // - ПОТ — Правила охраны труда (long-lived safety codes).
+    id.starts_with("ГОСТ")
+        || id.starts_with("GOST")
+        || id.starts_with("СТ РК")
+        || id.starts_with("ПУЭ")
+        || id.starts_with("ПОТ")
 }
