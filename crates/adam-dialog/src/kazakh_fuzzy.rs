@@ -112,12 +112,25 @@ const PHONETIC_PAIRS: &[(char, char)] = &[
     ('ц', 'т'),
     // Ламбдацизм: л → в / у-glide
     ('л', 'в'),
+    // Ламбдацизм (extension v6.8.9 D.2): л ↔ й — the most common
+    // child Kazakh defect, observed in production eval («Алматы»
+    // → «Айматы», «Балқаш» → «Байқаш»).  Added with cost 0.4
+    // because it's a deterministic articulation shift, not a
+    // random error.
+    ('л', 'й'),
+    // Сигматизм (extension v6.8.9 D.2): ф ↔ с — sibilant
+    // articulation fails to the labiodental fricative («Сәлем»
+    // → «Фәлем», «Су» → «Фу»).
+    ('ф', 'с'),
     // Йотацизм: й ↔ и (already covered above by «й ↔ и» but kept
     // as an explicit reminder — duplicates are safe, the lookup
     // is symmetric)
     // Каппацизм: қ / к → т (rare but observed)
     ('к', 'т'),
     ('қ', 'т'),
+    // Каппацизм (extension v6.8.9 D.2): қ ↔ х — uvular fails to
+    // velar fricative («Қазақстан» → «Хазахстан»).
+    ('х', 'қ'),
     // Звонкость / глухость (voicing) — common cross-language
     // confusion when child / adult speakers haven't fully
     // mastered voicing distinctions

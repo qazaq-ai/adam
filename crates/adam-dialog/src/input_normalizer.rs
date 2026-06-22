@@ -46,20 +46,35 @@ pub struct NormalizationResult {
     pub corrections: Vec<String>,
 }
 
-/// **D.1 entry point.** Run every D.1 transform in order against
+/// **Entry point.** Run every transform in order against
 /// `raw_input`.  Returns the normalised form plus a list of
 /// applied corrections (for trace logging).  When no transform
 /// fires, `normalized == raw_input` and `corrections` is empty.
+///
+/// Pipeline (in order):
+///   1. `destutter` (D.1) — collapse «`Са-сә-сәлем`» → «сәлем».
+///   2. `phonetic_substitute` (D.2) — token-level Kazakh-aware
+///      Levenshtein replacement against the shared vocabulary
+///      (Алматы/Қазақстан/жүрек/...) using the extended
+///      [`crate::kazakh_fuzzy`] phonetic-pair table that covers
+///      rhotacism / sigmatism / lambdacism / kappacism /
+///      nasalisation defect substitutions.
 pub fn normalize(raw_input: &str) -> NormalizationResult {
     let mut corrections = Vec::new();
     let mut current = raw_input.to_string();
 
-    // Pass 1: de-stuttering.  Token-level dash-prefix-onset
-    // collapse.
     let destuttered = destutter(&current);
     if destuttered != current {
         corrections.push(format!("destutter: «{current}» → «{destuttered}»"));
         current = destuttered;
+    }
+
+    let substituted = phonetic_substitute(&current, shared_vocab(), PHONETIC_THRESHOLD);
+    if substituted != current {
+        corrections.push(format!(
+            "phonetic_substitute: «{current}» → «{substituted}»",
+        ));
+        current = substituted;
     }
 
     NormalizationResult {
@@ -123,6 +138,167 @@ fn destutter_token(token: &str) -> String {
     }
     format!("{last}{punct}")
 }
+
+/// **D.2 phonetic substitution threshold.** A token must match
+/// a vocab entry with at least this Kazakh-fuzzy similarity
+/// score to be replaced.  Tuned so canonical defect patterns
+/// (one phonetic substitution against a 5-8 char target) pass
+/// while morphology-preserving inputs do NOT get rewritten:
+///
+///   * «Айматы» (6 chars) vs «Алматы» (1 phonetic sub, cost 0.4)
+///     → similarity ≈ 1 - 0.4/6 ≈ 0.93.  ✓ fires.
+///   * «Хазахстанның» (12 chars) vs «Қазақстанның» (2 phonetic
+///     subs, cost 0.8) → similarity ≈ 1 - 0.8/12 ≈ 0.93.  ✓ fires.
+///   * «Фәлем» (5) vs «сәлем» (1 phonetic sub) → 1 - 0.4/5 ≈ 0.92.
+///     ✓ fires.
+///   * «Жетіге» (6) vs «жетіген» (1 char insertion, cost 1.0)
+///     → 1 - 1/7 ≈ 0.86.  ✗ rejected — morphology preserved.
+///
+/// The 0.90 floor is the difference between «one-phonetic-sub
+/// defect» (cost 0.4 — always fires) and «one-char insertion or
+/// random sub» (cost 1.0 — rejected).  A v6.8.9 D.2 production
+/// regression (math morphology suffix «-ге» → «-ген») drove the
+/// floor up from 0.85 → 0.90.
+const PHONETIC_THRESHOLD: f32 = 0.90;
+
+/// **D.2 — token-level phonetic substitution.** Walk the input
+/// token by token; for any token NOT already in `vocab`,
+/// consult [`crate::kazakh_fuzzy::best_match`] for the best
+/// vocab entry above `threshold`; replace when found.  Existing
+/// punctuation is preserved.
+///
+/// Skipped categories (the substitution never fires):
+///   * pure-digit or punctuation tokens (math expressions,
+///     numbers, dates);
+///   * tokens shorter than 4 characters (too ambiguous —
+///     short Kazakh particles like «не», «ма», «де» would get
+///     incorrectly rewritten);
+///   * tokens that ARE in the vocab (no need to substitute).
+pub fn phonetic_substitute(input: &str, vocab: &[String], threshold: f32) -> String {
+    input
+        .split_whitespace()
+        .map(|tok| phonetic_substitute_token(tok, vocab, threshold))
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+fn phonetic_substitute_token(token: &str, vocab: &[String], threshold: f32) -> String {
+    let (core, punct) = split_trailing_punct(token);
+    let core_chars: Vec<char> = core.chars().collect();
+    if core_chars.len() < 4 {
+        return token.to_string();
+    }
+    if core_chars
+        .iter()
+        .all(|c| c.is_ascii_digit() || matches!(*c, '.' | ',' | '+' | '-' | '*' | '/' | '=' | '%'))
+    {
+        return token.to_string();
+    }
+    let lower = core.to_lowercase();
+    // Already in vocab (case-insensitive) — no substitution needed.
+    if vocab.iter().any(|v| v.to_lowercase() == lower) {
+        return token.to_string();
+    }
+    if let Some((best, _score)) = crate::kazakh_fuzzy::best_match(&lower, vocab, threshold) {
+        return format!("{best}{punct}");
+    }
+    token.to_string()
+}
+
+/// Shared vocabulary loaded once per process from the curated
+/// world_core fact graph plus a small set of high-frequency
+/// interjections / particles the eval covers but world_core
+/// does not (greetings, acknowledgements).  Lower-cased.
+///
+/// Vocab is intentionally limited to the world_core surface set
+/// + curated greetings; we do NOT pull in every random word from
+/// the lexicon, because doing so dilutes the best-match
+/// signal — most random Kazakh nouns would score similarly to
+/// the intended canonical, and the wrong one would win.
+fn shared_vocab() -> &'static [String] {
+    use std::sync::OnceLock;
+    static VOCAB: OnceLock<Vec<String>> = OnceLock::new();
+    VOCAB.get_or_init(build_vocab)
+}
+
+fn build_vocab() -> Vec<String> {
+    use std::collections::HashSet;
+    let mut set: HashSet<String> = HashSet::new();
+
+    // 1. High-frequency Kazakh greetings / interjections /
+    //    particles the eval probes.  Each is a stand-alone
+    //    canonical form a defect-form would map to.
+    for w in CURATED_HIGH_FREQ {
+        set.insert((*w).to_string());
+    }
+
+    // 2. Every distinct agent + object surface from world_core.
+    //    Walk all jsonl files in `data/world_core/*.jsonl` and
+    //    extract `facts[].subject` and `facts[].object`.  Each
+    //    surface is added in lowercase to match the caller's
+    //    case-insensitive lookup.
+    for candidate in [
+        "data/world_core",
+        "../data/world_core",
+        "../../data/world_core",
+        "../../../data/world_core",
+    ] {
+        if let Ok(read_dir) = std::fs::read_dir(candidate) {
+            for entry in read_dir.flatten() {
+                let p = entry.path();
+                if p.extension().and_then(|s| s.to_str()) != Some("jsonl") {
+                    continue;
+                }
+                let Ok(text) = std::fs::read_to_string(&p) else {
+                    continue;
+                };
+                for line in text.lines() {
+                    let Ok(val) = serde_json::from_str::<serde_json::Value>(line) else {
+                        continue;
+                    };
+                    let Some(facts) = val.get("facts").and_then(|v| v.as_array()) else {
+                        continue;
+                    };
+                    for fact in facts {
+                        for key in ["subject", "object"] {
+                            if let Some(s) = fact.get(key).and_then(|v| v.as_str()) {
+                                let trimmed = s.trim();
+                                if !trimmed.is_empty() {
+                                    set.insert(trimmed.to_lowercase());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            // First directory that worked wins; don't double-load.
+            break;
+        }
+    }
+
+    set.into_iter().collect()
+}
+
+/// High-frequency canonical surfaces that the eval probes but
+/// world_core does not list as facts (greetings, particles,
+/// short interjections).  Lower-case throughout.
+const CURATED_HIGH_FREQ: &[&str] = &[
+    "сәлем",
+    "рақмет",
+    "оқасы жоқ",
+    "сау бол",
+    "бар бол",
+    "иә",
+    "жоқ",
+    "мен",
+    "сен",
+    "сіз",
+    "ассалаумағалейкум",
+    "уағалайкум",
+    "уағалайкум-ас-салам",
+    "қош",
+    "хош",
+];
 
 /// Split a token into its alphabetic core and trailing
 /// punctuation.  «сәлем.» → («сәлем», «.»); «сәлем» → («сәлем»,
