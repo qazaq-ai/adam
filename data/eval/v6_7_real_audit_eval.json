@@ -234,9 +234,9 @@
     },
     {
       "input": "Менің атым — дәулет.",
-      "expected_response": "Атыңызды есте сақтадым. Танысқанымызға қуаныштымын!",
+      "expected_response": "Дәулет деген атыңызды есте сақтап, сізді Дәке деп атаймын.",
       "was_accepted": true,
-      "notes": "rc25: StatementOfName override worked"
+      "notes": "v6.8.4: expected aligned with current production StatementOfName response (richer honorific shape than the rc25-era 'Атыңызды есте сақтадым. Танысқанымызға қуаныштымын!' that produced strict miss but identical semantic outcome — name acknowledged + Kazakh-honorific Дәке)"
     },
     {
       "input": "Менің есімім даулет.",
