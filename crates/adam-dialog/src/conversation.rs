@@ -3768,18 +3768,26 @@ impl Conversation {
             } else {
                 final_output
             };
-        // **v6.8.4 L4.5 Phase 2.D — commitment retraction.**
+        // **v6.8.4 L4.5 Phase 2.D + 2.E.1 — repair turn handling.**
         // Detect a repair pattern in the RAW input («Жоқ, X емес,
         // Y» / «Нет, не X, а Y»).  When matched AND a prior user
-        // commitment mentions the rejected value X, mark that
-        // commitment `Rejected`.  Runs BEFORE the Phase 2.C
-        // promotion pass so an Accepted-then-Rejected lifecycle
-        // is visible in order on the discourse log.  The
-        // replacement value Y, if absorbed by the cascade as a
-        // new `Intent::StatementOfName` on the same turn, lands
-        // as a fresh `Proposed` commitment via the usual
-        // `absorb_entities` path.
-        let _ = self.apply_correction(&raw_input_for_safety);
+        // commitment mentions the rejected value X, the helper:
+        //   * marks that prior commitment `Rejected` (Phase 2.D);
+        //   * writes `session["name"]` to the canonical Y form;
+        //   * records a fresh `Proposed` commitment for Y;
+        //   * returns an explicit acknowledgement template
+        //     («Түзеттім — атыңызды Y деп есте сақтадым»).
+        // We override `final_output` with that template so the
+        // user sees a coherent correction acknowledgement instead
+        // of the weak v6.1 «Жоқ» fallback that Bug B exposed.
+        // Runs BEFORE the Phase 2.C promotion pass so the fresh
+        // Y commitment is in place when promotion runs.
+        let final_output = if let Some(ack) = self.apply_correction(&raw_input_for_safety, turn_id)
+        {
+            ack
+        } else {
+            final_output
+        };
 
         // **v6.8.4 L4.5 Phase 2.C — commitment promotion.** After
         // the final output is built, walk any Proposed user
@@ -4776,30 +4784,43 @@ impl Conversation {
         }
     }
 
-    /// **v6.8.4 L4.5 Phase 2.D.** Detect a repair / correction
-    /// pattern in `raw_input` («Жоқ, X емес, Y» / «Нет, не X, а
-    /// Y») and, when found AND a prior user commitment matches
-    /// the rejected value, mark that prior commitment `Rejected`.
+    /// **v6.8.4 L4.5 Phase 2.D + 2.E.1.** Process a repair /
+    /// correction turn end-to-end.
     ///
-    /// Phase 2.D ships ONLY the discourse-state transition — the
-    /// replacement value is left for the v6.1 cascade's normal
-    /// `Intent::StatementOfName` path to absorb on this turn (if
-    /// it does), which in turn lands a new `Proposed` commitment
-    /// via `absorb_entities`.  Phase 2.E will broaden to add the
-    /// explicit acknowledgement template and the typed
-    /// arbitration that ensures both the Rejected mark AND the
-    /// new Proposed commitment always land together.
+    /// Phase 2.D recognised the shape and only marked the prior
+    /// commitment `Rejected` on the discourse log — the cascade
+    /// reply on a correction turn was still the weak v6.1 «Жоқ»
+    /// because no intent path understood the contrast.
     ///
-    /// Returns `Some((rejected, replacement))` when a match was
-    /// found AND a prior commitment was marked Rejected; `None`
-    /// otherwise.  The return value is informational — the
-    /// state mutation is the load-bearing effect.
-    pub(crate) fn apply_correction(&mut self, raw_input: &str) -> Option<(String, String)> {
+    /// Phase 2.E.1 closes the user-visible loop without adding a
+    /// new `Intent` variant: detection happens here, the same
+    /// place that already mutates the discourse log, and the
+    /// method now ALSO:
+    ///
+    ///   1. Resolves the replacement value through
+    ///      `canonical_person_entity` (when the resolver
+    ///      recognises it as a Kazakh name) so the stored form is
+    ///      the same canonical shape `StatementOfName` would
+    ///      have produced.
+    ///   2. Writes `session["name"]` to that canonical form,
+    ///      overriding whatever the cascade left there.
+    ///   3. Records a fresh `Proposed` user commitment for the
+    ///      replacement on the current turn.  Phase 2.C's
+    ///      promote-on-slot-populated pass then lifts it to
+    ///      `Accepted` at the end of the turn.
+    ///   4. Returns `Some(ack_template)` so the caller can
+    ///      override the cascade output with an explicit
+    ///      acknowledgement reading «Түзеттім — атыңызды {Y} деп
+    ///      есте сақтадым».
+    ///
+    /// Returns `None` when the input doesn't match the repair
+    /// shape OR no prior matching user commitment was found
+    /// (i.e. the user is asserting «X емес Y» about something
+    /// adam has not seen claimed before — out of scope for this
+    /// phase).
+    pub(crate) fn apply_correction(&mut self, raw_input: &str, turn_id: usize) -> Option<String> {
         let (rejected, replacement) = crate::dialog_acts::detect_correction_pattern(raw_input)?;
-        // Find the most-recent user commitment whose claim text
-        // mentions the rejected value.  We walk newest-first so a
-        // chain of repairs («X → Y → Z») marks only the most
-        // recent reachable commitment.
+        // ── 1.  Mark prior commitment Rejected (Phase 2.D). ──
         let rejected_lower = rejected.to_lowercase();
         let mut marked = false;
         for commitment in self.discourse_state.commitments.iter_mut().rev() {
@@ -4823,11 +4844,33 @@ impl Conversation {
                 break;
             }
         }
-        if marked {
-            Some((rejected, replacement))
-        } else {
-            None
+        if !marked {
+            return None;
         }
+        // ── 2.  Resolve canonical form of the replacement. ──
+        let canonical =
+            if let Some(person) = crate::language_core::canonical_person_entity(&replacement) {
+                person.canonical
+            } else {
+                replacement.clone()
+            };
+        // ── 3.  Update session slot + record fresh Proposed
+        // commitment.  Phase 2.C's promotion pass will lift it
+        // to Accepted at end-of-turn (since `session["name"]` is
+        // now populated). ──
+        self.session.insert("name".into(), canonical.clone());
+        self.discourse_state
+            .record(crate::dialog_acts::CommitmentRecord {
+                author: crate::dialog_acts::Speaker::User,
+                claim_text: format!("Менің атым — {canonical}."),
+                status: crate::dialog_acts::CommitmentStatus::Proposed,
+                turn_id: turn_id as u64,
+            });
+        // ── 4.  Return acknowledgement template for the caller
+        // to use as the final cascade output override. ──
+        Some(format!(
+            "Түзеттім — атыңызды {canonical} деп есте сақтадым."
+        ))
     }
 
     /// **v6.8.4 L4.5 Phase 2.C.** Promote any Proposed user

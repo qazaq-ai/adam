@@ -137,18 +137,16 @@ fn reset_clears_discourse_state() {
     assert!(conv.discourse_state.commitments.is_empty());
 }
 
-/// **Phase 2.D — repair / correction.** When the user retracts
-/// a prior commitment with «Жоқ, X емес, Y», the prior
-/// commitment is marked `Rejected` on the discourse log.  The
-/// new value Y is absorbed by the v6.1 cascade as a fresh
-/// `Intent::StatementOfName` (when the cascade recognises that
-/// shape), landing as a new `Proposed` commitment via the same
-/// path Phase 2.B already wires.  Phase 2.E will broaden the
-/// cascade detection so adam's reply explicitly acknowledges
-/// the correction; for now we only assert the discourse-state
-/// transition is correct.
+/// **Phase 2.D + 2.E.1 — full repair-turn handling.** When the
+/// user retracts a prior commitment with «Жоқ, X емес, Y»:
+///   * the prior X commitment is marked `Rejected` (2.D);
+///   * `session["name"]` is updated to the canonical Y form (2.E.1);
+///   * a fresh `Proposed` Y commitment is recorded and then
+///     promoted to `Accepted` by the Phase 2.C pass (2.E.1);
+///   * adam's reply is the typed acknowledgement template
+///     «Түзеттім — атыңызды Y деп есте сақтадым» (2.E.1).
 #[test]
-fn correction_pattern_marks_prior_commitment_rejected() {
+fn correction_full_repair_lifecycle() {
     let Some(lex) = load_lexicon() else { return };
     let repo = load_repo();
     let mut conv = Conversation::new();
@@ -159,10 +157,24 @@ fn correction_pattern_marks_prior_commitment_rejected() {
 
     // Turn 2: user retracts with the Kazakh repair shape.
     let correction = format!("Жоқ, {TEST_FIRST_NAME_MALE} емес, {TEST_FIRST_NAME_OTHER_MALE}.",);
-    let _reply = conv.turn(&correction, &lex, &repo, 1);
+    let reply = conv.turn(&correction, &lex, &repo, 1);
 
-    // The first commitment must now carry `Rejected` status.
-    let first_commitment = conv
+    // ── Reply: typed acknowledgement template (Phase 2.E.1). ──
+    assert!(
+        reply.contains("Түзеттім") && reply.contains(TEST_FIRST_NAME_OTHER_MALE),
+        "expected the «Түзеттім — атыңызды Y деп есте сақтадым» \
+         acknowledgement, got: {reply}",
+    );
+
+    // ── session: name slot updated to replacement (2.E.1). ──
+    let name_in_session = conv.session.get("name").cloned().unwrap_or_default();
+    assert!(
+        name_in_session.contains(TEST_FIRST_NAME_OTHER_MALE),
+        "session['name'] should hold the replacement, got: {name_in_session:?}",
+    );
+
+    // ── Prior X commitment: Rejected (Phase 2.D). ──
+    let prior = conv
         .discourse_state
         .commitments
         .iter()
@@ -171,12 +183,30 @@ fn correction_pattern_marks_prior_commitment_rejected() {
                 && c.claim_text.contains(TEST_FIRST_NAME_MALE)
                 && c.turn_id == 0
         })
-        .expect("first commitment must be present on log");
+        .expect("prior commitment must be present");
     assert_eq!(
-        first_commitment.status,
+        prior.status,
         CommitmentStatus::Rejected,
-        "first commitment must be marked Rejected after the repair turn, got {:?}",
-        first_commitment.status,
+        "prior commitment must be Rejected, got {:?}",
+        prior.status,
+    );
+
+    // ── New Y commitment: Accepted (Phase 2.E.1 → 2.C promote). ──
+    let new_y = conv
+        .discourse_state
+        .commitments
+        .iter()
+        .find(|c| {
+            c.author == Speaker::User
+                && c.claim_text.contains(TEST_FIRST_NAME_OTHER_MALE)
+                && c.turn_id == 1
+        })
+        .expect("new replacement commitment must be present");
+    assert_eq!(
+        new_y.status,
+        CommitmentStatus::Accepted,
+        "new commitment should promote to Accepted (session['name'] set), got {:?}",
+        new_y.status,
     );
 }
 
