@@ -185,7 +185,15 @@ pub fn phonetic_substitute(input: &str, vocab: &[String], threshold: f32) -> Str
 fn phonetic_substitute_token(token: &str, vocab: &[String], threshold: f32) -> String {
     let (core, punct) = split_trailing_punct(token);
     let core_chars: Vec<char> = core.chars().collect();
-    if core_chars.len() < 4 {
+    // **D.2 fix.** Minimum length 6: 5-char Kazakh particles
+    // («керек», «қалай», «бойынша» prefix) are too ambiguous —
+    // one phonetic substitution against a world_core entry
+    // («терек» tree, «балай» misc) produces a 0.92-similarity
+    // false positive that corrupts perfectly clean input.  The
+    // sigmatism eval loses one «Фәлем» → «сәлем» case at this
+    // length floor; that's an acceptable tradeoff for keeping
+    // common Kazakh particles untouched.
+    if core_chars.len() < 6 {
         return token.to_string();
     }
     if core_chars
@@ -194,8 +202,18 @@ fn phonetic_substitute_token(token: &str, vocab: &[String], threshold: f32) -> S
     {
         return token.to_string();
     }
+    // **D.2 fix.** Skip ASCII-only tokens — English loanwords
+    // («lifetimes», «traits», «ownership») are first-class in
+    // the code-tutor cascade; vocab is exclusively Kazakh, so a
+    // best-match against vocab would inevitably rewrite a real
+    // English term to a phonetically-similar Kazakh word and
+    // corrupt the cascade input.  ASCII tokens that ARE
+    // misspelled English get caught elsewhere (the Rust
+    // curriculum keyword matcher handles its own typos).
+    if core_chars.iter().all(|c| c.is_ascii_alphabetic()) {
+        return token.to_string();
+    }
     let lower = core.to_lowercase();
-    // Already in vocab (case-insensitive) — no substitution needed.
     if vocab.iter().any(|v| v.to_lowercase() == lower) {
         return token.to_string();
     }
