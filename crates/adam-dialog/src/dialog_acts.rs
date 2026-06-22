@@ -441,12 +441,26 @@ impl DiscourseState {
         })
     }
 
-    /// **v6.8.4 L4.5 Phase 2.E.2.** Push a referent onto the
-    /// anaphora stack.  If the most-recent entry already carries
-    /// the same `token`, the existing entry's `turn_id` is
-    /// refreshed in place instead of duplicating — keeps the
-    /// stack compact across multi-turn discussions of the same
-    /// subject.
+    /// **v6.8.4 L4.5 Phase 2.E.2 (semantics revised v6.8.7
+    /// L4.8 / C.1).** Push a referent onto the anaphora stack.
+    /// If the most-recent entry already carries the same
+    /// `token`, the existing entry's `kind` may be refreshed
+    /// but its `turn_id` is LEFT UNCHANGED — `turn_id` records
+    /// the turn the referent was **first introduced**, not the
+    /// turn it was last mentioned.
+    ///
+    /// Why keep the introduction `turn_id`: the cascade's
+    /// «prior-turn referent» filter (`r.turn_id < current_turn`)
+    /// needs introduction-turn semantics.  If the dedupe
+    /// refreshed `turn_id` to the latest mention, a topic
+    /// introduced in turn 1 and re-mentioned via cascade-side
+    /// topic extraction in turn 2 would carry `turn_id = 2`,
+    /// and the filter would reject it as «same turn» — leaving
+    /// the cascade with no anaphora hint precisely when the
+    /// user is asking a follow-up.  Closes the
+    /// birthplace_after_lifespan_anaphora /
+    /// occupation_after_lifespan_anaphora probes that v6.8.6
+    /// captured.
     pub fn push_referent(&mut self, token: String, kind: ReferentKind, turn_id: u64) {
         let normalised = token.trim().to_string();
         if normalised.is_empty() {
@@ -454,8 +468,8 @@ impl DiscourseState {
         }
         if let Some(last) = self.referents.last_mut() {
             if last.token == normalised {
-                last.turn_id = turn_id;
                 last.kind = kind;
+                // `turn_id` intentionally NOT refreshed — see doc comment.
                 return;
             }
         }
@@ -831,11 +845,14 @@ mod tests {
         assert!(detect_correction_pattern("Жоқ, рахмет.").is_none());
     }
 
-    /// **Phase 2.E.2 — referent stack.** `push_referent` records
-    /// the surface + kind + turn_id, deduplicates a repeat push
-    /// of the same token (refreshes turn_id in place), and
+    /// **Phase 2.E.2 — referent stack** (semantics revised v6.8.7
+    /// L4.8 / C.1: dedupe keeps INTRODUCTION turn_id).
+    /// `push_referent` records the surface + kind + turn_id, and
     /// `last_referent_of_kind` returns the most-recent matching
-    /// entry.
+    /// entry.  Re-pushing the same token deduplicates but
+    /// preserves the original introduction `turn_id` — the
+    /// cascade's «prior-turn referent» filter depends on
+    /// introduction-turn semantics (see push_referent doc).
     #[test]
     fn referent_stack_push_and_query() {
         let mut state = DiscourseState::default();
@@ -865,11 +882,13 @@ mod tests {
                 .is_none()
         );
 
-        // Re-pushing the same token refreshes in place, no
-        // duplicate.
+        // Re-pushing the same token deduplicates without creating
+        // a fresh entry, AND preserves the original
+        // introduction turn_id (was 2, not the new 3) — see
+        // push_referent doc for the «prior-turn filter» reason.
         state.push_referent("абай".into(), ReferentKind::Person, 3);
         assert_eq!(state.referents.len(), 3);
-        assert_eq!(state.referents.last().map(|r| r.turn_id), Some(3));
+        assert_eq!(state.referents.last().map(|r| r.turn_id), Some(2));
     }
 
     /// `push_referent` ignores empty / whitespace-only tokens.

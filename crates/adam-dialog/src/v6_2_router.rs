@@ -278,6 +278,22 @@ fn answer_with_corpus_inner(
         return Some(answer);
     }
 
+    // **v6.8.7 L4.8 — PropertyQueryIR person handlers.**  Generalise
+    // the Phase 2.E.2 anaphora pattern from lifespan to BornIn
+    // (birthplace) and IsA (occupation).  Each handler:
+    //   * detects its shape;
+    //   * resolves the subject via `canonical_agent_for` OR the
+    //     `anaphora_subject` referent (so «Қайда туылды?» after
+    //     «X туралы айтшы.» resolves);
+    //   * queries the FrameIndex for the typed property;
+    //   * emits a Kazakh template citing the surfaced value.
+    if let Some(answer) = lookup_person_birthplace_with_anaphora(input, idx, anaphora_subject) {
+        return Some(answer);
+    }
+    if let Some(answer) = lookup_person_occupation_with_anaphora(input, idx, anaphora_subject) {
+        return Some(answer);
+    }
+
     // **v6.8.5 L4.6 — industrial-pilot SOP retrieval.**  Resolves
     // procedure / СОП queries against typed fixtures loaded from
     // `data/procedures/*.jsonl`.  Shape gate ensures unrelated
@@ -2075,6 +2091,148 @@ fn lookup_person_lifespan_typed(
     let candidate = AnswerCandidate::assert(text, proof, RouteId::Lifespan);
     debug_assert!(candidate.invariant_check().is_ok());
     Some(candidate)
+}
+
+/// **v6.8.7 L4.8 — PropertyQueryIR birthplace.**  Resolve
+/// «Қайда туылды?» / «Где родился?» against the FrameIndex's
+/// BornIn predicate.  Mirrors `lookup_person_lifespan_with_
+/// anaphora`: same anaphora-fallback pattern, different
+/// property + different output template.
+///
+/// Subject resolution: explicit `canonical_agent_for(input)`
+/// first; if None, fall back to `anaphora_subject` and retry
+/// with a synthesised input.
+fn lookup_person_birthplace_with_anaphora(
+    input: &str,
+    idx: &FrameIndex,
+    anaphora_subject: Option<&str>,
+) -> Option<String> {
+    if let Some(text) = lookup_person_birthplace(input, idx) {
+        return Some(text);
+    }
+    let subject = anaphora_subject?;
+    if !looks_like_birthplace_query(input) {
+        return None;
+    }
+    let synthesised = format!("{subject} {input}");
+    lookup_person_birthplace(&synthesised, idx)
+}
+
+fn lookup_person_birthplace(input: &str, idx: &FrameIndex) -> Option<String> {
+    if !looks_like_birthplace_query(input) {
+        return None;
+    }
+    let lower = input.to_lowercase();
+    let subject = canonical_agent_for(&lower)?;
+    let place = query_place_for_predicate(idx, &subject, FramePredicate::BornIn)?;
+    let subject_titlecase = capitalize_first(&subject);
+    Some(format!("{subject_titlecase} {place}-да туған."))
+}
+
+fn looks_like_birthplace_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    lower.contains("қайда туыл")
+        || lower.contains("туылған жер")
+        || lower.contains("қай жерде туыл")
+        || lower.contains("где родил")
+        || lower.contains("место рожд")
+}
+
+/// **v6.8.7 L4.8 — PropertyQueryIR occupation.**  Resolve
+/// «Кім болған?» / «Не маман?» / «Кем был?» against the
+/// FrameIndex's IsA predicate.  Returns the first IsA object
+/// (typically the dominant occupation).
+fn lookup_person_occupation_with_anaphora(
+    input: &str,
+    idx: &FrameIndex,
+    anaphora_subject: Option<&str>,
+) -> Option<String> {
+    if let Some(text) = lookup_person_occupation(input, idx) {
+        return Some(text);
+    }
+    let subject = anaphora_subject?;
+    if !looks_like_occupation_query(input) {
+        return None;
+    }
+    let synthesised = format!("{subject} {input}");
+    lookup_person_occupation(&synthesised, idx)
+}
+
+fn lookup_person_occupation(input: &str, idx: &FrameIndex) -> Option<String> {
+    if !looks_like_occupation_query(input) {
+        return None;
+    }
+    let lower = input.to_lowercase();
+    let subject = canonical_agent_for(&lower)?;
+    let occupation = query_isa_object(idx, &subject)?;
+    let subject_titlecase = capitalize_first(&subject);
+    Some(format!("{subject_titlecase} — {occupation}."))
+}
+
+fn looks_like_occupation_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    lower.contains("кім болған")
+        || lower.contains("не маман")
+        || lower.contains("қандай маман")
+        || lower.contains("кем был")
+        || lower.contains("какая профес")
+        || lower.contains("кто такой")
+}
+
+/// Query the FrameIndex for the (subject, predicate) place
+/// object — i.e. the non-year string that the predicate carries
+/// when the world_core entry is a location («торғай облысы»,
+/// not «1872 жылы 5 қыркүйек»).
+///
+/// world_core stores BornIn / DiedIn under both shapes:
+///   1. Object string with a leading year («1872 жылы 5 қыркүйек»)
+///      — extracted by `query_year_for_predicate`.
+///   2. Object string with a place name («торғай облысы») —
+///      what THIS function returns.
+fn query_place_for_predicate(
+    idx: &FrameIndex,
+    subject: &str,
+    predicate: FramePredicate,
+) -> Option<String> {
+    let q = QueryIR::new(
+        QueryFocus::Subject,
+        QuestionForm::Definition,
+        AnswerShape::BareNoun,
+    )
+    .with_agent(noun(subject))
+    .with_predicate(predicate);
+    for hit in idx.query(&q).into_iter().take(8) {
+        let Some(obj) = hit.frame.object.as_ref() else {
+            continue;
+        };
+        let surface = &obj.root.surface;
+        if extract_year_in_range(surface).is_none() && !surface.trim().is_empty() {
+            return Some(capitalize_first(surface));
+        }
+    }
+    None
+}
+
+/// Query the FrameIndex for the first IsA object for `subject`.
+/// Picks the FIRST hit so curators control "dominant occupation"
+/// ordering by listing the canonical role first in world_core.
+fn query_isa_object(idx: &FrameIndex, subject: &str) -> Option<String> {
+    let q = QueryIR::new(
+        QueryFocus::Subject,
+        QuestionForm::Definition,
+        AnswerShape::BareNoun,
+    )
+    .with_agent(noun(subject))
+    .with_predicate(FramePredicate::IsA);
+    for hit in idx.query(&q).into_iter().take(4) {
+        if let Some(obj) = hit.frame.object.as_ref() {
+            let surface = obj.root.surface.trim();
+            if !surface.is_empty() {
+                return Some(surface.to_string());
+            }
+        }
+    }
+    None
 }
 
 /// **v6.8.5 L4.6 — industrial-pilot retrieval.**  Resolve a
