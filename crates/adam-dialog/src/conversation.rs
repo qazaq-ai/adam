@@ -3529,6 +3529,40 @@ impl Conversation {
             let domain_hint = self.domain_index.lookup_domain(topic);
             self.dialog_context
                 .record_turn(self.turn_counter, topic, domain_hint, false);
+            // **v6.8.4 L4.5 Phase 2.E.2 — referent push.** Mirror
+            // the dialog_context topic onto the typed referent
+            // stack so anaphora-aware handlers (e.g.
+            // `lookup_person_lifespan_typed`) can resolve a bare
+            // «Қанша жыл өмір сүрді?» follow-up against the prior
+            // turn's subject.  Kind classification: prefer
+            // `canonical_person_entity` (the language_core resolver
+            // adam already uses for `StatementOfName`); fall back
+            // to domain_hint for Place / Organisation; default to
+            // Generic otherwise.  Person discrimination via the
+            // resolver — NOT via domain — because world_core gives
+            // each notable figure its own `kru_<name>` domain
+            // (kru_baitursynov, abai_works, etc.) rather than a
+            // shared "person" bucket, so hard-coding a list would
+            // miss new biographical entries as they're curated.
+            let kind = if crate::language_core::canonical_person_entity(topic).is_some() {
+                crate::dialog_acts::ReferentKind::Person
+            } else {
+                match domain_hint {
+                    Some("geography_kz")
+                    | Some("world_geography")
+                    | Some("astronomy")
+                    | Some("constellations_kz") => crate::dialog_acts::ReferentKind::Place,
+                    Some("government_kazakhstan") | Some("kz_industry") | Some("military_kz") => {
+                        crate::dialog_acts::ReferentKind::Organisation
+                    }
+                    _ => crate::dialog_acts::ReferentKind::Generic,
+                }
+            };
+            self.discourse_state.push_referent(
+                topic.to_lowercase(),
+                kind,
+                self.turn_counter as u64,
+            );
         }
         // **v4.96.5** — Codex round-2 audit Bug 5. Pedagogical
         // intents (AskExercise / CodeRequest / ExplainCompilerError /
@@ -3703,10 +3737,35 @@ impl Conversation {
             // longer reduces to «10» (= «он» numeral) because the FST
             // has a non-numeral parse for «онда» (pronoun «ол» +
             // locative).
-            crate::v6_2_router::answer_with_corpus_and_lexicon(
+            //
+            // **v6.8.4 L4.5 Phase 2.E.2** — anaphora-aware variant
+            // threads the PRIOR-turn referent so a bare follow-up
+            // like «Қанша жыл өмір сүрді?» resolves against the
+            // previous turn's subject.  Critical: `record_intent`
+            // (line ~2033) already pushed THIS turn's topic onto
+            // the stack before this point, so we must skip any
+            // referent whose `turn_id` equals the current turn
+            // counter — otherwise «жыл» (extracted from the
+            // current question) shadows «ахмет байтұрсынұлы»
+            // (the prior turn's subject).  Kind discrimination
+            // is intentionally deferred to the handler: world_core
+            // gives notable figures per-name domains rather than
+            // a shared "person" bucket, so the handler's own
+            // `canonical_agent_for` filter is cheaper than
+            // re-implementing Person discrimination up here.
+            let current_turn = self.turn_counter as u64;
+            let anaphora_subject = self
+                .discourse_state
+                .referents
+                .iter()
+                .rev()
+                .find(|r| r.turn_id < current_turn)
+                .map(|r| r.token.clone());
+            crate::v6_2_router::answer_with_corpus_and_anaphora(
                 input,
                 crate::v6_2_router::shared_corpus(),
                 lexicon,
+                anaphora_subject.as_deref(),
             )
             .unwrap_or(final_output)
         } else {

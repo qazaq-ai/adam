@@ -210,6 +210,54 @@ fn correction_full_repair_lifecycle() {
     );
 }
 
+/// **Phase 2.E.2 — referent stack anaphora.**  Two-turn dialog
+/// where turn 1 introduces a Person topic, turn 2 asks a bare
+/// follow-up that lacks an explicit subject.  The follow-up
+/// must resolve against the prior turn's referent.
+///
+/// Specifically: «Ахмет Байтұрсынұлы туралы айтшы» introduces
+/// the person; «Қанша жыл өмір сүрді?» without explicit subject
+/// must compute the lifespan from the prior referent.
+///
+/// Skips when the lexicon is missing.
+#[test]
+fn anaphora_resolves_bare_lifespan_query_to_prior_referent() {
+    // The anaphora-aware path lives behind the v6.2 router gate;
+    // production binaries (voice REPL, respond_full) set this
+    // automatically, but `cargo test` doesn't.
+    unsafe {
+        std::env::set_var("ADAM_V6_2", "1");
+    }
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    // Turn 1: introduce the person.  v6.1 broad-topic handler
+    // records the topic onto dialog_context, which the Phase
+    // 2.E.2 hook mirrors onto discourse_state.referents.
+    let _ = conv.turn("Ахмет Байтұрсынұлы туралы айтшы.", &lex, &repo, 0);
+
+    // Verify SOME referent landed on the stack — kind
+    // discrimination is the handler's job (see Phase 2.E.2 note
+    // in conversation.rs), not the test's.
+    let last = conv.discourse_state.last_referent();
+    assert!(
+        last.is_some(),
+        "expected a referent on the stack after the broad-topic turn; stack: {:?}",
+        conv.discourse_state.referents,
+    );
+
+    // Turn 2: bare lifespan query, no explicit subject.  The
+    // anaphora-aware lifespan handler should synthesise the
+    // input using the prior referent and resolve.
+    let reply = conv.turn("Қанша жыл өмір сүрді?", &lex, &repo, 1);
+    assert!(
+        reply.contains("жыл өмір сүрді")
+            && (reply.contains("65") || reply.contains("1872") || reply.contains("1937")),
+        "expected the lifespan answer derived from the prior-turn referent, got: {reply}",
+    );
+}
+
 /// **Phase 2.C — commitment promotion.** After the full cascade
 /// processes a name statement, the recorded Proposed commitment
 /// is promoted to Accepted because `session["name"]` is populated

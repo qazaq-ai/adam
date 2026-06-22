@@ -125,19 +125,37 @@ pub fn answer_with_corpus_and_lexicon(
     idx: &FrameIndex,
     lex: &adam_kernel_fst::lexicon::LexiconV1,
 ) -> Option<String> {
-    answer_with_corpus_inner(input, idx, Some(lex))
+    answer_with_corpus_inner(input, idx, Some(lex), None)
+}
+
+/// **v6.8.4 L4.5 Phase 2.E.2.** Anaphora-aware variant: same as
+/// [`answer_with_corpus_and_lexicon`] but threads an
+/// `anaphora_subject` (e.g. the prior-turn Person referent from
+/// [`crate::dialog_acts::DiscourseState`]) so handlers that need
+/// a subject can resolve a bare follow-up like «Қанша жыл өмір
+/// сүрді?» against it.  Phase 2.E.2 consumers: the lifespan
+/// handler; future phases broaden to property-query / date-of-
+/// birth / etc.
+pub fn answer_with_corpus_and_anaphora(
+    input: &str,
+    idx: &FrameIndex,
+    lex: &adam_kernel_fst::lexicon::LexiconV1,
+    anaphora_subject: Option<&str>,
+) -> Option<String> {
+    answer_with_corpus_inner(input, idx, Some(lex), anaphora_subject)
 }
 
 /// Variant that lets callers supply their own [`FrameIndex`] (used
 /// in integration tests + the live REPL).
 pub fn answer_with_corpus(input: &str, idx: &FrameIndex) -> Option<String> {
-    answer_with_corpus_inner(input, idx, None)
+    answer_with_corpus_inner(input, idx, None, None)
 }
 
 fn answer_with_corpus_inner(
     input: &str,
     idx: &FrameIndex,
     lex: Option<&adam_kernel_fst::lexicon::LexiconV1>,
+    anaphora_subject: Option<&str>,
 ) -> Option<String> {
     // 0a. STT-loop dedupe. Whisper sometimes gets stuck in a
     // repeat-loop and emits «Сәлем. Сәлем. Сәлем.» × 30+. Collapse
@@ -251,7 +269,12 @@ fn answer_with_corpus_inner(
     // because no handler combined BornIn + DiedIn into a single typed
     // answer. The data is present (kru_002 + kru_003 carry born_in
     // 1872 + died_in 1937); only the synthesis was missing.
-    if let Some(answer) = lookup_person_lifespan(input, idx) {
+    //
+    // **v6.8.4 L4.5 Phase 2.E.2** — anaphora-aware variant gets the
+    // optional prior-turn Person referent so a bare follow-up like
+    // «Қанша жыл өмір сүрді?» (no explicit subject) resolves against
+    // the previous turn's topic.
+    if let Some(answer) = lookup_person_lifespan_with_anaphora(input, idx, anaphora_subject) {
         return Some(answer);
     }
 
@@ -1930,6 +1953,44 @@ fn lookup_person_lifespan(input: &str, idx: &FrameIndex) -> Option<String> {
     // verification bug for this one route.  Subsequent routes
     // migrate the same way in Phase 2+.
     lookup_person_lifespan_typed(input, idx).map(|c| c.text)
+}
+
+/// **v6.8.4 L4.5 Phase 2.E.2.** Anaphora-aware wrapper around
+/// [`lookup_person_lifespan_typed`].  When the input has an
+/// explicit subject (`canonical_agent_for` resolves), behaviour
+/// is identical to the existing handler.  When the input
+/// matches the lifespan shape but has NO resolvable subject
+/// («Қанша жыл өмір сүрді?»), the function consults the
+/// `anaphora_subject` hint — typically the prior-turn Person
+/// referent surfaced via
+/// [`crate::dialog_acts::DiscourseState::last_referent_of_kind`]
+/// — and re-runs the handler with a synthesised input string
+/// «{anaphora_subject} қанша жыл өмір сүрді?».
+fn lookup_person_lifespan_with_anaphora(
+    input: &str,
+    idx: &FrameIndex,
+    anaphora_subject: Option<&str>,
+) -> Option<String> {
+    if let Some(text) = lookup_person_lifespan(input, idx) {
+        return Some(text);
+    }
+    // The handler returned None.  Phase 2.E.2 anaphora fallback:
+    // if the input matches the lifespan SHAPE («қанша жыл өмір
+    // сүр») but has no resolvable subject, prepend the prior-
+    // turn referent and retry.  We don't want to retry on inputs
+    // that aren't lifespan-shaped at all (canonical agent may be
+    // unresolved for many other reasons — math, chemistry, etc.).
+    let subject = anaphora_subject?;
+    let lower = input.to_lowercase();
+    let looks_like_lifespan = (lower.contains("қанша жыл")
+        || lower.contains("сколько лет")
+        || lower.contains("неше жыл"))
+        && (lower.contains("өмір сүр") || lower.contains("прожил") || lower.contains("жасады"));
+    if !looks_like_lifespan {
+        return None;
+    }
+    let synthesised = format!("{subject} {input}");
+    lookup_person_lifespan(&synthesised, idx)
 }
 
 /// **v6.8.4 — 2026-06-17 L4.5 Phase 1 canary.** Typed sibling of

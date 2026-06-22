@@ -226,12 +226,49 @@ impl StateDelta {
     }
 }
 
+/// **Phase 2.E.2** — typed referent for anaphora resolution.
+/// Pushed onto [`DiscourseState::referents`] whenever a turn
+/// surfaces a concrete topic (resolved subject in retrieval,
+/// agent in `StatementOfName`, etc.).  Consulted by handlers
+/// when the current input lacks an explicit subject and the
+/// shape demands one («Қанша жыл өмір сүрді?» → take the most
+/// recent person referent).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Referent {
+    /// Canonical surface for the referent (lowercased, FST-
+    /// resolvable — typically the same shape `canonical_agent_for`
+    /// returns).
+    pub token: String,
+    /// Coarse-grained kind so callers can filter (a lifespan
+    /// query wants a `Person` referent, not a `Place`).
+    pub kind: ReferentKind,
+    /// Turn in which this referent was last surfaced.
+    pub turn_id: u64,
+}
+
+/// Coarse-grained referent type.  Phase 2.E.2 ships the minimum
+/// set the migrated handlers care about; future phases add
+/// `Date`, `Concept`, `Event`, etc. as new producers appear.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum ReferentKind {
+    /// Person (historical figure, user themselves, named individual).
+    Person,
+    /// Place (city, country, region, building).
+    Place,
+    /// Organisation (institution, company, agency).
+    Organisation,
+    /// Generic / unclassified — the producer couldn't (yet) pin
+    /// the type but wants the surface logged.
+    Generic,
+}
+
 /// Discourse-level state carried by [`crate::Conversation`].  Phase
 /// 2.B ships only the `commitments` field — the typed log of what
 /// each participant has asserted, with provenance and status.
-/// Future phases add `register` (TY / VY politeness), `referents`
-/// (typed anaphora stack), `last_user_move` / `last_system_move`,
-/// and `task`-state pointers.
+/// Phase 2.E.2 adds `referents` — the anaphora stack consulted
+/// when an input lacks an explicit subject.  Future phases add
+/// `register` (TY / VY politeness), `last_user_move` /
+/// `last_system_move`, and `task`-state pointers.
 ///
 /// **Why on `Conversation` and not inside `session: HashMap<String,
 /// String>`:** the stringly-typed session map cannot record (a) who
@@ -253,6 +290,14 @@ pub struct DiscourseState {
     /// A bounded ring-buffer is a future-phase optimisation if we
     /// need it.
     pub commitments: Vec<CommitmentRecord>,
+    /// **Phase 2.E.2.** Referent stack — surfaces of concrete
+    /// entities recently brought into discourse, most-recent
+    /// last.  Pushed when a turn resolves a subject (broad-topic
+    /// retrieval, StatementOfName, etc.); consulted as anaphora
+    /// fallback when an input lacks an explicit subject and the
+    /// shape demands one.  Bounded growth is a future-phase
+    /// optimisation; small dialogs stay cheap to walk.
+    pub referents: Vec<Referent>,
 }
 
 /// **v6.8.4 L4.5 Phase 2.D.** Detect a repair / correction
@@ -394,6 +439,47 @@ impl DiscourseState {
                 && c.status == CommitmentStatus::Proposed
                 && c.turn_id == turn_id
         })
+    }
+
+    /// **v6.8.4 L4.5 Phase 2.E.2.** Push a referent onto the
+    /// anaphora stack.  If the most-recent entry already carries
+    /// the same `token`, the existing entry's `turn_id` is
+    /// refreshed in place instead of duplicating — keeps the
+    /// stack compact across multi-turn discussions of the same
+    /// subject.
+    pub fn push_referent(&mut self, token: String, kind: ReferentKind, turn_id: u64) {
+        let normalised = token.trim().to_string();
+        if normalised.is_empty() {
+            return;
+        }
+        if let Some(last) = self.referents.last_mut() {
+            if last.token == normalised {
+                last.turn_id = turn_id;
+                last.kind = kind;
+                return;
+            }
+        }
+        self.referents.push(Referent {
+            token: normalised,
+            kind,
+            turn_id,
+        });
+    }
+
+    /// **Phase 2.E.2.** Most-recent referent of the requested
+    /// `kind`, or `None` when the stack carries nothing matching.
+    /// Used by handlers like `lookup_person_lifespan` when the
+    /// current input lacks an explicit subject.
+    pub fn last_referent_of_kind(&self, kind: ReferentKind) -> Option<&Referent> {
+        self.referents.iter().rev().find(|r| r.kind == kind)
+    }
+
+    /// **Phase 2.E.2.** Most-recent referent of any kind.  Used by
+    /// callers that don't yet distinguish kinds (legacy fallback
+    /// path); prefer `last_referent_of_kind` when the call site
+    /// can express its expected type.
+    pub fn last_referent(&self) -> Option<&Referent> {
+        self.referents.last()
     }
 }
 
@@ -743,5 +829,55 @@ mod tests {
         // a repair.
         assert!(detect_correction_pattern("Жоқ.").is_none());
         assert!(detect_correction_pattern("Жоқ, рахмет.").is_none());
+    }
+
+    /// **Phase 2.E.2 — referent stack.** `push_referent` records
+    /// the surface + kind + turn_id, deduplicates a repeat push
+    /// of the same token (refreshes turn_id in place), and
+    /// `last_referent_of_kind` returns the most-recent matching
+    /// entry.
+    #[test]
+    fn referent_stack_push_and_query() {
+        let mut state = DiscourseState::default();
+        assert!(state.last_referent().is_none());
+
+        state.push_referent("ахмет байтұрсынұлы".into(), ReferentKind::Person, 0);
+        state.push_referent("қостанай".into(), ReferentKind::Place, 1);
+        state.push_referent("абай".into(), ReferentKind::Person, 2);
+
+        assert_eq!(state.referents.len(), 3);
+        // Last-of-kind walks newest-first.
+        assert_eq!(
+            state
+                .last_referent_of_kind(ReferentKind::Person)
+                .map(|r| r.token.as_str()),
+            Some("абай"),
+        );
+        assert_eq!(
+            state
+                .last_referent_of_kind(ReferentKind::Place)
+                .map(|r| r.token.as_str()),
+            Some("қостанай"),
+        );
+        assert!(
+            state
+                .last_referent_of_kind(ReferentKind::Organisation)
+                .is_none()
+        );
+
+        // Re-pushing the same token refreshes in place, no
+        // duplicate.
+        state.push_referent("абай".into(), ReferentKind::Person, 3);
+        assert_eq!(state.referents.len(), 3);
+        assert_eq!(state.referents.last().map(|r| r.turn_id), Some(3));
+    }
+
+    /// `push_referent` ignores empty / whitespace-only tokens.
+    #[test]
+    fn referent_stack_rejects_empty_token() {
+        let mut state = DiscourseState::default();
+        state.push_referent(String::new(), ReferentKind::Person, 0);
+        state.push_referent("   ".into(), ReferentKind::Place, 1);
+        assert!(state.referents.is_empty());
     }
 }
