@@ -65,6 +65,7 @@ pub mod phoneme;
 pub mod phonetic_match;
 pub mod planner;
 pub mod predicate_focus;
+pub mod procedure_loader;
 pub mod proof_object;
 pub mod quality;
 pub mod question_shape;

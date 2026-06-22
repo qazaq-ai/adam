@@ -278,6 +278,17 @@ fn answer_with_corpus_inner(
         return Some(answer);
     }
 
+    // **v6.8.5 L4.6 — industrial-pilot SOP retrieval.**  Resolves
+    // procedure / СОП queries against typed fixtures loaded from
+    // `data/procedures/*.jsonl`.  Shape gate ensures unrelated
+    // inputs (math, chemistry, generic questions) fall through to
+    // the v6.1 cascade unchanged; only inputs carrying a real
+    // procedure-query trigger («тәртіб», «рәсім», «порядок», ...)
+    // can reach this layer.
+    if let Some(answer) = lookup_procedure(input) {
+        return Some(answer);
+    }
+
     // 1a. Occupation acknowledgement. «Мен X» / «Мен X-мын» —
     // user stating profession / role. The v6.1 cascade interpreted
     // this as a definition request («Бағдарламашы — кәсіп иесі.»),
@@ -2064,6 +2075,166 @@ fn lookup_person_lifespan_typed(
     let candidate = AnswerCandidate::assert(text, proof, RouteId::Lifespan);
     debug_assert!(candidate.invariant_check().is_ok());
     Some(candidate)
+}
+
+/// **v6.8.5 L4.6 — industrial-pilot retrieval.**  Resolve a
+/// procedure / SOP query against the typed procedure set loaded
+/// from `data/procedures/*.jsonl`.
+///
+/// Handled query shapes (Kazakh + Russian — the pilot voice
+/// surface is Kazakh, but the cyrillic pilot supervisors often
+/// switch to Russian mid-sentence):
+///
+///   * «X қалай жүргізіледі?» / «X қалай жасалады?» / «X қалай
+///     өтеді?»
+///   * «X тәртібі қандай?» / «X-тің тәртібі қалай?»
+///   * «X рәсімі қалай?» / «X-ке арналған рәсім ...»
+///   * «Как проводится X?» / «Порядок проведения X?» /
+///     «Процедура X?»
+///
+/// Matching: simple keyword overlap between the query and each
+/// fixture's `title_kk` / `title_ru` / `applies_to` fields.
+/// Returns the highest-scoring procedure when the best score
+/// clears `MIN_SCORE`; `None` otherwise (so the cascade falls
+/// through to the v6.1 layer for non-procedure inputs).
+///
+/// Output: a multi-line response carrying title + prerequisites +
+/// ordered steps + hazards + source citation.  The voice layer
+/// reads the multi-line shape clause-by-clause.
+fn lookup_procedure(input: &str) -> Option<String> {
+    use crate::procedure_loader::shared_procedures;
+
+    // 1. Shape gate — must contain a procedure-query trigger.
+    let lower = input.to_lowercase();
+    let trigger_present = SHAPE_TRIGGERS_KK
+        .iter()
+        .chain(SHAPE_TRIGGERS_RU.iter())
+        .any(|t| lower.contains(t));
+    if !trigger_present {
+        return None;
+    }
+
+    // 2. Tokenise query for keyword scoring (≥ 4-byte tokens
+    //    avoids matching short grammatical particles in Kazakh
+    //    suffix chains).
+    let query_tokens: Vec<&str> = lower
+        .split(|c: char| !c.is_alphanumeric())
+        .filter(|t| t.chars().count() >= 4)
+        .collect();
+    if query_tokens.is_empty() {
+        return None;
+    }
+
+    // 3. Score each fixture.
+    let mut best: Option<(usize, i32)> = None;
+    for (idx, proc) in shared_procedures().iter().enumerate() {
+        let score = score_procedure(proc, &query_tokens);
+        if score >= MIN_SCORE && best.is_none_or(|(_, b)| score > b) {
+            best = Some((idx, score));
+        }
+    }
+    let (best_idx, _) = best?;
+    let proc = &shared_procedures()[best_idx];
+    Some(render_procedure(proc))
+}
+
+const SHAPE_TRIGGERS_KK: &[&str] = &[
+    "қалай жүргізіл",
+    "қалай жасал",
+    "қалай өткіз",
+    "қалай өтед",
+    "тәртіб",
+    "тәртіп",
+    "рәсім",
+    "рәсімі",
+    "нұсқаулық",
+];
+
+const SHAPE_TRIGGERS_RU: &[&str] = &[
+    "как провод",
+    "порядок ",
+    "процедур",
+    "инструктаж",
+    "регламент",
+];
+
+/// Minimum keyword overlap score for a match to fire.  Tuned for
+/// the 5-fixture foundation set: typical pilot questions match
+/// 2-3 tokens with the right fixture and 0-1 tokens with
+/// unrelated ones, so a threshold of 2 cleanly separates them.
+const MIN_SCORE: i32 = 2;
+
+fn score_procedure(proc: &adam_algebra::ProcedureIR, query_tokens: &[&str]) -> i32 {
+    let title_kk_lower = proc.title_kk.to_lowercase();
+    let title_ru_lower = proc
+        .title_ru
+        .as_ref()
+        .map(|s| s.to_lowercase())
+        .unwrap_or_default();
+    let applies_lower: String = proc.applies_to.join(" ").to_lowercase();
+
+    let mut score = 0i32;
+    for tok in query_tokens {
+        if title_kk_lower.contains(tok) {
+            score += 3;
+        }
+        if !title_ru_lower.is_empty() && title_ru_lower.contains(tok) {
+            score += 3;
+        }
+        if applies_lower.contains(tok) {
+            score += 2;
+        }
+    }
+    score
+}
+
+fn render_procedure(proc: &adam_algebra::ProcedureIR) -> String {
+    let mut out = String::new();
+    out.push_str("Рәсім: ");
+    out.push_str(&proc.title_kk);
+    out.push('\n');
+
+    if !proc.applies_to.is_empty() {
+        out.push_str("Қолданылады: ");
+        out.push_str(&proc.applies_to.join("; "));
+        out.push('\n');
+    }
+    if !proc.prerequisites.is_empty() {
+        out.push_str("Алдын ала шарттар:\n");
+        for pr in &proc.prerequisites {
+            out.push_str(" — ");
+            out.push_str(pr);
+            out.push('\n');
+        }
+    }
+    out.push_str("Қадамдар:\n");
+    for step in &proc.steps {
+        out.push_str(&format!(" {}. ", step.sequence));
+        out.push_str(&step.action_kk);
+        out.push('\n');
+    }
+    if !proc.hazards.is_empty() {
+        out.push_str("Қауіптер:\n");
+        for h in &proc.hazards {
+            out.push_str(" — ");
+            out.push_str(&h.kind_kk);
+            out.push_str(" → ");
+            out.push_str(&h.mitigation_kk);
+            out.push('\n');
+        }
+    }
+    // Source citation — anchors the answer in the regulation so
+    // a downstream auditor can verify currency.
+    out.push_str(&format!(
+        "Дереккөз: {} ({}",
+        proc.source.regulation_kk, proc.source.regulation_id,
+    ));
+    if let Some(article) = &proc.source.article {
+        out.push_str(", ");
+        out.push_str(article);
+    }
+    out.push_str(&format!(", {}).", proc.source.version_date));
+    out
 }
 
 /// Query the FrameIndex for the year associated with
