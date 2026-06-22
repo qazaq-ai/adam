@@ -908,6 +908,19 @@ impl Conversation {
         // A rewritten input could mask a crisis phrase that the FST
         // / planner stack then routes to a topic-search fallback.
         let raw_input_for_safety = input.to_string();
+        // **v6.8.8 L4.9 D.1** — speech-defect candidate rescoring.
+        // Apply structural normalisation (currently: stutter
+        // collapse) BEFORE the cascade processes the input.
+        // Safety override still works against the ORIGINAL
+        // `raw_input_for_safety` capture above, so the
+        // normalisation can never strip a crisis phrase the
+        // safety guard would otherwise catch.
+        let normalised_owned = crate::input_normalizer::normalize(input).normalized;
+        let input: &str = if normalised_owned != input {
+            normalised_owned.as_str()
+        } else {
+            input
+        };
         // **v6.1.40 — 2026-05-24 voice audit round 2.** Smart
         // consecutive-turn honorific dedup. If the PREVIOUS turn
         // emitted the diminutive («Дәке»), set a session flag the

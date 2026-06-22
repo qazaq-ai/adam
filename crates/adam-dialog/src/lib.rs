@@ -56,6 +56,7 @@ pub mod dialog_acts;
 pub mod dialog_context;
 pub mod discourse;
 pub mod domain_index;
+pub mod input_normalizer;
 pub mod intent;
 pub mod kazakh_fuzzy;
 pub mod language_core;
