@@ -319,6 +319,23 @@ fn answer_with_corpus_inner_full(
     if let Some(text) = lookup_procedure_authority(input, anaphora_procedure_id) {
         return Some(RouterAnswer::from_text(text, EvidenceKind::ProcedureMatch));
     }
+    // v6.8.12 — four additional procedure attribute follow-ups
+    // (hazards / prerequisites / step-by-number / source citation).
+    // All fire only when a procedure referent is on the discourse
+    // stack; without one they return None and the cascade falls
+    // through to v6.1 unchanged.
+    if let Some(text) = lookup_procedure_hazards(input, anaphora_procedure_id) {
+        return Some(RouterAnswer::from_text(text, EvidenceKind::ProcedureMatch));
+    }
+    if let Some(text) = lookup_procedure_prerequisites(input, anaphora_procedure_id) {
+        return Some(RouterAnswer::from_text(text, EvidenceKind::ProcedureMatch));
+    }
+    if let Some(text) = lookup_procedure_step_by_number(input, anaphora_procedure_id) {
+        return Some(RouterAnswer::from_text(text, EvidenceKind::ProcedureMatch));
+    }
+    if let Some(text) = lookup_procedure_source(input, anaphora_procedure_id) {
+        return Some(RouterAnswer::from_text(text, EvidenceKind::ProcedureMatch));
+    }
     // Main cascade — String-returning chain.  We also re-run the
     // procedure retrieval helper to recover both the matched id
     // (for the discourse-state referent push) AND the keyword
@@ -2606,6 +2623,224 @@ fn looks_like_procedure_authority_query(input: &str) -> bool {
         || lower.contains("кто отвечает")
         || lower.contains("кто ответствен")
         || lower.contains("чья ответствен")
+}
+
+/// **v6.8.12 — procedure attribute query (hazards).** Detects
+/// «Қауіптері қандай?» / «Какие опасности?» follow-ups against
+/// a prior procedure referent and returns the procedure's
+/// `hazards` field as a formatted list with mitigations.
+///
+/// Codex's voice REPL audit flagged the LOTO follow-up
+/// «Қауіптері қандай?» as falling through to the v6.1
+/// cascade — this handler closes that gap.
+fn lookup_procedure_hazards(input: &str, anaphora_procedure_id: Option<&str>) -> Option<String> {
+    if !looks_like_procedure_hazards_query(input) {
+        return None;
+    }
+    let proc_id = anaphora_procedure_id?;
+    let proc = crate::procedure_loader::shared_procedures()
+        .iter()
+        .find(|p| p.id == proc_id)?;
+    if proc.hazards.is_empty() {
+        // The procedure is on-record as having no curated hazards
+        // (NOT the same as having unknown hazards).  Surface the
+        // explicit empty state rather than fall back to the
+        // cascade — the curator deliberately recorded zero.
+        return Some(format!(
+            "«{}» рәсімінде тіркелген қауіптер жоқ.",
+            proc.title_kk,
+        ));
+    }
+    let mut out = format!("«{}» рәсімінің қауіптері:\n", proc.title_kk);
+    for h in &proc.hazards {
+        out.push_str(&format!(" — {} → {}\n", h.kind_kk, h.mitigation_kk));
+    }
+    Some(out.trim_end().to_string())
+}
+
+fn looks_like_procedure_hazards_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    lower.contains("қауіптер")
+        || lower.contains("қауіп қанд")
+        || lower.contains("қандай қауіп")
+        || lower.contains("опасност")
+        || lower.contains("какой риск")
+        || lower.contains("какие риск")
+}
+
+/// **v6.8.12 — procedure attribute query (prerequisites).**
+/// Detects «Алдын ала шарттар?» / «Какие предусловия?» and
+/// returns the procedure's `prerequisites` field as a list.
+fn lookup_procedure_prerequisites(
+    input: &str,
+    anaphora_procedure_id: Option<&str>,
+) -> Option<String> {
+    if !looks_like_procedure_prerequisites_query(input) {
+        return None;
+    }
+    let proc_id = anaphora_procedure_id?;
+    let proc = crate::procedure_loader::shared_procedures()
+        .iter()
+        .find(|p| p.id == proc_id)?;
+    if proc.prerequisites.is_empty() {
+        return Some(format!(
+            "«{}» рәсімінде алдын ала шарттар тіркелмеген.",
+            proc.title_kk,
+        ));
+    }
+    let mut out = format!("«{}» рәсімінің алдын ала шарттары:\n", proc.title_kk);
+    for p in &proc.prerequisites {
+        out.push_str(&format!(" — {p}\n"));
+    }
+    Some(out.trim_end().to_string())
+}
+
+fn looks_like_procedure_prerequisites_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    lower.contains("алдын ала шарт")
+        || lower.contains("қандай шарт")
+        || lower.contains("шарттары")
+        || lower.contains("предусловия")
+        || lower.contains("какие условия")
+        || lower.contains("требования")
+}
+
+/// **v6.8.12 — procedure attribute query (step-by-number).**
+/// Detects «Екінші қадамды айтшы», «Үшінші қадам не?», «Второй
+/// шаг» and returns the specific `steps[N-1].action_kk` for the
+/// referenced procedure.  Out-of-range step indices return a
+/// soft refusal naming the procedure's actual step count.
+///
+/// Kazakh ordinal parsing covers «бірінші» through «оныншы»
+/// (1–10) plus the matching cardinal in dative ﻿(«бірге», «екіге»,
+/// ﻿«үшке», …) so «екіге қадам» / «екінші қадамды» both work.
+fn lookup_procedure_step_by_number(
+    input: &str,
+    anaphora_procedure_id: Option<&str>,
+) -> Option<String> {
+    if !looks_like_procedure_step_by_number_query(input) {
+        return None;
+    }
+    let proc_id = anaphora_procedure_id?;
+    let proc = crate::procedure_loader::shared_procedures()
+        .iter()
+        .find(|p| p.id == proc_id)?;
+    let n = parse_step_ordinal(input)?;
+    if n == 0 || n as usize > proc.steps.len() {
+        return Some(format!(
+            "«{}» рәсімінде {} қадам бар; {}-ші қадам жоқ.",
+            proc.title_kk,
+            proc.steps.len(),
+            n,
+        ));
+    }
+    let step = &proc.steps[(n - 1) as usize];
+    Some(format!(
+        "«{}» рәсімінің {}-ші қадамы: {}",
+        proc.title_kk, step.sequence, step.action_kk,
+    ))
+}
+
+fn looks_like_procedure_step_by_number_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    let has_step_word =
+        lower.contains("қадам") || lower.contains("шаг") || lower.contains("қадамды");
+    if !has_step_word {
+        return false;
+    }
+    parse_step_ordinal(input).is_some()
+}
+
+/// Parse Kazakh ordinal («бірінші» / «екінші» / …) OR Russian
+/// ordinal («первый» / «второй» / …) OR bare numeral
+/// («2-қадам», «3-ші қадам») into `u32` step index.  Returns
+/// `None` when no recognisable ordinal is present.
+fn parse_step_ordinal(input: &str) -> Option<u32> {
+    let lower = input.to_lowercase();
+    const KK_ORDINALS: &[(&str, u32)] = &[
+        ("бірінші", 1),
+        ("екінші", 2),
+        ("үшінші", 3),
+        ("төртінші", 4),
+        ("бесінші", 5),
+        ("алтыншы", 6),
+        ("жетінші", 7),
+        ("сегізінші", 8),
+        ("тоғызыншы", 9),
+        ("оныншы", 10),
+    ];
+    const RU_ORDINALS: &[(&str, u32)] = &[
+        ("первый", 1),
+        ("вторый", 2),
+        ("второй", 2),
+        ("третий", 3),
+        ("четвертый", 4),
+        ("четвёртый", 4),
+        ("пятый", 5),
+        ("шестой", 6),
+        ("седьмой", 7),
+        ("восьмой", 8),
+        ("девятый", 9),
+        ("десятый", 10),
+    ];
+    for (word, n) in KK_ORDINALS.iter().chain(RU_ORDINALS) {
+        if lower.contains(word) {
+            return Some(*n);
+        }
+    }
+    // Bare numeral form «2-ші қадам» / «3 шаг» — scan for the
+    // first 1–2 digit token surrounded by non-digits.
+    let mut digits = String::new();
+    for ch in lower.chars().chain(std::iter::once(' ')) {
+        if ch.is_ascii_digit() {
+            digits.push(ch);
+        } else if !digits.is_empty() {
+            if digits.len() <= 2
+                && let Ok(n) = digits.parse::<u32>()
+                && (1..=20).contains(&n)
+            {
+                return Some(n);
+            }
+            digits.clear();
+        }
+    }
+    None
+}
+
+/// **v6.8.12 — procedure attribute query (source citation).**
+/// Detects «Қайдан?» / «Дереккөзі?» / «Откуда это?» and returns
+/// the procedure's `source` block (regulation name + id +
+/// article + version date) as a single sentence.  Critical for
+/// pilot supervisors auditing where an SOP came from.
+fn lookup_procedure_source(input: &str, anaphora_procedure_id: Option<&str>) -> Option<String> {
+    if !looks_like_procedure_source_query(input) {
+        return None;
+    }
+    let proc_id = anaphora_procedure_id?;
+    let proc = crate::procedure_loader::shared_procedures()
+        .iter()
+        .find(|p| p.id == proc_id)?;
+    let mut out = format!(
+        "«{}» рәсімінің дереккөзі — {} ({}",
+        proc.title_kk, proc.source.regulation_kk, proc.source.regulation_id,
+    );
+    if let Some(article) = &proc.source.article {
+        out.push_str(&format!(", {article}"));
+    }
+    out.push_str(&format!(", {}).", proc.source.version_date));
+    Some(out)
+}
+
+fn looks_like_procedure_source_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    lower.contains("дереккөз")
+        || lower.contains("дерек көз")
+        || lower.contains("қай заң")
+        || lower.contains("қайдан алын")
+        || lower.contains("қандай заң")
+        || lower.contains("источник")
+        || lower.contains("откуда это")
+        || lower.contains("какой закон")
 }
 
 const SHAPE_TRIGGERS_KK: &[&str] = &[
@@ -4907,6 +5142,51 @@ mod tests {
     fn lookup_procedure_with_score_misses_non_procedure_query() {
         assert!(lookup_procedure_matched_with_score("Сәлем!").is_none());
         assert!(lookup_procedure_matched_with_score("2+2 қанша?").is_none());
+    }
+
+    /// **v6.8.12 — procedure attribute expansion.** Kazakh +
+    /// Russian ordinals, plus bare numeral surfaces, parse into
+    /// step indices.
+    #[test]
+    fn parse_step_ordinal_kazakh_one_to_ten() {
+        let cases = [
+            ("бірінші қадам", 1),
+            ("Екінші қадамды айтшы.", 2),
+            ("Үшінші қадам не?", 3),
+            ("Төртінші қадам қандай?", 4),
+            ("Бесінші қадам туралы.", 5),
+            ("Алтыншы қадам қалай?", 6),
+            ("жетінші қадам", 7),
+            ("Сегізінші қадам.", 8),
+            ("тоғызыншы қадам", 9),
+            ("Оныншы қадам.", 10),
+        ];
+        for (input, expected) in cases {
+            assert_eq!(parse_step_ordinal(input), Some(expected), "input={input:?}",);
+        }
+    }
+
+    #[test]
+    fn parse_step_ordinal_russian_ordinals() {
+        assert_eq!(parse_step_ordinal("Второй шаг"), Some(2));
+        assert_eq!(parse_step_ordinal("Третий шаг расскажи"), Some(3));
+        assert_eq!(parse_step_ordinal("Пятый шаг."), Some(5));
+    }
+
+    #[test]
+    fn parse_step_ordinal_bare_numerals() {
+        assert_eq!(parse_step_ordinal("2-ші қадам"), Some(2));
+        assert_eq!(parse_step_ordinal("3 шаг"), Some(3));
+    }
+
+    #[test]
+    fn parse_step_ordinal_no_ordinal_returns_none() {
+        // Bare body parts and broad questions don't carry an
+        // ordinal — must not return a spurious number.
+        assert_eq!(parse_step_ordinal("Қандай рәсім бар?"), None);
+        assert_eq!(parse_step_ordinal("Қанша қадам?"), None);
+        // Numbers way out of step range (1–20) don't fire.
+        assert_eq!(parse_step_ordinal("Жыл 2024."), None);
     }
 
     /// `with_confidence` + `with_procedure_id` builders compose
