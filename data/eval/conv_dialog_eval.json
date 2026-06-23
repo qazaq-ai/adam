@@ -38,11 +38,11 @@
     },
     {
       "subject": "voice_real",
-      "topic": "thanks_with_extension",
+      "topic": "religious_wellbeing",
       "input": "Рақмет, аллаға шүкір.",
-      "expected_response": "оқасы жоқ",
+      "expected_response": "жақсы екен",
       "was_accepted": true,
-      "notes": "Thanks + religious phrase — should ack"
+      "notes": "v6.8.10 voice REPL audit T4 fix: «аллаға шүкір» is a wellness assertion («thanks be to God [for being well]»), NOT a favour-acknowledging thanks. The earlier expected «оқасы жоқ» codified the pre-fix Thanks-template misroute. Corrected via is_religious_wellbeing() check before detect_thanks in semantics::interpret_text."
     },
     {
       "subject": "voice_real",

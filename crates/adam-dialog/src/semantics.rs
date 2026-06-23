@@ -466,6 +466,19 @@ pub fn interpret_text_with_lexicon(
     if detect_farewell(&tokens, &joined) {
         return Intent::Farewell;
     }
+    // **v6.8.10 — voice REPL audit 2026-06-23 turn 4.**  Religious
+    // wellbeing phrases («аллаға шүкір» / «құдайға шүкір») are a
+    // wellness assertion in Kazakh culture — «thanks be to God [for
+    // being well]» — typically used as an answer to «How are you?».
+    // The earlier order put detect_thanks first, so a leading «Рақмет»
+    // (e.g. «Рақмет, аллаға шүкір.») triggered the Thanks template
+    // and emitted «Оқасы жоқ» («you're welcome») — the wrong tier
+    // for a wellbeing answer.  Catch the religious-wellbeing surface
+    // before detect_thanks so the StatementOfWellbeing template
+    // («жақсы екен» / «қуанып қалдым») fires instead.
+    if is_religious_wellbeing(&joined) {
+        return Intent::StatementOfWellbeing;
+    }
     // Order matters: thanks/apology should be checked before affirmation,
     // because "рахмет" is a single-token thanks and shouldn't accidentally
     // fall into affirmation if we ever add "рахмет" there.
@@ -1074,6 +1087,24 @@ fn detect_thanks(tokens: &[String], joined: &str) -> bool {
         .any(|t| matches!(t.as_str(), "рахмет" | "рахметім" | "рақмет"))
         || joined.contains("көп рахмет")
         || joined.contains("көп рақмет")
+}
+
+/// **v6.8.10 — religious-wellbeing phrase detector.** Catches the
+/// Kazakh culturally-standard wellness assertion «thanks be to
+/// God» (and its variants).  These are answers to «How are you?»
+/// — they are NOT favour-acknowledging «thanks», so they must not
+/// route to the «оқасы жоқ» template.
+///
+/// Substring match on `joined` (lowercased) so morphology
+/// (дативе «аллаға», nominative «алла», genitive «алланың») and
+/// surrounding tokens («Рақмет, аллаға шүкір», «Аллаға шүкір
+/// айтамын») all hit.
+fn is_religious_wellbeing(joined: &str) -> bool {
+    joined.contains("аллаға шүкір")
+        || joined.contains("аллаhа шүкір")
+        || joined.contains("құдайға шүкір")
+        || joined.contains("тәңірге шүкір")
+        || joined.contains("шүкіршілік")
 }
 
 fn detect_apology(tokens: &[String], joined: &str) -> bool {
