@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.8.9-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.8.10-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -22,8 +22,8 @@
 <p align="center">
   <img src="https://img.shields.io/badge/school%20program%20eval-159%2F159-2EA44F?style=flat-square" alt="school program 100%">
   <img src="https://img.shields.io/badge/conv%20dialog%20eval-52%2F52-2EA44F?style=flat-square" alt="conv dialog 100%">
-  <img src="https://img.shields.io/badge/safety%20eval-22%2F22-2EA44F?style=flat-square" alt="safety 100%">
-  <img src="https://img.shields.io/badge/real%20audit-26%2F26-2EA44F?style=flat-square" alt="real audit 100%">
+  <img src="https://img.shields.io/badge/safety%20eval-21%2F22%20strict%20·%2022%2F22%20sem-FBC02D?style=flat-square" alt="safety 21/22 strict · 22/22 semantic">
+  <img src="https://img.shields.io/badge/real%20audit-21%2F26%20strict%20·%2026%2F26%20sem-FBC02D?style=flat-square" alt="real audit 21/26 strict · 26/26 semantic">
   <img src="https://img.shields.io/badge/speech%20defect-47%2F71-FBC02D?style=flat-square" alt="speech defect 66%">
   <img src="https://img.shields.io/badge/multi--turn%20required-11%2F11-2EA44F?style=flat-square" alt="multi-turn 11/11">
   <img src="https://img.shields.io/badge/production%20p50-13.6%20ms-2EA44F?style=flat-square" alt="production p50">
@@ -60,18 +60,21 @@ ADAM_V6_2=1 ./target/release/adam_chat
 
 ---
 
-## What's new in v6.8.9
+## What's new in v6.8.10
 
-**L4.5 → L4.9 architectural arc — typed cross-turn dialog state.** The v6.8.x line consolidated v6.8.0's hybrid stack into a complete multi-turn substrate: typed `DialogueMove` / `DiscourseState` with statused commitments, typed `Referent` stack for anaphora, typed `ProofObject` carried through to the emitted text, and a `ProcedureIR` foundation for the industrial-pilot product line.
+**L4.5 → L4.9 architectural arc** + **three voice-REPL audit fixes** (T35 pain acknowledgement / T19+T21 «көлде» locative / T4 religious wellbeing).  The v6.8.x line consolidated v6.8.0's hybrid stack into a complete multi-turn substrate: typed `DialogueMove` / `DiscourseState` with statused commitments, typed `Referent` stack for anaphora, typed `ProofObject` carried through to the emitted text, and a `ProcedureIR` foundation for the industrial-pilot product line.
 
-| Suite | Accepted | Probes | Score | Δ from v6.8.0 |
-|---|---:|---:|---:|---:|
-| `school_program_eval` (14 subjects) | 159 | 0 | **100 %** | — |
-| `conv_dialog_eval` (real voice REPL + scripted) | 52 | 31 | **100 %** | — |
-| `safety_eval` (13 categories, Codex release gate) | 22 | 32 | **100 %** | +2 cases |
-| `v6_7_real_audit_eval` | 26 | 0 | **100 %** | +4 pp (was 96 %) |
-| `speech_defect_eval` (8 defect categories) | 71 | 9 | **66 %** | **+14 pp** (was 52 %) |
-| `multi_turn_eval_v686` (NEW — Codex's gate) | 11 | 2 | **100 %** required | NEW |
+| Suite | Accepted | Probes | Strict | Semantic | Δ from v6.8.0 |
+|---|---:|---:|---:|---:|---:|
+| `school_program_eval` (14 subjects) | 159 | 0 | **100 %** | **100 %** | — |
+| `conv_dialog_eval` (real voice REPL + scripted) | 52 | 31 | **100 %** | **100 %** | — |
+| `safety_eval` (13 categories, release gate) | 22 | 32 | 95 % | **100 %** | +2 cases |
+| `v6_7_real_audit_eval` | 26 | 0 | 81 % | **100 %** | +4 pp (was 96 % semantic) |
+| `speech_defect_eval` (8 defect categories) | 71 | 9 | **66 %** | **66 %** | **+14 pp** (was 52 %) |
+| `multi_turn_eval_v686` (NEW — Codex's gate) | 11 | 2 | **100 %** required | n/a | NEW |
+| `adversarial_dialog_v1` | 95 | 0 | **100 %** | **100 %** | — |
+
+**Strict vs semantic** — `strict` is exact-string match against the eval's `expected_response`; `semantic` is a meaning-equivalence check that admits paraphrase, ordering, and morphological variation around the same factual core.  When strict ≠ semantic, the dashboard reports both honestly (per external advisor review 2026-06-23).
 
 Headline architectural pieces, by milestone:
 
@@ -194,7 +197,7 @@ KazMMLU ([arXiv:2502.12829](https://arxiv.org/abs/2502.12829), 23 k Kazakh + Rus
 
 | Model | KazMMLU | Resource cost |
 |---|---|---|
-| **adam v6.8.9** | own 5-suite production dashboard (`school_program` 159 / 159 · `conv_dialog` 52 / 52 · `safety` 22 / 22 · `real_audit` 26 / 26 · `speech_defect` 47 / 71 = 66 %) + `multi_turn_eval` 11 / 11 required | **314 MB RSS · 0 GPU · $0** |
+| **adam v6.8.10** | own 5-suite dashboard reported strict + semantic (`school_program` 159 / 159 · `conv_dialog` 52 / 52 · `safety` 21 / 22 strict · 22 / 22 sem · `real_audit` 21 / 26 strict · 26 / 26 sem · `speech_defect` 47 / 71) + `multi_turn` 11 / 11 required | **314 MB RSS · 0 GPU · $0** |
 | GPT-4o | 76.6 % | API only · $2.50 / $10 per 1 M tok |
 | DeepSeek V3 | 76.9 % | self-host or API |
 | Llama 3.1 70B | 56.2 % | ~140 GB FP16 · 2–4× H100 |
@@ -212,9 +215,9 @@ See [`docs/COMPARISON.md`](docs/COMPARISON.md) for the full table (hallucination
 | Workspace test files | 274 (across 28 crates + 10 tools; run `cargo test --release --workspace --locked` for live counts) |
 | `school_program_eval` | **159 / 159 = 100 %** semantic (14 subjects via `respond_full`) |
 | `conv_dialog_eval` | **52 / 52 = 100 %** semantic (44 real voice REPL turns + 39 scripted; 31 probes) |
-| `safety_eval` | **22 / 22 = 100 %** semantic (13 categories, Codex release gate; 32 probes) |
-| `v6_7_real_audit_eval` | **26 / 26 = 100 %** semantic |
-| `speech_defect_eval` | 47 / 71 = 66 % semantic (8 defect categories; v6.8.9 +14 pp via destutter + phonetic substitute) |
+| `safety_eval` | 21 / 22 = 95 % strict · **22 / 22 = 100 %** semantic (13 categories, release gate; 32 probes) |
+| `v6_7_real_audit_eval` | 21 / 26 = 81 % strict · **26 / 26 = 100 %** semantic |
+| `speech_defect_eval` | 47 / 71 = 66 % strict + semantic (8 defect categories; v6.8.9 +14 pp via destutter + phonetic substitute) |
 | `multi_turn_eval_v686` (NEW) | **11 / 11 = 100 %** required + 2 / 6 probes documenting remaining gaps |
 | v6.2 dialog battery | 79 / 79 must-pass, 0 gaps (CI quality gate `dialog_battery_meets_quality_gate`) |
 | Production cascade latency (M2 Air, 30-query battery) | **13.6 ms p50** · 19.6 ms p95 · **314 MB peak RSS** |

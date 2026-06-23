@@ -3,6 +3,15 @@
 # run from a crate subdirectory).  Same Rust artefacts as the
 # root /target — never tracked.
 **/target/
+# **v6.8.10 — 2026-06-23 external advisor flag.**  Live REPL
+# sessions append to this file via the rejection-detector journal
+# (`crate::adam_voice_repl_v6_3::session_journal::correction_persisted`).
+# It is a RUNTIME artefact, not a source of truth — tracking it
+# meant every voice REPL session left a dirty working tree.  The
+# file is untracked from v6.8.10 onward; runtime continues to
+# write to it.  History is preserved in git as the file was
+# tracked through v6.8.9.
+data/mistake_corrections.jsonl
 .DS_Store
 /.idea
 /.vscode
