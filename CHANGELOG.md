@@ -28,6 +28,138 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.8.9] — 2026-06-23 — L4.5 → L4.9 typed cross-turn dialog state + industrial-pilot foundation
+
+**Stripe — Deterministic AI research.** Consolidates the L4.5
+Codex-architecture arc (typed `DialogueMove` / `DiscourseState`
+with statused commitments + typed `Referent` stack for anaphora +
+`ProofObject` carried through to emitted text) shipped over a
+single session.  Five tagged milestones (L4.5 → L4.9):
+
+### L4.5 Phase 2 — DiscourseState with statused commitments + correction lifecycle
+
+- `Conversation::discourse_state: DiscourseState` carries
+  `commitments: Vec<CommitmentRecord>` (Proposed → Accepted →
+  Rejected → Contested) AND `referents: Vec<Referent>`
+  (Person / Place / Organisation / Procedure / Generic).
+- Name corrections («Жоқ, X емес, Y.») now emit explicit
+  «Түзеттім — атыңызды Y деп есте сақтадым.» acknowledgement,
+  mark prior X commitment Rejected, push fresh Y commitment.
+- Phase 2.E.2 anaphora — bare lifespan follow-up («Қанша жыл
+  өмір сүрді?») resolves to prior-turn Person referent.
+
+### L4.6 ProcedureIR — industrial-pilot foundation
+
+- `crates/adam-algebra/src/procedure.rs` — typed SOP record:
+  `id + title + applies_to + prerequisites + steps + hazards +
+  authorization + confirmation_gates + source` with currency
+  metadata (`version_date` + `retrieved_at` + ISO date
+  validation).
+- `crates/adam-dialog/src/procedure_loader.rs` — eager
+  `OnceLock`-cached load from `data/procedures/*.jsonl`.
+- 15 hand-authored procedures cited against current in-force
+  Kazakh regulations: Кодекс труда РК ст. 414-V с поправками
+  **2024-04-15** (10 procedures across охрана труда / metallurgy
+  / automotive / construction), ГОСТ 12.x series (long-lived
+  state standards still in force), ПУЭ-7 (electrical safety).
+- `lookup_procedure(input)` cascade handler resolves pilot-style
+  queries («СИЗ беру тәртібі қандай?» / «Порядок выдачи СИЗ?»
+  RU code-switch) to full step-by-step responses with source
+  citation.
+- CI freshness lint (`procedure_fixtures::fixtures_carry_
+  currency_or_are_gost`) flags any procedure whose source
+  version date pre-dates a 5-year window and isn't a long-lived
+  state standard.
+
+### L4.7 Multi-turn eval framework — Codex's pre-LM gate
+
+- `crates/adam-dialog/src/multi_turn_eval.rs` — data-driven
+  schema (`MultiTurnCase { id, description, expected_to_pass,
+  turns }`) with typed `TurnAssertion`
+  (`response_contains` / `session_slot_equals` /
+  `referent_present` / `commitment_status`).
+- Required (`expected_to_pass=true`) cases gate CI; probes
+  (`=false`) capture documented gaps without breaking the
+  build — same semantics as the single-turn `was_accepted`
+  flag.
+- 13 starter cases under `data/eval_multi_turn/*.jsonl`:
+  11 required (correction lifecycle, anaphora, procedure
+  retrieval, code-switch, capability) + 2 probes
+  (language switch, bare-«Жоқ» correction).
+
+### L4.8 PropertyQueryIR — anaphora generalisation
+
+- Generalises Phase 2.E.2 lifespan anaphora pattern to
+  birthplace («Қайда туылды?»), occupation («Кім болған?»),
+  procedure step count («Қанша қадам бар?»), procedure
+  responsible role («Кім жауапты?»).
+- New `ReferentKind::Procedure` (token = procedure id);
+  `lookup_procedure_matched` returns the matched procedure id;
+  `answer_with_corpus_full` returns enriched `RouterAnswer`
+  carrying the id so the conversation can push a fresh
+  Procedure referent after the procedure handler fires.
+- Subtle bug fix: `push_referent` dedupe path was refreshing
+  `turn_id` to the latest mention; the cascade's «prior-turn
+  referent» filter needed introduction-turn semantics.
+  Dedupe now preserves the original `turn_id`.
+
+### L4.9 Input normalizer — speech-defect candidate rescoring
+
+- `crates/adam-dialog/src/input_normalizer.rs` — pre-processor
+  runs BEFORE `Conversation::turn`'s cascade.  Critical: safety
+  capture (`raw_input_for_safety`) is taken BEFORE
+  normalisation, so the safety guard can never lose a crisis
+  phrase to a pre-cascade rewrite.
+- **D.1 destutter** — collapses «`Са-сә-сәлем`» → «сәлем»
+  via per-token onset-prefix collapse, gated on
+  «1..=3-char onset + first-letter match» so legitimate
+  hyphenated compounds («наряд-рұқсат») stay untouched.
+- **D.2 phonetic substitute** — token-level Kazakh-aware
+  Levenshtein replacement against a shared OnceLock vocab
+  built from `data/world_core/*.jsonl` + 15 curated
+  greetings.  Extends `kazakh_fuzzy::PHONETIC_PAIRS` with
+  three defect-reverse pairs (л↔й lambdacism / ф↔с
+  sigmatism / х↔қ kappacism).
+- Two guards from CI feedback: ASCII-only token skip
+  (English code-tutor loanwords stay untouched) +
+  minimum-length 6 (5-char Kazakh particles like «керек»
+  collide with rare world_core entries via single-sub).
+- Threshold 0.90 — single phonetic substitution against a
+  5-12 char target scores ≥ 0.92 (passes); a one-char
+  insertion / random substitution scores ~0.86 (rejected).
+  Morphology preserved + 6 new defect cases pass.
+
+### Production eval dashboard at v6.8.9
+
+| Suite | Score | Δ from v6.8.0 |
+|---|---|---|
+| `school_program_eval` | **159/159 = 100 %** | — |
+| `conv_dialog_eval` | **52/52 = 100 %** | — |
+| `safety_eval` | **22/22 = 100 %** | +2 cases |
+| `v6_7_real_audit_eval` | **26/26 = 100 %** | +4 pp |
+| `speech_defect_eval` | **47/71 = 66 %** | **+14 pp** |
+| `multi_turn_eval_v686` (NEW) | **11/11 = 100 %** required | NEW |
+
+### Tagged milestones (intermediate)
+
+- `v6.8.5` — L4.6 ProcedureIR foundation
+- `v6.8.6` — L4.7 multi-turn eval framework
+- `v6.8.7` — L4.8 PropertyQueryIR (person + procedure
+  attributes)
+- `v6.8.8` — L4.9 D.1 destutter
+- `v6.8.9` — L4.9 D.2 phonetic_substitute + hotfix
+  (this release)
+
+### Roadmap (post-v6.8.9)
+
+Two probes remain open in `multi_turn_eval_v686`:
+`language_switch_mid_dialog` and
+`correction_without_replacement_probe`.  Three speech-defect
+categories still hold most of the open gap (elderly 5 / 12,
+sigmatism 4 / 7, whisper 7 / 10) — case-specific work that
+should follow a real voice-REPL audit rather than eval-driven
+speculation.
+
 ## [6.8.0] — 2026-06-17 — production hybrid stack + eval infrastructure consolidation
 
 **Stripe — Deterministic AI research.** Consolidates the v6.6

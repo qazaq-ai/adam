@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.8.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.8.9-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -22,9 +22,10 @@
 <p align="center">
   <img src="https://img.shields.io/badge/school%20program%20eval-159%2F159-2EA44F?style=flat-square" alt="school program 100%">
   <img src="https://img.shields.io/badge/conv%20dialog%20eval-52%2F52-2EA44F?style=flat-square" alt="conv dialog 100%">
-  <img src="https://img.shields.io/badge/safety%20eval-20%2F20-2EA44F?style=flat-square" alt="safety 100%">
-  <img src="https://img.shields.io/badge/v6.7%20real%20audit-25%2F26-2EA44F?style=flat-square" alt="real audit 96%">
-  <img src="https://img.shields.io/badge/speech%20defect%20baseline-37%2F71-FBC02D?style=flat-square" alt="speech defect baseline 52%">
+  <img src="https://img.shields.io/badge/safety%20eval-22%2F22-2EA44F?style=flat-square" alt="safety 100%">
+  <img src="https://img.shields.io/badge/real%20audit-26%2F26-2EA44F?style=flat-square" alt="real audit 100%">
+  <img src="https://img.shields.io/badge/speech%20defect-47%2F71-FBC02D?style=flat-square" alt="speech defect 66%">
+  <img src="https://img.shields.io/badge/multi--turn%20required-11%2F11-2EA44F?style=flat-square" alt="multi-turn 11/11">
   <img src="https://img.shields.io/badge/production%20p50-13.6%20ms-2EA44F?style=flat-square" alt="production p50">
   <img src="https://img.shields.io/badge/peak%20RSS-314%20MB-2EA44F?style=flat-square" alt="peak RSS">
   <img src="https://img.shields.io/badge/0%20GPU%20%2F%200%20network-2EA44F?style=flat-square" alt="0 GPU / 0 network">
@@ -59,21 +60,26 @@ ADAM_V6_2=1 ./target/release/adam_chat
 
 ---
 
-## What's new in v6.8.0
+## What's new in v6.8.9
 
-**Production hybrid stack + five-suite eval infrastructure.** Consolidates the v6.6 generative pivot and v6.7 staged training breakthrough into a single shipped release with verifiable trust signals. Five production eval suites measured against the full `respond_full` cascade (`ADAM_V6_2=1`):
+**L4.5 → L4.9 architectural arc — typed cross-turn dialog state.** The v6.8.x line consolidated v6.8.0's hybrid stack into a complete multi-turn substrate: typed `DialogueMove` / `DiscourseState` with statused commitments, typed `Referent` stack for anaphora, typed `ProofObject` carried through to the emitted text, and a `ProcedureIR` foundation for the industrial-pilot product line.
 
-| Suite | Accepted | Probes | Score |
-|---|---:|---:|---:|
-| `school_program_eval` (14 subjects) | 159 | 0 | **100 %** |
-| `conv_dialog_eval` (real voice REPL + scripted) | 52 | 31 | **100 %** |
-| `safety_eval` (13 categories, Codex release gate) | 20 | 32 | **100 %** |
-| `v6_7_real_audit_eval` | 26 | 0 | **96 %** |
-| `speech_defect_eval` (8 defect categories) | 71 | 9 | 52 % honest baseline |
+| Suite | Accepted | Probes | Score | Δ from v6.8.0 |
+|---|---:|---:|---:|---:|
+| `school_program_eval` (14 subjects) | 159 | 0 | **100 %** | — |
+| `conv_dialog_eval` (real voice REPL + scripted) | 52 | 31 | **100 %** | — |
+| `safety_eval` (13 categories, Codex release gate) | 22 | 32 | **100 %** | +2 cases |
+| `v6_7_real_audit_eval` | 26 | 0 | **100 %** | +4 pp (was 96 %) |
+| `speech_defect_eval` (8 defect categories) | 71 | 9 | **66 %** | **+14 pp** (was 52 %) |
+| `multi_turn_eval_v686` (NEW — Codex's gate) | 11 | 2 | **100 %** required | NEW |
 
-The headline shift is **stack measurement honesty**: the LM-only `respond` binary reports the v6.7 generative head ceiling alone (school 78 %); the `respond_full` binary runs the full deterministic cascade + world_core domain index (school **100 %**). All five suites are measured against `respond_full` — no LM-only scoring in the dashboard.
+Headline architectural pieces, by milestone:
 
-v6.8 also closes three production routing gaps (global `red_flags::detect` hoist at `Conversation::turn()`, weapon / harm-other marker expansion, past-tense math verbs), surfaced by the new suites and patched in [c67b37b3](https://github.com/qazaq-ai/adam/commit/c67b37b3).
+- **L4.5 Phase 2** — `Conversation::discourse_state: DiscourseState` carries `commitments: Vec<CommitmentRecord>` (Proposed/Accepted/Rejected/Contested) AND `referents: Vec<Referent>` (Person/Place/Org/Procedure/Generic). Name corrections («Жоқ, X емес, Y.») now emit the explicit «Түзеттім — атыңызды Y деп есте сақтадым.» acknowledgement.
+- **L4.6 ProcedureIR** — typed SOP records (`steps + prerequisites + hazards + authorization + source_with_version_date`) under [`data/procedures/labor_safety_kz.jsonl`](data/procedures/labor_safety_kz.jsonl). 15 hand-authored procedures cited against current Kazakh regulations (Кодекс труда РК ст. 414-V с поправками 2024-04-15 + ГОСТ + ПУЭ-7). Pilot-style queries («СИЗ беру тәртібі қандай?») resolve to full step-by-step responses with source citation.
+- **L4.7 Multi-turn eval framework** — `data/eval_multi_turn/*.jsonl` data-driven cases with typed `TurnAssertion` (`response_contains`, `session_slot_equals`, `referent_present`, `commitment_status`). Required + probe split mirrors the single-turn `was_accepted` semantics.
+- **L4.8 PropertyQueryIR** — anaphora-aware handlers generalised from lifespan (Phase 2.E.2) to birthplace, occupation, procedure step count, procedure responsible role. «Қайда туылды?» after a biographical intro now resolves to the prior-turn person referent.
+- **L4.9 Input normalizer** — D.1 destutter («Са-сә-сәлем» → «сәлем») + D.2 phonetic substitute (rhotacism / lambdacism / sigmatism / kappacism reverse maps via the extended `kazakh_fuzzy` phonetic-pair table) — runs BEFORE the cascade, leaves the raw-input safety capture intact.
 
 Full release history: [CHANGELOG.md](CHANGELOG.md).
 
@@ -188,7 +194,7 @@ KazMMLU ([arXiv:2502.12829](https://arxiv.org/abs/2502.12829), 23 k Kazakh + Rus
 
 | Model | KazMMLU | Resource cost |
 |---|---|---|
-| **adam v6.8.0** | own 5-suite production dashboard (`school_program` 159 / 159 · `conv_dialog` 52 / 52 · `safety` 20 / 20 · `real_audit` 24 / 26 · `speech_defect` 37 / 71 honest baseline) | **314 MB RSS · 0 GPU · $0** |
+| **adam v6.8.9** | own 5-suite production dashboard (`school_program` 159 / 159 · `conv_dialog` 52 / 52 · `safety` 22 / 22 · `real_audit` 26 / 26 · `speech_defect` 47 / 71 = 66 %) + `multi_turn_eval` 11 / 11 required | **314 MB RSS · 0 GPU · $0** |
 | GPT-4o | 76.6 % | API only · $2.50 / $10 per 1 M tok |
 | DeepSeek V3 | 76.9 % | self-host or API |
 | Llama 3.1 70B | 56.2 % | ~140 GB FP16 · 2–4× H100 |
@@ -206,9 +212,10 @@ See [`docs/COMPARISON.md`](docs/COMPARISON.md) for the full table (hallucination
 | Workspace test files | 274 (across 28 crates + 10 tools; run `cargo test --release --workspace --locked` for live counts) |
 | `school_program_eval` | **159 / 159 = 100 %** semantic (14 subjects via `respond_full`) |
 | `conv_dialog_eval` | **52 / 52 = 100 %** semantic (44 real voice REPL turns + 39 scripted; 31 probes) |
-| `safety_eval` | **20 / 20 = 100 %** semantic (13 categories, Codex release gate; 32 probes) |
-| `v6_7_real_audit_eval` | 25 / 26 = 96 % semantic |
-| `speech_defect_eval` | 37 / 71 = 52 % semantic (honest baseline; 8 defect categories) |
+| `safety_eval` | **22 / 22 = 100 %** semantic (13 categories, Codex release gate; 32 probes) |
+| `v6_7_real_audit_eval` | **26 / 26 = 100 %** semantic |
+| `speech_defect_eval` | 47 / 71 = 66 % semantic (8 defect categories; v6.8.9 +14 pp via destutter + phonetic substitute) |
+| `multi_turn_eval_v686` (NEW) | **11 / 11 = 100 %** required + 2 / 6 probes documenting remaining gaps |
 | v6.2 dialog battery | 79 / 79 must-pass, 0 gaps (CI quality gate `dialog_battery_meets_quality_gate`) |
 | Production cascade latency (M2 Air, 30-query battery) | **13.6 ms p50** · 19.6 ms p95 · **314 MB peak RSS** |
 | Algebra micro-path latency | ~470 ns avg · ~600 ns p95 (algebra core only — not a fair head-to-head against full NLP) |

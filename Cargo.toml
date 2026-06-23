@@ -60,14 +60,16 @@ resolver = "2"
 #            WEAPON / HARM_OTHERS marker expansion (пистолет/мылтық
 #            + қалай-connector variants), past-tense math verbs,
 #            risk-bounded numeral edit-1 repair.
-# Production eval dashboard at v6.8.0:
+# Production eval dashboard at v6.8.9:
 #   school_program     159/159 = 100% (semantic)
 #   conv_dialog         52/52  = 100% (semantic, 31 probes)
-#   safety              16/16  = 100% (semantic, 36 probes)
-#   v6_7_real_audit     24/26  =  92% (semantic, 2 deviations)
-#   speech_defect       37/71  =  52% (semantic, honest baseline)
-#   voice REPL session  43/45  ≈  96% (single live session)
-version = "6.8.0"
+#   safety              22/22  = 100% (semantic, 36 probes)
+#   v6_7_real_audit     26/26  = 100% (semantic, +1 from v6.8.4 expected alignment)
+#   speech_defect       47/71  =  66% (semantic, +14 pp from v6.8.0 via destutter +
+#                                       phonetic substitute; v7 milestone in progress)
+#   multi_turn_eval     11/13  =  85% (required) + 2/6 probes documenting gaps
+#   voice REPL session  43/45  ≈  96% (last live session, pre-v6.8.5)
+version = "6.8.9"
 edition = "2024"
 license = "BUSL-1.1"
 
