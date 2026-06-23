@@ -1,0 +1,18 @@
+[package]
+name = "adam-eval-dashboard"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "v6.8.10 daily self-eval harness.  Runs every production eval suite + multi-turn eval + adversarial battery, emits a JSON snapshot stamped with the git SHA + working-tree state + Cargo workspace version, and exits non-zero when any required suite regresses below its baseline.  External advisor's 2026-06-23 review identified this as the pre-LM gate before any continuous-learning work — the dashboard had been silently drifting (safety reported 22/22 when strict was 21/22), so closing the measurement honesty gap comes first."
+
+[[bin]]
+name = "eval_dashboard"
+path = "src/main.rs"
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+clap = { version = "4.5", features = ["derive"] }
+
+[lints]
+workspace = true

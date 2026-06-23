@@ -188,6 +188,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "adam-eval-dashboard"
+version = "6.8.10"
+dependencies = [
+ "clap",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "adam-forced-aligner"
 version = "6.8.10"
 dependencies = [

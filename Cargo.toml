@@ -39,6 +39,7 @@ members = [
   "tools/ingest_kaz_tili",
   "tools/build_pcm_bank",
   "tools/build_morpheme_bank",
+  "tools/eval_dashboard",
 ]
 resolver = "2"
 
