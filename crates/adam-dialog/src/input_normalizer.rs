@@ -183,16 +183,8 @@ pub fn phonetic_substitute(input: &str, vocab: &[String], threshold: f32) -> Str
 }
 
 fn phonetic_substitute_token(token: &str, vocab: &[String], threshold: f32) -> String {
-    let (core, punct) = split_trailing_punct(token);
+    let (leading, core, trailing) = split_punct_around_core(token);
     let core_chars: Vec<char> = core.chars().collect();
-    // **D.2 fix.** Minimum length 6: 5-char Kazakh particles
-    // («керек», «қалай», «бойынша» prefix) are too ambiguous —
-    // one phonetic substitution against a world_core entry
-    // («терек» tree, «балай» misc) produces a 0.92-similarity
-    // false positive that corrupts perfectly clean input.  The
-    // sigmatism eval loses one «Фәлем» → «сәлем» case at this
-    // length floor; that's an acceptable tradeoff for keeping
-    // common Kazakh particles untouched.
     if core_chars.len() < 6 {
         return token.to_string();
     }
@@ -207,9 +199,11 @@ fn phonetic_substitute_token(token: &str, vocab: &[String], threshold: f32) -> S
     // the code-tutor cascade; vocab is exclusively Kazakh, so a
     // best-match against vocab would inevitably rewrite a real
     // English term to a phonetically-similar Kazakh word and
-    // corrupt the cascade input.  ASCII tokens that ARE
-    // misspelled English get caught elsewhere (the Rust
-    // curriculum keyword matcher handles its own typos).
+    // corrupt the cascade input.  Rust attributes like
+    // `#[instrument]` are caught here too: the
+    // `split_punct_around_core` helper strips the leading `#[`
+    // and trailing `]` so the bracket-wrapped core («instrument»)
+    // reaches the all-ASCII-alphabetic check unobscured.
     if core_chars.iter().all(|c| c.is_ascii_alphabetic()) {
         return token.to_string();
     }
@@ -218,7 +212,7 @@ fn phonetic_substitute_token(token: &str, vocab: &[String], threshold: f32) -> S
         return token.to_string();
     }
     if let Some((best, _score)) = crate::kazakh_fuzzy::best_match(&lower, vocab, threshold) {
-        return format!("{best}{punct}");
+        return format!("{leading}{best}{trailing}");
     }
     token.to_string()
 }
@@ -320,7 +314,8 @@ const CURATED_HIGH_FREQ: &[&str] = &[
 
 /// Split a token into its alphabetic core and trailing
 /// punctuation.  «сәлем.» → («сәлем», «.»); «сәлем» → («сәлем»,
-/// «»).
+/// «»).  Used by destutter (whose stutter pattern lives in the
+/// core and dash-segments don't have leading punct).
 fn split_trailing_punct(token: &str) -> (&str, &str) {
     let mut split_at = token.len();
     for (i, ch) in token.char_indices().rev() {
@@ -333,6 +328,35 @@ fn split_trailing_punct(token: &str) -> (&str, &str) {
         return (token, "");
     }
     token.split_at(split_at)
+}
+
+/// Split a token into `(leading_punct, core, trailing_punct)`
+/// where `core` carries only alphanumeric characters (plus
+/// internal hyphens).  «`#[instrument]`» → («`#[`», «instrument»,
+/// «`]`»); «сәлем.» → («», «сәлем», «.»).  Used by
+/// `phonetic_substitute_token` so a Rust attribute or bracketed
+/// English term doesn't fall through the ASCII-alpha guard
+/// just because its leading bracket isn't alphanumeric.
+fn split_punct_around_core(token: &str) -> (&str, &str, &str) {
+    // Find first alphanumeric — leading punct ends there.
+    let first_alpha = token
+        .char_indices()
+        .find(|(_, c)| c.is_alphanumeric())
+        .map(|(i, _)| i);
+    let Some(start) = first_alpha else {
+        return ("", "", token);
+    };
+    // Find last alphanumeric — trailing punct starts after it.
+    let last_alpha_end = token
+        .char_indices()
+        .rev()
+        .find(|(_, c)| c.is_alphanumeric())
+        .map(|(i, c)| i + c.len_utf8())
+        .unwrap_or(token.len());
+    let leading = &token[..start];
+    let core = &token[start..last_alpha_end];
+    let trailing = &token[last_alpha_end..];
+    (leading, core, trailing)
 }
 
 #[cfg(test)]
@@ -428,5 +452,33 @@ mod tests {
         let r = normalize("Сәлем!");
         assert_eq!(r.normalized, "Сәлем!");
         assert!(r.corrections.is_empty());
+    }
+
+    /// **Regression coverage (D.2 hotfix v2).** Rust attributes
+    /// like `#[instrument]` carry brackets around an English-
+    /// alphabetic core.  Before `split_punct_around_core`, the
+    /// leading `#[` was retained as part of `core` and the
+    /// ASCII-alpha guard didn't fire — best_match then returned
+    /// a punctuated form that, with the trailing bracket
+    /// re-appended, produced «`#[instrument]]`» (extra bracket
+    /// at the end).  This caused
+    /// `rust_async_book_chapter_08_holdout::async8_instrument`
+    /// to drop to 17/18.  Fix: strip leading + trailing punct
+    /// around the core, then guard on the core's ASCII shape.
+    #[test]
+    fn normalize_preserves_rust_attribute_with_brackets() {
+        let r = normalize("#[instrument] деген не?");
+        assert_eq!(r.normalized, "#[instrument] деген не?");
+        assert!(
+            r.corrections.is_empty(),
+            "Rust attribute must pass through; corrections: {:?}",
+            r.corrections,
+        );
+    }
+
+    #[test]
+    fn normalize_preserves_bracketed_english_term() {
+        let r = normalize("[ownership] қалай жұмыс істейді?");
+        assert_eq!(r.normalized, "[ownership] қалай жұмыс істейді?");
     }
 }
