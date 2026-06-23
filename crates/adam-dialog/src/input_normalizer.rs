@@ -207,11 +207,36 @@ fn phonetic_substitute_token(token: &str, vocab: &[String], threshold: f32) -> S
     if core_chars.iter().all(|c| c.is_ascii_alphabetic()) {
         return token.to_string();
     }
+    // **D.2 hotfix v3.** Skip tokens whose core contains INNER
+    // punctuation — generic-parameterised Rust types like
+    // «`Arc<Mutex>`» / «`Vec<T>`» / «`Result<T,E>`» have
+    // alphanumeric chars on both ends, so split_punct_around_core
+    // keeps the inner `<` `>` `,` inside `core`.  A phonetic-defect
+    // pattern is by definition a single-word phoneme substitution
+    // and never spans punctuation, so the safe move is to skip
+    // any token whose core isn't alphanumeric-plus-hyphen.
+    if core_chars.iter().any(|c| !c.is_alphanumeric() && *c != '-') {
+        return token.to_string();
+    }
     let lower = core.to_lowercase();
     if vocab.iter().any(|v| v.to_lowercase() == lower) {
         return token.to_string();
     }
     if let Some((best, _score)) = crate::kazakh_fuzzy::best_match(&lower, vocab, threshold) {
+        // **D.2 hotfix v3.** Candidate length must be ≥ input
+        // length.  Speech defects substitute or drop characters
+        // — the canonical form is always EQUAL or LONGER than
+        // the defective form.  Without this guard, agglutinative
+        // morphology suffixes («университет-і» → «университет»)
+        // get treated as defect-fixes and stripped, corrupting
+        // any genitive / possessive construction.  Saw it caught
+        // by `v6_0_6_audit_regression::round4b_kru_university_
+        // definition_question_surfaces_grounded_fact`.
+        let input_len = lower.chars().count();
+        let cand_len = best.chars().count();
+        if cand_len < input_len {
+            return token.to_string();
+        }
         return format!("{leading}{best}{trailing}");
     }
     token.to_string()
@@ -480,5 +505,45 @@ mod tests {
     fn normalize_preserves_bracketed_english_term() {
         let r = normalize("[ownership] қалай жұмыс істейді?");
         assert_eq!(r.normalized, "[ownership] қалай жұмыс істейді?");
+    }
+
+    /// **Regression coverage (D.2 hotfix v3).** Generic-parameterised
+    /// Rust types like «`Arc<Mutex>`» / «`Vec<T>`» have alphanumeric
+    /// chars on both ends so split_punct_around_core keeps the
+    /// inner `<` / `>` inside `core`.  Before the inner-punct
+    /// guard, best_match would run against `arc<mutex` and return
+    /// a punctuated form that produced «`arc<mutex>>`» (extra `>`).
+    /// This caused `rust_book_chapter_16_holdout::ch16_arc_mutex`
+    /// to drop to 17/18.
+    #[test]
+    fn normalize_preserves_generic_type_with_angle_brackets() {
+        let r = normalize("Arc<Mutex> деген не?");
+        assert_eq!(r.normalized, "Arc<Mutex> деген не?");
+        assert!(r.corrections.is_empty());
+    }
+
+    #[test]
+    fn normalize_preserves_result_with_comma_inside() {
+        let r = normalize("Result<T,E> қалай жұмыс істейді?");
+        assert_eq!(r.normalized, "Result<T,E> қалай жұмыс істейді?");
+    }
+
+    /// **Regression coverage (D.2 hotfix v3 — morphology-preserving
+    /// length guard).** Kazakh agglutinative morphology suffixes
+    /// (possessive `-і`, locative `-те`, dative `-ге`, etc.) lengthen
+    /// the root.  Before the candidate-length guard, the
+    /// possessive «университет-і» would score ≈ 0.92 against the
+    /// shorter root «университет» (1-char edit / 12 chars) and
+    /// get stripped down to the bare root, breaking the cascade's
+    /// understanding of the genitive construction.
+    /// `v6_0_6_audit_regression::round4b_kru_university_definition_
+    /// question_surfaces_grounded_fact` caught this.
+    #[test]
+    fn normalize_preserves_morphology_suffix() {
+        let r = normalize("Қостанай өңірлік университеті деген не?");
+        assert_eq!(
+            r.normalized, "Қостанай өңірлік университеті деген не?",
+            "morphology suffix (-і possessive) must be preserved",
+        );
     }
 }
