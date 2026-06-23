@@ -777,27 +777,57 @@ fn handle_listing_query(input: &str) -> Option<String> {
     // alongside the К forms. Live REPL: «Қазастанда қандай таулар
     // бар» got `mentions_kz = false` because only К-prefix
     // «казас» was listed; Shirali's «қазас» wasn't covered.
+    // **v6.8.10 — voice REPL audit 2026-06-23 turn 19.**  When the
+    // user says «біздің жерімізде» («in our country») without an
+    // explicit «Қазақстан», that's an implicit Kazakhstan
+    // reference — adam is a Kazakh-first system and the speaker
+    // is asking about local geography.  Add «жеріміз» as a third
+    // anchor alongside the existing country-name surfaces.  Only
+    // co-occurs with the «қандай … бар» inventory shape, so the
+    // false-positive risk on unrelated «жеріміз» mentions is
+    // bounded.
     let mentions_kz = lower.contains("қазақ")
         || lower.contains("казақ")
         || lower.contains("казах")
         || lower.contains("қазах")
         || lower.contains("казас")
-        || lower.contains("қазас");
-    if mentions_kz && (lower.contains("таулар") || lower.contains("тау бар")) {
+        || lower.contains("қазас")
+        || lower.contains("жеріміз");
+    // **v6.8.10 — voice REPL audit 2026-06-23 turn 19 / 21.**  Users
+    // sometimes utter the locative-singular form («көлде» / «тауда»
+    // / «өзенде») instead of the plural («көлдер»).  Both surfaces
+    // mean «what lakes are there» in spoken Kazakh; the previous
+    // trigger only caught the plural so the singular fell through
+    // to the definition handler and emitted nonsense («Мемлекет»
+    // for T21, an Abay quote about «көл» for T19).  Add the
+    // locative variants alongside the existing plural triggers.
+    let asks_mountains = lower.contains("таулар")
+        || lower.contains("тау бар")
+        || lower.contains("тауда")
+        || lower.contains("тауларда");
+    let asks_rivers = lower.contains("өзендер")
+        || lower.contains("өзен бар")
+        || lower.contains("өзенде")
+        || lower.contains("өзендерде");
+    let asks_lakes = lower.contains("көлдер")
+        || lower.contains("көл бар")
+        || lower.contains("көлде")
+        || lower.contains("көлдерде");
+    if mentions_kz && asks_mountains {
         return Some(
             "Қазақстандағы танымал таулар: Алатау, Алтай, Тянь-Шань, \
              Жетісу Алатауы, Хан Тәңірі (биік шың)."
                 .to_string(),
         );
     }
-    if mentions_kz && (lower.contains("өзендер") || lower.contains("өзен бар")) {
+    if mentions_kz && asks_rivers {
         return Some(
             "Қазақстанның негізгі өзендері: Ертіс, Сырдария, Іле, \
              Жайық, Есіл, Тобыл, Шу, Қаратал, Талас."
                 .to_string(),
         );
     }
-    if mentions_kz && (lower.contains("көлдер") || lower.contains("көл бар")) {
+    if mentions_kz && asks_lakes {
         return Some(
             "Қазақстанның негізгі көлдері: Балқаш, Зайсан, Алакөл, \
              Тенгіз, Маркакөл."
