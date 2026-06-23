@@ -173,10 +173,108 @@ pub fn answer_with_corpus_full(
 /// procedure matched by the procedure-retrieval handler on this
 /// turn.  Caller pushes a `ReferentKind::Procedure` referent so
 /// subsequent turns' attribute follow-ups resolve.
-#[derive(Debug, Clone, PartialEq, Eq)]
+///
+/// **v6.8.11 — active-uncertainty foundation (external advisor
+/// Q2 #1).**  Adds two confidence-tracking fields so future
+/// commits can route low-confidence outputs to an explicit
+/// `Clarify` shape rather than the «Бәлкім X» / random-Abay-quote
+/// fallback the v6.1 cascade lands on today.
+#[derive(Debug, Clone, PartialEq)]
 pub struct RouterAnswer {
     pub text: String,
     pub matched_procedure_id: Option<String>,
+    /// Confidence in `[0.0, 1.0]` — how strongly the route
+    /// believes the answer is grounded.  Curated lookups and
+    /// system-self responses score `1.0`; procedure retrieval
+    /// scores the keyword overlap normalised against `MIN_SCORE`;
+    /// the v6.1 legacy cascade scores `0.5` because we haven't
+    /// yet plumbed individual handler confidence through it.
+    /// A future commit will gate the «Бәлкім X» fallback on
+    /// `confidence < CLARIFY_THRESHOLD`.
+    pub confidence: f32,
+    /// Typed provenance of the answer — which class of evidence
+    /// produced it.  Used by the verifier + future Clarify
+    /// routing to decide whether to suppress a tentative reply.
+    pub evidence_kind: EvidenceKind,
+}
+
+/// Coarse-grained classification of where a `RouterAnswer`
+/// came from.  The set is intentionally small for v6.8.11; the
+/// router has dozens of handlers but the verifier only needs to
+/// know which kind of grounding to expect.  Future variants
+/// (`KGInference`, `CompositionalSynthesis`) can be added as
+/// new handler categories appear.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum EvidenceKind {
+    /// A curated `world_core` fact / hand-authored template —
+    /// the strongest evidence class.  e.g. «Қазақстанның
+    /// астанасы — Астана», capital lookups, identity templates.
+    CuratedFact,
+    /// adam describing itself / its capabilities / its
+    /// limitations.  Backed by `SystemIdentity`; no external
+    /// fact required.
+    SystemSelf,
+    /// Procedure retrieval hit — full SOP returned by
+    /// `lookup_procedure_matched` / its attribute siblings.
+    /// Carries the keyword-overlap score in
+    /// `RouterAnswer::confidence`.
+    ProcedureMatch,
+    /// Multi-fact synthesis (e.g. BornIn + DiedIn → lifespan).
+    /// Confidence is `1.0` when both source facts were
+    /// individually `CuratedFact`-grade.
+    SynthesisedFact,
+    /// Soft-tier acknowledgement (pain ack / wellness statement
+    /// / correction template).  Confidence is `1.0` because the
+    /// template is deterministic, but it is NOT a factual answer.
+    SoftAck,
+    /// The v6.1 legacy cascade — not yet split by handler.
+    /// Confidence defaults to `0.5` until the cascade is fully
+    /// migrated to typed handlers.  A future commit will replace
+    /// this catch-all with per-handler kinds.
+    LegacyCascade,
+}
+
+/// **v6.8.11.**  Confidence floor below which the cascade should
+/// emit `Clarify` rather than a tentative answer.  Tuned against
+/// the external advisor's Q2 #1 test sketch: a `ProcedureMatch`
+/// whose keyword-overlap normalised score drops below ~0.5
+/// usually means the user asked about a topic we don't have a
+/// procedure for; in that case «Қандай рәсім туралы сұрап
+/// жатырсыз?» is a better answer than a low-quality match.
+///
+/// Defined here so the threshold is one place, not scattered
+/// across the cascade.  Initial value is conservative;
+/// the first commit only exposes the field — the legacy cascade
+/// still emits its «Бәлкім X» fallback as before.
+pub const CLARIFY_THRESHOLD: f32 = 0.5;
+
+impl RouterAnswer {
+    /// Construct a `RouterAnswer` from a `text` + `evidence_kind`
+    /// pair.  Confidence defaults to `1.0`; callers with
+    /// score-based evidence (procedure match) should use
+    /// `with_confidence`.
+    pub fn from_text(text: String, evidence_kind: EvidenceKind) -> Self {
+        Self {
+            text,
+            matched_procedure_id: None,
+            confidence: 1.0,
+            evidence_kind,
+        }
+    }
+
+    /// Override confidence in place.  Returns `self` for fluent
+    /// construction: `RouterAnswer::from_text(...).with_confidence(0.83)`.
+    pub fn with_confidence(mut self, confidence: f32) -> Self {
+        self.confidence = confidence.clamp(0.0, 1.0);
+        self
+    }
+
+    /// Override matched_procedure_id in place.  Returns `self`
+    /// for fluent construction at the procedure handler call site.
+    pub fn with_procedure_id(mut self, procedure_id: String) -> Self {
+        self.matched_procedure_id = Some(procedure_id);
+        self
+    }
 }
 
 /// Variant that lets callers supply their own [`FrameIndex`] (used
@@ -210,28 +308,39 @@ fn answer_with_corpus_inner_full(
     // Procedure attribute follow-ups need to fire BEFORE the
     // main inner handler chain so a bare «Қанша қадам бар?» (no
     // explicit subject) reaches them before the v6.1 broad-topic
-    // fallback gets a chance to emit a clarification.
+    // fallback gets a chance to emit a clarification.  These
+    // attribute handlers fire only when a procedure referent is
+    // already on the discourse stack, so confidence is `1.0`
+    // (the retrieval that surfaced the referent already cleared
+    // its own threshold last turn).
     if let Some(text) = lookup_procedure_step_count(input, anaphora_procedure_id) {
-        return Some(RouterAnswer {
-            text,
-            matched_procedure_id: None,
-        });
+        return Some(RouterAnswer::from_text(text, EvidenceKind::ProcedureMatch));
     }
     if let Some(text) = lookup_procedure_authority(input, anaphora_procedure_id) {
-        return Some(RouterAnswer {
-            text,
-            matched_procedure_id: None,
-        });
+        return Some(RouterAnswer::from_text(text, EvidenceKind::ProcedureMatch));
     }
-    // Main cascade — String-returning chain.  When the procedure
-    // retrieval handler is the one that fires, we want to know
-    // which procedure it matched so the caller can record a
-    // referent; we rebuild the call here.
+    // Main cascade — String-returning chain.  We also re-run the
+    // procedure retrieval helper to recover both the matched id
+    // (for the discourse-state referent push) AND the keyword
+    // overlap score (for confidence calibration).
     let text = answer_with_corpus_inner_legacy(input, idx, lex, anaphora_subject)?;
-    let matched_procedure_id = lookup_procedure_matched(input).map(|(_, id)| id);
+    if let Some((_, id, normalised_score)) = lookup_procedure_matched_with_score(input) {
+        return Some(
+            RouterAnswer::from_text(text, EvidenceKind::ProcedureMatch)
+                .with_procedure_id(id)
+                .with_confidence(normalised_score),
+        );
+    }
+    // Legacy cascade — not yet split by handler.  Future commits
+    // will migrate individual handlers (lifespan, birthplace,
+    // capital lookups, …) to populate their own EvidenceKind
+    // (CuratedFact / SystemSelf / SynthesisedFact) so the
+    // confidence floor can become handler-specific.
     Some(RouterAnswer {
         text,
-        matched_procedure_id,
+        matched_procedure_id: None,
+        confidence: 0.5,
+        evidence_kind: EvidenceKind::LegacyCascade,
     })
 }
 
@@ -2385,6 +2494,20 @@ fn lookup_procedure(input: &str) -> Option<String> {
 /// бар?» / «Кім жауапты?» consults to fetch the procedure's
 /// `steps` / `authorization` fields by id.
 fn lookup_procedure_matched(input: &str) -> Option<(String, String)> {
+    lookup_procedure_matched_with_score(input).map(|(text, id, _)| (text, id))
+}
+
+/// **v6.8.11 — active-uncertainty foundation.**  Same as
+/// `lookup_procedure_matched` but also returns a normalised
+/// confidence score in `[0.0, 1.0]` for the keyword-overlap
+/// match.  Raw score is the integer sum from `score_procedure`;
+/// normalised = `raw / NORMALISE_CEILING`, clamped.  A match
+/// just above `MIN_SCORE` (2) scores ≈ 0.25; a strong match
+/// (typical pilot query against the exact fixture title) scores
+/// 0.8 – 1.0.  The cascade uses this in `RouterAnswer::
+/// confidence` so future Clarify routing can suppress weak
+/// matches.
+fn lookup_procedure_matched_with_score(input: &str) -> Option<(String, String, f32)> {
     use crate::procedure_loader::shared_procedures;
 
     let lower = input.to_lowercase();
@@ -2409,9 +2532,19 @@ fn lookup_procedure_matched(input: &str) -> Option<(String, String)> {
             best = Some((idx, score));
         }
     }
-    let (best_idx, _) = best?;
+    let (best_idx, raw_score) = best?;
+    // Normalisation ceiling tuned against the v6.8.5 fixture set:
+    // a pilot-style query against the right fixture typically
+    // scores 6–10 (multiple title_kk + applies_to overlaps), so
+    // dividing by 8 lands strong matches at ~0.75–1.25 (clamped
+    // to 1.0) and the weakest acceptable match (just above
+    // MIN_SCORE = 2) at 0.25.  Defined inline because it is
+    // intrinsic to the score_procedure cost model and shouldn't
+    // diverge from it.
+    const NORMALISE_CEILING: f32 = 8.0;
+    let normalised_score = (raw_score as f32 / NORMALISE_CEILING).clamp(0.0, 1.0);
     let proc = &shared_procedures()[best_idx];
-    Some((render_procedure(proc), proc.id.clone()))
+    Some((render_procedure(proc), proc.id.clone(), normalised_score))
 }
 
 /// **v6.8.7 L4.8 C.2 — procedure attribute query (step count).**
@@ -4747,5 +4880,46 @@ mod tests {
                 "must NOT classify as identity probe: {input}"
             );
         }
+    }
+
+    /// **v6.8.11 — active-uncertainty foundation.** Verify the
+    /// procedure-match path exposes a normalised confidence
+    /// score and `EvidenceKind::ProcedureMatch`.  Unit-tests
+    /// the helper directly to avoid pulling the whole cascade
+    /// + lexicon load path into the test.
+    #[test]
+    fn lookup_procedure_with_score_returns_normalised_confidence() {
+        let r = lookup_procedure_matched_with_score("СИЗ беру тәртібі қандай?");
+        let (_, id, score) = r.expect("procedure query must match");
+        assert_eq!(id, "kk_labor_ppe_002");
+        assert!(
+            score > CLARIFY_THRESHOLD,
+            "expected confidence > {CLARIFY_THRESHOLD}, got {score}",
+        );
+        assert!(score <= 1.0, "normalised must be ≤ 1.0, got {score}");
+    }
+
+    /// A non-procedure query never reaches the procedure
+    /// scorer; the helper returns None and the caller falls
+    /// through to the legacy cascade (which the cascade-level
+    /// wrapper will tag `EvidenceKind::LegacyCascade`).
+    #[test]
+    fn lookup_procedure_with_score_misses_non_procedure_query() {
+        assert!(lookup_procedure_matched_with_score("Сәлем!").is_none());
+        assert!(lookup_procedure_matched_with_score("2+2 қанша?").is_none());
+    }
+
+    /// `with_confidence` + `with_procedure_id` builders compose
+    /// cleanly and clamp the confidence to `[0.0, 1.0]`.
+    #[test]
+    fn router_answer_builders_compose_and_clamp() {
+        let r = RouterAnswer::from_text("test".into(), EvidenceKind::ProcedureMatch)
+            .with_confidence(1.5)
+            .with_procedure_id("p_001".into());
+        assert_eq!(r.confidence, 1.0); // clamped down
+        assert_eq!(r.matched_procedure_id.as_deref(), Some("p_001"));
+        let r2 =
+            RouterAnswer::from_text("test".into(), EvidenceKind::CuratedFact).with_confidence(-0.3);
+        assert_eq!(r2.confidence, 0.0); // clamped up
     }
 }
