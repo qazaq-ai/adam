@@ -27,5 +27,6 @@
 //!   then runs the 6-stage parts-work cycle.
 
 pub mod ifs;
+pub mod pain_acknowledge;
 pub mod pain_support;
 pub mod red_flags;

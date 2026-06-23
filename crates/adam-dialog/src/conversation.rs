@@ -3859,14 +3859,31 @@ impl Conversation {
         // v6.8.2 ORDER INVERSION that the previous `turn()` carried.
         // The full cascade still runs so the trace + session state
         // stay faithful; only the emitted reply is replaced.
-        let final_output =
-            if let Some(flag) = crate::wellness::red_flags::detect(&raw_input_for_safety) {
-                crate::wellness::red_flags::escalation_template(flag).to_string()
-            } else if let Some(class) = crate::safety_guard::check(&raw_input_for_safety) {
-                class.refusal().to_string()
-            } else {
-                final_output
-            };
+        let final_output = if let Some(flag) =
+            crate::wellness::red_flags::detect(&raw_input_for_safety)
+        {
+            crate::wellness::red_flags::escalation_template(flag).to_string()
+        } else if let Some(class) = crate::safety_guard::check(&raw_input_for_safety) {
+            class.refusal().to_string()
+        } else if let Some(ack) = crate::wellness::pain_acknowledge::detect(&raw_input_for_safety) {
+            // **v6.8.10 — voice REPL audit 2026-06-23 turn 35.**
+            // Non-acute body pain («белім ауырады», «басым ауыр»)
+            // sits between acute crisis (handled by red_flags
+            // above) and generic capability questions (which
+            // the cascade routes to AskAboutTopic).  Without
+            // this tier, T35 «Менің белім ауырад көмекте аласың
+            // ба?» got the 24-second «I'm just a language
+            // model» capability description — the wrong tier
+            // for someone reporting pain.  The acknowledgement
+            // is a fixed template (no slot substitution): names
+            // adam's limit (not a doctor), gives the standard
+            // non-emergency next step (GP / 103 if severe), and
+            // ends with an open follow-up so the user isn't
+            // conversationally dead-ended.
+            ack.to_string()
+        } else {
+            final_output
+        };
         // **v6.8.4 L4.5 Phase 2.D + 2.E.1 — repair turn handling.**
         // Detect a repair pattern in the RAW input («Жоқ, X емес,
         // Y» / «Нет, не X, а Y»).  When matched AND a prior user
