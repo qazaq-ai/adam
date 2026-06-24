@@ -336,6 +336,12 @@ fn answer_with_corpus_inner_full(
     if let Some(text) = lookup_procedure_source(input, anaphora_procedure_id) {
         return Some(RouterAnswer::from_text(text, EvidenceKind::ProcedureMatch));
     }
+    // v6.8.13 — numeric condition check
+    // («биіктік 1,5 м болса СИЗ керек пе?» evaluates against
+    // the prior procedure's `ProcedureStep.condition` field).
+    if let Some(text) = lookup_procedure_condition_check(input, anaphora_procedure_id) {
+        return Some(RouterAnswer::from_text(text, EvidenceKind::ProcedureMatch));
+    }
     // Main cascade — String-returning chain.  We also re-run the
     // procedure retrieval helper to recover both the matched id
     // (for the discourse-state referent push) AND the keyword
@@ -2841,6 +2847,95 @@ fn looks_like_procedure_source_query(input: &str) -> bool {
         || lower.contains("источник")
         || lower.contains("откуда это")
         || lower.contains("какой закон")
+}
+
+/// **v6.8.13 — procedure attribute query (numeric condition check).**
+/// Detects «<X> <N> <unit> болса <Y> керек пе?» (and Russian
+/// equivalents) — a numeric-input shape against a procedure
+/// step's `condition` field.  Iterates the prior procedure's
+/// steps; for each step with a parseable `ConditionExpr`,
+/// evaluates against the user's parsed `ConditionInput`.
+///
+/// Honest «I cannot answer» when:
+///   * no `?` / question intent in the input;
+///   * no parseable user input («<var> <num> <unit>» pattern
+///     absent);
+///   * no procedure step has a numeric condition;
+///   * variable / unit mismatch between user input and the
+///     procedure's stored conditions (typed mismatch ≠ guessing).
+fn lookup_procedure_condition_check(
+    input: &str,
+    anaphora_procedure_id: Option<&str>,
+) -> Option<String> {
+    if !looks_like_procedure_condition_query(input) {
+        return None;
+    }
+    let proc_id = anaphora_procedure_id?;
+    let user_input = adam_algebra::parse_condition_user_input(input)?;
+    let proc = crate::procedure_loader::shared_procedures()
+        .iter()
+        .find(|p| p.id == proc_id)?;
+    // Walk steps, find one whose condition parses AND matches the
+    // user's variable / unit.  First match wins — in v1 each step
+    // has at most one condition and the procedure has at most
+    // one step per variable (the current fixture set holds).
+    for step in &proc.steps {
+        let Some(cond_text) = step.condition.as_ref() else {
+            continue;
+        };
+        let Some(expr) = adam_algebra::parse_condition(cond_text) else {
+            continue;
+        };
+        if let Some(verdict) = adam_algebra::evaluate_condition(&expr, &user_input) {
+            return Some(render_condition_verdict(
+                &user_input,
+                verdict,
+                &proc.title_kk,
+                step,
+                cond_text,
+            ));
+        }
+    }
+    // Reached only when the user's input parsed but no step
+    // conditioned on a matching (var, unit).  Honest refusal —
+    // the procedure may have categorical conditions or different
+    // variables.
+    Some(format!(
+        "«{}» рәсімінде «{}» жөнінде сандық шарт жоқ — нақты жауап бере алмаймын.",
+        proc.title_kk, user_input.var,
+    ))
+}
+
+fn looks_like_procedure_condition_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    let has_conditional = lower.contains("болса")
+        || lower.contains("болғанда")
+        || lower.contains("егер")
+        || lower.contains("если");
+    let has_question = input.contains('?') || lower.contains("керек пе");
+    has_conditional && has_question
+}
+
+fn render_condition_verdict(
+    user_input: &adam_algebra::ConditionInput,
+    verdict: bool,
+    proc_title: &str,
+    step: &adam_algebra::ProcedureStep,
+    cond_text: &str,
+) -> String {
+    let yes_no = if verdict { "иә" } else { "жоқ" };
+    let explanation = if verdict {
+        format!("{}-ші қадам шартына сай ({}).", step.sequence, cond_text,)
+    } else {
+        format!(
+            "{} {} {} — {}-ші қадам шарты «{}» орындалмайды.",
+            user_input.var, user_input.value, user_input.unit, step.sequence, cond_text,
+        )
+    };
+    format!(
+        "{yes_no}. «{proc_title}» рәсімі бойынша: {explanation} Қадам: «{}»",
+        step.action_kk,
+    )
 }
 
 const SHAPE_TRIGGERS_KK: &[&str] = &[

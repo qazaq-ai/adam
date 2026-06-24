@@ -106,6 +106,7 @@ pub mod index;
 pub mod math_solver;
 pub mod operator;
 pub mod procedure;
+pub mod procedure_condition;
 pub mod query;
 pub mod realiser;
 pub mod root;
@@ -120,6 +121,10 @@ pub use index::{FrameId, FrameIndex, IndexedFrame, RankedFrame};
 pub use operator::{SlotKind, SuffixOp};
 pub use procedure::{
     Hazard, ProcedureDomain, ProcedureIR, ProcedureParseError, ProcedureSource, ProcedureStep,
+};
+pub use procedure_condition::{
+    ConditionExpr, ConditionInput, evaluate as evaluate_condition, parse_condition,
+    parse_user_input as parse_condition_user_input,
 };
 pub use query::{
     AnswerShape, AnswerSlot, Domain, FrameMatch, Language, ModifierConstraint, ModifierRole,
