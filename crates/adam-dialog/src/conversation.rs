@@ -3798,29 +3798,35 @@ impl Conversation {
                 anaphora_subject.as_deref(),
                 anaphora_procedure_id.as_deref(),
             );
-            // **v6.8.15 — Clarify routing infrastructure (gate
-            // deliberately NOT wired in this commit).**  The
-            // `RouterAnswer::clarify()` builder + boundary unit
-            // tests land here, but the cascade-level gate that
-            // converts `confidence < CLARIFY_THRESHOLD` outputs
-            // to Clarify is gated on per-handler `EvidenceKind`
-            // migration — Codex's Q1 architectural debt #1.
+            // **v6.8.16 — Codex Q2 #1 v2: Clarify routing gate
+            // wired.**  When the router's output carries
+            // confidence strictly below `CLARIFY_THRESHOLD`,
+            // override the text with the deterministic Clarify
+            // template and DROP the procedure-referent push.
             //
-            // Why not wire now: the current scoring is coarse.
-            // `lookup_procedure_matched_with_score` divides the
-            // raw integer overlap by 8 — a legitimate single-
-            // token title match («Бастапқы нұсқаулықты қалай
-            // жүргізеді?» matches only «бастапқы» as substring,
-            // raw=3, normalised=0.375) lands BELOW 0.5 and the
-            // gate would Clarify a correct match.  Sustainable
-            // Clarify routing needs (a) prefix-aware scoring for
-            // Kazakh morphology OR (b) handler-specific
-            // thresholds.  Both belong to a separate arc.
+            // Safe-by-construction: LegacyCascade carries
+            // exactly 0.5 (not less than 0.5) so the v6.1 chain
+            // is untouched.  Only weak ProcedureMatch outputs
+            // — those where the new prefix-aware
+            // `word_overlap_match` (v6.8.16) finds at most one
+            // matching root — fall below the threshold.
             //
-            // The builder + boundary tests below document the
-            // intended semantics; turning the gate on is a
-            // one-line change at this callsite when the
-            // per-handler migration lands.
+            // The v6.8.15 commit pre-wired this gate but had
+            // to back it out because the previous substring-
+            // based scoring was morphologically blind and
+            // legitimate single-token matches (e.g. «Бастапқы
+            // нұсқаулықты қалай жүргізеді?») landed at 0.375.
+            // v6.8.16's prefix-aware match now correctly
+            // surfaces «бастапқы» AND «нұсқаулықты» (the latter
+            // shares an 8-char prefix with the bare-root
+            // «нұсқаулық»), pulling the same query to 0.75.
+            let router_answer = router_answer.map(|ans| {
+                if ans.confidence < crate::v6_2_router::CLARIFY_THRESHOLD {
+                    crate::v6_2_router::RouterAnswer::clarify()
+                } else {
+                    ans
+                }
+            });
             if let Some(ans) = &router_answer {
                 if let Some(proc_id) = &ans.matched_procedure_id {
                     self.discourse_state.push_referent(

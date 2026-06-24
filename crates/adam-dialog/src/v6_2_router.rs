@@ -3097,19 +3097,62 @@ fn score_procedure(proc: &adam_algebra::ProcedureIR, query_tokens: &[&str]) -> i
         .unwrap_or_default();
     let applies_lower: String = proc.applies_to.join(" ").to_lowercase();
 
+    let title_kk_words: Vec<&str> = split_alphanumeric_words(&title_kk_lower);
+    let title_ru_words: Vec<&str> = split_alphanumeric_words(&title_ru_lower);
+    let applies_words: Vec<&str> = split_alphanumeric_words(&applies_lower);
+
     let mut score = 0i32;
     for tok in query_tokens {
-        if title_kk_lower.contains(tok) {
+        if title_kk_words.iter().any(|w| word_overlap_match(tok, w)) {
             score += 3;
         }
-        if !title_ru_lower.is_empty() && title_ru_lower.contains(tok) {
+        if !title_ru_lower.is_empty() && title_ru_words.iter().any(|w| word_overlap_match(tok, w)) {
             score += 3;
         }
-        if applies_lower.contains(tok) {
+        if applies_words.iter().any(|w| word_overlap_match(tok, w)) {
             score += 2;
         }
     }
     score
+}
+
+/// **v6.8.16 — morphology-aware token match.**  Replaces the
+/// previous substring check (`title.contains(tok)`) which was
+/// blind to Kazakh case suffixes: «нұсқаулықты» (acc/poss) is
+/// NOT a substring of the bare-root «нұсқаулық» in the title,
+/// so a legitimate inflected query missed every title that
+/// shared the root.
+///
+/// New semantics: two words match when their common prefix is
+/// at least `MIN_PREFIX_OVERLAP = 4` characters AND at least
+/// half the length of the shorter word.  «нұсқаулықты» vs
+/// «нұсқаулық» common prefix = 8 ≥ 4 ✓.  «бастапқы» vs
+/// «бастапқы» common prefix = 8 ✓.  Two unrelated words that
+/// happen to share 3-char roots («іск...» / «іс...») don't
+/// match because of the half-length floor.
+///
+/// The 4-char floor is calibrated to the existing fixture
+/// vocabulary: Kazakh content words shorter than 4 chars are
+/// almost all particles / function words («не», «ма», «де»)
+/// that don't carry topic signal.
+fn word_overlap_match(query_token: &str, title_word: &str) -> bool {
+    const MIN_PREFIX_OVERLAP: usize = 4;
+    let common = prefix_overlap_chars(query_token, title_word);
+    if common < MIN_PREFIX_OVERLAP {
+        return false;
+    }
+    let shorter = query_token.chars().count().min(title_word.chars().count());
+    common >= shorter.div_ceil(2)
+}
+
+fn prefix_overlap_chars(a: &str, b: &str) -> usize {
+    a.chars().zip(b.chars()).take_while(|(x, y)| x == y).count()
+}
+
+fn split_alphanumeric_words(text: &str) -> Vec<&str> {
+    text.split(|c: char| !c.is_alphanumeric())
+        .filter(|w| w.chars().count() >= 4)
+        .collect()
 }
 
 fn render_procedure(proc: &adam_algebra::ProcedureIR) -> String {
