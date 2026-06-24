@@ -342,6 +342,14 @@ fn answer_with_corpus_inner_full(
     if let Some(text) = lookup_procedure_condition_check(input, anaphora_procedure_id) {
         return Some(RouterAnswer::from_text(text, EvidenceKind::ProcedureMatch));
     }
+    // v6.8.14 — categorical permission / forbidden-state check
+    // («Егер СИЗ жоқ болса, жұмысқа кіруге бола ма?»).  Runs
+    // AFTER condition_check so numeric-input shapes go through
+    // the typed evaluator first; only categorical conditionals
+    // («X жоқ/болмаса ... бола ма?») reach this layer.
+    if let Some(text) = lookup_procedure_permission_check(input, anaphora_procedure_id) {
+        return Some(RouterAnswer::from_text(text, EvidenceKind::ProcedureMatch));
+    }
     // Main cascade — String-returning chain.  We also re-run the
     // procedure retrieval helper to recover both the matched id
     // (for the discourse-state referent push) AND the keyword
@@ -2936,6 +2944,96 @@ fn render_condition_verdict(
         "{yes_no}. «{proc_title}» рәсімі бойынша: {explanation} Қадам: «{}»",
         step.action_kk,
     )
+}
+
+/// **v6.8.14 — procedure attribute query (permission / forbidden
+/// state).**  Categorical sibling of the v6.8.13 numeric
+/// `lookup_procedure_condition_check`.  Detects «X (жоқ |
+/// болмаса) ... (бола ма | жасауға бола ма)?» / «Если X нет,
+/// можно ли Y?» — the user is asking whether a categorical state
+/// is permitted.  Answers from the procedure's `hazards` field,
+/// which already carries forbidden-state pairs:
+///
+///   hazard.kind_kk      — the forbidden state («СИЗ-сіз жұмыс істеу»)
+///   hazard.mitigation_kk — the consequence / why it's forbidden
+///                          («бұл рәсім аяқталмайынша қызметкер
+///                           цехқа кіргізілмейді»)
+///
+/// Matching: token-overlap (≥ 4-char tokens, lowercased) between
+/// the input and `hazard.kind_kk`.  First hazard with the
+/// highest overlap wins.  When no hazard matches AND the
+/// procedure has no other forbidden-state info, returns `None`
+/// so the cascade falls through honestly.
+fn lookup_procedure_permission_check(
+    input: &str,
+    anaphora_procedure_id: Option<&str>,
+) -> Option<String> {
+    if !looks_like_procedure_permission_query(input) {
+        return None;
+    }
+    let proc_id = anaphora_procedure_id?;
+    let proc = crate::procedure_loader::shared_procedures()
+        .iter()
+        .find(|p| p.id == proc_id)?;
+    if proc.hazards.is_empty() {
+        return None;
+    }
+    let lower = input.to_lowercase();
+    let input_tokens: Vec<String> = lower
+        .split(|c: char| !c.is_alphanumeric())
+        .filter(|t| t.chars().count() >= 4)
+        .map(|t| t.to_string())
+        .collect();
+    if input_tokens.is_empty() {
+        return None;
+    }
+    // Bidirectional substring overlap: Kazakh case suffixes mean
+    // input tokens may carry agglutinated tails («жұмысқа» =
+    // «жұмыс» + «-қа» dative, «жұмысшы» = «жұмыс» + «-шы» agent
+    // nominaliser).  Substring match in BOTH directions catches
+    // the stem regardless of which side it appears on.
+    let mut best: Option<(usize, usize)> = None;
+    for (i, h) in proc.hazards.iter().enumerate() {
+        let kind_lower = h.kind_kk.to_lowercase();
+        let kind_tokens: Vec<&str> = kind_lower
+            .split(|c: char| !c.is_alphanumeric())
+            .filter(|t| t.chars().count() >= 4)
+            .collect();
+        let forward = input_tokens
+            .iter()
+            .filter(|t| kind_lower.contains(t.as_str()))
+            .count();
+        let reverse = kind_tokens.iter().filter(|t| lower.contains(*t)).count();
+        let overlap = forward + reverse;
+        if overlap > 0 && best.is_none_or(|(_, b)| overlap > b) {
+            best = Some((i, overlap));
+        }
+    }
+    let (idx, _) = best?;
+    let h = &proc.hazards[idx];
+    Some(format!(
+        "Жоқ. «{}» рәсімінде {} қауіпті деп тіркелген. Себебі: {}.",
+        proc.title_kk, h.kind_kk, h.mitigation_kk,
+    ))
+}
+
+fn looks_like_procedure_permission_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    let has_conditional = lower.contains("болса")
+        || lower.contains("болмаса")
+        || lower.contains("жоқ болса")
+        || lower.contains("если ")
+        || lower.contains("когда ");
+    let has_permission_q = lower.contains("бола ма")
+        || lower.contains("болмай ма")
+        || lower.contains("жасауға бола")
+        || lower.contains("кіруге бола")
+        || lower.contains("істеуге бола")
+        || lower.contains("болады ма")
+        || lower.contains("можно ли")
+        || lower.contains("разрешено")
+        || lower.contains("допустимо");
+    has_conditional && has_permission_q
 }
 
 const SHAPE_TRIGGERS_KK: &[&str] = &[
