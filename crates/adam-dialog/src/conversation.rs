@@ -3798,6 +3798,29 @@ impl Conversation {
                 anaphora_subject.as_deref(),
                 anaphora_procedure_id.as_deref(),
             );
+            // **v6.8.15 — Clarify routing infrastructure (gate
+            // deliberately NOT wired in this commit).**  The
+            // `RouterAnswer::clarify()` builder + boundary unit
+            // tests land here, but the cascade-level gate that
+            // converts `confidence < CLARIFY_THRESHOLD` outputs
+            // to Clarify is gated on per-handler `EvidenceKind`
+            // migration — Codex's Q1 architectural debt #1.
+            //
+            // Why not wire now: the current scoring is coarse.
+            // `lookup_procedure_matched_with_score` divides the
+            // raw integer overlap by 8 — a legitimate single-
+            // token title match («Бастапқы нұсқаулықты қалай
+            // жүргізеді?» matches only «бастапқы» as substring,
+            // raw=3, normalised=0.375) lands BELOW 0.5 and the
+            // gate would Clarify a correct match.  Sustainable
+            // Clarify routing needs (a) prefix-aware scoring for
+            // Kazakh morphology OR (b) handler-specific
+            // thresholds.  Both belong to a separate arc.
+            //
+            // The builder + boundary tests below document the
+            // intended semantics; turning the gate on is a
+            // one-line change at this callsite when the
+            // per-handler migration lands.
             if let Some(ans) = &router_answer {
                 if let Some(proc_id) = &ans.matched_procedure_id {
                     self.discourse_state.push_referent(

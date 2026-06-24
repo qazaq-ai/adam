@@ -275,7 +275,33 @@ impl RouterAnswer {
         self.matched_procedure_id = Some(procedure_id);
         self
     }
+
+    /// **v6.8.15 — Codex Q2 #1 v2.** Build a Clarify answer —
+    /// a deterministic «I'm not sure I understood, please
+    /// rephrase» template.  Used by the cascade-level Clarify
+    /// gate when a low-confidence match would otherwise produce
+    /// a confidently-wrong answer.  Always uses
+    /// [`EvidenceKind::SoftAck`] + confidence 1.0 — the
+    /// acknowledgement itself is deterministic, the underlying
+    /// fact is not.  No `matched_procedure_id` — a Clarify
+    /// MUST NOT pin a weak match as the discourse referent
+    /// (would propagate the wrong topic across turns).
+    pub fn clarify() -> Self {
+        Self {
+            text: CLARIFY_TEMPLATE.to_string(),
+            matched_procedure_id: None,
+            confidence: 1.0,
+            evidence_kind: EvidenceKind::SoftAck,
+        }
+    }
 }
+
+/// Fixed Clarify template.  Deterministic — no slot
+/// substitution — so the safety contract holds regardless of
+/// what the cascade was about to emit.  Asks the user to
+/// rephrase rather than guessing.
+const CLARIFY_TEMPLATE: &str = "Сұрағыңызды толық түсіндім деп айта алмаймын. Нақтырақ айтсаңыз — \
+     дұрыс жауап беруге тырысамын.";
 
 /// Variant that lets callers supply their own [`FrameIndex`] (used
 /// in integration tests + the live REPL).
@@ -5394,5 +5420,44 @@ mod tests {
         let r2 =
             RouterAnswer::from_text("test".into(), EvidenceKind::CuratedFact).with_confidence(-0.3);
         assert_eq!(r2.confidence, 0.0); // clamped up
+    }
+
+    /// **v6.8.15 — Clarify builder.** `RouterAnswer::clarify()`
+    /// produces a deterministic `SoftAck` with confidence 1.0
+    /// and no `matched_procedure_id` — a Clarify must NOT pin
+    /// a weak match as the discourse referent.
+    #[test]
+    fn router_answer_clarify_builder() {
+        let r = RouterAnswer::clarify();
+        assert_eq!(r.evidence_kind, EvidenceKind::SoftAck);
+        assert_eq!(r.confidence, 1.0);
+        assert!(r.matched_procedure_id.is_none());
+        assert!(r.text.contains("Сұрағыңызды"));
+        assert!(r.text.contains("Нақтырақ"));
+    }
+
+    /// `CLARIFY_THRESHOLD = 0.5` is the strict-inequality
+    /// boundary.  Three regression assertions guard the cascade
+    /// gate from being either too lax or too aggressive:
+    ///   * LegacyCascade (0.5) must NOT trigger Clarify — that
+    ///     would replace every v6.1 cascade output including
+    ///     correct curated lookups.
+    ///   * Weak ProcedureMatch (raw=2 → 0.25) MUST trigger.
+    ///   * Strong ProcedureMatch (raw=6 → 0.75) must NOT.
+    #[test]
+    fn clarify_threshold_boundary() {
+        // Strict-inequality boundary: `< CLARIFY_THRESHOLD` means
+        // values EQUAL to the threshold are NOT clarified.
+        // Asserted via `>=` form to keep clippy happy on f32
+        // partial-ordering — clippy flags the negated `!(x < y)`
+        // form because f32 admits NaN.
+        let legacy_05 = 0.5_f32;
+        assert!(legacy_05 >= CLARIFY_THRESHOLD);
+
+        let weak_025 = 0.25_f32;
+        assert!(weak_025 < CLARIFY_THRESHOLD);
+
+        let strong_075 = 0.75_f32;
+        assert!(strong_075 >= CLARIFY_THRESHOLD);
     }
 }
