@@ -304,6 +304,66 @@ pub struct DiscourseState {
     /// shape demands one.  Bounded growth is a future-phase
     /// optimisation; small dialogs stay cheap to walk.
     pub referents: Vec<Referent>,
+    /// **v6.8.24 — L4.5 first typed layer.**  Tracks slots the
+    /// user has just committed and that might be corrected on
+    /// the immediately-next turn (bare «Жоқ» / «Нет» reject).
+    /// Lifted from the v6.8.23 `session["pending_correction_target"]`
+    /// stringly representation per the 2026-06-25 strategic
+    /// review.  Most-recent at the end.  Bounded growth — only
+    /// the latest still-active entry per slot is consulted; older
+    /// entries are kept for replay / audit.
+    pub pending_corrections: Vec<PendingCorrection>,
+}
+
+/// **v6.8.24.**  Closed-set tag for the user-fact slots that
+/// participate in the bare-rejection correction flow.  Currently
+/// covers the three personal slots `Conversation` writes during a
+/// turn — name, age, city.  New slots added here cascade through
+/// the snapshot/diff machinery in `record_pending_correction_lift`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum UserSlot {
+    Name,
+    Age,
+    City,
+}
+
+impl UserSlot {
+    /// Canonical kebab-case identifier used as the
+    /// `session` HashMap key (mirrors v6.8.23's keys, kept for
+    /// backcompat during the typed transition).
+    pub fn as_session_key(self) -> &'static str {
+        match self {
+            UserSlot::Name => "name",
+            UserSlot::Age => "age",
+            UserSlot::City => "city",
+        }
+    }
+
+    pub fn from_session_key(s: &str) -> Option<Self> {
+        match s {
+            "name" => Some(UserSlot::Name),
+            "age" => Some(UserSlot::Age),
+            "city" => Some(UserSlot::City),
+            _ => None,
+        }
+    }
+}
+
+/// **v6.8.24.**  One pending correction window — a slot that
+/// was just committed and might be retracted on the next turn.
+/// Status defaults to [`CommitmentStatus::Proposed`] on
+/// introduction; flips to [`CommitmentStatus::Rejected`] when
+/// adam issues the re-prompt; advances to
+/// [`CommitmentStatus::Contested`] if the user keeps rejecting
+/// without supplying a replacement; settles at
+/// [`CommitmentStatus::Accepted`] when the next user turn
+/// commits a replacement value (or the correction window times
+/// out — one-turn staleness window).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PendingCorrection {
+    pub slot: UserSlot,
+    pub introduced_turn: u64,
+    pub status: CommitmentStatus,
 }
 
 /// **v6.8.4 L4.5 Phase 2.D.** Detect a repair / correction

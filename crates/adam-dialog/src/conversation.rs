@@ -979,7 +979,7 @@ impl Conversation {
         // staleness gets enforced — the prompt only fires if the
         // commit happened on the IMMEDIATELY-prior turn.
         let bare_rejection_override = if looks_like_bare_rejection(input) {
-            self.pending_correction_reprompt()
+            self.pending_correction_reprompt_lift()
         } else {
             None
         };
@@ -3949,7 +3949,7 @@ impl Conversation {
         if bare_rejection_override.is_some() {
             self.session.remove("pending_correction_target");
         } else {
-            self.record_pending_correction_target(&session_snapshot, self.turn_counter as u64);
+            self.record_pending_correction_lift(&session_snapshot, self.turn_counter as u64);
         }
         // **Phase 28 (2026-06-04 — post-rc13 audit)** — proper-noun
         // capitalization for the `Бәлкім, X туралы айтасыз ба`
@@ -5203,53 +5203,71 @@ impl Conversation {
     /// immediately-prior turn.  Multiple slots changing in the
     /// same turn keeps the LAST one wins (deterministic by the
     /// fixed order in `session_snapshot`).
-    fn record_pending_correction_target(
+    /// **v6.8.24 — typed L4.5 lift of the v6.8.23 session-string
+    /// state.**  When a user-fact slot just changed across the
+    /// cascade, push a [`crate::dialog_acts::PendingCorrection`]
+    /// onto `discourse_state.pending_corrections` with status
+    /// [`crate::dialog_acts::CommitmentStatus::Proposed`] and the
+    /// current turn id.  The session-key mirror is also written
+    /// so any external consumer of the v6.8.23 contract still
+    /// works during the migration window — removed in a follow-
+    /// up commit once no caller reads it.
+    fn record_pending_correction_lift(
         &mut self,
         snapshot: &[(&'static str, Option<String>)],
         turn_id: u64,
     ) {
-        let mut latest: Option<&'static str> = None;
-        for (slot, prior) in snapshot {
-            let now = self.session.get(*slot).cloned();
+        let mut latest: Option<crate::dialog_acts::UserSlot> = None;
+        for (slot_key, prior) in snapshot {
+            let now = self.session.get(*slot_key).cloned();
             if now != *prior && now.is_some() {
-                latest = Some(slot);
+                latest = crate::dialog_acts::UserSlot::from_session_key(slot_key);
             }
         }
         if let Some(slot) = latest {
+            self.discourse_state
+                .pending_corrections
+                .push(crate::dialog_acts::PendingCorrection {
+                    slot,
+                    introduced_turn: turn_id,
+                    status: crate::dialog_acts::CommitmentStatus::Proposed,
+                });
             self.session.insert(
                 "pending_correction_target".into(),
-                format!("{slot}|{turn_id}"),
+                format!("{}|{}", slot.as_session_key(), turn_id),
             );
         }
     }
 
-    /// **v6.8.23 — if a bare-rejection fires on the immediately-
-    /// next turn after a slot commit, return the appropriate
-    /// re-prompt text; otherwise return `None` so the cascade
-    /// handles the input.**
-    ///
-    /// The pending target is consumed only when used — `None`
-    /// returns leave it in place so a transient false-positive
-    /// «Жоқ» detection doesn't lose the correction window.
-    fn pending_correction_reprompt(&self) -> Option<String> {
-        let raw = self.session.get("pending_correction_target")?;
-        let (slot, turn_str) = raw.split_once('|')?;
-        let stored_turn: u64 = turn_str.parse().ok()?;
-        // Staleness — only fire when the slot was set on the
-        // IMMEDIATELY-prior turn.  `record_pending_correction_target`
-        // captures `self.turn_counter` AFTER the mid-cascade
-        // increment, so the stored value equals what
-        // `self.turn_counter` reads at the START of the next
-        // turn.  Equality, not `+1`.
-        if (self.turn_counter as u64) != stored_turn {
-            return None;
-        }
+    /// **v6.8.24 — typed read-path for the bare-rejection
+    /// handler.**  Walks `discourse_state.pending_corrections`
+    /// newest-to-oldest; returns the re-prompt for the most-
+    /// recent entry whose `introduced_turn` equals
+    /// `self.turn_counter` (= entry written at the end of the
+    /// immediately-prior turn) AND whose status is
+    /// [`crate::dialog_acts::CommitmentStatus::Proposed`].  When
+    /// a re-prompt fires, flips that entry's status to
+    /// [`crate::dialog_acts::CommitmentStatus::Rejected`] so a
+    /// second bare «Жоқ» without replacement doesn't loop on
+    /// the same prompt.
+    fn pending_correction_reprompt_lift(&mut self) -> Option<String> {
+        let current = self.turn_counter as u64;
+        let idx = self
+            .discourse_state
+            .pending_corrections
+            .iter()
+            .rposition(|p| {
+                p.introduced_turn == current
+                    && p.status == crate::dialog_acts::CommitmentStatus::Proposed
+            })?;
+        let slot = self.discourse_state.pending_corrections[idx].slot;
         let prompt = match slot {
-            "name" => "Атыңызды қайта айтыңызшы.",
-            "age" => "Жасыңызды қайта айтыңызшы.",
-            "city" => "Қайдан екеніңізді қайта айтыңызшы.",
-            _ => return None,
+            crate::dialog_acts::UserSlot::Name => "Атыңызды қайта айтыңызшы.",
+            crate::dialog_acts::UserSlot::Age => "Жасыңызды қайта айтыңызшы.",
+            crate::dialog_acts::UserSlot::City => "Қайдан екеніңізді қайта айтыңызшы.",
         };
+        self.discourse_state.pending_corrections[idx].status =
+            crate::dialog_acts::CommitmentStatus::Rejected;
         Some(prompt.into())
     }
 }
@@ -6560,6 +6578,86 @@ mod phase_27_tests {
     fn returns_none_when_no_turaly() {
         // «Бәлкім» but no «туралы» pattern — not a clarification.
         assert!(extract_belkim_clarification_noun("Бәлкім, осы жауап дұрыс шығар.").is_none());
+    }
+}
+
+#[cfg(test)]
+mod v6_8_24_pending_correction_lift_tests {
+    //! **v6.8.24 — typed L4.5 lift.**  Lock the round-trip
+    //! between record (Proposed write) and reprompt (Rejected
+    //! flip) on `DiscourseState.pending_corrections`.  The
+    //! end-to-end probe still lives in the multi-turn fixture.
+    use crate::Conversation;
+    use crate::dialog_acts::{CommitmentStatus, UserSlot};
+
+    #[test]
+    fn record_pushes_typed_proposed_entry() {
+        let mut conv = Conversation::new();
+        conv.session.insert("name".into(), "бекжан".into());
+        let snapshot: [(&'static str, Option<String>); 3] =
+            [("name", None), ("age", None), ("city", None)];
+        conv.record_pending_correction_lift(&snapshot, 7);
+        let last = conv.discourse_state.pending_corrections.last().unwrap();
+        assert_eq!(last.slot, UserSlot::Name);
+        assert_eq!(last.introduced_turn, 7);
+        assert_eq!(last.status, CommitmentStatus::Proposed);
+        // Session-key mirror present during migration window.
+        assert_eq!(
+            conv.session
+                .get("pending_correction_target")
+                .map(String::as_str),
+            Some("name|7"),
+        );
+    }
+
+    #[test]
+    fn reprompt_flips_proposed_to_rejected() {
+        let mut conv = Conversation::new();
+        conv.discourse_state
+            .pending_corrections
+            .push(crate::dialog_acts::PendingCorrection {
+                slot: UserSlot::Age,
+                introduced_turn: 3,
+                status: CommitmentStatus::Proposed,
+            });
+        // `turn_counter` equals stored introduced_turn at start
+        // of the next turn (see record_pending_correction_lift
+        // doc) — simulate by setting it directly.
+        conv.turn_counter = 3;
+        let r = conv.pending_correction_reprompt_lift();
+        assert_eq!(r.as_deref(), Some("Жасыңызды қайта айтыңызшы."));
+        assert_eq!(
+            conv.discourse_state.pending_corrections[0].status,
+            CommitmentStatus::Rejected,
+        );
+    }
+
+    #[test]
+    fn reprompt_skips_stale_entries() {
+        let mut conv = Conversation::new();
+        conv.discourse_state
+            .pending_corrections
+            .push(crate::dialog_acts::PendingCorrection {
+                slot: UserSlot::Name,
+                introduced_turn: 2, // two turns ago
+                status: CommitmentStatus::Proposed,
+            });
+        conv.turn_counter = 5;
+        assert!(conv.pending_correction_reprompt_lift().is_none());
+    }
+
+    #[test]
+    fn reprompt_skips_already_rejected_entries() {
+        let mut conv = Conversation::new();
+        conv.discourse_state
+            .pending_corrections
+            .push(crate::dialog_acts::PendingCorrection {
+                slot: UserSlot::City,
+                introduced_turn: 4,
+                status: CommitmentStatus::Rejected,
+            });
+        conv.turn_counter = 4;
+        assert!(conv.pending_correction_reprompt_lift().is_none());
     }
 }
 
