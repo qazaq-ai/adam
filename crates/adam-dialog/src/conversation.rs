@@ -3550,14 +3550,23 @@ impl Conversation {
             // turn's subject.  Kind classification: prefer
             // `canonical_person_entity` (the language_core resolver
             // adam already uses for `StatementOfName`); fall back
-            // to domain_hint for Place / Organisation; default to
-            // Generic otherwise.  Person discrimination via the
-            // resolver — NOT via domain — because world_core gives
-            // each notable figure its own `kru_<name>` domain
-            // (kru_baitursynov, abai_works, etc.) rather than a
-            // shared "person" bucket, so hard-coding a list would
-            // miss new biographical entries as they're curated.
+            // to domain_hint for Place / Organisation / Person; default
+            // to Generic otherwise.  Person classification has two
+            // sources:
+            //   1. `canonical_person_entity` — first-name DB lookup.
+            //   2. Person-bearing domain (`kru_*` per-figure /
+            //      `abai_works` / `notable_kazakhstanis`).  Codex's
+            //      Q3 school #5b: biographical topics like «Ахмет
+            //      Байтұрсынұлы» weren't in the name DB and the
+            //      domain-side fallback dropped them into Generic,
+            //      so anaphora couldn't distinguish a Person
+            //      referent from any other recent topic on the
+            //      stack.  Adding the person-bearing domain set
+            //      closes that — same intent as the earlier
+            //      Place / Organisation enrichment.
             let kind = if crate::language_core::canonical_person_entity(topic).is_some() {
+                crate::dialog_acts::ReferentKind::Person
+            } else if is_person_bearing_domain(domain_hint) {
                 crate::dialog_acts::ReferentKind::Person
             } else {
                 match domain_hint {
@@ -5081,6 +5090,33 @@ impl Conversation {
     }
 }
 
+/// **v6.8.19 — Codex Q3 school #5b.** Recognise world_core
+/// domains whose entries are people (so anaphora classification
+/// pushes them as `ReferentKind::Person`).
+///
+/// Two shapes:
+///   1. **`kru_*` per-figure domains** — convention: every
+///      notable Kazakh figure gets a domain `kru_<name>`
+///      (kru_baitursynov, kru_abai, kru_nazarbayev, ...).
+///      Prefix-match catches any future additions without
+///      touching this list.
+///   2. **Aggregate person-bearing domains** — explicit names
+///      where curated entries are about people (`abai_works`
+///      mixes works + biography; `notable_kazakhstanis` is
+///      person-by-design).
+///
+/// `world_history` / `history_kazakhstan` / `kz_literature` are
+/// NOT included — they mix events / places / works alongside
+/// people, so classifying the whole domain as Person would
+/// mislead anaphora.  Per-figure `kru_*` data lives there
+/// already and gets the Person tag via prefix #1.
+fn is_person_bearing_domain(domain_hint: Option<&str>) -> bool {
+    let Some(d) = domain_hint else {
+        return false;
+    };
+    d.starts_with("kru_") || matches!(d, "abai_works" | "notable_kazakhstanis")
+}
+
 /// v1.4.0 follow-up resolution. Some Kazakh utterances are meaningless
 /// out of context but carry a pointer back to the previous turn:
 ///
@@ -6194,6 +6230,49 @@ mod phase_27_tests {
     fn returns_none_when_no_turaly() {
         // «Бәлкім» but no «туралы» pattern — not a clarification.
         assert!(extract_belkim_clarification_noun("Бәлкім, осы жауап дұрыс шығар.").is_none());
+    }
+}
+
+#[cfg(test)]
+mod v6_8_19_person_domain_classification_tests {
+    //! **v6.8.19 — Codex Q3 school #5b.**  Verify the
+    //! `is_person_bearing_domain` helper that pushes
+    //! biographical world_core topics into the Person
+    //! anaphora bucket.
+
+    use super::is_person_bearing_domain;
+
+    #[test]
+    fn kru_prefix_classifies_as_person() {
+        assert!(is_person_bearing_domain(Some("kru_baitursynov")));
+        assert!(is_person_bearing_domain(Some("kru_abai")));
+        assert!(is_person_bearing_domain(Some("kru_nazarbayev")));
+        // Catches future additions via prefix.
+        assert!(is_person_bearing_domain(Some("kru_anyone_new")));
+    }
+
+    #[test]
+    fn aggregate_person_domains_classified() {
+        assert!(is_person_bearing_domain(Some("abai_works")));
+        assert!(is_person_bearing_domain(Some("notable_kazakhstanis")));
+    }
+
+    /// Domains that mix people with non-people are NOT in the
+    /// Person bucket — classifying the whole domain would tag
+    /// place / event / institution topics as Person and
+    /// mislead anaphora.
+    #[test]
+    fn mixed_domains_not_classified() {
+        assert!(!is_person_bearing_domain(Some("world_history")));
+        assert!(!is_person_bearing_domain(Some("history_kazakhstan")));
+        assert!(!is_person_bearing_domain(Some("kz_literature")));
+        assert!(!is_person_bearing_domain(Some("geography_kz")));
+        assert!(!is_person_bearing_domain(Some("government_kazakhstan")));
+    }
+
+    #[test]
+    fn none_domain_not_classified() {
+        assert!(!is_person_bearing_domain(None));
     }
 }
 
