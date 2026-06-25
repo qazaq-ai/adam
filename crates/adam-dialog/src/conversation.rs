@@ -921,6 +921,34 @@ impl Conversation {
         } else {
             input
         };
+        // **v6.8.20 — Codex Q3 school #2.**  Predicate-ellipsis
+        // expansion.  Pattern «Ал X-тің ше?» / «X-тің ше?» in
+        // Kazakh elides the predicate from the prior turn — Codex's
+        // audit example: «Судың формуласы?» → H₂O · «Ал
+        // көмірқышқыл газының ше?» previously emitted «Оксид»
+        // because the ellipsis fell into the broad-topic IsA
+        // handler.  When the session carries
+        // `last_query_predicate` and the input matches the
+        // ellipsis shape, rewrite to the full query form so the
+        // existing predicate-specific handler (formula / future
+        // others) fires correctly.
+        let ellipsis_expanded = expand_predicate_ellipsis(
+            input,
+            self.session.get("last_query_predicate").map(|s| s.as_str()),
+        );
+        let input: &str = match ellipsis_expanded.as_deref() {
+            Some(s) => s,
+            None => input,
+        };
+        // **v6.8.20 — track current turn's query predicate so the
+        // NEXT turn can use it for ellipsis expansion.**  Detection
+        // is shape-only — running ahead of the cascade — so the
+        // predicate flag persists whether or not the cascade
+        // ends up emitting a fact.
+        if let Some(pred) = detect_query_predicate(input) {
+            self.session
+                .insert("last_query_predicate".into(), pred.into());
+        }
         // **v6.1.40 — 2026-05-24 voice audit round 2.** Smart
         // consecutive-turn honorific dedup. If the PREVIOUS turn
         // emitted the diminutive («Дәке»), set a session flag the
@@ -5090,6 +5118,89 @@ impl Conversation {
     }
 }
 
+/// **v6.8.20 — Codex Q3 school #2: predicate ellipsis-inherit.**
+/// Detect the Kazakh ellipsis shape «Ал X-тің ше?» / «X-тің
+/// ше?» (and trailing-punctuation variants) and rewrite to the
+/// full query form using `last_query_predicate` from session.
+///
+/// Returns `None` when:
+///   * the input doesn't match the ellipsis shape;
+///   * no `last_query_predicate` is set (first-turn ellipsis is
+///     genuinely under-specified — let the cascade fall through
+///     to the v6.1 generic handler);
+///   * the predicate is recognised but no rewrite is registered
+///     yet (future predicates land here as separate match arms).
+///
+/// v6.8.20 ships ONLY `formula` rewriting because that's the
+/// Codex audit's exact case.  Adding `definition` / `taңba` /
+/// `lifespan` follows the same shape: one extra match arm.
+fn expand_predicate_ellipsis(input: &str, last_predicate: Option<&str>) -> Option<String> {
+    let lower = input.to_lowercase();
+    if !looks_like_predicate_ellipsis(&lower) {
+        return None;
+    }
+    let predicate = last_predicate?;
+    let noun = extract_genitive_noun(&lower)?;
+    match predicate {
+        "formula" => Some(format!("{noun} формуласы")),
+        _ => None,
+    }
+}
+
+/// Shape detector for «Ал X-тің ше?» / «X-тің ше?».  Requires
+/// BOTH a trailing «ше» (with optional `.` / `?` / `!` /
+/// whitespace) AND a genitive marker somewhere in the input.
+fn looks_like_predicate_ellipsis(lower: &str) -> bool {
+    let cleaned = lower.trim_end_matches(['?', '.', '!', ' ']);
+    let ends_with_she = cleaned.ends_with(" ше") || cleaned == "ше";
+    if !ends_with_she {
+        return false;
+    }
+    lower.contains("тің ")
+        || lower.contains("ның ")
+        || lower.contains("нің ")
+        || lower.contains("дың ")
+        || lower.contains("дің ")
+        || lower.contains("тың ")
+}
+
+/// Extract the noun phrase from an ellipsis input.  Strips
+/// trailing «ше» + punctuation, optional leading «Ал »/«А »
+/// filler, then strips the genitive suffix off the last word.
+/// Returns the full noun phrase (multi-word safe — «көмірқышқыл
+/// газының» → «көмірқышқыл газы»).
+fn extract_genitive_noun(lower: &str) -> Option<String> {
+    let cleaned = lower.trim_end_matches(['?', '.', '!', ',', ' ']);
+    let cleaned = cleaned.strip_suffix(" ше").unwrap_or(cleaned);
+    let cleaned = cleaned
+        .strip_prefix("ал ")
+        .or_else(|| cleaned.strip_prefix("а "))
+        .unwrap_or(cleaned)
+        .trim();
+    for suffix in &["тің", "ның", "нің", "дың", "дің", "тың"] {
+        if let Some(stem) = cleaned.strip_suffix(suffix) {
+            let stem = stem.trim();
+            if !stem.is_empty() {
+                return Some(stem.to_string());
+            }
+        }
+    }
+    None
+}
+
+/// **v6.8.20 — track current turn's query predicate.** Shape
+/// detection that runs ahead of the cascade so the predicate
+/// flag persists in session whether or not the cascade ends up
+/// emitting a fact.  Used by the NEXT turn's ellipsis
+/// expansion.
+fn detect_query_predicate(input: &str) -> Option<&'static str> {
+    let lower = input.to_lowercase();
+    if lower.contains("формула") || lower.contains("таңба") {
+        return Some("formula");
+    }
+    None
+}
+
 /// **v6.8.19 — Codex Q3 school #5b.** Recognise world_core
 /// domains whose entries are people (so anaphora classification
 /// pushes them as `ReferentKind::Person`).
@@ -6230,6 +6341,89 @@ mod phase_27_tests {
     fn returns_none_when_no_turaly() {
         // «Бәлкім» but no «туралы» pattern — not a clarification.
         assert!(extract_belkim_clarification_noun("Бәлкім, осы жауап дұрыс шығар.").is_none());
+    }
+}
+
+#[cfg(test)]
+mod v6_8_20_predicate_ellipsis_tests {
+    //! **v6.8.20 — Codex Q3 school #2.**  Verify the ellipsis
+    //! detector + genitive-noun extractor + predicate rewrite
+    //! against Codex's exact audit example and a few edge
+    //! shapes.
+
+    use super::{
+        detect_query_predicate, expand_predicate_ellipsis, extract_genitive_noun,
+        looks_like_predicate_ellipsis,
+    };
+
+    #[test]
+    fn looks_like_ellipsis_kazakh_shapes() {
+        // Canonical Codex case.
+        assert!(looks_like_predicate_ellipsis("ал көмірқышқыл газының ше?"));
+        // Without leading «Ал».
+        assert!(looks_like_predicate_ellipsis("көмірқышқыл газының ше?"));
+        // Different genitive suffixes.
+        assert!(looks_like_predicate_ellipsis("алтынның ше?"));
+        assert!(looks_like_predicate_ellipsis("күмістің ше?"));
+        // Trailing punctuation variants.
+        assert!(looks_like_predicate_ellipsis("ал темірдің ше."));
+        assert!(looks_like_predicate_ellipsis("ал темірдің ше"));
+    }
+
+    #[test]
+    fn looks_like_ellipsis_rejects_non_ellipsis() {
+        // No trailing «ше».
+        assert!(!looks_like_predicate_ellipsis(
+            "ал көмірқышқыл газының формуласы?"
+        ));
+        // No genitive marker.
+        assert!(!looks_like_predicate_ellipsis("ал көмірқышқыл газы ше?"));
+        // Empty.
+        assert!(!looks_like_predicate_ellipsis(""));
+        // Plain «ше» mid-sentence (not at end).
+        assert!(!looks_like_predicate_ellipsis("ше деген сөз неге?"));
+    }
+
+    #[test]
+    fn extract_genitive_noun_canonical() {
+        assert_eq!(
+            extract_genitive_noun("ал көмірқышқыл газының ше?"),
+            Some("көмірқышқыл газы".into()),
+        );
+        // «алтынның» strips «-ның» (3-char suffix) → «алтын».
+        // The suffix list is matched as whole-string trailing,
+        // not character-by-character, so the bare root's «н»
+        // stays intact.
+        assert_eq!(extract_genitive_noun("алтынның ше?"), Some("алтын".into()));
+    }
+
+    #[test]
+    fn expand_predicate_ellipsis_formula_rewrite() {
+        let r = expand_predicate_ellipsis("Ал көмірқышқыл газының ше?", Some("formula"));
+        assert_eq!(r, Some("көмірқышқыл газы формуласы".into()));
+    }
+
+    #[test]
+    fn expand_predicate_ellipsis_no_session_predicate() {
+        // First-turn ellipsis is under-specified — let cascade
+        // fall through to the generic handler.
+        let r = expand_predicate_ellipsis("Ал алтынның ше?", None);
+        assert_eq!(r, None);
+    }
+
+    #[test]
+    fn expand_predicate_ellipsis_unsupported_predicate() {
+        // v6.8.20 ships only formula rewriting.  Unknown
+        // predicates return None — the cascade decides.
+        let r = expand_predicate_ellipsis("Ал алтынның ше?", Some("definition"));
+        assert_eq!(r, None);
+    }
+
+    #[test]
+    fn detect_query_predicate_formula() {
+        assert_eq!(detect_query_predicate("Судың формуласы?"), Some("formula"));
+        assert_eq!(detect_query_predicate("Алтынның таңбасы?"), Some("formula"));
+        assert_eq!(detect_query_predicate("Привет!"), None);
     }
 }
 
