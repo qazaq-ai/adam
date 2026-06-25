@@ -376,6 +376,15 @@ fn answer_with_corpus_inner_full(
     if let Some(text) = lookup_procedure_permission_check(input, anaphora_procedure_id) {
         return Some(RouterAnswer::from_text(text, EvidenceKind::ProcedureMatch));
     }
+    // v6.8.21 — historical alias handler («Ол бұрын қалай
+    // аталды?»).  Runs BEFORE the legacy cascade so the v6.1
+    // live-data refusal (which previously matched on «бұрын»
+    // ambiguously) doesn't intercept the query.  Uses
+    // anaphora_subject for pronoun-elided shapes; explicit-
+    // subject queries match the lookup directly.
+    if let Some(text) = lookup_historical_alias_with_anaphora(input, anaphora_subject) {
+        return Some(RouterAnswer::from_text(text, EvidenceKind::CuratedFact));
+    }
     // Main cascade — String-returning chain.  We also re-run the
     // procedure retrieval helper to recover both the matched id
     // (for the discourse-state referent push) AND the keyword
@@ -3202,6 +3211,116 @@ fn looks_like_procedure_permission_query(input: &str) -> bool {
         || lower.contains("допустимо");
     has_conditional && has_permission_q
 }
+
+/// **v6.8.21 — Codex Q3 school #3: historical alias.**  Answer
+/// «X бұрын қалай аталды?» / «Ол бұрын қалай аталды?» from a
+/// curated Kazakh-cities-and-major-places alias table.
+///
+/// Anaphora-aware: when the input has no explicit subject, the
+/// helper consults `anaphora_subject` (the latest non-Procedure
+/// referent) and retries with a synthesised «{subject} бұрын
+/// қалай аталды?» query.
+///
+/// Returns `None` when:
+///   * the input doesn't carry a «бұрын аталды» / «ескі аты» /
+///     «прежнее название» marker;
+///   * the subject doesn't match any entry in
+///     `HISTORICAL_ALIASES`.  In that case the cascade falls
+///     through honestly — better than fabricating a
+///     plausible-sounding alias chain.
+fn lookup_historical_alias_with_anaphora(
+    input: &str,
+    anaphora_subject: Option<&str>,
+) -> Option<String> {
+    if let Some(text) = lookup_historical_alias(input) {
+        return Some(text);
+    }
+    let subject = anaphora_subject?;
+    if !looks_like_historical_alias_query(input) {
+        return None;
+    }
+    let synthesised = format!("{subject} {input}");
+    lookup_historical_alias(&synthesised)
+}
+
+fn lookup_historical_alias(input: &str) -> Option<String> {
+    if !looks_like_historical_alias_query(input) {
+        return None;
+    }
+    let lower = input.to_lowercase();
+    for (canonical, aliases) in HISTORICAL_ALIASES {
+        if lower.contains(canonical) {
+            let chain = aliases.join("; ");
+            return Some(format!("{} бұрын: {}.", capitalize_first(canonical), chain,));
+        }
+    }
+    None
+}
+
+fn looks_like_historical_alias_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    lower.contains("бұрын қалай аталды")
+        || lower.contains("бұрын қалай аталған")
+        || lower.contains("бұрынғы аты")
+        || lower.contains("бұрынғы атауы")
+        || lower.contains("ескі аты")
+        || lower.contains("ескі атауы")
+        || lower.contains("бұрын аталған")
+        || lower.contains("раньше назывался")
+        || lower.contains("прежнее название")
+        || lower.contains("старое название")
+}
+
+/// Curated historical alias table for major Kazakh cities and
+/// landmarks.  Each entry: canonical lowercased modern name →
+/// chronologically-ordered list of historical names with
+/// year ranges.  v6.8.21 ships a small set covering the
+/// places adam's world_core has factual coverage for; expand
+/// as new pilot or school-tutor data arrives.
+///
+/// Pattern: «<earlier name> (<year range>)» — Kazakh
+/// readability over machine parseability.  When a future
+/// commit needs structured access, this becomes a
+/// `BTreeMap<&str, Vec<HistoricalName>>` with typed time
+/// anchors.
+#[rustfmt::skip]
+const HISTORICAL_ALIASES: &[(&str, &[&str])] = &[
+    ("астана", &[
+        "Ақмолинск (1830–1961)",
+        "Целиноград (1961–1992)",
+        "Ақмола (1992–1998)",
+        "Астана (1998–2019)",
+        "Нұр-Сұлтан (2019–2022)",
+        "Астана (2022 жылдан қайтадан)",
+    ]),
+    ("алматы", &[
+        "Верный (1854–1921)",
+        "Алма-Ата (1921–1993)",
+        "Алматы (1993 жылдан)",
+    ]),
+    ("шымкент", &[
+        "Чимкент (Ресей империясы / КСРО кезеңі)",
+        "Шымкент (тәуелсіздік алғаннан кейін)",
+    ]),
+    ("тараз", &[
+        "Әулие-Ата (XIX ғасырға дейін)",
+        "Мирзоян (1936–1938)",
+        "Жамбыл (1938–1997)",
+        "Тараз (1997 жылдан)",
+    ]),
+    ("семей", &[
+        "Семипалатинск (1718–2007)",
+        "Семей (2007 жылдан)",
+    ]),
+    ("петропавл", &[
+        "Петропавловск (Ресей империялық дәуірі)",
+        "Петропавл (қазақша атау)",
+    ]),
+    ("өскемен", &[
+        "Усть-Каменогорск (орысша атау)",
+        "Өскемен (қазақша атау)",
+    ]),
+];
 
 const SHAPE_TRIGGERS_KK: &[&str] = &[
     "қалай жүргізіл",
