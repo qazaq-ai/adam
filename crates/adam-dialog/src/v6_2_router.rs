@@ -438,6 +438,18 @@ fn answer_with_corpus_inner_legacy(
     // have a real Kazakh meaning beyond «numeral + case».  Caller
     // without lexicon (legacy `answer_with_corpus(input, idx)`) falls
     // through to the hardcoded blacklist inside math_solver.
+    // **v6.8.17 — Codex Q3 school bug #1.**  Grade-statement
+    // detection runs BEFORE math_solver so «Сәлем, мен 8-сынып
+    // оқушысымын» doesn't get misrouted to the math refusal
+    // template just because the cascade sees a «8» numeral.
+    // Gated on a first-person marker AND a grade-role marker
+    // (see `recognize_grade_statement`), so standalone factual
+    // queries about a grade («8-сынып бағдарламасы қандай?»)
+    // are NOT affected.
+    if let Some(ack) = recognize_grade_statement(input) {
+        return Some(ack);
+    }
+
     let math_hit = if let Some(lex) = lex {
         let is_non_numeral = |w: &str| -> bool {
             use adam_kernel_fst::parser::{Analysis, analyse};
@@ -451,12 +463,10 @@ fn answer_with_corpus_inner_legacy(
         } else {
             None
         }
+    } else if looks_like_math(input) {
+        math_solver::solve(input)
     } else {
-        if looks_like_math(input) {
-            math_solver::solve(input)
-        } else {
-            None
-        }
+        None
     };
     if let Some(r) = math_hit {
         return Some(r.render());
@@ -1491,6 +1501,75 @@ fn recognize_occupation_statement(input: &str) -> Option<String> {
                 "Түсіндім, сіз {canonical}сыз. Бағдарламалау тілдері мен \
                  алгоритмдер туралы сұрағыңыз болса — көмектесуге тырысамын."
             ));
+        }
+    }
+    None
+}
+
+/// **v6.8.17 — Codex Q3 school bug #1.**  Detect a school-grade
+/// self-introduction («Мен 8-сынып оқушысымын» / «Менің 9
+/// сыныптамын» / «Сәлем, мен 11-сынып оқушысы») and return a
+/// friendly acknowledgement.
+///
+/// The fix replaces the previous misroute: `math_solver` would
+/// fire on the «8» (or «9», «11», …) numeral and refuse with
+/// «жазсаңыз — есептеп беремін» (please type a numeric
+/// expression).  Grade-statement detection MUST run BEFORE
+/// `math_solver::looks_like_math_validated` so the cascade
+/// recognises the self-introduction shape first.
+///
+/// Detection requires BOTH:
+///   * a first-person marker («мен» / «менің» / «маған»);
+///   * a grade-role marker («сынып оқушы» / «сыныптамын» /
+///     «сынып баласы» / «сынып студенті»).
+/// Without both, returns `None` and the cascade falls through.
+/// Standalone «X-сынып» (no first-person frame) stays available
+/// for legitimate factual queries («8-сынып бағдарламасы
+/// қандай?»).
+fn recognize_grade_statement(input: &str) -> Option<String> {
+    let lower = input.to_lowercase();
+    let has_first_person = lower
+        .split(|c: char| !c.is_alphanumeric())
+        .any(|t| matches!(t, "мен" | "менің" | "маған" | "мені" | "менде" | "менен"));
+    if !has_first_person {
+        return None;
+    }
+    let has_grade_role = lower.contains("сынып оқушы")
+        || lower.contains("сынып баласы")
+        || lower.contains("сынып студент")
+        || lower.contains("сыныптамын")
+        || lower.contains("сыныпта оқимын")
+        || lower.contains("сыныпта оқып");
+    if !has_grade_role {
+        return None;
+    }
+    let grade = extract_grade_number(&lower);
+    Some(match grade {
+        Some(n) => format!("Сәлем, {n}-сынып оқушысы! Қандай пәннен көмек керек?"),
+        None => "Сәлем, оқушы! Қандай пәннен көмек керек?".to_string(),
+    })
+}
+
+/// Extract a school-grade number from a lower-cased input.
+/// Accepts `1..=11` (Kazakh school covers grades 1 through 11).
+/// Scans for digit runs of 1–2 chars; first match wins.  Returns
+/// `None` when no digit appears (the caller emits a grade-less
+/// greeting).
+fn extract_grade_number(lower: &str) -> Option<u32> {
+    let mut digits = String::new();
+    for ch in lower.chars().chain(std::iter::once(' ')) {
+        if ch.is_ascii_digit() {
+            digits.push(ch);
+            if digits.len() > 2 {
+                digits.clear();
+            }
+        } else if !digits.is_empty() {
+            if let Ok(n) = digits.parse::<u32>()
+                && (1..=11).contains(&n)
+            {
+                return Some(n);
+            }
+            digits.clear();
         }
     }
     None
@@ -5487,6 +5566,67 @@ mod tests {
     ///     correct curated lookups.
     ///   * Weak ProcedureMatch (raw=2 → 0.25) MUST trigger.
     ///   * Strong ProcedureMatch (raw=6 → 0.75) must NOT.
+    /// **v6.8.17 — Codex Q3 school bug #1.** The exact bug:
+    /// «Сәлем, мен 8-сынып оқушысымын» fired math, returned
+    /// «жазсаңыз — есептеп беремін».  The grade-statement
+    /// detector now fires first.
+    #[test]
+    fn recognize_grade_statement_canonical() {
+        let r = recognize_grade_statement("Сәлем, мен 8-сынып оқушысымын.").expect("fires");
+        assert!(r.contains("8-сынып"), "expected grade number, got: {r}");
+        assert!(r.contains("Қандай пәннен"));
+    }
+
+    /// Grades 1–11 all parse.
+    #[test]
+    fn recognize_grade_statement_full_range() {
+        for n in 1..=11 {
+            let input = format!("Мен {n}-сынып оқушысымын.");
+            let r = recognize_grade_statement(&input)
+                .unwrap_or_else(|| panic!("grade {n} should fire — input was {input}"));
+            assert!(r.contains(&format!("{n}-сынып")));
+        }
+    }
+
+    /// Without first-person marker, the detector does NOT fire —
+    /// «8-сынып бағдарламасы қандай?» is a legitimate factual
+    /// query about a grade's curriculum, not a self-intro.
+    #[test]
+    fn recognize_grade_statement_no_first_person_no_fire() {
+        assert!(recognize_grade_statement("8-сынып бағдарламасы қандай?").is_none());
+        assert!(recognize_grade_statement("11-сынып емтиханы туралы.").is_none());
+    }
+
+    /// Without grade-role marker, doesn't fire — bare «мен 8»
+    /// is too sparse to interpret as a school grade statement.
+    #[test]
+    fn recognize_grade_statement_no_role_no_fire() {
+        assert!(recognize_grade_statement("Мен 8.").is_none());
+        assert!(recognize_grade_statement("Менің 8 кітабым бар.").is_none());
+    }
+
+    /// Bare math queries must NOT trigger grade detection — they
+    /// have neither a first-person grade-role marker nor any
+    /// «сынып» token.
+    #[test]
+    fn recognize_grade_statement_math_baseline() {
+        assert!(recognize_grade_statement("8+5 қанша?").is_none());
+        assert!(recognize_grade_statement("Жетіге бесті қос.").is_none());
+        assert!(recognize_grade_statement("2+2 қанша?").is_none());
+    }
+
+    /// `extract_grade_number` covers 1–11 and rejects out-of-range.
+    #[test]
+    fn extract_grade_number_range() {
+        assert_eq!(extract_grade_number("мен 8-сынып оқушысымын"), Some(8));
+        assert_eq!(extract_grade_number("11-сынып"), Some(11));
+        assert_eq!(extract_grade_number("1-сынып"), Some(1));
+        // 12 is above the Kazakh school range — reject.
+        assert_eq!(extract_grade_number("12-сынып"), None);
+        assert_eq!(extract_grade_number("100"), None);
+        assert_eq!(extract_grade_number("сынып"), None);
+    }
+
     #[test]
     fn clarify_threshold_boundary() {
         // Strict-inequality boundary: `< CLARIFY_THRESHOLD` means
