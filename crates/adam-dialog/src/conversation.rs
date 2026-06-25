@@ -949,6 +949,17 @@ impl Conversation {
             self.session
                 .insert("last_query_predicate".into(), pred.into());
         }
+        // **v6.8.22 — Codex Q3 school #4: meta-summarise.**  Detect
+        // «Қысқаша қорытынды жаса» / «коротко суммируй» shape and
+        // emit a Kazakh-first summary of the recent topic history.
+        // Captured BEFORE the cascade so the meta command always
+        // wins; the result is used in place of the cascade output
+        // at the v6_2_router callsite below.
+        let meta_summarise = if detect_meta_summarise_query(input) {
+            Some(summarise_recent_topics(&self.dialog_context))
+        } else {
+            None
+        };
         // **v6.1.40 — 2026-05-24 voice audit round 2.** Smart
         // consecutive-turn honorific dedup. If the PREVIOUS turn
         // emitted the diminutive («Дәке»), set a session flag the
@@ -3877,6 +3888,17 @@ impl Conversation {
         } else {
             final_output
         };
+        // **v6.8.22 — meta-summarise override.**  When the input
+        // matches the «Қысқаша қорытынды жаса» shape, the meta
+        // summary (computed earlier from `dialog_context`) wins
+        // over whatever the cascade produced.  This lets the
+        // user request a recap regardless of what specific
+        // handler the input would otherwise have routed to —
+        // exactly the meta-intent semantics Codex called for.
+        let final_output = match &meta_summarise {
+            Some(s) => s.clone(),
+            None => final_output,
+        };
         // **Phase 28 (2026-06-04 — post-rc13 audit)** — proper-noun
         // capitalization for the `Бәлкім, X туралы айтасыз ба`
         // clarification slot.  See `capitalize_belkim_noun_in_output`
@@ -5118,6 +5140,70 @@ impl Conversation {
     }
 }
 
+/// **v6.8.22 — Codex Q3 school #4: meta-summarise.**  Detect a
+/// «Қысқаша қорытынды жаса» / «коротко суммируй» / «summary
+/// please» meta command.  Returns `true` when the input asks
+/// for a summary of recent dialog.  Pure shape detector — does
+/// NOT touch the dialog context.
+fn detect_meta_summarise_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    lower.contains("қысқаша қорытынды")
+        || lower.contains("қорытынды жаса")
+        || lower.contains("қысқаша айтып бер")
+        || lower.contains("қысқаша түсіндір")
+        || lower.contains("суммарла")
+        || lower.contains("коротко суммируй")
+        || lower.contains("кратко суммируй")
+        || lower.contains("дай резюме")
+        || lower.contains("summarize")
+        || lower.contains("summary please")
+}
+
+/// **v6.8.22 — produce a Kazakh-first summary of the recent
+/// dialog topics.**  Reads from `DialogContext.topic_history`
+/// — the same source the v6.1 anaphora layer uses — so the
+/// summary reflects what was actually discussed, not what the
+/// cascade THOUGHT was discussed.
+///
+/// Algorithm:
+///   * Walk topic_history newest-to-oldest.
+///   * De-duplicate adjacent / identical topics.
+///   * Take up to 5 distinct topics.
+///   * When empty, return a friendly «nothing to summarise» line.
+///   * When non-empty, return «Соңғы талқыланғандар: A; B; C.»
+fn summarise_recent_topics(ctx: &crate::dialog_context::DialogContext) -> String {
+    let mut seen: Vec<String> = Vec::new();
+    for mention in ctx.topic_history.iter().rev() {
+        let canonical = mention.topic.trim().to_lowercase();
+        if canonical.is_empty() {
+            continue;
+        }
+        if seen.iter().any(|s| s == &canonical) {
+            continue;
+        }
+        seen.push(canonical);
+        if seen.len() >= 5 {
+            break;
+        }
+    }
+    if seen.is_empty() {
+        return "Әзірге талқыланған тақырып жоқ. Бір сұрақ қойсаңыз — кейін қорытынды жасап беремін.".into();
+    }
+    let mut titlecased: Vec<String> = seen
+        .iter()
+        .map(|s| {
+            let mut chars = s.chars();
+            match chars.next() {
+                Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
+                None => String::new(),
+            }
+        })
+        .collect();
+    // Reverse so the summary lists oldest-to-newest.
+    titlecased.reverse();
+    format!("Соңғы талқыланғандар: {}.", titlecased.join("; "))
+}
+
 /// **v6.8.20 — Codex Q3 school #2: predicate ellipsis-inherit.**
 /// Detect the Kazakh ellipsis shape «Ал X-тің ше?» / «X-тің
 /// ше?» (and trailing-punctuation variants) and rewrite to the
@@ -6341,6 +6427,99 @@ mod phase_27_tests {
     fn returns_none_when_no_turaly() {
         // «Бәлкім» but no «туралы» pattern — not a clarification.
         assert!(extract_belkim_clarification_noun("Бәлкім, осы жауап дұрыс шығар.").is_none());
+    }
+}
+
+#[cfg(test)]
+mod v6_8_22_meta_summarise_tests {
+    //! **v6.8.22 — Codex Q3 school #4.**  Verify the meta-
+    //! summarise shape detector and the topic-history
+    //! reduction against a few representative shapes.
+
+    use super::{detect_meta_summarise_query, summarise_recent_topics};
+    use crate::dialog_context::{DialogContext, TopicMention};
+
+    #[test]
+    fn detector_matches_codex_shapes() {
+        assert!(detect_meta_summarise_query("Қысқаша қорытынды жаса."));
+        assert!(detect_meta_summarise_query("қорытынды жаса"));
+        assert!(detect_meta_summarise_query("Қысқаша айтып бер."));
+        assert!(detect_meta_summarise_query("Кратко суммируй."));
+        assert!(detect_meta_summarise_query("Дай резюме."));
+        assert!(detect_meta_summarise_query("Please summarize."));
+    }
+
+    #[test]
+    fn detector_rejects_unrelated_inputs() {
+        assert!(!detect_meta_summarise_query("Судың формуласы?"));
+        assert!(!detect_meta_summarise_query("Сәлем!"));
+        assert!(!detect_meta_summarise_query("Қысқаша мысал."));
+        // «қорытынды» without «жаса» / «бер» — could be «вывод
+        // материала», not a meta command.
+        assert!(!detect_meta_summarise_query("Жоғары соттың қорытындысы."));
+    }
+
+    #[test]
+    fn summarise_empty_history_returns_fallback() {
+        let ctx = DialogContext::default();
+        let r = summarise_recent_topics(&ctx);
+        assert!(r.contains("Әзірге"), "got: {r}");
+    }
+
+    #[test]
+    fn summarise_emits_distinct_topics_oldest_to_newest() {
+        let mut ctx = DialogContext::default();
+        ctx.topic_history.push(TopicMention {
+            turn_id: 0,
+            topic: "су".into(),
+            domain: None,
+            from_anaphora: false,
+        });
+        ctx.topic_history.push(TopicMention {
+            turn_id: 1,
+            topic: "темір".into(),
+            domain: None,
+            from_anaphora: false,
+        });
+        ctx.topic_history.push(TopicMention {
+            turn_id: 2,
+            topic: "темір".into(), // duplicate
+            domain: None,
+            from_anaphora: false,
+        });
+        ctx.topic_history.push(TopicMention {
+            turn_id: 3,
+            topic: "күміс".into(),
+            domain: None,
+            from_anaphora: false,
+        });
+        let r = summarise_recent_topics(&ctx);
+        assert!(r.starts_with("Соңғы талқыланғандар:"), "got: {r}");
+        // Order: oldest first, newest last; duplicates collapsed.
+        let pos_su = r.find("Су").expect("Су in summary");
+        let pos_temir = r.find("Темір").expect("Темір in summary");
+        let pos_kumis = r.find("Күміс").expect("Күміс in summary");
+        assert!(pos_su < pos_temir);
+        assert!(pos_temir < pos_kumis);
+        // Темір appears only once despite being recorded twice.
+        assert_eq!(r.matches("Темір").count(), 1);
+    }
+
+    #[test]
+    fn summarise_caps_at_five_distinct_topics() {
+        let mut ctx = DialogContext::default();
+        for (i, t) in ["a", "b", "c", "d", "e", "f", "g"].iter().enumerate() {
+            ctx.topic_history.push(TopicMention {
+                turn_id: i,
+                topic: (*t).into(),
+                domain: None,
+                from_anaphora: false,
+            });
+        }
+        let r = summarise_recent_topics(&ctx);
+        // Newest 5 kept (c, d, e, f, g), oldest dropped (a, b).
+        assert!(!r.contains('A'), "should drop 'a': {r}");
+        assert!(r.contains('G'), "should include newest 'g': {r}");
     }
 }
 
