@@ -960,6 +960,39 @@ impl Conversation {
         } else {
             None
         };
+        // **v6.8.23 — Codex L4.5 first step: bare-rejection
+        // correction prompt.**  Catches the
+        // `correction_without_replacement` probe — after the
+        // user supplies a personal fact (name / age / city) and
+        // immediately rejects with bare «Жоқ» / «Нет» / «No», we
+        // surface a Kazakh re-statement prompt instead of falling
+        // through to the cascade's generic «Жоқ» refusal
+        // template.  This is the user-side analogue of the
+        // commitment-status pattern Codex sketched for L4.5 —
+        // here a Proposed commitment becomes Contested and adam
+        // asks for the replacement explicitly.
+        //
+        // The target slot is taken from
+        // `session["pending_correction_target"]`, set at the end
+        // of the previous turn when the cascade wrote to a
+        // user-fact slot.  Stored as `slot|turn_counter` so
+        // staleness gets enforced — the prompt only fires if the
+        // commit happened on the IMMEDIATELY-prior turn.
+        let bare_rejection_override = if looks_like_bare_rejection(input) {
+            self.pending_correction_reprompt()
+        } else {
+            None
+        };
+        // Snapshot user-fact slots BEFORE the cascade so we can
+        // record what changed for the next turn's bare-rejection
+        // handler.  Only the three slots we currently support
+        // (name / age / city) are captured — keeping the
+        // snapshot cheap and the diff trivial.
+        let session_snapshot: [(&str, Option<String>); 3] = [
+            ("name", self.session.get("name").cloned()),
+            ("age", self.session.get("age").cloned()),
+            ("city", self.session.get("city").cloned()),
+        ];
         // **v6.1.40 — 2026-05-24 voice audit round 2.** Smart
         // consecutive-turn honorific dedup. If the PREVIOUS turn
         // emitted the diminutive («Дәке»), set a session flag the
@@ -3899,6 +3932,25 @@ impl Conversation {
             Some(s) => s.clone(),
             None => final_output,
         };
+        // **v6.8.23 — bare-rejection override.**  Same shape as
+        // meta_summarise: when the input was a bare «Жоқ» AND
+        // the previous turn committed a user fact, replace the
+        // cascade's generic refusal with a slot-specific
+        // re-statement prompt.
+        let final_output = match &bare_rejection_override {
+            Some(s) => s.clone(),
+            None => final_output,
+        };
+        // **v6.8.23 — record the just-committed user fact for
+        // the NEXT turn's bare-rejection handler.**  Cheap
+        // before/after diff against the session map; we record
+        // the slot name and the current turn counter as
+        // `slot|turn_id` so staleness can be enforced.
+        if bare_rejection_override.is_some() {
+            self.session.remove("pending_correction_target");
+        } else {
+            self.record_pending_correction_target(&session_snapshot, self.turn_counter as u64);
+        }
         // **Phase 28 (2026-06-04 — post-rc13 audit)** — proper-noun
         // capitalization for the `Бәлкім, X туралы айтасыз ба`
         // clarification slot.  See `capitalize_belkim_noun_in_output`
@@ -5138,6 +5190,87 @@ impl Conversation {
         // commitments.
         self.discourse_state = crate::dialog_acts::DiscourseState::default();
     }
+
+    /// **v6.8.23 — when a user-fact slot just changed, record
+    /// the slot name + turn counter so the NEXT turn's
+    /// bare-rejection handler can offer the right re-prompt.**
+    ///
+    /// `snapshot` lists `(slot, prior_value)` taken BEFORE the
+    /// cascade ran; this method reads `self.session` (the
+    /// post-cascade state) and compares.  Stored format is
+    /// `slot|turn_id` so staleness gets enforced — a rejection
+    /// only fires when the commit happened in the
+    /// immediately-prior turn.  Multiple slots changing in the
+    /// same turn keeps the LAST one wins (deterministic by the
+    /// fixed order in `session_snapshot`).
+    fn record_pending_correction_target(
+        &mut self,
+        snapshot: &[(&'static str, Option<String>)],
+        turn_id: u64,
+    ) {
+        let mut latest: Option<&'static str> = None;
+        for (slot, prior) in snapshot {
+            let now = self.session.get(*slot).cloned();
+            if now != *prior && now.is_some() {
+                latest = Some(slot);
+            }
+        }
+        if let Some(slot) = latest {
+            self.session.insert(
+                "pending_correction_target".into(),
+                format!("{slot}|{turn_id}"),
+            );
+        }
+    }
+
+    /// **v6.8.23 — if a bare-rejection fires on the immediately-
+    /// next turn after a slot commit, return the appropriate
+    /// re-prompt text; otherwise return `None` so the cascade
+    /// handles the input.**
+    ///
+    /// The pending target is consumed only when used — `None`
+    /// returns leave it in place so a transient false-positive
+    /// «Жоқ» detection doesn't lose the correction window.
+    fn pending_correction_reprompt(&self) -> Option<String> {
+        let raw = self.session.get("pending_correction_target")?;
+        let (slot, turn_str) = raw.split_once('|')?;
+        let stored_turn: u64 = turn_str.parse().ok()?;
+        // Staleness — only fire when the slot was set on the
+        // IMMEDIATELY-prior turn.  `record_pending_correction_target`
+        // captures `self.turn_counter` AFTER the mid-cascade
+        // increment, so the stored value equals what
+        // `self.turn_counter` reads at the START of the next
+        // turn.  Equality, not `+1`.
+        if (self.turn_counter as u64) != stored_turn {
+            return None;
+        }
+        let prompt = match slot {
+            "name" => "Атыңызды қайта айтыңызшы.",
+            "age" => "Жасыңызды қайта айтыңызшы.",
+            "city" => "Қайдан екеніңізді қайта айтыңызшы.",
+            _ => return None,
+        };
+        Some(prompt.into())
+    }
+}
+
+/// **v6.8.23 — bare-rejection detector.**  Returns `true` when
+/// the input is JUST a rejection token with optional
+/// punctuation: «Жоқ», «Жоқ.», «Нет», «Нет.», «No», «Yo'q»
+/// (Uzbek loan), etc.  Multi-word inputs containing a rejection
+/// AND additional content (e.g. «Жоқ, мен Бекжан емеспін.»)
+/// return `false` — those are full corrections that the cascade
+/// handles via the existing «X емес» negation pathway.
+fn looks_like_bare_rejection(input: &str) -> bool {
+    let stripped: String = input
+        .chars()
+        .filter(|c| c.is_alphanumeric() || c.is_whitespace())
+        .collect();
+    let canonical = stripped.trim().to_lowercase();
+    matches!(
+        canonical.as_str(),
+        "жоқ" | "жок" | "нет" | "no" | "yo'q" | "yoq"
+    )
 }
 
 /// **v6.8.22 — Codex Q3 school #4: meta-summarise.**  Detect a
@@ -6427,6 +6560,36 @@ mod phase_27_tests {
     fn returns_none_when_no_turaly() {
         // «Бәлкім» but no «туралы» pattern — not a clarification.
         assert!(extract_belkim_clarification_noun("Бәлкім, осы жауап дұрыс шығар.").is_none());
+    }
+}
+
+#[cfg(test)]
+mod v6_8_23_bare_rejection_tests {
+    //! **v6.8.23.**  Coverage for the bare-rejection detector.
+    //! End-to-end behaviour (commit → reject → re-prompt) lives
+    //! in the multi-turn fixture; here we just lock the shape
+    //! detector.
+    use super::looks_like_bare_rejection;
+
+    #[test]
+    fn bare_rejection_tokens_fire() {
+        assert!(looks_like_bare_rejection("Жоқ."));
+        assert!(looks_like_bare_rejection("жоқ"));
+        assert!(looks_like_bare_rejection("Жок!"));
+        assert!(looks_like_bare_rejection("Нет."));
+        assert!(looks_like_bare_rejection("No"));
+        assert!(looks_like_bare_rejection("  Жоқ  "));
+    }
+
+    #[test]
+    fn full_corrections_do_not_fire() {
+        assert!(!looks_like_bare_rejection("Жоқ, мен Айдос."));
+        assert!(!looks_like_bare_rejection("Жоқ, басқа есім."));
+        assert!(!looks_like_bare_rejection("Нет, не Бекжан."));
+        // Empty / unrelated.
+        assert!(!looks_like_bare_rejection(""));
+        assert!(!looks_like_bare_rejection("Иә."));
+        assert!(!looks_like_bare_rejection("Сәлем."));
     }
 }
 
