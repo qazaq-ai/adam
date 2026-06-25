@@ -550,6 +550,12 @@ fn answer_with_corpus_inner_legacy(
     if let Some(answer) = lookup_person_birthplace_with_anaphora(input, idx, anaphora_subject) {
         return Some(answer);
     }
+    // v6.8.18 — anaphora-aware birth-year handler.  Closes
+    // Codex Q3 school #5 part 1: «Ол қай жылы туған?» bare
+    // follow-up after a biographical intro.
+    if let Some(answer) = lookup_person_birthyear_with_anaphora(input, idx, anaphora_subject) {
+        return Some(answer);
+    }
     if let Some(answer) = lookup_person_occupation_with_anaphora(input, idx, anaphora_subject) {
         return Some(answer);
     }
@@ -2495,6 +2501,62 @@ fn looks_like_birthplace_query(input: &str) -> bool {
         || lower.contains("қай жерде туыл")
         || lower.contains("где родил")
         || lower.contains("место рожд")
+}
+
+/// **v6.8.18 — Codex Q3 school #5 part 1.** Anaphora-aware
+/// birth-year handler.  Closes the «Ол қай жылы туған?»
+/// bare-follow-up gap that Codex flagged in the audit: the
+/// explicit-subject query («Ахмет Байтұрсынұлы қай жылы
+/// туылған?») already resolves via the cascade, but the
+/// pronoun-elided follow-up after a biographical intro had no
+/// handler and fell into a generic «Жыл бір күннен …»
+/// definition response.
+///
+/// Mirrors `lookup_person_birthplace_with_anaphora` exactly —
+/// same shape detector / same anaphora fallback / different
+/// extraction (year via `query_year_for_predicate` rather than
+/// place via `query_place_for_predicate`).  Both share the
+/// BornIn predicate but pick complementary fields.
+fn lookup_person_birthyear_with_anaphora(
+    input: &str,
+    idx: &FrameIndex,
+    anaphora_subject: Option<&str>,
+) -> Option<String> {
+    if let Some(text) = lookup_person_birthyear(input, idx) {
+        return Some(text);
+    }
+    let subject = anaphora_subject?;
+    if !looks_like_birthyear_query(input) {
+        return None;
+    }
+    let synthesised = format!("{subject} {input}");
+    lookup_person_birthyear(&synthesised, idx)
+}
+
+fn lookup_person_birthyear(input: &str, idx: &FrameIndex) -> Option<String> {
+    if !looks_like_birthyear_query(input) {
+        return None;
+    }
+    let lower = input.to_lowercase();
+    let subject = canonical_agent_for(&lower)?;
+    let year = query_year_for_predicate(idx, &subject, FramePredicate::BornIn)?;
+    let subject_titlecase = capitalize_first(&subject);
+    Some(format!("{subject_titlecase} {year} жылы туылған."))
+}
+
+fn looks_like_birthyear_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    // Kazakh: «қай жылы туыл» / «қай жылы туған» / «қашан туыл»
+    // / «қашан туған» — all ask for the birth YEAR specifically
+    // (vs `looks_like_birthplace_query` which asks for the
+    // birth PLACE via «қайда туыл» / «қай жерде»).
+    let asks_year = lower.contains("қай жылы")
+        || lower.contains("қашан туыл")
+        || lower.contains("қашан туған")
+        || lower.contains("в каком году")
+        || lower.contains("когда родил");
+    let asks_birth = lower.contains("туыл") || lower.contains("туған") || lower.contains("родил");
+    asks_year && asks_birth
 }
 
 /// **v6.8.7 L4.8 — PropertyQueryIR occupation.**  Resolve
@@ -4882,11 +4944,21 @@ mod tests {
     }
 
     /// Real biographical question → realised Kazakh sentence.
+    ///
+    /// v6.8.18 update: the answer changed from the bare year
+    /// «1872» to the fuller «Ахмет байтұрсынұлы 1872 жылы
+    /// туылған.» sentence after the dedicated
+    /// `lookup_person_birthyear_with_anaphora` handler started
+    /// firing on this shape.  The richer sentence is the
+    /// product-side win (Codex Q3 school #5); the bare year is
+    /// still embedded for downstream extractors.
     #[test]
     fn bio_question_returns_year_sentence() {
         let idx = dialog_battery::canonical_corpus();
         let r = answer_with_corpus("Ахмет Байтұрсынұлы қашан туылған?", &idx);
-        assert_eq!(r.as_deref(), Some("1872"));
+        let text = r.expect("should produce an answer");
+        assert!(text.contains("1872"), "expected 1872 in: {text}");
+        assert!(text.contains("туылған"), "expected туылған in: {text}");
     }
 
     /// IsA definition returns a copular sentence.
@@ -4985,7 +5057,11 @@ mod tests {
     fn stt_fold_tolgan_routes_to_birth_year() {
         let idx = dialog_battery::canonical_corpus();
         let r = answer_with_corpus("Ахмет байтурсынулы қашан толған?", &idx);
-        assert_eq!(r.as_deref(), Some("1872"));
+        // v6.8.18: answer shape changed from bare year to full
+        // sentence — assert on the year embedding so STT-fold
+        // routing is still being exercised.
+        let text = r.expect("should produce an answer");
+        assert!(text.contains("1872"), "expected 1872 in: {text}");
     }
 
     /// Session-4 audit: «Мен ағай болғанымды қалай түсіндім»
