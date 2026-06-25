@@ -385,6 +385,20 @@ fn answer_with_corpus_inner_full(
     if let Some(text) = lookup_historical_alias_with_anaphora(input, anaphora_subject) {
         return Some(RouterAnswer::from_text(text, EvidenceKind::CuratedFact));
     }
+    // **v6.8.25 — language-bridge peripheral pilot.**  Catches
+    // Russian / English / Kazakh capital-of-country queries
+    // against the trilingual `CAPITALS` table.  Runs BEFORE the
+    // legacy cascade so RU «А столица России?» / EN «What's the
+    // capital of China?» don't fall to the v6.1 «didn't
+    // understand» refusal.  Answer is mirrored in the source
+    // language — the canonical Kazakh fact graph is NOT
+    // duplicated; only the formatter switches.  See the 2026-
+    // 06-25 strategic review (project_codex_consultation_
+    // 2026_06_25) for the «peripheral semantic adapter»
+    // pattern this is the first instance of.
+    if let Some(text) = crate::lang_bridge::lookup_capital(input) {
+        return Some(RouterAnswer::from_text(text, EvidenceKind::CuratedFact));
+    }
     // Main cascade — String-returning chain.  We also re-run the
     // procedure retrieval helper to recover both the matched id
     // (for the discourse-state referent push) AND the keyword
