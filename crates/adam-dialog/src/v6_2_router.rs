@@ -169,7 +169,7 @@ pub fn answer_with_corpus_full(
     )
 }
 
-/// Rich router result — response text plus the id of any
+/// Typed router result — response text plus the id of any
 /// procedure matched by the procedure-retrieval handler on this
 /// turn.  Caller pushes a `ReferentKind::Procedure` referent so
 /// subsequent turns' attribute follow-ups resolve.
@@ -179,8 +179,21 @@ pub fn answer_with_corpus_full(
 /// commits can route low-confidence outputs to an explicit
 /// `Clarify` shape rather than the «Бәлкім X» / random-Abay-quote
 /// fallback the v6.1 cascade lands on today.
+///
+/// **v6.8.26 — renamed `RouterAnswer` → `AnswerCandidate` and
+/// added typed [`ProofRef`].**  Codex 2026-06-25 #3.  The
+/// rename signals the semantic shift: the v6.2 router no longer
+/// returns a *string answer* but a *candidate* that downstream
+/// layers (verifier, clarifier, future planner) can inspect,
+/// score, or discard.  `ProofRef` carries the typed reference
+/// to whatever produced the candidate — a curated fact id, a
+/// procedure id, a deterministic template name — so the
+/// verifier can trace «what did adam ground this on» without
+/// reparsing the surface text.  Legacy v6.1 cascade outputs
+/// still use [`ProofRef::LegacyCascade`] until each handler is
+/// individually migrated.
 #[derive(Debug, Clone, PartialEq)]
-pub struct RouterAnswer {
+pub struct AnswerCandidate {
     pub text: String,
     pub matched_procedure_id: Option<String>,
     /// Confidence in `[0.0, 1.0]` — how strongly the route
@@ -196,6 +209,58 @@ pub struct RouterAnswer {
     /// produced it.  Used by the verifier + future Clarify
     /// routing to decide whether to suppress a tentative reply.
     pub evidence_kind: EvidenceKind,
+    /// **v6.8.26.**  Typed reference to the producing artifact.
+    /// `LegacyCascade` is the migration-default; individual
+    /// handlers populate concrete refs (`CuratedFact { fact_id }`,
+    /// `ProcedureMatch { procedure_id }`, `Template { name }`,
+    /// `LangBridge { country }`) as they're touched.
+    pub proof_ref: ProofRef,
+}
+
+/// **v6.8.26.**  Backward-compat alias.  Pre-existing callers
+/// (telemetry, external bindings) keep working during the
+/// migration window.  Remove once no use site references the
+/// old name.
+pub type RouterAnswer = AnswerCandidate;
+
+/// **v6.8.26 — typed proof reference.**  Concrete reference to
+/// the artifact backing an [`AnswerCandidate`].  Distinguished
+/// from [`EvidenceKind`] (coarse classification) by carrying
+/// the actual ID / name so the verifier can resolve back to
+/// the source — a `CuratedFact { fact_id: "geo_kz_001" }` can
+/// be fetched from world_core, a `ProcedureMatch { procedure_id:
+/// "kk_labor_ppe_002" }` from `procedure_loader`, etc.
+///
+/// Variants are added when a handler has a structurally-known
+/// reference to populate; handlers that don't (most of the
+/// v6.1 cascade) keep `LegacyCascade` until their migration
+/// commit.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ProofRef {
+    /// World_core fact id.  Resolves via the FrameIndex; the
+    /// verifier checks the fact still exists + still says the
+    /// same thing before signing off.
+    CuratedFact { fact_id: String },
+    /// adam-self identity / capability template — no external
+    /// fact required.  The template id is enough to trace.
+    SystemSelf { template: &'static str },
+    /// Procedure record id resolvable via
+    /// `procedure_loader::shared_procedures()`.
+    ProcedureMatch { procedure_id: String },
+    /// Multi-fact synthesis (e.g. BornIn + DiedIn → lifespan).
+    SynthesisedFact { source_fact_ids: Vec<String> },
+    /// Deterministic template (Clarify, soft-ack, pain ack).
+    /// Verifier knows there is no external claim to validate.
+    Template { name: &'static str },
+    /// Lang-bridge peripheral mirror (RU/EN capital lookup,
+    /// future expansions).  `country` is the canonical lower-
+    /// case Kazakh name so the verifier can trace back to the
+    /// world_core entry.
+    LangBridge { country: &'static str },
+    /// v6.1 cascade — proof not yet typed at the handler level.
+    /// Migration target; new handlers MUST NOT introduce more
+    /// of these.
+    LegacyCascade,
 }
 
 /// Coarse-grained classification of where a `RouterAnswer`
@@ -248,22 +313,23 @@ pub enum EvidenceKind {
 /// still emits its «Бәлкім X» fallback as before.
 pub const CLARIFY_THRESHOLD: f32 = 0.5;
 
-impl RouterAnswer {
-    /// Construct a `RouterAnswer` from a `text` + `evidence_kind`
-    /// pair.  Confidence defaults to `1.0`; callers with
-    /// score-based evidence (procedure match) should use
-    /// `with_confidence`.
+impl AnswerCandidate {
+    /// Construct an `AnswerCandidate` from a `text` +
+    /// `evidence_kind` pair.  Confidence defaults to `1.0` and
+    /// `proof_ref` to [`ProofRef::LegacyCascade`]; callers with
+    /// a known proof reference should use `with_proof_ref`.
     pub fn from_text(text: String, evidence_kind: EvidenceKind) -> Self {
         Self {
             text,
             matched_procedure_id: None,
             confidence: 1.0,
             evidence_kind,
+            proof_ref: ProofRef::LegacyCascade,
         }
     }
 
     /// Override confidence in place.  Returns `self` for fluent
-    /// construction: `RouterAnswer::from_text(...).with_confidence(0.83)`.
+    /// construction: `AnswerCandidate::from_text(...).with_confidence(0.83)`.
     pub fn with_confidence(mut self, confidence: f32) -> Self {
         self.confidence = confidence.clamp(0.0, 1.0);
         self
@@ -273,6 +339,19 @@ impl RouterAnswer {
     /// for fluent construction at the procedure handler call site.
     pub fn with_procedure_id(mut self, procedure_id: String) -> Self {
         self.matched_procedure_id = Some(procedure_id);
+        self
+    }
+
+    /// **v6.8.26.**  Attach a typed [`ProofRef`].  Use at every
+    /// handler call site where the proof source is structurally
+    /// known — e.g. `with_proof_ref(ProofRef::ProcedureMatch {
+    /// procedure_id })` at the procedure-retrieval site, or
+    /// `with_proof_ref(ProofRef::LangBridge { country: "ресей" })`
+    /// at the lang-bridge site.  Legacy handlers that don't yet
+    /// have a typed source leave the default
+    /// [`ProofRef::LegacyCascade`].
+    pub fn with_proof_ref(mut self, proof_ref: ProofRef) -> Self {
+        self.proof_ref = proof_ref;
         self
     }
 
@@ -292,6 +371,7 @@ impl RouterAnswer {
             matched_procedure_id: None,
             confidence: 1.0,
             evidence_kind: EvidenceKind::SoftAck,
+            proof_ref: ProofRef::Template { name: "clarify" },
         }
     }
 }
@@ -383,7 +463,13 @@ fn answer_with_corpus_inner_full(
     // anaphora_subject for pronoun-elided shapes; explicit-
     // subject queries match the lookup directly.
     if let Some(text) = lookup_historical_alias_with_anaphora(input, anaphora_subject) {
-        return Some(RouterAnswer::from_text(text, EvidenceKind::CuratedFact));
+        return Some(
+            AnswerCandidate::from_text(text, EvidenceKind::CuratedFact).with_proof_ref(
+                ProofRef::Template {
+                    name: "historical_alias",
+                },
+            ),
+        );
     }
     // **v6.8.25 — language-bridge peripheral pilot.**  Catches
     // Russian / English / Kazakh capital-of-country queries
@@ -397,7 +483,10 @@ fn answer_with_corpus_inner_full(
     // 2026_06_25) for the «peripheral semantic adapter»
     // pattern this is the first instance of.
     if let Some(text) = crate::lang_bridge::lookup_capital(input) {
-        return Some(RouterAnswer::from_text(text, EvidenceKind::CuratedFact));
+        return Some(
+            AnswerCandidate::from_text(text, EvidenceKind::CuratedFact)
+                .with_proof_ref(ProofRef::LangBridge { country: "capital" }),
+        );
     }
     // Main cascade — String-returning chain.  We also re-run the
     // procedure retrieval helper to recover both the matched id
@@ -406,8 +495,9 @@ fn answer_with_corpus_inner_full(
     let text = answer_with_corpus_inner_legacy(input, idx, lex, anaphora_subject)?;
     if let Some((_, id, normalised_score)) = lookup_procedure_matched_with_score(input) {
         return Some(
-            RouterAnswer::from_text(text, EvidenceKind::ProcedureMatch)
-                .with_procedure_id(id)
+            AnswerCandidate::from_text(text, EvidenceKind::ProcedureMatch)
+                .with_procedure_id(id.clone())
+                .with_proof_ref(ProofRef::ProcedureMatch { procedure_id: id })
                 .with_confidence(normalised_score),
         );
     }
@@ -416,11 +506,12 @@ fn answer_with_corpus_inner_full(
     // capital lookups, …) to populate their own EvidenceKind
     // (CuratedFact / SystemSelf / SynthesisedFact) so the
     // confidence floor can become handler-specific.
-    Some(RouterAnswer {
+    Some(AnswerCandidate {
         text,
         matched_procedure_id: None,
         confidence: 0.5,
         evidence_kind: EvidenceKind::LegacyCascade,
+        proof_ref: ProofRef::LegacyCascade,
     })
 }
 
@@ -4684,6 +4775,64 @@ const _: fn() -> () = || {
     let _: Option<RankedFrame<'_>> = None;
     let _: AnswerSlot = AnswerSlot::Whole;
 };
+
+#[cfg(test)]
+mod v6_8_26_answer_candidate_tests {
+    //! **v6.8.26.**  Lock the AnswerCandidate / ProofRef surface
+    //! so future handler migrations have a stable typed contract.
+    use super::{AnswerCandidate, EvidenceKind, ProofRef, RouterAnswer};
+
+    #[test]
+    fn router_answer_alias_resolves_to_answer_candidate() {
+        // Backcompat alias works — pre-existing callers compile
+        // without churn during the migration window.
+        let a: RouterAnswer = AnswerCandidate::from_text("hi".into(), EvidenceKind::SystemSelf);
+        assert_eq!(a.proof_ref, ProofRef::LegacyCascade);
+    }
+
+    #[test]
+    fn from_text_defaults_to_legacy_cascade() {
+        let a = AnswerCandidate::from_text("x".into(), EvidenceKind::CuratedFact);
+        assert_eq!(a.proof_ref, ProofRef::LegacyCascade);
+    }
+
+    #[test]
+    fn with_proof_ref_attaches_typed_reference() {
+        let a = AnswerCandidate::from_text("x".into(), EvidenceKind::CuratedFact).with_proof_ref(
+            ProofRef::CuratedFact {
+                fact_id: "geo_kz_001".into(),
+            },
+        );
+        assert_eq!(
+            a.proof_ref,
+            ProofRef::CuratedFact {
+                fact_id: "geo_kz_001".into()
+            }
+        );
+    }
+
+    #[test]
+    fn clarify_uses_clarify_template_proof_ref() {
+        let a = AnswerCandidate::clarify();
+        assert_eq!(a.proof_ref, ProofRef::Template { name: "clarify" });
+        assert_eq!(a.evidence_kind, EvidenceKind::SoftAck);
+        assert_eq!(a.confidence, 1.0);
+        assert!(a.matched_procedure_id.is_none());
+    }
+
+    #[test]
+    fn fluent_builder_composes() {
+        let a = AnswerCandidate::from_text("x".into(), EvidenceKind::ProcedureMatch)
+            .with_procedure_id("kk_labor_ppe_002".into())
+            .with_proof_ref(ProofRef::ProcedureMatch {
+                procedure_id: "kk_labor_ppe_002".into(),
+            })
+            .with_confidence(0.83);
+        assert_eq!(a.confidence, 0.83);
+        assert_eq!(a.matched_procedure_id.as_deref(), Some("kk_labor_ppe_002"));
+        assert!(matches!(a.proof_ref, ProofRef::ProcedureMatch { .. }));
+    }
+}
 
 #[cfg(test)]
 mod tests {
