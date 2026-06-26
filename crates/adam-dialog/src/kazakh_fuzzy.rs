@@ -182,13 +182,36 @@ pub fn kazakh_edit_distance(a: &str, b: &str) -> f32 {
             } else {
                 1.0
             };
+            // **v6.8.29 — Codex #5 speech-defect v7.**  Cheap
+            // insertion cost when the candidate inserts a
+            // Kazakh vowel commonly DROPPED in elderly /
+            // hurried speech.  «Тмір» → «Темір» (insert «е»),
+            // «Кмістің» → «Күмістің» (insert «ү»), «Казхстан»
+            // → «Қазақстан» (insert «а»).  Without this, those
+            // shapes score similarity < 0.90 and fail to
+            // recover.  Only fires on the canonical-side
+            // character (`cb`) so spurious extra-vowel inputs
+            // don't get cheap acceptance the other direction.
+            let ins_cost = if is_elderly_dropped_vowel(cb) {
+                PHONETIC_SUB_COST
+            } else {
+                1.0
+            };
             let del = dp[i - 1][j] + 1.0;
-            let ins = dp[i][j - 1] + 1.0;
+            let ins = dp[i][j - 1] + ins_cost;
             let sub = dp[i - 1][j - 1] + sub_cost;
             dp[i][j] = del.min(ins).min(sub);
         }
     }
     dp[n][m]
+}
+
+/// **v6.8.29.**  Kazakh vowels most often dropped in elderly /
+/// hurried / accented speech.  Used to give cheap insertion
+/// cost during edit-distance scoring so a candidate with one
+/// missing vowel still clears the 0.90 similarity threshold.
+fn is_elderly_dropped_vowel(c: char) -> bool {
+    matches!(c, 'е' | 'ы' | 'і' | 'ұ' | 'ү' | 'ө' | 'ә' | 'а')
 }
 
 fn are_phonetically_close(a: char, b: char) -> bool {

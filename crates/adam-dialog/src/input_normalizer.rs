@@ -185,6 +185,15 @@ pub fn phonetic_substitute(input: &str, vocab: &[String], threshold: f32) -> Str
 fn phonetic_substitute_token(token: &str, vocab: &[String], threshold: f32) -> String {
     let (leading, core, trailing) = split_punct_around_core(token);
     let core_chars: Vec<char> = core.chars().collect();
+    // **v6.8.29 — Codex priority #5 speech-defect v7.**  The
+    // min-length-6 floor stays — at length 5 a single phonetic-
+    // sub (cost 0.4) clears the 0.90 threshold and false-
+    // positives common Kazakh words against same-length nouns
+    // («алдын» → «алтын», «керек» → «терек»).  The v6.8.29 win
+    // for kappacism / elderly tokens comes from the suffix-strip
+    // FALLBACK below (handles long-form «Хазахстанның» (12) →
+    // «Қазақстанның» via stem stripping), NOT from a lower
+    // length floor.
     if core_chars.len() < 6 {
         return token.to_string();
     }
@@ -239,7 +248,77 @@ fn phonetic_substitute_token(token: &str, vocab: &[String], threshold: f32) -> S
         }
         return format!("{leading}{best}{trailing}");
     }
+    // **v6.8.29 — speech-defect v7 fallback.**  When the direct
+    // lower-against-vocab match misses (typically because the
+    // input carries a case suffix not present in the vocab
+    // lemmas), try splitting the token into stem + suffix and
+    // matching just the stem.  On a hit, re-append the suffix
+    // so morphology is preserved.  Closes the kappacism cases
+    // «Хазахстанның» → «Қазақстанның» / «Тмірдің» → «Темірдің»
+    // / «Кмістің» → «Күмістің» that fall through the direct
+    // path because the world_core vocab indexes lemmas only.
+    if let Some((stem, suffix)) = split_case_suffix(&lower) {
+        if stem.chars().count() >= 4 {
+            if let Some((best_stem, _score)) =
+                crate::kazakh_fuzzy::best_match(&stem, vocab, threshold)
+            {
+                let best_len = best_stem.chars().count();
+                let stem_len = stem.chars().count();
+                if best_len >= stem_len {
+                    return format!("{leading}{best_stem}{suffix}{trailing}");
+                }
+            }
+        }
+    }
     token.to_string()
+}
+
+/// **v6.8.29.**  Split a Kazakh token into (stem, case_suffix) on
+/// recognised genitive / locative / ablative / dative endings.
+/// Returns `None` when no recognised suffix is present.  Local
+/// to this module — keeps the speech-defect fallback path
+/// self-contained without a cross-crate dependency on
+/// `v6_2_router::strip_kazakh_case_suffixes`.
+fn split_case_suffix(lower: &str) -> Option<(String, &'static str)> {
+    // Longest-first so «ның» strips before «ы».
+    const SUFFIXES: &[&str] = &[
+        "ның",
+        "нің",
+        "дың",
+        "дің",
+        "тың",
+        "тің",
+        "сынан",
+        "сінен",
+        "сына",
+        "сіне",
+        "ына",
+        "іне",
+        "нан",
+        "нен",
+        "дан",
+        "ден",
+        "тан",
+        "тен",
+        "ға",
+        "ге",
+        "қа",
+        "ке",
+        "да",
+        "де",
+        "та",
+        "те",
+    ];
+    for suf in SUFFIXES {
+        if lower.ends_with(suf) {
+            let stem_len = lower.len() - suf.len();
+            let stem = lower[..stem_len].to_string();
+            if !stem.is_empty() {
+                return Some((stem, suf));
+            }
+        }
+    }
+    None
 }
 
 /// Shared vocabulary loaded once per process from the curated
@@ -335,6 +414,28 @@ const CURATED_HIGH_FREQ: &[&str] = &[
     "уағалайкум-ас-салам",
     "қош",
     "хош",
+    // **v6.8.29 — Codex #5 speech-defect v7.**  High-frequency
+    // Kazakh function / content words that are NOT noun
+    // subjects/objects in world_core, so the world_core-derived
+    // vocab misses them.  Without these in the early-exit
+    // vocab the v6.8.29 min-length-4 phonetic-substitute path
+    // false-positives them onto similar-looking nouns
+    // («керек» → «терек»: poplar tree).  These are the closed
+    // set of 4-7 char tokens caught by adversarial probe.
+    "керек",
+    "деген",
+    "менің",
+    "сенің",
+    "сіздің",
+    "бұл",
+    "осы",
+    "сол",
+    "бірі",
+    "бірге",
+    "онда",
+    "сонда",
+    "өзің",
+    "өзім",
 ];
 
 /// Split a token into its alphabetic core and trailing
@@ -382,6 +483,63 @@ fn split_punct_around_core(token: &str) -> (&str, &str, &str) {
     let core = &token[start..last_alpha_end];
     let trailing = &token[last_alpha_end..];
     (leading, core, trailing)
+}
+
+#[cfg(test)]
+mod v6_8_29_speech_defect_tests {
+    //! **v6.8.29 — Codex #5 speech-defect v7.**  Lock the
+    //! suffix-stripping fallback path so kappacism / elderly
+    //! tokens with case suffixes recover via the world_core
+    //! lemma vocab.
+    use super::{normalize, split_case_suffix};
+
+    #[test]
+    fn split_case_suffix_genitive() {
+        assert_eq!(
+            split_case_suffix("хазахстанның"),
+            Some(("хазахстан".into(), "ның"))
+        );
+        assert_eq!(split_case_suffix("темірдің"), Some(("темір".into(), "дің")));
+    }
+
+    #[test]
+    fn split_case_suffix_locative() {
+        assert_eq!(
+            split_case_suffix("қазақстанда"),
+            Some(("қазақстан".into(), "да"))
+        );
+    }
+
+    #[test]
+    fn split_case_suffix_returns_none_for_lemma() {
+        // Stem with no recognised suffix shouldn't split.  The
+        // test relies on a token whose trailing chars don't
+        // match any of the curated case suffixes.
+        assert_eq!(split_case_suffix("кітап"), None);
+    }
+
+    #[test]
+    fn kappacism_with_genitive_recovers() {
+        let r = normalize("Хазахстанның");
+        assert!(
+            r.normalized.to_lowercase().contains("қазақстан"),
+            "expected normalisation to produce Қазақстанның, got «{}»",
+            r.normalized
+        );
+    }
+
+    #[test]
+    fn elderly_dropped_vowel_with_genitive_recovers() {
+        // Кмістің ← Күмістің (drop ү).  Fallback path strips
+        // «тің», stems are «кміс» → vocab «күміс» via cheap-
+        // vowel-insertion edit cost; suffix re-appended.
+        let r = normalize("Кмістің");
+        assert!(
+            r.normalized.to_lowercase().contains("күміс"),
+            "expected Күмістің recovery, got «{}»",
+            r.normalized
+        );
+    }
 }
 
 #[cfg(test)]
