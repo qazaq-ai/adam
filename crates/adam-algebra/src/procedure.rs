@@ -66,6 +66,32 @@ pub struct ProcedureIR {
     /// the Kazakh title; recording it lets the assistant answer
     /// «Что такое наряд-допуск?» without a re-render.
     pub title_ru: Option<String>,
+    /// Optional English title.  Added in v6.8.27 for foreign-
+    /// capital pilot contexts (Allur / KIA / new plants with
+    /// Chinese / Turkish / Arab capital).  Defaults to `None`
+    /// — the trilingual lift is gradual.
+    #[serde(default)]
+    pub title_en: Option<String>,
+    /// **v6.8.27.**  Kazakh-language search aliases — synonyms,
+    /// abbreviations, or alternate phrasings the user might type
+    /// instead of `title_kk`.  E.g. for «Жұмыс орнын дайындау» a
+    /// useful alias is «жұмыс орнының дайындығы» (genitive
+    /// shape).  Empty default keeps existing JSONL records
+    /// schema-compatible.
+    #[serde(default)]
+    pub aliases_kk: Vec<String>,
+    /// **v6.8.27.**  Russian-language search aliases — what the
+    /// SOP is known as in Russian.  Critical for ССГПО / KIA
+    /// pilot where Russian is the operational language even
+    /// when the canonical SOP is Kazakh-first.  E.g. «СИЗ»,
+    /// «наряд-допуск», «инструктаж».
+    #[serde(default)]
+    pub aliases_ru: Vec<String>,
+    /// **v6.8.27.**  English-language search aliases — the
+    /// industrial-pilot ↔ foreign-management bridge.  Typical
+    /// entries: «PPE», «work permit», «LOTO», «safety briefing».
+    #[serde(default)]
+    pub aliases_en: Vec<String>,
     /// Domain bucket — used by the retrieval handler to scope a
     /// query («Какая процедура для X?») to a candidate set.
     pub domain: ProcedureDomain,
@@ -347,6 +373,10 @@ mod tests {
             id: "kk_labor_001".into(),
             title_kk: "Бастапқы инструктаж".into(),
             title_ru: Some("Первичный инструктаж".into()),
+            title_en: None,
+            aliases_kk: Vec::new(),
+            aliases_ru: Vec::new(),
+            aliases_en: Vec::new(),
             domain: ProcedureDomain::OkhranaTruda,
             applies_to: vec!["барлық жаңа қызметкерлер".into()],
             prerequisites: vec!["жұмысқа қабылдау бұйрығы шығарылуы тиіс".into()],
@@ -462,6 +492,43 @@ mod tests {
         let line = serde_json::to_string(&p).expect("serialize");
         let parsed = ProcedureIR::from_jsonl_line(&line).expect("round trip");
         assert_eq!(parsed, p);
+    }
+
+    #[test]
+    fn trilingual_fields_default_to_empty_when_absent() {
+        // v6.8.27 schema lift: title_en + aliases_{kk,ru,en} are
+        // optional via #[serde(default)].  Pre-v6.8.27 JSONL
+        // records without these fields must continue to load.
+        let pre_lift = r#"{"id":"kk_legacy_001","title_kk":"тест",
+                          "title_ru":null,"domain":"other",
+                          "applies_to":[],"prerequisites":[],
+                          "steps":[{"sequence":1,"action_kk":"x",
+                            "actor":null,"condition":null,"evidence":null}],
+                          "hazards":[],"authorization":[],
+                          "confirmation_gates":[],
+                          "source":{"regulation_kk":"r","regulation_id":"r",
+                            "article":null,"version_date":"2024-01-01",
+                            "retrieved_at":"2026-06-22","url":null}}"#;
+        let p = ProcedureIR::from_jsonl_line(pre_lift)
+            .expect("legacy JSONL without trilingual fields must load");
+        assert!(p.title_en.is_none());
+        assert!(p.aliases_kk.is_empty());
+        assert!(p.aliases_ru.is_empty());
+        assert!(p.aliases_en.is_empty());
+    }
+
+    #[test]
+    fn trilingual_fields_round_trip() {
+        let mut p = sample_minimal();
+        p.title_en = Some("Initial briefing".into());
+        p.aliases_kk = vec!["бастапқы нұсқаулық".into()];
+        p.aliases_ru = vec!["вводный инструктаж".into(), "первичка".into()];
+        p.aliases_en = vec!["initial briefing".into(), "induction".into()];
+        let line = serde_json::to_string(&p).expect("serialize");
+        let parsed = ProcedureIR::from_jsonl_line(&line).expect("round trip");
+        assert_eq!(parsed, p);
+        assert_eq!(parsed.title_en.as_deref(), Some("Initial briefing"));
+        assert_eq!(parsed.aliases_ru.len(), 2);
     }
 
     #[test]
