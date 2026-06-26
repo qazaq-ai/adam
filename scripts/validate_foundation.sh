@@ -25,6 +25,7 @@ if [[ ! -f data/curated/adam_training_corpus_manifest.json ]]; then
     echo "[validate_foundation] running kernel-only validation"
     cargo fmt --all --check
     cargo run --release -p adam-reasoning --bin validate_world_core
+    cargo run --release -p adam-algebra --bin validate_procedures
     bash scripts/check_metrics_currency.sh
     echo "kernel validation passed (corpus pipeline skipped — manifest absent on this checkout)"
     exit 0
@@ -175,6 +176,16 @@ cmp -s "$tmp_acceptance_report" data/curated/source_acceptance_report.json
 # predicate (e.g. `produces`, `author`, `birth_year`) or stray
 # Latin character outside backticks fails the gate.
 cargo run --release -p adam-reasoning --bin validate_world_core
+
+# **v6.8.28** — procedure-data CI gate.  Validates every JSONL
+# line under `data/procedures/`: schema, `check_invariants()`
+# (id / title / step monotonicity / `source.version_date` non-
+# empty), unique-id collisions across files, and reports
+# freshness + trilingual coverage as INFO.  Codex 2026-06-25 #4
+# Phase 2 — gates curatorial growth from 15 toward the 50-100
+# target without the schema rot a hand-validated data set
+# accumulates.
+cargo run --release -p adam-algebra --bin validate_procedures
 
 # **v4.55.0** — metrics-currency CI gate. Cross-checks numeric
 # claims in README.md / data/README.md / data/world_core/README.md
