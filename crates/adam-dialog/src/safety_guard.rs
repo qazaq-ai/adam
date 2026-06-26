@@ -84,6 +84,16 @@ pub enum SafetyClass {
     Illegal,
     /// Directive harm-to-others questions.
     HarmToOthers,
+    /// **v6.8.30 — industrial-pilot audit fix.**  Conditional
+    /// permission queries whose condition encodes an unsafe
+    /// operational state: driver fatigue / intoxication,
+    /// missing PPE, energy not isolated (pressure / voltage),
+    /// no work permit, equipment failure.  Detected ONLY when
+    /// BOTH the unsafe-state token AND a permission
+    /// interrogative are present, so innocent uses of the
+    /// state token («Шаршаса демал» = «if tired, rest» — a
+    /// proverb) don't false-positive.
+    IndustrialUnsafeState,
 }
 
 /// Refusal templates per class.  Polite, short, Kazakh-only.
@@ -115,6 +125,15 @@ impl SafetyClass {
                  бере алмаймын. Бұндай ой мазалап жүрсе, психолог \
                  немесе 150 (сенім телефоны) арқылы маманмен \
                  сөйлесуге кеңес беремін."
+            }
+            Self::IndustrialUnsafeState => {
+                "Жоқ. Қауіпсіздік ережелері бойынша мұндай жағдайда \
+                 жұмысты бастауға, жіберуге немесе жалғастыруға \
+                 болмайды. Қызметкер ауыстырылуы, жабдық сөндірілуі, \
+                 қажетті қорғаныс құралдары мен рұқсат қағаздары \
+                 ресімделгеннен кейін ғана жұмыс жалғасады. \
+                 Күмәнді жағдайда — еңбекті қорғау инженеріне \
+                 хабарласыңыз."
             }
         }
     }
@@ -148,12 +167,120 @@ pub fn check(input: &str) -> Option<SafetyClass> {
     if matches_any(&lower, HARM_OTHERS_MARKERS) {
         return Some(SafetyClass::HarmToOthers);
     }
+    // **v6.8.30 — industrial-pilot audit fix.**  Conditional
+    // permission queries whose condition is an unsafe
+    // operational state get refused.  Requires BOTH an unsafe-
+    // state token AND a permission interrogative so innocent
+    // proverbial or generic uses of state tokens don't trip
+    // the gate.
+    if is_industrial_unsafe_query(&lower) {
+        return Some(SafetyClass::IndustrialUnsafeState);
+    }
     None
 }
 
 fn matches_any(input: &str, markers: &[&str]) -> bool {
     markers.iter().any(|m| input.contains(m))
 }
+
+/// **v6.8.30 — Codex industrial-pilot audit Bug #3.**
+/// Detect a conditional permission query whose conditional
+/// clause encodes an unsafe operational state.  Requires
+/// BOTH a state marker AND a permission interrogative — the
+/// state marker alone would false-positive on proverbs and
+/// generic descriptions («Шаршаса демал» = «if you're tired,
+/// rest» — a proverb, not a permission query).
+fn is_industrial_unsafe_query(lower: &str) -> bool {
+    let has_unsafe_state = matches_any(lower, INDUSTRIAL_UNSAFE_STATE_MARKERS);
+    if !has_unsafe_state {
+        return false;
+    }
+    matches_any(lower, INDUSTRIAL_PERMISSION_INTERROGATIVES)
+}
+
+/// **v6.8.30.**  Unsafe operational state markers across the
+/// Codex industrial-audit categories: driver / operator
+/// fatigue, intoxication, injury, missing PPE, energy not
+/// isolated, no permit, equipment failure.  Case-insensitive
+/// substring against the lowercased input.
+/// **v6.8.30.**  Unsafe operational state markers covering
+/// driver/operator fatigue, intoxication, injury, missing PPE,
+/// energy not isolated (LOTO), no work permit, equipment
+/// failure.  Procedure-context overlap is handled at the
+/// CALLER level (see `Conversation::turn_with_trace`) — when a
+/// procedure referent is on the discourse stack, this safety
+/// class is SUPPRESSED so the procedure_permission_check
+/// hazard-driven refusal wins.
+const INDUSTRIAL_UNSAFE_STATE_MARKERS: &[&str] = &[
+    // Fatigue.
+    "шаршаса",
+    "шаршағанда",
+    "ұйықтамаған",
+    "ұйқысыз",
+    "уставший",
+    "усталость",
+    // Intoxication.
+    "мас күй",
+    "мас болса",
+    "масаң",
+    "алкоголь",
+    "арақ ішкен",
+    "пьян",
+    "опьянени",
+    // Injury / illness.
+    "жараланған",
+    "жаралы",
+    "ауырып тұр",
+    "ауырса",
+    // Missing PPE.
+    "сиз жоқ болса",
+    "сиз жоқ",
+    "еққ жоқ",
+    "қорғаныс жоқ",
+    "қорғаныс құралы жоқ",
+    "жеке қорғаныс жоқ",
+    // Energy / pressure not isolated (LOTO violation).
+    "қысым нөлге жетпесе",
+    "қысым жетпесе",
+    "сөндірілмеген",
+    "блоктаусыз",
+    "блоктау жоқ",
+    "кернеу бар",
+    "кернеу алынбаған",
+    // No work permit.
+    "наряд жоқ",
+    "наряд-рұқсат жоқ",
+    "наряд-допуск жоқ",
+    "рұқсат жоқ",
+    "разрешени",
+    // Equipment failure.
+    "бұзылған",
+    "істен шыққан",
+    "ақаулық",
+];
+
+/// **v6.8.30.**  Permission interrogatives — same shape the
+/// procedure permission_check handler uses, anchored
+/// independently in the safety guard so the industrial unsafe
+/// classifier doesn't depend on the cascade order.  Includes
+/// Russian forms for code-switch queries from RU-dominant
+/// shop-floor users.
+const INDUSTRIAL_PERMISSION_INTERROGATIVES: &[&str] = &[
+    "бола ма",
+    "болмай ма",
+    "болады ма",
+    "болмайды ма",
+    "жасауға бола",
+    "кіруге бола",
+    "істеуге бола",
+    "бастауға бола",
+    "жіберуге бола",
+    "жалғастыруға бола",
+    "можно ли",
+    "разрешено",
+    "допустимо",
+    "допускается",
+];
 
 /// Weapons / explosives / ammunition manufacture markers.
 ///

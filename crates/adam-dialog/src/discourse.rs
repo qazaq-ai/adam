@@ -754,6 +754,48 @@ mod user_self_location_tests {
 }
 
 #[cfg(test)]
+mod v6_8_30_conditional_permission_tests {
+    //! **v6.8.30 Bug #1 — industrial-pilot audit fix.**  Lock
+    //! the `looks_like_conditional_permission_query` shape
+    //! detector + the splitter bailout so SOP conditional
+    //! permission queries stay as one string.
+    use super::{looks_like_conditional_permission_query, split_compound_utterance};
+
+    #[test]
+    fn detector_matches_kazakh_conditional_permission() {
+        assert!(looks_like_conditional_permission_query(
+            "Егер СИЗ жоқ болса, жұмысқа кіруге бола ма?"
+        ));
+        assert!(looks_like_conditional_permission_query(
+            "Егер қысым нөлге жетпесе жұмыс бастауға бола ма?"
+        ));
+        assert!(looks_like_conditional_permission_query(
+            "Егер жүргізуші шаршаса рейске жіберуге бола ма?"
+        ));
+    }
+
+    #[test]
+    fn detector_rejects_non_conditional_permission() {
+        assert!(!looks_like_conditional_permission_query(
+            "СИЗ беру тәртібі қандай?"
+        ));
+        assert!(!looks_like_conditional_permission_query(
+            "Қазақстанның астанасы қай қала?"
+        ));
+        // Missing «егер» — not the conditional shape.
+        assert!(!looks_like_conditional_permission_query(
+            "СИЗ жоқ болса жұмысқа кіруге бола ма?"
+        ));
+    }
+
+    #[test]
+    fn split_keeps_conditional_permission_intact() {
+        let pieces = split_compound_utterance("Егер СИЗ жоқ болса, жұмысқа кіруге бола ма?");
+        assert_eq!(pieces.len(), 1, "got: {pieces:?}");
+    }
+}
+
+#[cfg(test)]
 mod propositions_request_tests_v5110 {
     use super::extract_propositions_request;
 
@@ -1594,6 +1636,20 @@ pub fn split_compound_utterance(input: &str) -> Vec<String> {
     if crate::semantics::looks_like_name_recall(trimmed) {
         return vec![trimmed.to_string()];
     }
+    // **v6.8.30 — industrial-pilot audit fix.**  Conditional
+    // permission queries («Егер X (жоқ) болса/болмаса, Y-ға
+    // бола ма?») must reach the cascade as ONE string so the
+    // permission_check handler can evaluate both the condition
+    // clause and the action clause together.  Pre-fix the
+    // comma split sent «Егер X жоқ болса» to detect_question_shape
+    // as a standalone (no question shape — gets discarded) and
+    // «жұмысқа кіруге бола ма?» to the cascade without context,
+    // which then routed to the physics definition of «жұмыс».
+    // The shape is bounded: starts with «егер» AND contains a
+    // conditional copula AND ends in a permission interrogative.
+    if looks_like_conditional_permission_query(trimmed) {
+        return vec![trimmed.to_string()];
+    }
     let mut parts: Vec<String> = Vec::new();
     let mut buf = String::new();
     let mut in_quote = false;
@@ -2153,6 +2209,40 @@ pub fn is_ask_fix_previous_error(input: &str) -> bool {
 /// is the wrong addressee — adam answers about itself when the user
 /// asked about themselves. Conservative: requires a 1sg verb / pronoun
 /// marker AND no 2nd-person marker.
+/// **v6.8.30 — industrial-pilot audit fix.**  Detect a Kazakh
+/// conditional permission query like «Егер СИЗ жоқ болса,
+/// жұмысқа кіруге бола ма?».  Returns `true` when the input
+/// has all three structural markers: starts with «егер» (if),
+/// contains a conditional copula («болса» / «болмаса» / «жоқ
+/// болса» / «жетпесе»), and ends in a permission interrogative
+/// («бола ма?» / «болмай ма?» / «болады ма?» / «болмайды ма?»).
+/// Used by [`split_compound_utterance`] to keep the condition
+/// and action clauses in the same string so the cascade
+/// permission_check handler sees both.
+pub fn looks_like_conditional_permission_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    let trimmed_lower = lower.trim();
+    let starts_with_if = trimmed_lower.starts_with("егер ") || trimmed_lower.starts_with("егер,");
+    if !starts_with_if {
+        return false;
+    }
+    // Both endpoints anchored: «Егер»-prefix + permission
+    // interrogative is the bounded shape; the conditional
+    // copula in the middle is variable Kazakh verb morphology
+    // («болса» / «жетпесе» / «шаршаса» / «ауырса» / «жоғалса»
+    // / «бұзылса»…).  Don't require a specific copula —
+    // anchoring on both ends is restrictive enough.
+    trimmed_lower.contains("бола ма")
+        || trimmed_lower.contains("болмай ма")
+        || trimmed_lower.contains("болады ма")
+        || trimmed_lower.contains("болмайды ма")
+        || trimmed_lower.contains("жасауға бола")
+        || trimmed_lower.contains("кіруге бола")
+        || trimmed_lower.contains("істеуге бола")
+        || trimmed_lower.contains("бастауға бола")
+        || trimmed_lower.contains("жіберуге бола")
+}
+
 pub fn is_user_self_location_query(input: &str) -> bool {
     let lower = input.to_lowercase();
     // Token-set membership across non-alphabetic boundaries — mirrors

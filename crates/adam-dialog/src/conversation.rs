@@ -4003,7 +4003,29 @@ impl Conversation {
             crate::wellness::red_flags::detect(&raw_input_for_safety)
         {
             crate::wellness::red_flags::escalation_template(flag).to_string()
-        } else if let Some(class) = crate::safety_guard::check(&raw_input_for_safety) {
+        } else if let Some(class) = crate::safety_guard::check(&raw_input_for_safety).filter(|c| {
+            // **v6.8.30 — industrial-pilot audit fix.**
+            // Suppress IndustrialUnsafeState when a
+            // procedure referent is on the discourse stack.
+            // The procedure_permission_check handler
+            // returns a procedure-specific hazard-driven
+            // refusal that's strictly more informative
+            // than the generic IndustrialUnsafeState
+            // template (mentions the exact hazard text
+            // from the regulation, not a general
+            // «consult OHS engineer»).  Other safety
+            // classes (Medical / Weapon / Illegal /
+            // HarmToOthers) are never procedure-overlapped
+            // and pass through unchanged.
+            if *c != crate::safety_guard::SafetyClass::IndustrialUnsafeState {
+                return true;
+            }
+            !self
+                .discourse_state
+                .referents
+                .iter()
+                .any(|r| r.kind == crate::dialog_acts::ReferentKind::Procedure)
+        }) {
             class.refusal().to_string()
         } else if let Some(ack) = crate::wellness::pain_acknowledge::detect(&raw_input_for_safety) {
             // **v6.8.10 — voice REPL audit 2026-06-23 turn 35.**

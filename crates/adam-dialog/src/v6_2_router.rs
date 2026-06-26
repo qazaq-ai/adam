@@ -3303,6 +3303,19 @@ fn looks_like_procedure_permission_query(input: &str) -> bool {
     let has_conditional = lower.contains("болса")
         || lower.contains("болмаса")
         || lower.contains("жоқ болса")
+        // **v6.8.30 Bug #2.**  Industrial conditional verbs:
+        // «жетпесе» (doesn't reach), «жетпегенде» / «болмағанда»
+        // (when X doesn't hold), «шаршаса» (gets tired),
+        // «ауырса» (gets sick), «бұзылса» (breaks down).  The
+        // LOTO «қысым нөлге жетпесе» / driver-fatigue
+        // «шаршаса» industrial-audit cases fall here.
+        || lower.contains("жетпесе")
+        || lower.contains("жетпегенде")
+        || lower.contains("болмағанда")
+        || lower.contains("шаршаса")
+        || lower.contains("ауырса")
+        || lower.contains("бұзылса")
+        || lower.contains("істен шықса")
         || lower.contains("если ")
         || lower.contains("когда ");
     let has_permission_q = lower.contains("бола ма")
@@ -3310,6 +3323,14 @@ fn looks_like_procedure_permission_query(input: &str) -> bool {
         || lower.contains("жасауға бола")
         || lower.contains("кіруге бола")
         || lower.contains("істеуге бола")
+        // **v6.8.30 Bug #2.**  «бастауға бола» (allowed to
+        // start), «жіберуге бола» (allowed to dispatch),
+        // «жалғастыруға бола» (allowed to continue) — the
+        // industrial-pilot action verbs the school-tutor set
+        // didn't need.
+        || lower.contains("бастауға бола")
+        || lower.contains("жіберуге бола")
+        || lower.contains("жалғастыруға бола")
         || lower.contains("болады ма")
         || lower.contains("можно ли")
         || lower.contains("разрешено")
