@@ -35,15 +35,17 @@
 //! outputs around the deterministic core. None of them invent
 //! facts; they only normalise audio ↔ text.
 //!
-//! ## Usage
+//! ## Usage (v6.8.32 — one command)
 //!
 //! ```sh
-//! # Record 3 s, recognise, print, optionally speak back:
-//! cargo run --release -p adam-voice-repl-v6-3 -- --duration 3 --speak
-//!
-//! # Loop mode (press Enter to record, ^C to quit):
-//! cargo run --release -p adam-voice-repl-v6-3 -- --loop
+//! cargo run --release -p adam-voice-repl-v6-3
 //! ```
+//!
+//! Press Enter to start each recording.  VAD auto-stops on
+//! 1.5 s of silence (30 s hard cap).  TTS playback is always
+//! on.  `^C` quits.  Model paths can still be overridden via
+//! `--whisper-model` / `--piper-model` / `--stt-backend dtw`
+//! for debug / model-swap cases.
 //!
 //! ## Banks
 //!
@@ -66,7 +68,7 @@ mod session_journal;
 mod zipf_vocab;
 
 use adam_audio::play::play_blocking;
-use adam_audio::record::{RecordConfig, record_fixed_duration, record_until_silence};
+use adam_audio::record::{RecordConfig, record_until_silence};
 use adam_audio::wav::write_wav;
 use adam_dialog::Conversation;
 use adam_dialog::templates::TemplateRepository;
@@ -77,7 +79,6 @@ use adam_stt_phoneme::{PhonemeBank, WordConfig, recognise_word, rescore};
 use adam_tts_phoneme::{PcmBank, TtsConfig, synthesise_with_bank};
 use clap::Parser;
 use std::path::PathBuf;
-use std::time::Duration;
 
 // Phase 15f (2026-05-31) — KB / retrieval / reasoning artefact
 // paths. Same constants as `adam_chat.rs` so the two REPLs read
@@ -94,22 +95,16 @@ const WORLD_CORE_DIR: &str = "data/world_core";
     version
 )]
 struct Args {
-    /// Fixed recording duration in seconds. When set, --vad is
-    /// ignored.
-    #[arg(long)]
-    duration: Option<u64>,
-    /// Use VAD auto-stop (recording stops on 1.5 s of silence).
-    /// Default 30 s hard cap.
-    #[arg(long)]
-    vad: bool,
-    /// Loop mode — press Enter to start each recording, ^C to
-    /// quit.
-    #[arg(long, name = "loop")]
-    loop_mode: bool,
-    /// Synthesise the recognised phoneme stream back through
-    /// the TTS bank and play it.
-    #[arg(long)]
-    speak: bool,
+    // **v6.8.32 — single launch shape.**  Recording, TTS and
+    // looping are no longer toggleable — VAD is always on
+    // (auto-stop on 1.5 s of silence, 30 s hard cap), TTS
+    // playback always fires, the REPL always loops (Enter
+    // starts each turn, ^C quits).  The pre-v6.8.32
+    // `--duration` / `--vad` / `--speak` / `--loop` flags
+    // were removed so the launch surface is ONE command:
+    // `cargo run --release -p adam-voice-repl-v6-3`.
+    // Path / model overrides remain as `--long` flags below
+    // for the genuine debug / swap-model cases.
     /// Optional: save each recording to a WAV file (debugging).
     #[arg(long)]
     save_wav: Option<PathBuf>,
@@ -415,31 +410,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // and rc7 reads that file on the way IN to override the cascade.
     let mut journal = session_journal::SessionJournal::new();
 
-    let single = !args.loop_mode;
+    // **v6.8.32 — single-shape REPL.**  Always loops: Enter
+    // starts each recording, ^C quits.  Always VAD-bounded
+    // (auto-stop on 1.5 s of silence, 30 s hard cap) — the
+    // pre-v6.8.32 `--duration` fixed-cap path was removed
+    // because it guillotined long sentences mid-syllable.
     loop {
-        if args.loop_mode {
-            println!("[voice-repl] press Enter to record, ^C to quit");
-            let mut buf = String::new();
-            if std::io::stdin().read_line(&mut buf).is_err() || buf.is_empty() {
-                break;
-            }
+        println!("[voice-repl] press Enter to record, ^C to quit");
+        let mut buf = String::new();
+        if std::io::stdin().read_line(&mut buf).is_err() || buf.is_empty() {
+            break;
         }
 
-        // **Phase 15f.5 (2026-05-31)** — VAD is now the default.
-        // Earlier phases used a fixed N-second cap (3 → 6 → 4),
-        // which guillotined long sentences mid-syllable. The right
-        // shape — the one we had pre-v6.3 — is: record while the
-        // speaker is speaking, stop on a 1.5 s silence trail.
-        // `--duration N` still forces a fixed cap; `--vad` is a
-        // no-op now that VAD is on by default but kept for muscle
-        // memory.
-        let pcm = if let Some(d) = args.duration {
-            println!("[voice-repl] recording {d} s (fixed)...");
-            record_fixed_duration(Duration::from_secs(d))?
-        } else {
-            println!("[voice-repl] recording (auto-stop on 1.5 s of silence, 30 s max)...");
-            record_until_silence(RecordConfig::default())?
-        };
+        println!("[voice-repl] recording (auto-stop on 1.5 s of silence, 30 s max)...");
+        let pcm = record_until_silence(RecordConfig::default())?;
         println!(
             "[voice-repl] captured {:.2} s at {} Hz",
             pcm.duration_s(),
@@ -1053,20 +1037,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             neural_intent.as_ref().map(|(_, c)| *c),
             cyrillic.clone(),
         );
-        if args.loop_mode {
-            println!(
-                "[voice-repl] [journal] turn #{journal_turn_no} captured \
-                 (journal_len={})",
-                journal.len()
-            );
-        }
+        println!(
+            "[voice-repl] [journal] turn #{journal_turn_no} captured \
+             (journal_len={})",
+            journal.len()
+        );
 
-        // TTS playback. Phase 15f.1 (2026-05-31): in --mode=respond the
-        // REPL is a voice dialog, not a STT tester — a silent reply
-        // makes no sense. Force speak ON whenever we're responding.
-        // `--speak` still works for --mode=echo (loopback debugging).
-        let should_speak = args.speak || args.mode == "respond" || args.mode == "wellness";
-        if should_speak {
+        // **v6.8.32 — TTS playback is unconditional.**  The
+        // voice REPL is a voice dialog; a silent reply makes
+        // no sense in any of `respond` / `wellness` / `echo`
+        // modes.
+        {
             let tts_out = match args.tts_backend.as_str() {
                 "piper" => {
                     match synthesise_via_piper(&cyrillic, &args.piper_model, &args.piper_venv) {
@@ -1108,12 +1089,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             play_blocking(&tts_out)?;
         }
 
-        if single {
-            break;
-        }
+        // v6.8.32 — REPL is always looping; the single-shot
+        // path was removed (no `--duration`, no `--loop`).
         println!();
     }
 
+    #[allow(unreachable_code)]
     Ok(())
 }
 
