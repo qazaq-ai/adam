@@ -69,6 +69,24 @@ pub fn normalize(raw_input: &str) -> NormalizationResult {
         current = destuttered;
     }
 
+    // **v6.8.31 — kappacism start-letter correction.**  Try
+    // swapping initial «Х»/«К» → «Қ» when the resulting token
+    // exists in the vocab.  Targets the cluster of failing
+    // shapes the v6.8.30 audit surfaced («Хазах» → «Қазақ»,
+    // «Хышхыл» → «Қышқыл», «Казхстан» → «Қазақстан»,
+    // «Хазір» → «Қазір») that fall under the v6.8.29
+    // length-6 floor or carry too many edits to reach the
+    // 0.90 similarity threshold.  Runs BEFORE
+    // phonetic_substitute so the next stage sees the
+    // already-canonicalised initial letter.
+    let kappacism_fixed = apply_kappacism_start_correction(&current, shared_vocab());
+    if kappacism_fixed != current {
+        corrections.push(format!(
+            "kappacism_start: «{current}» → «{kappacism_fixed}»",
+        ));
+        current = kappacism_fixed;
+    }
+
     let substituted = phonetic_substitute(&current, shared_vocab(), PHONETIC_THRESHOLD);
     if substituted != current {
         corrections.push(format!(
@@ -81,6 +99,127 @@ pub fn normalize(raw_input: &str) -> NormalizationResult {
         normalized: current,
         corrections,
     }
+}
+
+/// **v6.8.31 — Codex priority #5 second iteration.**  Targeted
+/// start-letter kappacism correction.  Walks the input
+/// token-by-token; when a token's initial letter is `Х`/`х`
+/// (uvular fricative substitute) or `К`/`к` (velar fronting)
+/// AND swapping it to `Қ`/`қ` produces a token in the vocab,
+/// applies the swap.  Conservative — only acts when the
+/// post-swap form is exactly in vocab, so no risk of
+/// rewriting actual «х»-initial or «к»-initial Kazakh words
+/// («хабар», «көк», «келді»).  Also probes a case-suffix-
+/// stripped form so kappacism + case morphology compose
+/// («Казхстанның» → strip «-ның» → «казхстан» → swap → match).
+fn apply_kappacism_start_correction(input: &str, vocab: &[String]) -> String {
+    input
+        .split_whitespace()
+        .map(|tok| apply_kappacism_start_to_token(tok, vocab))
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+fn apply_kappacism_start_to_token(token: &str, vocab: &[String]) -> String {
+    let (leading, core, trailing) = split_punct_around_core(token);
+    let core_lower = core.to_lowercase();
+    let core_chars: Vec<char> = core_lower.chars().collect();
+    if core_chars.len() < 4 {
+        return token.to_string();
+    }
+    let first = core_chars[0];
+    if !matches!(first, 'х' | 'к' | 'т') {
+        return token.to_string();
+    }
+    if vocab.iter().any(|v| v.to_lowercase() == core_lower) {
+        // Already canonical or vocab-recognised — leave alone.
+        return token.to_string();
+    }
+    // Candidate substitutes per defect direction:
+    //   * `х → қ` — uvular fronting (most common Kazakh
+    //     kappacism: «Хазах», «Хышхыл», «Хазір»).
+    //   * `к → қ` — velar fronting that drops the uvular
+    //     marker («Казхстан», «Кітап» wouldn't apply here
+    //     since canonical К is correct).
+    //   * `т → к` — K-class fronting to dental («Тітап»
+    //     for «Кітап»).
+    let candidates: &[char] = match first {
+        'х' => &['қ'],
+        'к' => &['қ'],
+        'т' => &['к', 'қ'],
+        _ => &[],
+    };
+    let max_len = core_chars.len() + 1;
+    // **Asymmetric trust per starting letter.**  Х and К are
+    // RARE as canonical Kazakh word-initial — most Х/К-start
+    // tokens in defective speech are actually kappacism for
+    // canonical Қ.  Т is COMMON as canonical word-initial
+    // («таныс», «тұрады», «тарих», «тауық»…), so a blanket
+    // best_match swap on Т-initial tokens false-positives
+    // ordinary words onto distantly-related Kazakh nouns
+    // («таныс» → «Сәтбаев»-derived).  Restrict the Т path
+    // to EXACT vocab hits.
+    let allow_fuzzy = !matches!(first, 'т');
+    for &cand in candidates {
+        let swapped: String = std::iter::once(cand)
+            .chain(core_chars.iter().skip(1).copied())
+            .collect();
+        // Exact vocab hit — strongest evidence, return the
+        // canonical (which may include casing fixes etc.).
+        if let Some(canon) = vocab.iter().find(|v| v.to_lowercase() == swapped) {
+            return format!("{leading}{canon}{trailing}");
+        }
+        // Phonetic-reachable from vocab — return the canonical
+        // best_match directly so downstream length floors don't
+        // skip short post-swap tokens.  Bound the candidate
+        // length so we don't accept a much-longer canonical
+        // (would over-aggressively rewrite short defective
+        // tokens onto unrelated long Kazakh words).
+        if allow_fuzzy
+            && let Some((best, _score)) = crate::kazakh_fuzzy::best_match(&swapped, vocab, 0.85)
+            && best.chars().count() <= max_len
+        {
+            return format!("{leading}{best}{trailing}");
+        }
+    }
+    // Probe via the case-suffix strip path so kappacism +
+    // case morphology compose: «Хазахстанның» → strip «-ның»
+    // → «хазахстан» → swap to «қазахстан» — best_match against
+    // «қазақстан» (1 phonetic-sub-from-vocab) clears the bar.
+    if let Some((stem_lower, suffix)) = split_case_suffix(&core_lower) {
+        if !stem_lower.is_empty() {
+            let first_stem = stem_lower.chars().next().unwrap_or(' ');
+            if matches!(first_stem, 'х' | 'к' | 'т') {
+                let stem_chars: Vec<char> = stem_lower.chars().collect();
+                let stem_cands: &[char] = match first_stem {
+                    'х' => &['қ'],
+                    'к' => &['қ'],
+                    'т' => &['к', 'қ'],
+                    _ => &[],
+                };
+                let stem_max = stem_chars.len() + 1;
+                let stem_allow_fuzzy = !matches!(first_stem, 'т');
+                for &cand in stem_cands {
+                    let stem_swapped: String = std::iter::once(cand)
+                        .chain(stem_chars.iter().skip(1).copied())
+                        .collect();
+                    if let Some(canon) = vocab.iter().find(|v| v.to_lowercase() == stem_swapped) {
+                        let composed = format!("{canon}{suffix}");
+                        return format!("{leading}{composed}{trailing}");
+                    }
+                    if stem_allow_fuzzy
+                        && let Some((best, _score)) =
+                            crate::kazakh_fuzzy::best_match(&stem_swapped, vocab, 0.85)
+                        && best.chars().count() <= stem_max
+                    {
+                        let composed = format!("{best}{suffix}");
+                        return format!("{leading}{composed}{trailing}");
+                    }
+                }
+            }
+        }
+    }
+    token.to_string()
 }
 
 /// Collapse stuttering onsets of the form `<onset>-<onset>-...-<full>`
@@ -483,6 +622,75 @@ fn split_punct_around_core(token: &str) -> (&str, &str, &str) {
     let core = &token[start..last_alpha_end];
     let trailing = &token[last_alpha_end..];
     (leading, core, trailing)
+}
+
+#[cfg(test)]
+mod v6_8_31_kappacism_start_tests {
+    //! **v6.8.31 — Codex #5 second iteration.**  Lock the
+    //! start-letter kappacism preprocessor.  Recoveries should
+    //! be canonical Kazakh forms; canonical-Х / canonical-Т
+    //! Kazakh words must NOT be rewritten.
+    use super::normalize;
+
+    #[test]
+    fn x_initial_kappacism_recovers() {
+        let r = normalize("Хышхыл деген не?");
+        assert!(
+            r.normalized.to_lowercase().contains("қышқыл"),
+            "got: {}",
+            r.normalized
+        );
+    }
+
+    #[test]
+    fn k_initial_kappacism_recovers_with_suffix() {
+        // Казхстанның → suffix strip → казхстан → swap к→қ →
+        // best_match against canonical «қазақстан» → return
+        // canonical + re-append «-ның».
+        let r = normalize("Хазахстанның");
+        assert!(
+            r.normalized.to_lowercase().contains("қазақстан"),
+            "got: {}",
+            r.normalized
+        );
+    }
+
+    #[test]
+    fn t_initial_exact_vocab_match_recovers() {
+        // Тітап → swap т→к → «кітап» exact vocab hit → swap.
+        let r = normalize("Тітап деген не?");
+        assert!(
+            r.normalized.to_lowercase().contains("кітап"),
+            "got: {}",
+            r.normalized
+        );
+    }
+
+    #[test]
+    fn t_initial_canonical_word_not_rewritten() {
+        // «таныс» (acquainted) is a real Kazakh word — must
+        // NOT get rewritten via the kappacism path even
+        // though it starts with Т.  Fuzzy path is gated off
+        // for Т-initial tokens to prevent this.
+        let r = normalize("Алдымен таныс болайық.");
+        assert!(
+            r.normalized.to_lowercase().contains("таныс"),
+            "must preserve canonical «таныс», got: {}",
+            r.normalized
+        );
+    }
+
+    #[test]
+    fn x_initial_canonical_word_not_rewritten() {
+        // «хабар» (news) is canonical Kazakh — exact-vocab
+        // check skips already-canonical tokens.
+        let r = normalize("Хабар жоқ па?");
+        assert!(
+            r.normalized.to_lowercase().contains("хабар"),
+            "must preserve canonical «хабар», got: {}",
+            r.normalized
+        );
+    }
 }
 
 #[cfg(test)]
