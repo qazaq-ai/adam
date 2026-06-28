@@ -218,3 +218,6 @@ data/curated/adam_v6_8_balanced_val.json
 data/curated/adam_v6_8_step_b_train.json
 data/curated/adam_v6_8_step_b_curriculum_train.json
 data/curated/adam_v6_8_step_b_corpus.json
+
+# Model artefacts kept off-tree per the 50 MB threshold policy.
+data/lm_models/
