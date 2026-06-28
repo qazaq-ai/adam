@@ -1,0 +1,12 @@
+[package]
+name = "adam-hybrid-llm"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Hybrid-QLM experiment crate.  Subprocess wrapper around `llama-completion` (llama.cpp) exposing three typed proposer APIs — paraphrase, N-best rescoring, dialog-act classification — strictly behind the `ADAM_HYBRID_LM=1` env gate and downstream of the deterministic adam-kernel verifier.  Never speaks facts directly.  See experiments/hybrid_qlm/PROTOCOL.md."
+
+[dependencies]
+thiserror.workspace = true
+
+[lints]
+workspace = true

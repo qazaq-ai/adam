@@ -214,6 +214,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "adam-hybrid-llm"
+version = "6.8.10"
+dependencies = [
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "adam-ingest-kaz-tili"
 version = "6.8.10"
 dependencies = [

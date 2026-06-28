@@ -140,31 +140,43 @@ crates/adam-dialog/        ← verifier-side gate (existing
     behind an env var (`ADAM_HYBRID_LM=1`); default-off in
     every binary.
 
-## Day-by-day phasing
+## Phases (thematic, not calendar)
 
-  Day 1-3   — pick base model, write baseline measurement
-              harness, capture honest baseline of the bare LM
-              on existing eval suite.  Record in
-              `baseline/day_1.md`.
-  Day 4-7   — design + ship `crates/adam-hybrid-llm` API
-              skeleton.  Wire empty proposers behind env-var
-              gate.
-  Day 8-14  — author `paraphrase_coverage_eval.json` (~100
-              canonical queries × 5 paraphrases each).
-              Measure baseline of deterministic-only cascade.
-  Day 15-21 — LoRA / continued-pretrain on native Kazakh
-              corpora (data/curated existing + Wikipedia kk
-              + adam-dialog session journal extracts).
-              Measure cascade+LM combined.
-  Day 22-26 — verifier hardening.  100-case manual audit for
-              hallucination leakage.  Tighten gate where any
-              ungrounded claim slipped through.
-  Day 27-29 — final measurement of all promotion criteria.
-              Document in `archive_notes.md`.
-  Day 30    — promote-or-archive decision.
+Cadence is per-commit, not per-day — this work moves in hours,
+not weeks.  Each phase is one or more commits on this branch.
 
-Each day's deliverable is a commit on this branch.  No
-silent days, no «I'll catch up later» drift.
+  baseline           — pick base model, write baseline harness,
+                       capture honest bare-LM scores on existing
+                       eval probes.  **Done — 87166e82.**
+                       Result: 4B = 7/10 + 2 honest «не знаю»,
+                       1B = 0/10 (dropped).
+  api-skeleton       — design + ship `crates/adam-hybrid-llm`.
+                       Three proposer APIs (`propose_paraphrase`,
+                       `rescore_n_best`, `classify_dialog_act`)
+                       behind `ADAM_HYBRID_LM=1` env gate.
+                       Real `llama-completion` subprocess wiring.
+  paraphrase-eval    — author `paraphrase_coverage_eval.json`
+                       (~100 canonical queries × 5 paraphrases).
+                       Measure deterministic-only baseline so
+                       the hybrid lift is comparable.
+  lora-recipe        — LoRA / continued-pretrain on native
+                       Kazakh corpora (`data/curated` +
+                       Wikipedia kk + adam-dialog session
+                       journal extracts).  Re-measure with
+                       hybrid path on.
+  verifier-hardening — 100-case manual audit for hallucination
+                       leakage.  Tighten the
+                       `adam-kernel`-verifier gate at every
+                       place an ungrounded claim slipped
+                       through.
+  final-measurement  — re-run all three promotion criteria
+                       (production no-regression, paraphrase
+                       coverage ≥ 20 pp gain, zero
+                       hallucinations).  Write
+                       `archive_notes.md`.
+  promote-or-archive — single decision commit.  Either merge
+                       integration plan into main, or archive
+                       branch without rebase.
 
 ## Open questions (decide in first 3 days)
 

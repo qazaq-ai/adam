@@ -28,6 +28,9 @@ members = [
   "crates/adam-intent-classifier",
   "crates/adam-slot-extractor",
   "crates/adam-retrieval-ranker",
+  # Hybrid-QLM experiment crate (branch experiment/hybrid-qlm-verifier).
+  # Default-off, NOT wired into production binaries.
+  "crates/adam-hybrid-llm",
   # adam-wellness merged into adam-dialog/src/wellness/ at v6.5.0-rc27.
   "tools/intent_dataset",
   "tools/synth_corrections_pack",
