@@ -1,0 +1,127 @@
+{
+  "version": "v6.8.34-classify-eval-2026-06-28",
+  "name": "classify-dialog-act-eval",
+  "description": "30 Kazakh queries × 5 dialog-act classes (Greeting / FactualQuery / Clarify / RefusalSignal / Other).  Tests `classify_dialog_act` proposer: LM-4B vs simple keyword rules vs random.",
+  "items": [
+    {
+      "input": "Сәлем!",
+      "label": "Greeting"
+    },
+    {
+      "input": "Сәлеметсіз бе.",
+      "label": "Greeting"
+    },
+    {
+      "input": "Қайырлы таң.",
+      "label": "Greeting"
+    },
+    {
+      "input": "Қайырлы күн!",
+      "label": "Greeting"
+    },
+    {
+      "input": "Ассаламу алейкум.",
+      "label": "Greeting"
+    },
+    {
+      "input": "Жақсы кездестік!",
+      "label": "Greeting"
+    },
+    {
+      "input": "Қазақстанның астанасы қай қала?",
+      "label": "FactualQuery"
+    },
+    {
+      "input": "Темірдің химиялық таңбасы.",
+      "label": "FactualQuery"
+    },
+    {
+      "input": "Алгоритм дегеніміз не?",
+      "label": "FactualQuery"
+    },
+    {
+      "input": "Жүректің қызметі қандай?",
+      "label": "FactualQuery"
+    },
+    {
+      "input": "Балқаш көлі туралы.",
+      "label": "FactualQuery"
+    },
+    {
+      "input": "Жатыс септігі сұрағы.",
+      "label": "FactualQuery"
+    },
+    {
+      "input": "Атомның құрылысы қалай?",
+      "label": "FactualQuery"
+    },
+    {
+      "input": "Кітап деген не?",
+      "label": "FactualQuery"
+    },
+    {
+      "input": "Түсінбедім.",
+      "label": "Clarify"
+    },
+    {
+      "input": "Қайталашы.",
+      "label": "Clarify"
+    },
+    {
+      "input": "Қалай дедіңіз?",
+      "label": "Clarify"
+    },
+    {
+      "input": "Не дегенді білдіреді?",
+      "label": "Clarify"
+    },
+    {
+      "input": "Дұрыс түсінбедім, түсіндірші.",
+      "label": "Clarify"
+    },
+    {
+      "input": "Жоқ.",
+      "label": "RefusalSignal"
+    },
+    {
+      "input": "Нет.",
+      "label": "RefusalSignal"
+    },
+    {
+      "input": "Жоқ, олай емес.",
+      "label": "RefusalSignal"
+    },
+    {
+      "input": "Дұрыс емес.",
+      "label": "RefusalSignal"
+    },
+    {
+      "input": "Бұл қате.",
+      "label": "RefusalSignal"
+    },
+    {
+      "input": "Менің атым Дәулет.",
+      "label": "Other"
+    },
+    {
+      "input": "Алматыда тұрамын.",
+      "label": "Other"
+    },
+    {
+      "input": "Сау бол!",
+      "label": "Other"
+    },
+    {
+      "input": "Менің белім ауырады.",
+      "label": "Other"
+    },
+    {
+      "input": "Бүгін жұмыс істедім.",
+      "label": "Other"
+    },
+    {
+      "input": "Кешегі күн жақсы өтті.",
+      "label": "Other"
+    }
+  ]
+}
