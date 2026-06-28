@@ -28,6 +28,10 @@ members = [
   "crates/adam-intent-classifier",
   "crates/adam-slot-extractor",
   "crates/adam-retrieval-ranker",
+  # Data ingestion pipeline foundation — typed candidate
+  # records + persistent JSONL queue.  Codex 2026-06-27
+  # «missing piece» for ADAM growth.
+  "crates/adam-ingestion",
   # adam-wellness merged into adam-dialog/src/wellness/ at v6.5.0-rc27.
   "tools/intent_dataset",
   "tools/synth_corrections_pack",

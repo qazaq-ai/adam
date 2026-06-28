@@ -224,6 +224,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "adam-ingestion"
+version = "6.8.10"
+dependencies = [
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "adam-intent-classifier"
 version = "6.8.10"
 dependencies = [

@@ -1,0 +1,14 @@
+[package]
+name = "adam-ingestion"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Data ingestion pipeline foundation.  Typed `CandidateFact` / `CandidateProcedure` records, persistent JSONL store, and the queue-status state machine (Pending → AutoAccepted | AutoRejected | NeedsReview → ApprovedByHuman | RejectedByHuman → IntegratedIntoWorldCore).  Designed as the front-half of the «raw KZ text → world_core» pipeline Codex named the missing piece for ADAM growth on 2026-06-27."
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true
