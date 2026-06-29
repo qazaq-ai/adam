@@ -1,0 +1,168 @@
+{
+  "version": "v6.8-procedure-eval-2026-06-29",
+  "name": "adam-procedure-eval",
+  "description": "Industrial SOP procedure eval — 20 realistic Kazakh-language probes across the 15 curated procedures in data/procedures/labor_safety_kz.jsonl.  Tests whether production routes worker / supervisor / OH&S queries to the matching procedure rather than to medical refusal / generic safety / cascade fallthrough.  Probes were composed against the actual procedure titles + steps; expected_response is a substring or token that must appear in the production answer for a semantic pass.\n\nAccepted (was_accepted=true) probes are PRODUCTION-GATE-RELEVANT: they should pass before an industrial pilot.  Unaccepted probes document known coverage gaps.",
+  "sample_count": 20,
+  "cases": [
+    {
+      "subject": "procedure_actor",
+      "topic": "labor_intro_001_briefing_actor",
+      "input": "Жұмысқа алу кезіндегі бастапқы нұсқаулықты кім жүргізеді?",
+      "expected_response": "еңбекті қорғау инженері",
+      "was_accepted": true,
+      "notes": "kk_labor_intro_001 step 1 actor — initial briefing performed by the labor-safety engineer."
+    },
+    {
+      "subject": "procedure_steps",
+      "topic": "labor_ppe_002_issuance",
+      "input": "Жеке қорғаныс құралдарын беру тәртібі қандай?",
+      "expected_response": "СИЗ",
+      "was_accepted": true,
+      "notes": "kk_labor_ppe_002 — full PPE issuance procedure recall."
+    },
+    {
+      "subject": "procedure_steps",
+      "topic": "metallurgy_loto_003_lockout",
+      "input": "Жабдықты сөндіру және блоктау тәртібі қалай?",
+      "expected_response": "блоктау",
+      "was_accepted": true,
+      "notes": "kk_metallurgy_loto_003 — LOTO procedure."
+    },
+    {
+      "subject": "procedure_steps",
+      "topic": "okhrana_briefing_004_periodic",
+      "input": "Мерзімдік нұсқаулық қашан жүргізіледі?",
+      "expected_response": "ай",
+      "was_accepted": true,
+      "notes": "kk_okhrana_briefing_004 — periodicity (3 / 6 months)."
+    },
+    {
+      "subject": "procedure_steps",
+      "topic": "construction_height_005_request",
+      "input": "Биіктікте жұмыс жүргізу тәртібі қандай?",
+      "expected_response": "жеке құлдыраудан қорғаныс",
+      "was_accepted": true,
+      "notes": "kk_construction_height_005 — working-at-height procedure should mention PPE."
+    },
+    {
+      "subject": "procedure_steps",
+      "topic": "accident_investigation_006_steps",
+      "input": "Жұмыс орнындағы жазатайым оқиғаны қалай тергеу керек?",
+      "expected_response": "тергеу",
+      "was_accepted": true,
+      "notes": "kk_accident_investigation_006 — accident investigation recall."
+    },
+    {
+      "subject": "procedure_steps",
+      "topic": "medical_periodic_007_request",
+      "input": "Мерзімдік медициналық тексеру тәртібі қандай?",
+      "expected_response": "медицина",
+      "was_accepted": true,
+      "notes": "kk_medical_periodic_007 — medical exam procedure."
+    },
+    {
+      "subject": "procedure_steps",
+      "topic": "fire_evacuation_008_steps",
+      "input": "Өрт кезінде эвакуация қалай жүргізіледі?",
+      "expected_response": "эвакуация",
+      "was_accepted": true,
+      "notes": "kk_fire_evacuation_008 — fire evacuation procedure."
+    },
+    {
+      "subject": "procedure_steps",
+      "topic": "intoxication_denial_009_request",
+      "input": "Мас күйдегі қызметкерді не істеу керек?",
+      "expected_response": "шеттету",
+      "was_accepted": true,
+      "notes": "kk_intoxication_denial_009 — intoxicated worker → remove-from-work procedure.  KNOWN production bug 2026-06-29: safety_guard misroutes this as medical query."
+    },
+    {
+      "subject": "procedure_steps",
+      "topic": "metallurgy_gas_010_measure",
+      "input": "Цехта газ концентрациясын қалай өлшеу керек?",
+      "expected_response": "газ",
+      "was_accepted": true,
+      "notes": "kk_metallurgy_gas_010 — gas concentration measurement."
+    },
+    {
+      "subject": "procedure_steps",
+      "topic": "electrical_permit_011_request",
+      "input": "Электр жабдықтарына наряд-рұқсат қалай ресімделеді?",
+      "expected_response": "наряд",
+      "was_accepted": true,
+      "notes": "kk_electrical_permit_011 — electrical work permit procedure."
+    },
+    {
+      "subject": "procedure_steps",
+      "topic": "automotive_quality_check_012_steps",
+      "input": "Конвейердегі сапа бақылауы тәртібі қандай?",
+      "expected_response": "сапа",
+      "was_accepted": true,
+      "notes": "kk_automotive_quality_check_012 — quality checkpoint procedure."
+    },
+    {
+      "subject": "procedure_steps",
+      "topic": "chemical_storage_013_steps",
+      "input": "Химиялық заттарды цехта қалай сақтау керек?",
+      "expected_response": "химия",
+      "was_accepted": true,
+      "notes": "kk_chemical_storage_013 — chemical-substance storage procedure."
+    },
+    {
+      "subject": "procedure_steps",
+      "topic": "metallurgy_emergency_stop_014_request",
+      "input": "Цехтың авариялық тоқтату тәртібі қандай?",
+      "expected_response": "тоқтату",
+      "was_accepted": true,
+      "notes": "kk_metallurgy_emergency_stop_014 — emergency stop procedure."
+    },
+    {
+      "subject": "procedure_steps",
+      "topic": "safety_attestation_015_request",
+      "input": "Еңбекті қорғау бойынша білім аттестациясы қалай өтеді?",
+      "expected_response": "аттестация",
+      "was_accepted": true,
+      "notes": "kk_safety_attestation_015 — safety knowledge attestation procedure."
+    },
+    {
+      "subject": "procedure_hazard",
+      "topic": "construction_height_005_hazards",
+      "input": "Биіктікте жұмыс кезінде қандай қауіптер бар?",
+      "expected_response": "құлау",
+      "was_accepted": true,
+      "notes": "kk_construction_height_005 hazard recall — falling is the canonical answer."
+    },
+    {
+      "subject": "procedure_steps",
+      "topic": "labor_intro_001_first_day",
+      "input": "Жұмысқа алғаш келген қызметкер не істеуі керек?",
+      "expected_response": "нұсқаулық",
+      "was_accepted": true,
+      "notes": "kk_labor_intro_001 — first-day worker scenario, should bridge to intro briefing."
+    },
+    {
+      "subject": "procedure_actor",
+      "topic": "fire_evacuation_008_signal",
+      "input": "Өрт сигналы естілгенде не істейін?",
+      "expected_response": "эвакуация",
+      "was_accepted": true,
+      "notes": "kk_fire_evacuation_008 — first-person worker scenario.  Probe: does production handle informal first-person query the same way as the procedural form?"
+    },
+    {
+      "subject": "procedure_steps",
+      "topic": "medical_periodic_007_who",
+      "input": "Кім мерзімдік медициналық тексеруден өтуі тиіс?",
+      "expected_response": "қызметкер",
+      "was_accepted": true,
+      "notes": "kk_medical_periodic_007 actor — who undergoes periodic medical examination."
+    },
+    {
+      "subject": "procedure_prerequisite",
+      "topic": "electrical_permit_011_who_authorizes",
+      "input": "Электр жабдықтарына наряд-рұқсатты кім береді?",
+      "expected_response": "наряд",
+      "was_accepted": false,
+      "notes": "kk_electrical_permit_011 issuer — open probe.  Document if production handles authorizer-identity query (separate from procedure recall)."
+    }
+  ]
+}
