@@ -6072,7 +6072,6 @@ mod tests {
     }
 
     #[test]
-    #[test]
     fn v6_8_46_ne_iste_kerek_co_occurrence_fires() {
         // Industrial procedural query without «қалай» — caught
         // by the second co-occurrence trigger «не істе» + «керек».
@@ -6083,6 +6082,7 @@ mod tests {
         );
     }
 
+    #[test]
     fn v6_8_45_qalai_kerek_no_match_on_non_procedural() {
         // Generic «не істеу керек» without procedural anchor:
         // a Kazakh adjective doesn't match any procedure title,
