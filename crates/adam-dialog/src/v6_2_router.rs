@@ -2823,10 +2823,20 @@ fn lookup_procedure_matched_with_score(input: &str) -> Option<(String, String, f
     use crate::procedure_loader::shared_procedures;
 
     let lower = input.to_lowercase();
-    let trigger_present = SHAPE_TRIGGERS_KK
-        .iter()
-        .chain(SHAPE_TRIGGERS_RU.iter())
-        .any(|t| lower.contains(t));
+    // **v6.8.45 — procedure_eval audit fix.**  The flat
+    // SHAPE_TRIGGERS list catches «тәртібі қандай?» / «қалай
+    // жүргізіледі?» / etc. but not the productive «қалай
+    // <verb> керек?» shape (common in worker queries:
+    // «Газ концентрациясын қалай өлшеу керек?»).  Treat the
+    // co-occurrence of «қалай» + «керек» as a procedure
+    // shape trigger.  Same idea for Russian: «как ... нужно».
+    let cooccurrence_trigger = (lower.contains("қалай") && lower.contains("керек"))
+        || (lower.contains("как ") && lower.contains("нужно"));
+    let trigger_present = cooccurrence_trigger
+        || SHAPE_TRIGGERS_KK
+            .iter()
+            .chain(SHAPE_TRIGGERS_RU.iter())
+            .any(|t| lower.contains(t));
     if !trigger_present {
         return None;
     }
@@ -6021,5 +6031,41 @@ mod tests {
 
         let strong_075 = 0.75_f32;
         assert!(strong_075 >= CLARIFY_THRESHOLD);
+    }
+
+    /// **v6.8.45 — procedure_eval audit fix.**  Co-occurrence
+    /// «қалай ... керек» as a procedure-shape trigger.
+    /// Three pinned positives + one pinned negative confirm
+    /// the new trigger fires on real worker queries without
+    /// false-positives on non-procedural «керек» uses.
+    #[test]
+    fn v6_8_45_qalai_kerek_co_occurrence_fires_procedure_lookup() {
+        // Gas measurement procedure — was failing in v6.8.43
+        // baseline.
+        assert!(
+            lookup_procedure("Цехта газ концентрациясын қалай өлшеу керек?").is_some(),
+            "qalai+kerek procedure query must route"
+        );
+        // Chemical storage — was failing.
+        assert!(
+            lookup_procedure("Химиялық заттарды цехта қалай сақтау керек?").is_some(),
+            "qalai+kerek chemical-storage query must route"
+        );
+        // Accident investigation — was failing.
+        assert!(
+            lookup_procedure("Жұмыс орнындағы жазатайым оқиғаны қалай тергеу керек?").is_some(),
+            "qalai+kerek accident-investigation query must route"
+        );
+    }
+
+    #[test]
+    fn v6_8_45_qalai_kerek_no_match_on_non_procedural() {
+        // Generic «не істеу керек» without procedural anchor:
+        // a Kazakh adjective doesn't match any procedure title,
+        // so lookup returns None.  Confirms the trigger fires
+        // BUT the score-based match still gates the result.
+        assert!(lookup_procedure("Кітабым жоқ, қалай оқу керек?").is_none());
+        // No «қалай» at all → trigger doesn't fire.
+        assert!(lookup_procedure("Кітабым жоқ.").is_none());
     }
 }
