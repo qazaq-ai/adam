@@ -3611,18 +3611,56 @@ fn score_procedure(proc: &adam_algebra::ProcedureIR, query_tokens: &[&str]) -> i
         .map(|s| s.to_lowercase())
         .unwrap_or_default();
     let applies_lower: String = proc.applies_to.join(" ").to_lowercase();
+    // **v6.8.49 — procedure_eval audit fix.**  Bring
+    // `aliases_kk` / `aliases_ru` into the scorer.  The
+    // aliases field was already in `ProcedureIR` (v6.8.27)
+    // but the scorer ignored it, leaving curator-provided
+    // synonyms invisible.  Aliases score at the applies_to
+    // weight (+2) NOT the title weight (+3): aliases are
+    // semantic enrichment, not canonical labels — boosting
+    // them to title weight let weak underspecified queries
+    // («нұсқаулық рәсімі қандай?») clear the clarify
+    // threshold spuriously (broke
+    // `clarify_weak_procedure_match_v6815`).
+    let aliases_kk_lower: String = proc.aliases_kk.join(" ").to_lowercase();
+    let aliases_ru_lower: String = proc.aliases_ru.join(" ").to_lowercase();
 
     let title_kk_words: Vec<&str> = split_alphanumeric_words(&title_kk_lower);
     let title_ru_words: Vec<&str> = split_alphanumeric_words(&title_ru_lower);
     let applies_words: Vec<&str> = split_alphanumeric_words(&applies_lower);
+    let aliases_kk_words: Vec<&str> = split_alphanumeric_words(&aliases_kk_lower);
+    let aliases_ru_words: Vec<&str> = split_alphanumeric_words(&aliases_ru_lower);
 
     let mut score = 0i32;
     for tok in query_tokens {
-        if title_kk_words.iter().any(|w| word_overlap_match(tok, w)) {
+        let kk_title_hit = title_kk_words.iter().any(|w| word_overlap_match(tok, w));
+        let ru_title_hit =
+            !title_ru_lower.is_empty() && title_ru_words.iter().any(|w| word_overlap_match(tok, w));
+        if kk_title_hit {
             score += 3;
         }
-        if !title_ru_lower.is_empty() && title_ru_words.iter().any(|w| word_overlap_match(tok, w)) {
+        if ru_title_hit {
             score += 3;
+        }
+        // Aliases are dedup'd against their respective
+        // title field — an alias score only adds when the
+        // token did NOT already match the canonical title.
+        // Otherwise tokens that appear in BOTH title and
+        // aliases (the common case — aliases are partial
+        // synonyms) double-count, which inflates weak
+        // matches above the clarify threshold and breaks
+        // `clarify_weak_procedure_match_v6815`.
+        if !kk_title_hit
+            && !aliases_kk_words.is_empty()
+            && aliases_kk_words.iter().any(|w| word_overlap_match(tok, w))
+        {
+            score += 2;
+        }
+        if !ru_title_hit
+            && !aliases_ru_words.is_empty()
+            && aliases_ru_words.iter().any(|w| word_overlap_match(tok, w))
+        {
+            score += 2;
         }
         if applies_words.iter().any(|w| word_overlap_match(tok, w)) {
             score += 2;
