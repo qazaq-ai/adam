@@ -222,7 +222,13 @@ pub fn next_id_sequence(existing: &[WorldCoreEntry], id_prefix: &str) -> u32 {
     max_seen + 1
 }
 
-fn load_world_core_entries(path: &Path) -> Result<Vec<WorldCoreEntry>, IntegrationError> {
+/// Load every `WorldCoreEntry` from a JSONL file.  Missing
+/// file returns an empty vec — the caller is expected to
+/// treat the file as a sink that grows over time.  Exposed
+/// publicly so integration tests and command-line tools
+/// can read back the integrator's output without
+/// reimplementing the parse.
+pub fn load_world_core_entries(path: &Path) -> Result<Vec<WorldCoreEntry>, IntegrationError> {
     if !path.exists() {
         return Ok(Vec::new());
     }
