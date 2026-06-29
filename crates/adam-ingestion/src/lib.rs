@@ -65,6 +65,7 @@
 
 pub mod candidate;
 pub mod extractor;
+pub mod integrator;
 pub mod review;
 pub mod source;
 pub mod status;
@@ -73,6 +74,10 @@ pub mod validator;
 
 pub use candidate::{CandidateFact, CandidateId, CandidateProcedure, ParseError};
 pub use extractor::extract_facts_from_text;
+pub use integrator::{
+    IntegrationError, IntegrationSummary, IntegrationTarget, WorldCoreEntry, WorldCoreFact,
+    candidate_to_entry, integrate_approved_facts, next_id_sequence,
+};
 pub use review::{
     ReviewDecision, ReviewSummary, Reviewer, render_fact_for_review, run_review_session,
 };
