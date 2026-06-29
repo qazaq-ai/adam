@@ -2853,21 +2853,7 @@ fn lookup_procedure_matched_with_score(input: &str) -> Option<(String, String, f
     if !trigger_present {
         return None;
     }
-    let query_tokens: Vec<&str> = lower
-        .split(|c: char| !c.is_alphanumeric())
-        .filter(|t| t.chars().count() >= 4)
-        .collect();
-    if query_tokens.is_empty() {
-        return None;
-    }
-    let mut best: Option<(usize, i32)> = None;
-    for (idx, proc) in shared_procedures().iter().enumerate() {
-        let score = score_procedure(proc, &query_tokens);
-        if score >= MIN_SCORE && best.is_none_or(|(_, b)| score > b) {
-            best = Some((idx, score));
-        }
-    }
-    let (best_idx, raw_score) = best?;
+    let (best_idx, raw_score) = score_best_procedure(&lower)?;
     // Normalisation ceiling tuned against the v6.8.5 fixture set:
     // a pilot-style query against the right fixture typically
     // scores 6–10 (multiple title_kk + applies_to overlaps), so
@@ -2920,10 +2906,27 @@ fn lookup_procedure_authority(input: &str, anaphora_procedure_id: Option<&str>) 
     if !looks_like_procedure_authority_query(input) {
         return None;
     }
-    let proc_id = anaphora_procedure_id?;
-    let proc = crate::procedure_loader::shared_procedures()
-        .iter()
-        .find(|p| p.id == proc_id)?;
+    // **v6.8.48 — procedure_eval audit fix.**  Resolution
+    // order:
+    //   1. Strong content match (score ≥ ANAPHORA_OVERRIDE_FLOOR)
+    //      overrides anaphora — worker asking a topical
+    //      question gets that procedure's authority info.
+    //   2. Anaphora referent — bare follow-up («Кім жауап?»
+    //      with no topic mention) uses the prior procedure.
+    //   3. Any content match (score ≥ MIN_SCORE) — anaphora
+    //      absent.
+    //   4. None — neither path available.
+    let lower = input.to_lowercase();
+    let strong_match = score_best_procedure_with_floor(&lower, ANAPHORA_OVERRIDE_FLOOR);
+    let weak_match = score_best_procedure(&lower);
+    let proc = match (strong_match, anaphora_procedure_id, weak_match) {
+        (Some((idx, _)), _, _) => &crate::procedure_loader::shared_procedures()[idx],
+        (None, Some(id), _) => crate::procedure_loader::shared_procedures()
+            .iter()
+            .find(|p| p.id == id)?,
+        (None, None, Some((idx, _))) => &crate::procedure_loader::shared_procedures()[idx],
+        (None, None, None) => return None,
+    };
     if proc.authorization.is_empty() {
         return None;
     }
@@ -2936,11 +2939,31 @@ fn lookup_procedure_authority(input: &str, anaphora_procedure_id: Option<&str>) 
 
 fn looks_like_procedure_authority_query(input: &str) -> bool {
     let lower = input.to_lowercase();
-    lower.contains("кім жауап")
+    // **v6.8.48 — procedure_eval audit fix.**  Adjacent
+    // markers («кім береді») catch the simple shape;
+    // co-occurrence covers worker-perspective queries
+    // with object material between the interrogative and
+    // the verb («Кім мерзімдік медициналық тексеруден өтуі
+    // тиіс?»).  Audit 2026-06-29: zero conflicts in
+    // conv_dialog / safety / v6_7_real_audit /
+    // school_program for the «кім» + obligation-marker
+    // co-occurrence.
+    let adjacent = lower.contains("кім жауап")
         || lower.contains("кім жасайды")
+        || lower.contains("кім жүргіз")
+        || lower.contains("кім беред")
+        || lower.contains("кім өтеді")
+        || lower.contains("кім өтуі")
+        || lower.contains("кім тиіс")
+        || lower.contains("кім ресімдей")
         || lower.contains("кто отвечает")
         || lower.contains("кто ответствен")
         || lower.contains("чья ответствен")
+        || lower.contains("кто проводит")
+        || lower.contains("кто выдает");
+    let co_occurrence = lower.contains("кім")
+        && (lower.contains("тиіс") || lower.contains("өтуі") || lower.contains("береді"));
+    adjacent || co_occurrence
 }
 
 /// **v6.8.12 — procedure attribute query (hazards).** Detects
@@ -2955,10 +2978,31 @@ fn lookup_procedure_hazards(input: &str, anaphora_procedure_id: Option<&str>) ->
     if !looks_like_procedure_hazards_query(input) {
         return None;
     }
-    let proc_id = anaphora_procedure_id?;
-    let proc = crate::procedure_loader::shared_procedures()
-        .iter()
-        .find(|p| p.id == proc_id)?;
+    // **v6.8.48 — procedure_eval audit fix.**  Resolution
+    // order (mirrors `lookup_procedure_authority`):
+    //   1. Strong content match (≥ ANAPHORA_OVERRIDE_FLOOR)
+    //      → use that procedure.  Worker on a sequence of
+    //      independent topics gets the right procedure's
+    //      hazards even when the prior turn was about a
+    //      different procedure.
+    //   2. Anaphora referent → bare follow-up
+    //      «Қауіптері қандай?» stays bound to the
+    //      previously-named procedure (preserves the
+    //      v6.8.12 follow-up shape).
+    //   3. Weak content match → fall back when no
+    //      anaphora is set.
+    //   4. None → caller's cascade falls through.
+    let lower = input.to_lowercase();
+    let strong_match = score_best_procedure_with_floor(&lower, ANAPHORA_OVERRIDE_FLOOR);
+    let weak_match = score_best_procedure(&lower);
+    let proc = match (strong_match, anaphora_procedure_id, weak_match) {
+        (Some((idx, _)), _, _) => &crate::procedure_loader::shared_procedures()[idx],
+        (None, Some(id), _) => crate::procedure_loader::shared_procedures()
+            .iter()
+            .find(|p| p.id == id)?,
+        (None, None, Some((idx, _))) => &crate::procedure_loader::shared_procedures()[idx],
+        (None, None, None) => return None,
+    };
     if proc.hazards.is_empty() {
         // The procedure is on-record as having no curated hazards
         // (NOT the same as having unknown hazards).  Surface the
@@ -3481,6 +3525,20 @@ const SHAPE_TRIGGERS_KK: &[&str] = &[
     "рәсім",
     "рәсімі",
     "нұсқаулық",
+    // **v6.8.48 — procedure_eval audit fix.**  Worker-query
+    // shapes that the procedure router consults via attribute
+    // sub-routers (hazards / authority / actor) — without
+    // these as bare triggers, the procedure scorer never runs
+    // and the sub-routers have no anaphora to fall back on
+    // for first-turn queries.  Surveyed against conv_dialog +
+    // safety + v6_7_real_audit on 2026-06-29: zero
+    // false-positive matches.
+    "қауіп",
+    "кім беред",
+    "кім жүргіз",
+    "кім өтуі",
+    "кім тиіс",
+    "кім ресімдей",
 ];
 
 const SHAPE_TRIGGERS_RU: &[&str] = &[
@@ -3496,6 +3554,54 @@ const SHAPE_TRIGGERS_RU: &[&str] = &[
 /// 2-3 tokens with the right fixture and 0-1 tokens with
 /// unrelated ones, so a threshold of 2 cleanly separates them.
 const MIN_SCORE: i32 = 2;
+
+/// **v6.8.48 — procedure_eval audit fix.**  Score every
+/// procedure against the lowercased input and return the
+/// (index, raw_score) of the best match clearing the
+/// supplied floor.  Trigger-gate-free — callers that
+/// already know they're handling a procedure-shape query
+/// (the hazard / authority sub-routers, for instance)
+/// can short-circuit the shape check and just do content
+/// match.  None when no procedure clears the floor.
+fn score_best_procedure_with_floor(lower: &str, floor: i32) -> Option<(usize, i32)> {
+    use crate::procedure_loader::shared_procedures;
+    let query_tokens: Vec<&str> = lower
+        .split(|c: char| !c.is_alphanumeric())
+        .filter(|t| t.chars().count() >= 4)
+        .collect();
+    if query_tokens.is_empty() {
+        return None;
+    }
+    let mut best: Option<(usize, i32)> = None;
+    for (idx, proc) in shared_procedures().iter().enumerate() {
+        let score = score_procedure(proc, &query_tokens);
+        if score >= floor && best.is_none_or(|(_, b)| score > b) {
+            best = Some((idx, score));
+        }
+    }
+    best
+}
+
+/// Default floor (`MIN_SCORE = 2`).  Same threshold the
+/// flat `lookup_procedure_matched_with_score` uses.
+fn score_best_procedure(lower: &str) -> Option<(usize, i32)> {
+    score_best_procedure_with_floor(lower, MIN_SCORE)
+}
+
+/// **v6.8.48 — anaphora-override threshold.**  When the
+/// hazard / authority routers want to OVERRIDE an existing
+/// anaphora referent with a content match, the match has
+/// to be substantially stronger than the bare MIN_SCORE
+/// floor.  A score of `MIN_SCORE = 2` can come from a
+/// single applies_to coincidence — that's noise.
+/// `ANAPHORA_OVERRIDE_FLOOR = 5` requires either a title
+/// hit (worth 3) plus an applies_to hit (worth 2), OR
+/// multiple applies_to hits.  Bare follow-ups like
+/// «Қауіптері қандай?» (which score 2 against any
+/// procedure whose applies_to contains «қауіпті»)
+/// stay below this threshold and the anaphora wins as
+/// intended.
+const ANAPHORA_OVERRIDE_FLOOR: i32 = 5;
 
 fn score_procedure(proc: &adam_algebra::ProcedureIR, query_tokens: &[&str]) -> i32 {
     let title_kk_lower = proc.title_kk.to_lowercase();
