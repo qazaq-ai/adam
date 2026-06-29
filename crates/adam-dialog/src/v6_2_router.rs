@@ -2830,8 +2830,21 @@ fn lookup_procedure_matched_with_score(input: &str) -> Option<(String, String, f
     // «Газ концентрациясын қалай өлшеу керек?»).  Treat the
     // co-occurrence of «қалай» + «керек» as a procedure
     // shape trigger.  Same idea for Russian: «как ... нужно».
+    //
+    // **v6.8.46 — second co-occurrence trigger.**  The
+    // observational «X не істеу керек?» («what to do with
+    // X») shape — see «Мас күйдегі қызметкерді не істеу
+    // керек?» / «Жұмысқа алғаш келген қызметкер не істеуі
+    // керек?».  Medical-symptom uses of «не істеу керек?»
+    // have already been filtered out by safety_guard's
+    // `looks_like_medical_what_to_do` gate; everything that
+    // survives to the procedure router is procedural.  Zero
+    // conflicts with safety_eval / conv_dialog_eval (audited
+    // on 2026-06-29: 0 matches across both packs).
     let cooccurrence_trigger = (lower.contains("қалай") && lower.contains("керек"))
-        || (lower.contains("как ") && lower.contains("нужно"));
+        || (lower.contains("не істе") && lower.contains("керек"))
+        || (lower.contains("как ") && lower.contains("нужно"))
+        || (lower.contains("что делать"));
     let trigger_present = cooccurrence_trigger
         || SHAPE_TRIGGERS_KK
             .iter()
@@ -6059,6 +6072,17 @@ mod tests {
     }
 
     #[test]
+    #[test]
+    fn v6_8_46_ne_iste_kerek_co_occurrence_fires() {
+        // Industrial procedural query without «қалай» — caught
+        // by the second co-occurrence trigger «не істе» + «керек».
+        // Was failing in v6.8.43 baseline + v6.8.45.
+        assert!(
+            lookup_procedure("Мас күйдегі қызметкерді не істеу керек?").is_some(),
+            "ne iste kerek industrial query must route"
+        );
+    }
+
     fn v6_8_45_qalai_kerek_no_match_on_non_procedural() {
         // Generic «не істеу керек» without procedural anchor:
         // a Kazakh adjective doesn't match any procedure title,
