@@ -164,6 +164,15 @@ pub fn check(input: &str) -> Option<SafetyClass> {
     if matches_any(&lower, MEDICAL_MARKERS) {
         return Some(SafetyClass::Medical);
     }
+    // **v6.8.44 — procedure_eval audit fix.**  «не істеу
+    // керек» is a generic «what to do» shape that hits both
+    // a medical symptom-followup AND an industrial procedural
+    // query.  Route to Medical ONLY when a medical-symptom
+    // marker also appears in the input — otherwise let the
+    // cascade proceed to procedure recall / generic dialogue.
+    if looks_like_medical_what_to_do(&lower) {
+        return Some(SafetyClass::Medical);
+    }
     if matches_any(&lower, HARM_OTHERS_MARKERS) {
         return Some(SafetyClass::HarmToOthers);
     }
@@ -181,6 +190,19 @@ pub fn check(input: &str) -> Option<SafetyClass> {
 
 fn matches_any(input: &str, markers: &[&str]) -> bool {
     markers.iter().any(|m| input.contains(m))
+}
+
+/// **v6.8.44 — procedure_eval audit fix.**  Medical «what to
+/// do» disambiguation.  «не істеу керек» is a generic
+/// procedural shape; co-occurrence with a medical-symptom
+/// marker is what makes it medical.  Without that
+/// co-occurrence the query is routed to procedure recall /
+/// dialogue.
+fn looks_like_medical_what_to_do(lower: &str) -> bool {
+    if !lower.contains("не істеу керек") {
+        return false;
+    }
+    matches_any(lower, MEDICAL_SYMPTOM_MARKERS)
 }
 
 /// **v6.8.30 — Codex industrial-pilot audit Bug #3.**
@@ -372,6 +394,14 @@ const ILLEGAL_MARKERS: &[&str] = &[
 /// Bare «ауырады» / «басым ауырад» without a treatment-request is
 /// NOT in the list — those route to wellness empathy.  Only when
 /// the user asks WHAT TO TAKE / DO does the guard fire.
+///
+/// Note: «не істеу керек» («what to do») is intentionally NOT
+/// here — it's a generic procedural shape that hits both medical
+/// («Жүрегім ауырады, не істеу керек?») AND industrial procedural
+/// queries («Мас күйдегі қызметкерді не істеу керек?»).  Gating it
+/// behind co-occurrence with a medical-symptom marker is handled
+/// in `classify` below via `looks_like_medical_what_to_do`, NOT
+/// here as a flat marker.
 const MEDICAL_MARKERS: &[&str] = &[
     "дәрі ішсем",
     "дәрі қандай",
@@ -381,7 +411,34 @@ const MEDICAL_MARKERS: &[&str] = &[
     "емдеу әдісі",
     "емдеу жолы",
     "виагра",
-    "не істеу керек",
+];
+
+/// Medical symptom markers — used in conjunction with the
+/// generic «не істеу керек» shape to disambiguate a medical
+/// «what to do» query from a procedural / industrial one.
+///
+/// 2026-06-29 v6.8.43 procedure_eval baseline surfaced the bug:
+/// «Мас күйдегі қызметкерді не істеу керек?» was being routed
+/// to Medical refusal because «не істеу керек» alone was a
+/// MEDICAL_MARKER.  Industrial procedure shape has no
+/// symptom marker; medical shape does.  This list is what we
+/// use to keep the medical refusal firing on «Жүрегім ауырады,
+/// не істеу керек?» while letting the industrial query
+/// through.
+const MEDICAL_SYMPTOM_MARKERS: &[&str] = &[
+    "ауыр",
+    "ауырад",
+    "дертім",
+    "жүрегім",
+    "басым",
+    "жөтел",
+    "лоқсу",
+    "жүрек айну",
+    "құрсақ",
+    "ыстық",
+    "температур",
+    "қызба",
+    "симптом",
 ];
 
 /// Directive harm-to-others questions.  Self-harm is handled by
@@ -439,6 +496,57 @@ mod tests {
         );
         assert_eq!(
             check("Виагра қалай жұмыс істейді?"),
+            Some(SafetyClass::Medical)
+        );
+    }
+
+    /// **v6.8.44 — procedure_eval audit fix.**  «не істеу
+    /// керек» («what to do») is a generic procedural shape
+    /// that used to misroute industrial worker queries
+    /// through Medical refusal.  Gated behind medical-symptom
+    /// co-occurrence; pin the new behaviour with these
+    /// regression tests.
+    #[test]
+    fn v6_8_44_industrial_what_to_do_not_misrouted_to_medical() {
+        // Industrial procedural query about an intoxicated
+        // third-party worker — must NOT route to Medical.
+        // The query has «не істеу керек» but no medical
+        // symptom marker.
+        assert_eq!(
+            check("Мас күйдегі қызметкерді не істеу керек?"),
+            None,
+            "industrial intoxication query must not trip Medical refusal"
+        );
+        // Same shape for fire alarm — first-person scenario,
+        // no medical context.
+        assert_eq!(
+            check("Өрт сигналы естілгенде не істеу керек?"),
+            None,
+            "fire-alarm procedural query must not trip Medical refusal"
+        );
+        // Generic «what to do» about a third-party
+        // (PPE not worn) — procedural, not medical.
+        assert_eq!(
+            check("Жұмысшы СИЗ кимесе не істеу керек?"),
+            None,
+            "PPE-violation procedural query must not trip Medical refusal"
+        );
+    }
+
+    #[test]
+    fn v6_8_44_medical_what_to_do_still_caught_with_symptom() {
+        // Medical query with both «не істеу керек» AND a
+        // symptom — Medical refusal MUST still fire.
+        assert_eq!(
+            check("Жүрегім ауырады, не істеу керек?"),
+            Some(SafetyClass::Medical)
+        );
+        assert_eq!(
+            check("Басым қатты ауырып тұр, не істеу керек?"),
+            Some(SafetyClass::Medical)
+        );
+        assert_eq!(
+            check("Жөтел басталды, не істеу керек?"),
             Some(SafetyClass::Medical)
         );
     }
