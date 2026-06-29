@@ -2852,10 +2852,20 @@ fn lookup_procedure_matched_with_score(input: &str) -> Option<(String, String, f
     // survives to the procedure router is procedural.  Zero
     // conflicts with safety_eval / conv_dialog_eval (audited
     // on 2026-06-29: 0 matches across both packs).
+    // **v6.8.51 — 1st-person volitive «не істейін?».**
+    // Fire-signal / emergency scenarios use the 1st-person
+    // volitive «не істейін?» («what should I do?») rather
+    // than the 3rd-person «не істеу керек?».  Catches it
+    // as a bare token — audited against conv_dialog /
+    // safety / v6_7_real_audit / school_program on
+    // 2026-06-29: 0 conflicts.  The «істейін» suffix is
+    // morphologically unambiguous in Kazakh.
     let cooccurrence_trigger = (lower.contains("қалай") && lower.contains("керек"))
         || (lower.contains("не істе") && lower.contains("керек"))
+        || lower.contains("не істейін")
         || (lower.contains("как ") && lower.contains("нужно"))
-        || (lower.contains("что делать"));
+        || (lower.contains("что делать"))
+        || lower.contains("что мне делать");
     let trigger_present = cooccurrence_trigger
         || SHAPE_TRIGGERS_KK
             .iter()
