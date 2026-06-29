@@ -68,9 +68,14 @@ pub mod extractor;
 pub mod source;
 pub mod status;
 pub mod store;
+pub mod validator;
 
 pub use candidate::{CandidateFact, CandidateId, CandidateProcedure, ParseError};
 pub use extractor::extract_facts_from_text;
 pub use source::{SourceKind, SourceRef};
 pub use status::{IngestionStatus, StatusTransitionError};
 pub use store::{CandidateStore, StoreError};
+pub use validator::{
+    AUTO_ACCEPT_FLOOR, AUTO_REJECT_CEILING, KNOWN_PREDICATES, ValidationOutcome, WorldCoreIndex,
+    validate_fact,
+};
