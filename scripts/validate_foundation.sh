@@ -26,6 +26,7 @@ if [[ ! -f data/curated/adam_training_corpus_manifest.json ]]; then
     cargo fmt --all --check
     cargo run --release -p adam-reasoning --bin validate_world_core
     cargo run --release -p adam-algebra --bin validate_procedures
+    cargo run --release -p adam-ingestion --bin validate_ingestion
     bash scripts/check_metrics_currency.sh
     echo "kernel validation passed (corpus pipeline skipped — manifest absent on this checkout)"
     exit 0
@@ -186,6 +187,15 @@ cargo run --release -p adam-reasoning --bin validate_world_core
 # target without the schema rot a hand-validated data set
 # accumulates.
 cargo run --release -p adam-algebra --bin validate_procedures
+
+# **v6.8.39** — ingestion-queue CI gate.  Walks
+# `data/ingestion/{facts,procedures}.jsonl` (when present),
+# confirms every record parses + passes `check_invariants()`,
+# ids are unique across the queue, and reports the status
+# histogram as INFO.  Missing directory is treated as silent
+# success — pre-pipeline checkouts and CI runs without any
+# accumulated candidates skip cleanly.
+cargo run --release -p adam-ingestion --bin validate_ingestion
 
 # **v4.55.0** — metrics-currency CI gate. Cross-checks numeric
 # claims in README.md / data/README.md / data/world_core/README.md
