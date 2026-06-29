@@ -120,6 +120,15 @@ fn extract_em_dash_declaration(
     // a sentence without a trailing period returns empty
     // here and the body-empty guard below rejects it.
     let s = sentence.trim();
+    // Reject sentence-leading em-dash — that's a Kazakh
+    // dialogue marker («— Сопы деді»), not a definition.
+    // 2026-06-29 wikibooks_kk dry-run: 17 / 234 raw
+    // candidates were dialogue dashes; this rule drops them
+    // at extract time rather than burning reviewer attention
+    // on them.
+    if s.starts_with("— ") || s.starts_with('—') {
+        return None;
+    }
     let body = s.strip_suffix('.').unwrap_or("");
     if body.is_empty() {
         return None;
@@ -316,5 +325,31 @@ mod tests {
             "got: {}",
             facts[0].id
         );
+    }
+
+    #[test]
+    fn dialogue_dash_sentence_rejected() {
+        // Kazakh literary convention: an em-dash at the
+        // sentence start marks direct speech («— Сопы деді»).
+        // Empirically these dominated noise in the
+        // 2026-06-29 wikibooks_kk dry-run (17 of 234 raw
+        // candidates).  Reject at extract time so the
+        // reviewer doesn't waste cycles on them.
+        let text = "— Сопы, иманыңды ұста, — деді.\n— Әрине, — деп жауап берді.";
+        let facts = extract_facts_from_text(text, "src.txt", SourceKind::TextFile, "2026-06-29");
+        assert!(facts.is_empty(), "got: {facts:?}");
+    }
+
+    #[test]
+    fn definition_after_dialogue_still_extracted() {
+        // Same line MIX of dialogue + real definition:
+        // dialogue rejected, definition kept.  Important
+        // because the line-level pre-filter doesn't catch
+        // mid-line dialogue — only sentence-leading dashes.
+        let text = "— Сопы, иманыңды ұста, — деді. Адам — тіршілік иесі.";
+        let facts = extract_facts_from_text(text, "src.txt", SourceKind::TextFile, "2026-06-29");
+        assert_eq!(facts.len(), 1);
+        assert_eq!(facts[0].subject, "адам");
+        assert_eq!(facts[0].object, "тіршілік иесі");
     }
 }

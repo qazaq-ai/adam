@@ -221,3 +221,19 @@ data/curated/adam_v6_8_step_b_corpus.json
 
 # Model artefacts kept off-tree per the 50 MB threshold policy.
 data/lm_models/
+
+# **v6.8.34 — 2026-06-29 ingestion pipeline.**  `data/ingestion/`
+# is the live candidate queue between extractor, validator,
+# reviewer, and integrator (see `crates/adam-ingestion/`).
+# Like `data/mistake_corrections.jsonl`, it is a RUNTIME
+# artefact, not a source of truth — committing it would mean
+# every pipeline run left a dirty working tree.  The CI gate
+# (`validate_ingestion`) degrades to silent success when the
+# directory is absent.
+data/ingestion/
+# Raw text staged for the extractor (PDF text dumps, scraped
+# corpora, etc.) — scratch input under the dedicated
+# `ingest_demo/` subdirectory, not authoritative data.
+# Tracked files in `data/raw/` itself (source_registry,
+# source_scoring_rules, rust_book_kk/) stay in git.
+data/raw/ingest_demo/
