@@ -65,6 +65,7 @@
 
 pub mod candidate;
 pub mod extractor;
+pub mod review;
 pub mod source;
 pub mod status;
 pub mod store;
@@ -72,6 +73,9 @@ pub mod validator;
 
 pub use candidate::{CandidateFact, CandidateId, CandidateProcedure, ParseError};
 pub use extractor::extract_facts_from_text;
+pub use review::{
+    ReviewDecision, ReviewSummary, Reviewer, render_fact_for_review, run_review_session,
+};
 pub use source::{SourceKind, SourceRef};
 pub use status::{IngestionStatus, StatusTransitionError};
 pub use store::{CandidateStore, StoreError};
