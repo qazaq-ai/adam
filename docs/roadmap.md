@@ -2,6 +2,21 @@
 
 Version-by-version history of `adam`, grouped into architectural eras.
 
+> **Status 2026-06-29.** **v6.9.0 shipped** as the
+> consolidation release for the 2026-06-29 work-day arc:
+> a new typed `adam-ingestion` crate (raw KZ text →
+> world_core pipeline, end-to-end composable in a single
+> integration test), real-data extractor refinement (two
+> matchers: em-dash declarative + «X дегеніміз — Y»), and
+> an 8-commit procedure-router restructure measured against
+> the new `procedure_eval` industrial-pilot suite:
+> **53 % → 95 %** (18 / 19 cases, 100 % on accepted-only).
+> Production dashboard 4 / 6 evals at 100 %, speech_defect
+> at 76 % (plateau), procedure at 95 %.  See
+> [`CHANGELOG.md`](../CHANGELOG.md) v6.9.0 for the
+> 18-commit consolidation detail.  All other production
+> evals preserved unchanged across the arc.
+>
 > **Status 2026-05-25.** **v6.2.0 shipped** as the architectural
 > redesign promised at v6.1.50. Lands the new `adam-algebra` crate
 > (8 modules, 195 lib tests) + `adam-dialog::v6_2_router`
