@@ -422,6 +422,17 @@ fn answer_with_corpus_inner_full(
     if let Some(text) = lookup_procedure_step_count(input, anaphora_procedure_id) {
         return Some(RouterAnswer::from_text(text, EvidenceKind::ProcedureMatch));
     }
+    // **v6.8.50 — procedure_eval audit fix.**  Actor-undergoer
+    // query («Кім ... тиіс?» / «Кто проходит ...?») —
+    // distinct from authority queries because it asks about
+    // WHO PERFORMS the procedure, not WHO IS RESPONSIBLE
+    // for it.  Maps to `applies_to` instead of
+    // `authorization`.  Must fire BEFORE
+    // `lookup_procedure_authority` so the undergoer shape
+    // doesn't get hijacked into a responsibility answer.
+    if let Some(text) = lookup_procedure_actor_undergoer(input, anaphora_procedure_id) {
+        return Some(RouterAnswer::from_text(text, EvidenceKind::ProcedureMatch));
+    }
     if let Some(text) = lookup_procedure_authority(input, anaphora_procedure_id) {
         return Some(RouterAnswer::from_text(text, EvidenceKind::ProcedureMatch));
     }
@@ -2964,6 +2975,81 @@ fn looks_like_procedure_authority_query(input: &str) -> bool {
     let co_occurrence = lower.contains("кім")
         && (lower.contains("тиіс") || lower.contains("өтуі") || lower.contains("береді"));
     adjacent || co_occurrence
+}
+
+/// **v6.8.50 — procedure attribute query (actor-undergoer).**
+/// Distinct from `lookup_procedure_authority`: the worker
+/// query «Кім ... өтуі тиіс?» («Who must undergo ...?») asks
+/// about the SUBJECT that DOES the action, not the
+/// responsible party.  Maps to `procedure.applies_to`
+/// instead of `procedure.authorization`.
+///
+/// Surface-form audit (2026-06-29 procedure_eval baseline):
+/// «Кім мерзімдік медициналық тексеруден өтуі тиіс?»
+/// expected «қызметкер» — production was returning the
+/// procedure's authority list («кадр бөлімі, еңбекті қорғау
+/// инженері») which is semantically wrong.  This sub-router
+/// closes that gap.
+fn lookup_procedure_actor_undergoer(
+    input: &str,
+    anaphora_procedure_id: Option<&str>,
+) -> Option<String> {
+    if !looks_like_procedure_undergoer_query(input) {
+        return None;
+    }
+    // Same content-match-preference + anaphora-fallback
+    // resolution as `lookup_procedure_hazards` /
+    // `lookup_procedure_authority`.  Strong content match
+    // wins over stale anaphora; bare follow-up with no
+    // content anchor uses the previously-named procedure.
+    let lower = input.to_lowercase();
+    let strong_match = score_best_procedure_with_floor(&lower, ANAPHORA_OVERRIDE_FLOOR);
+    let weak_match = score_best_procedure(&lower);
+    let proc = match (strong_match, anaphora_procedure_id, weak_match) {
+        (Some((idx, _)), _, _) => &crate::procedure_loader::shared_procedures()[idx],
+        (None, Some(id), _) => crate::procedure_loader::shared_procedures()
+            .iter()
+            .find(|p| p.id == id)?,
+        (None, None, Some((idx, _))) => &crate::procedure_loader::shared_procedures()[idx],
+        (None, None, None) => return None,
+    };
+    if proc.applies_to.is_empty() {
+        return None;
+    }
+    Some(format!(
+        "«{}» рәсіміне {} жатады.",
+        proc.title_kk,
+        proc.applies_to.join(", "),
+    ))
+}
+
+/// Surface-form detector for actor-undergoer queries.
+/// Distinct from `looks_like_procedure_authority_query`:
+/// authority asks «who is responsible», undergoer asks
+/// «who performs / undergoes».  The same «кім» interrogative
+/// AND verbs that indicate undergoing the action
+/// («өтуі / өтеді» — passes through, «жатады» — applies
+/// to / belongs to, «қатысады» — participates in,
+/// «тиіс» — must/should).
+fn looks_like_procedure_undergoer_query(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    if !lower.contains("кім") && !lower.contains("кто ") {
+        return false;
+    }
+    // The undergoer shape leans on three Kazakh verbs of
+    // undergoing/participation.  Combined with «кім» these
+    // are unambiguous worker-perspective questions about
+    // applies_to.  «тиіс» (must/should) here narrows
+    // generic «who» queries to obligation framing — the
+    // typical SOP context.
+    let undergoer_verb = lower.contains("өтуі")
+        || lower.contains("өтеді")
+        || lower.contains("қатысады")
+        || lower.contains("жатады")
+        || lower.contains("проходит")
+        || lower.contains("участвует");
+    let obligation = lower.contains("тиіс") || lower.contains("должен");
+    undergoer_verb && obligation
 }
 
 /// **v6.8.12 — procedure attribute query (hazards).** Detects
@@ -6235,5 +6321,49 @@ mod tests {
         assert!(lookup_procedure("Кітабым жоқ, қалай оқу керек?").is_none());
         // No «қалай» at all → trigger doesn't fire.
         assert!(lookup_procedure("Кітабым жоқ.").is_none());
+    }
+
+    #[test]
+    fn v6_8_50_undergoer_shape_recognised() {
+        // Worker-perspective actor-undergoer query MUST be
+        // recognised — distinct from authority query.
+        assert!(looks_like_procedure_undergoer_query(
+            "Кім мерзімдік медициналық тексеруден өтуі тиіс?"
+        ));
+        assert!(looks_like_procedure_undergoer_query(
+            "Кім инструктажға қатысады тиіс?"
+        ));
+        // Without «тиіс» (no obligation framing) — doesn't
+        // fire.  Free-floating «кім ... өтеді» is
+        // ambiguous between SOP context and general
+        // narrative.
+        assert!(!looks_like_procedure_undergoer_query(
+            "Кім марафонды өтеді?"
+        ));
+        // Authority query «Кім жауапты?» — NOT an
+        // undergoer query (no undergoer verb).
+        assert!(!looks_like_procedure_undergoer_query("Кім жауапты?"));
+    }
+
+    #[test]
+    fn v6_8_50_undergoer_router_returns_applies_to() {
+        // Standalone content-match query routes to medical
+        // procedure and returns its applies_to (the
+        // SUBJECT-undergoers), not its authorization (the
+        // RESPONSIBLE parties).
+        let answer = lookup_procedure_actor_undergoer(
+            "Кім мерзімдік медициналық тексеруден өтуі тиіс?",
+            None,
+        );
+        assert!(answer.is_some());
+        let text = answer.unwrap();
+        // The medical procedure's applies_to contains
+        // «қызметкерлер» (workers) — that should surface,
+        // NOT «кадр бөлімі» (HR — the authority).
+        assert!(text.contains("қызметкер"), "got: {text}");
+        assert!(
+            !text.contains("кадр бөлімі"),
+            "should not return authority, got: {text}"
+        );
     }
 }
