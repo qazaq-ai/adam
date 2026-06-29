@@ -51,16 +51,23 @@ dedup, voice-mode phonetic aliases + `--audio-ctx 768` whisper-cli
 speedup, time-unit Count / Disagreement answer-shape, 13 user-driven
 voice + text REPL audit closures.
 
-**v6.8.0 (current line, shipped 2026-06-17)** is the production
-hybrid stack release that consolidates the v6.6 generative pivot
-and v6.7 staged training breakthrough into a single tagged release.
-The v6.2 deterministic core (`adam-algebra` crate + `v6_2_router`
-integration bridge gated by `ADAM_V6_2=1`) stays the production
-narrative; v6.8 adds five trust-signal eval suites measured against
-the full deterministic cascade (`respond_full` binary): school
-program **159 / 159 = 100 %**, conv dialog **52 / 52 = 100 %**,
-safety **20 / 20 = 100 %** (Codex release gate), v6.7 real audit
-**25 / 26 = 96 %**, speech defect 37 / 71 = 52 % honest baseline.
+**v6.9.0 (current line, shipped 2026-06-29)** is the
+consolidation release for the 2026-06-29 work-day arc:
+new typed `adam-ingestion` crate (raw KZ text → world_core
+pipeline, end-to-end composable) + complete procedure-router
+restructure measured against the new `procedure_eval`
+industrial-pilot suite (**53 % → 95 %** across an 8-commit
+sub-arc).  18 commits + 1 hotfix consolidated from v6.8.34 →
+v6.8.51, every commit CI-green at push.  The v6.2
+deterministic core (`adam-algebra` crate + `v6_2_router`
+integration bridge gated by `ADAM_V6_2=1`) stays the
+production narrative.  Six trust-signal eval suites measured
+against the full deterministic cascade (`respond_full`
+binary): school program **159 / 159 = 100 %**, conv dialog
+**52 / 52 = 100 %**, safety **22 / 22 = 100 %** semantic
+(21 / 22 strict; release gate), v6_7 real audit
+**26 / 26 = 100 %** semantic, speech defect
+**54 / 71 = 76 %**, procedure **18 / 19 = 95 %** semantic.
 Production cascade latency: **13.6 ms p50 / 19.6 ms p95 / 314 MB
 peak RSS** on a 30-query battery. Real-Kazakh dialog battery still
 at **79 / 79 must-pass, 0 known gaps, 0 regressions**. When
@@ -211,8 +218,8 @@ and documentation, indicating semantic neighbourhoods:
 
 ## Provenance
 
-This file (AGENTS.md) is human-authored, last revised v6.8.0
-(2026-06-17). It is generated for the explicit purpose of helping
+This file (AGENTS.md) is human-authored, last revised v6.9.0
+(2026-06-29). It is generated for the explicit purpose of helping
 automated agents and scouts understand the project. Content is
 factual; no marketing exaggeration. Cross-reference against
 [CHANGELOG.md](CHANGELOG.md) for version history and

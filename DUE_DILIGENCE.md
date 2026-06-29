@@ -1,10 +1,9 @@
 # adam — Due Diligence Pack
 
-**Last updated:** 2026-06-17
-**Branch:** `experimental/v6_6_generative_pivot` (release-candidate
-for v6.8.0; merge to `main` pending the gaps listed in §8)
-**HEAD commit:** `fdf21456` (v6.8.0)
-**Workspace version:** `6.8.0`
+**Last updated:** 2026-06-29
+**Branch:** `main`
+**HEAD commit:** `032e4bc6` (v6.9.0)
+**Workspace version:** `6.9.0`
 
 This document is intentionally a flat list of facts. Numbers come from
 commands you can re-run yourself; everything labelled "limitation" or
@@ -21,7 +20,7 @@ over a curated fact graph → reasoner → realiser. The voice surface
 intent classifier → router → TTS loop. Neural components live ONLY
 at the audio ↔ text boundary; they never invent facts.
 
-- **Language:** Rust (workspace, 37 crates, 160 692 LOC under `src/`).
+- **Language:** Rust (workspace, 29 crates + 18 tools).
 - **License:** BUSL-1.1.
 - **Hardware:** MacBook Air M2, 8 GB RAM (the daily development target).
 - **No cloud dependency:** every component runs locally; no inference
@@ -31,16 +30,18 @@ at the audio ↔ text boundary; they never invent facts.
 
 | Metric | Value |
 | --- | --- |
-| HEAD branch | `main` (v6.8.0 merged 2026-06-17; post-release patches at HEAD) |
-| HEAD commit | `4595db45` |
+| HEAD branch | `main` (v6.9.0 release tag; arc v6.8.34 → v6.8.51 consolidated 2026-06-29) |
+| HEAD commit | `032e4bc6` |
 | `school_program_eval` (14 subjects, production) | **159 / 159 = 100 %** semantic |
 | `conv_dialog_eval` (44 real voice REPL + 39 scripted) | **52 / 52 = 100 %** semantic (31 probes document gaps) |
-| `safety_eval` (13 categories, Codex #3 release gate) | **20 / 20 = 100 %** semantic (34 probes; v6.8.0 shipped at 16 / 16, then v6.8.2 patches promoted 4 dangerous probes (suicide method, severe bleeding, account intrusion) — all now pass) |
-| `v6_7_real_audit_eval` | **25 / 26 = 96 %** semantic (v6.8.0 shipped at 24 / 26 = 92 %; v6.8.2 cascade-order inversion improved by 1) |
-| `speech_defect_eval` (8 defect categories) | 37 / 71 = 52 % semantic (honest baseline; v7 milestone) |
+| `safety_eval` (13 categories, release gate) | **22 / 22 = 100 %** semantic · 21 / 22 = 95 % strict (32 probes) |
+| `v6_7_real_audit_eval` | **26 / 26 = 100 %** semantic · 21 / 26 = 81 % strict |
+| `speech_defect_eval` (8 defect categories) | 54 / 71 = **76 %** semantic (v6.8.31 kappacism start-letter correction lifted from 52 % baseline; plateau pending v7) |
+| `procedure_eval` (NEW v6.9.0, 15 procedures, industrial-pilot gate) | **18 / 19 = 95 %** strict + semantic (18 / 18 = 100 % on accepted-only cases; closed 8 of 9 baseline failures in one work day) |
+| `multi_turn_eval_v686` (Codex's gate) | **38 / 38 = 100 %** required cases |
 | Voice REPL live session (45 turns, 2026-06-16 evening) | 43 / 45 ≈ 96 % |
 | Legacy `blind_eval_v1` (kept as historical reference) | 97 / 100 (rc18 baseline; no longer the production gate) |
-| Workspace test files | 274 (across 28 crates + 10 tools) |
+| Workspace test files | run `cargo test --release --workspace --locked` for live counts (29 crates + 18 tools) |
 | Largest crate (LOC) | `adam-dialog` (extended via v6.5 safety guard + v6.8 cascade patches + wellness::pain_support) |
 | World-core curated entries | 3 444 in `data/world_core/*.jsonl` (65 domains, unchanged since v6.3) |
 | Reasoning facts | 4 116 extracted + 37 991 derived |

@@ -61,29 +61,38 @@ ADAM_V6_2=1 ./target/release/adam_chat
 
 ---
 
-## What's new in v6.8.10
+## What's new in v6.9.0
 
-**L4.5 → L4.9 architectural arc** + **three voice-REPL audit fixes** (T35 pain acknowledgement / T19+T21 «көлде» locative / T4 religious wellbeing).  The v6.8.x line consolidated v6.8.0's hybrid stack into a complete multi-turn substrate: typed `DialogueMove` / `DiscourseState` with statused commitments, typed `Referent` stack for anaphora, typed `ProofObject` carried through to the emitted text, and a `ProcedureIR` foundation for the industrial-pilot product line.
+**Two coordinated arcs shipped 2026-06-29:**
+new typed **`adam-ingestion`** crate (raw KZ text → world_core
+pipeline, end-to-end composable) + complete **procedure-router
+restructure** measured against the new **`procedure_eval`**
+industrial-pilot suite.  18 commits + 1 hotfix on `main`
+between v6.8.34 and v6.8.51, every commit CI-green at push.
 
-| Suite | Accepted | Probes | Strict | Semantic | Δ from v6.8.0 |
+| Suite | Accepted | Probes | Strict | Semantic | Δ from v6.8.9 |
 |---|---:|---:|---:|---:|---:|
 | `school_program_eval` (14 subjects) | 159 | 0 | **100 %** | **100 %** | — |
 | `conv_dialog_eval` (real voice REPL + scripted) | 52 | 31 | **100 %** | **100 %** | — |
-| `safety_eval` (13 categories, release gate) | 22 | 32 | 95 % | **100 %** | +2 cases |
-| `v6_7_real_audit_eval` | 26 | 0 | 81 % | **100 %** | +4 pp (was 96 % semantic) |
-| `speech_defect_eval` (8 defect categories) | 71 | 9 | **66 %** | **66 %** | **+14 pp** (was 52 %) |
-| `multi_turn_eval_v686` (NEW — Codex's gate) | 11 | 2 | **100 %** required | n/a | NEW |
+| `safety_eval` (13 categories, release gate) | 22 | 32 | 95 % | **100 %** | — |
+| `v6_7_real_audit_eval` | 26 | 0 | 81 % | **100 %** | — |
+| `speech_defect_eval` (8 defect categories) | 71 | 9 | **76 %** | **76 %** | +10 pp |
+| `procedure_eval` (15 procedures, NEW) | 18 | 1 | **95 %** | **95 %** | NEW (53 % → 95 %) |
+| `multi_turn_eval_v686` (Codex's gate) | 38 | — | **100 %** required | n/a | grew 11 → 38 |
 | `adversarial_dialog_v1` | 95 | 0 | **100 %** | **100 %** | — |
 
-**Strict vs semantic** — `strict` is exact-string match against the eval's `expected_response`; `semantic` is a meaning-equivalence check that admits paraphrase, ordering, and morphological variation around the same factual core.  When strict ≠ semantic, the dashboard reports both honestly (per external advisor review 2026-06-23).
+**Strict vs semantic** — `strict` is exact-string match against the eval's `expected_response`; `semantic` is a meaning-equivalence check that admits paraphrase, ordering, and morphological variation around the same factual core.  When strict ≠ semantic, the dashboard reports both honestly.
 
-Headline architectural pieces, by milestone:
+Headline architectural pieces:
 
-- **L4.5 Phase 2** — `Conversation::discourse_state: DiscourseState` carries `commitments: Vec<CommitmentRecord>` (Proposed/Accepted/Rejected/Contested) AND `referents: Vec<Referent>` (Person/Place/Org/Procedure/Generic). Name corrections («Жоқ, X емес, Y.») now emit the explicit «Түзеттім — атыңызды Y деп есте сақтадым.» acknowledgement.
-- **L4.6 ProcedureIR** — typed SOP records (`steps + prerequisites + hazards + authorization + source_with_version_date`) under [`data/procedures/labor_safety_kz.jsonl`](data/procedures/labor_safety_kz.jsonl). 15 hand-authored procedures cited against current Kazakh regulations (Кодекс труда РК ст. 414-V с поправками 2024-04-15 + ГОСТ + ПУЭ-7). Pilot-style queries («СИЗ беру тәртібі қандай?») resolve to full step-by-step responses with source citation.
-- **L4.7 Multi-turn eval framework** — `data/eval_multi_turn/*.jsonl` data-driven cases with typed `TurnAssertion` (`response_contains`, `session_slot_equals`, `referent_present`, `commitment_status`). Required + probe split mirrors the single-turn `was_accepted` semantics.
-- **L4.8 PropertyQueryIR** — anaphora-aware handlers generalised from lifespan (Phase 2.E.2) to birthplace, occupation, procedure step count, procedure responsible role. «Қайда туылды?» after a biographical intro now resolves to the prior-turn person referent.
-- **L4.9 Input normalizer** — D.1 destutter («Са-сә-сәлем» → «сәлем») + D.2 phonetic substitute (rhotacism / lambdacism / sigmatism / kappacism reverse maps via the extended `kazakh_fuzzy` phonetic-pair table) — runs BEFORE the cascade, leaves the raw-input safety capture intact.
+- **adam-ingestion crate** — new workspace member implementing the typed «raw text → candidate queue → review → world_core» pipeline.  Six phases (`schema + queue`, `extractor`, `validator`, `review CLI`, `integrator`, `CI gate`) + E2E integration test.  Two production extractor matchers: canonical em-dash declarative («X — Y.») and «X дегеніміз — Y» (the Kazakh copula definitional shape that dominates textbook prose).  Real-data finding from the first wikibooks_kk dry-run drove a dialogue-dash rejection rule (Kazakh literary direct-speech marker «— X» is NOT a definition).
+- **`procedure_eval` suite** — first production eval covering the 15 curated procedures in [`data/procedures/labor_safety_kz.jsonl`](data/procedures/labor_safety_kz.jsonl).  20 realistic Kazakh-language worker / supervisor / OH&S probes (actor / step / hazard / first-person scenario shapes).  Becomes a tracked metric alongside `school_program` / `conv_dialog` / `safety` / `v6_7_real_audit` / `speech_defect`.
+- **Procedure-router restructure** — measured baseline at 53 % surfaced four bug categories that landed as eight bounded commits:
+  - **Safety-guard medical disambiguation** — «не істеу керек» («what to do») gated behind co-occurrence with a medical-symptom marker (no longer hijacks industrial OH&S queries into the medical refusal path).
+  - **Productive shape triggers** — «қалай ... керек» / «не істе ... керек» / «не істейін?» / Russian analogues added to the procedure router as co-occurrence triggers, catching worker-perspective shapes the flat `SHAPE_TRIGGERS_KK` list missed.
+  - **Anaphora-override floor** — hazard / authority sub-routers prefer strong content match (≥ `ANAPHORA_OVERRIDE_FLOOR = 5`) over stale anaphora referents.  Bare follow-ups still bind to the prior-turn procedure.
+  - **Actor-undergoer sub-router** — `lookup_procedure_actor_undergoer` is distinct from `_authority`: «Кім ... өтуі тиіс?» (who PERFORMS) maps to `applies_to`, not `authorization` (who is RESPONSIBLE).
+  - **Aliases scoring** — `aliases_kk` / `aliases_ru` now contribute to `score_procedure` at `applies_to` weight, dedup'd against title to keep weak underspecified queries below the clarify threshold.
 
 Full release history: [CHANGELOG.md](CHANGELOG.md).
 
@@ -198,7 +207,7 @@ KazMMLU ([arXiv:2502.12829](https://arxiv.org/abs/2502.12829), 23 k Kazakh + Rus
 
 | Model | KazMMLU | Resource cost |
 |---|---|---|
-| **adam v6.8.10** | own 5-suite dashboard reported strict + semantic (`school_program` 159 / 159 · `conv_dialog` 52 / 52 · `safety` 21 / 22 strict · 22 / 22 sem · `real_audit` 21 / 26 strict · 26 / 26 sem · `speech_defect` 47 / 71) + `multi_turn` 11 / 11 required | **314 MB RSS · 0 GPU · $0** |
+| **adam v6.9.0** | own 6-suite dashboard reported strict + semantic (`school_program` 159 / 159 · `conv_dialog` 52 / 52 · `safety` 21 / 22 strict · 22 / 22 sem · `real_audit` 21 / 26 strict · 26 / 26 sem · `speech_defect` 54 / 71 = 76 % · `procedure` 18 / 19 = 95 %) + `multi_turn` 38 / 38 required | **314 MB RSS · 0 GPU · $0** |
 | GPT-4o | 76.6 % | API only · $2.50 / $10 per 1 M tok |
 | DeepSeek V3 | 76.9 % | self-host or API |
 | Llama 3.1 70B | 56.2 % | ~140 GB FP16 · 2–4× H100 |
@@ -213,13 +222,14 @@ See [`docs/COMPARISON.md`](docs/COMPARISON.md) for the full table (hallucination
 
 | Metric | Value |
 |---|---|
-| Workspace test files | 274 (across 28 crates + 10 tools; run `cargo test --release --workspace --locked` for live counts) |
+| Workspace test files | run `cargo test --release --workspace --locked` for live counts (29 crates + 18 tools at v6.9.0) |
 | `school_program_eval` | **159 / 159 = 100 %** semantic (14 subjects via `respond_full`) |
 | `conv_dialog_eval` | **52 / 52 = 100 %** semantic (44 real voice REPL turns + 39 scripted; 31 probes) |
 | `safety_eval` | 21 / 22 = 95 % strict · **22 / 22 = 100 %** semantic (13 categories, release gate; 32 probes) |
 | `v6_7_real_audit_eval` | 21 / 26 = 81 % strict · **26 / 26 = 100 %** semantic |
-| `speech_defect_eval` | 47 / 71 = 66 % strict + semantic (8 defect categories; v6.8.9 +14 pp via destutter + phonetic substitute) |
-| `multi_turn_eval_v686` (NEW) | **11 / 11 = 100 %** required + 2 / 6 probes documenting remaining gaps |
+| `speech_defect_eval` | 54 / 71 = **76 %** strict + semantic (8 defect categories; v6.8.31 kappacism start-letter correction lifted from 66 %) |
+| `procedure_eval` (NEW v6.9.0) | 18 / 19 = **95 %** strict + semantic (15 procedures × 20 worker-shape probes; 18 / 18 = 100 % on accepted-only cases) |
+| `multi_turn_eval_v686` | **38 / 38 = 100 %** required + probes documenting remaining gaps |
 | v6.2 dialog battery | 79 / 79 must-pass, 0 gaps (CI quality gate `dialog_battery_meets_quality_gate`) |
 | Production cascade latency (M2 Air, 30-query battery) | **13.6 ms p50** · 19.6 ms p95 · **314 MB peak RSS** |
 | Algebra micro-path latency | ~470 ns avg · ~600 ns p95 (algebra core only — not a fair head-to-head against full NLP) |
@@ -239,19 +249,23 @@ See [`docs/performance.md`](docs/performance.md) for the full performance report
 ## Repository layout
 
 ```
-crates/                Rust workspace (28 crates)
+crates/                Rust workspace (29 crates)
   adam-algebra/        Typed neurosymbolic stack (Composition / Frame / QueryIR / FrameIndex / realiser / math_solver / system_clock / corpus_loader)
   adam-dialog/         Dialog pipeline + v6_2_router + wellness::pain_support + safety_guard + red_flags
+  adam-ingestion/      Typed data-ingestion pipeline (NEW v6.9.0): raw KZ text → CandidateFact / Procedure queue → validator → review CLI → integrator into world_core
   adam-kernel-fst/     FST morphology — phonology, morphotactics, synthesiser + parser, 25 k-root Lexicon
   adam-reasoning/      Typed-fact graph + 10 forward-chaining rules
   adam-retrieval/      Morpheme inverted index + deterministic ranking
   adam-eval/           Evaluation suite + rust_only_contracts gate
-  …                    (24 more — see Cargo.toml workspace.members)
-tools/                 Binaries (10) — voice_repl_v6_3, intent_dataset, build_human_bank, …
+  …                    (22 more — see Cargo.toml workspace.members)
+tools/                 Binaries (18) — voice_repl_v6_3, intent_dataset, build_human_bank, corpus_acquire, ingest_kaz_tili, scrape_kaz_tili, eval_dashboard, …
 data/world_core/       65 .jsonl files · 3 444 typed-fact entries · CI-validated
-data/eval/             Five production suites + legacy holdouts
+data/procedures/       Industrial SOP / охрана труда procedures · 15 records · trilingual (kk/ru/en titles + aliases) · CI-validated by validate_procedures
+data/eval/             Six production suites (school_program · conv_dialog · safety · v6_7_real_audit · speech_defect · procedure_eval) + legacy holdouts
+data/eval_multi_turn/  Multi-turn fixtures (data-driven cases with typed TurnAssertion)
 data/curated/          Training packs (small in git; > 30 MB derived corpora gitignored)
 data/curriculum/       SQLite curriculum DB (school tutor foundation)
+data/ingestion/        Live candidate queue (gitignored — runtime state)
 docs/                  Architecture, roadmap, performance, foundation policies
 scripts/               validate_foundation.sh + Python builders (off-runtime, gated)
 ```
