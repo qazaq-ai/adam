@@ -94,6 +94,18 @@ pub enum SafetyClass {
     /// state token («Шаршаса демал» = «if tired, rest» — a
     /// proverb) don't false-positive.
     IndustrialUnsafeState,
+    /// **v6.9.1 — follow-up audit fix.**  User is about to
+    /// share a credential / one-time code / password / CVV /
+    /// PIN with another party.  Classic phishing /
+    /// social-engineering pattern: bank-impersonator calls,
+    /// asks for the SMS code that was just sent.  The
+    /// refusal explicitly tells the user: do NOT share
+    /// these credentials with anyone, including AI
+    /// assistants.  Detected when BOTH a credential marker
+    /// AND a sharing-intent verb are present, so generic
+    /// references to «код» / «пароль» in non-sharing
+    /// context don't false-positive.
+    CredentialDisclosure,
 }
 
 /// Refusal templates per class.  Polite, short, Kazakh-only.
@@ -125,6 +137,15 @@ impl SafetyClass {
                  бере алмаймын. Бұндай ой мазалап жүрсе, психолог \
                  немесе 150 (сенім телефоны) арқылы маманмен \
                  сөйлесуге кеңес беремін."
+            }
+            Self::CredentialDisclosure => {
+                "Сақ болыңыз — SMS-кодын, банк құпия сөзін, \
+                 PIN немесе CVV нөмірін ешкімге, оның ішінде \
+                 маған да, бермеңіз. Шынайы банк қызметкері \
+                 ешқашан ондай мәліметтерді сұрамайды. \
+                 Күмәнді қоңырау түссе, өзіңіз банкке арнайы \
+                 нөмір (мысалы Halyk 7575, Kaspi 2255) арқылы \
+                 қайта қоңырау шалыңыз."
             }
             Self::IndustrialUnsafeState => {
                 "Жоқ. Қауіпсіздік ережелері бойынша мұндай жағдайда \
@@ -176,6 +197,17 @@ pub fn check(input: &str) -> Option<SafetyClass> {
     if matches_any(&lower, HARM_OTHERS_MARKERS) {
         return Some(SafetyClass::HarmToOthers);
     }
+    // **v6.9.1 — follow-up audit fix.**  Credential / OTP /
+    // PIN / CVV sharing query.  Classic
+    // social-engineering / phishing pattern — must refuse
+    // explicitly so the user doesn't act on an attacker's
+    // pressure to share the credential.  Detected when BOTH
+    // a credential marker AND a sharing-intent verb appear;
+    // standalone references to «код» / «пароль» in unrelated
+    // contexts don't trip the gate.
+    if is_credential_disclosure_query(&lower) {
+        return Some(SafetyClass::CredentialDisclosure);
+    }
     // **v6.8.30 — industrial-pilot audit fix.**  Conditional
     // permission queries whose condition is an unsafe
     // operational state get refused.  Requires BOTH an unsafe-
@@ -203,6 +235,28 @@ fn looks_like_medical_what_to_do(lower: &str) -> bool {
         return false;
     }
     matches_any(lower, MEDICAL_SYMPTOM_MARKERS)
+}
+
+/// **v6.9.1 — follow-up audit fix.**  Credential / one-time
+/// code disclosure detector.  Fires when BOTH a credential
+/// marker AND a sharing-intent verb are present.  Bank-
+/// impersonator phishing is the canonical case the gate
+/// catches: «SMS код келді, оны саған айтайын ба?» («SMS
+/// code came, should I tell it to you?»).  Pattern is
+/// substring-based so the user's volitive
+/// («-айын», «-ейін», «беремін бе», «жазайын ба») gets
+/// caught alongside the noun.
+fn is_credential_disclosure_query(lower: &str) -> bool {
+    let has_credential = matches_any(lower, CREDENTIAL_MARKERS);
+    if !has_credential {
+        return false;
+    }
+    matches_any(lower, CREDENTIAL_SHARING_VERBS)
+        // Also fire on the descriptive pattern «X жұмыскері
+        // / адам кодымды сұрап жатыр» — «someone is asking
+        // for my code» — that's the phishing-recognition
+        // scenario that needs the same refusal.
+        || matches_any(lower, CREDENTIAL_REQUESTED_BY_OTHERS)
 }
 
 /// **v6.8.30 — Codex industrial-pilot audit Bug #3.**
@@ -474,6 +528,74 @@ const HARM_OTHERS_MARKERS: &[&str] = &[
     "улауға қалай",
 ];
 
+/// **v6.9.1 — follow-up audit fix.**  Credentials the user
+/// must NEVER share.  One-time codes (SMS / банк коды /
+/// «бір реттік код»), passwords, PINs, CVV codes.  Each
+/// marker is a substring against the lowercased input;
+/// they fire ONLY in conjunction with a sharing-intent
+/// verb or a third-party request marker (see
+/// `is_credential_disclosure_query`).
+const CREDENTIAL_MARKERS: &[&str] = &[
+    "sms код",
+    "смс код",
+    "смс-код",
+    "sms-код",
+    "бір реттік код",
+    "банк коды",
+    "банк құпия",
+    "кодым",
+    "кодыңды",
+    "құпия сөз",
+    "құпиясөз",
+    "пароль",
+    "пин код",
+    "пин-код",
+    "пинкод",
+    "pin код",
+    "cvv",
+    "csv нөмір",
+    "карта нөмірі",
+    "карта номері",
+    "карточка номері",
+];
+
+/// **v6.9.1.**  User offering to share a credential.  Kazakh
+/// 1st-person volitive («-айын», «-ейін», «-айын ба»,
+/// «-ейін бе») and the matching Russian forms.  These are
+/// what an attacker pressures the user into doing.
+const CREDENTIAL_SHARING_VERBS: &[&str] = &[
+    "айтайын ба",
+    "айтайын ба?",
+    "айтайыншы",
+    "берейін бе",
+    "беремін бе",
+    "жіберейін бе",
+    "жазайын ба",
+    "көрсетейін бе",
+    "оқиын ба",
+    "айт деп жатыр",
+    "сказать тебе",
+    "отправить тебе",
+    "написать тебе",
+];
+
+/// **v6.9.1.**  Pattern markers indicating a third party is
+/// asking for the credential (the attacker side of the
+/// phishing call).  Same refusal class — the response is
+/// «do NOT share with anyone, including the AI».
+const CREDENTIAL_REQUESTED_BY_OTHERS: &[&str] = &[
+    "кодымды сұрап",
+    "кодты сұрап",
+    "паролды сұрап",
+    "құпия сөзді сұрап",
+    "айт деп жатыр",
+    "айтыңыз деп",
+    "беріңіз деп",
+    "просит код",
+    "просят пароль",
+    "требует код",
+];
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -549,6 +671,44 @@ mod tests {
             check("Жөтел басталды, не істеу керек?"),
             Some(SafetyClass::Medical)
         );
+    }
+
+    /// **v6.9.1 — follow-up audit fix.**  Credential
+    /// disclosure / phishing patterns.  User about to
+    /// share an OTP / PIN / CVV / password gets the
+    /// explicit refusal; bare references to «код» /
+    /// «пароль» in non-sharing context stay through.
+    #[test]
+    fn v6_9_1_credential_sharing_catches_phishing_patterns() {
+        // Bank-impersonator phishing — user about to share
+        // the SMS OTP.
+        assert_eq!(
+            check("SMS код келді, оны саған айтайын ба?"),
+            Some(SafetyClass::CredentialDisclosure)
+        );
+        assert_eq!(
+            check("Банк қызметкері кодымды сұрап жатыр"),
+            Some(SafetyClass::CredentialDisclosure)
+        );
+        assert_eq!(
+            check("Менің құпия сөзімді саған берейін бе?"),
+            Some(SafetyClass::CredentialDisclosure)
+        );
+        assert_eq!(
+            check("Картаның CVV нөмірін жазайын ба?"),
+            Some(SafetyClass::CredentialDisclosure)
+        );
+    }
+
+    #[test]
+    fn v6_9_1_bare_credential_words_dont_trip_gate() {
+        // Bare references to «код» / «пароль» without a
+        // sharing-intent verb stay through to the cascade.
+        // (The procedure / dialog layers handle them as
+        // generic content.)
+        assert_eq!(check("Менің кодым ұзын"), None);
+        assert_eq!(check("Пароль ұмыттым"), None);
+        assert_eq!(check("Жаңа пин-код жасайын"), None);
     }
 
     #[test]

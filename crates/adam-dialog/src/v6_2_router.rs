@@ -3635,6 +3635,17 @@ const SHAPE_TRIGGERS_KK: &[&str] = &[
     "кім өтуі",
     "кім тиіс",
     "кім ресімдей",
+    // **v6.9.1 — follow-up audit fix.**  «ресімдеу» (issue /
+    // process / authorise) is the verb used in industrial
+    // permit-related procedures.  The passive «ресімделеді»
+    // («is being processed / issued») is the natural worker
+    // question shape («Қалай ресімделеді?» = «how is it
+    // processed?»).  «рәсім» (procedure / ceremony) is a
+    // different root and stays as its own trigger above;
+    // these two are colloquial Russian-influenced spellings
+    // for the same act.  Audit 2026-06-29: zero conflicts.
+    "ресімдеу",
+    "ресімдел",
 ];
 
 const SHAPE_TRIGGERS_RU: &[&str] = &[
