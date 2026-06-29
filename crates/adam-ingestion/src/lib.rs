@@ -64,11 +64,13 @@
 //!     `Conversation`-level fixtures.
 
 pub mod candidate;
+pub mod extractor;
 pub mod source;
 pub mod status;
 pub mod store;
 
 pub use candidate::{CandidateFact, CandidateId, CandidateProcedure, ParseError};
+pub use extractor::extract_facts_from_text;
 pub use source::{SourceKind, SourceRef};
 pub use status::{IngestionStatus, StatusTransitionError};
 pub use store::{CandidateStore, StoreError};
