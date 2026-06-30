@@ -237,3 +237,8 @@ data/ingestion/
 # Tracked files in `data/raw/` itself (source_registry,
 # source_scoring_rules, rust_book_kk/) stay in git.
 data/raw/ingest_demo/
+
+# Деловая переписка с предприятиями (письма, шаблоны, NDA-черновики,
+# презентации one-pager).  Не должна попадать в публичный git: это
+# рабочие материалы для рассылки, удаляются вручную после отправки.
+docs/outreach/
