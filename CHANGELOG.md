@@ -28,6 +28,68 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.10.0] — 2026-07-02 — OT/ТБ safety-briefing session engine + procedure corpus 15 → 33
+
+**Stripe — Deterministic AI research.** The industrial
+knowledge-assistant line gains the full service cycle the
+Kazakh occupational-safety regulation prescribes — not just
+answering one procedural question, but running an end-to-end
+briefing session and issuing a допуск verdict.
+
+Regulatory basis: ст.182 ТК РК + Приказ №1019 (Правила
+обучения, инструктирования и проверки знаний), whose knowledge
+check may be conducted «с помощью технических средств
+обучения»; the remote/digital format is explicitly sanctioned
+by Приказ №223 (effective 12.07.2026, ЕЦС + electronic
+certificates).
+
+Headline pieces:
+
+- **Briefing session engine** — new `crates/adam-dialog/src/briefing_session.rs`
+  module (`BriefingSession` state machine). Walks a worker
+  through a procedure's steps, then asks 3–8 control questions
+  **generated deterministically from the curated `ProcedureIR`
+  fields** (`authorization` / `steps` / `hazards` /
+  `confirmation_gates`) — no invented questions or answers.
+  Grades spoken answers by Kazakh prefix-overlap (the same
+  matcher the retrieval scorer uses, so inflection like «құлып»
+  → «құлыпты» is tolerated), scores pass/fail against a
+  configurable admission threshold (default 0.6), and emits a
+  signed-off Kazakh protocol («ЖҰМЫСҚА ЖІБЕРІЛДІ / ЖІБЕРІЛМЕДІ»)
+  for the ОТ/ТБ ИТР. Runs as a distinct mode alongside — not
+  inside — the `Conversation` cascade, so all 193 `end_to_end`
+  fixtures stay byte-identical. Quiz depth covers every hazard's
+  mitigation individually and all confirmation gates.
+- **`adam_briefing` REPL** — new binary: `--list` enumerates the
+  corpus; `<procedure_id>` runs one session end-to-end.
+- **Procedure corpus 15 → 33** — `data/procedures/labor_safety_kz.jsonl`
+  now covers the full universal OT/ТБ lifecycle common to every
+  enterprise: all five инструктаж types (вводный / первичный на
+  рабочем месте / повторный / внеплановый / целевой) +
+  дистанционный, стажировка + допуск к самостоятельной работе,
+  проверка знаний, наряд-допуск, first aid, регистрация в
+  журнале + ЕЦС, plus cross-industrial high-hazard work
+  (газоопасные / огневые / замкнутое пространство /
+  погрузо-разгрузочные / группы допуска по электробезопасности /
+  предварительный медосмотр / подрядчики / аварийное
+  реагирование). Every record trilingual (kk/ru/en) with search
+  aliases; each citation grounded in a real regulation (ТК 414-V,
+  Приказ №1019/№223, Правила ТБ электроустановок V1500010907).
+  Retrieval regressions surfaced during the scale-up — a
+  registration procedure out-scoring the canonical вводный
+  инструктаж, and new records double-counting a title token in
+  `applies_to` (score 5 = anaphora-override / above clarify
+  threshold), which broke a hazards-followup and a clarify-gate
+  multi-turn case — were fixed by tightening the offending
+  `applies_to` phrasing. The full-workspace pre-push gate
+  (`cargo test --release --workspace --locked`) caught the
+  multi-turn ones.
+- **Tests** — 7 unit + 3 integration for the session engine
+  (integration driven against the real corpus, graceful-skip on
+  partial checkouts). `validate_procedures`, `procedure_fixtures`,
+  `procedure_retrieval_v685`, and `end_to_end` (193/193) all
+  green. All other production evals unchanged.
+
 ## [6.9.0] — 2026-06-29 — adam-ingestion crate + procedure-router restructure + procedure_eval
 
 **Stripe — Deterministic AI research.** Consolidates the

@@ -2,6 +2,19 @@
 
 Version-by-version history of `adam`, grouped into architectural eras.
 
+> **Status 2026-07-02.** **v6.10.0 shipped** — the industrial
+> OT/ТБ line gains the full safety-briefing **session engine**
+> (`crates/adam-dialog/src/briefing_session.rs` + `adam_briefing`
+> REPL): инструктаж → устный опрос → оценка → протокол допуска,
+> with control questions generated deterministically from the
+> curated `ProcedureIR` and answers graded by Kazakh prefix-overlap.
+> The procedure corpus doubled **15 → 33** universal OT/ТБ records
+> (all five инструктаж types + high-hazard cross-industrial work),
+> each citation grounded in a real regulation (ст.182 ТК РК,
+> Приказ №1019/№223 — remote/digital format effective 12.07.2026).
+> Engine runs as a distinct mode; end-to-end 193/193 unchanged.
+> See [`CHANGELOG.md`](../CHANGELOG.md) v6.10.0.
+>
 > **Status 2026-06-29.** **v6.9.0 shipped** as the
 > consolidation release for the 2026-06-29 work-day arc:
 > a new typed `adam-ingestion` crate (raw KZ text →

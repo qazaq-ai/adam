@@ -78,7 +78,7 @@ resolver = "2"
 #   multi_turn_eval     11/11  = 100% required + 2/6 probes documenting gaps
 #   adversarial_dialog  95/95  = 100%
 #   voice REPL session  43/45  ≈  96% (last live session, pre-v6.8.5)
-version = "6.9.0"
+version = "6.10.0"
 edition = "2024"
 license = "BUSL-1.1"
 
