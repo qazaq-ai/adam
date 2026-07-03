@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.10.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.10.1-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -72,7 +72,7 @@ by Приказ №223, effective 12.07.2026):
   инструктаж → проверка знаний (устный опрос) → оценка (допуск / неуд) → протокол
 
 - **Briefing session engine** — new [`briefing_session`](crates/adam-dialog/src/briefing_session.rs) module: a stateful state machine that walks a worker through a procedure's steps, then asks control questions **generated deterministically from the curated `ProcedureIR` fields** (`authorization` / `steps` / `hazards` / `confirmation_gates`) — no invented questions or answers.  It grades spoken answers by Kazakh prefix-overlap (shared with the retrieval scorer, so inflection like «құлып» → «құлыпты» matches), scores pass/fail against a configurable admission threshold, and emits a signed-off Kazakh **protocol** («ЖҰМЫСҚА ЖІБЕРІЛДІ / ЖІБЕРІЛМЕДІ») for the ОТ/ТБ ИТР.  Runs as a distinct mode alongside — not inside — the `Conversation` cascade, so the 193 end-to-end fixtures stay byte-identical.
-- **`adam_briefing` REPL** — new binary to run one procedure end-to-end: `cargo run -p adam-dialog --bin adam_briefing -- --list` then `-- <procedure_id>`.
+- **`adam_briefing` REPL** — new binary to run one procedure end-to-end: `cargo run -p adam-dialog --bin adam_briefing -- --list` then `-- <procedure_id>`.  **v6.10.1** adds `--voice` — spoken Kazakh prompts + verdict via the existing `TtsBackend` (neural Piper with the bundled `kk_KZ-issai-high` voice, degrading to OS `say` / no-op).  Voice is a front-end layer over the unchanged engine, so any future UI reuses it.
 - **Procedure corpus 15 → 33** — [`data/procedures/labor_safety_kz.jsonl`](data/procedures/labor_safety_kz.jsonl) now covers the full universal OT/ТБ lifecycle common to every enterprise: all five инструктаж types (вводный / первичный на рабочем месте / повторный / внеплановый / целевой) + дистанционный, стажировка + допуск, проверка знаний, наряд-допуск, first aid, electronic registration (ЕЦС), plus cross-industrial high-hazard work (газоопасные / огневые / замкнутое пространство / погрузо-разгрузочные / электробезопасность-группы допуска / предварительный медосмотр / подрядчики / аварийное реагирование).  Every record trilingual (kk/ru/en) with search aliases, each citation grounded in a real regulation (ТК 414-V, Приказ №1019/№223, Правила ТБ электроустановок).  CI-validated by `validate_procedures`.
 
 Production suite dashboard (unchanged — this release adds capability without touching existing evals; end-to-end 193/193 and procedure-retrieval regression green):
@@ -85,7 +85,7 @@ Production suite dashboard (unchanged — this release adds capability without t
 | `v6_7_real_audit_eval` | 26 | 81 % | **100 %** |
 | `speech_defect_eval` (8 defect categories) | 71 | **76 %** | **76 %** |
 | `procedure_eval` (19 probes) | 18 | **95 %** | **95 %** |
-| `briefing_session` (engine, NEW) | 10 | **100 %** | — |
+| `briefing_session` (engine, NEW) | 12 | **100 %** | — |
 
 **Strict vs semantic** — `strict` is exact-string match against the eval's `expected_response`; `semantic` is a meaning-equivalence check that admits paraphrase, ordering, and morphological variation around the same factual core.  When strict ≠ semantic, the dashboard reports both honestly.
 
@@ -202,7 +202,7 @@ KazMMLU ([arXiv:2502.12829](https://arxiv.org/abs/2502.12829), 23 k Kazakh + Rus
 
 | Model | KazMMLU | Resource cost |
 |---|---|---|
-| **adam v6.10.0** | own dashboard reported strict + semantic (`school_program` 159 / 159 · `conv_dialog` 52 / 52 · `safety` 21 / 22 strict · 22 / 22 sem · `real_audit` 21 / 26 strict · 26 / 26 sem · `speech_defect` 54 / 71 = 76 % · `procedure` 18 / 19 = 95 %) + `multi_turn` 38 / 38 required + `briefing_session` 10 / 10 | **314 MB RSS · 0 GPU · $0** |
+| **adam v6.10.0** | own dashboard reported strict + semantic (`school_program` 159 / 159 · `conv_dialog` 52 / 52 · `safety` 21 / 22 strict · 22 / 22 sem · `real_audit` 21 / 26 strict · 26 / 26 sem · `speech_defect` 54 / 71 = 76 % · `procedure` 18 / 19 = 95 %) + `multi_turn` 38 / 38 required + `briefing_session` 12 / 12 | **314 MB RSS · 0 GPU · $0** |
 | GPT-4o | 76.6 % | API only · $2.50 / $10 per 1 M tok |
 | DeepSeek V3 | 76.9 % | self-host or API |
 | Llama 3.1 70B | 56.2 % | ~140 GB FP16 · 2–4× H100 |
@@ -224,7 +224,7 @@ See [`docs/COMPARISON.md`](docs/COMPARISON.md) for the full table (hallucination
 | `v6_7_real_audit_eval` | 21 / 26 = 81 % strict · **26 / 26 = 100 %** semantic |
 | `speech_defect_eval` | 54 / 71 = **76 %** strict + semantic (8 defect categories; v6.8.31 kappacism start-letter correction lifted from 66 %) |
 | `procedure_eval` | 18 / 19 = **95 %** strict + semantic (19 worker-shape probes; 18 / 18 = 100 % on accepted-only cases) over the 33-procedure corpus |
-| `briefing_session` (NEW v6.10.0) | session engine: 7 unit + 3 integration = 10 / 10; deterministic control-question generation + Kazakh answer grading + допуск protocol |
+| `briefing_session` (NEW v6.10.0) | session engine: 9 unit + 3 integration = 12 / 12; deterministic control-question generation + Kazakh answer grading + safety-critical допуск protocol (fail a hazard/mitigation/gate question → not admitted) |
 | `multi_turn_eval_v686` | **38 / 38 = 100 %** required + probes documenting remaining gaps |
 | v6.2 dialog battery | 79 / 79 must-pass, 0 gaps (CI quality gate `dialog_battery_meets_quality_gate`) |
 | Production cascade latency (M2 Air, 30-query battery) | **13.6 ms p50** · 19.6 ms p95 · **314 MB peak RSS** |

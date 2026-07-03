@@ -28,6 +28,42 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.10.1] — 2026-07-02 — briefing session voice output (`--voice`)
+
+**Stripe — Deterministic AI research.** The `adam_briefing`
+REPL gains spoken Kazakh output so the OT/ТБ session can be
+demoed (and, on the shop floor, delivered) hands-free.
+
+- **`--voice` flag** on `adam_briefing`: speaks the intro, each
+  step, each control question, per-answer feedback, and a
+  concise final verdict; the full protocol still prints for the
+  ИТР to sign. Backend selection prefers the neural **Piper**
+  backend with the bundled Kazakh voice
+  (`data/tts_models/kk_KZ-issai-high.onnx`; needs the `piper`
+  CLI + an audio player on `PATH`) and degrades gracefully to
+  the OS synthesiser (macOS ships a `kk_KZ` «Aru» voice, so the
+  demo speaks Kazakh out of the box) and then to a silent no-op.
+  `--tts-backend piper|os`, `--tts-model <path>`, `--tts-voice
+  <name>` tune the selection.
+- **Front-end-only change.** Voice lives in the binary over the
+  existing `tts::TtsBackend`; the `BriefingSession` engine stays
+  pure text-in/text-out, so a future UI reuses the same
+  `speak()` path with zero rework. Audible output does NOT
+  require the crate's `voice` feature (that gates voice *input*
+  / AEC) — Piper shells out to the audio player regardless.
+  Text-only behaviour (no `--voice`) is byte-identical.
+- **Safety-critical admission rule (fix).** A live демо surfaced
+  a 3/5 = 60 % session admitting a worker who had failed the
+  hazard-mitigation and gate questions — «допущен» despite not
+  knowing how to stay safe.  Admission now requires BOTH the
+  aggregate threshold AND that every safety-critical question
+  (hazard / mitigation / confirmation-gate,
+  `QuestionSource::is_safety_critical`) passed; a single failed
+  safety question denies regardless of the average, and the
+  protocol prints the reason («Себебі: …»).  Authority / first-
+  step questions remain aggregate-only.  Engine tests grew
+  7 → 9 (the regression + a non-critical-slip control).
+
 ## [6.10.0] — 2026-07-02 — OT/ТБ safety-briefing session engine + procedure corpus 15 → 33
 
 **Stripe — Deterministic AI research.** The industrial

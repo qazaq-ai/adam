@@ -91,6 +91,24 @@ pub enum QuestionSource {
     Gate,
 }
 
+impl QuestionSource {
+    /// Whether failing this question, on its own, must block
+    /// admission regardless of the aggregate score.
+    ///
+    /// The safety-knowledge questions — what the hazards are
+    /// (`Hazard`), how to protect against each one (`Mitigation`),
+    /// and which conditions gate the work (`Gate`) — are the whole
+    /// point of the briefing: a worker who cannot answer them is
+    /// «неудовлетворительно» by the regulation's own standard and
+    /// must not be admitted, even if they aced the who-is-responsible
+    /// (`Authority`) and first-step (`Step`) questions.  Averaging
+    /// those in would let a competent-on-paperwork / unsafe-in-practice
+    /// worker clear a 60 % bar (the exact 3/5 case a live демо hit).
+    pub fn is_safety_critical(self) -> bool {
+        matches!(self, Self::Hazard | Self::Mitigation | Self::Gate)
+    }
+}
+
 /// One deterministically-generated control question.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ControlQuestion {
@@ -143,6 +161,10 @@ pub struct BriefingProtocol {
     pub answers: Vec<AnsweredQuestion>,
     pub passed_count: usize,
     pub total: usize,
+    /// `true` when at least one safety-critical question
+    /// ([`QuestionSource::is_safety_critical`]) was failed — the
+    /// dominant reason for denial, surfaced so the ИТР sees *why*.
+    pub critical_failed: bool,
     /// `true` → допущен; `false` → не допущен (повторный инструктаж).
     pub admitted: bool,
 }
@@ -181,6 +203,12 @@ impl BriefingProtocol {
                 "ЖІБЕРІЛМЕДІ — қайта нұсқаулық қажет (не допущен)"
             },
         ));
+        if self.critical_failed {
+            out.push_str(
+                "Себебі: қауіпсіздік бойынша негізгі сұрақ (қауіп/қорғану/жіберу шарты) \
+                 дұрыс жауапталмады — орташа пайызға қарамастан жіберілмейді.\n",
+            );
+        }
         out.push_str("ИТҚ растауы: ____________________\n");
         out
     }
@@ -356,13 +384,23 @@ impl BriefingSession {
     fn build_protocol(&self) -> BriefingProtocol {
         let passed_count = self.answers.iter().filter(|a| a.passed).count();
         let total = self.answers.len();
-        let admitted = total > 0 && (passed_count as f32 / total as f32) >= self.pass_ratio;
+        let critical_failed = self
+            .answers
+            .iter()
+            .any(|a| a.source.is_safety_critical() && !a.passed);
+        // Admission requires BOTH the aggregate bar AND every
+        // safety-critical question passed — a single failed
+        // hazard/mitigation/gate answer is «неудовлетворительно»
+        // regardless of the average.
+        let meets_ratio = total > 0 && (passed_count as f32 / total as f32) >= self.pass_ratio;
+        let admitted = meets_ratio && !critical_failed;
         BriefingProtocol {
             procedure_id: self.procedure_id.clone(),
             title_kk: self.title_kk.clone(),
             answers: self.answers.clone(),
             passed_count,
             total,
+            critical_failed,
             admitted,
         }
     }
@@ -638,5 +676,62 @@ mod tests {
             "a worker who answers nothing must be denied"
         );
         assert_eq!(proto.passed_count, 0);
+    }
+
+    /// **v6.10.1 regression.** A worker who clears the aggregate
+    /// threshold but fails a safety-critical question (mitigation /
+    /// gate) must NOT be admitted — the exact 3/5-→-«допущен» edge a
+    /// live демо surfaced.  sample()'s questions are: authority,
+    /// step1, hazard, mitigation, gate.
+    #[test]
+    fn failing_a_safety_critical_question_denies_despite_passing_ratio() {
+        let mut s = BriefingSession::from_procedure(&sample());
+        let _ = s.begin();
+        s.advance("түсінікті");
+        s.advance("түсінікті");
+        s.advance("энергетик пен цех бастығы жауапты"); // Q1 authority ✓
+        s.advance("энергетик электр қуатын ажыратады"); // Q2 step ✓
+        s.advance("күтпеген іске қосылу қаупі"); // Q3 hazard ✓
+        s.advance("білмеймін"); // Q4 mitigation ✗ (critical)
+        s.advance("білмеймін"); // Q5 gate ✗ (critical)
+        let proto = s.protocol().expect("done");
+        // 3 of 5 = 0.6 clears the aggregate bar…
+        assert_eq!(proto.passed_count, 3);
+        assert!(proto.passed_count as f32 / proto.total as f32 >= 0.6);
+        // …but a critical failure must still deny admission.
+        assert!(proto.critical_failed, "mitigation + gate were failed");
+        assert!(
+            !proto.admitted,
+            "failing a safety-critical question must deny despite 60% aggregate",
+        );
+        assert!(
+            proto.render_kk().contains("Себебі"),
+            "protocol must explain the safety-critical denial reason",
+        );
+    }
+
+    /// Non-critical failures alone (authority + first step) do NOT
+    /// trigger the safety-critical override — denial there is by the
+    /// aggregate bar only, and passing every safety question while
+    /// missing only paperwork questions still admits (if the ratio
+    /// holds).
+    #[test]
+    fn passing_all_safety_questions_admits_even_if_a_paperwork_answer_slips() {
+        let mut s = BriefingSession::from_procedure(&sample());
+        let _ = s.begin();
+        s.advance("түсінікті");
+        s.advance("түсінікті");
+        s.advance("білмеймін"); // Q1 authority ✗ (non-critical)
+        s.advance("энергетик электр қуатын ажыратады"); // Q2 step ✓
+        s.advance("күтпеген іске қосылу қаупі"); // Q3 hazard ✓ (critical)
+        s.advance("жеке құлып пен бирка орнатамыз"); // Q4 mitigation ✓ (critical)
+        s.advance("барлық блоктаулар тізілімге енгізіледі"); // Q5 gate ✓ (critical)
+        let proto = s.protocol().expect("done");
+        assert_eq!(proto.passed_count, 4); // 4/5 = 0.8 ≥ ratio
+        assert!(!proto.critical_failed, "all safety questions passed");
+        assert!(
+            proto.admitted,
+            "passing every safety question + clearing the ratio must admit",
+        );
     }
 }

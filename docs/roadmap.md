@@ -13,7 +13,11 @@ Version-by-version history of `adam`, grouped into architectural eras.
 > each citation grounded in a real regulation (ст.182 ТК РК,
 > Приказ №1019/№223 — remote/digital format effective 12.07.2026).
 > Engine runs as a distinct mode; end-to-end 193/193 unchanged.
-> See [`CHANGELOG.md`](../CHANGELOG.md) v6.10.0.
+> **v6.10.1** adds `--voice` spoken Kazakh output to the
+> `adam_briefing` REPL — a front-end layer over the unchanged
+> engine (macOS speaks it out of the box via the `kk_KZ` «Aru»
+> voice; Piper for higher quality).
+> See [`CHANGELOG.md`](../CHANGELOG.md) v6.10.0 / v6.10.1.
 >
 > **Status 2026-06-29.** **v6.9.0 shipped** as the
 > consolidation release for the 2026-06-29 work-day arc:
