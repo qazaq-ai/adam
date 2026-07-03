@@ -28,6 +28,33 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.10.3] — 2026-07-03 — допуск protocol as an auditable artifact
+
+**Stripe — Deterministic AI research.** Codex's audit flagged the
+briefing protocol as a weak legal artifact — it lacked the
+worker's answer, the question type, a critical marker, a
+timestamp, identities, and a tamper-evidence hash.  This turns it
+into a signable допуск journal entry, keeping the deterministic
+engine reproducible.
+
+- **Engine (deterministic).** `render_kk` now shows, per question,
+  its TYPE label (жауаптылық / қадам / қауіп / қорғану / жіберу
+  шарты), a `критикалық` marker for safety-critical questions, and
+  the worker's raw ANSWER alongside pass/coverage.  New
+  `BriefingProtocol::content_digest()` — a dependency-free FNV-1a
+  hash (`adam1-<16 hex>`) over procedure + every graded answer +
+  verdict, rendered into the protocol as «Тұтастық хеші».  Changing
+  any answer, coverage, or the verdict changes the digest;
+  identical sessions hash identically.
+- **Front-end (caller-injected context).** `adam_briefing` gains
+  `--worker <name>` and `--operator <name>`; the protocol is now
+  stamped with a header carrying the local wall-clock date/time
+  (via `system_clock`) and both identities — the context the
+  deterministic engine deliberately does not own.
+- Engine tests 13 → 15 (digest stability/sensitivity + enriched
+  render).  Grader unchanged; existing markers (verdict, «Себебі»)
+  preserved, so all prior tests hold.
+
 ## [6.10.2] — 2026-07-03 — briefing grader hardening (adversarial audit)
 
 **Stripe — Deterministic AI research.** An external adversarial

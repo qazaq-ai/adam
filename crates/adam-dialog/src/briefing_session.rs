@@ -112,6 +112,18 @@ impl QuestionSource {
     pub fn is_safety_critical(self) -> bool {
         matches!(self, Self::Hazard | Self::Mitigation | Self::Gate)
     }
+
+    /// Short Kazakh label for the protocol — tells the ИТР *what*
+    /// each question tested.
+    pub fn label_kk(self) -> &'static str {
+        match self {
+            Self::Authority => "жауаптылық",
+            Self::Step(_) => "қадам",
+            Self::Hazard => "қауіп",
+            Self::Mitigation => "қорғану",
+            Self::Gate => "жіберу шарты",
+        }
+    }
 }
 
 /// One deterministically-generated control question.
@@ -186,10 +198,18 @@ impl BriefingProtocol {
             self.title_kk, self.procedure_id
         ));
         for (i, a) in self.answers.iter().enumerate() {
+            let crit = if a.source.is_safety_critical() {
+                ", критикалық"
+            } else {
+                ""
+            };
             out.push_str(&format!(
-                "{}. {} — {} (қамту {:.0}%)\n",
+                "{}. [{}{}] {}\n   Жауап: «{}» — {} (қамту {:.0}%)\n",
                 i + 1,
+                a.source.label_kk(),
+                crit,
                 a.prompt_kk,
+                a.user_answer.trim(),
                 if a.passed {
                     "дұрыс"
                 } else {
@@ -214,8 +234,43 @@ impl BriefingProtocol {
                  дұрыс жауапталмады — орташа пайызға қарамастан жіберілмейді.\n",
             );
         }
+        out.push_str(&format!("Тұтастық хеші: {}\n", self.content_digest()));
         out.push_str("ИТҚ растауы: ____________________\n");
         out
+    }
+
+    /// Deterministic, dependency-free content digest of the graded
+    /// session — a tamper-evidence stamp for the допуск journal.  Two
+    /// protocols with identical procedure + questions + answers +
+    /// verdict hash the same; changing any answer, coverage, or the
+    /// verdict changes the digest.  FNV-1a/64 rendered as
+    /// `adam1-<16 hex>`.  Excludes caller-side context (date, worker /
+    /// operator identity) so the ENGINE part stays reproducible; a
+    /// front-end that needs those in the seal can hash them alongside.
+    pub fn content_digest(&self) -> String {
+        // FNV-1a 64-bit.
+        const OFFSET: u64 = 0xcbf2_9ce4_8422_2325;
+        const PRIME: u64 = 0x0000_0100_0000_01b3;
+        let mut h = OFFSET;
+        let mut mix = |s: &str| {
+            for b in s.as_bytes() {
+                h ^= *b as u64;
+                h = h.wrapping_mul(PRIME);
+            }
+            h ^= 0xff; // field separator
+            h = h.wrapping_mul(PRIME);
+        };
+        mix(&self.procedure_id);
+        for a in &self.answers {
+            mix(&a.prompt_kk);
+            mix(a.user_answer.trim());
+            mix(a.source.label_kk());
+            mix(if a.passed { "1" } else { "0" });
+            mix(&format!("{:.3}", a.coverage));
+        }
+        mix(&format!("{}/{}", self.passed_count, self.total));
+        mix(if self.admitted { "ADMIT" } else { "DENY" });
+        format!("adam1-{h:016x}")
     }
 }
 
@@ -769,6 +824,62 @@ mod tests {
         assert!(
             proto.admitted,
             "passing every safety question + clearing the ratio must admit",
+        );
+    }
+
+    fn full_run(answers: &[&str]) -> BriefingProtocol {
+        let mut s = BriefingSession::from_procedure(&sample());
+        let nq = s.questions().len();
+        let _ = s.begin();
+        s.advance("ok");
+        s.advance("ok");
+        for i in 0..nq {
+            s.advance(answers[i % answers.len()]);
+        }
+        s.protocol().expect("done")
+    }
+
+    /// **v6.10.3.** The content digest is deterministic (same graded
+    /// session → same hash), sensitive (any answer change flips it),
+    /// and tagged.  It's the tamper-evidence stamp on the допуск
+    /// journal.
+    #[test]
+    fn content_digest_stable_and_sensitive() {
+        let good = [
+            "энергетик",
+            "энергетик электр қуатын ажыратады",
+            "күтпеген іске қосылу",
+            "жеке құлып пен бирка орнатамыз",
+            "барлық блоктаулар тізілімге енгізіледі",
+        ];
+        let d1 = full_run(&good).content_digest();
+        let d2 = full_run(&good).content_digest();
+        assert_eq!(d1, d2, "identical sessions must hash identically");
+        assert!(d1.starts_with("adam1-"), "digest must be tagged: {d1}");
+        let mut worse = good;
+        worse[3] = "білмеймін"; // change the mitigation answer
+        assert_ne!(
+            d1,
+            full_run(&worse).content_digest(),
+            "changed answer must change the digest"
+        );
+    }
+
+    /// The rendered protocol carries the fields that make it a usable
+    /// допуск artifact: question TYPE, a safety-critical marker, the
+    /// worker's raw ANSWER, and the integrity hash.
+    #[test]
+    fn render_carries_type_answer_and_hash() {
+        let r = full_run(&["энергетик электр қуатын ажыратады"]).render_kk();
+        assert!(r.contains("Жауап:"), "must quote the worker's answer");
+        assert!(
+            r.contains("критикалық"),
+            "must flag safety-critical questions"
+        );
+        assert!(r.contains("[қауіп"), "must label question type");
+        assert!(
+            r.contains("Тұтастық хеші: adam1-"),
+            "must carry the integrity hash"
         );
     }
 }

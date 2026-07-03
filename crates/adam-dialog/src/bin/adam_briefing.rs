@@ -43,6 +43,7 @@ use std::path::PathBuf;
 
 use adam_dialog::briefing_session::BriefingSession;
 use adam_dialog::procedure_loader::shared_procedures;
+use adam_dialog::system_clock::{read_clock, tz_offset_secs_from_env};
 use adam_dialog::tts::{NoOpTts, OsTtsBackend, PiperTtsBackend, TtsBackend};
 
 /// Bundled Kazakh Piper voice, used when `--voice` is on and
@@ -55,8 +56,10 @@ fn main() {
     if args.is_empty() || args.iter().any(|a| a == "--help" || a == "-h") {
         eprintln!(
             "usage: adam_briefing [--voice] [--tts-backend piper|os] \
-             [--tts-model <path>] [--tts-voice <name>] <procedure_id> | --list\n\
-             example: adam_briefing --voice kk_metallurgy_loto_003"
+             [--tts-model <path>] [--tts-voice <name>] \
+             [--worker <name>] [--operator <name>] <procedure_id> | --list\n\
+             example: adam_briefing --voice --worker \"Асан Асанов\" \
+             --operator \"ИТҚ Досжан\" kk_metallurgy_loto_003"
         );
         return;
     }
@@ -78,6 +81,8 @@ fn main() {
     let backend_choice = flag_value(&args, "--tts-backend");
     let model = flag_value(&args, "--tts-model");
     let os_voice = flag_value(&args, "--tts-voice");
+    let worker = flag_value(&args, "--worker");
+    let operator = flag_value(&args, "--operator");
 
     // First non-flag argument is the procedure id.  Skip flag values.
     let id = positional_id(&args);
@@ -87,7 +92,7 @@ fn main() {
     };
 
     let tts = build_tts(voice, backend_choice.as_deref(), model, os_voice.as_deref());
-    run_session(&id, tts.as_ref());
+    run_session(&id, tts.as_ref(), worker.as_deref(), operator.as_deref());
 }
 
 /// Value following `flag` (e.g. `--tts-model foo` → `Some("foo")`).
@@ -101,7 +106,13 @@ fn flag_value(args: &[String], flag: &str) -> Option<String> {
 /// The procedure id — the first bare token that is neither a flag nor
 /// a flag's value.
 fn positional_id(args: &[String]) -> Option<String> {
-    const VALUED_FLAGS: [&str; 3] = ["--tts-backend", "--tts-model", "--tts-voice"];
+    const VALUED_FLAGS: [&str; 5] = [
+        "--tts-backend",
+        "--tts-model",
+        "--tts-voice",
+        "--worker",
+        "--operator",
+    ];
     let mut skip_next = false;
     for (i, a) in args.iter().enumerate() {
         if skip_next {
@@ -167,7 +178,24 @@ fn say(tts: &dyn TtsBackend, text: &str) {
     }
 }
 
-fn run_session(id: &str, tts: &dyn TtsBackend) {
+/// Caller-injected protocol header: the context the deterministic
+/// engine cannot own — wall-clock date/time (local KZ zone) and the
+/// worker / operator (ИТҚ) identities.  Printed just above the
+/// engine's `render_kk` body (which carries the tamper-evidence hash),
+/// so together they form a signable допуск journal entry.
+fn print_protocol_header(worker: Option<&str>, operator: Option<&str>) {
+    let clock = read_clock(tz_offset_secs_from_env());
+    let blank = "____________________";
+    println!("──────────── ДОПУСК ХАТТАМАСЫ ────────────");
+    println!(
+        "Күні/уақыты: {:04}-{:02}-{:02} {:02}:{:02} (жергілікті)",
+        clock.year, clock.month, clock.day, clock.hour, clock.minute
+    );
+    println!("Жұмысшы: {}", worker.unwrap_or(blank));
+    println!("ИТҚ/оператор: {}", operator.unwrap_or(blank));
+}
+
+fn run_session(id: &str, tts: &dyn TtsBackend, worker: Option<&str>, operator: Option<&str>) {
     let Some(mut session) = BriefingSession::from_id(id) else {
         eprintln!("procedure `{id}` not found. Run with --list to see available ids.");
         return;
@@ -187,10 +215,13 @@ fn run_session(id: &str, tts: &dyn TtsBackend) {
             return;
         }
         let reply = session.advance(line.trim());
-        println!("\n{}\n", reply.text);
         if reply.done {
-            // Speak a concise verdict rather than the full protocol
-            // table (which prints for the ИТР to read/sign).
+            // Stamp the caller-side header, then print the engine's
+            // protocol body (feedback + render_kk with the integrity
+            // hash) for the ИТР to read and sign.
+            println!();
+            print_protocol_header(worker, operator);
+            println!("\n{}\n", reply.text);
             if let Some(p) = session.protocol() {
                 let verdict = if p.admitted {
                     "Жұмысқа жіберілді."
@@ -208,6 +239,7 @@ fn run_session(id: &str, tts: &dyn TtsBackend) {
             tts.wait_until_done();
             break;
         }
+        println!("\n{}\n", reply.text);
         say(tts, &reply.text);
     }
 }

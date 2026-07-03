@@ -20,8 +20,11 @@ Version-by-version history of `adam`, grouped into architectural eras.
 > grader after an external adversarial audit (prompt-token
 > exclusion + per-source coverage floor kill prompt-echo /
 > generic-word gaming; a corpus-wide adversarial regression test
-> gates all 33 procedures).
-> See [`CHANGELOG.md`](../CHANGELOG.md) v6.10.0 → v6.10.2.
+> gates all 33 procedures). **v6.10.3** turns the протокол into a
+> signable допуск artifact: per-question type + worker answer +
+> critical marker, a dependency-free content integrity hash
+> (`adam1-…`), and a `--worker`/`--operator`/timestamp header.
+> See [`CHANGELOG.md`](../CHANGELOG.md) v6.10.0 → v6.10.3.
 >
 > **Status 2026-06-29.** **v6.9.0 shipped** as the
 > consolidation release for the 2026-06-29 work-day arc:
