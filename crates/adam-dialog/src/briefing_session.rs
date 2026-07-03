@@ -54,13 +54,18 @@ use crate::procedure_loader::shared_procedures;
 /// grading vocabulary matches routing vocabulary.
 const MIN_PREFIX_OVERLAP: usize = 4;
 
-/// A control question passes when the best expected-phrase coverage
-/// (fraction of that phrase's content tokens the worker mentioned)
-/// reaches this floor.  0.4 means: for a two-concept phrase, naming
-/// one core concept is enough; for a long step sentence, ~half its
-/// content words.  Deliberately lenient — this is an oral briefing
+/// Coverage floor for a NON-safety-critical question (authority,
+/// first step).  Deliberately lenient — this is an oral briefing
 /// check, not a written exam; the ИТР retains final sign-off.
 const PASS_COVERAGE: f32 = 0.4;
+
+/// Coverage floor for a **safety-critical** question (hazard /
+/// mitigation / gate).  Stricter than [`PASS_COVERAGE`] because a
+/// half-remembered safety answer is not «satisfactory».  Codex's
+/// 2026-07-02 adversarial audit showed 0.4 let prompt-echo and
+/// generic tokens clear critical questions; 0.5 + the min-distinct
+/// rule closes that.
+const CRITICAL_PASS_COVERAGE: f32 = 0.5;
 
 /// Default session verdict threshold: the worker is *admitted*
 /// (допущен) only when at least this fraction of control questions
@@ -417,7 +422,12 @@ fn build_questions(p: &ProcedureIR) -> Vec<ControlQuestion> {
 
     if !p.authorization.is_empty() {
         qs.push(ControlQuestion {
-            prompt_kk: format!("«{}» рәсімінде кім жауапты?", p.title_kk),
+            // Generic prompt — NOT «{title} рәсімінде…»: embedding the
+            // procedure title let a worker echo the question and score
+            // the title's words as if they were the answer (Codex audit,
+            // kk_labor_work_permit_022).  The worker already knows which
+            // procedure — it was announced at session start.
+            prompt_kk: "Бұл рәсім бойынша кім жауапты?".to_string(),
             expected: p.authorization.clone(),
             source: QuestionSource::Authority,
         });
@@ -433,7 +443,10 @@ fn build_questions(p: &ProcedureIR) -> Vec<ControlQuestion> {
     // correct answer (disjunction over all hazard kinds).
     if !p.hazards.is_empty() {
         qs.push(ControlQuestion {
-            prompt_kk: "Бұл жұмыстағы қауіптер қандай?".into(),
+            // Avoid «жұмыс» in the prompt: several hazard kinds contain
+            // «жұмыс», and prompt-token exclusion would then strip it
+            // from a correct answer (Codex audit, kk_labor_ppe_002).
+            prompt_kk: "Осы рәсімде қандай қауіптер бар?".into(),
             expected: p.hazards.iter().map(|h| h.kind_kk.clone()).collect(),
             source: QuestionSource::Hazard,
         });
@@ -480,32 +493,56 @@ fn build_questions(p: &ProcedureIR) -> Vec<ControlQuestion> {
 }
 
 /// Grade one answer.  Returns `(passed, best_coverage)`.
+///
+/// **Hardened per Codex's 2026-07-02 adversarial audit.**  Two prior
+/// leaks let a worker clear a question without knowing the answer:
+///
+/// 1. **Prompt echo / adjacent-answer bleed** — reading the question
+///    back (or answering with a neighbouring question's words that
+///    overlap this prompt) scored the *prompt's* tokens as knowledge.
+///    Fix: strip any answer token that echoes a token in the question
+///    prompt before matching, so only NOVEL content counts.
+/// 2. **Single generic token** — one broad word («жұмыс»,
+///    «қауіпсіздік») covering a multi-concept answer.  Fix: a
+///    multi-token expected phrase needs ≥ 2 distinct concept matches.
+///
+/// Safety-critical questions ([`QuestionSource::is_safety_critical`])
+/// use the higher [`CRITICAL_PASS_COVERAGE`] floor.
 fn grade(q: &ControlQuestion, answer: &str) -> (bool, f32) {
-    let user_tokens = content_tokens(answer);
     if q.expected.is_empty() {
         return (true, 1.0);
     }
-    let best = q
-        .expected
-        .iter()
-        .map(|phrase| phrase_coverage(&user_tokens, phrase))
-        .fold(0.0_f32, f32::max);
-    (best >= PASS_COVERAGE, best)
-}
+    let prompt_tokens = content_tokens(&q.prompt_kk);
+    let novel: Vec<String> = content_tokens(answer)
+        .into_iter()
+        .filter(|u| !prompt_tokens.iter().any(|p| token_match(u, p)))
+        .collect();
 
-/// Fraction of `phrase`'s content tokens that appear (fuzzily) in the
-/// worker's answer.  An empty phrase (no content tokens) scores 1.0
-/// so it never blocks admission.
-fn phrase_coverage(user_tokens: &[String], phrase: &str) -> f32 {
-    let expected = content_tokens(phrase);
-    if expected.is_empty() {
-        return 1.0;
+    let floor = if q.source.is_safety_critical() {
+        CRITICAL_PASS_COVERAGE
+    } else {
+        PASS_COVERAGE
+    };
+
+    let mut best_cov = 0.0_f32;
+    for phrase in &q.expected {
+        let expected = content_tokens(phrase);
+        let coverage = if expected.is_empty() {
+            1.0
+        } else {
+            let m = expected
+                .iter()
+                .filter(|e| novel.iter().any(|u| token_match(u, e)))
+                .count();
+            m as f32 / expected.len() as f32
+        };
+        best_cov = best_cov.max(coverage);
     }
-    let matched = expected
-        .iter()
-        .filter(|e| user_tokens.iter().any(|u| token_match(u, e)))
-        .count();
-    matched as f32 / expected.len() as f32
+    // Coverage floor alone suffices once prompt tokens are excluded:
+    // a single stray word can only clear the floor on a 1–2-concept
+    // phrase, and for a 3+-concept phrase the floor already rejects a
+    // lone match (1/3 < 0.4).  Echo answers strip to zero novel tokens.
+    (best_cov >= floor, best_cov)
 }
 
 /// Two tokens match when their common prefix is at least

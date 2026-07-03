@@ -16,8 +16,12 @@ Version-by-version history of `adam`, grouped into architectural eras.
 > **v6.10.1** adds `--voice` spoken Kazakh output to the
 > `adam_briefing` REPL — a front-end layer over the unchanged
 > engine (macOS speaks it out of the box via the `kk_KZ` «Aru»
-> voice; Piper for higher quality).
-> See [`CHANGELOG.md`](../CHANGELOG.md) v6.10.0 / v6.10.1.
+> voice; Piper for higher quality). **v6.10.2** hardens the answer
+> grader after an external adversarial audit (prompt-token
+> exclusion + per-source coverage floor kill prompt-echo /
+> generic-word gaming; a corpus-wide adversarial regression test
+> gates all 33 procedures).
+> See [`CHANGELOG.md`](../CHANGELOG.md) v6.10.0 → v6.10.2.
 >
 > **Status 2026-06-29.** **v6.9.0 shipped** as the
 > consolidation release for the 2026-06-29 work-day arc:

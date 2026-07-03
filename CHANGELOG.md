@@ -28,6 +28,40 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.10.2] — 2026-07-03 — briefing grader hardening (adversarial audit)
+
+**Stripe — Deterministic AI research.** An external adversarial
+audit of the v6.10.0/6.10.1 session engine found the answer
+grader could be gamed: reading the question back, or answering
+with generic domain words, scored as knowledge — and one
+procedure (`kk_labor_work_permit_022`) was admitted 4/5 on pure
+prompt-echo, defeating the safety-critical rule.  Root cause:
+prompt tokens and broad tokens counted toward coverage.
+
+- **Prompt-token exclusion** — before matching, answer tokens
+  that echo a token in the question prompt are stripped, so only
+  NOVEL content counts.  Reading the question back now scores
+  zero on every question.  This also kills most adjacent-answer
+  contamination (neighbouring answers that overlapped the prompt).
+- **Per-source coverage floor** — safety-critical questions
+  (hazard / mitigation / gate) now need `≥ 0.5` coverage vs `0.4`
+  for authority / first-step.
+- **Prompt wording fixes** — the authority prompt no longer
+  embeds the procedure title (which leaked the title's words as
+  the answer), and the hazard prompt no longer contains «жұмыс»
+  (which collided with hazard kinds and stripped a correct
+  answer).  Both are generic — the worker already knows which
+  procedure from the session opening.
+- **Corpus-wide adversarial regression test** — a new integration
+  test sweeps ALL curated procedures: reciting curated answers
+  must admit; noise, prompt-echo, and adjacent-answer answers
+  must never admit (and echo must pass zero questions).  This is
+  the standing CI gate the audit recommended.
+- Engine tests 9 → 13 (9 unit + 4 integration).  Curated
+  recitation still admits 33/33; no production eval affected
+  (grader is briefing-only, not in the retrieval/Conversation
+  path).
+
 ## [6.10.1] — 2026-07-02 — briefing session voice output (`--voice`)
 
 **Stripe — Deterministic AI research.** The `adam_briefing`

@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.10.1-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.10.2-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -84,8 +84,8 @@ Production suite dashboard (unchanged — this release adds capability without t
 | `safety_eval` (13 categories, release gate) | 22 | 95 % | **100 %** |
 | `v6_7_real_audit_eval` | 26 | 81 % | **100 %** |
 | `speech_defect_eval` (8 defect categories) | 71 | **76 %** | **76 %** |
-| `procedure_eval` (19 probes) | 18 | **95 %** | **95 %** |
-| `briefing_session` (engine, NEW) | 12 | **100 %** | — |
+| `procedure_eval` (19 probes) | 19 | **100 %** | **100 %** |
+| `briefing_session` (engine, NEW) | 13 | **100 %** | — |
 
 **Strict vs semantic** — `strict` is exact-string match against the eval's `expected_response`; `semantic` is a meaning-equivalence check that admits paraphrase, ordering, and morphological variation around the same factual core.  When strict ≠ semantic, the dashboard reports both honestly.
 
@@ -202,7 +202,7 @@ KazMMLU ([arXiv:2502.12829](https://arxiv.org/abs/2502.12829), 23 k Kazakh + Rus
 
 | Model | KazMMLU | Resource cost |
 |---|---|---|
-| **adam v6.10.0** | own dashboard reported strict + semantic (`school_program` 159 / 159 · `conv_dialog` 52 / 52 · `safety` 21 / 22 strict · 22 / 22 sem · `real_audit` 21 / 26 strict · 26 / 26 sem · `speech_defect` 54 / 71 = 76 % · `procedure` 18 / 19 = 95 %) + `multi_turn` 38 / 38 required + `briefing_session` 12 / 12 | **314 MB RSS · 0 GPU · $0** |
+| **adam v6.10.0** | own dashboard reported strict + semantic (`school_program` 159 / 159 · `conv_dialog` 52 / 52 · `safety` 21 / 22 strict · 22 / 22 sem · `real_audit` 21 / 26 strict · 26 / 26 sem · `speech_defect` 54 / 71 = 76 % · `procedure` 19 / 19 = 100 %) + `multi_turn` 38 / 38 required + `briefing_session` 13 / 13 | **314 MB RSS · 0 GPU · $0** |
 | GPT-4o | 76.6 % | API only · $2.50 / $10 per 1 M tok |
 | DeepSeek V3 | 76.9 % | self-host or API |
 | Llama 3.1 70B | 56.2 % | ~140 GB FP16 · 2–4× H100 |
@@ -223,8 +223,8 @@ See [`docs/COMPARISON.md`](docs/COMPARISON.md) for the full table (hallucination
 | `safety_eval` | 21 / 22 = 95 % strict · **22 / 22 = 100 %** semantic (13 categories, release gate; 32 probes) |
 | `v6_7_real_audit_eval` | 21 / 26 = 81 % strict · **26 / 26 = 100 %** semantic |
 | `speech_defect_eval` | 54 / 71 = **76 %** strict + semantic (8 defect categories; v6.8.31 kappacism start-letter correction lifted from 66 %) |
-| `procedure_eval` | 18 / 19 = **95 %** strict + semantic (19 worker-shape probes; 18 / 18 = 100 % on accepted-only cases) over the 33-procedure corpus |
-| `briefing_session` (NEW v6.10.0) | session engine: 9 unit + 3 integration = 12 / 12; deterministic control-question generation + Kazakh answer grading + safety-critical допуск protocol (fail a hazard/mitigation/gate question → not admitted) |
+| `procedure_eval` | 19 / 19 = **100 %** strict + semantic (19 worker-shape probes over the 33-procedure corpus) |
+| `briefing_session` (NEW v6.10.0) | session engine: 9 unit + 4 integration = 13 / 13; deterministic control-question generation + hardened Kazakh answer grading (prompt-token exclusion, per-source floor) + safety-critical допуск protocol + corpus-wide adversarial gate |
 | `multi_turn_eval_v686` | **38 / 38 = 100 %** required + probes documenting remaining gaps |
 | v6.2 dialog battery | 79 / 79 must-pass, 0 gaps (CI quality gate `dialog_battery_meets_quality_gate`) |
 | Production cascade latency (M2 Air, 30-query battery) | **13.6 ms p50** · 19.6 ms p95 · **314 MB peak RSS** |

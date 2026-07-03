@@ -7,7 +7,7 @@
 //! Convention (see `answer_ir_e2e_v590.rs`): tests gracefully skip
 //! when the data artefact is absent so partial checkouts still build.
 
-use adam_dialog::briefing_session::BriefingSession;
+use adam_dialog::briefing_session::{BriefingProtocol, BriefingSession};
 use adam_dialog::procedure_loader::shared_procedures;
 
 /// A procedure id known to exist in the corpus and to carry enough
@@ -113,4 +113,106 @@ fn empty_answers_deny_the_worker() {
     assert_eq!(proto.passed_count, 0, "noise answers must not pass");
     assert!(!proto.admitted, "a worker who knows nothing must be denied");
     assert!(proto.render_kk().contains("ЖІБЕРІЛМЕДІ"));
+}
+
+/// Drive a session to completion: acknowledge every step, then feed
+/// one answer per generated question (cycling `answers` if shorter).
+fn run(id: &str, answers: &[String]) -> BriefingProtocol {
+    let mut s = BriefingSession::from_id(id).expect("procedure exists");
+    let nq = s.questions().len();
+    let steps = s.step_count();
+    let _ = s.begin();
+    for _ in 0..steps {
+        s.advance("түсінікті");
+    }
+    for i in 0..nq {
+        s.advance(&answers[i % answers.len()]);
+    }
+    s.protocol().expect("session done")
+}
+
+/// **v6.10.2 — corpus-wide adversarial gate (Codex 2026-07-02).**
+/// For EVERY curated procedure the session engine must:
+///   - admit a worker who recites the curated answers, and
+///   - deny (never admit) a worker who answers with noise, with the
+///     question text echoed back, or with a neighbouring question's
+///     answer — the leak class that let `kk_labor_work_permit_022`
+///     score 4/5 on prompt-echo before the grader was hardened.
+#[test]
+fn adversarial_sweep_admits_curated_denies_gaming() {
+    if !corpus_available() {
+        eprintln!("procedure corpus missing — skipping");
+        return;
+    }
+    let noise = vec!["иә рахмет жақсы".to_string()];
+    let mut admit_failures = vec![];
+    let mut gaming_admits = vec![];
+    let mut echo_pass = vec![];
+
+    for p in shared_procedures() {
+        let s = BriefingSession::from_id(&p.id).unwrap();
+        assert!(
+            s.questions().len() >= 3,
+            "{}: must generate ≥3 control questions",
+            p.id
+        );
+        let expected: Vec<String> = s
+            .questions()
+            .iter()
+            .map(|q| q.expected.first().cloned().unwrap_or_default())
+            .collect();
+        let prompts: Vec<String> = s.questions().iter().map(|q| q.prompt_kk.clone()).collect();
+
+        // 1. Curated recitation → admitted, every question passed.
+        let curated = run(&p.id, &expected);
+        if !curated.admitted || curated.passed_count != curated.total {
+            admit_failures.push(format!(
+                "{}: curated {}/{} admitted={}",
+                p.id, curated.passed_count, curated.total, curated.admitted
+            ));
+        }
+
+        // 2. Noise → never admitted.
+        if run(&p.id, &noise).admitted {
+            gaming_admits.push(format!("{}: NOISE admitted", p.id));
+        }
+
+        // 3. Prompt echo → never admitted; expect zero question passes
+        //    (all answer tokens echo the prompt → nothing novel).
+        let echo = run(&p.id, &prompts);
+        if echo.admitted {
+            gaming_admits.push(format!("{}: PROMPT-ECHO admitted", p.id));
+        }
+        if echo.passed_count != 0 {
+            echo_pass.push(format!(
+                "{}: echo passed {} question(s)",
+                p.id, echo.passed_count
+            ));
+        }
+
+        // 4. Adjacent-answer contamination (shift by one) → never admitted.
+        if expected.len() >= 2 {
+            let mut shifted = expected.clone();
+            shifted.rotate_left(1);
+            if run(&p.id, &shifted).admitted {
+                gaming_admits.push(format!("{}: ADJACENT(i+1) admitted", p.id));
+            }
+        }
+    }
+
+    assert!(
+        admit_failures.is_empty(),
+        "curated recitation must admit:\n{}",
+        admit_failures.join("\n")
+    );
+    assert!(
+        gaming_admits.is_empty(),
+        "gaming answers must never admit:\n{}",
+        gaming_admits.join("\n")
+    );
+    assert!(
+        echo_pass.is_empty(),
+        "prompt-echo must pass zero questions:\n{}",
+        echo_pass.join("\n")
+    );
 }
