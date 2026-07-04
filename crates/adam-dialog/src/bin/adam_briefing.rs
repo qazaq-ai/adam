@@ -37,6 +37,32 @@
 //! Audible output does NOT require the crate's `voice` feature (that
 //! feature is for voice *input* / AEC) — Piper shells out to the
 //! audio player either way.
+//!
+//! ## Sealed допуск credential (v6.11.0 / v6.12.0)
+//!
+//! Given a signing key, the finished protocol is sealed into a
+//! cryptographically verifiable **work-admission credential** (see
+//! [`adam_dialog::briefing_seal`]).  Commands:
+//!
+//! ```sh
+//! # Mint an Ed25519 key (public key → stdout, secret seed → 0600 file):
+//! cargo run -p adam-dialog --bin adam_briefing -- keygen --out operator.key
+//!
+//! # Run + sign a session, writing the sealed credential:
+//! cargo run -p adam-dialog --bin adam_briefing -- \
+//!   --worker "Асан Асанов" --worker-id SSGPO-EMP-12345 \
+//!   --operator "Досжан" --operator-role ИТҚ \
+//!   --sign-key operator.key --seal-out dopusk.json kk_metallurgy_loto_003
+//!
+//! # Verify a sealed credential (exit 0 = valid, 1 = tampered/invalid):
+//! cargo run -p adam-dialog --bin adam_briefing -- \
+//!   verify dopusk.json --expect-key <operator-public-key-hex>
+//! ```
+//!
+//! The credential binds worker identity, operator authority (a signed
+//! assertion, verified against the signing key), and the SOP content
+//! hash — so editing any field, forging the verdict, or swapping the
+//! signer breaks verification.
 
 use std::io::{self, Write};
 use std::path::PathBuf;
@@ -62,13 +88,15 @@ fn main() {
         eprintln!(
             "usage:\n  \
              adam_briefing [--voice] [--tts-backend piper|os] [--tts-model <path>] \
-             [--tts-voice <name>] [--worker <name>] [--operator <name>] \
-             [--site <id>] [--sign-key <seed.key>] [--seal-out <sealed.json>] \
-             <procedure_id>\n  \
+             [--tts-voice <name>] [--worker <name>] [--worker-id <id>] \
+             [--operator <name>] [--operator-role <role>] \
+             [--authority-assertion <text>] [--site <id>] \
+             [--sign-key <seed.key>] [--seal-out <sealed.json>] <procedure_id>\n  \
              adam_briefing --list\n  \
              adam_briefing keygen [--out <seed.key>]\n  \
              adam_briefing verify <sealed.json> [--expect-key <pubhex>]\n\n\
-             example: adam_briefing --worker \"Асан Асанов\" --operator \"ИТҚ Досжан\" \
+             example: adam_briefing --worker \"Асан Асанов\" --worker-id SSGPO-EMP-12345 \
+             --operator \"Досжан\" --operator-role ИТҚ \
              --sign-key operator.key --seal-out dopusk.json kk_metallurgy_loto_003"
         );
         return;
@@ -105,7 +133,10 @@ fn main() {
     let model = flag_value(&args, "--tts-model");
     let os_voice = flag_value(&args, "--tts-voice");
     let worker = flag_value(&args, "--worker");
+    let worker_id = flag_value(&args, "--worker-id");
     let operator = flag_value(&args, "--operator");
+    let operator_role = flag_value(&args, "--operator-role");
+    let authority_assertion = flag_value(&args, "--authority-assertion");
     let site = flag_value(&args, "--site");
     let sign_key = flag_value(&args, "--sign-key");
     let seal_out = flag_value(&args, "--seal-out");
@@ -133,7 +164,10 @@ fn main() {
     let tts = build_tts(voice, backend_choice.as_deref(), model, os_voice.as_deref());
     let session_ctx = SessionContext {
         worker: worker.as_deref(),
+        worker_id: worker_id.as_deref(),
         operator: operator.as_deref(),
+        operator_role: operator_role.as_deref(),
+        authority_assertion: authority_assertion.as_deref(),
         site: site.as_deref(),
         signer: signer.as_ref(),
         seal_out: seal_out.as_deref(),
@@ -142,10 +176,13 @@ fn main() {
 }
 
 /// Front-end context threaded into a briefing session: caller-side
-/// identities plus the optional signing key / seal destination.
+/// identity + authority, plus the optional signing key / seal destination.
 struct SessionContext<'a> {
     worker: Option<&'a str>,
+    worker_id: Option<&'a str>,
     operator: Option<&'a str>,
+    operator_role: Option<&'a str>,
+    authority_assertion: Option<&'a str>,
     site: Option<&'a str>,
     signer: Option<&'a SigningKey>,
     seal_out: Option<&'a str>,
@@ -162,12 +199,15 @@ fn flag_value(args: &[String], flag: &str) -> Option<String> {
 /// The procedure id — the first bare token that is neither a flag nor
 /// a flag's value.
 fn positional_id(args: &[String]) -> Option<String> {
-    const VALUED_FLAGS: [&str; 9] = [
+    const VALUED_FLAGS: [&str; 12] = [
         "--tts-backend",
         "--tts-model",
         "--tts-voice",
         "--worker",
+        "--worker-id",
         "--operator",
+        "--operator-role",
+        "--authority-assertion",
         "--site",
         "--sign-key",
         "--seal-out",
@@ -330,14 +370,21 @@ fn emit_seal(
     tz: &str,
     key: &SigningKey,
 ) {
-    let seal_ctx = SealContext {
+    let mut seal_ctx = SealContext {
         worker: ctx.worker.unwrap_or_default().to_string(),
+        worker_id: ctx.worker_id.unwrap_or_default().to_string(),
         operator: ctx.operator.unwrap_or_default().to_string(),
         timestamp: timestamp.to_string(),
         timezone: tz.to_string(),
         site: ctx.site.unwrap_or_default().to_string(),
-        prev_record_hash: String::new(),
+        ..SealContext::default()
     };
+    if let Some(role) = ctx.operator_role {
+        seal_ctx.operator_role = role.to_string();
+    }
+    if let Some(assertion) = ctx.authority_assertion {
+        seal_ctx.authority_assertion = assertion.to_string();
+    }
     let sealed = p.seal_with(&seal_ctx, key, ENGINE_VERSION);
     let json = sealed.to_json();
     match ctx.seal_out {
@@ -452,15 +499,32 @@ fn run_verify(args: &[String]) {
     let v = sealed.verify();
     let env = &sealed.envelope;
     println!("──────────── SEAL ТЕКСЕРУ ────────────");
-    println!("Рәсім: {} ({})", env.procedure_title_kk, env.procedure_id);
-    println!("Жұмысшы: {}", env.worker);
-    println!("ИТҚ/оператор: {}", env.operator);
-    println!("Күні/уақыты: {} ({})", env.timestamp, env.timezone);
+    println!("Схема: {}", env.schema);
+    println!("Рәсім: {} ({})", env.procedure.title_kk, env.procedure.id);
+    println!(
+        "SOP нұсқасы: {} — {}",
+        env.procedure.sop_version_date, env.procedure.sop_hash
+    );
+    println!(
+        "Жұмысшы (subject): {} [{}] (сәйкестендіру: {})",
+        env.credential_subject.name,
+        env.credential_subject.id_ref,
+        env.credential_subject.id_method
+    );
+    println!(
+        "ИТҚ/оператор (issuer): {} [{}]",
+        env.issuer.name, env.issuer.role
+    );
+    println!(
+        "  өкілеттік мәлімдемесі: «{}»",
+        env.issuer.authority_assertion
+    );
+    println!("Күні/уақыты: {} ({})", env.issuance_date, env.timezone);
     println!("Қозғалтқыш нұсқасы: {}", env.engine_version);
     println!(
         "Нәтиже: {}/{} — {}",
-        env.passed_count,
-        env.total,
+        env.evidence.passed_count,
+        env.evidence.total,
         if env.admitted {
             "допущен"
         } else {
@@ -468,9 +532,10 @@ fn run_verify(args: &[String]) {
         }
     );
     println!("Қол қойған кілт (public): {}", sealed.public_key());
-    println!("  алгоритм танылды: {}", yes_no(v.alg_known));
-    println!("  дайджест сәйкес:  {}", yes_no(v.digest_matches));
-    println!("  қолтаңба жарамды: {}", yes_no(v.signature_valid));
+    println!("  алгоритм/схема танылды: {}", yes_no(v.alg_known));
+    println!("  дайджест сәйкес:        {}", yes_no(v.digest_matches));
+    println!("  қолтаңба жарамды:       {}", yes_no(v.signature_valid));
+    println!("  issuer = қол қойған:    {}", yes_no(v.issuer_bound));
 
     let mut ok = v.is_valid();
     if let Some(expected) = expect_key {

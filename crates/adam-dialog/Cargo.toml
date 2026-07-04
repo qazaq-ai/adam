@@ -3,7 +3,7 @@ name = "adam-dialog"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Deterministic dialog layer of the Qazaq IR research kernel — 41-intent recogniser, multi-turn session, FST-backed slot expansion, BeliefState with auditable contradiction resolution, curriculum tracking, voice output transducer (TTS / phoneme G2P). Pure Rust; graph-first; no probabilistic generation."
+description = "Deterministic dialog layer of the Qazaq IR research kernel — 41-intent recogniser, multi-turn session, FST-backed slot expansion, BeliefState with auditable contradiction resolution, curriculum tracking, voice output transducer (TTS / phoneme G2P), and the OT/ТБ safety-briefing session engine that seals a graded work-admission (допуск) into a cryptographically verifiable, identity-bound credential (briefing_seal / adam-seal). Pure Rust; graph-first; no probabilistic generation."
 
 [dependencies]
 adam-algebra = { path = "../adam-algebra" }

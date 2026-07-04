@@ -41,6 +41,7 @@
 //! reviewer already curated, and grades against that same content.
 
 use adam_algebra::ProcedureIR;
+use adam_seal::{sha256, to_hex};
 
 use crate::procedure_loader::shared_procedures;
 
@@ -175,6 +176,15 @@ pub struct BriefingReply {
 pub struct BriefingProtocol {
     pub procedure_id: String,
     pub title_kk: String,
+    /// Content hash of the SOP that was briefed, `sha256:<hex>` over the
+    /// procedure's canonical fields (id, title, version date, steps,
+    /// hazards, authorization, gates).  Proves *which version* of the
+    /// procedure the worker was tested on — the load-bearing answer to
+    /// «по какой версии процедуры был допуск» in an accident review.
+    pub sop_hash: String,
+    /// Curator-declared version date of the briefed SOP, carried for a
+    /// human-readable cross-reference alongside [`Self::sop_hash`].
+    pub sop_version_date: String,
     pub answers: Vec<AnsweredQuestion>,
     pub passed_count: usize,
     pub total: usize,
@@ -196,6 +206,10 @@ impl BriefingProtocol {
         out.push_str(&format!(
             "Рәсім: {} ({})\n",
             self.title_kk, self.procedure_id
+        ));
+        out.push_str(&format!(
+            "SOP нұсқасы: {} — {}\n",
+            self.sop_version_date, self.sop_hash
         ));
         for (i, a) in self.answers.iter().enumerate() {
             let crit = if a.source.is_safety_critical() {
@@ -286,6 +300,11 @@ pub struct BriefingSession {
     answers: Vec<AnsweredQuestion>,
     phase: Phase,
     pass_ratio: f32,
+    /// `sha256:<hex>` over the briefed SOP's canonical content, fixed at
+    /// construction so the protocol records exactly which version ran.
+    sop_hash: String,
+    /// Curator version date of the briefed SOP.
+    sop_version_date: String,
 }
 
 impl BriefingSession {
@@ -302,6 +321,8 @@ impl BriefingSession {
             applies_to: p.applies_to.clone(),
             steps,
             questions: build_questions(p),
+            sop_hash: sop_content_hash(p),
+            sop_version_date: p.source.version_date.clone(),
             answers: Vec::new(),
             phase: Phase::Instruct(0),
             pass_ratio: DEFAULT_PASS_RATIO,
@@ -457,6 +478,8 @@ impl BriefingSession {
         BriefingProtocol {
             procedure_id: self.procedure_id.clone(),
             title_kk: self.title_kk.clone(),
+            sop_hash: self.sop_hash.clone(),
+            sop_version_date: self.sop_version_date.clone(),
             answers: self.answers.clone(),
             passed_count,
             total,
@@ -464,6 +487,37 @@ impl BriefingSession {
             admitted,
         }
     }
+}
+
+/// Deterministic content hash of a procedure's SOP, `sha256:<hex>`.
+///
+/// Hashes the curated fields a briefing actually tests — id, Kazakh
+/// title, curator version date, ordered steps, hazards with their
+/// mitigations, authorization, and confirmation gates — so that editing
+/// any of them yields a different hash.  Sealed into the protocol, it
+/// proves which *version* of the procedure a worker was briefed on,
+/// independently of the free-text `procedure_id`.
+fn sop_content_hash(p: &ProcedureIR) -> String {
+    let mut s = String::new();
+    s.push_str(&p.id);
+    s.push('\n');
+    s.push_str(&p.title_kk);
+    s.push('\n');
+    s.push_str(&p.source.version_date);
+    s.push('\n');
+    for st in &p.steps {
+        s.push_str(&format!("S{}\u{1f}{}\n", st.sequence, st.action_kk));
+    }
+    for h in &p.hazards {
+        s.push_str(&format!("H\u{1f}{}\u{1f}{}\n", h.kind_kk, h.mitigation_kk));
+    }
+    for a in &p.authorization {
+        s.push_str(&format!("A\u{1f}{a}\n"));
+    }
+    for g in &p.confirmation_gates {
+        s.push_str(&format!("G\u{1f}{g}\n"));
+    }
+    format!("sha256:{}", to_hex(&sha256(s.as_bytes())))
 }
 
 /// Deterministically generate 3–5 control questions from the

@@ -32,7 +32,15 @@ Version-by-version history of `adam`, grouped into architectural eras.
 > (`adam_briefing keygen` / `--sign-key` / `verify`) — editing any
 > field breaks the signature, so a forged or back-dated допуск is
 > detectable without trusting our program.
-> See [`CHANGELOG.md`](../CHANGELOG.md) v6.10.0 → v6.11.0.
+> **v6.12.0** adds the identity & authority chain: the seal becomes a
+> W3C-VC-shaped work-admission credential (`adam-dopusk-credential/2`)
+> binding *who answered* (`credentialSubject`), *who admitted them and
+> by what authority* (`issuer` + signed `authorityAssertion`, verified
+> against the signing key), and *which SOP version* (`procedure.sopHash`)
+> — the three questions an accident review asks.  `credentialStatus` /
+> `prevRecordHash` are reserved for a future revocation ledger; full key
+> management is the next layer.
+> See [`CHANGELOG.md`](../CHANGELOG.md) v6.10.0 → v6.12.0.
 >
 > **Status 2026-06-29.** **v6.9.0 shipped** as the
 > consolidation release for the 2026-06-29 work-day arc:

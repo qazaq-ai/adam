@@ -28,6 +28,48 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.12.0] — 2026-07-04 — identity & authority chain (verifiable допуск credential)
+
+**Stripe — Deterministic AI research.** v6.11.0 signed the protocol's
+*content*, but a legally load-bearing допуск must also answer *who
+answered*, *who admitted them and by what authority*, and *which SOP
+version* was briefed — the exact questions an accident review asks. This
+release binds all three into the sealed artifact and reshapes it as a
+W3C-Verifiable-Credentials-shaped work-admission credential, so the
+format can converge on that standard later without a breaking change.
+
+- **SOP version binding (engine).** `BriefingProtocol` now carries a
+  `sop_hash` — `sha256:<hex>` over the procedure's canonical content
+  (id, title, curator version date, ordered steps, hazards + their
+  mitigations, authorization, gates) — plus the SOP version date, both
+  surfaced in `render_kk`. Editing any briefed field changes the hash,
+  proving which version of the procedure the worker was tested on.
+- **Identity & authority in the envelope (`briefing_seal`).** The
+  credential now binds: `credentialSubject` (worker name + id reference
+  + `idMethod`, `operator-confirmed` by default, `badge`/`biometric`
+  reserved); `issuer` (operator name + authority `role` + a signed
+  `authorityAssertion` + public key); and `procedure` (id, title,
+  `sopHash`, version date). Verification adds an **issuer-bound** check:
+  `issuer.publicKey` must equal the signing key, so the operator's
+  authority assertion is provably signed by their own key.
+- **W3C-VC-shaped canonical form.** The envelope is restructured to VC
+  vocabulary — `schema` (`adam-dopusk-credential/2`), `type`
+  (`[VerifiableCredential, WorkAdmissionCredential]`), `issuer`,
+  `credentialSubject`, `evidence`, `credentialStatus` — while remaining
+  a self-contained canonical-JSON + Ed25519 credential (not JSON-LD).
+  `credentialStatus.status` and `prevRecordHash` are reserved for a
+  future revocation/ledger. NOTE: this supersedes the v6.11.0
+  `adam-sealed-protocol/1` format; there are no production `/1` seals.
+- **CLI.** `adam_briefing` gains `--worker-id`, `--operator-role`, and
+  `--authority-assertion`; `verify` now prints the subject, issuer +
+  authority assertion, SOP version/hash, and the issuer-bound result.
+- Tests: seal suite 6 → 9 (authority-assertion tamper, SOP-hash tamper,
+  substituted-issuer-key). End-to-end verified: swapping the issuer key
+  or the SOP hash in a sealed file fails verification (exit 1). Cold
+  gate green — fmt + clippy -D warnings + `cargo test --release
+  --workspace --locked`. Full key management (rotation, revocation
+  lists, operator-role registry, HSM custody) is the next layer.
+
 ## [6.11.0] — 2026-07-04 — Protocol Seal: a cryptographically signed допуск
 
 **Stripe — Deterministic AI research.** The v6.10.3 protocol carried
