@@ -1,0 +1,11 @@
+[package]
+name = "adam-seal"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Protocol Seal — zero-dependency, pure-Rust cryptographic primitives (SHA-256, SHA-512, Ed25519 per RFC 8032) used to turn a briefing допуск protocol into a signed, publicly verifiable legal artifact. No external crates: the entire signature path is auditable in-tree and gated on the official RFC 8032 known-answer test vectors. Constant-time execution is NOT guaranteed (pure-Rust, no hardware intrinsics); acceptable for offline on-device sealing where no remote timing oracle exists — see crate docs."
+
+[dependencies]
+
+[lints]
+workspace = true

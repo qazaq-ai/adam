@@ -28,6 +28,10 @@ members = [
   "crates/adam-intent-classifier",
   "crates/adam-slot-extractor",
   "crates/adam-retrieval-ranker",
+  # Protocol Seal — zero-dep pure-Rust Ed25519 seal that
+  # turns a briefing допуск protocol into a signed, publicly
+  # verifiable legal artifact.  KAT-gated on RFC 8032.
+  "crates/adam-seal",
   # Data ingestion pipeline foundation — typed candidate
   # records + persistent JSONL queue.  Codex 2026-06-27
   # «missing piece» for ADAM growth.
@@ -78,7 +82,7 @@ resolver = "2"
 #   multi_turn_eval     11/11  = 100% required + 2/6 probes documenting gaps
 #   adversarial_dialog  95/95  = 100%
 #   voice REPL session  43/45  ≈  96% (last live session, pre-v6.8.5)
-version = "6.10.3"
+version = "6.11.0"
 edition = "2024"
 license = "BUSL-1.1"
 

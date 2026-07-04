@@ -24,7 +24,15 @@ Version-by-version history of `adam`, grouped into architectural eras.
 > signable допуск artifact: per-question type + worker answer +
 > critical marker, a dependency-free content integrity hash
 > (`adam1-…`), and a `--worker`/`--operator`/timestamp header.
-> See [`CHANGELOG.md`](../CHANGELOG.md) v6.10.0 → v6.10.3.
+> **v6.11.0** makes that artifact legally defensible: the new
+> zero-dependency `adam-seal` crate (pure-Rust SHA-256 / SHA-512 /
+> Ed25519, gated on the official RFC 8032 known-answer vectors)
+> **cryptographically signs** the protocol into a `{envelope, seal}`
+> that anyone can verify with any Ed25519 implementation
+> (`adam_briefing keygen` / `--sign-key` / `verify`) — editing any
+> field breaks the signature, so a forged or back-dated допуск is
+> detectable without trusting our program.
+> See [`CHANGELOG.md`](../CHANGELOG.md) v6.10.0 → v6.11.0.
 >
 > **Status 2026-06-29.** **v6.9.0 shipped** as the
 > consolidation release for the 2026-06-29 work-day arc:

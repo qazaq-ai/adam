@@ -28,6 +28,51 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.11.0] — 2026-07-04 — Protocol Seal: a cryptographically signed допуск
+
+**Stripe — Deterministic AI research.** The v6.10.3 protocol carried
+a fast FNV checksum — good against accidental edits, but not against
+someone altering a допуск after the fact.  In an accident
+investigation the question is not «did the text change by chance» but
+«could the protocol have been forged or back-dated».  This release
+answers that: the finished protocol can now be sealed with an
+**Ed25519 signature** and verified by anyone, with any independent
+implementation — the artifact no longer requires trusting our program.
+
+- **`adam-seal` (new crate, zero dependencies).** Pure-Rust SHA-256,
+  SHA-512, and Ed25519 (RFC 8032), implemented in-tree so the whole
+  signature path is auditable and gated on the **official RFC 8032
+  known-answer vectors** (public key + sign + verify) plus the FIPS
+  180-4 SHA vectors.  No external crypto crates: keeps the project's
+  dependency-light stance while giving the seal a standard, portable
+  format.  Not constant-time — documented as acceptable for offline,
+  on-device sealing (no remote timing oracle); explicitly not for an
+  online service.
+- **Canonical envelope + seal.** `BriefingProtocol::seal_with` builds
+  a deterministic envelope (procedure, engine version, every graded
+  question with coverage as integer permille — no floats — verdict,
+  worker, operator, timestamp, timezone, site, and a reserved
+  `prev_record_hash` for a future ledger), signs its compact-JSON
+  canonical bytes, and emits `{envelope, seal}` with the signer's
+  public key.  Verification re-serializes the parsed envelope, so
+  reformatting the stored file never breaks a valid seal; editing any
+  field does.  The engine's FNV `content_digest` is carried inside for
+  a human cross-check.  The format carries an algorithm tag
+  (`adam-ed25519-sha256-v1`) so it can evolve without invalidating
+  already-issued protocols.
+- **CLI.** `adam_briefing keygen [--out <seed.key>]` mints an Ed25519
+  key (secret seed to a `0600` file; public key to stdout);
+  `--sign-key`/`--seal-out`/`--site` seal a live session's protocol;
+  `adam_briefing verify <sealed.json> [--expect-key <pubhex>]` prints a
+  Kazakh verdict and exits non-zero when the seal does not hold, so a
+  script or registry can gate on it.  A bad `--sign-key` now fails
+  before the worker sits through the whole briefing.
+- Tests: 8 KAT (4 RFC 8032 vectors × pubkey/sign/verify + tamper
+  rejection, 5 FIPS SHA vectors) in `adam-seal`; 6 seal round-trip /
+  tamper / wrong-key tests in `adam-dialog`.  End-to-end verified:
+  flipping the admission verdict in a sealed file fails both the digest
+  and the signature check.
+
 ## [6.10.3] — 2026-07-03 — допуск protocol as an auditable artifact
 
 **Stripe — Deterministic AI research.** Codex's audit flagged the
