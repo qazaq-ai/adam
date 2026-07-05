@@ -28,6 +28,32 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.12.2] — 2026-07-05 — Kazakh-purity allowlist + ERG pilot demo
+
+- **`validate_world_core` Kazakh-purity allowlist.** The corpus-purity
+  audit flagged 769 "non-Kazakh character" warnings, almost all of them
+  noise: formula/notation symbols and the Latin technical vocabulary of
+  the programming / chemistry / physics / maths domains (`async`,
+  `Future-ды`, `H₂O`). Two carve-outs, on top of the existing backtick
+  code-span rule: (1) a notation allowlist (`ALLOWED_SYMBOLS` — maths /
+  science operators, units, sub/superscripts, `№ ° % × ≥ → …`, Greek
+  maths letters) applied in every domain; (2) non-Cyrillic letters
+  allowed in technical domains (`TECHNICAL_DOMAIN_PREFIXES`). Bare Latin
+  prose in general-knowledge domains is still flagged, so the directive
+  holds where it matters. Warnings 769 → **27** (real residue for
+  review); 5 new unit tests. No prose can pass on a symbol, since letters
+  are handled separately.
+- **ERG pilot demo (local, offline).** New self-contained
+  `demo/erg_ot_tb_demo.html` — a pitch one-pager for the ERG / ССГПО
+  pilot that runs from `file://` with zero external requests (consistent
+  with the product's offline story), showing the full cycle инструктаж →
+  устный контроль → допуск → verifiable protocol with a live tamper
+  demonstration, the shanraq brand mark, and a sun/moon theme switch.
+- **Pilot legal prep.** New `docs/legal/ot_tb_source_currency_checklist.md`
+  — a source-currency checklist over the 33-procedure corpus for a lawyer
+  / OT expert to verify before the pilot (ГОСТ/ПУЭ currency, №223
+  applicability, who may sign the допуск).
+
 ## [6.12.1] — 2026-07-05 — due-diligence currency + eval-dashboard DX
 
 Housekeeping after an external local verification pass.

@@ -47,13 +47,13 @@
     --header-bg: rgba(251,252,253,0.82);
   }
   :root[data-theme="dark"] {
-    --bg: #0E1113; --surface: #171B1E; --surface-2: #1E2327;
+    --bg: #2a343b; --surface: #171B1E; --surface-2: #1E2327;
     --ink: #ECEFF1; --ink-soft: #9DA5AB; --ink-faint: #6B747B;
     --line: #272D32; --line-strong: #353D43;
     --accent: #E0A63F; --accent-soft: #3A2E15;
     --verified: #37B87F; --verified-soft: #16281F;
     --danger: #E6635C; --danger-soft: #2C1917;
-    --header-bg: rgba(23,27,30,0.82);
+    --header-bg: rgba(32, 36, 40, 0.85);
   }
 
   * { box-sizing: border-box; }
@@ -76,8 +76,15 @@
     background: var(--header-bg); backdrop-filter: saturate(1.4) blur(10px);
     border-bottom: 1px solid var(--line);
   }
-  .topbar .inner { max-width: var(--maxw); margin: 0 auto; padding: 0.7rem clamp(1.1rem, 4vw, 2.4rem);
-    display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .topbar .inner { 
+    max-width: var(--maxw); 
+    margin: 0 auto; 
+    padding: 0.7rem clamp(1.1rem, 4vw, 2.4rem);
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    gap: 1rem;
+  }
   .lock { display: flex; align-items: center; gap: 0.7rem; }
   .brand { font-family: var(--mono); font-weight: 700; letter-spacing: 0.04em; font-size: 0.95rem; color: var(--ink); }
   .brand span { color: var(--accent); }

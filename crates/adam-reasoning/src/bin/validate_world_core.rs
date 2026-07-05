@@ -58,7 +58,7 @@ fn main() -> ExitCode {
         }
         stats.fact_count += entry.facts.len();
         // Non-Kazakh sentence audit.
-        if let Some(reason) = non_kazakh_reason(&entry.kk) {
+        if let Some(reason) = non_kazakh_reason(&entry.kk, &entry.domain) {
             stats.non_kazakh.push((entry.id.clone(), reason));
         }
     }
@@ -124,19 +124,68 @@ struct DomainStats {
     non_kazakh: Vec<(String, String)>,
 }
 
+/// Domain-name prefixes whose Kazakh text inherently carries non-Kazakh
+/// *letters* — programming keywords, chemical formulas, physics / maths
+/// symbols.  In these domains the Cyrillic-only rule is relaxed to allow
+/// non-Cyrillic letters (`async`, `Future-ды`, `H₂O`), because flagging a
+/// domain's own subject matter is noise, not a purity signal.  General
+/// knowledge domains (history, literature, geography …) stay strict.
+const TECHNICAL_DOMAIN_PREFIXES: &[&str] = &[
+    "programming",
+    "rust_curriculum",
+    "language_features",
+    "computer_science",
+    "chemistry",
+    "physics",
+    "mathematics",
+];
+
+fn domain_allows_latin(domain: &str) -> bool {
+    TECHNICAL_DOMAIN_PREFIXES
+        .iter()
+        .any(|p| domain.starts_with(p))
+}
+
+/// Non-Cyrillic characters that are *notation, not prose*: maths / science
+/// operators, typographic marks, sub- and superscripts, and the Greek
+/// letters used as maths symbols.  Allowing these clears formula /
+/// notation warnings in every domain without ever letting Latin or Russian
+/// *prose* pass — letters are handled separately, so no word can sneak
+/// through on the back of a symbol.
+const ALLOWED_SYMBOLS: &[char] = &[
+    // operators & comparison
+    '*', '/', '+', '=', '<', '>', '±', '×', '÷', '·', '−', '≤', '≥', '≠', '≈', '≡', //
+    // arrows & set notation
+    '→', '←', '↔', '⟺', '⊂', //
+    // typographic & structural punctuation
+    '–', '_', '#', '|', '&', '\\', '[', ']', '{', '}', '\'', '…', '~', '′', '″', //
+    // units & marks
+    '°', '№', '%', '‰', 'µ', '√', '∞', //
+    // superscripts / subscripts
+    '⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹', '⁺', '⁻', //
+    '₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉', //
+    // Greek letters used as maths / science symbols
+    'α', 'β', 'γ', 'δ', 'ε', 'θ', 'λ', 'π', 'ρ', 'σ', 'τ', 'φ', 'ω', 'Δ', 'Φ', 'Ω', 'Σ', 'Π',
+];
+
 /// Returns `Some(reason)` if the Kazakh sentence contains characters
 /// outside the allowed set. Allowed: Cyrillic (Kazakh alphabet), ASCII
-/// digits, dash, common punctuation, whitespace, em-dash, quotes.
+/// digits, common punctuation, whitespace, em-dash, quotes, plus the
+/// science / maths notation in [`ALLOWED_SYMBOLS`].
 ///
-/// **v4.7.0** — corpus-purity carve-out for technical text:
-/// backtick-quoted spans (`fn`, `let`, `Vec<T>`, `Cargo.toml` etc.)
-/// are treated as code identifiers and bypass the Cyrillic-only
-/// check. The carve-out applies ONLY inside paired backticks; bare
-/// Latin prose outside backticks is still flagged. This lets the
-/// `programming_rust.jsonl` domain (and any future technical
-/// domain) embed Rust keywords / types / commands verbatim while
-/// keeping the Kazakh-only directive intact for free prose.
-fn non_kazakh_reason(kk: &str) -> Option<String> {
+/// **Technical-text carve-outs.**
+/// 1. **Backtick spans** (`fn`, `let`, `Vec<T>`, `Cargo.toml`) are treated
+///    as code identifiers and bypass the check (since v4.7.0).
+/// 2. **Notation symbols** ([`ALLOWED_SYMBOLS`]) are allowed everywhere —
+///    formulas and units are not loanwords.
+/// 3. **Technical domains** ([`TECHNICAL_DOMAIN_PREFIXES`]) additionally
+///    allow non-Cyrillic letters, so a Rust or chemistry entry can name
+///    its own vocabulary (`async`, `H₂O`, `Future-ды`) without a warning.
+///
+/// Bare Latin prose in a general-knowledge domain is still flagged, so the
+/// Kazakh-only directive holds where it matters.
+fn non_kazakh_reason(kk: &str, domain: &str) -> Option<String> {
+    let allow_latin = domain_allows_latin(domain);
     let mut in_code = false;
     for ch in kk.chars() {
         if ch == '`' {
@@ -152,7 +201,9 @@ fn non_kazakh_reason(kk: &str) -> Option<String> {
                 ',' | '.' | ';' | ':' | '-' | '—' | '«' | '»' | '"' | '(' | ')' | '?' | '!'
             )
             || ch.is_ascii_digit()
-            || is_cyrillic(ch);
+            || is_cyrillic(ch)
+            || ALLOWED_SYMBOLS.contains(&ch)
+            || (allow_latin && ch.is_alphabetic() && !is_cyrillic(ch));
         if !ok {
             return Some(format!(
                 "contains non-Kazakh / non-punctuation character: `{ch}` (U+{:04X})",
@@ -161,6 +212,43 @@ fn non_kazakh_reason(kk: &str) -> Option<String> {
         }
     }
     None
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn technical_domain_allows_latin_vocabulary() {
+        assert!(non_kazakh_reason("async fn — Future-ды қайтарады", "programming_rust").is_none());
+        assert!(non_kazakh_reason("H₂O — судың формуласы", "chemistry_school").is_none());
+    }
+
+    #[test]
+    fn general_domain_still_flags_bare_latin() {
+        // A stray Latin word in a history entry must still warn.
+        assert!(non_kazakh_reason("бұл hello деген сөз", "world_history").is_some());
+    }
+
+    #[test]
+    fn notation_symbols_allowed_everywhere() {
+        // Units, operators, superscripts, № — all notation, no letters.
+        assert!(
+            non_kazakh_reason("ауданы 5 м² · 2 = 10, №1, ≥ 3, ±0.5 → 7", "world_history").is_none()
+        );
+    }
+
+    #[test]
+    fn degree_letter_still_flags_in_general_domain() {
+        // «°C» carries a Latin C; outside a technical domain that is still
+        // a warning (write °С in Cyrillic, or use a technical domain).
+        assert!(non_kazakh_reason("температура 5 °C", "world_history").is_some());
+    }
+
+    #[test]
+    fn backtick_code_span_still_bypasses() {
+        assert!(non_kazakh_reason("`Vec<T>` дегеніміз тізбек", "world_history").is_none());
+    }
 }
 
 fn is_cyrillic(ch: char) -> bool {
