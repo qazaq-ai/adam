@@ -150,6 +150,12 @@ fn main() {
 
     let timestamp = args.today.unwrap_or_else(|| "2026-06-23".into());
 
+    // The production suites shell out to `respond_full`; if it isn't
+    // built the runs silently score `null`.  Build it up front (once) so
+    // the dashboard reports real numbers instead of a wall of nulls, and
+    // fail loudly with the exact command if the build itself fails.
+    ensure_respond_full_built();
+
     let mut suites = Vec::new();
 
     // ── Production single-turn suites via respond_full ──────────
@@ -264,6 +270,32 @@ const PRODUCTION_SUITES: &[(&str, &str, Option<Baseline>)] = &[
         None,
     ),
 ];
+
+/// Ensure the `respond_full` binary exists before the production suites
+/// run.  If it is missing, build it once; if the build fails, exit with
+/// the exact command to run rather than letting every suite score null.
+fn ensure_respond_full_built() {
+    if std::path::Path::new(RESPOND_FULL_BIN).exists() {
+        return;
+    }
+    eprintln!(
+        "[eval_dashboard] {RESPOND_FULL_BIN} not found — building it \
+         (cargo build --release --bin respond_full)…"
+    );
+    let built = Command::new("cargo")
+        .args(["build", "--release", "--bin", "respond_full"])
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false);
+    if !built || !std::path::Path::new(RESPOND_FULL_BIN).exists() {
+        eprintln!(
+            "[eval_dashboard] ERROR: could not build respond_full. Build it \
+             manually before running the dashboard:\n    \
+             cargo build --release --bin respond_full"
+        );
+        std::process::exit(1);
+    }
+}
 
 fn run_respond_full_suite(name: &str, path: &str, baseline: Option<Baseline>) -> SuiteResult {
     let output = Command::new(RESPOND_FULL_BIN)

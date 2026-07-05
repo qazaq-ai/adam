@@ -1,9 +1,9 @@
 # adam — Due Diligence Pack
 
-**Last updated:** 2026-06-29
+**Last updated:** 2026-07-05
 **Branch:** `main`
-**HEAD commit:** `032e4bc6` (v6.9.0)
-**Workspace version:** `6.9.0`
+**HEAD commit:** `d7ebaae2` (v6.12.0)
+**Workspace version:** `6.12.1`
 
 This document is intentionally a flat list of facts. Numbers come from
 commands you can re-run yourself; everything labelled "limitation" or
@@ -20,28 +20,72 @@ over a curated fact graph → reasoner → realiser. The voice surface
 intent classifier → router → TTS loop. Neural components live ONLY
 at the audio ↔ text boundary; they never invent facts.
 
-- **Language:** Rust (workspace, 29 crates + 18 tools).
+The current commercial focus (v6.10 → v6.12) is the industrial
+**OT/ТБ (охрана труда / техника безопасности)** line: a deterministic
+safety-briefing session engine that runs инструктаж → oral knowledge
+check → допуск/недопуск, then seals the graded result into a
+cryptographically verifiable, identity-bound **work-admission
+credential** (Ed25519, RFC 8032, verifiable by any third party without
+trusting our program). See §"Industrial OT/ТБ line" below.
+
+- **Language:** Rust (workspace, 30 crates + 18 tools).
 - **License:** BUSL-1.1.
 - **Hardware:** MacBook Air M2, 8 GB RAM (the daily development target).
 - **No cloud dependency:** every component runs locally; no inference
   API calls, no telemetry.
 
+### Industrial OT/ТБ line (current commercial focus)
+
+The applied wedge is an **offline evidence engine for work-admission
+(допуск)**, not a training platform. The pipeline, all deterministic:
+
+1. **Session engine** ([`briefing_session.rs`](crates/adam-dialog/src/briefing_session.rs)) —
+   walks a worker through a curated procedure's steps, then asks
+   control questions **generated from the procedure's own fields**
+   (authorization / steps / hazards / mitigations / gates); no invented
+   questions or answers. Grades oral answers by Kazakh prefix-overlap
+   with a per-source coverage floor (stricter for safety-critical
+   questions), and issues допуск/недопуск — a single failed
+   hazard/mitigation/gate answer blocks admission regardless of the
+   average.
+2. **Protocol Seal** ([`briefing_seal.rs`](crates/adam-dialog/src/briefing_seal.rs) +
+   the zero-dependency [`adam-seal`](crates/adam-seal) crate) — seals
+   the graded result into a W3C-Verifiable-Credentials-shaped
+   work-admission credential (`adam-dopusk-credential/2`), signed with
+   pure-Rust **Ed25519 (RFC 8032)**. The credential binds *who answered*
+   (`credentialSubject`), *who admitted them and by what authority*
+   (`issuer` + a signed `authorityAssertion`, verified against the
+   signing key), and *which SOP version* (`procedure.sopHash`). Anyone
+   can verify it with any Ed25519 implementation; editing any field
+   breaks the signature. `credentialStatus` / `prevRecordHash` are
+   reserved for a future revocation ledger.
+3. **Corpus** — 33 curated OT/ТБ procedures
+   (`data/procedures/labor_safety_kz.jsonl`), trilingual (kk/ru/en),
+   each grounded in a real regulation, CI-validated.
+
+Positioned against a real but modest global EHS-software market
+(~$2–8 B depending on definition, incumbents already shipping AI); the
+differentiation is deterministic + offline + Kazakh-first + a
+cryptographically verifiable допуск, not feature breadth.
+
 ## 2. Repository state
 
 | Metric | Value |
 | --- | --- |
-| HEAD branch | `main` (v6.9.0 release tag; arc v6.8.34 → v6.8.51 consolidated 2026-06-29) |
-| HEAD commit | `032e4bc6` |
+| HEAD branch | `main` (v6.12.0 release tag; OT/ТБ arc v6.10.0 → v6.12.0: session engine → grader hardening → Protocol Seal → identity/authority credential) |
+| HEAD commit | `d7ebaae2` |
 | `school_program_eval` (14 subjects, production) | **159 / 159 = 100 %** semantic |
 | `conv_dialog_eval` (44 real voice REPL + 39 scripted) | **52 / 52 = 100 %** semantic (31 probes document gaps) |
 | `safety_eval` (13 categories, release gate) | **22 / 22 = 100 %** semantic · 21 / 22 = 95 % strict (32 probes) |
 | `v6_7_real_audit_eval` | **26 / 26 = 100 %** semantic · 21 / 26 = 81 % strict |
 | `speech_defect_eval` (8 defect categories) | 54 / 71 = **76 %** semantic (v6.8.31 kappacism start-letter correction lifted from 52 % baseline; plateau pending v7) |
-| `procedure_eval` (NEW v6.9.0, 15 procedures, industrial-pilot gate) | **18 / 19 = 95 %** strict + semantic (18 / 18 = 100 % on accepted-only cases; closed 8 of 9 baseline failures in one work day) |
+| `procedure_eval` (industrial-pilot gate, 33 procedures) | **19 / 19 = 100 %** strict + semantic |
+| `briefing_session` (OT/ТБ session engine) | **15 / 15** (11 unit + 4 integration) |
+| Protocol Seal (`adam-seal` KAT) | **8 / 8** — 4 RFC 8032 Ed25519 vectors (pubkey/sign/verify) + FIPS 180-4 SHA-256/512; seal round-trip/tamper suite **9 / 9** in `adam-dialog` |
 | `multi_turn_eval_v686` (Codex's gate) | **38 / 38 = 100 %** required cases |
 | Voice REPL live session (45 turns, 2026-06-16 evening) | 43 / 45 ≈ 96 % |
 | Legacy `blind_eval_v1` (kept as historical reference) | 97 / 100 (rc18 baseline; no longer the production gate) |
-| Workspace test files | run `cargo test --release --workspace --locked` for live counts (29 crates + 18 tools) |
+| Workspace test files | run `cargo test --release --workspace --locked` for live counts (30 crates + 18 tools) |
 | Largest crate (LOC) | `adam-dialog` (extended via v6.5 safety guard + v6.8 cascade patches + wellness::pain_support) |
 | World-core curated entries | 3 444 in `data/world_core/*.jsonl` (65 domains, unchanged since v6.3) |
 | Reasoning facts | 4 116 extracted + 37 991 derived |
@@ -98,27 +142,25 @@ cargo build --release --bin respond_full
 Each invocation prints `strict` (exact-token match) and `semantic`
 (content-roots overlap ≥ 0.70) scores, plus per-subject and
 per-topic rollups. The numbers reported in §2 above are semantic
-scores at HEAD `fdf21456`.
+scores confirmed at HEAD `d7ebaae2` (v6.12.0).
 
 The contrast with `respond` (LM-only) is intentional: `respond` runs
 the v6.7 generative head WITHOUT world_core / reasoning / domain
 inference, so its school_program score (78 %) reports the LM ceiling
 alone, not the production ceiling.
 
-### The 1 failing test (`rust_book_chapter_15_holdout`)
+### Workspace test status (green at HEAD)
 
 ```sh
-cargo test --release -p adam-dialog --test rust_book_chapter_15
-# → 1/18 cases fails: ch15_smart_pointer
-# Query: «Ақылды сілтеме деген не?» → got: «Рахмет»
-# Expected any of: «қосымша мінез-құлық», «weak<t>», «interior mutability»
+cargo test --release --workspace --locked
+# → 0 failures across the workspace (294 test-result groups at v6.12.0)
 ```
 
-**This test passed in v4.85.5** (commit `6eaa579c`, the release that
-shipped chapter 15). Some intervening refactor across ~100 commits
-broke routing for that one query — substring «рахмет» (thanks) fires
-instead of the smart-pointer concept lookup. This is the only red
-regression test in the workspace; tracked for a focused fix.
+The previously-tracked red regression `rust_book_chapter_15_holdout`
+(`ch15_smart_pointer`: «Ақылды сілтеме деген не?» mis-routed to the
+«рахмет» / thanks substring) is now **green** — verified directly with
+`cargo test --release -p adam-dialog --test rust_book_chapter_15`
+(18 / 18). No red regression tests remain in the workspace.
 
 ### Replay battery (voice REPL transcripts)
 

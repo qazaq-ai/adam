@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.12.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.12.1-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -25,7 +25,7 @@
   <img src="https://img.shields.io/badge/safety%20eval-21%2F22%20strict%20·%2022%2F22%20sem-FBC02D?style=flat-square" alt="safety 21/22 strict · 22/22 semantic">
   <img src="https://img.shields.io/badge/real%20audit-21%2F26%20strict%20·%2026%2F26%20sem-FBC02D?style=flat-square" alt="real audit 21/26 strict · 26/26 semantic">
   <img src="https://img.shields.io/badge/speech%20defect-54%2F71-FBC02D?style=flat-square" alt="speech defect 76%">
-  <img src="https://img.shields.io/badge/procedure%20eval-18%2F19-2EA44F?style=flat-square" alt="procedure eval 95%">
+  <img src="https://img.shields.io/badge/procedure%20eval-19%2F19-2EA44F?style=flat-square" alt="procedure eval 100%">
   <img src="https://img.shields.io/badge/multi--turn%20required-38%2F38-2EA44F?style=flat-square" alt="multi-turn 38/38">
   <img src="https://img.shields.io/badge/production%20p50-13.6%20ms-2EA44F?style=flat-square" alt="production p50">
   <img src="https://img.shields.io/badge/peak%20RSS-314%20MB-2EA44F?style=flat-square" alt="peak RSS">

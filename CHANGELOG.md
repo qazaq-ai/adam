@@ -28,6 +28,25 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.12.1] — 2026-07-05 — due-diligence currency + eval-dashboard DX
+
+Housekeeping after an external local verification pass.
+
+- **`DUE_DILIGENCE.md` refreshed to v6.12.0.** It was still pinned to
+  v6.9.0 (`032e4bc6`) and reported `rust_book_chapter_15_holdout` as the
+  one red regression — that test is now green (verified directly). The
+  header, crate count (29 → 30), and eval table are updated;
+  `procedure_eval` is now 19/19 strict + semantic over 33 procedures, and
+  new rows cover the `briefing_session` engine (15/15) and the Protocol
+  Seal KAT (8/8 RFC 8032 + FIPS + 9/9 seal tamper suite). A new
+  "Industrial OT/ТБ line" subsection documents the current commercial
+  focus (session engine → verifiable допуск credential).
+- **`eval_dashboard` fails loudly instead of scoring `null`.** When the
+  `respond_full` binary was not built, every production suite silently
+  scored `null`; the dashboard now builds it up front (once) and, if the
+  build fails, exits with the exact `cargo build --release --bin
+  respond_full` command.
+
 ## [6.12.0] — 2026-07-04 — identity & authority chain (verifiable допуск credential)
 
 **Stripe — Deterministic AI research.** v6.11.0 signed the protocol's
