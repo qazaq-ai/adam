@@ -8,13 +8,11 @@
   Локальная демо-страница. Полностью автономна: ноль внешних запросов,
   открывается по file:// без интернета.
 
-  ▸ Логотип ERG: замените плейсхолдер в <header> (элемент .clientmark)
-    на официальный ассет заказчика, например:
-      <img class="clientlogo" src="data:image/svg+xml;base64,…" alt="ERG">
-    или положите файл рядом и сошлитесь: <img src="erg-logo.svg" alt="ERG">
-  ▸ Favicon: замените data-URI в <link rel="icon"> на иконку заказчика.
+  Бренд-знак в шапке — наш shanraq (assets/shanraq.svg), встроен инлайном
+  с префиксными классами sq-* (без глобальных коллизий).  «Подготовлено
+  для ERG · ССГПО» — подпись адресата питча, не их товарный знак.
 -->
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23B26E14'/%3E%3Cpath d='M12 4l7 3v4.5c0 4-2.9 6.9-7 8.5-4.1-1.6-7-4.5-7-8.5V7z' fill='none' stroke='%23fff' stroke-width='1.6'/%3E%3Cpath d='M8.5 12.2l2.4 2.4 4.6-4.8' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cg stroke='%23e53935' stroke-width='45' stroke-linecap='round'%3E%3Cline x1='76' y1='76' x2='324' y2='324'/%3E%3Cline x1='137' y1='37' x2='363' y2='263'/%3E%3Cline x1='37' y1='137' x2='263' y2='363'/%3E%3Cline x1='76' y1='324' x2='324' y2='76'/%3E%3Cline x1='137' y1='363' x2='363' y2='137'/%3E%3Cline x1='37' y1='263' x2='263' y2='37'/%3E%3C/g%3E%3C/svg%3E">
 <style>
   :root {
     --bg: #EBEEF0; --surface: #FBFCFD; --surface-2: #F1F3F5;
@@ -85,8 +83,19 @@
   .brand span { color: var(--accent); }
   .sep { width: 1px; height: 20px; background: var(--line-strong); }
   .clientmark { display: flex; align-items: center; gap: 0.5rem; font-family: var(--mono); font-size: 0.74rem; color: var(--ink-soft); letter-spacing: 0.04em; }
-  /* placeholder logo tile — swap for the real ERG asset */
-  .clientlogo-ph { width: 26px; height: 26px; border-radius: 6px; border: 1px dashed var(--line-strong); display: grid; place-items: center; font-weight: 700; font-size: 0.72rem; color: var(--ink-faint); }
+
+  /* ---- shanraq brand mark (inlined assets/shanraq.svg, sq-* scoped) ---- */
+  .brandlogo { display: inline-flex; width: 30px; height: 30px; flex: none; }
+  .brandlogo svg { width: 30px; height: 30px; display: block; }
+  .sq-scale { transform: scale(0.85); transform-origin: 200px 200px; }
+  .sq-stroke { fill: none; stroke: rgba(229, 57, 53, .35); stroke-width: 45; stroke-linecap: round; }
+  .sq-flow { fill: none; stroke: #e53935; stroke-width: 30; stroke-linecap: round; stroke-dasharray: 60; stroke-dashoffset: 120; animation-duration: 1.83s; animation-iteration-count: infinite; animation-timing-function: linear; }
+  .sq-flow-1, .sq-flow-4 { animation-name: sq-fwd; }
+  .sq-flow-2, .sq-flow-3, .sq-flow-5, .sq-flow-6 { animation-name: sq-rev; }
+  .sq-heartbeat { animation: sq-beat 1.83s ease-in-out infinite; transform-origin: 200px 200px; }
+  @keyframes sq-fwd { 0%{stroke-dashoffset:180;opacity:.7} 12%{opacity:1} 20%{opacity:.7} 42%{opacity:1} 55%{stroke-dashoffset:40;opacity:.7} 100%{stroke-dashoffset:0;opacity:.7} }
+  @keyframes sq-rev { 0%{stroke-dashoffset:0;opacity:.7} 12%{opacity:1} 20%{opacity:.7} 42%{opacity:1} 55%{stroke-dashoffset:140;opacity:.7} 100%{stroke-dashoffset:180;opacity:.7} }
+  @keyframes sq-beat { 0%{transform:scale(1)} 12%{transform:scale(1.08)} 25%{transform:scale(1)} 42%{transform:scale(1.05)} 55%{transform:scale(1)} 100%{transform:scale(1)} }
 
   /* ---- theme switch (sun / moon) ---- */
   .switch { --w: 58px; --h: 28px; position: relative; width: var(--w); height: var(--h); border-radius: 999px;
@@ -184,7 +193,10 @@
   .footrow a { color: var(--accent); text-decoration: none; font-family: var(--mono); font-size: 0.82rem; }
   .footrow a:hover { text-decoration: underline; }
 
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto; } }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; scroll-behavior: auto; }
+    .sq-heartbeat, .sq-flow { animation: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -193,10 +205,27 @@
 <div class="topbar">
   <div class="inner">
     <div class="lock">
+      <span class="brandlogo" aria-hidden="true">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <g class="sq-scale"><g class="sq-heartbeat">
+            <line class="sq-stroke" x1="76" y1="76" x2="324" y2="324"/>
+            <line class="sq-stroke" x1="137" y1="37" x2="363" y2="263"/>
+            <line class="sq-stroke" x1="37" y1="137" x2="263" y2="363"/>
+            <line class="sq-stroke" x1="76" y1="324" x2="324" y2="76"/>
+            <line class="sq-stroke" x1="137" y1="363" x2="363" y2="137"/>
+            <line class="sq-stroke" x1="37" y1="263" x2="263" y2="37"/>
+            <line class="sq-flow sq-flow-1" x1="76" y1="76" x2="324" y2="324"/>
+            <line class="sq-flow sq-flow-2" x1="137" y1="37" x2="363" y2="263"/>
+            <line class="sq-flow sq-flow-3" x1="37" y1="137" x2="263" y2="363"/>
+            <line class="sq-flow sq-flow-4" x1="76" y1="324" x2="324" y2="76"/>
+            <line class="sq-flow sq-flow-5" x1="137" y1="363" x2="363" y2="137"/>
+            <line class="sq-flow sq-flow-6" x1="37" y1="263" x2="263" y2="37"/>
+          </g></g>
+        </svg>
+      </span>
       <div class="brand">ADAM<span>·</span>ОТ/ТБ</div>
       <div class="sep" aria-hidden="true"></div>
-      <!-- ▸ ERG logo slot: replace .clientlogo-ph with <img class="clientlogo" src="…" alt="ERG"> -->
-      <div class="clientmark"><span class="clientlogo-ph" aria-hidden="true">ERG</span>подготовлено для ERG · ССГПО</div>
+      <div class="clientmark">подготовлено для ERG · ССГПО</div>
     </div>
     <button class="switch" id="themeSwitch" role="switch" aria-checked="false" aria-label="Тёмная тема">
       <span class="ghost l" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg></span>
