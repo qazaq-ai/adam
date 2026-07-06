@@ -28,6 +28,26 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.13.2] — 2026-07-06 — portal briefing: spoken slides (voice + SOP slides)
+
+Makes the portal feel like a real инструктаж rather than a text form —
+the first half of "инструктаж через видеосвязь от нашей модели ИИ".
+
+- **SOP slides.** Each briefing step and control question renders as a
+  formatted slide in the worker page, with an accent rail and a
+  «Нұсқаулық» / «Бақылау сұрағы» kind label so a worker sees where they
+  are.
+- **Voice.** The slide/question is read aloud in Kazakh via the browser's
+  Web Speech API (kk-KZ voice, falling back to ru-RU, then any) — zero
+  backend, offline, always available. A «🔊 Дауыс» on/off toggle and a
+  «↻ Қайта» replay button; speech starts on the worker's first gesture
+  (the Start button) per browser autoplay rules, and is cancelled on
+  finish. Gracefully disables when no speech engine is present.
+- Front-end only — the deterministic engine and signed допуск are
+  unchanged. NOTE: this is the reliable baseline voice; serving our own
+  neural Kazakh Piper voice from the server (`/api/tts`) is the next
+  increment (#2b).
+
 ## [6.13.1] — 2026-07-06 — portal persistence + stable signing key
 
 Closes the two prototype defects that would have sunk a real pilot.

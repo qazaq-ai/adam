@@ -37,6 +37,18 @@
   button.ghost{background:transparent;color:var(--ink);border-color:var(--line-strong)}
   button:disabled{opacity:.5;cursor:default}
   .prompt{font-size:1.12rem;white-space:pre-wrap;margin:0 0 .3rem}
+  .slidebar{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:.6rem}
+  .slidekind{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;
+    padding:.18rem .55rem;border-radius:5px;background:var(--surface-2);color:var(--ink-soft)}
+  .slidekind.quiz{color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent)}
+  .vctl{display:flex;gap:.4rem}
+  .chip{font-family:var(--mono);font-size:.72rem;padding:.32rem .6rem;border-radius:999px;cursor:pointer;
+    border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);margin:0}
+  .chip.off{opacity:.5}
+  .slide{font-size:1.28rem;line-height:1.5;white-space:pre-wrap;background:var(--surface-2);
+    border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;
+    padding:1.1rem 1.2rem;margin:0 0 .3rem;min-height:4.5rem}
+  .slide.quiz{border-left-color:var(--accent);font-weight:600}
   .step-meta{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);margin-bottom:.9rem}
   .hint{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);margin-top:.5rem}
   .verdict{border-radius:12px;padding:1.1rem 1.2rem;font-family:var(--mono);font-weight:700;
@@ -78,8 +90,15 @@
 
   <!-- 2. Briefing session -->
   <section id="session" class="card hidden">
+    <div class="slidebar">
+      <span class="slidekind" id="slidekind">Нұсқаулық</span>
+      <div class="vctl">
+        <button id="voiceBtn" class="chip" type="button" title="Дауыс қосу/өшіру">🔊 Дауыс</button>
+        <button id="replayBtn" class="chip" type="button" title="Қайта тыңдау">↻ Қайта</button>
+      </div>
+    </div>
+    <div class="slide" id="prompt"></div>
     <div class="step-meta" id="meta"></div>
-    <p class="prompt" id="prompt"></p>
     <label for="answer">Жауап / Ответ</label>
     <input id="answer" autocomplete="off">
     <div>
@@ -125,10 +144,36 @@
 
   function show(sec) { ["login","session","result"].forEach(s => $(s).classList.toggle("hidden", s !== sec)); }
 
+  // ---- голос ИИ: браузерный синтез (казахский → русский → любой) ----
+  let voiceOn = true, ttsVoice = null, lastText = "";
+  const synth = window.speechSynthesis || null;
+  function pickVoice() {
+    if (!synth) return;
+    const vs = synth.getVoices() || [];
+    ttsVoice = vs.find(v => /^kk/i.test(v.lang)) || vs.find(v => /^ru/i.test(v.lang)) || vs[0] || null;
+  }
+  if (synth) { pickVoice(); synth.onvoiceschanged = pickVoice; }
+  function speak(text) {
+    lastText = text || "";
+    if (!voiceOn || !synth || !text) return;
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    if (ttsVoice) u.voice = ttsVoice;
+    u.lang = ttsVoice ? ttsVoice.lang : "kk-KZ";
+    u.rate = 0.98;
+    synth.speak(u);
+  }
+
   function render(reply) {
+    const isQuiz = /^\s*Сұрақ/i.test(reply.text || "");
     $("prompt").textContent = reply.text;
-    $("phase").textContent = reply.done ? "" : "Инструктаж жалғасуда…";
-    if (reply.done) finish();
+    $("prompt").classList.toggle("quiz", isQuiz);
+    const kind = $("slidekind");
+    kind.textContent = isQuiz ? "Бақылау сұрағы" : "Нұсқаулық";
+    kind.classList.toggle("quiz", isQuiz);
+    $("phase").textContent = reply.done ? "" : (isQuiz ? "Сұраққа жауап беріңіз…" : "Тыңдаңыз, содан кейін «Түсінікті»…");
+    speak(reply.text);
+    if (reply.done) { if (synth) synth.cancel(); finish(); }
   }
 
   async function start() {
@@ -175,6 +220,14 @@
   $("sendBtn").onclick = () => send();
   $("ackBtn").onclick = () => send("түсінікті");
   $("answer").addEventListener("keydown", e => { if (e.key === "Enter") send(); });
+  $("voiceBtn").onclick = () => {
+    voiceOn = !voiceOn;
+    $("voiceBtn").classList.toggle("off", !voiceOn);
+    $("voiceBtn").textContent = voiceOn ? "🔊 Дауыс" : "🔇 Дауыс";
+    if (!voiceOn && synth) synth.cancel(); else if (voiceOn) speak(lastText);
+  };
+  $("replayBtn").onclick = () => speak(lastText);
+  if (!synth) { $("voiceBtn").classList.add("off"); $("voiceBtn").textContent = "🔇 жоқ"; $("voiceBtn").disabled = true; }
   loadProcedures();
 </script>
 </body>
