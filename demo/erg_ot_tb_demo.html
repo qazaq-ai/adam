@@ -257,11 +257,11 @@
     </p>
     <p class="notplatform">offline evidence engine для допуска к опасной работе</p>
     <div class="metastrip">
-      <span><b>0</b> облака / сети</span>
-      <span><b>~314 MB</b> RSS</span>
+      <span><b>0</b> облачного ИИ</span>
+      <span><b>self-hosted</b> веб-портал</span>
       <span><b>Ed25519</b> RFC&nbsp;8032</span>
       <span><b>33</b> процедуры ОТ/ТБ</span>
-      <span><b>v6.12.1</b></span>
+      <span><b>v6.14.0</b></span>
     </div>
   </div>
 </header>
@@ -285,9 +285,24 @@
 <section>
   <div class="wrap">
     <div class="sec-head">
+      <p class="eyebrow">Как это работает у вас</p>
+      <h2>Веб-портал на ваших серверах. Рабочий проходит из дома.</h2>
+      <p>«Offline» = без стороннего облачного ИИ и данные не покидают серверы предприятия — но это полноценный веб-портал. Приказ №223 (с 12.07.2026) легализует дистанционный инструктаж с видеофиксацией.</p>
+    </div>
+    <div class="wedge">
+      <div class="w"><h3><span class="mono">кабинет работника</span>Говорящий инструктаж</h3><p>Заходит под своей учёткой из дома или киоска. ИИ читает шаги SOP <b>казахским голосом</b>, показывает слайды, затем устный контроль знаний.</p></div>
+      <div class="w"><h3><span class="mono">камера-прокторинг</span>Допуск привязан к лицу</h3><p>Снимок при старте, его SHA-256 <b>вшивается в подпись допуска</b>. Подменить «кто проходил» задним числом нельзя — доказательство при НС.</p></div>
+      <div class="w"><h3><span class="mono">дашборд ИТҚ</span>Журнал и контроль</h3><p>ИТР видит все выданные допуски в реальном времени: фото, вердикт, статус подписи. Журнал переживает перезапуск, допуска проверяемы годами.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
       <p class="eyebrow">Живой артефакт</p>
       <h2>Подделать протокол задним числом — нельзя.</h2>
-      <p>Ниже — настоящий подписанный допуск (процедура LOTO, движок v6.12.1). Измените любое поле — подпись перестанет сходиться. Проверьте сами.</p>
+      <p>Ниже — настоящий подписанный допуск (движок v6.14.0). Измените любое поле — подпись перестанет сходиться. Проверьте сами.</p>
     </div>
     <div class="demo">
       <div class="card">
@@ -296,12 +311,13 @@
           <span class="badge ok" id="cred-badge">admitted</span>
         </div>
         <div class="cred">
-          <div class="row"><span class="k">schema</span><span class="v">adam-dopusk-credential/2</span></div>
+          <div class="row"><span class="k">schema</span><span class="v">adam-dopusk-credential/3</span></div>
           <div class="row"><span class="k">issuer</span><span class="v">Досжан · <span style="color:var(--accent)">ИТҚ</span></span></div>
           <div class="row indent"><span class="k">authority</span><span class="v">«жеке басын растадым, жіберуге өкілеттімін»</span></div>
           <div class="row"><span class="k">subject</span><span class="v">Асан Асанов · SSGPO-EMP-12345</span></div>
-          <div class="row indent"><span class="k">idMethod</span><span class="v">operator-confirmed</span></div>
-          <div class="row"><span class="k">procedure</span><span class="v">kk_metallurgy_loto_003</span></div>
+          <div class="row indent"><span class="k">idMethod</span><span class="v">camera-proctored</span></div>
+          <div class="row indent"><span class="k">proctorSha256</span><span class="hash">sha256:97c869a5f5…4bb2c05b</span></div>
+          <div class="row"><span class="k">procedure</span><span class="v">kk_labor_vvodnyi_016</span></div>
           <div class="row indent"><span class="k">sopHash</span><span class="hash">sha256:1758dd22da…557c364a</span></div>
           <div class="row"><span class="k">verdict</span><span class="v" id="cred-admitted">admitted: <b>true</b> · 6/6</span></div>
           <div class="row"><span class="k">signature</span><span class="hash">39c22ffd38…f4859e0b</span></div>
@@ -334,7 +350,7 @@
       <div class="w"><h3><span class="mono">qazaq-first</span>Казахский промышленный слой</h3><p>Понимает диктовку рабочего и локальные SOP, а не generic-английский LMS.</p></div>
       <div class="w"><h3><span class="mono">verifier</span>Детерминизм в пути истины</h3><p>Решение о допуске выносит правило, не вероятностная модель. Ноль галлюцинаций в покрытых доменах.</p></div>
       <div class="w"><h3><span class="mono">signed record</span>Проверяемый допуск</h3><p>Протокол проверяется любой реализацией Ed25519 — без доверия к поставщику.</p></div>
-      <div class="w"><h3><span class="mono">identity chain</span>Кто, кем, по какой SOP</h3><p>Подпись связывает работника, полномочия оператора и версию процедуры.</p></div>
+      <div class="w"><h3><span class="mono">identity chain</span>Кто (по лицу), кем, по какой SOP</h3><p>Подпись связывает работника (фото-хеш с камеры), полномочия оператора и версию процедуры — цельная доказательная цепочка.</p></div>
       <div class="w"><h3><span class="mono">process fit</span>Внутренняя комиссия</h3><p>Инструмент комиссии работодателя — там, где по закону РК и рождается допуск рабочего.</p></div>
     </div>
   </div>
@@ -351,14 +367,15 @@
         <div class="f"><div class="num">33</div><div class="lab">процедуры ОТ/ТБ, трёхъязычные, CI-валидированы</div></div>
         <div class="f"><div class="num">19/19</div><div class="lab">procedure_eval · strict + semantic</div></div>
         <div class="f"><div class="num">8/8</div><div class="lab">KAT крипто по RFC 8032 + FIPS</div></div>
-        <div class="f"><div class="num">294</div><div class="lab">групп тестов зелёные, 0 падений</div></div>
+        <div class="f"><div class="num">295</div><div class="lab">групп тестов зелёные, 0 падений</div></div>
       </div>
       <div class="honest">
-        <h3>Что ещё не сделано</h3>
+        <h3>Готово / что ещё не сделано</h3>
         <ul>
+          <li><b>Готово:</b> веб-портал, голос ИИ + слайды, камера-прокторинг, подписанный допуск, персистентный журнал и ключ.</li>
+          <li>Корпоративные учётки / SSO + TLS — для реального развёртывания на серверах предприятия.</li>
+          <li>Полное управление ключами: ротация, отзыв, реестр ролей операторов — следующий слой после пилота.</li>
           <li>Юридическая сверка применимости Приказа №223 (в силе 12.07.2026) и актуальности источников ГОСТ/ПУЭ — до пилота.</li>
-          <li>Полное управление ключами: ротация, отзыв, реестр ролей — следующий слой после пилота.</li>
-          <li>Голосовой ввод рабочего — пока shadow-режим с подтверждением оператора (точность 76% &lt; порога).</li>
           <li>Пока это не «сертифицированный аттестатор» — это инструмент внутренней комиссии.</li>
         </ul>
       </div>
