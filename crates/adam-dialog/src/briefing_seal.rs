@@ -9,14 +9,16 @@
 //! a court expert can then verify the seal with any independent Ed25519
 //! implementation — the artifact does not require trusting our program.
 //!
-//! ## Identity & authority chain (v6.12.0)
+//! ## Identity & authority chain (v6.12.0, proctoring v6.14.0)
 //!
 //! A signature over the *content* is not enough for a legally load-bearing
 //! допуск: an accident review asks *who answered*, *who admitted them and
 //! by what authority*, and *which version of the SOP* was briefed.  The
 //! envelope therefore binds:
-//! - **subject** — the worker (name + id reference + how identity was
-//!   established), the `credentialSubject`;
+//! - **subject** — the worker (name + id reference + `idMethod`, and when
+//!   camera-proctored a `proctorSha256` that cryptographically commits to
+//!   the worker's face snapshot stored on the enterprise's server), the
+//!   `credentialSubject`;
 //! - **issuer** — the operator/ИТҚ who admits, their authority `role`, an
 //!   explicit `authorityAssertion`, and their public key.  Verification
 //!   requires `issuer.publicKey == seal.publicKey`, so the authority
@@ -51,7 +53,7 @@ use serde::{Deserialize, Serialize};
 use crate::briefing_session::BriefingProtocol;
 
 /// Schema tag stored in every sealed credential.
-pub const SEALED_FORMAT: &str = "adam-dopusk-credential/2";
+pub const SEALED_FORMAT: &str = "adam-dopusk-credential/3";
 
 /// Credential `type` array (W3C-VC-shaped).
 pub const CREDENTIAL_TYPE: [&str; 2] = ["VerifiableCredential", "WorkAdmissionCredential"];
@@ -76,8 +78,12 @@ pub struct SealContext {
     /// Worker identity reference (badge / personnel id); may be empty.
     pub worker_id: String,
     /// How the worker's identity was established
-    /// (`operator-confirmed` / `badge` / `biometric` — the last reserved).
+    /// (`operator-confirmed` / `camera-proctored` / `badge` / `biometric`).
     pub worker_id_method: String,
+    /// `sha256:<hex>` of the proctoring snapshot taken at session start —
+    /// binds the worker's face to the допуск as accident-investigation
+    /// evidence.  Empty string = no proctoring image.
+    pub proctor_sha256: String,
     /// Operator / ИТҚ who conducted the briefing and admits the worker.
     pub operator: String,
     /// Operator's authority role (e.g. `ИТҚ`, `начальник участка`).
@@ -102,6 +108,7 @@ impl Default for SealContext {
             worker: String::new(),
             worker_id: String::new(),
             worker_id_method: DEFAULT_ID_METHOD.to_string(),
+            proctor_sha256: String::new(),
             operator: String::new(),
             operator_role: DEFAULT_OPERATOR_ROLE.to_string(),
             authority_assertion: DEFAULT_AUTHORITY_ASSERTION.to_string(),
@@ -133,6 +140,10 @@ pub struct CredentialSubject {
     pub name: String,
     pub id_ref: String,
     pub id_method: String,
+    /// `sha256:<hex>` of the proctoring snapshot (empty if none) — the
+    /// signed credential thus cryptographically commits to the worker's
+    /// face image, which is stored alongside on the enterprise's server.
+    pub proctor_sha256: String,
 }
 
 /// The SOP the worker was briefed and tested on.
@@ -303,6 +314,7 @@ impl BriefingProtocol {
                 name: ctx.worker.clone(),
                 id_ref: ctx.worker_id.clone(),
                 id_method: ctx.worker_id_method.clone(),
+                proctor_sha256: ctx.proctor_sha256.clone(),
             },
             procedure: ProcedureRef {
                 id: self.procedure_id.clone(),
@@ -541,5 +553,27 @@ mod tests {
                 .iter()
                 .all(|a| a.coverage_permille <= 1000)
         );
+    }
+
+    #[test]
+    fn proctoring_hash_is_bound_and_tamper_evident() {
+        let p = run_protocol(&["түсінікті"; 40]);
+        let key = SigningKey::from_seed([31u8; 32]);
+        let mut c = ctx();
+        c.worker_id_method = "camera-proctored".into();
+        c.proctor_sha256 = "sha256:abc123".into();
+        let mut sealed = p.seal_with(&c, &key, "6.13.3");
+        assert_eq!(
+            sealed.envelope.credential_subject.proctor_sha256,
+            "sha256:abc123"
+        );
+        assert_eq!(
+            sealed.envelope.credential_subject.id_method,
+            "camera-proctored"
+        );
+        assert!(sealed.verify().is_valid());
+        // Swapping the proctoring snapshot hash must break the seal.
+        sealed.envelope.credential_subject.proctor_sha256 = "sha256:deadbeef".into();
+        assert!(!sealed.verify().is_valid());
     }
 }

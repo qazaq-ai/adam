@@ -62,6 +62,10 @@
   .err{color:var(--danger);font-family:var(--mono);font-size:.82rem;margin-top:.6rem}
   a.dl{color:var(--accent);font-family:var(--mono);font-size:.8rem;display:inline-block;margin-top:.7rem}
   .hidden{display:none}
+  .cam{margin-top:1rem;display:flex;flex-direction:column;gap:.4rem}
+  .cam video{width:220px;height:165px;object-fit:cover;border-radius:10px;border:1px solid var(--line-strong);background:#000;transform:scaleX(-1)}
+  .cam.nocam video{display:none}
+  .camnote{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);margin:0;max-width:36ch}
 </style>
 </head>
 <body>
@@ -83,6 +87,10 @@
     <input id="wid" placeholder="SSGPO-EMP-12345" autocomplete="off">
     <label for="proc">Рәсім / Процедура</label>
     <select id="proc"><option>жүктелуде…</option></select>
+    <div class="cam" id="camwrap">
+      <video id="cam" autoplay playsinline muted></video>
+      <p class="camnote" id="camnote">📷 Камера жеке басты растайды — суреті допуск дәлелі ретінде сақталады.</p>
+    </div>
     <button id="startBtn" type="button">Бастау / Начать</button>
     <div id="loginErr" class="err"></div>
     <p class="hint">Тіл: қазақша сұрақтар. Жауапты өз сөзіңізбен жазыңыз.</p>
@@ -176,13 +184,44 @@
     if (reply.done) { if (synth) synth.cancel(); finish(); }
   }
 
+  // ---- камера-прокторинг: снимок при старте → хеш в допуск ----
+  let camStream = null;
+  async function initCam() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { noCam("камера қолжетімсіз"); return; }
+    try {
+      camStream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 }, audio: false });
+      $("cam").srcObject = camStream;
+    } catch (e) { noCam("камераға рұқсат жоқ — операторлық растау"); }
+  }
+  function noCam(msg) {
+    camStream = null;
+    $("camwrap").classList.add("nocam");
+    $("camnote").textContent = "⚠ " + msg;
+  }
+  async function captureProctor() {
+    if (!camStream) return "";
+    const v = $("cam");
+    const c = document.createElement("canvas");
+    c.width = v.videoWidth || 320; c.height = v.videoHeight || 240;
+    c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
+    const blob = await new Promise(r => c.toBlob(r, "image/jpeg", 0.85));
+    if (!blob) return "";
+    const r = await fetch("/api/proctor", { method: "POST", headers: { "Content-Type": "image/jpeg" }, body: blob });
+    if (!r.ok) return "";
+    return (await r.json()).proctorSha256 || "";
+  }
+  function stopCam() { if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; } }
+
   async function start() {
     const worker = $("worker").value.trim(), wid = $("wid").value.trim(), proc = $("proc").value;
     if (!worker) { $("loginErr").textContent = "Аты-жөні қажет."; return; }
     try {
-      const res = await api("/api/start", { worker, workerId: wid, procedureId: proc });
+      let proctorSha256 = "";
+      try { proctorSha256 = await captureProctor(); } catch (e) {}
+      const res = await api("/api/start", { worker, workerId: wid, procedureId: proc, proctorSha256 });
+      stopCam();
       sessionId = res.sessionId;
-      show("session"); $("meta").textContent = proc; render(res);
+      show("session"); $("meta").textContent = proc + (proctorSha256 ? " · 📷 расталды" : ""); render(res);
       $("answer").focus();
     } catch (e) { $("loginErr").textContent = "Қате: " + e.message; }
   }
@@ -229,6 +268,7 @@
   $("replayBtn").onclick = () => speak(lastText);
   if (!synth) { $("voiceBtn").classList.add("off"); $("voiceBtn").textContent = "🔇 жоқ"; $("voiceBtn").disabled = true; }
   loadProcedures();
+  initCam();
 </script>
 </body>
 </html>

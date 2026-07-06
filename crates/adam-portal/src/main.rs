@@ -36,7 +36,7 @@ use adam_dialog::briefing_seal::{SealContext, SealedProtocol};
 use adam_dialog::briefing_session::BriefingSession;
 use adam_dialog::procedure_loader::shared_procedures;
 use adam_dialog::system_clock::{read_clock, tz_offset_secs_from_env};
-use adam_seal::SigningKey;
+use adam_seal::{SigningKey, sha256, to_hex};
 use serde_json::{Value, json};
 
 const ENGINE_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -61,6 +61,8 @@ struct Admission {
     issuance_date: String,
     public_key: String,
     valid: bool,
+    id_method: String,
+    proctor_sha256: String,
 }
 
 impl Admission {
@@ -78,6 +80,8 @@ impl Admission {
             issuance_date: e.issuance_date.clone(),
             public_key: sealed.public_key().to_string(),
             valid: sealed.verify().is_valid(),
+            id_method: e.credential_subject.id_method.clone(),
+            proctor_sha256: e.credential_subject.proctor_sha256.clone(),
         }
     }
 }
@@ -87,6 +91,8 @@ struct Live {
     session: BriefingSession,
     worker: String,
     worker_id: String,
+    /// `sha256:<hex>` of the proctoring snapshot, or empty if none.
+    proctor_sha256: String,
 }
 
 struct AppState {
@@ -94,6 +100,8 @@ struct AppState {
     admissions: Vec<Admission>,
     key: SigningKey,
     journal_path: PathBuf,
+    /// Directory holding proctoring snapshots (`<hex>.jpg`).
+    proctor_dir: PathBuf,
 }
 
 fn main() {
@@ -129,11 +137,19 @@ fn main() {
         admissions.len()
     );
 
+    // Proctoring snapshots live next to the journal.
+    let proctor_dir = journal_path
+        .parent()
+        .unwrap_or_else(|| Path::new("."))
+        .join("proctor");
+    let _ = fs::create_dir_all(&proctor_dir);
+
     let state = Arc::new(Mutex::new(AppState {
         sessions: HashMap::new(),
         admissions,
         key,
         journal_path,
+        proctor_dir,
     }));
 
     let listener = match TcpListener::bind(ADDR) {
@@ -200,10 +216,15 @@ fn route(
     body: &[u8],
     state: &Mutex<AppState>,
 ) -> (u16, &'static str, Vec<u8>) {
+    // Proctoring snapshots are served from /proctor/<hex>.jpg.
+    if method == "GET" && path.starts_with("/proctor/") {
+        return serve_proctor(path, state);
+    }
     match (method, path) {
         ("GET", "/") => (200, "text/html; charset=utf-8", WORKER_HTML.into()),
         ("GET", "/itr") => (200, "text/html; charset=utf-8", ITR_HTML.into()),
         ("GET", "/api/procedures") => json_ok(&api_procedures()),
+        ("POST", "/api/proctor") => api_proctor(body, state),
         ("POST", "/api/start") => api_start(body, state),
         ("POST", "/api/answer") => api_answer(body, state),
         ("POST", "/api/seal") => api_seal(body, state),
@@ -232,6 +253,8 @@ fn api_start(body: &[u8], state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8
     let worker = v["worker"].as_str().unwrap_or("").trim().to_string();
     let worker_id = v["workerId"].as_str().unwrap_or("").trim().to_string();
     let proc_id = v["procedureId"].as_str().unwrap_or("");
+    // Proctoring hash from a prior /api/proctor upload (empty if none).
+    let proctor_sha256 = v["proctorSha256"].as_str().unwrap_or("").to_string();
     if worker.is_empty() {
         return json_err("worker name required");
     }
@@ -247,6 +270,7 @@ fn api_start(body: &[u8], state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8
             session,
             worker,
             worker_id,
+            proctor_sha256,
         },
     );
     json_ok(&json!({ "sessionId": id, "text": intro, "done": false }))
@@ -282,12 +306,18 @@ fn api_seal(body: &[u8], state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8>
     };
 
     let clock = read_clock(tz_offset_secs_from_env());
+    // Camera proctoring, when a snapshot was captured, upgrades the
+    // identity method and binds the face-image hash into the credential.
+    let has_proctor = !live.proctor_sha256.is_empty();
     let ctx = SealContext {
         worker: live.worker.clone(),
         worker_id: live.worker_id.clone(),
-        // Remote self-service: identity is portal-asserted for now; camera
-        // proctoring upgrades this to a stronger id_method in the next layer.
-        worker_id_method: "portal-selfservice".to_string(),
+        worker_id_method: if has_proctor {
+            "camera-proctored".to_string()
+        } else {
+            "portal-selfservice".to_string()
+        },
+        proctor_sha256: live.proctor_sha256.clone(),
         operator: "ADAM ОТ/ТБ порталы".to_string(),
         timestamp: format!(
             "{:04}-{:02}-{:02} {:02}:{:02}",
@@ -338,10 +368,55 @@ fn api_admissions(state: &Mutex<AppState>) -> Value {
                 "issuanceDate": a.issuance_date,
                 "publicKey": a.public_key,
                 "valid": a.valid,
+                "idMethod": a.id_method,
+                "proctorSha256": a.proctor_sha256,
+                "proctorUrl": proctor_url(&a.proctor_sha256),
             })
         })
         .collect();
     Value::Array(rows)
+}
+
+/// Store a proctoring snapshot (raw JPEG body): hash it, save `<hex>.jpg`,
+/// and return the `sha256:<hex>` the worker page then passes to /api/start.
+fn api_proctor(body: &[u8], state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8>) {
+    if body.is_empty() {
+        return json_err("empty image");
+    }
+    let hex = to_hex(&sha256(body));
+    let dir = { state.lock().unwrap().proctor_dir.clone() };
+    let path = dir.join(format!("{hex}.jpg"));
+    if let Err(e) = fs::write(&path, body) {
+        eprintln!(
+            "adam_portal: cannot write proctor image {}: {e}",
+            path.display()
+        );
+        return json_err("cannot store image");
+    }
+    json_ok(&json!({ "proctorSha256": format!("sha256:{hex}") }))
+}
+
+/// Serve a proctoring snapshot from `/proctor/<hex>.jpg`.  The filename is
+/// constrained to hex + `.jpg` so it cannot escape the directory.
+fn serve_proctor(path: &str, state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8>) {
+    let name = path.trim_start_matches("/proctor/");
+    let stem = name.strip_suffix(".jpg").unwrap_or(name);
+    if stem.is_empty() || !stem.chars().all(|c| c.is_ascii_hexdigit()) {
+        return (404, "text/plain; charset=utf-8", b"not found".to_vec());
+    }
+    let dir = { state.lock().unwrap().proctor_dir.clone() };
+    match fs::read(dir.join(format!("{stem}.jpg"))) {
+        Ok(bytes) => (200, "image/jpeg", bytes),
+        Err(_) => (404, "text/plain; charset=utf-8", b"not found".to_vec()),
+    }
+}
+
+/// `/proctor/<hex>.jpg` URL for a `sha256:<hex>` proctoring hash, or empty.
+fn proctor_url(proctor_sha256: &str) -> String {
+    match proctor_sha256.strip_prefix("sha256:") {
+        Some(hex) if !hex.is_empty() => format!("/proctor/{hex}.jpg"),
+        _ => String::new(),
+    }
 }
 
 // ------------------------------------------------------------- helpers

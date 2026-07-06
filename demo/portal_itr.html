@@ -40,6 +40,8 @@
   .pill{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:.15rem .5rem;border-radius:5px}
   .pill.ok{color:var(--verified);background:var(--verified-soft)} .pill.bad{color:var(--danger);background:var(--danger-soft)}
   .v{font-family:var(--mono);font-size:.8rem} .v.y{color:var(--verified)} .v.n{color:var(--danger)}
+  .face{width:34px;height:34px;object-fit:cover;border-radius:6px;border:1px solid var(--line-strong);display:block;transform:scaleX(-1)}
+  .idm{font-family:var(--mono);font-size:.9rem;color:var(--ink-faint)}
   .empty{padding:2rem;text-align:center;color:var(--ink-faint);font-family:var(--mono);font-size:.85rem}
   .live{margin-left:.5rem;font-family:var(--mono);font-size:.7rem;color:var(--verified)}
 </style>
@@ -65,10 +67,10 @@
   <div style="overflow-x:auto">
   <table id="tbl">
     <thead><tr>
-      <th>Время</th><th>Работник</th><th>Табельный</th><th>Процедура</th>
+      <th>Время</th><th>Идент.</th><th>Работник</th><th>Табельный</th><th>Процедура</th>
       <th>Результат</th><th>Вердикт</th><th>Подпись</th>
     </tr></thead>
-    <tbody id="rows"><tr><td colspan="7" class="empty">Ожидание протоколов… запустите adam_portal и пройдите инструктаж в кабинете работника.</td></tr></tbody>
+    <tbody id="rows"><tr><td colspan="8" class="empty">Ожидание протоколов… запустите adam_portal и пройдите инструктаж в кабинете работника.</td></tr></tbody>
   </table>
   </div>
 </main>
@@ -96,6 +98,9 @@
     $("rows").innerHTML = total ? rows.slice().reverse().map(x => `
       <tr>
         <td class="mono">${x.issuanceDate || "—"}</td>
+        <td>${x.proctorUrl
+          ? `<a href="${x.proctorUrl}" target="_blank" title="camera-proctored"><img class="face" src="${x.proctorUrl}" alt="фото"></a>`
+          : `<span class="idm" title="${esc(x.idMethod)}">${x.idMethod==='camera-proctored'?'📷':'—'}</span>`}</td>
         <td>${esc(x.worker)}</td>
         <td class="mono">${esc(x.workerId) || "—"}</td>
         <td class="mono">${esc(x.procedure)}</td>
@@ -103,7 +108,7 @@
         <td><span class="pill ${x.admitted?'ok':'bad'}">${x.admitted?'допущен':'не допущен'}</span></td>
         <td><span class="v ${x.valid?'y':'n'}">${x.valid?'✓ верна':'✗ невалидна'}</span></td>
       </tr>`).join("")
-      : `<tr><td colspan="7" class="empty">Пока нет протоколов.</td></tr>`;
+      : `<tr><td colspan="8" class="empty">Пока нет протоколов.</td></tr>`;
   }
   function esc(s){return (s||"").replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]));}
   poll();

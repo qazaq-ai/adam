@@ -28,6 +28,34 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.14.0] — 2026-07-06 — camera proctoring: face-bound допуск
+
+**Stripe — Deterministic AI research.** The weakest link in a remote
+допуск is *«was it really that worker at home?»* — the ИТР's first
+objection and the identity gap both we and prior audits flagged. This
+binds a proctoring snapshot into the signed credential, so the допуск is
+tied to the worker's face and stands as accident-investigation evidence
+(consent is handled at hiring, per the founder).
+
+- **Face-bound credential (schema `adam-dopusk-credential/3`).**
+  `credentialSubject` gains `proctorSha256` — the `sha256` of a snapshot
+  taken at session start — and `idMethod` becomes `camera-proctored`. The
+  signature covers it, so swapping the snapshot hash after the fact breaks
+  verification (proven by a new tamper test). Supersedes `/2` (no
+  production `/2` credentials exist).
+- **Portal camera flow (`adam-portal`, zero-dep).** The worker page shows
+  a camera preview and, on Start, captures a JPEG frame → `POST
+  /api/proctor` (raw binary, no base64) → the server SHA-256s it, stores
+  `data/portal/proctor/<hex>.jpg`, and returns the hash, which is bound
+  into the допуск. Snapshots are served back at `/proctor/<hex>.jpg`
+  (filename constrained to hex, no path traversal). Graceful fallback to
+  `portal-selfservice` when no camera / permission.
+- **ИТР dashboard** shows the proctoring photo thumbnail (links to the
+  full image) and the identity method per протокол.
+- End-to-end verified: proctored session → `idMethod: camera-proctored`
+  + bound hash + valid seal; tampering the stored snapshot hash flips the
+  journal row to `valid: false`. Seal tests 9 → 10. Cold gate green.
+
 ## [6.13.2] — 2026-07-06 — portal briefing: spoken slides (voice + SOP slides)
 
 Makes the portal feel like a real инструктаж rather than a text form —
