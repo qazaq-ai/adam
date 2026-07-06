@@ -23,13 +23,16 @@
 //! ```
 
 use std::collections::HashMap;
+use std::env;
+use std::fs;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::net::{TcpListener, TcpStream};
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread;
 
-use adam_dialog::briefing_seal::SealContext;
+use adam_dialog::briefing_seal::{SealContext, SealedProtocol};
 use adam_dialog::briefing_session::BriefingSession;
 use adam_dialog::procedure_loader::shared_procedures;
 use adam_dialog::system_clock::{read_clock, tz_offset_secs_from_env};
@@ -40,6 +43,12 @@ const ENGINE_VERSION: &str = env!("CARGO_PKG_VERSION");
 const ADDR: &str = "127.0.0.1:8787";
 const WORKER_HTML: &str = include_str!("../../../demo/portal_worker.html");
 const ITR_HTML: &str = include_str!("../../../demo/portal_itr.html");
+
+/// Default persistent signing key (hex seed).  Override with `ADAM_PORTAL_KEY`.
+const KEY_FILE: &str = "data/portal/operator.key";
+/// Default допуск journal — one signed credential per line (JSONL).
+/// Override with `ADAM_PORTAL_JOURNAL`.
+const JOURNAL_FILE: &str = "data/portal/admissions.jsonl";
 
 /// One issued протокол, kept for the ИТР dashboard.
 struct Admission {
@@ -54,6 +63,25 @@ struct Admission {
     valid: bool,
 }
 
+impl Admission {
+    /// Summarise a signed credential for the dashboard, re-verifying its
+    /// seal (so a tampered journal line shows as `valid: false`).
+    fn from_sealed(sealed: &SealedProtocol) -> Admission {
+        let e = &sealed.envelope;
+        Admission {
+            worker: e.credential_subject.name.clone(),
+            worker_id: e.credential_subject.id_ref.clone(),
+            procedure: e.procedure.title_kk.clone(),
+            admitted: e.admitted,
+            passed_count: e.evidence.passed_count,
+            total: e.evidence.total,
+            issuance_date: e.issuance_date.clone(),
+            public_key: sealed.public_key().to_string(),
+            valid: sealed.verify().is_valid(),
+        }
+    }
+}
+
 /// A live session plus the caller context needed to seal it later.
 struct Live {
     session: BriefingSession,
@@ -65,25 +93,47 @@ struct AppState {
     sessions: HashMap<String, Live>,
     admissions: Vec<Admission>,
     key: SigningKey,
+    journal_path: PathBuf,
 }
 
 fn main() {
-    // Ephemeral operator key for the prototype.  A real deployment loads a
-    // persistent per-operator key (see adam_briefing keygen).
-    let key = match adam_seal::generate_signing_key() {
+    let key_path = env_path("ADAM_PORTAL_KEY", KEY_FILE);
+    let journal_path = env_path("ADAM_PORTAL_JOURNAL", JOURNAL_FILE);
+    ensure_parent_dir(&key_path);
+    ensure_parent_dir(&journal_path);
+
+    // Persistent operator signing key: loaded from disk, or minted once and
+    // saved so every restart signs with the SAME key (past допуска stay
+    // verifiable).
+    let key = match load_or_create_key(&key_path) {
         Ok(k) => k,
         Err(e) => {
-            eprintln!("adam_portal: cannot read OS randomness for signing key: {e}");
+            eprintln!(
+                "adam_portal: signing key error ({}): {e}",
+                key_path.display()
+            );
             return;
         }
     };
-    eprintln!("adam_portal: signer public key {}", key.public_key_hex());
-    eprintln!("adam_portal: (ephemeral prototype key — regenerated each start)");
+    eprintln!(
+        "adam_portal: signer public key {} (key: {})",
+        key.public_key_hex(),
+        key_path.display()
+    );
+
+    // Restore the допуск journal (signed credentials, JSONL) from disk.
+    let admissions = load_journal(&journal_path);
+    eprintln!(
+        "adam_portal: journal {} — {} протокол(ов) restored",
+        journal_path.display(),
+        admissions.len()
+    );
 
     let state = Arc::new(Mutex::new(AppState {
         sessions: HashMap::new(),
-        admissions: Vec::new(),
+        admissions,
         key,
+        journal_path,
     }));
 
     let listener = match TcpListener::bind(ADDR) {
@@ -250,23 +300,11 @@ fn api_seal(body: &[u8], state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8>
     let sealed = protocol.seal_with(&ctx, &st.key, ENGINE_VERSION);
     let verify = sealed.verify();
 
-    let admission = Admission {
-        worker: live.worker.clone(),
-        worker_id: live.worker_id.clone(),
-        procedure: sealed.envelope.procedure.title_kk.clone(),
-        admitted: sealed.envelope.admitted,
-        passed_count: sealed.envelope.evidence.passed_count,
-        total: sealed.envelope.evidence.total,
-        issuance_date: sealed.envelope.issuance_date.clone(),
-        public_key: sealed.public_key().to_string(),
-        valid: verify.is_valid(),
-    };
-
     let resp = json!({
-        "admitted": admission.admitted,
-        "passedCount": admission.passed_count,
-        "total": admission.total,
-        "publicKey": admission.public_key,
+        "admitted": sealed.envelope.admitted,
+        "passedCount": sealed.envelope.evidence.passed_count,
+        "total": sealed.envelope.evidence.total,
+        "publicKey": sealed.public_key(),
         "verify": {
             "signatureValid": verify.signature_valid,
             "digestMatches": verify.digest_matches,
@@ -276,7 +314,10 @@ fn api_seal(body: &[u8], state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8>
         "sealed": serde_json::to_value(&sealed).unwrap_or(Value::Null),
     });
 
-    st.admissions.push(admission);
+    // Persist the signed credential (append-only journal), then update the
+    // in-memory dashboard view.
+    append_journal(&st.journal_path, &sealed);
+    st.admissions.push(Admission::from_sealed(&sealed));
     st.sessions.remove(&sid);
     json_ok(&resp)
 }
@@ -308,6 +349,93 @@ fn api_admissions(state: &Mutex<AppState>) -> Value {
 fn next_session_id() -> String {
     static COUNTER: AtomicU64 = AtomicU64::new(1);
     format!("s{}", COUNTER.fetch_add(1, Ordering::Relaxed))
+}
+
+/// Path from an env var, or the given default.
+fn env_path(var: &str, default: &str) -> PathBuf {
+    env::var(var)
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| PathBuf::from(default))
+}
+
+/// Create the parent directory of `path` if it does not exist.
+fn ensure_parent_dir(path: &Path) {
+    if let Some(parent) = path.parent() {
+        if !parent.as_os_str().is_empty() {
+            let _ = fs::create_dir_all(parent);
+        }
+    }
+}
+
+/// Load the operator signing key from `path`, or mint a fresh one and save
+/// it (owner-only where the OS supports it) so restarts reuse the same key.
+fn load_or_create_key(path: &Path) -> std::io::Result<SigningKey> {
+    if path.exists() {
+        let hex = fs::read_to_string(path)?;
+        return SigningKey::from_seed_hex(hex.trim()).ok_or_else(|| {
+            std::io::Error::new(
+                std::io::ErrorKind::InvalidData,
+                "not a valid 32-byte hex seed",
+            )
+        });
+    }
+    let key = adam_seal::generate_signing_key()?;
+    write_secret_seed(path, &key.seed_hex())?;
+    eprintln!("adam_portal: minted a new signing key → {}", path.display());
+    Ok(key)
+}
+
+/// Write a secret seed with owner-only permissions where supported.
+fn write_secret_seed(path: &Path, seed_hex: &str) -> std::io::Result<()> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        let mut f = fs::OpenOptions::new()
+            .write(true)
+            .create(true)
+            .truncate(true)
+            .mode(0o600)
+            .open(path)?;
+        f.write_all(seed_hex.as_bytes())?;
+        f.write_all(b"\n")
+    }
+    #[cfg(not(unix))]
+    {
+        fs::write(path, format!("{seed_hex}\n"))
+    }
+}
+
+/// Restore the допуск journal — one signed credential per line.  Malformed
+/// lines are skipped; each survivor is re-verified for the dashboard.
+fn load_journal(path: &Path) -> Vec<Admission> {
+    let mut out = Vec::new();
+    if let Ok(content) = fs::read_to_string(path) {
+        for line in content.lines() {
+            let line = line.trim();
+            if line.is_empty() {
+                continue;
+            }
+            if let Ok(sealed) = SealedProtocol::from_json(line) {
+                out.push(Admission::from_sealed(&sealed));
+            }
+        }
+    }
+    out
+}
+
+/// Append one signed credential to the journal as a compact JSON line.
+fn append_journal(path: &Path, sealed: &SealedProtocol) {
+    let Ok(line) = serde_json::to_string(sealed) else {
+        return;
+    };
+    match fs::OpenOptions::new().create(true).append(true).open(path) {
+        Ok(mut f) => {
+            if let Err(e) = writeln!(f, "{line}") {
+                eprintln!("adam_portal: journal append failed: {e}");
+            }
+        }
+        Err(e) => eprintln!("adam_portal: cannot open journal {}: {e}", path.display()),
+    }
 }
 
 fn json_ok(v: &Value) -> (u16, &'static str, Vec<u8>) {

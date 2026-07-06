@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ERG/ССГПО · ОТ/ТБ — кабинет работника</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cg stroke='%23e53935' stroke-width='45' stroke-linecap='round'%3E%3Cline x1='76' y1='76' x2='324' y2='324'/%3E%3Cline x1='137' y1='37' x2='363' y2='263'/%3E%3Cline x1='37' y1='137' x2='263' y2='363'/%3E%3Cline x1='76' y1='324' x2='324' y2='76'/%3E%3Cline x1='137' y1='363' x2='363' y2='137'/%3E%3Cline x1='37' y1='263' x2='263' y2='37'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cg stroke='%23d27700' stroke-width='45' stroke-linecap='round'%3E%3Cline x1='76' y1='76' x2='324' y2='324'/%3E%3Cline x1='137' y1='37' x2='363' y2='263'/%3E%3Cline x1='37' y1='137' x2='263' y2='363'/%3E%3Cline x1='76' y1='324' x2='324' y2='76'/%3E%3Cline x1='137' y1='363' x2='363' y2='137'/%3E%3Cline x1='37' y1='263' x2='263' y2='37'/%3E%3C/g%3E%3C/svg%3E">
 <style>
   :root {
     --bg:#EBEEF0; --surface:#FBFCFD; --surface-2:#F1F3F5; --ink:#14181B;
     --ink-soft:#545C63; --ink-faint:#8A9299; --line:#D2D8DC; --line-strong:#B8C0C6;
-    --accent:#B26E14; --verified:#1E8A5C; --verified-soft:#DBEEE4;
+    --accent:#d27700; --verified:#1E8A5C; --verified-soft:#DBEEE4;
     --danger:#C13A34; --danger-soft:#F3DAD8;
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
     --sans:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
@@ -54,7 +54,7 @@
 </head>
 <body>
 <div class="bar"><div class="in">
-  <svg class="logo" viewBox="0 0 400 400" aria-hidden="true"><g stroke="#B26E14" stroke-width="45" stroke-linecap="round">
+  <svg class="logo" viewBox="0 0 400 400" aria-hidden="true"><g stroke="#d27700" stroke-width="45" stroke-linecap="round">
     <line x1="76" y1="76" x2="324" y2="324"/><line x1="137" y1="37" x2="363" y2="263"/><line x1="37" y1="137" x2="263" y2="363"/>
     <line x1="76" y1="324" x2="324" y2="76"/><line x1="137" y1="363" x2="363" y2="137"/><line x1="37" y1="263" x2="263" y2="37"/></g></svg>
   <span class="brand">ERG/ССГПО<b>·</b>ОТ/ТБ</span>
@@ -111,10 +111,15 @@
     return r.json();
   }
 
+  // Вводный инструктаж — тот, что проходят ВСЕ специальности; демо по умолчанию.
+  const DEFAULT_PROC = "kk_labor_vvodnyi_016";
   async function loadProcedures() {
     try {
       const list = await api("/api/procedures");
+      // Put the general (вводный) briefing first, then preselect it.
+      list.sort((a, b) => (b.id === DEFAULT_PROC) - (a.id === DEFAULT_PROC));
       $("proc").innerHTML = list.map(p => `<option value="${p.id}">${p.title}</option>`).join("");
+      $("proc").value = DEFAULT_PROC;
     } catch (e) { $("proc").innerHTML = "<option>сервер жоқ — adam_portal іске қосыңыз</option>"; }
   }
 

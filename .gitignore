@@ -242,3 +242,6 @@ data/raw/ingest_demo/
 # презентации one-pager).  Не должна попадать в публичный git: это
 # рабочие материалы для рассылки, удаляются вручную после отправки.
 docs/outreach/
+
+# Portal runtime state — secret signing key + допуск journal (never commit)
+data/portal/

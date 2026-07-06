@@ -28,6 +28,29 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.13.1] — 2026-07-06 — portal persistence + stable signing key
+
+Closes the two prototype defects that would have sunk a real pilot.
+
+- **Persistent operator signing key.** `adam-portal` no longer mints an
+  ephemeral key each start; it loads a persistent key from
+  `data/portal/operator.key` (override `ADAM_PORTAL_KEY`), minting and
+  saving one (`0600`) on first run. Every restart now signs with the
+  **same** key, so допуска issued months apart stay verifiable against
+  one public key.
+- **Persistent допуск journal.** Issued credentials are appended to
+  `data/portal/admissions.jsonl` (override `ADAM_PORTAL_JOURNAL`) — one
+  full signed protocol per line — and restored + re-verified on startup,
+  so the ИТР dashboard survives a restart and keeps the actual signed
+  artifacts for long-term re-verification. Runtime state is git-ignored
+  (the key is a secret; the journal is per-deployment data).
+- **Demo default = вводный инструктаж** (`kk_labor_vvodnyi_016`) — the
+  general briefing every specialty takes — pre-selected in the worker
+  page for the ССГПО demo.
+- Verified end-to-end: fresh run mints the key and writes the journal;
+  restart reuses the identical public key and restores the протокол
+  (`valid: true`). Cold gate green.
+
 ## [6.13.0] — 2026-07-06 — pilot web portal over the engine (`adam-portal`)
 
 **Stripe — Deterministic AI research.** Moving toward the ССГПО/ERG
