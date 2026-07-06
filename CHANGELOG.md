@@ -28,6 +28,38 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.13.0] — 2026-07-06 — pilot web portal over the engine (`adam-portal`)
+
+**Stripe — Deterministic AI research.** Moving toward the ССГПО/ERG
+pilot. The founder (ex-ССГПО, worker → ИТР) mapped the real onboarding /
+training lifecycle; the highest-cost, highest-frequency pain is the
+**annual mass retraining + exam of the whole workforce** (weekends, ИТР
+hours, paper), and Приказ №223/№129 (effective 12.07.2026) legalize the
+remote online proctored form. This release puts the deterministic engine
+behind a browser so that flow can run self-hosted on the enterprise's own
+servers.
+
+- **`adam-portal` (new crate, zero external dependencies).** A `std::net`
+  HTTP server — no web framework, no async runtime — that runs the real
+  [`briefing_session`] engine and issues the signed
+  [`briefing_seal`] допуск credential over a small JSON API
+  (`/api/procedures`, `/api/start`, `/api/answer`, `/api/seal`,
+  `/api/admissions`). It serves two pages from `demo/`:
+  `portal_worker.html` (login → инструктаж → устный опрос →
+  допуск/недопуск → downloadable signed protocol) and `portal_itr.html`
+  (live ИТР dashboard: issued протоколы, verdict, and Ed25519 verify
+  status, auto-refreshing). Run: `cargo run -p adam-portal --bin
+  adam_portal` → worker at `/`, ИТР board at `/itr`.
+- **Same engine, no mocks.** The grading, допуск decision, and signature
+  are the production deterministic path; end-to-end verified (worker
+  admitted 6/6, `issuerBound` + `signatureValid` true, credential
+  downloadable and independently verifiable).
+- **Positioning clarified.** "Offline" now means *no external cloud AI +
+  data on the company's own servers*, not "no web": the portal is
+  self-hosted, so remote workers (home laptop) and on-site kiosks are two
+  modes of one product. Prototype-grade — TLS, corporate SSO, camera
+  proctoring, and persistence are the next layer.
+
 ## [6.12.2] — 2026-07-05 — Kazakh-purity allowlist + ERG pilot demo
 
 - **`validate_world_core` Kazakh-purity allowlist.** The corpus-purity

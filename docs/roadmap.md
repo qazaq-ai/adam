@@ -40,7 +40,14 @@ Version-by-version history of `adam`, grouped into architectural eras.
 > — the three questions an accident review asks.  `credentialStatus` /
 > `prevRecordHash` are reserved for a future revocation ledger; full key
 > management is the next layer.
-> See [`CHANGELOG.md`](../CHANGELOG.md) v6.10.0 → v6.12.0.
+> **v6.13.0** puts the engine behind a browser for the ССГПО/ERG pilot:
+> the zero-dependency `adam-portal` (`std::net`, no web framework) serves
+> a worker page and a live ИТР dashboard (`demo/portal_*.html`) running
+> the real deterministic engine + signed допуск, self-hosted on the
+> enterprise's servers.  Pilot leads with the annual mass retraining+exam
+> flow (Приказ №223 legalizes it remote).  Next: corporate SSO, camera
+> proctoring, TLS, persistence, key management.
+> See [`CHANGELOG.md`](../CHANGELOG.md) v6.10.0 → v6.13.0.
 >
 > **Status 2026-06-29.** **v6.9.0 shipped** as the
 > consolidation release for the 2026-06-29 work-day arc:

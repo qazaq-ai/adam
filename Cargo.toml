@@ -32,6 +32,10 @@ members = [
   # turns a briefing допуск protocol into a signed, publicly
   # verifiable legal artifact.  KAT-gated on RFC 8032.
   "crates/adam-seal",
+  # Pilot web portal — zero-external-dep (std::net) HTTP server that
+  # runs the deterministic briefing engine + signed допуск in a
+  # browser, for the ССГПО/ERG annual-retraining pilot.
+  "crates/adam-portal",
   # Data ingestion pipeline foundation — typed candidate
   # records + persistent JSONL queue.  Codex 2026-06-27
   # «missing piece» for ADAM growth.
@@ -82,7 +86,7 @@ resolver = "2"
 #   multi_turn_eval     11/11  = 100% required + 2/6 probes documenting gaps
 #   adversarial_dialog  95/95  = 100%
 #   voice REPL session  43/45  ≈  96% (last live session, pre-v6.8.5)
-version = "6.12.2"
+version = "6.13.0"
 edition = "2024"
 license = "BUSL-1.1"
 

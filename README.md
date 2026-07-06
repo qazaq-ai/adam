@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.12.2-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.13.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -61,7 +61,7 @@ ADAM_V6_2=1 ./target/release/adam_chat
 
 ---
 
-## What's new (v6.10.0 → v6.12.0)
+## What's new (v6.10.0 → v6.13.0)
 
 **Industrial OT/ТБ session engine + doubled procedure corpus (2026-07-02), then a cryptographically-signed, identity-bound допуск credential (v6.11.0 → v6.12.0).**
 The industrial knowledge-assistant line gains the full
@@ -75,6 +75,7 @@ by Приказ №223, effective 12.07.2026):
 - **`adam_briefing` REPL** — new binary to run one procedure end-to-end: `cargo run -p adam-dialog --bin adam_briefing -- --list` then `-- <procedure_id>`.  **v6.10.1** adds `--voice` — spoken Kazakh prompts + verdict via the existing `TtsBackend` (neural Piper with the bundled `kk_KZ-issai-high` voice, degrading to OS `say` / no-op).  Voice is a front-end layer over the unchanged engine, so any future UI reuses it.
 - **Protocol Seal (v6.11.0)** — the finished допуск protocol can be **cryptographically signed** and independently verified.  New zero-dependency [`adam-seal`](crates/adam-seal) crate implements SHA-256 / SHA-512 / Ed25519 (RFC 8032) in pure Rust — the whole signature path is auditable in-tree and gated on the **official RFC 8032 known-answer vectors**.  `adam_briefing keygen` mints a key, `--sign-key`/`--seal-out` seal a session, and `adam_briefing verify <sealed.json>` checks the seal and exits non-zero if it does not hold.  Editing any field — e.g. flipping the admission verdict after the fact — breaks the signature, so the protocol is a tamper-**evident** legal artifact, not just a demo transcript.  Not constant-time; scoped to offline on-device sealing.
 - **Identity & authority chain (v6.12.0)** — the seal is reshaped as a **W3C-Verifiable-Credentials-shaped work-admission credential** ([`briefing_seal`](crates/adam-dialog/src/briefing_seal.rs), `adam-dopusk-credential/2`).  It binds the three questions an accident review actually asks: **who answered** (`credentialSubject` — worker name + id reference + id method), **who admitted them and by what authority** (`issuer` — operator name + role + a signed `authorityAssertion`, with verification requiring `issuer.publicKey == seal.publicKey` so the assertion is provably the operator's), and **which SOP version** (`procedure.sopHash` — a `sha256` content hash proving the exact briefed procedure version).  CLI adds `--worker-id`, `--operator-role`, `--authority-assertion`; `credentialStatus`/`prevRecordHash` are reserved for a future revocation ledger.
+- **Pilot web portal (v6.13.0)** — new zero-dependency [`adam-portal`](crates/adam-portal) crate: a `std::net` HTTP server (no web framework, no async runtime) that runs the **real** deterministic engine + signed допуск in a browser for the ССГПО/ERG annual-retraining flow.  It serves a worker page ([`demo/portal_worker.html`](demo/portal_worker.html): login → инструктаж → устный опрос → допуск/недопуск → downloadable signed protocol) and a live ИТР dashboard ([`demo/portal_itr.html`](demo/portal_itr.html): issued протоколы + Ed25519 verify status).  Run `cargo run -p adam-portal --bin adam_portal` → worker at `/`, ИТР board at `/itr`.  Meant to be **self-hosted on the enterprise's own servers** — "offline" = no external cloud AI + data on the company's servers, not "no web".  Prototype-grade (TLS / corporate SSO / camera proctoring are the next layer).
 - **Procedure corpus 15 → 33** — [`data/procedures/labor_safety_kz.jsonl`](data/procedures/labor_safety_kz.jsonl) now covers the full universal OT/ТБ lifecycle common to every enterprise: all five инструктаж types (вводный / первичный на рабочем месте / повторный / внеплановый / целевой) + дистанционный, стажировка + допуск, проверка знаний, наряд-допуск, first aid, electronic registration (ЕЦС), plus cross-industrial high-hazard work (газоопасные / огневые / замкнутое пространство / погрузо-разгрузочные / электробезопасность-группы допуска / предварительный медосмотр / подрядчики / аварийное реагирование).  Every record trilingual (kk/ru/en) with search aliases, each citation grounded in a real regulation (ТК 414-V, Приказ №1019/№223, Правила ТБ электроустановок).  CI-validated by `validate_procedures`.
 
 Production suite dashboard (unchanged — this release adds capability without touching existing evals; end-to-end 193/193 and procedure-retrieval regression green):

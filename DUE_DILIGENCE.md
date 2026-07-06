@@ -3,7 +3,7 @@
 **Last updated:** 2026-07-05
 **Branch:** `main`
 **HEAD commit:** `d7ebaae2` (v6.12.0)
-**Workspace version:** `6.12.2`
+**Workspace version:** `6.13.0`
 
 This document is intentionally a flat list of facts. Numbers come from
 commands you can re-run yourself; everything labelled "limitation" or
@@ -20,15 +20,18 @@ over a curated fact graph → reasoner → realiser. The voice surface
 intent classifier → router → TTS loop. Neural components live ONLY
 at the audio ↔ text boundary; they never invent facts.
 
-The current commercial focus (v6.10 → v6.12) is the industrial
+The current commercial focus (v6.10 → v6.13) is the industrial
 **OT/ТБ (охрана труда / техника безопасности)** line: a deterministic
 safety-briefing session engine that runs инструктаж → oral knowledge
 check → допуск/недопуск, then seals the graded result into a
 cryptographically verifiable, identity-bound **work-admission
 credential** (Ed25519, RFC 8032, verifiable by any third party without
-trusting our program). See §"Industrial OT/ТБ line" below.
+trusting our program). v6.13.0 puts this behind a browser — a
+zero-dependency `std::net` web portal (`adam-portal`) with a worker page
+and a live ИТР dashboard, self-hosted on the enterprise's servers for the
+ССГПО/ERG annual-retraining pilot. See §"Industrial OT/ТБ line" below.
 
-- **Language:** Rust (workspace, 30 crates + 18 tools).
+- **Language:** Rust (workspace, 31 crates + 18 tools).
 - **License:** BUSL-1.1.
 - **Hardware:** MacBook Air M2, 8 GB RAM (the daily development target).
 - **No cloud dependency:** every component runs locally; no inference
@@ -62,6 +65,13 @@ The applied wedge is an **offline evidence engine for work-admission
 3. **Corpus** — 33 curated OT/ТБ procedures
    (`data/procedures/labor_safety_kz.jsonl`), trilingual (kk/ru/en),
    each grounded in a real regulation, CI-validated.
+4. **Web portal** ([`adam-portal`](crates/adam-portal), v6.13.0) — a
+   zero-external-dependency `std::net` HTTP server that runs the above
+   engine + signed допуск in a browser: a worker page and a live ИТР
+   dashboard (`demo/portal_*.html`). Self-hosted on the enterprise's own
+   servers; prototype-grade (TLS / corporate SSO / camera proctoring are
+   the next layer). "Offline" = no external cloud AI + data on the
+   company's servers, not "no web".
 
 Positioned against a real but modest global EHS-software market
 (~$2–8 B depending on definition, incumbents already shipping AI); the
@@ -85,7 +95,7 @@ cryptographically verifiable допуск, not feature breadth.
 | `multi_turn_eval_v686` (Codex's gate) | **38 / 38 = 100 %** required cases |
 | Voice REPL live session (45 turns, 2026-06-16 evening) | 43 / 45 ≈ 96 % |
 | Legacy `blind_eval_v1` (kept as historical reference) | 97 / 100 (rc18 baseline; no longer the production gate) |
-| Workspace test files | run `cargo test --release --workspace --locked` for live counts (30 crates + 18 tools) |
+| Workspace test files | run `cargo test --release --workspace --locked` for live counts (31 crates + 18 tools) |
 | Largest crate (LOC) | `adam-dialog` (extended via v6.5 safety guard + v6.8 cascade patches + wellness::pain_support) |
 | World-core curated entries | 3 444 in `data/world_core/*.jsonl` (65 domains, unchanged since v6.3) |
 | Reasoning facts | 4 116 extracted + 37 991 derived |

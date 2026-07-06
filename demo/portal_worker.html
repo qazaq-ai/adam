@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ERG/ССГПО · ОТ/ТБ — кабинет работника</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cg stroke='%23e53935' stroke-width='45' stroke-linecap='round'%3E%3Cline x1='76' y1='76' x2='324' y2='324'/%3E%3Cline x1='137' y1='37' x2='363' y2='263'/%3E%3Cline x1='37' y1='137' x2='263' y2='363'/%3E%3Cline x1='76' y1='324' x2='324' y2='76'/%3E%3Cline x1='137' y1='363' x2='363' y2='137'/%3E%3Cline x1='37' y1='263' x2='263' y2='37'/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:#EBEEF0; --surface:#FBFCFD; --surface-2:#F1F3F5; --ink:#14181B;
+    --ink-soft:#545C63; --ink-faint:#8A9299; --line:#D2D8DC; --line-strong:#B8C0C6;
+    --accent:#B26E14; --verified:#1E8A5C; --verified-soft:#DBEEE4;
+    --danger:#C13A34; --danger-soft:#F3DAD8;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#0E1113;--surface:#171B1E;--surface-2:#1E2327;--ink:#ECEFF1;--ink-soft:#9DA5AB;
+    --ink-faint:#6B747B;--line:#272D32;--line-strong:#353D43;--accent:#E0A63F;
+    --verified:#37B87F;--verified-soft:#16281F;--danger:#E6635C;--danger-soft:#2C1917;}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55}
+  .bar{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+  .bar .in{max-width:52rem;margin:0 auto;padding:.7rem 1.2rem;display:flex;align-items:center;gap:.6rem}
+  .logo{width:24px;height:24px;flex:none}
+  .brand{font-family:var(--mono);font-weight:700;font-size:.9rem}
+  .brand b{color:var(--accent)}
+  .tag{margin-left:auto;font-family:var(--mono);font-size:.72rem;color:var(--ink-faint)}
+  main{max-width:52rem;margin:0 auto;padding:1.6rem 1.2rem 4rem}
+  h1{font-size:1.5rem;margin:.2rem 0 1.2rem}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1.3rem;margin-bottom:1.1rem}
+  label{display:block;font-size:.8rem;color:var(--ink-soft);margin:.7rem 0 .3rem;font-family:var(--mono)}
+  input,select{width:100%;padding:.6rem .7rem;border:1px solid var(--line-strong);border-radius:8px;
+    background:var(--surface-2);color:var(--ink);font-family:var(--sans);font-size:1rem}
+  button{font-family:var(--mono);font-size:.9rem;padding:.65rem 1.1rem;border-radius:9px;cursor:pointer;
+    border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;margin-top:1rem}
+  button.ghost{background:transparent;color:var(--ink);border-color:var(--line-strong)}
+  button:disabled{opacity:.5;cursor:default}
+  .prompt{font-size:1.12rem;white-space:pre-wrap;margin:0 0 .3rem}
+  .step-meta{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);margin-bottom:.9rem}
+  .hint{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);margin-top:.5rem}
+  .verdict{border-radius:12px;padding:1.1rem 1.2rem;font-family:var(--mono);font-weight:700;
+    display:flex;align-items:center;gap:.6rem;font-size:1rem;border:1px solid transparent}
+  .verdict.ok{color:var(--verified);background:var(--verified-soft);border-color:var(--verified)}
+  .verdict.bad{color:var(--danger);background:var(--danger-soft);border-color:var(--danger)}
+  .checks{font-family:var(--mono);font-size:.82rem;margin:.8rem 0 0;padding:0;list-style:none}
+  .checks li{padding:.28rem 0;display:flex;gap:.5rem}
+  .checks .y{color:var(--verified)} .checks .n{color:var(--danger)}
+  .kbd{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint)}
+  .err{color:var(--danger);font-family:var(--mono);font-size:.82rem;margin-top:.6rem}
+  a.dl{color:var(--accent);font-family:var(--mono);font-size:.8rem;display:inline-block;margin-top:.7rem}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="bar"><div class="in">
+  <svg class="logo" viewBox="0 0 400 400" aria-hidden="true"><g stroke="#B26E14" stroke-width="45" stroke-linecap="round">
+    <line x1="76" y1="76" x2="324" y2="324"/><line x1="137" y1="37" x2="363" y2="263"/><line x1="37" y1="137" x2="263" y2="363"/>
+    <line x1="76" y1="324" x2="324" y2="76"/><line x1="137" y1="363" x2="363" y2="137"/><line x1="37" y1="263" x2="263" y2="37"/></g></svg>
+  <span class="brand">ERG/ССГПО<b>·</b>ОТ/ТБ</span>
+  <span class="tag">кабинет работника · движок ADAM</span>
+</div></div>
+
+<main>
+  <!-- 1. Login / choose briefing -->
+  <section id="login" class="card">
+    <h1>Жылдық нұсқаулық / Ежегодный инструктаж</h1>
+    <label for="worker">Аты-жөні / ФИО</label>
+    <input id="worker" placeholder="Асан Асанов" autocomplete="off">
+    <label for="wid">Табельный № / ID</label>
+    <input id="wid" placeholder="SSGPO-EMP-12345" autocomplete="off">
+    <label for="proc">Рәсім / Процедура</label>
+    <select id="proc"><option>жүктелуде…</option></select>
+    <button id="startBtn" type="button">Бастау / Начать</button>
+    <div id="loginErr" class="err"></div>
+    <p class="hint">Тіл: қазақша сұрақтар. Жауапты өз сөзіңізбен жазыңыз.</p>
+  </section>
+
+  <!-- 2. Briefing session -->
+  <section id="session" class="card hidden">
+    <div class="step-meta" id="meta"></div>
+    <p class="prompt" id="prompt"></p>
+    <label for="answer">Жауап / Ответ</label>
+    <input id="answer" autocomplete="off">
+    <div>
+      <button id="sendBtn" type="button">Жіберу / Отправить</button>
+      <button id="ackBtn" class="ghost" type="button">Түсінікті</button>
+    </div>
+    <p class="hint" id="phase"></p>
+  </section>
+
+  <!-- 3. Result / допуск -->
+  <section id="result" class="card hidden">
+    <div class="verdict" id="verdict"></div>
+    <ul class="checks" id="checks"></ul>
+    <p class="kbd" id="issuer"></p>
+    <a class="dl" id="download" href="#" download="dopusk.json">↓ Подписанный протокол (JSON)</a>
+    <div><button class="ghost" type="button" onclick="location.reload()">Жаңадан бастау</button></div>
+  </section>
+</main>
+
+<script>
+  const $ = id => document.getElementById(id);
+  let sessionId = null;
+
+  async function api(path, body) {
+    const opt = { method: body ? "POST" : "GET", headers: { "Content-Type": "application/json" } };
+    if (body) opt.body = JSON.stringify(body);
+    const r = await fetch(path, opt);
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return r.json();
+  }
+
+  async function loadProcedures() {
+    try {
+      const list = await api("/api/procedures");
+      $("proc").innerHTML = list.map(p => `<option value="${p.id}">${p.title}</option>`).join("");
+    } catch (e) { $("proc").innerHTML = "<option>сервер жоқ — adam_portal іске қосыңыз</option>"; }
+  }
+
+  function show(sec) { ["login","session","result"].forEach(s => $(s).classList.toggle("hidden", s !== sec)); }
+
+  function render(reply) {
+    $("prompt").textContent = reply.text;
+    $("phase").textContent = reply.done ? "" : "Инструктаж жалғасуда…";
+    if (reply.done) finish();
+  }
+
+  async function start() {
+    const worker = $("worker").value.trim(), wid = $("wid").value.trim(), proc = $("proc").value;
+    if (!worker) { $("loginErr").textContent = "Аты-жөні қажет."; return; }
+    try {
+      const res = await api("/api/start", { worker, workerId: wid, procedureId: proc });
+      sessionId = res.sessionId;
+      show("session"); $("meta").textContent = proc; render(res);
+      $("answer").focus();
+    } catch (e) { $("loginErr").textContent = "Қате: " + e.message; }
+  }
+
+  async function send(text) {
+    if (!sessionId) return;
+    const input = text !== undefined ? text : $("answer").value;
+    $("answer").value = "";
+    try { render(await api("/api/answer", { sessionId, input })); }
+    catch (e) { $("phase").textContent = "Қате: " + e.message; }
+  }
+
+  async function finish() {
+    try {
+      const s = await api("/api/seal", { sessionId });
+      show("result");
+      const v = $("verdict");
+      v.className = "verdict " + (s.admitted ? "ok" : "bad");
+      v.innerHTML = "<span>●</span><span>" + (s.admitted
+        ? `ЖҰМЫСҚА ЖІБЕРІЛДІ · ${s.passedCount}/${s.total}`
+        : `ЖІБЕРІЛМЕДІ · ${s.passedCount}/${s.total} — қайта нұсқаулық қажет`) + "</span>";
+      const ck = s.verify || {};
+      $("checks").innerHTML = [
+        ["Ed25519 қолтаңба", ck.signatureValid],
+        ["дайджест", ck.digestMatches],
+        ["issuer = кілт", ck.issuerBound],
+      ].map(([t, ok]) => `<li><span class="${ok?'y':'n'}">${ok?'✓':'✗'}</span>${t}</li>`).join("");
+      $("issuer").textContent = "Қол қойған кілт: " + (s.publicKey || "").slice(0, 24) + "…";
+      const blob = new Blob([JSON.stringify(s.sealed, null, 2)], { type: "application/json" });
+      $("download").href = URL.createObjectURL(blob);
+    } catch (e) { $("phase").textContent = "Мөр қатесі: " + e.message; }
+  }
+
+  $("startBtn").onclick = start;
+  $("sendBtn").onclick = () => send();
+  $("ackBtn").onclick = () => send("түсінікті");
+  $("answer").addEventListener("keydown", e => { if (e.key === "Enter") send(); });
+  loadProcedures();
+</script>
+</body>
+</html>

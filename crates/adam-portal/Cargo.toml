@@ -1,0 +1,19 @@
+[package]
+name = "adam-portal"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Pilot web portal for the OT/ТБ (охрана труда) line — a zero-external-dependency (std::net) HTTP server that runs the deterministic briefing engine (adam-dialog) and the signed допуск credential (adam-seal) in a browser. Serves the worker portal + ИТР dashboard pages from demo/, exposing the real engine over a small JSON API. Prototype-grade (no TLS/hardening); intended to be self-hosted on the enterprise's own servers for the ССГПО/ERG annual-retraining pilot."
+
+[[bin]]
+name = "adam_portal"
+path = "src/main.rs"
+
+[dependencies]
+adam-dialog = { path = "../adam-dialog" }
+adam-seal = { path = "../adam-seal" }
+serde.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true
