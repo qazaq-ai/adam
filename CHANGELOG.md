@@ -28,6 +28,14 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.17.1] — 2026-07-07 — CI hotfix: clippy `single_match` on the voice-gender hint
+
+The 6.17.0 `/api/chat` voice-gender block used a `match` with one real arm;
+CI's `cargo clippy --all-targets -- -D warnings` (stricter than the local
+gate, which omitted `-D warnings`) rejected it as `clippy::single_match`.
+Rewritten as `if let`. The local release gate now also runs clippy with
+`-D warnings` so this class of drift is caught before push.
+
 ## [6.17.0] — 2026-07-07 — bilingual corpus (all 33 procedures RU) + Russian protocol + demo i18n
 
 Completes the kz/ru delivery started in 6.16.0: the whole OT/ТБ corpus, the
