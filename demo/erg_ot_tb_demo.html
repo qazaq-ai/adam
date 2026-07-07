@@ -104,6 +104,11 @@
   @keyframes sq-rev { 0%{stroke-dashoffset:0;opacity:.7} 12%{opacity:1} 20%{opacity:.7} 42%{opacity:1} 55%{stroke-dashoffset:140;opacity:.7} 100%{stroke-dashoffset:180;opacity:.7} }
   @keyframes sq-beat { 0%{transform:scale(1)} 12%{transform:scale(1.08)} 25%{transform:scale(1)} 42%{transform:scale(1.05)} 55%{transform:scale(1)} 100%{transform:scale(1)} }
 
+  /* ---- language switch + right-side group ---- */
+  .rightgrp { display: flex; align-items: center; gap: 0.7rem; }
+  .lang { font-family: var(--mono); font-size: 0.78rem; padding: 0.35rem 0.5rem; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-2); color: var(--ink); cursor: pointer; }
+  .lang:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
   /* ---- theme switch (sun / moon) ---- */
   .switch { --w: 58px; --h: 28px; position: relative; width: var(--w); height: var(--h); border-radius: 999px;
     border: 1px solid var(--line-strong); background: var(--surface-2); cursor: pointer; padding: 0; flex: none; }
@@ -232,8 +237,13 @@
       </span>
       <div class="brand">ERG/ССГПО<span>·</span>ОТ/ТБ</div>
       <div class="sep" aria-hidden="true"></div>
-      <div class="clientmark">детерминированный движок ADAM</div>
+      <div class="clientmark" data-i18n="clientmark">детерминированный движок ADAM</div>
     </div>
+    <div class="rightgrp">
+    <select id="lang" class="lang" aria-label="Тіл / Язык">
+      <option value="ru">Русский</option>
+      <option value="kk">Қазақша</option>
+    </select>
     <button class="switch" id="themeSwitch" role="switch" aria-checked="false" aria-label="Тёмная тема">
       <span class="ghost l" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg></span>
       <span class="ghost r" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></span>
@@ -242,26 +252,27 @@
         <svg class="moon" viewBox="0 0 24 24" fill="#fff"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
       </span>
     </button>
+    </div>
   </div>
 </div>
 
 <header class="hero">
   <div class="wrap">
-    <p class="eyebrow">Offline · детерминированный · қазақ тілінде</p>
-    <h1>Инженер доступа&#8202;— не обучающая платформа.</h1>
-    <p class="lead">
+    <p class="eyebrow" data-i18n="hero.eyebrow">Offline · детерминированный · қазақ тілінде</p>
+    <h1 data-i18n="hero.h1">Инженер доступа&#8202;— не обучающая платформа.</h1>
+    <p class="lead" data-i18n="hero.lead">
       ADAM проводит инструктаж по конкретной процедуре, проверяет
       <b>понимание</b> устным опросом, выносит <b>допуск или недопуск</b> и
       подписывает результат в <b>криптографически проверяемый протокол</b> —
       который любая сторона проверит, не доверяя ни работодателю, ни нам.
     </p>
-    <p class="notplatform">offline evidence engine для допуска к опасной работе</p>
+    <p class="notplatform" data-i18n="hero.notplatform">offline evidence engine для допуска к опасной работе</p>
     <div class="metastrip">
-      <span><b>0</b> облачного ИИ</span>
-      <span><b>self-hosted</b> веб-портал</span>
+      <span data-i18n="hero.m1"><b>0</b> облачного ИИ</span>
+      <span data-i18n="hero.m2"><b>self-hosted</b> веб-портал</span>
       <span><b>Ed25519</b> RFC&nbsp;8032</span>
-      <span><b>33</b> процедуры ОТ/ТБ</span>
-      <span><b>v6.14.0</b></span>
+      <span data-i18n="hero.m4"><b>33</b> процедуры ОТ/ТБ</span>
+      <span><b>v6.17.0</b></span>
     </div>
   </div>
 </header>
@@ -269,15 +280,15 @@
 <section>
   <div class="wrap">
     <div class="sec-head">
-      <p class="eyebrow">Полный цикл допуска</p>
-      <h2>Четыре шага, которые сегодня делают на бумаге.</h2>
-      <p>Последовательность, предписанная регламентом РК (ст. 182 ТК РК, Приказ №1019). Каждый шаг — детерминированный, без свободной генерации.</p>
+      <p class="eyebrow" data-i18n="cyc.eyebrow">Полный цикл допуска</p>
+      <h2 data-i18n="cyc.h2">Четыре шага, которые сегодня делают на бумаге.</h2>
+      <p data-i18n="cyc.p">Последовательность, предписанная регламентом РК (ст. 182 ТК РК, Приказ №1019). Каждый шаг — детерминированный, без свободной генерации.</p>
     </div>
     <div class="flow">
-      <div class="step"><span class="n">01</span><span class="kkname">нұсқаулық</span><h3>Инструктаж</h3><p>Проводит по шагам конкретной SOP предприятия — на казахском, offline.</p></div>
-      <div class="step"><span class="n">02</span><span class="kkname">білім тексеру</span><h3>Устный контроль</h3><p>Контрольные вопросы из полей самой процедуры. Оценка по покрытию, строже для критичных.</p></div>
-      <div class="step"><span class="n">03</span><span class="kkname">допуск / недопуск</span><h3>Решение</h3><p>Один проваленный вопрос по опасности блокирует допуск — независимо от среднего балла.</p></div>
-      <div class="step"><span class="n">04</span><span class="kkname">қол қойылған хаттама</span><h3>Протокол</h3><p>Подписанный credential: кто, кем, по какой версии SOP, с проверяемой подписью.</p></div>
+      <div class="step"><span class="n">01</span><span class="kkname">нұсқаулық</span><h3 data-i18n="cyc.s1h">Инструктаж</h3><p data-i18n="cyc.s1p">Проводит по шагам конкретной SOP предприятия — на казахском, offline.</p></div>
+      <div class="step"><span class="n">02</span><span class="kkname">білім тексеру</span><h3 data-i18n="cyc.s2h">Устный контроль</h3><p data-i18n="cyc.s2p">Контрольные вопросы из полей самой процедуры. Оценка по покрытию, строже для критичных.</p></div>
+      <div class="step"><span class="n">03</span><span class="kkname">допуск / недопуск</span><h3 data-i18n="cyc.s3h">Решение</h3><p data-i18n="cyc.s3p">Один проваленный вопрос по опасности блокирует допуск — независимо от среднего балла.</p></div>
+      <div class="step"><span class="n">04</span><span class="kkname">қол қойылған хаттама</span><h3 data-i18n="cyc.s4h">Протокол</h3><p data-i18n="cyc.s4p">Подписанный credential: кто, кем, по какой версии SOP, с проверяемой подписью.</p></div>
     </div>
   </div>
 </section>
@@ -285,14 +296,14 @@
 <section>
   <div class="wrap">
     <div class="sec-head">
-      <p class="eyebrow">Как это работает у вас</p>
-      <h2>Веб-портал на ваших серверах. Рабочий проходит из дома.</h2>
-      <p>«Offline» = без стороннего облачного ИИ и данные не покидают серверы предприятия — но это полноценный веб-портал. Приказ №223 (с 12.07.2026) легализует дистанционный инструктаж с видеофиксацией.</p>
+      <p class="eyebrow" data-i18n="dep.eyebrow">Как это работает у вас</p>
+      <h2 data-i18n="dep.h2">Веб-портал на ваших серверах. Рабочий проходит из дома.</h2>
+      <p data-i18n="dep.p">«Offline» = без стороннего облачного ИИ и данные не покидают серверы предприятия — но это полноценный веб-портал. Приказ №223 (с 12.07.2026) легализует дистанционный инструктаж с видеофиксацией.</p>
     </div>
     <div class="wedge">
-      <div class="w"><h3><span class="mono">кабинет работника</span>Говорящий инструктаж</h3><p>Заходит под своей учёткой из дома или киоска. ИИ читает шаги SOP <b>казахским голосом</b>, показывает слайды, затем устный контроль знаний.</p></div>
-      <div class="w"><h3><span class="mono">камера-прокторинг</span>Допуск привязан к лицу</h3><p>Снимок при старте, его SHA-256 <b>вшивается в подпись допуска</b>. Подменить «кто проходил» задним числом нельзя — доказательство при НС.</p></div>
-      <div class="w"><h3><span class="mono">дашборд ИТҚ</span>Журнал и контроль</h3><p>ИТР видит все выданные допуски в реальном времени: фото, вердикт, статус подписи. Журнал переживает перезапуск, допуска проверяемы годами.</p></div>
+      <div class="w"><h3 data-i18n="dep.w1h"><span class="mono">кабинет работника</span>Говорящий инструктаж</h3><p data-i18n="dep.w1p">Заходит под своей учёткой из дома или киоска. ИИ читает шаги SOP <b>казахским голосом</b>, показывает слайды, затем устный контроль знаний.</p></div>
+      <div class="w"><h3 data-i18n="dep.w2h"><span class="mono">камера-прокторинг</span>Допуск привязан к лицу</h3><p data-i18n="dep.w2p">Снимок при старте, его SHA-256 <b>вшивается в подпись допуска</b>. Подменить «кто проходил» задним числом нельзя — доказательство при НС.</p></div>
+      <div class="w"><h3 data-i18n="dep.w3h"><span class="mono">дашборд ИТҚ</span>Журнал и контроль</h3><p data-i18n="dep.w3p">ИТР видит все выданные допуски в реальном времени: фото, вердикт, статус подписи. Журнал переживает перезапуск, допуска проверяемы годами.</p></div>
     </div>
   </div>
 </section>
@@ -300,9 +311,9 @@
 <section>
   <div class="wrap">
     <div class="sec-head">
-      <p class="eyebrow">Живой артефакт</p>
-      <h2>Подделать протокол задним числом — нельзя.</h2>
-      <p>Ниже — настоящий подписанный допуск (движок v6.14.0). Измените любое поле — подпись перестанет сходиться. Проверьте сами.</p>
+      <p class="eyebrow" data-i18n="art.eyebrow">Живой артефакт</p>
+      <h2 data-i18n="art.h2">Подделать протокол задним числом — нельзя.</h2>
+      <p data-i18n="art.p">Ниже — настоящий подписанный допуск (движок v6.17.0). Измените любое поле — подпись перестанет сходиться. Проверьте сами.</p>
     </div>
     <div class="demo">
       <div class="card">
@@ -325,14 +336,14 @@
       </div>
       <div class="verify">
         <div class="checks" id="checks">
-          <div class="ck pass"><span class="mark">✓</span><span class="txt"><b>схема</b> распознана</span></div>
-          <div class="ck pass"><span class="mark">✓</span><span class="txt"><b>дайджест</b> совпал</span></div>
-          <div class="ck pass"><span class="mark">✓</span><span class="txt"><b>подпись</b> Ed25519 верна</span></div>
-          <div class="ck pass"><span class="mark">✓</span><span class="txt"><b>issuer</b> = ключ подписи</span></div>
+          <div class="ck pass"><span class="mark">✓</span><span class="txt" data-i18n="art.ck1"><b>схема</b> распознана</span></div>
+          <div class="ck pass"><span class="mark">✓</span><span class="txt" data-i18n="art.ck2"><b>дайджест</b> совпал</span></div>
+          <div class="ck pass"><span class="mark">✓</span><span class="txt" data-i18n="art.ck3"><b>подпись</b> Ed25519 верна</span></div>
+          <div class="ck pass"><span class="mark">✓</span><span class="txt" data-i18n="art.ck4"><b>issuer</b> = ключ подписи</span></div>
         </div>
-        <div class="verdict ok" id="verdict"><span>●</span><span>ЖАРАМДЫ — протокол цел, подписан</span></div>
-        <button class="tamperbtn" id="tamper" type="button">▷ Подделать вердикт (admitted → false)</button>
-        <p class="demo-note">Демонстрация: смена одного поля рвёт дайджест и подпись — ровно то, что делает независимая проверка <span style="font-family:var(--mono)">adam_briefing verify</span> (exit 1).</p>
+        <div class="verdict ok" id="verdict"><span>●</span><span id="verdict-txt" data-i18n="art.vok">ЖАРАМДЫ — протокол цел, подписан</span></div>
+        <button class="tamperbtn" id="tamper" type="button" data-i18n="art.tamper">▷ Подделать вердикт (admitted → false)</button>
+        <p class="demo-note" data-i18n="art.note">Демонстрация: смена одного поля рвёт дайджест и подпись — ровно то, что делает независимая проверка <span style="font-family:var(--mono)">adam_briefing verify</span> (exit 1).</p>
       </div>
     </div>
   </div>
@@ -341,17 +352,17 @@
 <section>
   <div class="wrap">
     <div class="sec-head">
-      <p class="eyebrow">Почему это трудно скопировать</p>
-      <h2>Ров — формат и встроенность в процесс, а не «ИИ-фича».</h2>
-      <p>Крупные EHS-вендоры уже отгружают ИИ. Наш клин — в том, что клиент не может забрать быстро.</p>
+      <p class="eyebrow" data-i18n="moat.eyebrow">Почему это трудно скопировать</p>
+      <h2 data-i18n="moat.h2">Ров — формат и встроенность в процесс, а не «ИИ-фича».</h2>
+      <p data-i18n="moat.p">Крупные EHS-вендоры уже отгружают ИИ. Наш клин — в том, что клиент не может забрать быстро.</p>
     </div>
     <div class="wedge">
-      <div class="w"><h3><span class="mono">offline / on-prem</span>Данные не покидают периметр</h3><p>Промплощадки не отдают инструктаж в облако. Движок работает локально, без сети.</p></div>
-      <div class="w"><h3><span class="mono">qazaq-first</span>Казахский промышленный слой</h3><p>Понимает диктовку рабочего и локальные SOP, а не generic-английский LMS.</p></div>
-      <div class="w"><h3><span class="mono">verifier</span>Детерминизм в пути истины</h3><p>Решение о допуске выносит правило, не вероятностная модель. Ноль галлюцинаций в покрытых доменах.</p></div>
-      <div class="w"><h3><span class="mono">signed record</span>Проверяемый допуск</h3><p>Протокол проверяется любой реализацией Ed25519 — без доверия к поставщику.</p></div>
-      <div class="w"><h3><span class="mono">identity chain</span>Кто (по лицу), кем, по какой SOP</h3><p>Подпись связывает работника (фото-хеш с камеры), полномочия оператора и версию процедуры — цельная доказательная цепочка.</p></div>
-      <div class="w"><h3><span class="mono">process fit</span>Внутренняя комиссия</h3><p>Инструмент комиссии работодателя — там, где по закону РК и рождается допуск рабочего.</p></div>
+      <div class="w"><h3 data-i18n="moat.w1h"><span class="mono">offline / on-prem</span>Данные не покидают периметр</h3><p data-i18n="moat.w1p">Промплощадки не отдают инструктаж в облако. Движок работает локально, без сети.</p></div>
+      <div class="w"><h3 data-i18n="moat.w2h"><span class="mono">qazaq-first</span>Казахский промышленный слой</h3><p data-i18n="moat.w2p">Понимает диктовку рабочего и локальные SOP, а не generic-английский LMS.</p></div>
+      <div class="w"><h3 data-i18n="moat.w3h"><span class="mono">verifier</span>Детерминизм в пути истины</h3><p data-i18n="moat.w3p">Решение о допуске выносит правило, не вероятностная модель. Ноль галлюцинаций в покрытых доменах.</p></div>
+      <div class="w"><h3 data-i18n="moat.w4h"><span class="mono">signed record</span>Проверяемый допуск</h3><p data-i18n="moat.w4p">Протокол проверяется любой реализацией Ed25519 — без доверия к поставщику.</p></div>
+      <div class="w"><h3 data-i18n="moat.w5h"><span class="mono">identity chain</span>Кто (по лицу), кем, по какой SOP</h3><p data-i18n="moat.w5p">Подпись связывает работника (фото-хеш с камеры), полномочия оператора и версию процедуры — цельная доказательная цепочка.</p></div>
+      <div class="w"><h3 data-i18n="moat.w6h"><span class="mono">process fit</span>Внутренняя комиссия</h3><p data-i18n="moat.w6p">Инструмент комиссии работодателя — там, где по закону РК и рождается допуск рабочего.</p></div>
     </div>
   </div>
 </section>
@@ -359,24 +370,24 @@
 <section>
   <div class="wrap">
     <div class="sec-head">
-      <p class="eyebrow">Статус · честно</p>
-      <h2>Где мы сейчас.</h2>
+      <p class="eyebrow" data-i18n="st.eyebrow">Статус · честно</p>
+      <h2 data-i18n="st.h2">Где мы сейчас.</h2>
     </div>
     <div class="status">
       <div class="stat-facts">
-        <div class="f"><div class="num">33</div><div class="lab">процедуры ОТ/ТБ, трёхъязычные, CI-валидированы</div></div>
-        <div class="f"><div class="num">19/19</div><div class="lab">procedure_eval · strict + semantic</div></div>
-        <div class="f"><div class="num">8/8</div><div class="lab">KAT крипто по RFC 8032 + FIPS</div></div>
-        <div class="f"><div class="num">295</div><div class="lab">групп тестов зелёные, 0 падений</div></div>
+        <div class="f"><div class="num">33</div><div class="lab" data-i18n="st.f1">процедуры ОТ/ТБ, трёхъязычные, CI-валидированы</div></div>
+        <div class="f"><div class="num">19/19</div><div class="lab" data-i18n="st.f2">procedure_eval · strict + semantic</div></div>
+        <div class="f"><div class="num">8/8</div><div class="lab" data-i18n="st.f3">KAT крипто по RFC 8032 + FIPS</div></div>
+        <div class="f"><div class="num">295</div><div class="lab" data-i18n="st.f4">групп тестов зелёные, 0 падений</div></div>
       </div>
       <div class="honest">
-        <h3>Готово / что ещё не сделано</h3>
+        <h3 data-i18n="st.honesth">Готово / что ещё не сделано</h3>
         <ul>
-          <li><b>Готово:</b> веб-портал, голос ИИ + слайды, камера-прокторинг, подписанный допуск, персистентный журнал и ключ.</li>
-          <li>Корпоративные учётки / SSO + TLS — для реального развёртывания на серверах предприятия.</li>
-          <li>Полное управление ключами: ротация, отзыв, реестр ролей операторов — следующий слой после пилота.</li>
-          <li>Юридическая сверка применимости Приказа №223 (в силе 12.07.2026) и актуальности источников ГОСТ/ПУЭ — до пилота.</li>
-          <li>Пока это не «сертифицированный аттестатор» — это инструмент внутренней комиссии.</li>
+          <li data-i18n="st.li1"><b>Готово:</b> веб-портал, голос ИИ + слайды, камера-прокторинг, подписанный допуск, персистентный журнал и ключ.</li>
+          <li data-i18n="st.li2">Корпоративные учётки / SSO + TLS — для реального развёртывания на серверах предприятия.</li>
+          <li data-i18n="st.li3">Полное управление ключами: ротация, отзыв, реестр ролей операторов — следующий слой после пилота.</li>
+          <li data-i18n="st.li4">Юридическая сверка применимости Приказа №223 (в силе 12.07.2026) и актуальности источников ГОСТ/ПУЭ — до пилота.</li>
+          <li data-i18n="st.li5">Пока это не «сертифицированный аттестатор» — это инструмент внутренней комиссии.</li>
         </ul>
       </div>
     </div>
@@ -385,7 +396,7 @@
 
 <footer>
   <div class="wrap footrow">
-    <div class="who">&copy; 2026 <b>ERG / ССГПО</b> · инструмент внутренней комиссии по рабочим</div>
+    <div class="who" data-i18n="foot.who">&copy; 2026 <b>ERG / ССГПО</b> · инструмент внутренней комиссии по рабочим</div>
     <a href="mailto:baimurza.daulet@gmail.com">baimurza.daulet@gmail.com</a>
   </div>
 </footer>
@@ -411,11 +422,95 @@
       apply(root.getAttribute("data-theme") === "dark" ? "light" : "dark");
     });
 
+    // ---- i18n: kk/ru; RU — исходная разметка страницы, KK — словарь ----
+    var KK = {
+      "clientmark": `детерминистік ADAM қозғалтқышы`,
+      "hero.eyebrow": `Offline · детерминистік · қазақ тілінде`,
+      "hero.h1": `Жіберу инженері&#8202;— оқыту платформасы емес.`,
+      "hero.lead": `ADAM нақты рәсім бойынша нұсқаулық жүргізеді, <b>түсінікті</b> ауызша сұрау арқылы тексереді, <b>жіберу немесе жібермеу</b> шешімін шығарады және нәтижені <b>криптографиялық тексерілетін хаттамаға</b> қол қояды — оны кез келген тарап жұмыс берушіге де, бізге де сенбей тексере алады.`,
+      "hero.notplatform": `қауіпті жұмысқа жіберудің offline дәлелдеме қозғалтқышы`,
+      "hero.m1": `<b>0</b> бұлттық ИИ`,
+      "hero.m2": `<b>self-hosted</b> веб-портал`,
+      "hero.m4": `<b>33</b> ОТ/ТБ рәсімі`,
+      "cyc.eyebrow": `Жіберудің толық циклі`,
+      "cyc.h2": `Бүгін қағазбен жасалатын төрт қадам.`,
+      "cyc.p": `ҚР регламентімен белгіленген реттілік (ҚР ЕК 182-бабы, №1019 бұйрық). Әр қадам — детерминистік, еркін генерациясыз.`,
+      "cyc.s1h": `Нұсқаулық`,
+      "cyc.s1p": `Кәсіпорынның нақты SOP қадамдары бойынша жүргізеді — қазақша, offline.`,
+      "cyc.s2h": `Ауызша тексеру`,
+      "cyc.s2p": `Бақылау сұрақтары рәсімнің өз өрістерінен. Бағалау қамту бойынша, критикалық сұрақтарға қатаңырақ.`,
+      "cyc.s3h": `Шешім`,
+      "cyc.s3p": `Қауіп бойынша бір қате жауап жіберуді бұғаттайды — орташа балға қарамастан.`,
+      "cyc.s4h": `Хаттама`,
+      "cyc.s4p": `Қол қойылған credential: кім, кіммен, SOP қай нұсқасы бойынша, тексерілетін қолтаңбамен.`,
+      "dep.eyebrow": `Бұл сізде қалай жұмыс істейді`,
+      "dep.h2": `Веб-портал сіздің серверлеріңізде. Жұмысшы үйден өтеді.`,
+      "dep.p": `«Offline» = бөгде бұлттық ИИ жоқ және деректер кәсіпорын серверлерінен шықпайды — бірақ бұл толыққанды веб-портал. №223 бұйрық (12.07.2026-дан) бейнетіркеумен қашықтан нұсқаулықты заңдастырады.`,
+      "dep.w1h": `<span class="mono">жұмысшы кабинеті</span>Сөйлейтін нұсқаулық`,
+      "dep.w1p": `Үйден немесе киоскіден өз тіркелгісімен кіреді. ИИ SOP қадамдарын <b>қазақ дауысымен</b> оқиды, слайдтарды көрсетеді, содан кейін білімді ауызша тексереді.`,
+      "dep.w2h": `<span class="mono">камера-прокторинг</span>Жіберу бет-әлпетке байланған`,
+      "dep.w2p": `Басталуда суретке түсіреді, оның SHA-256-сы <b>жіберу қолтаңбасына тігіледі</b>. «Кім өтті» дегенді кейін ауыстыру мүмкін емес — жазатайым оқиға кезіндегі дәлел.`,
+      "dep.w3h": `<span class="mono">ИТҚ дашбордысы</span>Журнал және бақылау`,
+      "dep.w3p": `ИТҚ берілген барлық жіберуді нақты уақытта көреді: фото, шешім, қолтаңба күйі. Журнал қайта іске қосуды сақтайды, жіберулер жылдар бойы тексеріледі.`,
+      "art.eyebrow": `Тірі артефакт`,
+      "art.h2": `Хаттаманы кейін бұрмалау мүмкін емес.`,
+      "art.p": `Төменде — нақты қол қойылған жіберу (қозғалтқыш v6.17.0). Кез келген өрісті өзгертіңіз — қолтаңба сәйкес келмей қалады. Өзіңіз тексеріңіз.`,
+      "art.ck1": `<b>схема</b> танылды`,
+      "art.ck2": `<b>дайджест</b> сәйкес келді`,
+      "art.ck3": `<b>Ed25519 қолтаңбасы</b> дұрыс`,
+      "art.ck4": `<b>issuer</b> = қолтаңба кілті`,
+      "art.vok": `ЖАРАМДЫ — хаттама бүтін, қол қойылған`,
+      "art.tamper": `▷ Шешімді бұрмалау (admitted → false)`,
+      "art.note": `Демонстрация: бір өрісті өзгерту дайджест пен қолтаңбаны бұзады — дәл осыны тәуелсіз тексеру <span style="font-family:var(--mono)">adam_briefing verify</span> (exit 1) жасайды.`,
+      "moat.eyebrow": `Мұны көшіру неге қиын`,
+      "moat.h2": `Қорған — формат пен процеске кірігу, «ИИ-фича» емес.`,
+      "moat.p": `Ірі EHS-вендорлар ИИ-ді әлдеқашан жеткізуде. Біздің сынамыз — клиент тез ала алмайтын нәрсе.`,
+      "moat.w1h": `<span class="mono">offline / on-prem</span>Деректер периметрден шықпайды`,
+      "moat.w1p": `Өнеркәсіп алаңдары нұсқаулықты бұлтқа бермейді. Қозғалтқыш желісіз, жергілікті жұмыс істейді.`,
+      "moat.w2h": `<span class="mono">qazaq-first</span>Қазақ өнеркәсіптік қабаты`,
+      "moat.w2p": `Жұмысшының диктовкасын және жергілікті SOP-ты түсінеді, generic-ағылшын LMS емес.`,
+      "moat.w3h": `<span class="mono">verifier</span>Ақиқат жолындағы детерминизм`,
+      "moat.w3p": `Жіберу шешімін ереже шығарады, ықтималдық моделі емес. Қамтылған домендерде нөл галлюцинация.`,
+      "moat.w4h": `<span class="mono">signed record</span>Тексерілетін жіберу`,
+      "moat.w4p": `Хаттаманы кез келген Ed25519 іске асыруы тексереді — жеткізушіге сенбей.`,
+      "moat.w5h": `<span class="mono">identity chain</span>Кім (бет бойынша), кіммен, қай SOP бойынша`,
+      "moat.w5p": `Қолтаңба жұмысшыны (камерадан фото-хеш), оператор өкілеттігін және рәсім нұсқасын байланыстырады — тұтас дәлелдеме тізбегі.`,
+      "moat.w6h": `<span class="mono">process fit</span>Ішкі комиссия`,
+      "moat.w6p": `Жұмыс беруші комиссиясының құралы — ҚР заңы бойынша жұмысшы жіберуі дәл сол жерде туады.`,
+      "st.eyebrow": `Мәртебе · шынайы`,
+      "st.h2": `Біз қазір қайдамыз.`,
+      "st.f1": `ОТ/ТБ рәсімі, үштілді, CI-валидацияланған`,
+      "st.f2": `procedure_eval · strict + semantic`,
+      "st.f3": `RFC 8032 + FIPS бойынша KAT крипто`,
+      "st.f4": `тест тобы жасыл, 0 құлау`,
+      "st.honesth": `Дайын / әлі жасалмағаны`,
+      "st.li1": `<b>Дайын:</b> веб-портал, ИИ дауысы + слайдтар, камера-прокторинг, қол қойылған жіберу, тұрақты журнал және кілт.`,
+      "st.li2": `Корпоративтік тіркелгілер / SSO + TLS — кәсіпорын серверлерінде нақты орналастыру үшін.`,
+      "st.li3": `Кілттерді толық басқару: ротация, кері қайтару, оператор рөлдерінің тізілімі — пилоттан кейінгі келесі қабат.`,
+      "st.li4": `№223 бұйрықтың қолданылуын (12.07.2026-дан күшінде) және ГОСТ/ПУЭ дереккөздерінің өзектілігін заңды салыстыру — пилотқа дейін.`,
+      "st.li5": `Әзірге бұл «сертификатталған аттестатор» емес — ішкі комиссияның құралы.`,
+      "foot.who": `&copy; 2026 <b>ERG / ССГПО</b> · жұмысшылар бойынша ішкі комиссия құралы`
+    };
+    // динамические строки tamper-демо (нет в статичном DOM)
+    var DYN = {
+      ru: { vbad: "ЖАРАМСЫЗ — подделка обнаружена (exit 1)", untamper: "↺ Вернуть подлинный протокол", badgeBad: "изменён" },
+      kk: { vbad: "ЖАРАМСЫЗ — бұрмалау анықталды (exit 1)", untamper: "↺ Түпнұсқа хаттаманы қайтару", badgeBad: "өзгертілді" }
+    };
+    var TITLE = { ru: "ERG/ССГПО · ОТ/ТБ — детерминированный движок ADAM", kk: "ERG/ССГПО · ОТ/ТБ — детерминистік ADAM қозғалтқышы" };
+
+    // захват русских оригиналов из разметки
+    var i18nEls = document.querySelectorAll("[data-i18n]");
+    var RU = {};
+    i18nEls.forEach(function (el) { RU[el.getAttribute("data-i18n")] = el.innerHTML; });
+
+    var curLang = "ru";
+
     // ---- live tamper demonstration ----
     var tampered = false;
     var tbtn = document.getElementById("tamper");
     var checks = document.getElementById("checks");
     var verdict = document.getElementById("verdict");
+    var verdictTxt = document.getElementById("verdict-txt");
     var credBadge = document.getElementById("cred-badge");
     var credAdmitted = document.getElementById("cred-admitted");
     function setCheck(i, pass) {
@@ -423,24 +518,47 @@
       ck.className = "ck " + (pass ? "pass" : "fail");
       ck.querySelector(".mark").textContent = pass ? "✓" : "✗";
     }
+    function resetTamper() {
+      tampered = false;
+      credAdmitted.innerHTML = 'admitted: <b>true</b> · 6/6';
+      credBadge.className = "badge ok"; credBadge.textContent = "admitted";
+      setCheck(1, true); setCheck(2, true);
+      verdict.className = "verdict ok";
+      // verdictTxt и tbtn уже переставлены applyLang через data-i18n
+    }
     tbtn.addEventListener("click", function () {
       tampered = !tampered;
+      var d = DYN[curLang];
       if (tampered) {
         credAdmitted.innerHTML = 'admitted: <b class="flip">false</b> · 6/6';
-        credBadge.className = "badge bad"; credBadge.textContent = "изменён";
+        credBadge.className = "badge bad"; credBadge.textContent = d.badgeBad;
         setCheck(1, false); setCheck(2, false);
         verdict.className = "verdict bad";
-        verdict.innerHTML = "<span>●</span><span>ЖАРАМСЫЗ — подделка обнаружена (exit 1)</span>";
-        tbtn.textContent = "↺ Вернуть подлинный протокол";
+        verdictTxt.textContent = d.vbad;
+        tbtn.textContent = d.untamper;
       } else {
         credAdmitted.innerHTML = 'admitted: <b>true</b> · 6/6';
         credBadge.className = "badge ok"; credBadge.textContent = "admitted";
         setCheck(1, true); setCheck(2, true);
         verdict.className = "verdict ok";
-        verdict.innerHTML = "<span>●</span><span>ЖАРАМДЫ — протокол цел, подписан</span>";
-        tbtn.textContent = "▷ Подделать вердикт (admitted → false)";
+        verdictTxt.textContent = KK["art.vok"] && curLang === "kk" ? KK["art.vok"] : RU["art.vok"];
+        tbtn.textContent = curLang === "kk" ? KK["art.tamper"] : RU["art.tamper"];
       }
     });
+
+    function applyLang(l) {
+      curLang = (l === "kk") ? "kk" : "ru";
+      var map = (curLang === "kk") ? KK : RU;
+      i18nEls.forEach(function (el) {
+        var k = el.getAttribute("data-i18n");
+        if (map[k] !== undefined) el.innerHTML = map[k];
+      });
+      root.lang = curLang;
+      document.title = TITLE[curLang];
+      resetTamper();            // язык переключили — вернуть демо к подлинному виду
+    }
+    document.getElementById("lang").addEventListener("change", function () { applyLang(this.value); });
+    applyLang("ru");
   })();
 </script>
 </body>

@@ -23,7 +23,8 @@
   .logo{width:24px;height:24px;flex:none}
   .brand{font-family:var(--mono);font-weight:700;font-size:.9rem}
   .brand b{color:var(--accent)}
-  .tag{margin-left:auto;font-family:var(--mono);font-size:.72rem;color:var(--ink-faint)}
+  .tag{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint)}
+  .lang{margin-left:auto;font-family:var(--mono);font-size:.78rem;padding:.35rem .5rem;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface-2);color:var(--ink)}
   main{max-width:72rem;margin:0 auto;padding:1.6rem 1.4rem 4rem}
   h1{font-size:1.4rem;margin:.2rem 0 1.1rem}
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:1.4rem}
@@ -52,43 +53,71 @@
     <line x1="76" y1="76" x2="324" y2="324"/><line x1="137" y1="37" x2="363" y2="263"/><line x1="37" y1="137" x2="263" y2="363"/>
     <line x1="76" y1="324" x2="324" y2="76"/><line x1="137" y1="363" x2="363" y2="137"/><line x1="37" y1="263" x2="263" y2="37"/></g></svg>
   <span class="brand">ERG/ССГПО<b>·</b>ОТ/ТБ</span>
-  <span class="tag">дашборд ИТР · движок ADAM<span class="live" id="live">● live</span></span>
+  <span class="tag" id="tag"></span><span class="live" id="live">● live</span>
+  <select id="lang" class="lang">
+    <option value="ru">Русский</option>
+    <option value="kk">Қазақша</option>
+  </select>
 </div></div>
 
 <main>
-  <h1>Журнал допусков</h1>
+  <h1 id="h1"></h1>
   <div class="stats">
-    <div class="stat"><div class="n" id="s-total">0</div><div class="l">всего протоколов</div></div>
-    <div class="stat"><div class="n ok" id="s-adm">0</div><div class="l">допущено</div></div>
-    <div class="stat"><div class="n bad" id="s-den">0</div><div class="l">не допущено</div></div>
-    <div class="stat"><div class="n" id="s-ver">0</div><div class="l">подпись верна</div></div>
+    <div class="stat"><div class="n" id="s-total">0</div><div class="l" id="l-total"></div></div>
+    <div class="stat"><div class="n ok" id="s-adm">0</div><div class="l" id="l-adm"></div></div>
+    <div class="stat"><div class="n bad" id="s-den">0</div><div class="l" id="l-den"></div></div>
+    <div class="stat"><div class="n" id="s-ver">0</div><div class="l" id="l-ver"></div></div>
   </div>
 
   <div style="overflow-x:auto">
   <table id="tbl">
-    <thead><tr>
-      <th>Время</th><th>Идент.</th><th>Работник</th><th>Табельный</th><th>Процедура</th>
-      <th>Результат</th><th>Вердикт</th><th>Подпись</th>
-    </tr></thead>
-    <tbody id="rows"><tr><td colspan="8" class="empty">Ожидание протоколов… запустите adam_portal и пройдите инструктаж в кабинете работника.</td></tr></tbody>
+    <thead><tr id="head"></tr></thead>
+    <tbody id="rows"></tbody>
   </table>
   </div>
 </main>
 
 <script>
   const $ = id => document.getElementById(id);
-  async function poll() {
-    let rows = [];
-    try {
-      const r = await fetch("/api/admissions");
-      if (r.ok) rows = await r.json();
-      $("live").textContent = "● live";
-      $("live").style.color = "var(--verified)";
-    } catch (e) {
-      $("live").textContent = "○ нет связи";
-      $("live").style.color = "var(--ink-faint)";
+  const I18N = {
+    ru: {
+      htmllang:"ru", tag:"дашборд ИТР · движок ADAM", h1:"Журнал допусков",
+      lTotal:"всего протоколов", lAdm:"допущено", lDen:"не допущено", lVer:"подпись верна",
+      cols:["Время","Идент.","Работник","Табельный","Процедура","Результат","Вердикт","Подпись"],
+      live:"● live", noconn:"○ нет связи",
+      wait:"Ожидание протоколов… запустите adam_portal и пройдите инструктаж в кабинете работника.",
+      none:"Пока нет протоколов.",
+      admitted:"допущен", denied:"не допущен", sigOk:"✓ верна", sigBad:"✗ невалидна"
+    },
+    kk: {
+      htmllang:"kk", tag:"ИТҚ дашбордысы · ADAM қозғалтқышы", h1:"Жіберу журналы",
+      lTotal:"барлық хаттама", lAdm:"жіберілді", lDen:"жіберілмеді", lVer:"қолтаңба дұрыс",
+      cols:["Уақыт","Сәйкест.","Қызметкер","Табельдік","Рәсім","Нәтиже","Шешім","Қолтаңба"],
+      live:"● live", noconn:"○ байланыс жоқ",
+      wait:"Хаттамалар күтілуде… adam_portal іске қосып, қызметкер кабинетінде нұсқаулықтан өтіңіз.",
+      none:"Әзірге хаттама жоқ.",
+      admitted:"жіберілді", denied:"жіберілмеді", sigOk:"✓ дұрыс", sigBad:"✗ жарамсыз"
     }
-    const total = rows.length;
+  };
+  let lang = "ru", T = I18N.ru, lastRows = [], hadConn = false;
+
+  function applyLang(l){
+    lang = (l === "kk") ? "kk" : "ru"; T = I18N[lang];
+    document.documentElement.lang = T.htmllang;
+    document.title = "ERG/ССГПО · ОТ/ТБ — " + T.h1;
+    $("tag").textContent = T.tag;
+    $("h1").textContent = T.h1;
+    $("l-total").textContent = T.lTotal;
+    $("l-adm").textContent = T.lAdm;
+    $("l-den").textContent = T.lDen;
+    $("l-ver").textContent = T.lVer;
+    $("head").innerHTML = T.cols.map(c => `<th>${c}</th>`).join("");
+    $("live").textContent = hadConn ? T.live : T.noconn;
+    render();
+  }
+
+  function render(){
+    const rows = lastRows, total = rows.length;
     const adm = rows.filter(x => x.admitted).length;
     const ver = rows.filter(x => x.valid).length;
     $("s-total").textContent = total;
@@ -105,12 +134,29 @@
         <td class="mono">${esc(x.workerId) || "—"}</td>
         <td class="mono">${esc(x.procedure)}</td>
         <td class="mono">${x.passedCount}/${x.total}</td>
-        <td><span class="pill ${x.admitted?'ok':'bad'}">${x.admitted?'допущен':'не допущен'}</span></td>
-        <td><span class="v ${x.valid?'y':'n'}">${x.valid?'✓ верна':'✗ невалидна'}</span></td>
+        <td><span class="pill ${x.admitted?'ok':'bad'}">${x.admitted?T.admitted:T.denied}</span></td>
+        <td><span class="v ${x.valid?'y':'n'}">${x.valid?T.sigOk:T.sigBad}</span></td>
       </tr>`).join("")
-      : `<tr><td colspan="8" class="empty">Пока нет протоколов.</td></tr>`;
+      : `<tr><td colspan="8" class="empty">${hadConn?T.none:T.wait}</td></tr>`;
+  }
+
+  async function poll() {
+    try {
+      const r = await fetch("/api/admissions");
+      if (r.ok) lastRows = await r.json();
+      hadConn = true;
+      $("live").textContent = T.live;
+      $("live").style.color = "var(--verified)";
+    } catch (e) {
+      hadConn = false;
+      $("live").textContent = T.noconn;
+      $("live").style.color = "var(--ink-faint)";
+    }
+    render();
   }
   function esc(s){return (s||"").replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]));}
+  $("lang").onchange = () => applyLang($("lang").value);
+  applyLang("ru");
   poll();
   setInterval(poll, 3000);
 </script>

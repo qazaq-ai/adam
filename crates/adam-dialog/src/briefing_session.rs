@@ -118,6 +118,13 @@ impl QuestionSource {
 
     /// Short Kazakh label for the protocol — tells the ИТР *what*
     /// each question tested.
+    ///
+    /// This is also the **canonical machine tag** sealed into the
+    /// credential (`SealedAnswer::kind`) and mixed into the content
+    /// digest, so it stays language-invariant regardless of the
+    /// session's display language — a Russian-language session and a
+    /// Kazakh-language session of the same procedure carry the same
+    /// question-type tags in their signed evidence.
     pub fn label_kk(self) -> &'static str {
         match self {
             Self::Authority => "жауаптылық",
@@ -125,6 +132,28 @@ impl QuestionSource {
             Self::Hazard => "қауіп",
             Self::Mitigation => "қорғану",
             Self::Gate => "жіберу шарты",
+        }
+    }
+
+    /// Short Russian label for the human-readable protocol — the
+    /// display counterpart of [`Self::label_kk`] for a Russian
+    /// briefing.  Display-only: the signed credential keeps the
+    /// Kazakh canonical tag.
+    pub fn label_ru(self) -> &'static str {
+        match self {
+            Self::Authority => "ответственность",
+            Self::Step(_) => "шаг",
+            Self::Hazard => "опасность",
+            Self::Mitigation => "защита",
+            Self::Gate => "условие допуска",
+        }
+    }
+
+    /// Language-parametric label for rendering the protocol.
+    pub fn label_in(self, lang: Lang) -> &'static str {
+        match lang {
+            Lang::Kk => self.label_kk(),
+            Lang::Ru => self.label_ru(),
         }
     }
 }
@@ -196,62 +225,135 @@ pub struct BriefingProtocol {
     pub critical_failed: bool,
     /// `true` → допущен; `false` → не допущен (повторный инструктаж).
     pub admitted: bool,
+    /// Language the session was conducted in — selects which set of
+    /// human-readable strings [`Self::render`] emits.  The signed
+    /// evidence stays language-invariant (Kazakh canonical tags);
+    /// only the journal render follows this field.
+    pub lang: Lang,
 }
 
 impl BriefingProtocol {
-    /// Render the protocol as a Kazakh journal entry the ИТР can
-    /// review before signing.  A caller with a clock stamps the
-    /// date/identity around this body.
+    /// Render the protocol as a journal entry the ИТР can review
+    /// before signing, in the session's own language ([`Self::lang`]).
+    /// A caller with a clock stamps the date/identity around this body.
+    pub fn render(&self) -> String {
+        self.render_in(self.lang)
+    }
+
+    /// Render the protocol as a Kazakh journal entry.  A caller with a
+    /// clock stamps the date/identity around this body.
     pub fn render_kk(&self) -> String {
+        self.render_in(Lang::Kk)
+    }
+
+    /// Render the protocol as a Russian journal entry — the display
+    /// counterpart of [`Self::render_kk`] for a Russian briefing.
+    pub fn render_ru(&self) -> String {
+        self.render_in(Lang::Ru)
+    }
+
+    /// Language-parametric journal render.  Only the human-readable
+    /// chrome and the question-type labels switch language; the
+    /// prompts, title and answers are carried verbatim from the graded
+    /// session (already in that language) and the content digest is
+    /// language-invariant.
+    pub fn render_in(&self, lang: Lang) -> String {
         let mut out = String::new();
-        out.push_str("=== Нұсқаулық хаттамасы ===\n");
-        out.push_str(&format!(
-            "Рәсім: {} ({})\n",
-            self.title_kk, self.procedure_id
-        ));
-        out.push_str(&format!(
-            "SOP нұсқасы: {} — {}\n",
-            self.sop_version_date, self.sop_hash
-        ));
+        match lang {
+            Lang::Kk => {
+                out.push_str("=== Нұсқаулық хаттамасы ===\n");
+                out.push_str(&format!(
+                    "Рәсім: {} ({})\n",
+                    self.title_kk, self.procedure_id
+                ));
+                out.push_str(&format!(
+                    "SOP нұсқасы: {} — {}\n",
+                    self.sop_version_date, self.sop_hash
+                ));
+            }
+            Lang::Ru => {
+                out.push_str("=== Протокол инструктажа ===\n");
+                out.push_str(&format!(
+                    "Процедура: {} ({})\n",
+                    self.title_kk, self.procedure_id
+                ));
+                out.push_str(&format!(
+                    "Версия SOP: {} — {}\n",
+                    self.sop_version_date, self.sop_hash
+                ));
+            }
+        }
         for (i, a) in self.answers.iter().enumerate() {
-            let crit = if a.source.is_safety_critical() {
-                ", критикалық"
-            } else {
-                ""
+            let crit = match (lang, a.source.is_safety_critical()) {
+                (Lang::Kk, true) => ", критикалық",
+                (Lang::Ru, true) => ", критично",
+                (_, false) => "",
+            };
+            let (verdict, coverage_word) = match (lang, a.passed) {
+                (Lang::Kk, true) => ("дұрыс", "қамту"),
+                (Lang::Kk, false) => ("толық емес", "қамту"),
+                (Lang::Ru, true) => ("верно", "охват"),
+                (Lang::Ru, false) => ("неполно", "охват"),
+            };
+            let answer_word = match lang {
+                Lang::Kk => "Жауап",
+                Lang::Ru => "Ответ",
             };
             out.push_str(&format!(
-                "{}. [{}{}] {}\n   Жауап: «{}» — {} (қамту {:.0}%)\n",
+                "{}. [{}{}] {}\n   {}: «{}» — {} ({} {:.0}%)\n",
                 i + 1,
-                a.source.label_kk(),
+                a.source.label_in(lang),
                 crit,
                 a.prompt_kk,
+                answer_word,
                 a.user_answer.trim(),
-                if a.passed {
-                    "дұрыс"
-                } else {
-                    "толық емес"
-                },
+                verdict,
+                coverage_word,
                 a.coverage * 100.0,
             ));
         }
-        out.push_str(&format!(
-            "Нәтиже: {}/{} дұрыс — {}\n",
-            self.passed_count,
-            self.total,
-            if self.admitted {
-                "ЖҰМЫСҚА ЖІБЕРІЛДІ (допущен)"
-            } else {
-                "ЖІБЕРІЛМЕДІ — қайта нұсқаулық қажет (не допущен)"
-            },
-        ));
-        if self.critical_failed {
-            out.push_str(
-                "Себебі: қауіпсіздік бойынша негізгі сұрақ (қауіп/қорғану/жіберу шарты) \
-                 дұрыс жауапталмады — орташа пайызға қарамастан жіберілмейді.\n",
-            );
+        match lang {
+            Lang::Kk => {
+                out.push_str(&format!(
+                    "Нәтиже: {}/{} дұрыс — {}\n",
+                    self.passed_count,
+                    self.total,
+                    if self.admitted {
+                        "ЖҰМЫСҚА ЖІБЕРІЛДІ (допущен)"
+                    } else {
+                        "ЖІБЕРІЛМЕДІ — қайта нұсқаулық қажет (не допущен)"
+                    },
+                ));
+                if self.critical_failed {
+                    out.push_str(
+                        "Себебі: қауіпсіздік бойынша негізгі сұрақ (қауіп/қорғану/жіберу шарты) \
+                         дұрыс жауапталмады — орташа пайызға қарамастан жіберілмейді.\n",
+                    );
+                }
+                out.push_str(&format!("Тұтастық хеші: {}\n", self.content_digest()));
+                out.push_str("ИТҚ растауы: ____________________\n");
+            }
+            Lang::Ru => {
+                out.push_str(&format!(
+                    "Итог: {}/{} верно — {}\n",
+                    self.passed_count,
+                    self.total,
+                    if self.admitted {
+                        "ДОПУЩЕН К РАБОТЕ"
+                    } else {
+                        "НЕ ДОПУЩЕН — требуется повторный инструктаж"
+                    },
+                ));
+                if self.critical_failed {
+                    out.push_str(
+                        "Причина: основной вопрос по безопасности (опасность/защита/условие допуска) \
+                         отвечен неверно — не допускается независимо от среднего процента.\n",
+                    );
+                }
+                out.push_str(&format!("Хеш целостности: {}\n", self.content_digest()));
+                out.push_str("Подтверждение ИТР: ____________________\n");
+            }
         }
-        out.push_str(&format!("Тұтастық хеші: {}\n", self.content_digest()));
-        out.push_str("ИТҚ растауы: ____________________\n");
         out
     }
 
@@ -535,6 +637,7 @@ impl BriefingSession {
             total,
             critical_failed,
             admitted,
+            lang: self.lang,
         }
     }
 }
@@ -981,6 +1084,67 @@ mod tests {
         assert!(
             proto.admitted,
             "passing every safety question + clearing the ratio must admit",
+        );
+    }
+
+    /// **v6.16.1 — bilingual protocol.** A Russian-language session
+    /// renders a Russian journal (`render`/`render_ru`) with Russian
+    /// question-type labels, while the *signed* anchors stay
+    /// language-invariant: the SOP hash (version stability) and the
+    /// Kazakh-canonical question-type tags are identical to the Kazakh
+    /// session of the same procedure.
+    #[test]
+    fn ru_session_renders_russian_but_keeps_invariant_anchors() {
+        let answers = [
+            "энергетик пен цех бастығы жауапты",
+            "энергетик электр қуатын ажыратады",
+            "күтпеген іске қосылу қаупі",
+            "жеке құлып пен бирка орнатамыз",
+            "барлық блоктаулар тізілімге енгізіледі",
+        ];
+        let mut sk = BriefingSession::from_procedure(&sample());
+        let _ = sk.begin();
+        sk.advance("ok");
+        sk.advance("ok");
+        for a in answers {
+            sk.advance(a);
+        }
+        let pk = sk.protocol().expect("kk done");
+
+        let mut sr = BriefingSession::from_procedure_in(&sample(), Lang::Ru);
+        let _ = sr.begin();
+        sr.advance("ok");
+        sr.advance("ok");
+        for a in answers {
+            sr.advance(a);
+        }
+        let pr = sr.protocol().expect("ru done");
+
+        // Version anchor is language-invariant.
+        assert_eq!(
+            pk.sop_hash, pr.sop_hash,
+            "sopHash must not depend on language"
+        );
+        // Sealed question-type tags stay Kazakh-canonical.
+        for (ak, ar) in pk.answers.iter().zip(pr.answers.iter()) {
+            assert_eq!(ak.source.label_kk(), ar.source.label_kk());
+        }
+        // The render follows the session language.
+        assert_eq!(pr.lang, Lang::Ru);
+        let ru = pr.render();
+        assert!(ru.contains("Протокол инструктажа"), "Russian header");
+        assert!(ru.contains("Итог:"), "Russian verdict line");
+        assert!(
+            ru.contains("условие допуска") || ru.contains("опасность"),
+            "Russian question-type labels: {ru}"
+        );
+        assert!(
+            !ru.contains("Нұсқаулық хаттамасы"),
+            "no Kazakh chrome in ru render"
+        );
+        assert!(
+            pk.render_kk().contains("Нұсқаулық хаттамасы"),
+            "kk render unchanged"
         );
     }
 

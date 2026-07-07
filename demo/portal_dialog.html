@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ERG/ССГПО · ОТ/ТБ — жалпы диалог (движок ADAM)</title>
+<title>ERG/ССГПО · ОТ/ТБ — общий диалог (движок ADAM)</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cg stroke='%23d27700' stroke-width='45' stroke-linecap='round'%3E%3Cline x1='76' y1='76' x2='324' y2='324'/%3E%3Cline x1='137' y1='37' x2='363' y2='263'/%3E%3Cline x1='37' y1='137' x2='263' y2='363'/%3E%3Cline x1='76' y1='324' x2='324' y2='76'/%3E%3Cline x1='137' y1='363' x2='363' y2='137'/%3E%3Cline x1='37' y1='263' x2='263' y2='37'/%3E%3C/g%3E%3C/svg%3E">
 <style>
   :root{
@@ -24,13 +24,14 @@
   .logo{width:24px;height:24px;flex:none}
   .brand{font-family:var(--mono);font-weight:700;font-size:.9rem}
   .brand b{color:var(--accent)}
-  .tag{margin-left:auto;font-family:var(--mono);font-size:.72rem;color:var(--ink-faint)}
+  .tag{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint)}
+  .lang{margin-left:auto;font-family:var(--mono);font-size:.78rem;padding:.35rem .5rem;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface-2);color:var(--ink)}
   main{flex:1;max-width:52rem;width:100%;margin:0 auto;padding:1.2rem;overflow-y:auto;display:flex;flex-direction:column;gap:.7rem}
   .msg{max-width:80%;padding:.6rem .85rem;border-radius:12px;line-height:1.5;white-space:pre-wrap;font-size:1rem}
   .msg.user{align-self:flex-end;background:var(--user);border:1px solid var(--line)}
   .msg.adam{align-self:flex-start;background:var(--adam-soft);border:1px solid var(--line)}
   .msg .who{display:block;font-family:var(--mono);font-size:.64rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:.2rem}
-  .hint{align-self:center;font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);text-align:center;max-width:40ch}
+  .hint{align-self:center;font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);text-align:center;max-width:46ch}
   .composer{border-top:1px solid var(--line);background:var(--surface)}
   .composer .in{max-width:52rem;margin:0 auto;padding:.7rem 1.2rem;display:flex;gap:.5rem;align-items:center}
   #text{flex:1;padding:.65rem .8rem;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface-2);color:var(--ink);font-size:1rem;font-family:var(--sans)}
@@ -39,6 +40,7 @@
   button.on{border-color:var(--accent);color:var(--accent)}
   button.rec{border-color:#C13A34;color:#C13A34}
   button:disabled{opacity:.5;cursor:default}
+  .voicechip{align-self:center;font-family:var(--mono);font-size:.68rem;color:var(--ink-faint)}
 </style>
 </head>
 <body>
@@ -47,32 +49,75 @@
     <line x1="76" y1="76" x2="324" y2="324"/><line x1="137" y1="37" x2="363" y2="263"/><line x1="37" y1="137" x2="263" y2="363"/>
     <line x1="76" y1="324" x2="324" y2="76"/><line x1="137" y1="363" x2="363" y2="137"/><line x1="37" y1="263" x2="263" y2="37"/></g></svg>
   <span class="brand">ERG/ССГПО<b>·</b>ОТ/ТБ</span>
-  <span class="tag">жалпы диалог · движок ADAM</span>
+  <span class="tag" id="tag"></span>
+  <select id="lang" class="lang">
+    <option value="ru">Русский</option>
+    <option value="kk">Қазақша</option>
+  </select>
 </div></div>
 
-<main id="log">
-  <div class="msg adam"><span class="who">adam</span>Сәлеметсіз бе! Мен — қазақша сөйлесуге арналған ARK, атым адам. Сұрағыңызды жазыңыз немесе 🎙 басып айтыңыз.</div>
-  <div class="hint">Мысалы: «Судың формуласы қандай?», «Қазір сағат неше?», «44 көбейт 6 ға», «Қазақстанда қандай таулар бар?»</div>
-</main>
+<main id="log"></main>
 
 <div class="composer"><div class="in">
-  <button id="micBtn" type="button" title="Дауыспен айту">🎙</button>
-  <input id="text" placeholder="Сұрағыңызды жазыңыз…" autocomplete="off">
-  <button id="voiceBtn" class="on" type="button" title="Жауапты дауыстау">🔊</button>
-  <button id="sendBtn" class="pri" type="button">Жіберу</button>
+  <button id="micBtn" type="button">🎙</button>
+  <input id="text" autocomplete="off">
+  <button id="voiceBtn" class="on" type="button">🔊</button>
+  <button id="sendBtn" class="pri" type="button"></button>
 </div></div>
 
 <script>
   const $ = id => document.getElementById(id);
   const log = $("log");
 
+  // ---- i18n: язык интерфейса kk/ru (движок ARK отвечает по-казахски) ----
+  const I18N = {
+    ru: {
+      htmllang:"ru", tag:"общий диалог · движок ADAM", send:"Отправить",
+      placeholder:"Напишите вопрос…", micTitle:"Сказать голосом", voiceTitle:"Озвучивать ответ",
+      greet:"Здравствуйте! Я — ARK для общения на казахском, меня зовут adam. Напишите вопрос или нажмите 🎙 и скажите голосом.",
+      hint:"Например: «Судың формуласы қандай?», «Қазір сағат неше?», «44 көбейт 6 ға», «Қазақстанда қандай таулар бар?»",
+      you:"вы", noSR:"В этом браузере нет голосового ввода — напишите текстом",
+      err:"Ошибка: сервер недоступен (запустите adam_portal).", srLang:"ru-RU",
+      vMale:"голос: мужской", vFemale:"голос: женский", vChild:"голос: детский"
+    },
+    kk: {
+      htmllang:"kk", tag:"жалпы диалог · ADAM қозғалтқышы", send:"Жіберу",
+      placeholder:"Сұрағыңызды жазыңыз…", micTitle:"Дауыспен айту", voiceTitle:"Жауапты дауыстау",
+      greet:"Сәлеметсіз бе! Мен — қазақша сөйлесуге арналған ARK, атым адам. Сұрағыңызды жазыңыз немесе 🎙 басып айтыңыз.",
+      hint:"Мысалы: «Судың формуласы қандай?», «Қазір сағат неше?», «44 көбейт 6 ға», «Қазақстанда қандай таулар бар?»",
+      you:"сіз", noSR:"Бұл браузерде дауыспен енгізу жоқ — мәтінмен жазыңыз",
+      err:"Қате: сервер жоқ (adam_portal іске қосыңыз).", srLang:"kk-KZ",
+      vMale:"дауыс: ер адам", vFemale:"дауыс: әйел", vChild:"дауыс: бала"
+    }
+  };
+  let lang = "ru", T = I18N.ru;
+
   function add(text, who) {
     const d = document.createElement("div");
     d.className = "msg " + who;
-    const w = document.createElement("span"); w.className = "who"; w.textContent = who === "user" ? "сіз" : "adam";
+    const w = document.createElement("span"); w.className = "who"; w.textContent = who === "user" ? T.you : "adam";
     d.appendChild(w); d.appendChild(document.createTextNode(text));
     log.appendChild(d); log.scrollTop = log.scrollHeight;
     return d;
+  }
+
+  function renderIntro(){
+    log.innerHTML = "";
+    add(T.greet, "adam");
+    const h = document.createElement("div"); h.className = "hint"; h.textContent = T.hint;
+    log.appendChild(h);
+  }
+
+  function applyLang(l){
+    lang = (l === "kk") ? "kk" : "ru"; T = I18N[lang];
+    document.documentElement.lang = T.htmllang;
+    $("tag").textContent = T.tag;
+    $("sendBtn").textContent = T.send;
+    $("text").placeholder = T.placeholder;
+    $("micBtn").title = T.micTitle;
+    $("voiceBtn").title = T.voiceTitle;
+    if (rec) rec.lang = T.srLang;
+    renderIntro();
   }
 
   // ---- голос ИИ на выходе: НАШ нейронный казахский (/api/tts),
@@ -98,37 +143,105 @@
     browserSpeak(t); // /api/tts жоқ болса — браузер даусы
   }
 
+  // ---- определение пола говорящего по высоте голоса (F0) ----
+  //   Промышленная безопасность: работник не сможет подменить мужской
+  //   голос женским. Оценка автокорреляцией; медиана F0 за реплику →
+  //   мужской/женский/детский. Отправляется на /api/chat как voice_gender,
+  //   движок открывает диалог с «Ағай»/«Апай»/«Балам».
+  let audioCtx=null, analyser=null, micStream=null, pitchTimer=null, f0samples=[], lastVoiceGender=null;
+
+  function autoCorrelate(buf, rate){
+    let n=buf.length, rms=0;
+    for(let i=0;i<n;i++){ rms+=buf[i]*buf[i]; }
+    rms=Math.sqrt(rms/n);
+    if(rms<0.01) return -1;               // слишком тихо
+    let r1=0, r2=n-1, thr=0.2;
+    for(let i=0;i<n/2;i++){ if(Math.abs(buf[i])<thr){r1=i;break;} }
+    for(let i=1;i<n/2;i++){ if(Math.abs(buf[n-i])<thr){r2=n-i;break;} }
+    const b=buf.slice(r1,r2); n=b.length;
+    if(n<32) return -1;
+    const c=new Float32Array(n);
+    for(let i=0;i<n;i++){ let s=0; for(let j=0;j<n-i;j++){ s+=b[j]*b[j+i]; } c[i]=s; }
+    let d=0; while(d<n-1 && c[d]>c[d+1]) d++;
+    let maxv=-1, maxp=-1;
+    for(let i=d;i<n;i++){ if(c[i]>maxv){ maxv=c[i]; maxp=i; } }
+    if(maxp<=0) return -1;
+    const x1=c[maxp-1]||0, x2=c[maxp], x3=c[maxp+1]||0;
+    const a=(x1+x3-2*x2)/2, bb=(x3-x1)/2;
+    let T0=maxp; if(a) T0=maxp-bb/(2*a);
+    return rate/T0;
+  }
+
+  async function startPitch(){
+    try{
+      micStream = await navigator.mediaDevices.getUserMedia({audio:true});
+      audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      const src = audioCtx.createMediaStreamSource(micStream);
+      analyser = audioCtx.createAnalyser(); analyser.fftSize = 2048;
+      src.connect(analyser);
+      f0samples = [];
+      const buf = new Float32Array(analyser.fftSize);
+      pitchTimer = setInterval(()=>{
+        analyser.getFloatTimeDomainData(buf);
+        const f = autoCorrelate(buf, audioCtx.sampleRate);
+        if (f>60 && f<400) f0samples.push(f);   // правдоподобный речевой диапазон
+      }, 60);
+    }catch(e){ /* нет доступа к микрофону — просто без определения пола */ }
+  }
+
+  function classifyGender(){
+    if (f0samples.length < 4) return;
+    const s = f0samples.slice().sort((a,b)=>a-b);
+    const med = s[Math.floor(s.length/2)];
+    lastVoiceGender = med >= 255 ? "child" : (med >= 165 ? "female" : "male");
+    const chip = document.createElement("div");
+    chip.className = "voicechip";
+    chip.textContent = (lastVoiceGender==="male"?T.vMale:lastVoiceGender==="female"?T.vFemale:T.vChild)+" · F0≈"+Math.round(med)+" Гц";
+    log.appendChild(chip); log.scrollTop = log.scrollHeight;
+  }
+
+  function stopPitch(){
+    if (pitchTimer){ clearInterval(pitchTimer); pitchTimer=null; }
+    classifyGender();
+    if (micStream){ micStream.getTracks().forEach(t=>t.stop()); micStream=null; }
+    if (audioCtx){ audioCtx.close().catch(()=>{}); audioCtx=null; }
+  }
+
   async function send(text) {
     const t = (text !== undefined ? text : $("text").value).trim();
     if (!t) return;
     $("text").value = "";
     add(t, "user");
     const thinking = add("…", "adam");
+    const payload = { text: t };
+    if (lastVoiceGender) payload.voice_gender = lastVoiceGender;
     try {
-      const r = await fetch("/api/chat", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ text: t }) });
+      const r = await fetch("/api/chat", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload) });
       const d = await r.json();
       const reply = d.reply || d.error || "…";
       thinking.remove();
       add(reply, "adam");
       speak(reply);
-    } catch (e) { thinking.remove(); add("Қате: сервер жоқ (adam_portal іске қосыңыз).", "adam"); }
+    } catch (e) { thinking.remove(); add(T.err, "adam"); }
   }
 
-  // ---- микрофон (браузерлік STT, бар болса) ----
+  // ---- микрофон (браузерлік STT, бар болса) + анализ высоты голоса ----
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
   let rec = null, listening = false;
   if (SR) {
-    rec = new SR(); rec.lang = "kk-KZ"; rec.interimResults = false; rec.maxAlternatives = 1;
+    rec = new SR(); rec.lang = "ru-RU"; rec.interimResults = false; rec.maxAlternatives = 1;
     rec.onresult = e => { const t = e.results[0][0].transcript; send(t); };
-    rec.onend = () => { listening = false; $("micBtn").classList.remove("rec"); $("micBtn").textContent = "🎙"; };
-    rec.onerror = () => { listening = false; $("micBtn").classList.remove("rec"); $("micBtn").textContent = "🎙"; };
-    $("micBtn").onclick = () => {
+    rec.onend = () => { listening = false; stopPitch(); $("micBtn").classList.remove("rec"); $("micBtn").textContent = "🎙"; };
+    rec.onerror = () => { listening = false; stopPitch(); $("micBtn").classList.remove("rec"); $("micBtn").textContent = "🎙"; };
+    $("micBtn").onclick = async () => {
       if (listening) { rec.stop(); return; }
-      try { rec.lang = "kk-KZ"; rec.start(); listening = true; $("micBtn").classList.add("rec"); $("micBtn").textContent = "⏺"; }
-      catch (e) {}
+      await startPitch();
+      try { rec.lang = T.srLang; rec.start(); listening = true; $("micBtn").classList.add("rec"); $("micBtn").textContent = "⏺"; }
+      catch (e) { stopPitch(); }
     };
   } else {
-    $("micBtn").disabled = true; $("micBtn").title = "Бұл браузерде дауыспен енгізу жоқ — мәтінмен жазыңыз";
+    $("micBtn").disabled = true;
+    $("micBtn").title = I18N.ru.noSR;
   }
 
   $("sendBtn").onclick = () => send();
@@ -139,6 +252,9 @@
     $("voiceBtn").textContent = voiceOn ? "🔊" : "🔇";
     if (!voiceOn) stopAudio();
   };
+  $("lang").onchange = () => applyLang($("lang").value);
+
+  applyLang("ru");
   $("text").focus();
 </script>
 </body>

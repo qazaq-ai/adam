@@ -28,6 +28,34 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.17.0] — 2026-07-07 — bilingual corpus (all 33 procedures RU) + Russian protocol + demo i18n
+
+Completes the kz/ru delivery started in 6.16.0: the whole OT/ТБ corpus, the
+human-readable protocol, and every demo page now run in the worker's chosen
+language — Kazakh **or** Russian, end-to-end.
+
+- **Corpus.** All 32 remaining procedures in
+  `data/procedures/labor_safety_kz.jsonl` are translated to Russian
+  (`applies_to_ru`, `prerequisites_ru`, per-step `action_ru`, per-hazard
+  `kind_ru` / `mitigation_ru`, `authorization_ru`, `confirmation_gates_ru`).
+  `validate_procedures` now reports **ru 33/33**. A Russian session therefore
+  reads Russian steps + questions and grades Russian answers for every
+  procedure, not just the вводный.
+- **Protocol (`briefing_session`).** `QuestionSource::label_ru` / `label_in`
+  and `BriefingProtocol::render_ru` / `render_in` / `render` produce a
+  fully-Russian journal entry; `BriefingProtocol` carries the session `lang`.
+  The signed anchors stay language-invariant — the `sopHash` and the
+  Kazakh-canonical question-type tags in the sealed evidence are identical
+  across languages, so a допуск is version-stable and comparable.
+- **Voice-derived gender (`/api/chat`).** The browser estimates the speaker's
+  pitch (F0, autocorrelation) and sends a `voice_gender` hint; the engine
+  opens with the correct Kazakh vocative («Ағай» / «Апай» / «Балам»). Also an
+  anti-impersonation signal for industrial safety — a male voice can't pass
+  as female.
+- **Demo i18n.** All four pages (`erg_ot_tb_demo`, `portal_worker`,
+  `portal_dialog`, `portal_itr`) get a kz/ru switcher; content switches with
+  the selection (Russian default), not just the UI chrome.
+
 ## [6.16.0] — 2026-07-07 — bilingual briefing (kz/ru) — mandatory for ССГПО
 
 For АО ССГПО the inability to run инструктажи / проверки знаний in

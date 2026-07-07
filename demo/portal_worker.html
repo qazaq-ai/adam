@@ -25,7 +25,8 @@
   .logo{width:24px;height:24px;flex:none}
   .brand{font-family:var(--mono);font-weight:700;font-size:.9rem}
   .brand b{color:var(--accent)}
-  .tag{margin-left:auto;font-family:var(--mono);font-size:.72rem;color:var(--ink-faint)}
+  .tag{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint)}
+  .lang{margin-left:auto;font-family:var(--mono);font-size:.78rem;width:auto;padding:.35rem .5rem;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface-2);color:var(--ink)}
   main{max-width:52rem;margin:0 auto;padding:1.6rem 1.2rem 4rem}
   h1{font-size:1.5rem;margin:.2rem 0 1.2rem}
   .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1.3rem;margin-bottom:1.1rem}
@@ -65,7 +66,7 @@
   .cam{margin-top:1rem;display:flex;flex-direction:column;gap:.4rem}
   .cam video{width:220px;height:165px;object-fit:cover;border-radius:10px;border:1px solid var(--line-strong);background:#000;transform:scaleX(-1)}
   .cam.nocam video{display:none}
-  .camnote{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);margin:0;max-width:36ch}
+  .camnote{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);margin:0;max-width:38ch}
 </style>
 </head>
 <body>
@@ -74,46 +75,48 @@
     <line x1="76" y1="76" x2="324" y2="324"/><line x1="137" y1="37" x2="363" y2="263"/><line x1="37" y1="137" x2="263" y2="363"/>
     <line x1="76" y1="324" x2="324" y2="76"/><line x1="137" y1="363" x2="363" y2="137"/><line x1="37" y1="263" x2="263" y2="37"/></g></svg>
   <span class="brand">ERG/ССГПО<b>·</b>ОТ/ТБ</span>
-  <span class="tag">кабинет работника · движок ADAM</span>
+  <span class="tag" id="tag"></span>
+  <select id="lang" class="lang">
+    <option value="ru">Русский</option>
+    <option value="kk">Қазақша</option>
+  </select>
 </div></div>
 
 <main>
   <!-- 1. Login / choose briefing -->
   <section id="login" class="card">
-    <h1>Жылдық нұсқаулық / Ежегодный инструктаж</h1>
-    <label for="lang">Тіл / Язык</label>
-    <select id="lang"><option value="ru">Русский</option><option value="kk">Қазақша</option></select>
-    <label for="worker">Аты-жөні / ФИО</label>
+    <h1 id="t-title"></h1>
+    <label for="worker" id="t-l-worker"></label>
     <input id="worker" placeholder="Асан Асанов" autocomplete="off">
-    <label for="wid">Табельный № / ID</label>
+    <label for="wid" id="t-l-wid"></label>
     <input id="wid" placeholder="SSGPO-EMP-12345" autocomplete="off">
-    <label for="proc">Рәсім / Процедура</label>
-    <select id="proc"><option>жүктелуде…</option></select>
+    <label for="proc" id="t-l-proc"></label>
+    <select id="proc"><option>…</option></select>
     <div class="cam" id="camwrap">
       <video id="cam" autoplay playsinline muted></video>
-      <p class="camnote" id="camnote">📷 Камера жеке басты растайды — суреті допуск дәлелі ретінде сақталады.</p>
+      <p class="camnote" id="camnote"></p>
     </div>
-    <button id="startBtn" type="button">Бастау / Начать</button>
+    <button id="startBtn" type="button"></button>
     <div id="loginErr" class="err"></div>
-    <p class="hint">Тіл: қазақша сұрақтар. Жауапты өз сөзіңізбен жазыңыз.</p>
+    <p class="hint" id="t-hint"></p>
   </section>
 
   <!-- 2. Briefing session -->
   <section id="session" class="card hidden">
     <div class="slidebar">
-      <span class="slidekind" id="slidekind">Нұсқаулық</span>
+      <span class="slidekind" id="slidekind"></span>
       <div class="vctl">
-        <button id="voiceBtn" class="chip" type="button" title="Дауыс қосу/өшіру">🔊 Дауыс</button>
-        <button id="replayBtn" class="chip" type="button" title="Қайта тыңдау">↻ Қайта</button>
+        <button id="voiceBtn" class="chip" type="button"></button>
+        <button id="replayBtn" class="chip" type="button"></button>
       </div>
     </div>
     <div class="slide" id="prompt"></div>
     <div class="step-meta" id="meta"></div>
-    <label for="answer">Жауап / Ответ</label>
+    <label for="answer" id="t-l-answer"></label>
     <input id="answer" autocomplete="off">
     <div>
-      <button id="sendBtn" type="button">Жіберу / Отправить</button>
-      <button id="ackBtn" class="ghost" type="button">Түсінікті</button>
+      <button id="sendBtn" type="button"></button>
+      <button id="ackBtn" class="ghost" type="button"></button>
     </div>
     <p class="hint" id="phase"></p>
   </section>
@@ -123,14 +126,71 @@
     <div class="verdict" id="verdict"></div>
     <ul class="checks" id="checks"></ul>
     <p class="kbd" id="issuer"></p>
-    <a class="dl" id="download" href="#" download="dopusk.json">↓ Подписанный протокол (JSON)</a>
-    <div><button class="ghost" type="button" onclick="location.reload()">Жаңадан бастау</button></div>
+    <a class="dl" id="download" href="#" download="dopusk.json"></a>
+    <div><button class="ghost" type="button" id="restartBtn" onclick="location.reload()"></button></div>
   </section>
 </main>
 
 <script>
   const $ = id => document.getElementById(id);
   let sessionId = null;
+
+  // ---- i18n словарь (kk/ru); движок ведёт инструктаж на выбранном языке ----
+  const I18N = {
+    ru: {
+      htmllang:"ru", title:"Ежегодный инструктаж", tag:"кабинет работника · движок ADAM",
+      lWorker:"ФИО", lWid:"Табельный № / ID", lProc:"Процедура", lAnswer:"Ответ",
+      camnote:"📷 Камера подтверждает личность — снимок сохраняется как доказательство допуска.",
+      start:"Начать", hint:"Вопросы на выбранном языке. Отвечайте своими словами.",
+      voiceOn:"🔊 Голос", voiceOff:"🔇 Голос", voiceNo:"🔇 нет", replay:"↻ Повтор",
+      send:"Отправить", ack:"Понятно", restart:"Начать заново",
+      kindQuiz:"Контрольный вопрос", kindInstr:"Инструктаж",
+      phaseQuiz:"Ответьте на вопрос…", phaseInstr:"Слушайте, затем «понятно»…",
+      needName:"Укажите ФИО.", procLoading:"загрузка…", procNoServer:"сервер недоступен — запустите adam_portal",
+      camUnavail:"камера недоступна", camDenied:"нет доступа к камере — подтверждение оператором",
+      proctorOk:"📷 подтверждено", errPrefix:"Ошибка: ", sealErr:"Ошибка печати: ",
+      admitted:"ДОПУЩЕН К РАБОТЕ", denied:"НЕ ДОПУЩЕН", denyTail:"требуется повторный инструктаж",
+      ckSig:"подпись Ed25519", ckDigest:"дайджест", ckIssuer:"issuer = ключ",
+      issuerKey:"Ключ подписи: ", download:"↓ Подписанный протокол (JSON)", ack_word:"понятно"
+    },
+    kk: {
+      htmllang:"kk", title:"Жылдық нұсқаулық", tag:"жұмысшы кабинеті · ADAM қозғалтқышы",
+      lWorker:"Аты-жөні", lWid:"Табельдік № / ID", lProc:"Рәсім", lAnswer:"Жауап",
+      camnote:"📷 Камера жеке басты растайды — суреті допуск дәлелі ретінде сақталады.",
+      start:"Бастау", hint:"Сұрақтар таңдалған тілде. Жауапты өз сөзіңізбен жазыңыз.",
+      voiceOn:"🔊 Дауыс", voiceOff:"🔇 Дауыс", voiceNo:"🔇 жоқ", replay:"↻ Қайта",
+      send:"Жіберу", ack:"Түсінікті", restart:"Жаңадан бастау",
+      kindQuiz:"Бақылау сұрағы", kindInstr:"Нұсқаулық",
+      phaseQuiz:"Сұраққа жауап беріңіз…", phaseInstr:"Тыңдаңыз, содан кейін «Түсінікті»…",
+      needName:"Аты-жөні қажет.", procLoading:"жүктелуде…", procNoServer:"сервер жоқ — adam_portal іске қосыңыз",
+      camUnavail:"камера қолжетімсіз", camDenied:"камераға рұқсат жоқ — операторлық растау",
+      proctorOk:"📷 расталды", errPrefix:"Қате: ", sealErr:"Мөр қатесі: ",
+      admitted:"ЖҰМЫСҚА ЖІБЕРІЛДІ", denied:"ЖІБЕРІЛМЕДІ", denyTail:"қайта нұсқаулық қажет",
+      ckSig:"Ed25519 қолтаңба", ckDigest:"дайджест", ckIssuer:"issuer = кілт",
+      issuerKey:"Қол қойған кілт: ", download:"↓ Қол қойылған хаттама (JSON)", ack_word:"түсінікті"
+    }
+  };
+  let curLang = "ru", T = I18N.ru;
+
+  function applyLang(l){
+    curLang = (l === "kk") ? "kk" : "ru"; T = I18N[curLang];
+    document.documentElement.lang = T.htmllang;
+    $("tag").textContent = T.tag;
+    $("t-title").textContent = T.title;
+    $("t-l-worker").textContent = T.lWorker;
+    $("t-l-wid").textContent = T.lWid;
+    $("t-l-proc").textContent = T.lProc;
+    $("t-l-answer").textContent = T.lAnswer;
+    if (!$("camwrap").classList.contains("nocam")) $("camnote").textContent = T.camnote;
+    $("startBtn").textContent = T.start;
+    $("t-hint").textContent = T.hint;
+    $("voiceBtn").textContent = voiceOn ? T.voiceOn : T.voiceOff;
+    $("replayBtn").textContent = T.replay;
+    $("sendBtn").textContent = T.send;
+    $("ackBtn").textContent = T.ack;
+    $("restartBtn").textContent = T.restart;
+    $("download").textContent = T.download;
+  }
 
   async function api(path, body) {
     const opt = { method: body ? "POST" : "GET", headers: { "Content-Type": "application/json" } };
@@ -145,17 +205,16 @@
   async function loadProcedures() {
     try {
       const list = await api("/api/procedures");
-      // Put the general (вводный) briefing first, then preselect it.
       list.sort((a, b) => (b.id === DEFAULT_PROC) - (a.id === DEFAULT_PROC));
       $("proc").innerHTML = list.map(p => `<option value="${p.id}">${p.title}</option>`).join("");
       $("proc").value = DEFAULT_PROC;
-    } catch (e) { $("proc").innerHTML = "<option>сервер жоқ — adam_portal іске қосыңыз</option>"; }
+    } catch (e) { $("proc").innerHTML = `<option>${T.procNoServer}</option>`; }
   }
 
   function show(sec) { ["login","session","result"].forEach(s => $(s).classList.toggle("hidden", s !== sec)); }
 
   // ---- голос ИИ: НАШ нейронный казахский (/api/tts), браузер — fallback ----
-  let voiceOn = true, ttsVoice = null, lastText = "", curAudio = null, sessionLang = "kk";
+  let voiceOn = true, ttsVoice = null, lastText = "", curAudio = null, sessionLang = "ru";
   const synth = window.speechSynthesis || null;
   function pickVoice() {
     if (!synth) return;
@@ -168,7 +227,6 @@
     if (!synth) return;
     synth.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    // Russian: pick a ru voice (browser Russian is good). Kazakh: kk→any.
     const vs = synth.getVoices() || [];
     const v = sessionLang === "ru" ? (vs.find(x => /^ru/i.test(x.lang)) || ttsVoice) : ttsVoice;
     if (v) u.voice = v;
@@ -180,7 +238,7 @@
     lastText = text || "";
     if (!voiceOn || !text) return;
     stopAudio();
-    // Russian → browser ru voice (good). Kazakh → our neural /api/tts.
+    // Русский → браузерный ru-голос (хорош). Казахский → наш нейронный /api/tts.
     if (sessionLang === "ru") { browserSpeak(text); return; }
     try {
       const r = await fetch("/api/tts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
@@ -199,10 +257,9 @@
     $("prompt").textContent = reply.text;
     $("prompt").classList.toggle("quiz", isQuiz);
     const kind = $("slidekind");
-    const L = sessionLang === "ru";
-    kind.textContent = isQuiz ? (L ? "Контрольный вопрос" : "Бақылау сұрағы") : (L ? "Инструктаж" : "Нұсқаулық");
+    kind.textContent = isQuiz ? T.kindQuiz : T.kindInstr;
     kind.classList.toggle("quiz", isQuiz);
-    $("phase").textContent = reply.done ? "" : (isQuiz ? (L ? "Ответьте на вопрос…" : "Сұраққа жауап беріңіз…") : (L ? "Слушайте, затем «понятно»…" : "Тыңдаңыз, содан кейін «Түсінікті»…"));
+    $("phase").textContent = reply.done ? "" : (isQuiz ? T.phaseQuiz : T.phaseInstr);
     speak(reply.text);
     if (reply.done) { stopAudio(); finish(); }
   }
@@ -210,11 +267,11 @@
   // ---- камера-прокторинг: снимок при старте → хеш в допуск ----
   let camStream = null;
   async function initCam() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { noCam("камера қолжетімсіз"); return; }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { noCam(T.camUnavail); return; }
     try {
       camStream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 }, audio: false });
       $("cam").srcObject = camStream;
-    } catch (e) { noCam("камераға рұқсат жоқ — операторлық растау"); }
+    } catch (e) { noCam(T.camDenied); }
   }
   function noCam(msg) {
     camStream = null;
@@ -238,18 +295,16 @@
   async function start() {
     const worker = $("worker").value.trim(), wid = $("wid").value.trim(), proc = $("proc").value;
     sessionLang = $("lang").value;
-    if (!worker) { $("loginErr").textContent = sessionLang === "ru" ? "Укажите ФИО." : "Аты-жөні қажет."; return; }
-    // Ack button label follows the language.
-    $("ackBtn").textContent = sessionLang === "ru" ? "Понятно" : "Түсінікті";
+    if (!worker) { $("loginErr").textContent = T.needName; return; }
     try {
       let proctorSha256 = "";
       try { proctorSha256 = await captureProctor(); } catch (e) {}
       const res = await api("/api/start", { worker, workerId: wid, procedureId: proc, proctorSha256, lang: sessionLang });
       stopCam();
       sessionId = res.sessionId;
-      show("session"); $("meta").textContent = proc + (proctorSha256 ? " · 📷 расталды" : ""); render(res);
+      show("session"); $("meta").textContent = proc + (proctorSha256 ? " · " + T.proctorOk : ""); render(res);
       $("answer").focus();
-    } catch (e) { $("loginErr").textContent = "Қате: " + e.message; }
+    } catch (e) { $("loginErr").textContent = T.errPrefix + e.message; }
   }
 
   async function send(text) {
@@ -257,7 +312,7 @@
     const input = text !== undefined ? text : $("answer").value;
     $("answer").value = "";
     try { render(await api("/api/answer", { sessionId, input })); }
-    catch (e) { $("phase").textContent = "Қате: " + e.message; }
+    catch (e) { $("phase").textContent = T.errPrefix + e.message; }
   }
 
   async function finish() {
@@ -267,32 +322,35 @@
       const v = $("verdict");
       v.className = "verdict " + (s.admitted ? "ok" : "bad");
       v.innerHTML = "<span>●</span><span>" + (s.admitted
-        ? `ЖҰМЫСҚА ЖІБЕРІЛДІ · ${s.passedCount}/${s.total}`
-        : `ЖІБЕРІЛМЕДІ · ${s.passedCount}/${s.total} — қайта нұсқаулық қажет`) + "</span>";
+        ? `${T.admitted} · ${s.passedCount}/${s.total}`
+        : `${T.denied} · ${s.passedCount}/${s.total} — ${T.denyTail}`) + "</span>";
       const ck = s.verify || {};
       $("checks").innerHTML = [
-        ["Ed25519 қолтаңба", ck.signatureValid],
-        ["дайджест", ck.digestMatches],
-        ["issuer = кілт", ck.issuerBound],
+        [T.ckSig, ck.signatureValid],
+        [T.ckDigest, ck.digestMatches],
+        [T.ckIssuer, ck.issuerBound],
       ].map(([t, ok]) => `<li><span class="${ok?'y':'n'}">${ok?'✓':'✗'}</span>${t}</li>`).join("");
-      $("issuer").textContent = "Қол қойған кілт: " + (s.publicKey || "").slice(0, 24) + "…";
+      $("issuer").textContent = T.issuerKey + (s.publicKey || "").slice(0, 24) + "…";
       const blob = new Blob([JSON.stringify(s.sealed, null, 2)], { type: "application/json" });
       $("download").href = URL.createObjectURL(blob);
-    } catch (e) { $("phase").textContent = "Мөр қатесі: " + e.message; }
+    } catch (e) { $("phase").textContent = T.sealErr + e.message; }
   }
 
   $("startBtn").onclick = start;
   $("sendBtn").onclick = () => send();
-  $("ackBtn").onclick = () => send("түсінікті");
+  $("ackBtn").onclick = () => send(T.ack_word);
   $("answer").addEventListener("keydown", e => { if (e.key === "Enter") send(); });
   $("voiceBtn").onclick = () => {
     voiceOn = !voiceOn;
     $("voiceBtn").classList.toggle("off", !voiceOn);
-    $("voiceBtn").textContent = voiceOn ? "🔊 Дауыс" : "🔇 Дауыс";
-    if (!voiceOn) stopAudio(); else if (voiceOn) speak(lastText);
+    $("voiceBtn").textContent = voiceOn ? T.voiceOn : T.voiceOff;
+    if (!voiceOn) stopAudio(); else speak(lastText);
   };
   $("replayBtn").onclick = () => speak(lastText);
-  if (!synth) { $("voiceBtn").classList.add("off"); $("voiceBtn").textContent = "🔇 жоқ"; $("voiceBtn").disabled = true; }
+  $("lang").onchange = () => { applyLang($("lang").value); };
+
+  applyLang("ru");
+  if (!synth) { $("voiceBtn").classList.add("off"); $("voiceBtn").textContent = T.voiceNo; $("voiceBtn").disabled = true; }
   loadProcedures();
   initCam();
 </script>

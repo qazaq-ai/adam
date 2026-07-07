@@ -510,6 +510,18 @@ fn api_chat(body: &[u8], chat: &Option<Mutex<ChatEngine>>) -> (u16, &'static str
     };
     let mut e = engine.lock().unwrap();
     let ChatEngine { conv, lex, repo } = &mut *e;
+    // Voice-derived gender hint from the browser's pitch (F0) estimate —
+    // lets the engine open with the correct Kazakh vocative («Ағай» for a
+    // male voice, «Апай» for a female one).  For industrial safety this is
+    // also an anti-impersonation signal: the worker cannot pass a male
+    // voice off as female.  Only trusted values are forwarded.
+    match v["voice_gender"].as_str() {
+        Some(g @ ("male" | "female" | "child")) => {
+            conv.session
+                .insert("voice_gender_hint".to_string(), g.to_string());
+        }
+        _ => {}
+    }
     let reply = conv.turn(&text, lex, repo, 42);
     json_ok(&json!({ "reply": reply }))
 }
