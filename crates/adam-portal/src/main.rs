@@ -28,6 +28,7 @@ use std::fs;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -50,6 +51,12 @@ const WORKER_HTML: &str = include_str!("../../../demo/portal_worker.html");
 const ITR_HTML: &str = include_str!("../../../demo/portal_itr.html");
 const DIALOG_HTML: &str = include_str!("../../../demo/portal_dialog.html");
 const PITCH_HTML: &str = include_str!("../../../demo/erg_ot_tb_demo.html");
+
+/// Our neural Kazakh voice — Piper model + venv binary.  Override with
+/// `ADAM_PORTAL_PIPER_MODEL` / `ADAM_PORTAL_PIPER_BIN`.  When absent,
+/// `/api/tts` returns 503 and the browser falls back to its own voice.
+const PIPER_MODEL: &str = "data/tts_models/kk_KZ-issai-high.onnx";
+const PIPER_BIN: &str = "data/tts_models/.venv/bin/piper";
 
 const RETRIEVAL_INDEX_PATH: &str = "data/retrieval/morpheme_index.json";
 const FACTS_PATH: &str = "data/retrieval/facts.json";
@@ -330,6 +337,7 @@ fn route(
         ("POST", "/api/answer") => api_answer(body, state),
         ("POST", "/api/seal") => api_seal(body, state),
         ("POST", "/api/chat") => api_chat(body, chat),
+        ("POST", "/api/tts") => api_tts(body),
         ("GET", "/api/admissions") => json_ok(&api_admissions(state)),
         _ => (
             404,
@@ -499,6 +507,81 @@ fn api_chat(body: &[u8], chat: &Option<Mutex<ChatEngine>>) -> (u16, &'static str
     let ChatEngine { conv, lex, repo } = &mut *e;
     let reply = conv.turn(&text, lex, repo, 42);
     json_ok(&json!({ "reply": reply }))
+}
+
+/// Text-to-speech with **our** neural Kazakh voice (Piper).  Returns a
+/// 22.05 kHz mono WAV the browser plays directly — far better Kazakh than
+/// the browser's own speech engine.  503 when Piper isn't set up (the page
+/// then falls back to the browser voice).
+fn api_tts(body: &[u8]) -> (u16, &'static str, Vec<u8>) {
+    let v: Value = serde_json::from_slice(body).unwrap_or(Value::Null);
+    let text = v["text"].as_str().unwrap_or("").trim();
+    if text.is_empty() {
+        return json_err("empty text");
+    }
+    match synth_piper(text) {
+        Some(wav) => (200, "audio/wav", wav),
+        None => (
+            503,
+            "application/json; charset=utf-8",
+            br#"{"error":"tts unavailable"}"#.to_vec(),
+        ),
+    }
+}
+
+/// Synthesise `text` to WAV bytes via the Piper venv, or `None` if Piper is
+/// unavailable / fails.  Shells out per request (a demo, not a hot path).
+fn synth_piper(text: &str) -> Option<Vec<u8>> {
+    let model = env_path("ADAM_PORTAL_PIPER_MODEL", PIPER_MODEL);
+    let bin = env_path("ADAM_PORTAL_PIPER_BIN", PIPER_BIN);
+    if !model.exists() || !bin.exists() {
+        return None;
+    }
+    let prompt = tts_prompt(text);
+    if prompt.is_empty() {
+        return None;
+    }
+    static TTS_COUNTER: AtomicU64 = AtomicU64::new(1);
+    let n = TTS_COUNTER.fetch_add(1, Ordering::Relaxed);
+    let out = std::env::temp_dir().join(format!("adam_portal_tts_{}_{n}.wav", std::process::id()));
+
+    let mut child = Command::new(&bin)
+        .arg("--model")
+        .arg(&model)
+        .arg("--length-scale")
+        .arg("1.0")
+        .arg("--sentence-silence")
+        .arg("0.2")
+        .arg("--output-file")
+        .arg(&out)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .ok()?;
+    if let Some(mut stdin) = child.stdin.take() {
+        let _ = stdin.write_all(prompt.as_bytes());
+    }
+    let ok = child.wait().ok()?.success();
+    let bytes = if ok { fs::read(&out).ok() } else { None };
+    let _ = fs::remove_file(&out);
+    bytes
+}
+
+/// Canonical TTS sentence shape: capitalise the first letter and add a
+/// trailing period so Piper reads it as a full sentence.
+fn tts_prompt(text: &str) -> String {
+    let t = text.trim();
+    let mut chars = t.chars();
+    let Some(head) = chars.next() else {
+        return String::new();
+    };
+    let cap: String = head.to_uppercase().collect::<String>() + chars.as_str();
+    if cap.ends_with(['.', '!', '?']) {
+        cap
+    } else {
+        format!("{cap}.")
+    }
 }
 
 /// Store a proctoring snapshot (raw JPEG body): hash it, save `<hex>.jpg`,

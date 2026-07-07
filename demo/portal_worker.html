@@ -152,8 +152,8 @@
 
   function show(sec) { ["login","session","result"].forEach(s => $(s).classList.toggle("hidden", s !== sec)); }
 
-  // ---- голос ИИ: браузерный синтез (казахский → русский → любой) ----
-  let voiceOn = true, ttsVoice = null, lastText = "";
+  // ---- голос ИИ: НАШ нейронный казахский (/api/tts), браузер — fallback ----
+  let voiceOn = true, ttsVoice = null, lastText = "", curAudio = null;
   const synth = window.speechSynthesis || null;
   function pickVoice() {
     if (!synth) return;
@@ -161,15 +161,30 @@
     ttsVoice = vs.find(v => /^kk/i.test(v.lang)) || vs.find(v => /^ru/i.test(v.lang)) || vs[0] || null;
   }
   if (synth) { pickVoice(); synth.onvoiceschanged = pickVoice; }
-  function speak(text) {
-    lastText = text || "";
-    if (!voiceOn || !synth || !text) return;
+  function stopAudio() { if (curAudio) { curAudio.pause(); curAudio = null; } if (synth) synth.cancel(); }
+  function browserSpeak(text) {
+    if (!synth) return;
     synth.cancel();
     const u = new SpeechSynthesisUtterance(text);
     if (ttsVoice) u.voice = ttsVoice;
     u.lang = ttsVoice ? ttsVoice.lang : "kk-KZ";
     u.rate = 0.98;
     synth.speak(u);
+  }
+  async function speak(text) {
+    lastText = text || "";
+    if (!voiceOn || !text) return;
+    stopAudio();
+    try {
+      const r = await fetch("/api/tts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
+      if (r.ok) {
+        const blob = new Blob([await r.arrayBuffer()], { type: "audio/wav" });
+        curAudio = new Audio(URL.createObjectURL(blob));
+        curAudio.play().catch(() => browserSpeak(text));
+        return;
+      }
+    } catch (e) {}
+    browserSpeak(text);
   }
 
   function render(reply) {
@@ -181,7 +196,7 @@
     kind.classList.toggle("quiz", isQuiz);
     $("phase").textContent = reply.done ? "" : (isQuiz ? "Сұраққа жауап беріңіз…" : "Тыңдаңыз, содан кейін «Түсінікті»…");
     speak(reply.text);
-    if (reply.done) { if (synth) synth.cancel(); finish(); }
+    if (reply.done) { stopAudio(); finish(); }
   }
 
   // ---- камера-прокторинг: снимок при старте → хеш в допуск ----
@@ -263,7 +278,7 @@
     voiceOn = !voiceOn;
     $("voiceBtn").classList.toggle("off", !voiceOn);
     $("voiceBtn").textContent = voiceOn ? "🔊 Дауыс" : "🔇 Дауыс";
-    if (!voiceOn && synth) synth.cancel(); else if (voiceOn) speak(lastText);
+    if (!voiceOn) stopAudio(); else if (voiceOn) speak(lastText);
   };
   $("replayBtn").onclick = () => speak(lastText);
   if (!synth) { $("voiceBtn").classList.add("off"); $("voiceBtn").textContent = "🔇 жоқ"; $("voiceBtn").disabled = true; }

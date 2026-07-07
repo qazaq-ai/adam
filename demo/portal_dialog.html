@@ -75,12 +75,28 @@
     return d;
   }
 
-  // ---- голос ИИ на выходе (SpeechSynthesis) ----
-  let voiceOn = true, ttsVoice = null;
+  // ---- голос ИИ на выходе: НАШ нейронный казахский (/api/tts),
+  //      с откатом на браузерный голос, если сервер TTS недоступен ----
+  let voiceOn = true, ttsVoice = null, curAudio = null;
   const synth = window.speechSynthesis || null;
   function pickVoice(){ if(!synth) return; const vs=synth.getVoices()||[]; ttsVoice=vs.find(v=>/^kk/i.test(v.lang))||vs.find(v=>/^ru/i.test(v.lang))||vs[0]||null; }
   if (synth){ pickVoice(); synth.onvoiceschanged=pickVoice; }
-  function speak(t){ if(!voiceOn||!synth||!t) return; synth.cancel(); const u=new SpeechSynthesisUtterance(t); if(ttsVoice)u.voice=ttsVoice; u.lang=ttsVoice?ttsVoice.lang:"kk-KZ"; u.rate=0.98; synth.speak(u); }
+  function stopAudio(){ if(curAudio){ curAudio.pause(); curAudio=null; } if(synth) synth.cancel(); }
+  function browserSpeak(t){ if(!synth) return; synth.cancel(); const u=new SpeechSynthesisUtterance(t); if(ttsVoice)u.voice=ttsVoice; u.lang=ttsVoice?ttsVoice.lang:"kk-KZ"; u.rate=0.98; synth.speak(u); }
+  async function speak(t){
+    if(!voiceOn||!t) return;
+    stopAudio();
+    try {
+      const r = await fetch("/api/tts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:t})});
+      if (r.ok) {
+        const blob = new Blob([await r.arrayBuffer()],{type:"audio/wav"});
+        curAudio = new Audio(URL.createObjectURL(blob));
+        curAudio.play().catch(()=>browserSpeak(t));
+        return;
+      }
+    } catch(e){}
+    browserSpeak(t); // /api/tts жоқ болса — браузер даусы
+  }
 
   async function send(text) {
     const t = (text !== undefined ? text : $("text").value).trim();
@@ -121,7 +137,7 @@
     voiceOn = !voiceOn;
     $("voiceBtn").classList.toggle("on", voiceOn);
     $("voiceBtn").textContent = voiceOn ? "🔊" : "🔇";
-    if (!voiceOn && synth) synth.cancel();
+    if (!voiceOn) stopAudio();
   };
   $("text").focus();
 </script>

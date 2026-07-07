@@ -28,6 +28,24 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.15.1] — 2026-07-07 — our neural Kazakh voice in the browser (`/api/tts`)
+
+The browser's own speech engine mangles Kazakh; this serves **our** voice
+instead.
+
+- **`/api/tts` in `adam-portal`.** Synthesises text with our neural Kazakh
+  voice (Piper `kk_KZ-issai-high`) and returns a 22.05 kHz WAV the browser
+  plays directly — far better Kazakh than `SpeechSynthesis`. Shells out to
+  the Piper venv per request (`ADAM_PORTAL_PIPER_MODEL` /
+  `ADAM_PORTAL_PIPER_BIN` override the paths); returns 503 when Piper isn't
+  set up.
+- **Worker + dialog pages prefer our voice.** Both now call `/api/tts`
+  first and fall back to the browser voice only if the server TTS is
+  unavailable, so the demo speaks Kazakh naturally where Piper is
+  installed and still speaks (roughly) everywhere else.
+- Verified: `POST /api/tts` → `audio/wav` (22.05 kHz mono); pages embed the
+  `/api/tts`-first path. Cold gate green.
+
 ## [6.15.0] — 2026-07-07 — browser demos: general dialog page + one-command launcher
 
 Moves the demos out of the console into the browser (more наглядно and
