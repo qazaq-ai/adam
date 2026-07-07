@@ -28,6 +28,33 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.15.0] — 2026-07-07 — browser demos: general dialog page + one-command launcher
+
+Moves the demos out of the console into the browser (more наглядно and
+realistic for the ССГПО presentation), and adds a single command that
+opens the whole picture.
+
+- **General-dialog page (`demo/portal_dialog.html`, served at `/dialog`).**
+  A browser chat with the **real ADAM deterministic engine** — not a
+  mock. Type (or 🎙 speak, where the browser supports `SpeechRecognition`)
+  a Kazakh phrase; ADAM answers and reads it aloud (`SpeechSynthesis`).
+  Same v6.2 production path as the console voice REPL: verified live —
+  `Судың формуласы қандай?` → `H₂O`, clock, `44 көбейт 6 ға` → `264`,
+  Kazakhstan mountains, greetings.
+- **`/api/chat` in `adam-portal`.** The portal now also loads the
+  deterministic conversation engine (v6.2 router + retrieval index +
+  world_core; **no neural rescorer, so no burn dependency**) once at
+  startup and serves general dialog over a small JSON API. Best-effort:
+  if `data/retrieval` / `data/world_core` are absent, `/dialog` reports
+  it and the briefing flow is unaffected.
+- **Portal serves all four demo pages:** `/` (worker), `/itr` (ИТР
+  dashboard), `/dialog` (general dialog), `/pitch` (ERG pitch) — the
+  worker/ИТР pages need the server for `/api/*`, so all four open over
+  http.
+- **`scripts/demo.sh` — one command.** Builds + starts the portal and
+  opens all four pages in the browser (macOS `open` / Linux `xdg-open`),
+  Ctrl+C stops.
+
 ## [6.14.0] — 2026-07-06 — camera proctoring: face-bound допуск
 
 **Stripe — Deterministic AI research.** The weakest link in a remote

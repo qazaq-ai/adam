@@ -36,13 +36,25 @@ use adam_dialog::briefing_seal::{SealContext, SealedProtocol};
 use adam_dialog::briefing_session::BriefingSession;
 use adam_dialog::procedure_loader::shared_procedures;
 use adam_dialog::system_clock::{read_clock, tz_offset_secs_from_env};
+use adam_dialog::templates::TemplateRepository;
+use adam_dialog::{Conversation, DomainIndex};
+use adam_kernel_fst::lexicon::LexiconV1;
+use adam_retrieval::MorphemeIndex;
 use adam_seal::{SigningKey, sha256, to_hex};
+use serde::Deserialize;
 use serde_json::{Value, json};
 
 const ENGINE_VERSION: &str = env!("CARGO_PKG_VERSION");
 const ADDR: &str = "127.0.0.1:8787";
 const WORKER_HTML: &str = include_str!("../../../demo/portal_worker.html");
 const ITR_HTML: &str = include_str!("../../../demo/portal_itr.html");
+const DIALOG_HTML: &str = include_str!("../../../demo/portal_dialog.html");
+const PITCH_HTML: &str = include_str!("../../../demo/erg_ot_tb_demo.html");
+
+const RETRIEVAL_INDEX_PATH: &str = "data/retrieval/morpheme_index.json";
+const FACTS_PATH: &str = "data/retrieval/facts.json";
+const DERIVED_FACTS_PATH: &str = "data/retrieval/derived_facts.json";
+const WORLD_CORE_DIR: &str = "data/world_core";
 
 /// Default persistent signing key (hex seed).  Override with `ADAM_PORTAL_KEY`.
 const KEY_FILE: &str = "data/portal/operator.key";
@@ -104,7 +116,76 @@ struct AppState {
     proctor_dir: PathBuf,
 }
 
+/// The general-conversation engine — the *real* ADAM deterministic path
+/// (v6.2 router + retrieval + world_core; no neural rescorer, so no burn).
+/// One shared instance behind a Mutex: dialog context accumulates across
+/// turns, which for a demo is desirable (it remembers the name, like the
+/// console voice REPL).  Loading is best-effort; if the data packs are
+/// absent, `/api/chat` reports that instead of running.
+struct ChatEngine {
+    conv: Conversation,
+    lex: LexiconV1,
+    repo: TemplateRepository,
+}
+
+fn load_chat_engine() -> Option<ChatEngine> {
+    let lex = LexiconV1::load_default().ok()?;
+    let repo = TemplateRepository::load_default().ok()?;
+    let mut conv = Conversation::new();
+    if let Some(idx) = load_retrieval_index() {
+        conv = conv.with_morpheme_index(idx);
+    }
+    let (extracted, derived) = load_reasoning_chains();
+    if !extracted.is_empty() || !derived.is_empty() {
+        conv = conv.with_reasoning_chains(extracted, derived);
+    }
+    if let Ok(report) = adam_reasoning::world_core::load_world_core_dir(Path::new(WORLD_CORE_DIR)) {
+        let entries: Vec<_> = report.entries.into_iter().map(|(e, _)| e).collect();
+        conv = conv.with_domain_index(DomainIndex::build(&entries));
+    }
+    Some(ChatEngine { conv, lex, repo })
+}
+
+fn load_retrieval_index() -> Option<MorphemeIndex> {
+    let file = fs::File::open(RETRIEVAL_INDEX_PATH).ok()?;
+    let mut idx: MorphemeIndex = serde_json::from_reader(BufReader::new(file)).ok()?;
+    idx.refresh_stats();
+    Some(idx)
+}
+
+fn load_reasoning_chains() -> (
+    Vec<adam_reasoning::Fact>,
+    Vec<adam_reasoning::reasoner::DerivedFact>,
+) {
+    #[derive(Deserialize)]
+    struct FactsFile {
+        facts: Vec<adam_reasoning::Fact>,
+    }
+    #[derive(Deserialize)]
+    struct DerivedFile {
+        derived: Vec<adam_reasoning::reasoner::DerivedFact>,
+    }
+    let extracted = fs::File::open(FACTS_PATH)
+        .ok()
+        .and_then(|f| serde_json::from_reader::<_, FactsFile>(BufReader::new(f)).ok())
+        .map(|f| f.facts)
+        .unwrap_or_default();
+    let derived = fs::File::open(DERIVED_FACTS_PATH)
+        .ok()
+        .and_then(|f| serde_json::from_reader::<_, DerivedFile>(BufReader::new(f)).ok())
+        .map(|f| f.derived)
+        .unwrap_or_default();
+    (extracted, derived)
+}
+
 fn main() {
+    // Enable the v6.2 router before building the Conversation engine —
+    // without it the math / clock / FrameIndex stack stays gated off.
+    if std::env::var("ADAM_V6_2").is_err() {
+        // SAFETY: single-threaded here, before any thread is spawned.
+        unsafe { std::env::set_var("ADAM_V6_2", "1") };
+    }
+
     let key_path = env_path("ADAM_PORTAL_KEY", KEY_FILE);
     let journal_path = env_path("ADAM_PORTAL_JOURNAL", JOURNAL_FILE);
     ensure_parent_dir(&key_path);
@@ -152,6 +233,16 @@ fn main() {
         proctor_dir,
     }));
 
+    // General-conversation engine (real ADAM, deterministic path).
+    let chat: Arc<Option<Mutex<ChatEngine>>> = Arc::new(load_chat_engine().map(Mutex::new));
+    if chat.is_some() {
+        eprintln!("adam_portal: chat engine ready — general dialog at /dialog");
+    } else {
+        eprintln!(
+            "adam_portal: chat engine NOT loaded (data/retrieval or world_core missing) — /dialog reports unavailable"
+        );
+    }
+
     let listener = match TcpListener::bind(ADDR) {
         Ok(l) => l,
         Err(e) => {
@@ -159,6 +250,8 @@ fn main() {
             return;
         }
     };
+    eprintln!("adam_portal: pitch   → http://{ADDR}/pitch");
+    eprintln!("adam_portal: dialog  → http://{ADDR}/dialog");
     eprintln!("adam_portal: worker  → http://{ADDR}/");
     eprintln!("adam_portal: ИТР     → http://{ADDR}/itr");
 
@@ -166,8 +259,9 @@ fn main() {
         match stream {
             Ok(s) => {
                 let state = Arc::clone(&state);
+                let chat = Arc::clone(&chat);
                 thread::spawn(move || {
-                    if let Err(e) = handle(s, &state) {
+                    if let Err(e) = handle(s, &state, &chat) {
                         eprintln!("adam_portal: connection error: {e}");
                     }
                 });
@@ -177,7 +271,11 @@ fn main() {
     }
 }
 
-fn handle(mut stream: TcpStream, state: &Mutex<AppState>) -> std::io::Result<()> {
+fn handle(
+    mut stream: TcpStream,
+    state: &Mutex<AppState>,
+    chat: &Option<Mutex<ChatEngine>>,
+) -> std::io::Result<()> {
     let mut reader = BufReader::new(stream.try_clone()?);
     let mut request_line = String::new();
     if reader.read_line(&mut request_line)? == 0 {
@@ -206,7 +304,7 @@ fn handle(mut stream: TcpStream, state: &Mutex<AppState>) -> std::io::Result<()>
         reader.read_exact(&mut body)?;
     }
 
-    let (status, ctype, payload) = route(&method, &path, &body, state);
+    let (status, ctype, payload) = route(&method, &path, &body, state, chat);
     write_response(&mut stream, status, ctype, &payload)
 }
 
@@ -215,6 +313,7 @@ fn route(
     path: &str,
     body: &[u8],
     state: &Mutex<AppState>,
+    chat: &Option<Mutex<ChatEngine>>,
 ) -> (u16, &'static str, Vec<u8>) {
     // Proctoring snapshots are served from /proctor/<hex>.jpg.
     if method == "GET" && path.starts_with("/proctor/") {
@@ -223,11 +322,14 @@ fn route(
     match (method, path) {
         ("GET", "/") => (200, "text/html; charset=utf-8", WORKER_HTML.into()),
         ("GET", "/itr") => (200, "text/html; charset=utf-8", ITR_HTML.into()),
+        ("GET", "/dialog") => (200, "text/html; charset=utf-8", DIALOG_HTML.into()),
+        ("GET", "/pitch") => (200, "text/html; charset=utf-8", PITCH_HTML.into()),
         ("GET", "/api/procedures") => json_ok(&api_procedures()),
         ("POST", "/api/proctor") => api_proctor(body, state),
         ("POST", "/api/start") => api_start(body, state),
         ("POST", "/api/answer") => api_answer(body, state),
         ("POST", "/api/seal") => api_seal(body, state),
+        ("POST", "/api/chat") => api_chat(body, chat),
         ("GET", "/api/admissions") => json_ok(&api_admissions(state)),
         _ => (
             404,
@@ -375,6 +477,28 @@ fn api_admissions(state: &Mutex<AppState>) -> Value {
         })
         .collect();
     Value::Array(rows)
+}
+
+/// General conversation: run the visitor's text through the real ADAM
+/// deterministic engine and return its Kazakh reply.
+fn api_chat(body: &[u8], chat: &Option<Mutex<ChatEngine>>) -> (u16, &'static str, Vec<u8>) {
+    let v: Value = match serde_json::from_slice(body) {
+        Ok(v) => v,
+        Err(_) => return json_err("bad json"),
+    };
+    let text = v["text"].as_str().unwrap_or("").trim().to_string();
+    if text.is_empty() {
+        return json_err("empty text");
+    }
+    let Some(engine) = chat else {
+        return json_ok(&json!({
+            "reply": "Диалог қозғалтқышы жүктелмеген (data/retrieval немесе world_core жоқ)."
+        }));
+    };
+    let mut e = engine.lock().unwrap();
+    let ChatEngine { conv, lex, repo } = &mut *e;
+    let reply = conv.turn(&text, lex, repo, 42);
+    json_ok(&json!({ "reply": reply }))
 }
 
 /// Store a proctoring snapshot (raw JPEG body): hash it, save `<hex>.jpg`,

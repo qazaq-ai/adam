@@ -12,6 +12,9 @@ path = "src/main.rs"
 [dependencies]
 adam-dialog = { path = "../adam-dialog" }
 adam-seal = { path = "../adam-seal" }
+adam-kernel-fst = { path = "../adam-kernel-fst" }
+adam-retrieval = { path = "../adam-retrieval" }
+adam-reasoning = { path = "../adam-reasoning" }
 serde.workspace = true
 serde_json.workspace = true
 
