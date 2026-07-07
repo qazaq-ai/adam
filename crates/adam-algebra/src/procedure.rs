@@ -99,10 +99,17 @@ pub struct ProcedureIR {
     /// first.  Typically a job category («заводта жұмыс істейтін
     /// барлық қызметкерлер») or a hazard class.
     pub applies_to: Vec<String>,
+    /// Russian translation of [`Self::applies_to`], for bilingual
+    /// (kz/ru) delivery.  Empty ⇒ fall back to the Kazakh list.
+    #[serde(default)]
+    pub applies_to_ru: Vec<String>,
     /// Things that MUST be true before step 1 is allowed to
     /// begin — typically training certifications, equipment
     /// checks, naryad-dopusk paperwork.
     pub prerequisites: Vec<String>,
+    /// Russian translation of [`Self::prerequisites`].
+    #[serde(default)]
+    pub prerequisites_ru: Vec<String>,
     /// Ordered sequence of actions.  The sequence is significant:
     /// re-ordering steps is a safety violation in the real
     /// regulation, so the type preserves order.
@@ -116,11 +123,17 @@ pub struct ProcedureIR {
     /// Kazakh role names so they match the actual organisational
     /// chart («цех бастығы», «энергетик», «мастер»).
     pub authorization: Vec<String>,
+    /// Russian translation of [`Self::authorization`].
+    #[serde(default)]
+    pub authorization_ru: Vec<String>,
     /// Confirmation gates — discrete checkpoints where the
     /// procedure must pause until an external condition is
     /// observed/signed.  Example: «наряд-допуск рәсімделуі
     /// тиіс», «газ концентрациясы өлшенуі тиіс».
     pub confirmation_gates: Vec<String>,
+    /// Russian translation of [`Self::confirmation_gates`].
+    #[serde(default)]
+    pub confirmation_gates_ru: Vec<String>,
     /// Provenance + currency metadata.  Source carries the
     /// regulation version date so a CI lint can flag procedures
     /// whose underlying regulation has been superseded.
@@ -137,6 +150,10 @@ pub struct ProcedureStep {
     /// Imperative Kazakh action.  Voice assistant reads this
     /// aloud; keep it ≤ ~120 chars for natural pacing.
     pub action_kk: String,
+    /// Russian translation of [`Self::action_kk`], for bilingual
+    /// delivery.  `None` ⇒ fall back to the Kazakh action.
+    #[serde(default)]
+    pub action_ru: Option<String>,
     /// Optional explicit actor when it differs from the parent
     /// procedure's `authorization` (e.g. a step performed by a
     /// subordinate while the cell stays under supervisor's
@@ -158,9 +175,80 @@ pub struct Hazard {
     /// Short noun phrase: «жоғары кернеу», «газ улануы», «биіктен
     /// құлау».
     pub kind_kk: String,
+    /// Russian translation of [`Self::kind_kk`].
+    #[serde(default)]
+    pub kind_ru: Option<String>,
     /// Mitigation as the regulation prescribes it — typically a
     /// СИЗ requirement, isolation step, or monitoring action.
     pub mitigation_kk: String,
+    /// Russian translation of [`Self::mitigation_kk`].
+    #[serde(default)]
+    pub mitigation_ru: Option<String>,
+}
+
+/// Delivery language for a briefing session (kz / ru).  English is a
+/// future addition once the corpus carries `_en` briefable fields.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Lang {
+    Kk,
+    Ru,
+}
+
+impl ProcedureStep {
+    /// Action text in `lang`, falling back to Kazakh when the Russian
+    /// translation is absent.
+    pub fn action_in(&self, lang: Lang) -> &str {
+        match lang {
+            Lang::Ru => self.action_ru.as_deref().unwrap_or(&self.action_kk),
+            Lang::Kk => &self.action_kk,
+        }
+    }
+}
+
+impl Hazard {
+    pub fn kind_in(&self, lang: Lang) -> &str {
+        match lang {
+            Lang::Ru => self.kind_ru.as_deref().unwrap_or(&self.kind_kk),
+            Lang::Kk => &self.kind_kk,
+        }
+    }
+    pub fn mitigation_in(&self, lang: Lang) -> &str {
+        match lang {
+            Lang::Ru => self.mitigation_ru.as_deref().unwrap_or(&self.mitigation_kk),
+            Lang::Kk => &self.mitigation_kk,
+        }
+    }
+}
+
+impl ProcedureIR {
+    /// Title in `lang`, falling back to Kazakh.
+    pub fn title_in(&self, lang: Lang) -> &str {
+        match lang {
+            Lang::Ru => self.title_ru.as_deref().unwrap_or(&self.title_kk),
+            Lang::Kk => &self.title_kk,
+        }
+    }
+    /// `applies_to` in `lang` (falls back to Kazakh when the RU list is empty).
+    pub fn applies_to_in(&self, lang: Lang) -> &[String] {
+        match lang {
+            Lang::Ru if !self.applies_to_ru.is_empty() => &self.applies_to_ru,
+            _ => &self.applies_to,
+        }
+    }
+    /// `authorization` roles in `lang`.
+    pub fn authorization_in(&self, lang: Lang) -> &[String] {
+        match lang {
+            Lang::Ru if !self.authorization_ru.is_empty() => &self.authorization_ru,
+            _ => &self.authorization,
+        }
+    }
+    /// `confirmation_gates` in `lang`.
+    pub fn gates_in(&self, lang: Lang) -> &[String] {
+        match lang {
+            Lang::Ru if !self.confirmation_gates_ru.is_empty() => &self.confirmation_gates_ru,
+            _ => &self.confirmation_gates,
+        }
+    }
 }
 
 /// Provenance + currency metadata.
@@ -379,17 +467,22 @@ mod tests {
             aliases_en: Vec::new(),
             domain: ProcedureDomain::OkhranaTruda,
             applies_to: vec!["барлық жаңа қызметкерлер".into()],
+            applies_to_ru: Vec::new(),
             prerequisites: vec!["жұмысқа қабылдау бұйрығы шығарылуы тиіс".into()],
+            prerequisites_ru: Vec::new(),
             steps: vec![ProcedureStep {
                 sequence: 1,
                 action_kk: "Кадр қызметі жаңа қызметкерді қабылдау бұйрығын ресімдейді.".into(),
+                action_ru: None,
                 actor: Some("кадр қызметі".into()),
                 condition: None,
                 evidence: Some("қол қойылған бұйрық".into()),
             }],
             hazards: vec![],
             authorization: vec!["еңбекті қорғау инженері".into()],
+            authorization_ru: Vec::new(),
             confirmation_gates: vec!["журналға қол қойылуы тиіс".into()],
+            confirmation_gates_ru: Vec::new(),
             source: ProcedureSource {
                 regulation_kk: "Қазақстан Республикасының Еңбек кодексі".into(),
                 regulation_id: "414-V".into(),
@@ -424,6 +517,7 @@ mod tests {
         p.steps.push(ProcedureStep {
             sequence: 3, // skips 2
             action_kk: "келесі қадам".into(),
+            action_ru: None,
             actor: None,
             condition: None,
             evidence: None,

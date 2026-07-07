@@ -81,6 +81,8 @@
   <!-- 1. Login / choose briefing -->
   <section id="login" class="card">
     <h1>Жылдық нұсқаулық / Ежегодный инструктаж</h1>
+    <label for="lang">Тіл / Язык</label>
+    <select id="lang"><option value="ru">Русский</option><option value="kk">Қазақша</option></select>
     <label for="worker">Аты-жөні / ФИО</label>
     <input id="worker" placeholder="Асан Асанов" autocomplete="off">
     <label for="wid">Табельный № / ID</label>
@@ -153,7 +155,7 @@
   function show(sec) { ["login","session","result"].forEach(s => $(s).classList.toggle("hidden", s !== sec)); }
 
   // ---- голос ИИ: НАШ нейронный казахский (/api/tts), браузер — fallback ----
-  let voiceOn = true, ttsVoice = null, lastText = "", curAudio = null;
+  let voiceOn = true, ttsVoice = null, lastText = "", curAudio = null, sessionLang = "kk";
   const synth = window.speechSynthesis || null;
   function pickVoice() {
     if (!synth) return;
@@ -166,8 +168,11 @@
     if (!synth) return;
     synth.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    if (ttsVoice) u.voice = ttsVoice;
-    u.lang = ttsVoice ? ttsVoice.lang : "kk-KZ";
+    // Russian: pick a ru voice (browser Russian is good). Kazakh: kk→any.
+    const vs = synth.getVoices() || [];
+    const v = sessionLang === "ru" ? (vs.find(x => /^ru/i.test(x.lang)) || ttsVoice) : ttsVoice;
+    if (v) u.voice = v;
+    u.lang = sessionLang === "ru" ? "ru-RU" : (ttsVoice ? ttsVoice.lang : "kk-KZ");
     u.rate = 0.98;
     synth.speak(u);
   }
@@ -175,6 +180,8 @@
     lastText = text || "";
     if (!voiceOn || !text) return;
     stopAudio();
+    // Russian → browser ru voice (good). Kazakh → our neural /api/tts.
+    if (sessionLang === "ru") { browserSpeak(text); return; }
     try {
       const r = await fetch("/api/tts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
       if (r.ok) {
@@ -188,13 +195,14 @@
   }
 
   function render(reply) {
-    const isQuiz = /^\s*Сұрақ/i.test(reply.text || "");
+    const isQuiz = /^\s*(Сұрақ|Вопрос)/i.test(reply.text || "");
     $("prompt").textContent = reply.text;
     $("prompt").classList.toggle("quiz", isQuiz);
     const kind = $("slidekind");
-    kind.textContent = isQuiz ? "Бақылау сұрағы" : "Нұсқаулық";
+    const L = sessionLang === "ru";
+    kind.textContent = isQuiz ? (L ? "Контрольный вопрос" : "Бақылау сұрағы") : (L ? "Инструктаж" : "Нұсқаулық");
     kind.classList.toggle("quiz", isQuiz);
-    $("phase").textContent = reply.done ? "" : (isQuiz ? "Сұраққа жауап беріңіз…" : "Тыңдаңыз, содан кейін «Түсінікті»…");
+    $("phase").textContent = reply.done ? "" : (isQuiz ? (L ? "Ответьте на вопрос…" : "Сұраққа жауап беріңіз…") : (L ? "Слушайте, затем «понятно»…" : "Тыңдаңыз, содан кейін «Түсінікті»…"));
     speak(reply.text);
     if (reply.done) { stopAudio(); finish(); }
   }
@@ -229,11 +237,14 @@
 
   async function start() {
     const worker = $("worker").value.trim(), wid = $("wid").value.trim(), proc = $("proc").value;
-    if (!worker) { $("loginErr").textContent = "Аты-жөні қажет."; return; }
+    sessionLang = $("lang").value;
+    if (!worker) { $("loginErr").textContent = sessionLang === "ru" ? "Укажите ФИО." : "Аты-жөні қажет."; return; }
+    // Ack button label follows the language.
+    $("ackBtn").textContent = sessionLang === "ru" ? "Понятно" : "Түсінікті";
     try {
       let proctorSha256 = "";
       try { proctorSha256 = await captureProctor(); } catch (e) {}
-      const res = await api("/api/start", { worker, workerId: wid, procedureId: proc, proctorSha256 });
+      const res = await api("/api/start", { worker, workerId: wid, procedureId: proc, proctorSha256, lang: sessionLang });
       stopCam();
       sessionId = res.sessionId;
       show("session"); $("meta").textContent = proc + (proctorSha256 ? " · 📷 расталды" : ""); render(res);

@@ -43,6 +43,8 @@
 use adam_algebra::ProcedureIR;
 use adam_seal::{sha256, to_hex};
 
+pub use adam_algebra::Lang;
+
 use crate::procedure_loader::shared_procedures;
 
 /// Minimum common-prefix length (in chars) for two tokens to be
@@ -300,6 +302,9 @@ pub struct BriefingSession {
     answers: Vec<AnsweredQuestion>,
     phase: Phase,
     pass_ratio: f32,
+    /// Delivery language (kz / ru).  Selects which language's fields the
+    /// steps, prompts and expected answers are drawn from.
+    lang: Lang,
     /// `sha256:<hex>` over the briefed SOP's canonical content, fixed at
     /// construction so the protocol records exactly which version ran.
     sop_hash: String,
@@ -308,34 +313,47 @@ pub struct BriefingSession {
 }
 
 impl BriefingSession {
-    /// Build a session from a curated procedure.
+    /// Build a Kazakh session from a curated procedure.
     pub fn from_procedure(p: &ProcedureIR) -> Self {
+        Self::from_procedure_in(p, Lang::Kk)
+    }
+
+    /// Build a session from a curated procedure in the given language.
+    /// Steps, prompts and expected answers use that language's fields,
+    /// falling back to Kazakh where a translation is absent.
+    pub fn from_procedure_in(p: &ProcedureIR, lang: Lang) -> Self {
         let steps = p
             .steps
             .iter()
-            .map(|s| format!("Қадам {}: {}", s.sequence, s.action_kk))
+            .map(|s| format!("{} {}: {}", step_word(lang), s.sequence, s.action_in(lang)))
             .collect();
         Self {
             procedure_id: p.id.clone(),
-            title_kk: p.title_kk.clone(),
-            applies_to: p.applies_to.clone(),
+            title_kk: p.title_in(lang).to_string(),
+            applies_to: p.applies_to_in(lang).to_vec(),
             steps,
-            questions: build_questions(p),
+            questions: build_questions(p, lang),
             sop_hash: sop_content_hash(p),
             sop_version_date: p.source.version_date.clone(),
             answers: Vec::new(),
             phase: Phase::Instruct(0),
             pass_ratio: DEFAULT_PASS_RATIO,
+            lang,
         }
     }
 
-    /// Look a procedure up by its stable id and start a session.
+    /// Look a procedure up by its stable id and start a Kazakh session.
     /// Returns `None` when no procedure carries that id.
     pub fn from_id(id: &str) -> Option<Self> {
+        Self::from_id_in(id, Lang::Kk)
+    }
+
+    /// Look a procedure up by id and start a session in `lang`.
+    pub fn from_id_in(id: &str, lang: Lang) -> Option<Self> {
         shared_procedures()
             .iter()
             .find(|p| p.id == id)
-            .map(Self::from_procedure)
+            .map(|p| Self::from_procedure_in(p, lang))
     }
 
     /// Override the admission threshold (fraction of questions that
@@ -365,17 +383,34 @@ impl BriefingSession {
     /// loader rejects empty-step procedures), so `steps[0]` is safe.
     pub fn begin(&self) -> String {
         let mut out = String::new();
-        out.push_str(&format!(
-            "«{}» бойынша нұсқаулық сессиясы басталды.\n",
-            self.title_kk
-        ));
-        if !self.applies_to.is_empty() {
-            out.push_str(&format!("Қолданылады: {}\n", self.applies_to.join("; ")));
+        match self.lang {
+            Lang::Kk => {
+                out.push_str(&format!(
+                    "«{}» бойынша нұсқаулық сессиясы басталды.\n",
+                    self.title_kk
+                ));
+                if !self.applies_to.is_empty() {
+                    out.push_str(&format!("Қолданылады: {}\n", self.applies_to.join("; ")));
+                }
+                out.push_str(
+                    "Мен қадамдарды ретімен түсіндіремін, содан кейін бақылау сұрақтарын қоямын. \
+                     Әр қадамнан кейін «түсінікті» деп жауап беріңіз.\n\n",
+                );
+            }
+            Lang::Ru => {
+                out.push_str(&format!(
+                    "Начата сессия инструктажа по «{}».\n",
+                    self.title_kk
+                ));
+                if !self.applies_to.is_empty() {
+                    out.push_str(&format!("Применяется к: {}\n", self.applies_to.join("; ")));
+                }
+                out.push_str(
+                    "Я объясню шаги по порядку, затем задам контрольные вопросы. \
+                     После каждого шага ответьте «понятно».\n\n",
+                );
+            }
         }
-        out.push_str(
-            "Мен қадамдарды ретімен түсіндіремін, содан кейін бақылау сұрақтарын қоямын. \
-             Әр қадамнан кейін «түсінікті» деп жауап беріңіз.\n\n",
-        );
         out.push_str(&self.steps[0]);
         out
     }
@@ -399,14 +434,23 @@ impl BriefingSession {
                     if self.questions.is_empty() {
                         self.phase = Phase::Done;
                         BriefingReply {
-                            text: "Нұсқаулық аяқталды. Бақылау сұрақтары жоқ.".into(),
+                            text: match self.lang {
+                                Lang::Kk => "Нұсқаулық аяқталды. Бақылау сұрақтары жоқ.",
+                                Lang::Ru => "Инструктаж завершён. Контрольных вопросов нет.",
+                            }
+                            .into(),
                             done: true,
                         }
                     } else {
                         self.phase = Phase::Quiz(0);
+                        let head = match self.lang {
+                            Lang::Kk => "Нұсқаулық аяқталды. Енді бақылау сұрақтары.",
+                            Lang::Ru => "Инструктаж завершён. Теперь контрольные вопросы.",
+                        };
                         BriefingReply {
                             text: format!(
-                                "Нұсқаулық аяқталды. Енді бақылау сұрақтары.\n\nСұрақ 1: {}",
+                                "{head}\n\n{} 1: {}",
+                                question_word(self.lang),
                                 self.questions[0].prompt_kk
                             ),
                             done: false,
@@ -423,17 +467,19 @@ impl BriefingSession {
                     passed,
                     coverage,
                 });
-                let feedback = if passed {
-                    "Дұрыс."
-                } else {
-                    "Толық емес — бұл сұрақ қайта қаралуы тиіс."
+                let feedback = match (self.lang, passed) {
+                    (Lang::Kk, true) => "Дұрыс.",
+                    (Lang::Kk, false) => "Толық емес — бұл сұрақ қайта қаралуы тиіс.",
+                    (Lang::Ru, true) => "Верно.",
+                    (Lang::Ru, false) => "Неполно — этот вопрос требует пересмотра.",
                 };
                 let next = i + 1;
                 if next < self.questions.len() {
                     self.phase = Phase::Quiz(next);
                     BriefingReply {
                         text: format!(
-                            "{feedback}\n\nСұрақ {}: {}",
+                            "{feedback}\n\n{} {}: {}",
+                            question_word(self.lang),
                             next + 1,
                             self.questions[next].prompt_kk
                         ),
@@ -447,7 +493,11 @@ impl BriefingSession {
                 }
             }
             Phase::Done => BriefingReply {
-                text: "Сессия аяқталды.".into(),
+                text: match self.lang {
+                    Lang::Kk => "Сессия аяқталды.",
+                    Lang::Ru => "Сессия завершена.",
+                }
+                .into(),
                 done: true,
             },
         }
@@ -526,25 +576,35 @@ fn sop_content_hash(p: &ProcedureIR) -> String {
 /// capped at 5.  Falls back to extra steps if the richer fields are
 /// empty so even a sparse procedure yields ≥3 questions when it has
 /// enough steps.
-fn build_questions(p: &ProcedureIR) -> Vec<ControlQuestion> {
+fn build_questions(p: &ProcedureIR, lang: Lang) -> Vec<ControlQuestion> {
     let mut qs: Vec<ControlQuestion> = Vec::new();
+    let auth = p.authorization_in(lang);
+    let gates = p.gates_in(lang);
 
-    if !p.authorization.is_empty() {
+    if !auth.is_empty() {
         qs.push(ControlQuestion {
             // Generic prompt — NOT «{title} рәсімінде…»: embedding the
             // procedure title let a worker echo the question and score
             // the title's words as if they were the answer (Codex audit,
             // kk_labor_work_permit_022).  The worker already knows which
             // procedure — it was announced at session start.
-            prompt_kk: "Бұл рәсім бойынша кім жауапты?".to_string(),
-            expected: p.authorization.clone(),
+            prompt_kk: match lang {
+                Lang::Kk => "Бұл рәсім бойынша кім жауапты?",
+                Lang::Ru => "Кто отвечает за эту процедуру?",
+            }
+            .to_string(),
+            expected: auth.to_vec(),
             source: QuestionSource::Authority,
         });
     }
     if let Some(first) = p.steps.first() {
         qs.push(ControlQuestion {
-            prompt_kk: "Бұл рәсімнің бірінші қадамы неден басталады?".into(),
-            expected: vec![first.action_kk.clone()],
+            prompt_kk: match lang {
+                Lang::Kk => "Бұл рәсімнің бірінші қадамы неден басталады?",
+                Lang::Ru => "С чего начинается первый шаг этой процедуры?",
+            }
+            .into(),
+            expected: vec![first.action_in(lang).to_string()],
             source: QuestionSource::Step(first.sequence),
         });
     }
@@ -555,8 +615,16 @@ fn build_questions(p: &ProcedureIR) -> Vec<ControlQuestion> {
             // Avoid «жұмыс» in the prompt: several hazard kinds contain
             // «жұмыс», and prompt-token exclusion would then strip it
             // from a correct answer (Codex audit, kk_labor_ppe_002).
-            prompt_kk: "Осы рәсімде қандай қауіптер бар?".into(),
-            expected: p.hazards.iter().map(|h| h.kind_kk.clone()).collect(),
+            prompt_kk: match lang {
+                Lang::Kk => "Осы рәсімде қандай қауіптер бар?",
+                Lang::Ru => "Какие опасности есть в этой процедуре?",
+            }
+            .into(),
+            expected: p
+                .hazards
+                .iter()
+                .map(|h| h.kind_in(lang).to_string())
+                .collect(),
             source: QuestionSource::Hazard,
         });
     }
@@ -564,8 +632,11 @@ fn build_questions(p: &ProcedureIR) -> Vec<ControlQuestion> {
     // measure is the safety-critical knowledge and differs per hazard.
     for h in &p.hazards {
         qs.push(ControlQuestion {
-            prompt_kk: format!("«{}» қаупінен қалай қорғанады?", h.kind_kk),
-            expected: vec![h.mitigation_kk.clone()],
+            prompt_kk: match lang {
+                Lang::Kk => format!("«{}» қаупінен қалай қорғанады?", h.kind_in(lang)),
+                Lang::Ru => format!("Как защититься от опасности «{}»?", h.kind_in(lang)),
+            },
+            expected: vec![h.mitigation_in(lang).to_string()],
             source: QuestionSource::Mitigation,
         });
     }
@@ -573,12 +644,17 @@ fn build_questions(p: &ProcedureIR) -> Vec<ControlQuestion> {
     // Per-gate questions would have to name the gate in the prompt,
     // leaking the answer; instead the worker must recall at least one
     // документируемое условие допуска unprompted.
-    if !p.confirmation_gates.is_empty() {
+    if !gates.is_empty() {
         qs.push(ControlQuestion {
-            prompt_kk: "Жұмысқа жіберу үшін қандай шарттар міндетті түрде \
-                        орындалуы (ресімделуі) тиіс?"
-                .into(),
-            expected: p.confirmation_gates.clone(),
+            prompt_kk: match lang {
+                Lang::Kk => "Жұмысқа жіберу үшін қандай шарттар міндетті түрде \
+                             орындалуы (ресімделуі) тиіс?"
+                    .to_string(),
+                Lang::Ru => "Какие условия обязательно должны быть выполнены \
+                             (оформлены) для допуска к работе?"
+                    .to_string(),
+            },
+            expected: gates.to_vec(),
             source: QuestionSource::Gate,
         });
     }
@@ -590,8 +666,11 @@ fn build_questions(p: &ProcedureIR) -> Vec<ControlQuestion> {
                 break;
             }
             qs.push(ControlQuestion {
-                prompt_kk: format!("{}-қадамда не істеледі?", s.sequence),
-                expected: vec![s.action_kk.clone()],
+                prompt_kk: match lang {
+                    Lang::Kk => format!("{}-қадамда не істеледі?", s.sequence),
+                    Lang::Ru => format!("Что делается на шаге {}?", s.sequence),
+                },
+                expected: vec![s.action_in(lang).to_string()],
                 source: QuestionSource::Step(s.sequence),
             });
         }
@@ -599,6 +678,22 @@ fn build_questions(p: &ProcedureIR) -> Vec<ControlQuestion> {
 
     qs.truncate(MAX_QUESTIONS);
     qs
+}
+
+/// Word for a numbered step, per language.
+fn step_word(lang: Lang) -> &'static str {
+    match lang {
+        Lang::Kk => "Қадам",
+        Lang::Ru => "Шаг",
+    }
+}
+
+/// Word for a control question, per language.
+fn question_word(lang: Lang) -> &'static str {
+    match lang {
+        Lang::Kk => "Сұрақ",
+        Lang::Ru => "Вопрос",
+    }
 }
 
 /// Grade one answer.  Returns `(passed, best_coverage)`.
@@ -701,11 +796,14 @@ mod tests {
             aliases_en: vec![],
             domain: adam_algebra::ProcedureDomain::OkhranaTruda,
             applies_to: vec!["жөндеу тобы".into()],
+            applies_to_ru: Vec::new(),
             prerequisites: vec!["наряд-рұқсат ресімделген".into()],
+            prerequisites_ru: Vec::new(),
             steps: vec![
                 ProcedureStep {
                     sequence: 1,
                     action_kk: "Энергетик электр қуатын ажыратады.".into(),
+                    action_ru: None,
                     actor: Some("энергетик".into()),
                     condition: None,
                     evidence: Some("блоктау биркасы".into()),
@@ -713,6 +811,7 @@ mod tests {
                 ProcedureStep {
                     sequence: 2,
                     action_kk: "Механик гидравликалық жүйені босатады.".into(),
+                    action_ru: None,
                     actor: Some("механик".into()),
                     condition: None,
                     evidence: None,
@@ -720,10 +819,14 @@ mod tests {
             ],
             hazards: vec![Hazard {
                 kind_kk: "күтпеген іске қосылу".into(),
+                kind_ru: None,
                 mitigation_kk: "жеке құлып пен бирка орнату".into(),
+                mitigation_ru: None,
             }],
             authorization: vec!["энергетик".into(), "цех бастығы".into()],
+            authorization_ru: Vec::new(),
             confirmation_gates: vec!["барлық блоктаулар тізілімге енгізілуі тиіс".into()],
+            confirmation_gates_ru: Vec::new(),
             source: ProcedureSource {
                 regulation_kk: "Еңбек кодексі".into(),
                 regulation_id: "414-V".into(),
@@ -737,7 +840,7 @@ mod tests {
 
     #[test]
     fn builds_questions_from_curated_fields() {
-        let qs = build_questions(&sample());
+        let qs = build_questions(&sample(), Lang::Kk);
         // authority + step1 + hazard + mitigation + gate = 5.
         assert_eq!(qs.len(), 5);
         assert_eq!(qs[0].source, QuestionSource::Authority);
@@ -754,7 +857,7 @@ mod tests {
 
     #[test]
     fn grade_passes_on_correct_authority_answer() {
-        let qs = build_questions(&sample());
+        let qs = build_questions(&sample(), Lang::Kk);
         let authority = &qs[0];
         // Worker names one valid role → best phrase coverage 1.0.
         let (passed, cov) = grade(authority, "Цех бастығы жауапты");
@@ -764,7 +867,7 @@ mod tests {
 
     #[test]
     fn grade_fails_on_irrelevant_answer() {
-        let qs = build_questions(&sample());
+        let qs = build_questions(&sample(), Lang::Kk);
         let (passed, cov) = grade(&qs[0], "Білмеймін, ауа райы жақсы");
         assert!(!passed, "irrelevant answer must fail");
         assert!(cov < PASS_COVERAGE);

@@ -34,7 +34,7 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 
 use adam_dialog::briefing_seal::{SealContext, SealedProtocol};
-use adam_dialog::briefing_session::BriefingSession;
+use adam_dialog::briefing_session::{BriefingSession, Lang};
 use adam_dialog::procedure_loader::shared_procedures;
 use adam_dialog::system_clock::{read_clock, tz_offset_secs_from_env};
 use adam_dialog::templates::TemplateRepository;
@@ -365,10 +365,15 @@ fn api_start(body: &[u8], state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8
     let proc_id = v["procedureId"].as_str().unwrap_or("");
     // Proctoring hash from a prior /api/proctor upload (empty if none).
     let proctor_sha256 = v["proctorSha256"].as_str().unwrap_or("").to_string();
+    // Delivery language (kz default; ru mandatory for ССГПО).
+    let lang = match v["lang"].as_str() {
+        Some("ru") => Lang::Ru,
+        _ => Lang::Kk,
+    };
     if worker.is_empty() {
         return json_err("worker name required");
     }
-    let Some(session) = BriefingSession::from_id(proc_id) else {
+    let Some(session) = BriefingSession::from_id_in(proc_id, lang) else {
         return json_err("unknown procedure");
     };
     let intro = session.begin();

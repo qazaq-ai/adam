@@ -120,7 +120,7 @@ pub use frame::{
 pub use index::{FrameId, FrameIndex, IndexedFrame, RankedFrame};
 pub use operator::{SlotKind, SuffixOp};
 pub use procedure::{
-    Hazard, ProcedureDomain, ProcedureIR, ProcedureParseError, ProcedureSource, ProcedureStep,
+    Hazard, Lang, ProcedureDomain, ProcedureIR, ProcedureParseError, ProcedureSource, ProcedureStep,
 };
 pub use procedure_condition::{
     ConditionExpr, ConditionInput, evaluate as evaluate_condition, parse_condition,

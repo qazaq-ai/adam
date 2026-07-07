@@ -28,6 +28,34 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.16.0] — 2026-07-07 — bilingual briefing (kz/ru) — mandatory for ССГПО
+
+For АО ССГПО the inability to run инструктажи / проверки знаний in
+**Russian** is a red flag — 60%+ of workers don't know Kazakh. This makes
+the briefing itself bilingual (not just the UI): steps, control questions,
+answer grading and voice all work in Russian.
+
+- **Schema (`adam-algebra`).** `ProcedureIR` / `ProcedureStep` / `Hazard`
+  gain optional Russian fields (`action_ru`, `kind_ru`, `mitigation_ru`,
+  `authorization_ru`, `confirmation_gates_ru`, `applies_to_ru`,
+  `prerequisites_ru`) plus a `Lang` enum and `*_in(lang)` accessors that
+  fall back to Kazakh when a translation is absent.
+- **Engine (`briefing_session`).** `BriefingSession::from_procedure_in` /
+  `from_id_in(id, lang)` build steps, prompts and expected answers in the
+  chosen language; all surface strings (intro, feedback, «Вопрос N») are
+  localised. Grading is language-agnostic (prefix-overlap), so it works on
+  Russian answers unchanged. The `sopHash` stays on the Kazakh canonical
+  content, so a допуск is version-stable regardless of delivery language.
+- **Corpus.** The demo procedure (вводный инструктаж `kk_labor_vvodnyi_016`)
+  is fully translated to Russian; the remaining 32 fall back to Kazakh
+  until translated (a content pass).
+- **Portal + worker page.** `/api/start` accepts `lang`; the worker page
+  has a **язык kz/ru** selector (Russian default), passes it, and speaks
+  Russian with the browser's Russian voice while Kazakh uses our neural
+  `/api/tts`. Verified end-to-end: a Russian session grades Russian
+  answers and issues a signed допуск (admitted 5/5, Russian prompts in the
+  credential). English + full 32-procedure RU + dialog/pitch i18n are next.
+
 ## [6.15.1] — 2026-07-07 — our neural Kazakh voice in the browser (`/api/tts`)
 
 The browser's own speech engine mangles Kazakh; this serves **our** voice
