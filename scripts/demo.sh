@@ -39,10 +39,18 @@ URLS=(
 
 if [ -n "$OPEN" ]; then
   echo "==> opening 4 pages in the browser…"
-  "$OPEN" "${URLS[@]}"
+  # Open one at a time: macOS LaunchServices can time out (error -1712)
+  # when handed several URLs in a single `open` call.  `|| true` keeps a
+  # browser-launch hiccup from tripping `set -e` and tearing down the
+  # portal via the EXIT trap — the demo must stay up regardless.
+  for url in "${URLS[@]}"; do
+    "$OPEN" "$url" || echo "   (couldn't open $url automatically — open it manually)"
+    sleep 0.4
+  done
 else
   echo "==> open these in your browser:"; printf '   %s\n' "${URLS[@]}"
 fi
+echo "==> pages: ${URLS[*]}"
 
 echo "==> demo running. Press Ctrl+C to stop."
 wait "$PORTAL_PID"

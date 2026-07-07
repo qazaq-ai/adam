@@ -74,8 +74,8 @@
     ru: {
       htmllang:"ru", tag:"общий диалог · движок ADAM", send:"Отправить",
       placeholder:"Напишите вопрос…", micTitle:"Сказать голосом", voiceTitle:"Озвучивать ответ",
-      greet:"Здравствуйте! Я — ARK для общения на казахском, меня зовут adam. Напишите вопрос или нажмите 🎙 и скажите голосом.",
-      hint:"Например: «Судың формуласы қандай?», «Қазір сағат неше?», «44 көбейт 6 ға», «Қазақстанда қандай таулар бар?»",
+      greet:"Здравствуйте! Я — adam, локальный движок ARK. По-русски отвечаю на приветствия, вопросы о себе, арифметику и столицы; развёрнутые темы — лучше по-казахски. Напишите или нажмите 🎙.",
+      hint:"Например: «Кто ты?», «Что умеешь?», «44 умножить на 6», «Столица России?»",
       you:"вы", noSR:"В этом браузере нет голосового ввода — напишите текстом",
       err:"Ошибка: сервер недоступен (запустите adam_portal).", srLang:"ru-RU",
       vMale:"голос: мужской", vFemale:"голос: женский", vChild:"голос: детский"
@@ -127,10 +127,21 @@
   function pickVoice(){ if(!synth) return; const vs=synth.getVoices()||[]; ttsVoice=vs.find(v=>/^kk/i.test(v.lang))||vs.find(v=>/^ru/i.test(v.lang))||vs[0]||null; }
   if (synth){ pickVoice(); synth.onvoiceschanged=pickVoice; }
   function stopAudio(){ if(curAudio){ curAudio.pause(); curAudio=null; } if(synth) synth.cancel(); }
-  function browserSpeak(t){ if(!synth) return; synth.cancel(); const u=new SpeechSynthesisUtterance(t); if(ttsVoice)u.voice=ttsVoice; u.lang=ttsVoice?ttsVoice.lang:"kk-KZ"; u.rate=0.98; synth.speak(u); }
+  function browserSpeak(t){
+    if(!synth) return; synth.cancel();
+    const u=new SpeechSynthesisUtterance(t);
+    const vs=synth.getVoices()||[];
+    // Russian reply → browser ru voice (good); Kazakh → our kk voice.
+    const v = lang==="ru" ? (vs.find(x=>/^ru/i.test(x.lang))||ttsVoice) : ttsVoice;
+    if(v) u.voice=v;
+    u.lang = lang==="ru" ? "ru-RU" : (ttsVoice?ttsVoice.lang:"kk-KZ");
+    u.rate=0.98; synth.speak(u);
+  }
   async function speak(t){
     if(!voiceOn||!t) return;
     stopAudio();
+    // Russian → browser ru voice; Kazakh → our neural /api/tts.
+    if(lang==="ru"){ browserSpeak(t); return; }
     try {
       const r = await fetch("/api/tts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:t})});
       if (r.ok) {
@@ -213,7 +224,7 @@
     $("text").value = "";
     add(t, "user");
     const thinking = add("…", "adam");
-    const payload = { text: t };
+    const payload = { text: t, lang: lang };
     if (lastVoiceGender) payload.voice_gender = lastVoiceGender;
     try {
       const r = await fetch("/api/chat", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload) });

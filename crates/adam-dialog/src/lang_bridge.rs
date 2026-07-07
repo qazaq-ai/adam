@@ -195,9 +195,195 @@ pub fn lookup_capital(input: &str) -> Option<String> {
     Some(format_answer(entry, lang))
 }
 
+/// Extract the first two non-negative integers appearing in `s`
+/// (digit runs).  Used by the bounded Russian arithmetic path.
+fn first_two_ints(s: &str) -> Option<(i64, i64)> {
+    let mut nums = Vec::new();
+    let mut cur = String::new();
+    for ch in s.chars() {
+        if ch.is_ascii_digit() {
+            cur.push(ch);
+        } else if !cur.is_empty() {
+            if let Ok(n) = cur.parse::<i64>() {
+                nums.push(n);
+            }
+            cur.clear();
+            if nums.len() == 2 {
+                break;
+            }
+        }
+    }
+    if nums.len() < 2 && !cur.is_empty() {
+        if let Ok(n) = cur.parse::<i64>() {
+            nums.push(n);
+        }
+    }
+    if nums.len() >= 2 {
+        Some((nums[0], nums[1]))
+    } else {
+        None
+    }
+}
+
+/// Bounded Russian arithmetic: «44 умножить на 6», «12 плюс 8»,
+/// «сколько будет 7 на 8».  Returns `None` unless the input has
+/// two numbers and a recognised operator word.
+fn try_arithmetic_ru(lower: &str) -> Option<String> {
+    let (a, b) = first_two_ints(lower)?;
+    let op = if lower.contains("умнож") || lower.contains('×') || lower.contains('*') {
+        '×'
+    } else if lower.contains("раздел") || lower.contains("дели") || lower.contains('/') {
+        '÷'
+    } else if lower.contains("плюс") || lower.contains("прибав") || lower.contains("сложи")
+    {
+        '+'
+    } else if lower.contains("минус") || lower.contains("вычт") || lower.contains("отними")
+    {
+        '-'
+    } else if lower.contains(" на ") {
+        // colloquial «44 на 6» → multiplication
+        '×'
+    } else {
+        return None;
+    };
+    let res: i64 = match op {
+        '×' => a.saturating_mul(b),
+        '+' => a.saturating_add(b),
+        '-' => a.saturating_sub(b),
+        '÷' => {
+            if b == 0 {
+                return Some("На ноль делить нельзя.".into());
+            }
+            a / b
+        }
+        _ => return None,
+    };
+    Some(format!("{a} {op} {b} = {res}"))
+}
+
+/// **Bounded Russian conversational responder** for the general
+/// dialog page (`/dialog`) when the user selects Russian.
+///
+/// ADAM's truth path is Kazakh-first; this is the peripheral
+/// adapter (same pattern as [`lookup_capital`]) giving the demo a
+/// visibly-Russian dialog over the common conversational surface —
+/// greeting, small-talk, identity, capabilities, arithmetic and
+/// capital lookups.  Anything outside that returns an honest
+/// Russian capability message rather than a Kazakh «не понял»
+/// refusal.  The canonical Kazakh fact graph is NOT duplicated and
+/// the Kazakh dialog path is unchanged: the portal calls this ONLY
+/// for Russian-language turns.
+pub fn respond_ru(input: &str) -> String {
+    let lower = input.to_lowercase();
+    let has = |kws: &[&str]| kws.iter().any(|k| lower.contains(k));
+
+    // Specific, computable shapes first.
+    if let Some(ans) = lookup_capital(input) {
+        return ans;
+    }
+    if let Some(ans) = try_arithmetic_ru(&lower) {
+        return ans;
+    }
+
+    // Conversational surface.
+    if has(&[
+        "привет",
+        "здравств",
+        "добрый день",
+        "добрый вечер",
+        "доброе утро",
+        "салам",
+        "здорово",
+    ]) {
+        return "Здравствуйте! Я — adam, локальный казахскоязычный движок ARK. По-русски отвечаю на \
+                приветствия, вопросы о себе, простую арифметику и столицы стран; развёрнутые вопросы \
+                лучше задавать по-казахски."
+            .into();
+    }
+    if has(&[
+        "что умеешь",
+        "что ты умеешь",
+        "что можешь",
+        "что ты можешь",
+        "чем поможешь",
+        "твои возможности",
+        "на что способен",
+        "помоги",
+    ]) {
+        return "По-русски я пока умею: поздороваться, рассказать о себе, посчитать арифметику \
+                (например «44 умножить на 6») и назвать столицу страны («столица России»). Основной \
+                язык — казахский: на нём отвечаю на факты, время и школьные темы. Полноценный русский \
+                диалог — в планах развития модели."
+            .into();
+    }
+    if has(&[
+        "кто ты",
+        "ты кто",
+        "как тебя зовут",
+        "как тебя звать",
+        "что ты такое",
+        "твоё имя",
+        "твое имя",
+        "представься",
+    ]) {
+        return "Меня зовут adam. Я — ARK (агглютинативное рассуждающее ядро): детерминированный \
+                казахскоязычный движок ИИ. Работаю локально, без облака, и не выдумываю факты."
+            .into();
+    }
+    if has(&[
+        "дела",
+        "как ты",
+        "как поживаешь",
+        "как настроение",
+        "как жизнь",
+    ]) {
+        return "Спасибо, я программа — работаю стабильно и жду ваш вопрос. Могу посчитать \
+                арифметику или назвать столицу страны."
+            .into();
+    }
+    if has(&["спасибо", "благодар", "рахмет"]) {
+        return "Пожалуйста! Обращайтесь.".into();
+    }
+    if has(&["до свидания", "досвидания", "до встречи", "прощай", "пока "])
+        || lower.trim() == "пока"
+    {
+        return "До свидания! Хорошего дня.".into();
+    }
+
+    // Honest bounded fallback.
+    "Я казахскоязычный движок. По-русски пока отвечаю на приветствия, вопросы о себе, арифметику и \
+     столицы стран. Этот вопрос лучше задать по-казахски — тогда отвечу точнее. Полноценный русский \
+     диалог — в планах развития модели."
+        .into()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn ru_responder_covers_conversational_surface() {
+        assert!(respond_ru("Здравствуйте").contains("adam"));
+        assert!(
+            respond_ru("как ваши дела")
+                .to_lowercase()
+                .contains("стабильно")
+        );
+        assert!(respond_ru("кто ты?").contains("ARK"));
+        assert!(
+            respond_ru("что умеешь?")
+                .to_lowercase()
+                .contains("арифметик")
+        );
+        assert_eq!(respond_ru("44 умножить на 6"), "44 × 6 = 264");
+        assert_eq!(respond_ru("сколько будет 12 плюс 8"), "12 + 8 = 20");
+        assert_eq!(respond_ru("100 разделить на 4"), "100 ÷ 4 = 25");
+        assert_eq!(respond_ru("столица России?"), "Столица — Москва.");
+        // Unknown → honest bounded fallback, never a Kazakh refusal.
+        let fb = respond_ru("расскажи про фотосинтез");
+        assert!(fb.contains("казахск"));
+        assert!(!fb.contains("түсінбедім"));
+    }
 
     #[test]
     fn ru_capital_query_returns_ru_answer() {

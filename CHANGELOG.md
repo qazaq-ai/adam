@@ -28,6 +28,31 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.17.2] — 2026-07-07 — bounded Russian dialog on `/dialog` (peripheral adapter)
+
+The general-dialog page has a kz/ru switcher but the Kazakh-first engine
+answered Russian input with a Kazakh «мен тек қазақ тілінде сөйлеймін»
+refusal. This adds a **bounded Russian conversational surface** so the demo
+dialog is visibly bilingual — a local-AI bonus for a Russian-speaking
+workforce — without pretending to be an open-domain Russian model.
+
+- **`lang_bridge::respond_ru`** — extends the existing «peripheral semantic
+  adapter» (the RU/EN capital lookup) to greeting, small-talk, identity,
+  capabilities, arithmetic («44 умножить на 6») and capital lookups, all
+  answered in Russian. Anything outside that returns an **honest Russian
+  capability message**, not a Kazakh refusal. The canonical Kazakh fact
+  graph is not duplicated.
+- **Portal `/api/chat`** — Russian turns (the page sends `lang` from its
+  selector) route through `respond_ru`; the Kazakh truth path
+  (`Conversation::turn`) is untouched. Works even without the chat engine
+  loaded.
+- **Dialog page** — sends `lang`; Russian replies are spoken with the
+  browser's Russian voice (Kazakh still uses our neural `/api/tts`); the
+  greeting + example hints are Russian-appropriate.
+- Honest scope: this is a bounded demo surface, not a full Russian model —
+  open-domain Russian Q&A (understanding + generation, or a ru↔kk translator
+  over the Kazakh core) remains future work.
+
 ## [6.17.1] — 2026-07-07 — CI hotfix: clippy `single_match` on the voice-gender hint
 
 The 6.17.0 `/api/chat` voice-gender block used a `match` with one real arm;

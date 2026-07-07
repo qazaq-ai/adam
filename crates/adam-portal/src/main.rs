@@ -503,6 +503,15 @@ fn api_chat(body: &[u8], chat: &Option<Mutex<ChatEngine>>) -> (u16, &'static str
     if text.is_empty() {
         return json_err("empty text");
     }
+    // Russian turns go through the bounded peripheral adapter (greeting,
+    // small-talk, identity, arithmetic, capitals; honest RU fallback
+    // otherwise) — the Kazakh truth path stays untouched, and this works
+    // even without the chat engine loaded.  The general-dialog page sets
+    // `lang` from its kz/ru selector.
+    if v["lang"].as_str() == Some("ru") {
+        let reply = adam_dialog::lang_bridge::respond_ru(&text);
+        return json_ok(&json!({ "reply": reply }));
+    }
     let Some(engine) = chat else {
         return json_ok(&json!({
             "reply": "Диалог қозғалтқышы жүктелмеген (data/retrieval немесе world_core жоқ)."
