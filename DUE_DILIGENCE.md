@@ -1,8 +1,8 @@
 # adam — Due Diligence Pack
 
-**Last updated:** 2026-07-05
+**Last updated:** 2026-07-08
 **Branch:** `main`
-**HEAD commit:** `d7ebaae2` (v6.12.0)
+**HEAD commit:** `304e5431` (v6.17.2)
 **Workspace version:** `6.17.2`
 
 This document is intentionally a flat list of facts. Numbers come from
