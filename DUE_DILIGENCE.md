@@ -3,7 +3,7 @@
 **Last updated:** 2026-07-08
 **Branch:** `main`
 **HEAD commit:** `304e5431` (v6.17.2)
-**Workspace version:** `6.18.0`
+**Workspace version:** `6.18.1`
 
 This document is intentionally a flat list of facts. Numbers come from
 commands you can re-run yourself; everything labelled "limitation" or

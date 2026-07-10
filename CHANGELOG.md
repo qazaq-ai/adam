@@ -28,6 +28,15 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.18.1] — 2026-07-08 — CI hotfix: clippy lints from the Rust 1.97 toolchain bump
+
+CI's stable toolchain moved to Rust 1.97, whose clippy promotes
+`clippy::for_kv_map` and `clippy::question_mark` to `-D warnings` failures
+on pre-existing code the older local toolchain didn't flag. Applied the
+machine-suggested fixes (`.keys()` iteration in `reasoner.rs`, `?` operator
+in `frame.rs` / `discourse.rs`) — no behaviour change. The local toolchain
+was updated to 1.97 to match CI so the gate reproduces it.
+
 ## [6.18.0] — 2026-07-08 — annual-program допуск: topic → зачёт → aggregate verdict
 
 Fixes a serious integrity bug and completes the retraining flow. Before,

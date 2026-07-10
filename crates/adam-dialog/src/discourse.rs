@@ -3624,9 +3624,9 @@ pub fn try_apply_formula(input: &str) -> Option<(String, i64, String)> {
     for c in expr.chars() {
         if c.is_alphabetic() {
             let var_str = c.to_string();
-            match numeric.get(&var_str) {
-                Some(val) => substituted.push_str(&val.to_string()),
-                None => return None,
+            {
+                let val = numeric.get(&var_str)?;
+                substituted.push_str(&val.to_string())
             }
         } else {
             substituted.push(c);

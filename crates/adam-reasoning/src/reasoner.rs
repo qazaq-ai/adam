@@ -468,7 +468,7 @@ fn rule_r5_shared_is_a_target(
 
     // Scan every node; if it has ≥ 2 incoming IsA edges, every pair
     // of those incoming subjects is RelatedTo each other via it.
-    for (hub, _stats) in graph.nodes.iter() {
+    for hub in graph.nodes.keys() {
         // v4.0.23 — skip overbroad hubs entirely (Codex #4).
         if is_overbroad_r5_hub(hub) {
             continue;
@@ -924,7 +924,7 @@ fn rule_r11_in_domain_shared_target(
     out: &mut Vec<DerivedFact>,
 ) {
     let mut pass_pairs: BTreeSet<(String, String)> = BTreeSet::new();
-    for (hub, _stats) in graph.nodes.iter() {
+    for hub in graph.nodes.keys() {
         let incoming_in_domain: Vec<&crate::graph::GraphEdge> = graph
             .incoming(hub)
             .into_iter()

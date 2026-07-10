@@ -543,10 +543,9 @@ impl Frame {
             let pred =
                 predicate_from_verb_root(&comp.root.surface).unwrap_or(FramePredicate::DoesTo);
             (pred, Some((idx, comp)))
-        } else if let Some(pred) = predicate_from_copular_lattice(lattice) {
-            (pred, None)
         } else {
-            return None;
+            let pred = predicate_from_copular_lattice(lattice)?;
+            (pred, None)
         };
 
         // 2. Walk the lattice to collect agent / object / modifiers.
