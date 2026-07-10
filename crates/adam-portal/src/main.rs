@@ -34,7 +34,7 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 
 use adam_dialog::briefing_seal::{SealContext, SealedProtocol};
-use adam_dialog::briefing_session::{BriefingSession, Lang};
+use adam_dialog::briefing_session::{BriefingProtocol, BriefingSession, Lang};
 use adam_dialog::procedure_loader::shared_procedures;
 use adam_dialog::system_clock::{read_clock, tz_offset_secs_from_env};
 use adam_dialog::templates::TemplateRepository;
@@ -42,7 +42,7 @@ use adam_dialog::{Conversation, DomainIndex};
 use adam_kernel_fst::lexicon::LexiconV1;
 use adam_retrieval::MorphemeIndex;
 use adam_seal::{SigningKey, sha256, to_hex};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
 const ENGINE_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -69,54 +69,75 @@ const KEY_FILE: &str = "data/portal/operator.key";
 /// Override with `ADAM_PORTAL_JOURNAL`.
 const JOURNAL_FILE: &str = "data/portal/admissions.jsonl";
 
-/// One issued протокол, kept for the ИТР dashboard.
-struct Admission {
-    worker: String,
-    worker_id: String,
-    procedure: String,
-    admitted: bool,
+/// The annual-retraining **program** — the ordered set of briefing
+/// topics a worker must clear to be admitted.  A допуск is issued ONLY
+/// after every topic's зачёт is passed; failing any one → пересдача.
+///
+/// Demo default is a short, watchable set; a real deployment lists the
+/// full applicable program (edit this constant).  Ids are validated
+/// against the loaded corpus at startup.
+const PROGRAM: &[&str] = &[
+    "kk_labor_vvodnyi_016",           // вводный инструктаж
+    "kk_labor_primary_workplace_017", // первичный инструктаж на рабочем месте
+    "kk_okhrana_briefing_004",        // периодический (повторный) инструктаж
+];
+
+/// Days a worker gets to self-prepare before a пересдача when a зачёт is
+/// failed.  30 days (~1 month) mirrors the Kazakhstan practice for a
+/// repeat knowledge check (повторная проверка знаний) after an
+/// unsatisfactory result.
+const RETAKE_DAYS: i64 = 30;
+
+/// One graded topic inside a program run — carries its own signed
+/// protocol so every зачёт stays independently verifiable.
+#[derive(Clone, Serialize, Deserialize)]
+struct TopicRecord {
+    procedure_id: String,
+    title: String,
     passed_count: u32,
     total: u32,
+    admitted: bool,
+    sealed: SealedProtocol,
+}
+
+/// The aggregate outcome of one worker's full program run — the unit the
+/// ИТР dashboard shows and the journal persists (one JSONL line each).
+#[derive(Clone, Serialize, Deserialize)]
+struct ProgramRecord {
+    schema: String,
+    worker: String,
+    worker_id: String,
     issuance_date: String,
-    public_key: String,
-    valid: bool,
     id_method: String,
     proctor_sha256: String,
+    topics: Vec<TopicRecord>,
+    topics_passed: u32,
+    topics_total: u32,
+    questions_correct: u32,
+    questions_total: u32,
+    /// Admitted only when EVERY topic passed.
+    admitted: bool,
+    /// Date after which a пересдача is allowed (empty when admitted).
+    retake_after: String,
 }
 
-impl Admission {
-    /// Summarise a signed credential for the dashboard, re-verifying its
-    /// seal (so a tampered journal line shows as `valid: false`).
-    fn from_sealed(sealed: &SealedProtocol) -> Admission {
-        let e = &sealed.envelope;
-        Admission {
-            worker: e.credential_subject.name.clone(),
-            worker_id: e.credential_subject.id_ref.clone(),
-            procedure: e.procedure.title_kk.clone(),
-            admitted: e.admitted,
-            passed_count: e.evidence.passed_count,
-            total: e.evidence.total,
-            issuance_date: e.issuance_date.clone(),
-            public_key: sealed.public_key().to_string(),
-            valid: sealed.verify().is_valid(),
-            id_method: e.credential_subject.id_method.clone(),
-            proctor_sha256: e.credential_subject.proctor_sha256.clone(),
-        }
-    }
-}
-
-/// A live session plus the caller context needed to seal it later.
+/// A live program run: the fixed topic list, which topic is active, the
+/// signed outcomes of finished topics, and the current topic's session.
 struct Live {
     session: BriefingSession,
     worker: String,
     worker_id: String,
     /// `sha256:<hex>` of the proctoring snapshot, or empty if none.
     proctor_sha256: String,
+    lang: Lang,
+    program: Vec<String>,
+    idx: usize,
+    outcomes: Vec<TopicRecord>,
 }
 
 struct AppState {
     sessions: HashMap<String, Live>,
-    admissions: Vec<Admission>,
+    admissions: Vec<ProgramRecord>,
     key: SigningKey,
     journal_path: PathBuf,
     /// Directory holding proctoring snapshots (`<hex>.jpg`).
@@ -220,7 +241,7 @@ fn main() {
     // Restore the допуск journal (signed credentials, JSONL) from disk.
     let admissions = load_journal(&journal_path);
     eprintln!(
-        "adam_portal: journal {} — {} протокол(ов) restored",
+        "adam_portal: journal {} — {} запис(ей) допуска restored",
         journal_path.display(),
         admissions.len()
     );
@@ -332,10 +353,10 @@ fn route(
         ("GET", "/dialog") => (200, "text/html; charset=utf-8", DIALOG_HTML.into()),
         ("GET", "/pitch") => (200, "text/html; charset=utf-8", PITCH_HTML.into()),
         ("GET", "/api/procedures") => json_ok(&api_procedures()),
+        ("GET", "/api/program") => json_ok(&api_program()),
         ("POST", "/api/proctor") => api_proctor(body, state),
         ("POST", "/api/start") => api_start(body, state),
         ("POST", "/api/answer") => api_answer(body, state),
-        ("POST", "/api/seal") => api_seal(body, state),
         ("POST", "/api/chat") => api_chat(body, chat),
         ("POST", "/api/tts") => api_tts(body),
         ("GET", "/api/admissions") => json_ok(&api_admissions(state)),
@@ -355,6 +376,36 @@ fn api_procedures() -> Value {
     Value::Array(list)
 }
 
+/// The training program's ordered topics with kk/ru titles — the worker
+/// page lists these before starting, and shows «Тема N из M» during.
+fn api_program() -> Value {
+    let procs = shared_procedures();
+    let list: Vec<Value> = resolved_program()
+        .iter()
+        .filter_map(|id| procs.iter().find(|p| &p.id == id))
+        .map(|p| {
+            json!({
+                "id": p.id,
+                "title_kk": p.title_kk,
+                "title_ru": p.title_ru.clone().unwrap_or_else(|| p.title_kk.clone()),
+            })
+        })
+        .collect();
+    Value::Array(list)
+}
+
+/// The program a worker runs: the constant `PROGRAM` filtered to ids the
+/// loaded corpus actually knows (so a typo can't wedge a session).
+fn resolved_program() -> Vec<String> {
+    let known: std::collections::HashSet<&str> =
+        shared_procedures().iter().map(|p| p.id.as_str()).collect();
+    PROGRAM
+        .iter()
+        .filter(|id| known.contains(*id))
+        .map(|s| s.to_string())
+        .collect()
+}
+
 fn api_start(body: &[u8], state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8>) {
     let v: Value = match serde_json::from_slice(body) {
         Ok(v) => v,
@@ -362,7 +413,6 @@ fn api_start(body: &[u8], state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8
     };
     let worker = v["worker"].as_str().unwrap_or("").trim().to_string();
     let worker_id = v["workerId"].as_str().unwrap_or("").trim().to_string();
-    let proc_id = v["procedureId"].as_str().unwrap_or("");
     // Proctoring hash from a prior /api/proctor upload (empty if none).
     let proctor_sha256 = v["proctorSha256"].as_str().unwrap_or("").to_string();
     // Delivery language (kz default; ru mandatory for ССГПО).
@@ -373,10 +423,16 @@ fn api_start(body: &[u8], state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8
     if worker.is_empty() {
         return json_err("worker name required");
     }
-    let Some(session) = BriefingSession::from_id_in(proc_id, lang) else {
+    let program = resolved_program();
+    let Some(first_id) = program.first() else {
+        return json_err("empty program");
+    };
+    let Some(session) = BriefingSession::from_id_in(first_id, lang) else {
         return json_err("unknown procedure");
     };
     let intro = session.begin();
+    let title = session.title().to_string();
+    let count = program.len();
     let id = next_session_id();
     let mut st = state.lock().unwrap();
     st.sessions.insert(
@@ -386,43 +442,26 @@ fn api_start(body: &[u8], state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8
             worker,
             worker_id,
             proctor_sha256,
+            lang,
+            program,
+            idx: 0,
+            outcomes: Vec::new(),
         },
     );
-    json_ok(&json!({ "sessionId": id, "text": intro, "done": false }))
+    json_ok(&json!({
+        "sessionId": id,
+        "text": intro,
+        "done": false,
+        "topicIndex": 1,
+        "topicCount": count,
+        "topicTitle": title,
+    }))
 }
 
-fn api_answer(body: &[u8], state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8>) {
-    let v: Value = match serde_json::from_slice(body) {
-        Ok(v) => v,
-        Err(_) => return json_err("bad json"),
-    };
-    let sid = v["sessionId"].as_str().unwrap_or("");
-    let input = v["input"].as_str().unwrap_or("");
-    let mut st = state.lock().unwrap();
-    let Some(live) = st.sessions.get_mut(sid) else {
-        return json_err("unknown session");
-    };
-    let reply = live.session.advance(input.trim());
-    json_ok(&json!({ "text": reply.text, "done": reply.done }))
-}
-
-fn api_seal(body: &[u8], state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8>) {
-    let v: Value = match serde_json::from_slice(body) {
-        Ok(v) => v,
-        Err(_) => return json_err("bad json"),
-    };
-    let sid = v["sessionId"].as_str().unwrap_or("").to_string();
-    let mut st = state.lock().unwrap();
-    let Some(live) = st.sessions.get(&sid) else {
-        return json_err("unknown session");
-    };
-    let Some(protocol) = live.session.protocol() else {
-        return json_err("session not finished");
-    };
-
+/// Seal one finished topic's protocol into an independently-verifiable
+/// credential, under the worker/proctor context and the current clock.
+fn seal_topic(live: &Live, protocol: &BriefingProtocol, key: &SigningKey) -> SealedProtocol {
     let clock = read_clock(tz_offset_secs_from_env());
-    // Camera proctoring, when a snapshot was captured, upgrades the
-    // identity method and binds the face-image hash into the credential.
     let has_proctor = !live.proctor_sha256.is_empty();
     let ctx = SealContext {
         worker: live.worker.clone(),
@@ -442,54 +481,274 @@ fn api_seal(body: &[u8], state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8>
         site: "ССГПО".to_string(),
         ..SealContext::default()
     };
-    let sealed = protocol.seal_with(&ctx, &st.key, ENGINE_VERSION);
-    let verify = sealed.verify();
+    protocol.seal_with(&ctx, key, ENGINE_VERSION)
+}
 
-    let resp = json!({
-        "admitted": sealed.envelope.admitted,
-        "passedCount": sealed.envelope.evidence.passed_count,
-        "total": sealed.envelope.evidence.total,
-        "publicKey": sealed.public_key(),
-        "verify": {
-            "signatureValid": verify.signature_valid,
-            "digestMatches": verify.digest_matches,
-            "algKnown": verify.alg_known,
-            "issuerBound": verify.issuer_bound,
+/// Build the aggregate program record from the signed per-topic outcomes.
+fn build_program_record(live: &Live) -> ProgramRecord {
+    // `topics_total` is the WHOLE program, not just attempted topics — a
+    // run that stops early on a failed зачёт shows «1/3», making clear the
+    // program was not completed.
+    let topics_total = live.program.len() as u32;
+    let topics_passed = live.outcomes.iter().filter(|t| t.admitted).count() as u32;
+    let questions_correct: u32 = live.outcomes.iter().map(|t| t.passed_count).sum();
+    let questions_total: u32 = live.outcomes.iter().map(|t| t.total).sum();
+    // Admitted only when every program topic was passed.
+    let admitted = topics_total > 0 && topics_passed == topics_total;
+    let has_proctor = !live.proctor_sha256.is_empty();
+    let clock = read_clock(tz_offset_secs_from_env());
+    let issuance_date = format!(
+        "{:04}-{:02}-{:02} {:02}:{:02}",
+        clock.year, clock.month, clock.day, clock.hour, clock.minute
+    );
+    let retake_after = if admitted {
+        String::new()
+    } else {
+        let (y, m, d) = add_days(
+            clock.year as i64,
+            clock.month as i64,
+            clock.day as i64,
+            RETAKE_DAYS,
+        );
+        format!("{y:04}-{m:02}-{d:02}")
+    };
+    ProgramRecord {
+        schema: "adam-dopusk-program/1".to_string(),
+        worker: live.worker.clone(),
+        worker_id: live.worker_id.clone(),
+        issuance_date,
+        id_method: if has_proctor {
+            "camera-proctored".to_string()
+        } else {
+            "portal-selfservice".to_string()
         },
-        "sealed": serde_json::to_value(&sealed).unwrap_or(Value::Null),
-    });
+        proctor_sha256: live.proctor_sha256.clone(),
+        topics: live.outcomes.clone(),
+        topics_passed,
+        topics_total,
+        questions_correct,
+        questions_total,
+        admitted,
+        retake_after,
+    }
+}
 
-    // Persist the signed credential (append-only journal), then update the
-    // in-memory dashboard view.
-    append_journal(&st.journal_path, &sealed);
-    st.admissions.push(Admission::from_sealed(&sealed));
+fn api_answer(body: &[u8], state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8>) {
+    let v: Value = match serde_json::from_slice(body) {
+        Ok(v) => v,
+        Err(_) => return json_err("bad json"),
+    };
+    let sid = v["sessionId"].as_str().unwrap_or("").to_string();
+    let input = v["input"].as_str().unwrap_or("");
+    let mut st = state.lock().unwrap();
+    if !st.sessions.contains_key(&sid) {
+        return json_err("unknown session");
+    }
+
+    // 1) Advance the current topic's session.
+    let reply = {
+        let live = st.sessions.get_mut(&sid).unwrap();
+        live.session.advance(input.trim())
+    };
+
+    // Still inside the current topic → return the next slide/question with
+    // program progress so the worker page can show «Тема N из M».
+    if !reply.done {
+        let live = st.sessions.get(&sid).unwrap();
+        return json_ok(&json!({
+            "text": reply.text,
+            "done": false,
+            "isQuestion": reply.is_question,
+            "topicIndex": live.idx + 1,
+            "topicCount": live.program.len(),
+            "topicTitle": live.session.title(),
+        }));
+    }
+
+    // 2) The current topic's зачёт just finished — seal it (immutable read
+    // of the session + the key, disjoint fields).
+    let outcome = {
+        let live = st.sessions.get(&sid).unwrap();
+        let Some(protocol) = live.session.protocol() else {
+            return json_err("topic not finished");
+        };
+        let sealed = seal_topic(live, &protocol, &st.key);
+        TopicRecord {
+            procedure_id: live.session.procedure_id().to_string(),
+            title: live.session.title().to_string(),
+            passed_count: protocol.passed_count as u32,
+            total: protocol.total as u32,
+            admitted: protocol.admitted,
+            sealed,
+        }
+    };
+
+    // 3) Record it.  Advance to the next topic ONLY if this зачёт passed
+    //    and more topics remain; a failed зачёт STOPS the program right
+    //    here (пересдача), and passing the last topic finalises the допуск.
+    let live = st.sessions.get_mut(&sid).unwrap();
+    live.outcomes.push(outcome.clone());
+    let lang = live.lang;
+
+    if outcome.admitted && live.idx + 1 < live.program.len() {
+        live.idx += 1;
+        let next_id = live.program[live.idx].clone();
+        match BriefingSession::from_id_in(&next_id, lang) {
+            Some(next) => {
+                let intro = next.begin();
+                let title = next.title().to_string();
+                let idx = live.idx;
+                let count = live.program.len();
+                live.session = next;
+                let head = topic_transition_head(lang, &outcome, idx, count);
+                return json_ok(&json!({
+                    "text": format!("{head}\n\n{intro}"),
+                    "done": false,
+                    "isQuestion": false,
+                    "topicComplete": true,
+                    "topicIndex": idx + 1,
+                    "topicCount": count,
+                    "topicTitle": title,
+                    "lastTopic": { "title": outcome.title, "passedCount": outcome.passed_count, "total": outcome.total, "admitted": outcome.admitted },
+                }));
+            }
+            None => return json_err("unknown procedure"),
+        }
+    }
+
+    // 4) Last topic done → build + persist the aggregate program record.
+    let record = build_program_record(live);
+    append_journal(&st.journal_path, &record);
+    st.admissions.push(record.clone());
     st.sessions.remove(&sid);
-    json_ok(&resp)
+
+    json_ok(&json!({
+        "done": true,
+        "programComplete": true,
+        "aggregate": program_record_json(&record),
+        "sealed": serde_json::to_value(&record).unwrap_or(Value::Null),
+    }))
+}
+
+/// Localised one-line verdict shown when a topic's зачёт finishes and the
+/// next topic starts.
+fn topic_transition_head(lang: Lang, o: &TopicRecord, next_idx: usize, count: usize) -> String {
+    let n = next_idx + 1;
+    match lang {
+        Lang::Ru => {
+            let verdict = if o.admitted {
+                format!("зачёт сдан ({}/{})", o.passed_count, o.total)
+            } else {
+                format!("зачёт НЕ сдан ({}/{})", o.passed_count, o.total)
+            };
+            format!("«{}» — {verdict}.\n— Тема {n} из {count}.", o.title)
+        }
+        Lang::Kk => {
+            let verdict = if o.admitted {
+                format!("сынақ тапсырылды ({}/{})", o.passed_count, o.total)
+            } else {
+                format!("сынақ тапсырылмады ({}/{})", o.passed_count, o.total)
+            };
+            format!(
+                "«{}» — {verdict}.\n— {n}-тақырып, барлығы {count}.",
+                o.title
+            )
+        }
+    }
+}
+
+/// Dashboard/verification view of one program record: per-topic seal
+/// re-verification (a tampered journal line shows `valid:false`) plus the
+/// aggregate the ИТР board renders.
+fn program_record_json(r: &ProgramRecord) -> Value {
+    let topics: Vec<Value> = r
+        .topics
+        .iter()
+        .map(|t| {
+            json!({
+                "title": t.title,
+                "procedureId": t.procedure_id,
+                "passedCount": t.passed_count,
+                "total": t.total,
+                "admitted": t.admitted,
+                "valid": t.sealed.verify().is_valid(),
+            })
+        })
+        .collect();
+    let all_valid = r.topics.iter().all(|t| t.sealed.verify().is_valid());
+    let public_key = r
+        .topics
+        .first()
+        .map(|t| t.sealed.public_key().to_string())
+        .unwrap_or_default();
+    // The topic that stopped the program (first failed зачёт), if any.
+    let stopped_at = r
+        .topics
+        .iter()
+        .find(|t| !t.admitted)
+        .map(|t| t.title.clone())
+        .unwrap_or_default();
+    json!({
+        "worker": r.worker,
+        "workerId": r.worker_id,
+        "issuanceDate": r.issuance_date,
+        "idMethod": r.id_method,
+        "proctorSha256": r.proctor_sha256,
+        "proctorUrl": proctor_url(&r.proctor_sha256),
+        "topics": topics,
+        "topicsPassed": r.topics_passed,
+        "topicsTotal": r.topics_total,
+        "attempted": r.topics.len(),
+        "stoppedAt": stopped_at,
+        "questionsCorrect": r.questions_correct,
+        "questionsTotal": r.questions_total,
+        "admitted": r.admitted,
+        "retakeAfter": r.retake_after,
+        "valid": all_valid,
+        "publicKey": public_key,
+    })
 }
 
 fn api_admissions(state: &Mutex<AppState>) -> Value {
     let st = state.lock().unwrap();
-    let rows: Vec<Value> = st
-        .admissions
-        .iter()
-        .map(|a| {
-            json!({
-                "worker": a.worker,
-                "workerId": a.worker_id,
-                "procedure": a.procedure,
-                "admitted": a.admitted,
-                "passedCount": a.passed_count,
-                "total": a.total,
-                "issuanceDate": a.issuance_date,
-                "publicKey": a.public_key,
-                "valid": a.valid,
-                "idMethod": a.id_method,
-                "proctorSha256": a.proctor_sha256,
-                "proctorUrl": proctor_url(&a.proctor_sha256),
-            })
-        })
-        .collect();
-    Value::Array(rows)
+    Value::Array(st.admissions.iter().map(program_record_json).collect())
+}
+
+/// Whether `y` is a leap year (Gregorian).
+fn is_leap(y: i64) -> bool {
+    (y % 4 == 0 && y % 100 != 0) || y % 400 == 0
+}
+
+/// Days in month `m` of year `y`.
+fn days_in_month(y: i64, m: i64) -> i64 {
+    match m {
+        2 => {
+            if is_leap(y) {
+                29
+            } else {
+                28
+            }
+        }
+        4 | 6 | 9 | 11 => 30,
+        _ => 31,
+    }
+}
+
+/// Add `n` days to `(y, m, d)`, handling month/year rollover.
+fn add_days(mut y: i64, mut m: i64, mut d: i64, mut n: i64) -> (i64, i64, i64) {
+    while n > 0 {
+        d += 1;
+        if d > days_in_month(y, m) {
+            d = 1;
+            m += 1;
+            if m > 12 {
+                m = 1;
+                y += 1;
+            }
+        }
+        n -= 1;
+    }
+    (y, m, d)
 }
 
 /// General conversation: run the visitor's text through the real ADAM
@@ -509,7 +768,7 @@ fn api_chat(body: &[u8], chat: &Option<Mutex<ChatEngine>>) -> (u16, &'static str
     // even without the chat engine loaded.  The general-dialog page sets
     // `lang` from its kz/ru selector.
     if v["lang"].as_str() == Some("ru") {
-        let reply = adam_dialog::lang_bridge::respond_ru(&text);
+        let reply = adam_dialog::lang_bridge::respond_ru(&text, v["voice_gender"].as_str());
         return json_ok(&json!({ "reply": reply }));
     }
     let Some(engine) = chat else {
@@ -712,7 +971,7 @@ fn write_secret_seed(path: &Path, seed_hex: &str) -> std::io::Result<()> {
 
 /// Restore the допуск journal — one signed credential per line.  Malformed
 /// lines are skipped; each survivor is re-verified for the dashboard.
-fn load_journal(path: &Path) -> Vec<Admission> {
+fn load_journal(path: &Path) -> Vec<ProgramRecord> {
     let mut out = Vec::new();
     if let Ok(content) = fs::read_to_string(path) {
         for line in content.lines() {
@@ -720,17 +979,18 @@ fn load_journal(path: &Path) -> Vec<Admission> {
             if line.is_empty() {
                 continue;
             }
-            if let Ok(sealed) = SealedProtocol::from_json(line) {
-                out.push(Admission::from_sealed(&sealed));
+            if let Ok(record) = serde_json::from_str::<ProgramRecord>(line) {
+                out.push(record);
             }
         }
     }
     out
 }
 
-/// Append one signed credential to the journal as a compact JSON line.
-fn append_journal(path: &Path, sealed: &SealedProtocol) {
-    let Ok(line) = serde_json::to_string(sealed) else {
+/// Append one aggregate program record to the journal as a compact JSON
+/// line (append-only JSONL).
+fn append_journal(path: &Path, record: &ProgramRecord) {
+    let Ok(line) = serde_json::to_string(record) else {
         return;
     };
     match fs::OpenOptions::new().create(true).append(true).open(path) {

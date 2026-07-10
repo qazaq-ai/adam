@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.17.2-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-6.18.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="https://github.com/qazaq-ai/adam/actions/workflows/rust.yml"><img src="https://img.shields.io/github/actions/workflow/status/qazaq-ai/adam/rust.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
@@ -61,7 +61,9 @@ ADAM_V6_2=1 ./target/release/adam_chat
 
 ---
 
-## What's new (v6.10.0 → v6.17.2)
+## What's new (v6.10.0 → v6.18.0)
+
+- **Annual-program допуск (v6.18.0)** — the worker portal now runs an ordered **program of topics**, not a single procedure: each topic is briefed, its зачёт taken, and admission is granted **only when every topic passes** (any failure → пересдача with a retake date).  Each topic's protocol is independently Ed25519-signed; the ИТР board shows a per-worker aggregate (topics N/M with per-topic status, questions correct/total, допуск/пересдача).  Fixes the earlier integrity gap where one зачёт issued a full допуск.
 
 **Industrial OT/ТБ session engine + doubled procedure corpus (2026-07-02), then a cryptographically-signed, identity-bound допуск credential (v6.11.0 → v6.12.0).**
 The industrial knowledge-assistant line gains the full

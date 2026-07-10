@@ -3,7 +3,7 @@
 **Last updated:** 2026-07-08
 **Branch:** `main`
 **HEAD commit:** `304e5431` (v6.17.2)
-**Workspace version:** `6.17.2`
+**Workspace version:** `6.18.0`
 
 This document is intentionally a flat list of facts. Numbers come from
 commands you can re-run yourself; everything labelled "limitation" or
@@ -54,7 +54,7 @@ The applied wedge is an **offline evidence engine for work-admission
 2. **Protocol Seal** ([`briefing_seal.rs`](crates/adam-dialog/src/briefing_seal.rs) +
    the zero-dependency [`adam-seal`](crates/adam-seal) crate) — seals
    the graded result into a W3C-Verifiable-Credentials-shaped
-   work-admission credential (`adam-dopusk-credential/2`), signed with
+   work-admission credential (`adam-dopusk-credential/3`), signed with
    pure-Rust **Ed25519 (RFC 8032)**. The credential binds *who answered*
    (`credentialSubject`), *who admitted them and by what authority*
    (`issuer` + a signed `authorityAssertion`, verified against the
@@ -82,8 +82,8 @@ cryptographically verifiable допуск, not feature breadth.
 
 | Metric | Value |
 | --- | --- |
-| HEAD branch | `main` (v6.12.0 release tag; OT/ТБ arc v6.10.0 → v6.12.0: session engine → grader hardening → Protocol Seal → identity/authority credential) |
-| HEAD commit | `d7ebaae2` |
+| HEAD branch | `main` (v6.18.0 release tag; OT/ТБ arc through the annual-program допуск flow) |
+| HEAD commit | `304e5431` |
 | `school_program_eval` (14 subjects, production) | **159 / 159 = 100 %** semantic |
 | `conv_dialog_eval` (44 real voice REPL + 39 scripted) | **52 / 52 = 100 %** semantic (31 probes document gaps) |
 | `safety_eval` (13 categories, release gate) | **22 / 22 = 100 %** semantic · 21 / 22 = 95 % strict (32 probes) |

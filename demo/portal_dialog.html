@@ -174,9 +174,18 @@
     const c=new Float32Array(n);
     for(let i=0;i<n;i++){ let s=0; for(let j=0;j<n-i;j++){ s+=b[j]*b[j+i]; } c[i]=s; }
     let d=0; while(d<n-1 && c[d]>c[d+1]) d++;
+    // Search only plausible voice lags (70–300 Hz) so formant/noise peaks
+    // at very short lags can't inflate F0.
+    const minLag=Math.max(d, Math.floor(rate/300));
+    const maxLag=Math.min(n-1, Math.floor(rate/70));
     let maxv=-1, maxp=-1;
-    for(let i=d;i<n;i++){ if(c[i]>maxv){ maxv=c[i]; maxp=i; } }
+    for(let i=minLag;i<=maxLag;i++){ if(c[i]>maxv){ maxv=c[i]; maxp=i; } }
     if(maxp<=0) return -1;
+    // Octave-down correction: if a comparably-strong peak sits at ~2× the
+    // lag, THAT is the true fundamental (lower frequency). This fixes the
+    // common octave-up error that reads a male voice as female.
+    const dbl=maxp*2;
+    if(dbl<=maxLag && c[dbl] >= 0.8*maxv) maxp=dbl;
     const x1=c[maxp-1]||0, x2=c[maxp], x3=c[maxp+1]||0;
     const a=(x1+x3-2*x2)/2, bb=(x3-x1)/2;
     let T0=maxp; if(a) T0=maxp-bb/(2*a);
@@ -201,10 +210,12 @@
   }
 
   function classifyGender(){
-    if (f0samples.length < 4) return;
+    if (f0samples.length < 6) return;   // need enough voiced frames to be stable
     const s = f0samples.slice().sort((a,b)=>a-b);
     const med = s[Math.floor(s.length/2)];
-    lastVoiceGender = med >= 255 ? "child" : (med >= 165 ? "female" : "male");
+    // Thresholds: male F0 ~85–180, female ~165–255, child >255. Boundary at
+    // 185 Hz (not 165) so a normally-pitched male isn't misread as female.
+    lastVoiceGender = med >= 255 ? "child" : (med >= 185 ? "female" : "male");
     const chip = document.createElement("div");
     chip.className = "voicechip";
     chip.textContent = (lastVoiceGender==="male"?T.vMale:lastVoiceGender==="female"?T.vFemale:T.vChild)+" · F0≈"+Math.round(med)+" Гц";

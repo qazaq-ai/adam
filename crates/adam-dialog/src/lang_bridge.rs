@@ -273,7 +273,7 @@ fn try_arithmetic_ru(lower: &str) -> Option<String> {
 /// refusal.  The canonical Kazakh fact graph is NOT duplicated and
 /// the Kazakh dialog path is unchanged: the portal calls this ONLY
 /// for Russian-language turns.
-pub fn respond_ru(input: &str) -> String {
+pub fn respond_ru(input: &str, gender: Option<&str>) -> String {
     let lower = input.to_lowercase();
     let has = |kws: &[&str]| kws.iter().any(|k| lower.contains(k));
 
@@ -295,10 +295,19 @@ pub fn respond_ru(input: &str) -> String {
         "салам",
         "здорово",
     ]) {
-        return "Здравствуйте! Я — adam, локальный казахскоязычный движок ARK. По-русски отвечаю на \
-                приветствия, вопросы о себе, простую арифметику и столицы стран; развёрнутые вопросы \
-                лучше задавать по-казахски."
-            .into();
+        // Voice-derived Kazakh vocative, when the browser passed a pitch
+        // estimate — «аға» to a male voice, «апай» to a female one.
+        let voc = match gender {
+            Some("male") => ", аға",
+            Some("female") => ", апай",
+            Some("child") => ", қарағым",
+            _ => "",
+        };
+        return format!(
+            "Здравствуйте{voc}! Я — adam, локальный казахскоязычный движок ARK. По-русски отвечаю \
+             на приветствия, вопросы о себе, простую арифметику и столицы стран; развёрнутые \
+             вопросы лучше задавать по-казахски."
+        );
     }
     if has(&[
         "что умеешь",
@@ -363,26 +372,34 @@ mod tests {
 
     #[test]
     fn ru_responder_covers_conversational_surface() {
-        assert!(respond_ru("Здравствуйте").contains("adam"));
+        assert!(respond_ru("Здравствуйте", None).contains("adam"));
         assert!(
-            respond_ru("как ваши дела")
+            respond_ru("как ваши дела", None)
                 .to_lowercase()
                 .contains("стабильно")
         );
-        assert!(respond_ru("кто ты?").contains("ARK"));
+        assert!(respond_ru("кто ты?", None).contains("ARK"));
         assert!(
-            respond_ru("что умеешь?")
+            respond_ru("что умеешь?", None)
                 .to_lowercase()
                 .contains("арифметик")
         );
-        assert_eq!(respond_ru("44 умножить на 6"), "44 × 6 = 264");
-        assert_eq!(respond_ru("сколько будет 12 плюс 8"), "12 + 8 = 20");
-        assert_eq!(respond_ru("100 разделить на 4"), "100 ÷ 4 = 25");
-        assert_eq!(respond_ru("столица России?"), "Столица — Москва.");
+        assert_eq!(respond_ru("44 умножить на 6", None), "44 × 6 = 264");
+        assert_eq!(respond_ru("сколько будет 12 плюс 8", None), "12 + 8 = 20");
+        assert_eq!(respond_ru("100 разделить на 4", None), "100 ÷ 4 = 25");
+        assert_eq!(respond_ru("столица России?", None), "Столица — Москва.");
         // Unknown → honest bounded fallback, never a Kazakh refusal.
-        let fb = respond_ru("расскажи про фотосинтез");
+        let fb = respond_ru("расскажи про фотосинтез", None);
         assert!(fb.contains("казахск"));
         assert!(!fb.contains("түсінбедім"));
+    }
+
+    #[test]
+    fn ru_greeting_uses_voice_derived_vocative() {
+        assert!(respond_ru("Здравствуйте", Some("male")).contains("аға"));
+        assert!(respond_ru("Здравствуйте", Some("female")).contains("апай"));
+        // No gender → no vocative, still a valid greeting.
+        assert!(!respond_ru("Здравствуйте", None).contains("аға"));
     }
 
     #[test]

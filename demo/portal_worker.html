@@ -67,6 +67,26 @@
   .cam video{width:220px;height:165px;object-fit:cover;border-radius:10px;border:1px solid var(--line-strong);background:#000;transform:scaleX(-1)}
   .cam.nocam video{display:none}
   .camnote{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);margin:0;max-width:38ch}
+  .program{display:flex;flex-direction:column;gap:.35rem;margin-top:.2rem}
+  .program .t{display:flex;gap:.5rem;align-items:baseline;font-size:.9rem}
+  .program .t .i{font-family:var(--mono);font-size:.72rem;color:var(--accent);min-width:1.4rem}
+  .progress{font-family:var(--mono);font-size:.75rem;color:var(--ink-soft);margin-bottom:.6rem;
+    padding-bottom:.5rem;border-bottom:1px solid var(--line)}
+  .progress b{color:var(--accent)}
+  .agg{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);
+    border-radius:10px;overflow:hidden;margin:.9rem 0}
+  .agg .c{background:var(--surface);padding:.7rem .9rem}
+  .agg .n{font-family:var(--mono);font-size:1.3rem;font-weight:700}
+  .agg .l{font-size:.76rem;color:var(--ink-soft)}
+  .topiclist{list-style:none;margin:.4rem 0 0;padding:0;display:flex;flex-direction:column;gap:.4rem}
+  .topiclist li{display:flex;align-items:center;gap:.6rem;font-size:.88rem;padding:.5rem .7rem;
+    border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}
+  .topiclist .tp{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:.12rem .5rem;border-radius:5px}
+  .topiclist .tp.ok{color:var(--verified);background:var(--verified-soft)}
+  .topiclist .tp.bad{color:var(--danger);background:var(--danger-soft)}
+  .topiclist .sc{margin-left:auto;font-family:var(--mono);font-size:.78rem;color:var(--ink-faint)}
+  .denynote{font-size:.9rem;color:var(--ink-soft);margin:.2rem 0 0;padding:.6rem .8rem;
+    border-left:3px solid var(--danger);background:var(--danger-soft);border-radius:0 8px 8px 0}
 </style>
 </head>
 <body>
@@ -90,8 +110,8 @@
     <input id="worker" placeholder="Асан Асанов" autocomplete="off">
     <label for="wid" id="t-l-wid"></label>
     <input id="wid" placeholder="SSGPO-EMP-12345" autocomplete="off">
-    <label for="proc" id="t-l-proc"></label>
-    <select id="proc"><option>…</option></select>
+    <label id="t-l-prog"></label>
+    <div class="program" id="progList"></div>
     <div class="cam" id="camwrap">
       <video id="cam" autoplay playsinline muted></video>
       <p class="camnote" id="camnote"></p>
@@ -103,6 +123,7 @@
 
   <!-- 2. Briefing session -->
   <section id="session" class="card hidden">
+    <div class="progress" id="progress"></div>
     <div class="slidebar">
       <span class="slidekind" id="slidekind"></span>
       <div class="vctl">
@@ -124,9 +145,11 @@
   <!-- 3. Result / допуск -->
   <section id="result" class="card hidden">
     <div class="verdict" id="verdict"></div>
-    <ul class="checks" id="checks"></ul>
+    <p class="denynote" id="denynote"></p>
+    <div class="agg" id="agg"></div>
+    <ul class="topiclist" id="topiclist"></ul>
     <p class="kbd" id="issuer"></p>
-    <a class="dl" id="download" href="#" download="dopusk.json"></a>
+    <a class="dl" id="download" href="#" download="dopusk_programma.json"></a>
     <div><button class="ghost" type="button" id="restartBtn" onclick="location.reload()"></button></div>
   </section>
 </main>
@@ -139,35 +162,39 @@
   const I18N = {
     ru: {
       htmllang:"ru", title:"Ежегодный инструктаж", tag:"кабинет работника · движок ADAM",
-      lWorker:"ФИО", lWid:"Табельный № / ID", lProc:"Процедура", lAnswer:"Ответ",
+      lWorker:"ФИО", lWid:"Табельный № / ID", lProg:"Годовая программа инструктажа", lAnswer:"Ответ",
       camnote:"📷 Камера подтверждает личность — снимок сохраняется как доказательство допуска.",
-      start:"Начать", hint:"Вопросы на выбранном языке. Отвечайте своими словами.",
+      start:"Начать программу", hint:"После каждой темы — зачёт. Допуск выдаётся только когда сданы все темы.",
       voiceOn:"🔊 Голос", voiceOff:"🔇 Голос", voiceNo:"🔇 нет", replay:"↻ Повтор",
       send:"Отправить", ack:"Понятно", restart:"Начать заново",
       kindQuiz:"Контрольный вопрос", kindInstr:"Инструктаж",
       phaseQuiz:"Ответьте на вопрос…", phaseInstr:"Слушайте, затем «понятно»…",
       needName:"Укажите ФИО.", procLoading:"загрузка…", procNoServer:"сервер недоступен — запустите adam_portal",
       camUnavail:"камера недоступна", camDenied:"нет доступа к камере — подтверждение оператором",
-      proctorOk:"📷 подтверждено", errPrefix:"Ошибка: ", sealErr:"Ошибка печати: ",
-      admitted:"ДОПУЩЕН К РАБОТЕ", denied:"НЕ ДОПУЩЕН", denyTail:"требуется повторный инструктаж",
-      ckSig:"подпись Ed25519", ckDigest:"дайджест", ckIssuer:"issuer = ключ",
-      issuerKey:"Ключ подписи: ", download:"↓ Подписанный протокол (JSON)", ack_word:"понятно"
+      proctorOk:"📷 подтверждено", errPrefix:"Ошибка: ",
+      admitted:"ДОПУЩЕН К РАБОТЕ", denied:"НЕ ДОПУЩЕН", denyTail:"пересдача после",
+      stopped:"Инструктаж прекращён на теме", prep:"Подготовьтесь и пройдите повторно после",
+      progTopic:"Тема", progOf:"из", aggTopics:"темы сданы", aggQuestions:"вопросы верно",
+      tPass:"сдан", tFail:"не сдан", sigOk:"✓ подпись Ed25519 верна", sigBad:"✗ подпись не сходится",
+      issuerKey:"Ключ подписи: ", download:"↓ Протокол программы (JSON)", ack_word:"понятно"
     },
     kk: {
       htmllang:"kk", title:"Жылдық нұсқаулық", tag:"жұмысшы кабинеті · ADAM қозғалтқышы",
-      lWorker:"Аты-жөні", lWid:"Табельдік № / ID", lProc:"Рәсім", lAnswer:"Жауап",
+      lWorker:"Аты-жөні", lWid:"Табельдік № / ID", lProg:"Жылдық нұсқаулық бағдарламасы", lAnswer:"Жауап",
       camnote:"📷 Камера жеке басты растайды — суреті допуск дәлелі ретінде сақталады.",
-      start:"Бастау", hint:"Сұрақтар таңдалған тілде. Жауапты өз сөзіңізбен жазыңыз.",
+      start:"Бағдарламаны бастау", hint:"Әр тақырыптан кейін — сынақ. Допуск барлық тақырып тапсырылғанда ғана беріледі.",
       voiceOn:"🔊 Дауыс", voiceOff:"🔇 Дауыс", voiceNo:"🔇 жоқ", replay:"↻ Қайта",
       send:"Жіберу", ack:"Түсінікті", restart:"Жаңадан бастау",
       kindQuiz:"Бақылау сұрағы", kindInstr:"Нұсқаулық",
       phaseQuiz:"Сұраққа жауап беріңіз…", phaseInstr:"Тыңдаңыз, содан кейін «Түсінікті»…",
       needName:"Аты-жөні қажет.", procLoading:"жүктелуде…", procNoServer:"сервер жоқ — adam_portal іске қосыңыз",
       camUnavail:"камера қолжетімсіз", camDenied:"камераға рұқсат жоқ — операторлық растау",
-      proctorOk:"📷 расталды", errPrefix:"Қате: ", sealErr:"Мөр қатесі: ",
-      admitted:"ЖҰМЫСҚА ЖІБЕРІЛДІ", denied:"ЖІБЕРІЛМЕДІ", denyTail:"қайта нұсқаулық қажет",
-      ckSig:"Ed25519 қолтаңба", ckDigest:"дайджест", ckIssuer:"issuer = кілт",
-      issuerKey:"Қол қойған кілт: ", download:"↓ Қол қойылған хаттама (JSON)", ack_word:"түсінікті"
+      proctorOk:"📷 расталды", errPrefix:"Қате: ",
+      admitted:"ЖҰМЫСҚА ЖІБЕРІЛДІ", denied:"ЖІБЕРІЛМЕДІ", denyTail:"қайта тапсыру",
+      stopped:"Нұсқаулық тоқтатылды, тақырып", prep:"Дайындалып, кейін қайта тапсырыңыз, мерзімі",
+      progTopic:"Тақырып", progOf:"—", aggTopics:"тақырып тапсырылды", aggQuestions:"сұрақ дұрыс",
+      tPass:"тапсырылды", tFail:"тапсырылмады", sigOk:"✓ Ed25519 қолтаңба дұрыс", sigBad:"✗ қолтаңба сәйкес емес",
+      issuerKey:"Қол қойған кілт: ", download:"↓ Бағдарлама хаттамасы (JSON)", ack_word:"түсінікті"
     }
   };
   let curLang = "ru", T = I18N.ru;
@@ -179,8 +206,9 @@
     $("t-title").textContent = T.title;
     $("t-l-worker").textContent = T.lWorker;
     $("t-l-wid").textContent = T.lWid;
-    $("t-l-proc").textContent = T.lProc;
+    $("t-l-prog").textContent = T.lProg;
     $("t-l-answer").textContent = T.lAnswer;
+    renderProgram();
     if (!$("camwrap").classList.contains("nocam")) $("camnote").textContent = T.camnote;
     $("startBtn").textContent = T.start;
     $("t-hint").textContent = T.hint;
@@ -200,15 +228,18 @@
     return r.json();
   }
 
-  // Вводный инструктаж — тот, что проходят ВСЕ специальности; демо по умолчанию.
-  const DEFAULT_PROC = "kk_labor_vvodnyi_016";
-  async function loadProcedures() {
-    try {
-      const list = await api("/api/procedures");
-      list.sort((a, b) => (b.id === DEFAULT_PROC) - (a.id === DEFAULT_PROC));
-      $("proc").innerHTML = list.map(p => `<option value="${p.id}">${p.title}</option>`).join("");
-      $("proc").value = DEFAULT_PROC;
-    } catch (e) { $("proc").innerHTML = `<option>${T.procNoServer}</option>`; }
+  // ---- программа инструктажа: список тем (сервер задаёт порядок) ----
+  let PROGRAM = [];
+  async function loadProgram() {
+    try { PROGRAM = await api("/api/program"); }
+    catch (e) { PROGRAM = []; }
+    renderProgram();
+  }
+  function renderProgram() {
+    if (!PROGRAM.length) { $("progList").innerHTML = `<div class="t">${T.procNoServer}</div>`; return; }
+    $("progList").innerHTML = PROGRAM.map((p, i) =>
+      `<div class="t"><span class="i">${i + 1}.</span><span>${curLang === "kk" ? p.title_kk : p.title_ru}</span></div>`
+    ).join("");
   }
 
   function show(sec) { ["login","session","result"].forEach(s => $(s).classList.toggle("hidden", s !== sec)); }
@@ -253,15 +284,20 @@
   }
 
   function render(reply) {
-    const isQuiz = /^\s*(Сұрақ|Вопрос)/i.test(reply.text || "");
+    if (reply.done) { stopAudio(); finishProgram(reply); return; }
+    // program progress «Тема N из M: <title>»
+    if (reply.topicIndex && reply.topicCount) {
+      $("progress").innerHTML = `${T.progTopic} <b>${reply.topicIndex}</b> ${T.progOf} <b>${reply.topicCount}</b>` +
+        (reply.topicTitle ? ` · ${reply.topicTitle}` : "");
+    }
+    const isQuiz = reply.isQuestion === true;
     $("prompt").textContent = reply.text;
     $("prompt").classList.toggle("quiz", isQuiz);
     const kind = $("slidekind");
     kind.textContent = isQuiz ? T.kindQuiz : T.kindInstr;
     kind.classList.toggle("quiz", isQuiz);
-    $("phase").textContent = reply.done ? "" : (isQuiz ? T.phaseQuiz : T.phaseInstr);
+    $("phase").textContent = isQuiz ? T.phaseQuiz : T.phaseInstr;
     speak(reply.text);
-    if (reply.done) { stopAudio(); finish(); }
   }
 
   // ---- камера-прокторинг: снимок при старте → хеш в допуск ----
@@ -293,16 +329,18 @@
   function stopCam() { if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; } }
 
   async function start() {
-    const worker = $("worker").value.trim(), wid = $("wid").value.trim(), proc = $("proc").value;
+    const worker = $("worker").value.trim(), wid = $("wid").value.trim();
     sessionLang = $("lang").value;
     if (!worker) { $("loginErr").textContent = T.needName; return; }
     try {
       let proctorSha256 = "";
       try { proctorSha256 = await captureProctor(); } catch (e) {}
-      const res = await api("/api/start", { worker, workerId: wid, procedureId: proc, proctorSha256, lang: sessionLang });
+      const res = await api("/api/start", { worker, workerId: wid, proctorSha256, lang: sessionLang });
       stopCam();
       sessionId = res.sessionId;
-      show("session"); $("meta").textContent = proc + (proctorSha256 ? " · " + T.proctorOk : ""); render(res);
+      show("session");
+      $("meta").textContent = (proctorSha256 ? T.proctorOk : "");
+      render(res);
       $("answer").focus();
     } catch (e) { $("loginErr").textContent = T.errPrefix + e.message; }
   }
@@ -315,25 +353,32 @@
     catch (e) { $("phase").textContent = T.errPrefix + e.message; }
   }
 
-  async function finish() {
-    try {
-      const s = await api("/api/seal", { sessionId });
-      show("result");
-      const v = $("verdict");
-      v.className = "verdict " + (s.admitted ? "ok" : "bad");
-      v.innerHTML = "<span>●</span><span>" + (s.admitted
-        ? `${T.admitted} · ${s.passedCount}/${s.total}`
-        : `${T.denied} · ${s.passedCount}/${s.total} — ${T.denyTail}`) + "</span>";
-      const ck = s.verify || {};
-      $("checks").innerHTML = [
-        [T.ckSig, ck.signatureValid],
-        [T.ckDigest, ck.digestMatches],
-        [T.ckIssuer, ck.issuerBound],
-      ].map(([t, ok]) => `<li><span class="${ok?'y':'n'}">${ok?'✓':'✗'}</span>${t}</li>`).join("");
-      $("issuer").textContent = T.issuerKey + (s.publicKey || "").slice(0, 24) + "…";
-      const blob = new Blob([JSON.stringify(s.sealed, null, 2)], { type: "application/json" });
-      $("download").href = URL.createObjectURL(blob);
-    } catch (e) { $("phase").textContent = T.sealErr + e.message; }
+  // Final aggregate result over the whole program.
+  function finishProgram(reply) {
+    const a = reply.aggregate || {};
+    show("result");
+    const v = $("verdict");
+    v.className = "verdict " + (a.admitted ? "ok" : "bad");
+    v.innerHTML = "<span>●</span><span>" + (a.admitted
+      ? `${T.admitted}`
+      : `${T.denied} — ${T.denyTail} ${a.retakeAfter || ""}`) + "</span>";
+    const dn = $("denynote");
+    if (!a.admitted && a.stoppedAt) {
+      dn.style.display = "block";
+      dn.textContent = `${T.stopped} «${a.stoppedAt}». ${T.prep} ${a.retakeAfter}.`;
+    } else { dn.style.display = "none"; }
+    $("agg").innerHTML =
+      `<div class="c"><div class="n">${a.topicsPassed}/${a.topicsTotal}</div><div class="l">${T.aggTopics}</div></div>` +
+      `<div class="c"><div class="n">${a.questionsCorrect}/${a.questionsTotal}</div><div class="l">${T.aggQuestions}</div></div>`;
+    $("topiclist").innerHTML = (a.topics || []).map(t =>
+      `<li><span class="tp ${t.admitted?'ok':'bad'}">${t.admitted?T.tPass:T.tFail}</span>` +
+      `<span>${t.title}</span><span class="sc">${t.passedCount}/${t.total}` +
+      `${t.valid?'':' · '+T.sigBad}</span></li>`
+    ).join("");
+    const allValid = (a.topics || []).every(t => t.valid);
+    $("issuer").textContent = (allValid ? T.sigOk + " · " : "") + T.issuerKey + (a.publicKey || "").slice(0, 24) + "…";
+    const blob = new Blob([JSON.stringify(reply.sealed, null, 2)], { type: "application/json" });
+    $("download").href = URL.createObjectURL(blob);
   }
 
   $("startBtn").onclick = start;
@@ -351,7 +396,7 @@
 
   applyLang("ru");
   if (!synth) { $("voiceBtn").classList.add("off"); $("voiceBtn").textContent = T.voiceNo; $("voiceBtn").disabled = true; }
-  loadProcedures();
+  loadProgram();
   initCam();
 </script>
 </body>

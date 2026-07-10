@@ -28,6 +28,46 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.18.0] — 2026-07-08 — annual-program допуск: topic → зачёт → aggregate verdict
+
+Fixes a serious integrity bug and completes the retraining flow. Before,
+the worker page ran a **single** procedure and issued a допуск after its
+one зачёт — so the ИТР board showed «допущен» though only one topic was
+briefed. Now the portal runs an ordered **program** of topics: each topic
+is briefed, its зачёт taken, and admission is granted ONLY when every
+topic passes. A **failed зачёт stops the program immediately** with a
+пересдача message and a retake date — no point continuing.
+
+- **Portal — program session.** A run is a fixed ordered `PROGRAM` of
+  procedure ids. `/api/answer` seals each topic's protocol as it finishes
+  (every зачёт independently Ed25519-verifiable); on a **passed** зачёт it
+  advances to the next topic, on a **failed** one it stops and finalises,
+  and after the last topic it finalises the допуск. The **aggregate
+  program record** carries topics passed / total (total = whole program,
+  so a stop-early reads «1/3»), questions correct/total, per-topic
+  verdicts, `admitted` = all-passed, and a `retakeAfter` date (**+30 days
+  ≈ 1 month**, the Kazakhstan norm for a repeat knowledge check) plus the
+  `stoppedAt` topic. The journal stores one aggregate record per run;
+  `/api/program` lists the program's topics.
+- **Worker page.** Shows «Тема N из M», carries the worker across topics
+  automatically, and ends on an aggregate result (verdict, topics N/M,
+  questions correct, per-topic pass/fail, downloadable program protocol).
+  The procedure dropdown is gone — the program is the unit.
+- **ИТР dashboard.** Per-worker aggregate row: topics N/M with per-topic
+  status dots, questions correct/total, допуск **or** пересдача до <date>,
+  and signature validity.
+- **Quiz-turn detection fixed.** The engine now marks each turn as a
+  question or an instruction (`BriefingReply::is_question`); the page no
+  longer guesses from the text (questions are prefixed with feedback, so
+  the old `^Вопрос` regex never matched and mislabeled the quiz).
+- **Russian rendering fixed.** The end-of-topic protocol now renders in the
+  session language (`render()` not `render_kk()`), so a Russian session is
+  Russian throughout.
+- **Voice-derived gender hardened.** F0 autocorrelation gains an
+  octave-error guard + voice-range lag window and a 185 Hz threshold, so a
+  male voice is no longer misread as female; the Russian greeting now adds
+  the voice-derived Kazakh vocative («аға» / «апай»).
+
 ## [6.17.2] — 2026-07-07 — bounded Russian dialog on `/dialog` (peripheral adapter)
 
 The general-dialog page has a kz/ru switcher but the Kazakh-first engine

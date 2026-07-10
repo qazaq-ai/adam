@@ -196,10 +196,17 @@ enum Phase {
 /// What the engine says on a single `advance` turn.
 #[derive(Debug, Clone)]
 pub struct BriefingReply {
-    /// Kazakh surface to show the worker (feedback + next prompt).
+    /// Surface to show the worker (feedback + next prompt), in the
+    /// session language.
     pub text: String,
     /// `true` once the session has finished and a protocol exists.
     pub done: bool,
+    /// `true` when this turn presents a **control question** (зачёт) the
+    /// worker must answer — as opposed to an instruction step to
+    /// acknowledge.  A front-end can't infer this from the text alone,
+    /// because a question is prefixed with the previous answer's feedback
+    /// («Верно.» / «Неполно…») or the quiz-opening header.
+    pub is_question: bool,
 }
 
 /// The signed-off outcome of a completed session.
@@ -470,6 +477,13 @@ impl BriefingSession {
         &self.procedure_id
     }
 
+    /// Display title of the briefed procedure, in the session language
+    /// (Russian text for a Russian session).  Used by a program driver
+    /// to label «тема N из M».
+    pub fn title(&self) -> &str {
+        &self.title_kk
+    }
+
     pub fn questions(&self) -> &[ControlQuestion] {
         &self.questions
     }
@@ -529,6 +543,7 @@ impl BriefingSession {
                     BriefingReply {
                         text: self.steps[next].clone(),
                         done: false,
+                        is_question: false,
                     }
                 } else {
                     // Steps exhausted → open the quiz (or finish if,
@@ -542,6 +557,7 @@ impl BriefingSession {
                             }
                             .into(),
                             done: true,
+                            is_question: false,
                         }
                     } else {
                         self.phase = Phase::Quiz(0);
@@ -556,6 +572,7 @@ impl BriefingSession {
                                 self.questions[0].prompt_kk
                             ),
                             done: false,
+                            is_question: true,
                         }
                     }
                 }
@@ -586,12 +603,17 @@ impl BriefingSession {
                             self.questions[next].prompt_kk
                         ),
                         done: false,
+                        is_question: true,
                     }
                 } else {
                     self.phase = Phase::Done;
                     let proto = self.build_protocol();
-                    let text = format!("{feedback}\n\n{}", proto.render_kk());
-                    BriefingReply { text, done: true }
+                    let text = format!("{feedback}\n\n{}", proto.render());
+                    BriefingReply {
+                        text,
+                        done: true,
+                        is_question: false,
+                    }
                 }
             }
             Phase::Done => BriefingReply {
@@ -601,6 +623,7 @@ impl BriefingSession {
                 }
                 .into(),
                 done: true,
+                is_question: false,
             },
         }
     }

@@ -41,6 +41,9 @@
   .pill{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:.15rem .5rem;border-radius:5px}
   .pill.ok{color:var(--verified);background:var(--verified-soft)} .pill.bad{color:var(--danger);background:var(--danger-soft)}
   .v{font-family:var(--mono);font-size:.8rem} .v.y{color:var(--verified)} .v.n{color:var(--danger)}
+  .dots{display:inline-flex;gap:3px;margin-left:.3rem;vertical-align:middle}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;cursor:help}
+  .dot.ok{background:var(--verified)} .dot.bad{background:var(--danger)}
   .face{width:34px;height:34px;object-fit:cover;border-radius:6px;border:1px solid var(--line-strong);display:block;transform:scaleX(-1)}
   .idm{font-family:var(--mono);font-size:.9rem;color:var(--ink-faint)}
   .empty{padding:2rem;text-align:center;color:var(--ink-faint);font-family:var(--mono);font-size:.85rem}
@@ -81,22 +84,22 @@
   const $ = id => document.getElementById(id);
   const I18N = {
     ru: {
-      htmllang:"ru", tag:"дашборд ИТР · движок ADAM", h1:"Журнал допусков",
-      lTotal:"всего протоколов", lAdm:"допущено", lDen:"не допущено", lVer:"подпись верна",
-      cols:["Время","Идент.","Работник","Табельный","Процедура","Результат","Вердикт","Подпись"],
+      htmllang:"ru", tag:"дашборд ИТР · движок ADAM", h1:"Журнал допусков (годовая программа)",
+      lTotal:"всего работников", lAdm:"допущено", lDen:"на пересдачу", lVer:"подпись верна",
+      cols:["Время","Идент.","Работник","Табельный","Темы","Вопросы","Вердикт","Подпись"],
       live:"● live", noconn:"○ нет связи",
-      wait:"Ожидание протоколов… запустите adam_portal и пройдите инструктаж в кабинете работника.",
-      none:"Пока нет протоколов.",
-      admitted:"допущен", denied:"не допущен", sigOk:"✓ верна", sigBad:"✗ невалидна"
+      wait:"Ожидание записей… запустите adam_portal и пройдите программу в кабинете работника.",
+      none:"Пока нет записей.",
+      admitted:"допущен", denied:"пересдача", retake:"до", sigOk:"✓ верна", sigBad:"✗ невалидна"
     },
     kk: {
-      htmllang:"kk", tag:"ИТҚ дашбордысы · ADAM қозғалтқышы", h1:"Жіберу журналы",
-      lTotal:"барлық хаттама", lAdm:"жіберілді", lDen:"жіберілмеді", lVer:"қолтаңба дұрыс",
-      cols:["Уақыт","Сәйкест.","Қызметкер","Табельдік","Рәсім","Нәтиже","Шешім","Қолтаңба"],
+      htmllang:"kk", tag:"ИТҚ дашбордысы · ADAM қозғалтқышы", h1:"Жіберу журналы (жылдық бағдарлама)",
+      lTotal:"барлық қызметкер", lAdm:"жіберілді", lDen:"қайта тапсыруға", lVer:"қолтаңба дұрыс",
+      cols:["Уақыт","Сәйкест.","Қызметкер","Табельдік","Тақырыптар","Сұрақтар","Шешім","Қолтаңба"],
       live:"● live", noconn:"○ байланыс жоқ",
-      wait:"Хаттамалар күтілуде… adam_portal іске қосып, қызметкер кабинетінде нұсқаулықтан өтіңіз.",
-      none:"Әзірге хаттама жоқ.",
-      admitted:"жіберілді", denied:"жіберілмеді", sigOk:"✓ дұрыс", sigBad:"✗ жарамсыз"
+      wait:"Жазбалар күтілуде… adam_portal іске қосып, қызметкер кабинетінде бағдарламадан өтіңіз.",
+      none:"Әзірге жазба жоқ.",
+      admitted:"жіберілді", denied:"қайта тапсыру", retake:"дейін", sigOk:"✓ дұрыс", sigBad:"✗ жарамсыз"
     }
   };
   let lang = "ru", T = I18N.ru, lastRows = [], hadConn = false;
@@ -124,7 +127,14 @@
     $("s-adm").textContent = adm;
     $("s-den").textContent = total - adm;
     $("s-ver").textContent = ver;
-    $("rows").innerHTML = total ? rows.slice().reverse().map(x => `
+    $("rows").innerHTML = total ? rows.slice().reverse().map(x => {
+      const dots = (x.topics||[]).map(t =>
+        `<span class="dot ${t.admitted?'ok':'bad'}" title="${esc(t.title)}: ${t.passedCount}/${t.total}${t.valid?'':' · подпись невалидна'}"></span>`
+      ).join("");
+      const verdict = x.admitted
+        ? `<span class="pill ok">${T.admitted}</span>`
+        : `<span class="pill bad">${T.denied}${x.retakeAfter?` ${T.retake} ${x.retakeAfter}`:''}</span>`;
+      return `
       <tr>
         <td class="mono">${x.issuanceDate || "—"}</td>
         <td>${x.proctorUrl
@@ -132,11 +142,11 @@
           : `<span class="idm" title="${esc(x.idMethod)}">${x.idMethod==='camera-proctored'?'📷':'—'}</span>`}</td>
         <td>${esc(x.worker)}</td>
         <td class="mono">${esc(x.workerId) || "—"}</td>
-        <td class="mono">${esc(x.procedure)}</td>
-        <td class="mono">${x.passedCount}/${x.total}</td>
-        <td><span class="pill ${x.admitted?'ok':'bad'}">${x.admitted?T.admitted:T.denied}</span></td>
+        <td class="mono">${x.topicsPassed}/${x.topicsTotal} <span class="dots">${dots}</span></td>
+        <td class="mono">${x.questionsCorrect}/${x.questionsTotal}</td>
+        <td>${verdict}</td>
         <td><span class="v ${x.valid?'y':'n'}">${x.valid?T.sigOk:T.sigBad}</span></td>
-      </tr>`).join("")
+      </tr>`; }).join("")
       : `<tr><td colspan="8" class="empty">${hadConn?T.none:T.wait}</td></tr>`;
   }
 
