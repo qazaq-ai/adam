@@ -10,7 +10,7 @@
 //! ИТР watches issued протоколы on a live dashboard.  It serves the two
 //! pages from `demo/` and exposes a small JSON API.
 //!
-//! This is the pilot MVP for the ССГПО/ERG annual-retraining flow, meant
+//! This is the pilot MVP for the enterprise annual-retraining flow, meant
 //! to be **self-hosted on the enterprise's own servers** (data never
 //! leaves the company; no external cloud AI).  Prototype-grade: no TLS, no
 //! auth, single process, in-memory state.  Production hardening (corporate
@@ -135,9 +135,46 @@ struct Live {
     outcomes: Vec<TopicRecord>,
 }
 
+/// One person in the enterprise org chart.
+#[derive(Clone, Serialize, Deserialize)]
+struct OrgWorker {
+    id: String,
+    name: String,
+    position: String,
+}
+
+/// A section (участок) within a shop (цех).
+#[derive(Clone, Serialize, Deserialize)]
+struct OrgSection {
+    section: String,
+    workers: Vec<OrgWorker>,
+}
+
+/// A shop (цех) — the top level of the org chart.
+#[derive(Clone, Serialize, Deserialize)]
+struct OrgShop {
+    shop: String,
+    sections: Vec<OrgSection>,
+}
+
+/// Built-in org chart (цеха → участки → персонал).  Overridable by
+/// dropping a `data/portal/org.json` with the same shape.
+const ORG_SEED: &str = include_str!("../../../demo/org_seed.json");
+const ORG_FILE: &str = "data/portal/org.json";
+
+fn load_org() -> Vec<OrgShop> {
+    if let Ok(s) = fs::read_to_string(ORG_FILE) {
+        if let Ok(v) = serde_json::from_str::<Vec<OrgShop>>(&s) {
+            return v;
+        }
+    }
+    serde_json::from_str(ORG_SEED).unwrap_or_default()
+}
+
 struct AppState {
     sessions: HashMap<String, Live>,
     admissions: Vec<ProgramRecord>,
+    org: Vec<OrgShop>,
     key: SigningKey,
     journal_path: PathBuf,
     /// Directory holding proctoring snapshots (`<hex>.jpg`).
@@ -253,9 +290,21 @@ fn main() {
         .join("proctor");
     let _ = fs::create_dir_all(&proctor_dir);
 
+    let org = load_org();
+    let worker_count: usize = org
+        .iter()
+        .flat_map(|s| &s.sections)
+        .map(|sec| sec.workers.len())
+        .sum();
+    eprintln!(
+        "adam_portal: org chart — {} цех(ов), {} работник(ов)",
+        org.len(),
+        worker_count
+    );
     let state = Arc::new(Mutex::new(AppState {
         sessions: HashMap::new(),
         admissions,
+        org,
         key,
         journal_path,
         proctor_dir,
@@ -354,6 +403,8 @@ fn route(
         ("GET", "/pitch") => (200, "text/html; charset=utf-8", PITCH_HTML.into()),
         ("GET", "/api/procedures") => json_ok(&api_procedures()),
         ("GET", "/api/program") => json_ok(&api_program()),
+        ("GET", "/api/org") => json_ok(&api_org(state)),
+        ("POST", "/api/worker") => api_worker(body, state),
         ("POST", "/api/proctor") => api_proctor(body, state),
         ("POST", "/api/start") => api_start(body, state),
         ("POST", "/api/answer") => api_answer(body, state),
@@ -404,6 +455,228 @@ fn resolved_program() -> Vec<String> {
         .filter(|id| known.contains(*id))
         .map(|s| s.to_string())
         .collect()
+}
+
+/// The most recent program run for a worker id, if any.
+fn latest_run<'a>(admissions: &'a [ProgramRecord], id: &str) -> Option<&'a ProgramRecord> {
+    if id.is_empty() {
+        return None;
+    }
+    admissions.iter().rev().find(|r| r.worker_id == id)
+}
+
+/// The kk/ru titles of the program's topics, in order.
+fn program_topics_titled() -> Vec<(String, String, String)> {
+    let procs = shared_procedures();
+    resolved_program()
+        .iter()
+        .filter_map(|id| procs.iter().find(|p| &p.id == id))
+        .map(|p| {
+            (
+                p.id.clone(),
+                p.title_kk.clone(),
+                p.title_ru.clone().unwrap_or_else(|| p.title_kk.clone()),
+            )
+        })
+        .collect()
+}
+
+/// The org chart with each worker's live допуск status (derived from the
+/// journal) plus top-line stats — the ИТР admin dashboard's data source.
+fn api_org(state: &Mutex<AppState>) -> Value {
+    let st = state.lock().unwrap();
+    let program_total = resolved_program().len() as u32;
+    let (mut total, mut admitted, mut retake) = (0u32, 0u32, 0u32);
+
+    // Workers with a live program run right now (currently taking a зачёт).
+    let online_ids: std::collections::HashSet<String> = st
+        .sessions
+        .values()
+        .map(|l| l.worker_id.clone())
+        .filter(|s| !s.is_empty())
+        .collect();
+    let prog_ids = resolved_program();
+
+    let shops: Vec<Value> = st
+        .org
+        .iter()
+        .map(|shop| {
+            let mut shop_total = 0u32;
+            let mut shop_admitted = 0u32;
+            let sections: Vec<Value> = shop
+                .sections
+                .iter()
+                .map(|sec| {
+                    let workers: Vec<Value> = sec
+                        .workers
+                        .iter()
+                        .map(|w| {
+                            total += 1;
+                            shop_total += 1;
+                            let latest = latest_run(&st.admissions, &w.id);
+                            let (status, last_date, retake_after, tp, tt) = match latest {
+                                Some(r) => {
+                                    if r.admitted {
+                                        admitted += 1;
+                                        shop_admitted += 1;
+                                    } else {
+                                        retake += 1;
+                                    }
+                                    (
+                                        if r.admitted { "admitted" } else { "retake" },
+                                        r.issuance_date.clone(),
+                                        r.retake_after.clone(),
+                                        r.topics_passed,
+                                        r.topics_total,
+                                    )
+                                }
+                                None => ("none", String::new(), String::new(), 0, program_total),
+                            };
+                            // Per-category status of the assigned program topics,
+                            // aligned to program order: "p" passed / "f" failed /
+                            // "-" pending — lets the dashboard filter by category.
+                            let topic_flags: Vec<&str> = prog_ids
+                                .iter()
+                                .map(|pid| {
+                                    match latest.and_then(|r| {
+                                        r.topics.iter().find(|t| &t.procedure_id == pid)
+                                    }) {
+                                        Some(t) if t.admitted => "p",
+                                        Some(_) => "f",
+                                        None => "-",
+                                    }
+                                })
+                                .collect();
+                            json!({
+                                "id": w.id, "name": w.name, "position": w.position,
+                                "status": status, "lastDate": last_date, "retakeAfter": retake_after,
+                                "topicsPassed": tp, "topicsTotal": tt,
+                                "online": online_ids.contains(&w.id),
+                                "t": topic_flags,
+                                "proctorUrl": latest.map(|r| proctor_url(&r.proctor_sha256)).unwrap_or_default(),
+                            })
+                        })
+                        .collect();
+                    json!({ "section": sec.section, "workers": workers })
+                })
+                .collect();
+            json!({
+                "shop": shop.shop, "sections": sections,
+                "total": shop_total, "admitted": shop_admitted,
+            })
+        })
+        .collect();
+
+    // Per-category (briefing topic) aggregate across every worker's latest
+    // run — powers the «по категориям инструктажей» sidebar + chart.
+    let prog = program_topics_titled();
+    let topic_stats: Vec<Value> = prog
+        .iter()
+        .map(|(pid, kk, ru)| {
+            let (mut passed, mut failed, mut pending) = (0u32, 0u32, 0u32);
+            for shop in &st.org {
+                for sec in &shop.sections {
+                    for w in &sec.workers {
+                        let t = latest_run(&st.admissions, &w.id)
+                            .and_then(|r| r.topics.iter().find(|t| &t.procedure_id == pid));
+                        match t {
+                            Some(t) if t.admitted => passed += 1,
+                            Some(_) => failed += 1,
+                            None => pending += 1,
+                        }
+                    }
+                }
+            }
+            json!({
+                "procedureId": pid, "titleKk": kk, "titleRu": ru,
+                "passed": passed, "failed": failed, "pending": pending,
+            })
+        })
+        .collect();
+
+    json!({
+        "shops": shops,
+        "topics": topic_stats,
+        "onlineIds": online_ids.iter().cloned().collect::<Vec<_>>(),
+        "stats": {
+            "total": total, "admitted": admitted, "retake": retake,
+            "notStarted": total - admitted - retake,
+            "online": online_ids.len(),
+        },
+    })
+}
+
+/// One worker's personal cabinet: identity + assigned program (with
+/// per-topic status from the latest run) + full attempt history.
+fn api_worker(body: &[u8], state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8>) {
+    let v: Value = match serde_json::from_slice(body) {
+        Ok(v) => v,
+        Err(_) => return json_err("bad json"),
+    };
+    let id = v["id"].as_str().unwrap_or("").trim();
+    if id.is_empty() {
+        return json_err("id required");
+    }
+    let st = state.lock().unwrap();
+
+    // Locate the worker in the org chart.
+    let mut found: Option<(String, String, &OrgWorker)> = None;
+    for shop in &st.org {
+        for sec in &shop.sections {
+            if let Some(w) = sec.workers.iter().find(|w| w.id == id) {
+                found = Some((shop.shop.clone(), sec.section.clone(), w));
+            }
+        }
+    }
+    let Some((shop, section, worker)) = found else {
+        return json_err("unknown worker");
+    };
+
+    let latest = latest_run(&st.admissions, id);
+    // Per-topic status of the assigned program, from the latest run.
+    let topics: Vec<Value> = program_topics_titled()
+        .iter()
+        .map(|(pid, kk, ru)| {
+            let t = latest.and_then(|r| r.topics.iter().find(|t| &t.procedure_id == pid));
+            let status = match t {
+                Some(t) if t.admitted => "passed",
+                Some(_) => "failed",
+                None => "pending",
+            };
+            json!({ "procedureId": pid, "titleKk": kk, "titleRu": ru, "status": status,
+                    "passedCount": t.map(|t| t.passed_count), "total": t.map(|t| t.total) })
+        })
+        .collect();
+
+    // Full attempt history, newest first.
+    let history: Vec<Value> = st
+        .admissions
+        .iter()
+        .rev()
+        .filter(|r| r.worker_id == id)
+        .map(|r| {
+            json!({
+                "issuanceDate": r.issuance_date, "admitted": r.admitted,
+                "topicsPassed": r.topics_passed, "topicsTotal": r.topics_total,
+                "questionsCorrect": r.questions_correct, "questionsTotal": r.questions_total,
+                "retakeAfter": r.retake_after,
+            })
+        })
+        .collect();
+
+    let status = match latest {
+        Some(r) if r.admitted => "admitted",
+        Some(_) => "retake",
+        None => "none",
+    };
+    json_ok(&json!({
+        "id": worker.id, "name": worker.name, "position": worker.position,
+        "shop": shop, "section": section,
+        "status": status,
+        "retakeAfter": latest.map(|r| r.retake_after.clone()).unwrap_or_default(),
+        "topics": topics,
+        "history": history,
+    }))
 }
 
 fn api_start(body: &[u8], state: &Mutex<AppState>) -> (u16, &'static str, Vec<u8>) {
@@ -478,7 +751,7 @@ fn seal_topic(live: &Live, protocol: &BriefingProtocol, key: &SigningKey) -> Sea
             clock.year, clock.month, clock.day, clock.hour, clock.minute
         ),
         timezone: "UTC+05:00".to_string(),
-        site: "ССГПО".to_string(),
+        site: "Company name".to_string(),
         ..SealContext::default()
     };
     protocol.seal_with(&ctx, key, ENGINE_VERSION)

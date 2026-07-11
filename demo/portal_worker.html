@@ -3,90 +3,106 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ERG/ССГПО · ОТ/ТБ — кабинет работника</title>
+<title>Company name · ОТ/ТБ — кабинет работника</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cg stroke='%23d27700' stroke-width='45' stroke-linecap='round'%3E%3Cline x1='76' y1='76' x2='324' y2='324'/%3E%3Cline x1='137' y1='37' x2='363' y2='263'/%3E%3Cline x1='37' y1='137' x2='263' y2='363'/%3E%3Cline x1='76' y1='324' x2='324' y2='76'/%3E%3Cline x1='137' y1='363' x2='363' y2='137'/%3E%3Cline x1='37' y1='263' x2='263' y2='37'/%3E%3C/g%3E%3C/svg%3E">
 <style>
-  :root {
-    --bg:#EBEEF0; --surface:#FBFCFD; --surface-2:#F1F3F5; --ink:#14181B;
-    --ink-soft:#545C63; --ink-faint:#8A9299; --line:#D2D8DC; --line-strong:#B8C0C6;
-    --accent:#d27700; --verified:#1E8A5C; --verified-soft:#DBEEE4;
-    --danger:#C13A34; --danger-soft:#F3DAD8;
-    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  :root{
+    --bg:#EBEEF0;--surface:#FBFCFD;--surface-2:#F1F3F5;--ink:#14181B;--ink-soft:#545C63;
+    --ink-faint:#8A9299;--line:#D2D8DC;--line-strong:#B8C0C6;--accent:#d27700;
+    --verified:#1E8A5C;--verified-soft:#DBEEE4;--danger:#C13A34;--danger-soft:#F3DAD8;
+    --warn:#B8791A;--warn-soft:#F5E6C8;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    --shadow:0 1px 2px rgba(20,24,27,.04),0 2px 8px rgba(20,24,27,.05);
   }
   @media (prefers-color-scheme:dark){:root{
     --bg:#0E1113;--surface:#171B1E;--surface-2:#1E2327;--ink:#ECEFF1;--ink-soft:#9DA5AB;
     --ink-faint:#6B747B;--line:#272D32;--line-strong:#353D43;--accent:#E0A63F;
-    --verified:#37B87F;--verified-soft:#16281F;--danger:#E6635C;--danger-soft:#2C1917;}}
+    --verified:#37B87F;--verified-soft:#16281F;--danger:#E6635C;--danger-soft:#2C1917;
+    --warn:#E0A63F;--warn-soft:#2E2716;--shadow:0 1px 2px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.25);}}
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-variant-numeric:tabular-nums}
   .bar{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
-  .bar .in{max-width:52rem;margin:0 auto;padding:.7rem 1.2rem;display:flex;align-items:center;gap:.6rem}
-  .logo{width:24px;height:24px;flex:none}
+  .bar .in{max-width:56rem;margin:0 auto;padding:.7rem 1.2rem;display:flex;align-items:center;gap:.6rem}
+  .logo{width:26px;height:26px;flex:none}
   .brand{font-family:var(--mono);font-weight:700;font-size:.9rem}
   .brand b{color:var(--accent)}
   .tag{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint)}
   .lang{margin-left:auto;font-family:var(--mono);font-size:.78rem;width:auto;padding:.35rem .5rem;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface-2);color:var(--ink)}
-  main{max-width:52rem;margin:0 auto;padding:1.6rem 1.2rem 4rem}
-  h1{font-size:1.5rem;margin:.2rem 0 1.2rem}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1.3rem;margin-bottom:1.1rem}
-  label{display:block;font-size:.8rem;color:var(--ink-soft);margin:.7rem 0 .3rem;font-family:var(--mono)}
-  input,select{width:100%;padding:.6rem .7rem;border:1px solid var(--line-strong);border-radius:8px;
+  main{max-width:56rem;margin:0 auto;padding:1.4rem 1.2rem 4rem}
+  h1{font-size:1.4rem;margin:.2rem 0 1.1rem;font-weight:750}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:1.3rem;margin-bottom:1.1rem;box-shadow:var(--shadow)}
+  label{display:block;font-size:.78rem;color:var(--ink-soft);margin:.7rem 0 .3rem;font-family:var(--mono)}
+  select,input{width:100%;padding:.6rem .7rem;border:1px solid var(--line-strong);border-radius:9px;
     background:var(--surface-2);color:var(--ink);font-family:var(--sans);font-size:1rem}
-  button{font-family:var(--mono);font-size:.9rem;padding:.65rem 1.1rem;border-radius:9px;cursor:pointer;
+  button{font-family:var(--mono);font-size:.9rem;padding:.7rem 1.15rem;border-radius:10px;cursor:pointer;
     border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;margin-top:1rem}
   button.ghost{background:transparent;color:var(--ink);border-color:var(--line-strong)}
   button:disabled{opacity:.5;cursor:default}
-  .prompt{font-size:1.12rem;white-space:pre-wrap;margin:0 0 .3rem}
+  .hidden{display:none}
+  /* ---- cabinet header ---- */
+  .phead{display:flex;align-items:center;gap:1rem}
+  .ava{width:56px;height:56px;border-radius:50%;flex:none;display:grid;place-items:center;font-family:var(--mono);font-weight:700;font-size:1.2rem;color:#fff;background:var(--accent)}
+  .ava img{width:100%;height:100%;border-radius:50%;object-fit:cover;transform:scaleX(-1)}
+  .pmeta .nm{font-size:1.25rem;font-weight:750}
+  .pmeta .sub{font-size:.86rem;color:var(--ink-soft)}
+  .pmeta .loc{font-family:var(--mono);font-size:.74rem;color:var(--ink-faint);margin-top:.15rem}
+  .statuschip{margin-left:auto;font-family:var(--mono);font-size:.8rem;font-weight:700;padding:.35rem .7rem;border-radius:999px;white-space:nowrap}
+  .statuschip.ok{color:var(--verified);background:var(--verified-soft)}
+  .statuschip.bad{color:var(--danger);background:var(--danger-soft)}
+  .statuschip.none{color:var(--ink-soft);background:var(--surface-2)}
+  .ctitle{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);margin:0 0 .7rem}
+  /* ---- program topic list ---- */
+  .topics{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.5rem}
+  .topics li{display:flex;align-items:center;gap:.7rem;padding:.6rem .8rem;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
+  .topics .ic{width:1.7rem;height:1.7rem;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:800;font-size:.9rem}
+  .topics .ic.passed{color:var(--verified);background:var(--verified-soft)}
+  .topics .ic.failed{color:var(--danger);background:var(--danger-soft)}
+  .topics .ic.pending{color:var(--ink-faint);background:var(--surface)}
+  .topics .tt{font-size:.92rem}
+  .topics .sc{margin-left:auto;font-family:var(--mono);font-size:.78rem;color:var(--ink-faint)}
+  /* ---- history table ---- */
+  table{width:100%;border-collapse:collapse}
+  th,td{text-align:left;padding:.5rem .5rem;font-size:.84rem;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);font-weight:600}
+  tr:last-child td{border-bottom:none}
+  .pill{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:.12rem .5rem;border-radius:999px}
+  .pill.ok{color:var(--verified);background:var(--verified-soft)} .pill.bad{color:var(--danger);background:var(--danger-soft)}
+  .muted{color:var(--ink-faint);font-family:var(--mono);font-size:.82rem}
+  .rowbtns{display:flex;gap:.6rem;flex-wrap:wrap}
+  /* ---- camera ---- */
+  .cam{margin-top:.8rem;display:flex;align-items:center;gap:.8rem}
+  .cam video{width:120px;height:90px;object-fit:cover;border-radius:10px;border:1px solid var(--line-strong);background:#000;transform:scaleX(-1)}
+  .cam.nocam video{display:none}
+  .camnote{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);margin:0;max-width:34ch}
+  /* ---- session ---- */
+  .progress{font-family:var(--mono);font-size:.75rem;color:var(--ink-soft);margin-bottom:.6rem;padding-bottom:.5rem;border-bottom:1px solid var(--line)}
+  .progress b{color:var(--accent)}
   .slidebar{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:.6rem}
-  .slidekind{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;
-    padding:.18rem .55rem;border-radius:5px;background:var(--surface-2);color:var(--ink-soft)}
+  .slidekind{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;padding:.18rem .55rem;border-radius:5px;background:var(--surface-2);color:var(--ink-soft)}
   .slidekind.quiz{color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent)}
   .vctl{display:flex;gap:.4rem}
-  .chip{font-family:var(--mono);font-size:.72rem;padding:.32rem .6rem;border-radius:999px;cursor:pointer;
-    border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);margin:0}
+  .chip{font-family:var(--mono);font-size:.72rem;padding:.32rem .6rem;border-radius:999px;cursor:pointer;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);margin:0}
   .chip.off{opacity:.5}
-  .slide{font-size:1.28rem;line-height:1.5;white-space:pre-wrap;background:var(--surface-2);
-    border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;
-    padding:1.1rem 1.2rem;margin:0 0 .3rem;min-height:4.5rem}
-  .slide.quiz{border-left-color:var(--accent);font-weight:600}
+  .slide{font-size:1.24rem;line-height:1.5;white-space:pre-wrap;background:var(--surface-2);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:1.1rem 1.2rem;margin:0 0 .3rem;min-height:4.5rem}
+  .slide.quiz{font-weight:600}
   .step-meta{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);margin-bottom:.9rem}
   .hint{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);margin-top:.5rem}
-  .verdict{border-radius:12px;padding:1.1rem 1.2rem;font-family:var(--mono);font-weight:700;
-    display:flex;align-items:center;gap:.6rem;font-size:1rem;border:1px solid transparent}
+  .err{color:var(--danger);font-family:var(--mono);font-size:.82rem;margin-top:.6rem}
+  /* ---- result ---- */
+  .verdict{border-radius:12px;padding:1.1rem 1.2rem;font-family:var(--mono);font-weight:700;display:flex;align-items:center;gap:.6rem;font-size:1rem;border:1px solid transparent}
   .verdict.ok{color:var(--verified);background:var(--verified-soft);border-color:var(--verified)}
   .verdict.bad{color:var(--danger);background:var(--danger-soft);border-color:var(--danger)}
-  .checks{font-family:var(--mono);font-size:.82rem;margin:.8rem 0 0;padding:0;list-style:none}
-  .checks li{padding:.28rem 0;display:flex;gap:.5rem}
-  .checks .y{color:var(--verified)} .checks .n{color:var(--danger)}
-  .kbd{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint)}
-  .err{color:var(--danger);font-family:var(--mono);font-size:.82rem;margin-top:.6rem}
-  a.dl{color:var(--accent);font-family:var(--mono);font-size:.8rem;display:inline-block;margin-top:.7rem}
-  .hidden{display:none}
-  .cam{margin-top:1rem;display:flex;flex-direction:column;gap:.4rem}
-  .cam video{width:220px;height:165px;object-fit:cover;border-radius:10px;border:1px solid var(--line-strong);background:#000;transform:scaleX(-1)}
-  .cam.nocam video{display:none}
-  .camnote{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);margin:0;max-width:38ch}
-  .program{display:flex;flex-direction:column;gap:.35rem;margin-top:.2rem}
-  .program .t{display:flex;gap:.5rem;align-items:baseline;font-size:.9rem}
-  .program .t .i{font-family:var(--mono);font-size:.72rem;color:var(--accent);min-width:1.4rem}
-  .progress{font-family:var(--mono);font-size:.75rem;color:var(--ink-soft);margin-bottom:.6rem;
-    padding-bottom:.5rem;border-bottom:1px solid var(--line)}
-  .progress b{color:var(--accent)}
-  .agg{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);
-    border-radius:10px;overflow:hidden;margin:.9rem 0}
+  .denynote{font-size:.9rem;color:var(--ink-soft);margin:.6rem 0 0;padding:.6rem .8rem;border-left:3px solid var(--danger);background:var(--danger-soft);border-radius:0 8px 8px 0}
+  .agg{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:.9rem 0}
   .agg .c{background:var(--surface);padding:.7rem .9rem}
-  .agg .n{font-family:var(--mono);font-size:1.3rem;font-weight:700}
-  .agg .l{font-size:.76rem;color:var(--ink-soft)}
+  .agg .n{font-family:var(--mono);font-size:1.3rem;font-weight:700} .agg .l{font-size:.76rem;color:var(--ink-soft)}
   .topiclist{list-style:none;margin:.4rem 0 0;padding:0;display:flex;flex-direction:column;gap:.4rem}
-  .topiclist li{display:flex;align-items:center;gap:.6rem;font-size:.88rem;padding:.5rem .7rem;
-    border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}
+  .topiclist li{display:flex;align-items:center;gap:.6rem;font-size:.88rem;padding:.5rem .7rem;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}
   .topiclist .tp{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:.12rem .5rem;border-radius:5px}
-  .topiclist .tp.ok{color:var(--verified);background:var(--verified-soft)}
-  .topiclist .tp.bad{color:var(--danger);background:var(--danger-soft)}
+  .topiclist .tp.ok{color:var(--verified);background:var(--verified-soft)} .topiclist .tp.bad{color:var(--danger);background:var(--danger-soft)}
   .topiclist .sc{margin-left:auto;font-family:var(--mono);font-size:.78rem;color:var(--ink-faint)}
-  .denynote{font-size:.9rem;color:var(--ink-soft);margin:.2rem 0 0;padding:.6rem .8rem;
-    border-left:3px solid var(--danger);background:var(--danger-soft);border-radius:0 8px 8px 0}
+  .kbd{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint)}
+  a.dl{color:var(--accent);font-family:var(--mono);font-size:.8rem;display:inline-block;margin-top:.7rem}
 </style>
 </head>
 <body>
@@ -94,34 +110,61 @@
   <svg class="logo" viewBox="0 0 400 400" aria-hidden="true"><g stroke="#d27700" stroke-width="45" stroke-linecap="round">
     <line x1="76" y1="76" x2="324" y2="324"/><line x1="137" y1="37" x2="363" y2="263"/><line x1="37" y1="137" x2="263" y2="363"/>
     <line x1="76" y1="324" x2="324" y2="76"/><line x1="137" y1="363" x2="363" y2="137"/><line x1="37" y1="263" x2="263" y2="37"/></g></svg>
-  <span class="brand">ERG/ССГПО<b>·</b>ОТ/ТБ</span>
+  <span class="brand">Company name<b>·</b>ОТ/ТБ</span>
   <span class="tag" id="tag"></span>
-  <select id="lang" class="lang">
-    <option value="ru">Русский</option>
-    <option value="kk">Қазақша</option>
-  </select>
+  <select id="lang" class="lang"><option value="ru">Русский</option><option value="kk">Қазақша</option></select>
 </div></div>
 
 <main>
-  <!-- 1. Login / choose briefing -->
+  <!-- 1. Roster login -->
   <section id="login" class="card">
     <h1 id="t-title"></h1>
-    <label for="worker" id="t-l-worker"></label>
-    <input id="worker" placeholder="Асан Асанов" autocomplete="off">
-    <label for="wid" id="t-l-wid"></label>
-    <input id="wid" placeholder="SSGPO-EMP-12345" autocomplete="off">
-    <label id="t-l-prog"></label>
-    <div class="program" id="progList"></div>
-    <div class="cam" id="camwrap">
-      <video id="cam" autoplay playsinline muted></video>
-      <p class="camnote" id="camnote"></p>
-    </div>
-    <button id="startBtn" type="button"></button>
+    <label id="t-l-shop"></label>
+    <select id="selShop"></select>
+    <label id="t-l-section"></label>
+    <select id="selSection"></select>
+    <label id="t-l-worker"></label>
+    <select id="selWorker"></select>
+    <button id="enterBtn" type="button"></button>
     <div id="loginErr" class="err"></div>
     <p class="hint" id="t-hint"></p>
   </section>
 
-  <!-- 2. Briefing session -->
+  <!-- 2. Personal cabinet -->
+  <section id="cabinet" class="hidden">
+    <div class="card">
+      <div class="phead">
+        <span class="ava" id="c-ava"></span>
+        <div class="pmeta">
+          <div class="nm" id="c-name"></div>
+          <div class="sub" id="c-pos"></div>
+          <div class="loc" id="c-loc"></div>
+        </div>
+        <span class="statuschip" id="c-status"></span>
+      </div>
+      <div class="cam" id="camwrap">
+        <video id="cam" autoplay playsinline muted></video>
+        <p class="camnote" id="camnote"></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="ctitle" id="t-prog"></p>
+      <ul class="topics" id="c-topics"></ul>
+      <div class="rowbtns">
+        <button id="startBtn" type="button"></button>
+        <button id="switchBtn" class="ghost" type="button"></button>
+      </div>
+      <p class="hint" id="c-actionnote"></p>
+    </div>
+
+    <div class="card">
+      <p class="ctitle" id="t-hist"></p>
+      <div id="c-history"></div>
+    </div>
+  </section>
+
+  <!-- 3. Briefing session -->
   <section id="session" class="card hidden">
     <div class="progress" id="progress"></div>
     <div class="slidebar">
@@ -135,269 +178,249 @@
     <div class="step-meta" id="meta"></div>
     <label for="answer" id="t-l-answer"></label>
     <input id="answer" autocomplete="off">
-    <div>
+    <div class="rowbtns">
       <button id="sendBtn" type="button"></button>
       <button id="ackBtn" class="ghost" type="button"></button>
     </div>
     <p class="hint" id="phase"></p>
   </section>
 
-  <!-- 3. Result / допуск -->
+  <!-- 4. Aggregate result -->
   <section id="result" class="card hidden">
     <div class="verdict" id="verdict"></div>
-    <p class="denynote" id="denynote"></p>
+    <p class="denynote hidden" id="denynote"></p>
     <div class="agg" id="agg"></div>
-    <ul class="topiclist" id="topiclist"></ul>
+    <ul class="topiclist" id="reslist"></ul>
     <p class="kbd" id="issuer"></p>
     <a class="dl" id="download" href="#" download="dopusk_programma.json"></a>
-    <div><button class="ghost" type="button" id="restartBtn" onclick="location.reload()"></button></div>
+    <div class="rowbtns"><button class="ghost" type="button" id="backBtn"></button></div>
   </section>
 </main>
 
 <script>
   const $ = id => document.getElementById(id);
-  let sessionId = null;
-
-  // ---- i18n словарь (kk/ru); движок ведёт инструктаж на выбранном языке ----
   const I18N = {
-    ru: {
-      htmllang:"ru", title:"Ежегодный инструктаж", tag:"кабинет работника · движок ADAM",
-      lWorker:"ФИО", lWid:"Табельный № / ID", lProg:"Годовая программа инструктажа", lAnswer:"Ответ",
-      camnote:"📷 Камера подтверждает личность — снимок сохраняется как доказательство допуска.",
-      start:"Начать программу", hint:"После каждой темы — зачёт. Допуск выдаётся только когда сданы все темы.",
+    ru:{ htmllang:"ru", tag:"кабинет работника · охрана труда", title:"Вход в кабинет работника",
+      lShop:"Цех", lSection:"Участок", lWorker:"Работник", lAnswer:"Ответ",
+      enter:"Войти", hint:"Выберите себя из списка — откроется личный кабинет с программой и историей.",
+      camnote:"📷 Камера подтверждает личность — снимок вшивается в допуск.",
+      camUnavail:"камера недоступна", camDenied:"нет доступа к камере — подтверждение оператором", proctorOk:"📷 подтверждено",
+      prog:"Программа инструктажей", hist:"История экзаменов", noHist:"Пока нет попыток.",
+      start:"Пройти программу", startRetake:"Пройти пересдачу", startAgain:"Пройти заново", switch:"Сменить работника",
+      admitted:"ДОПУЩЕН", retake:"ПЕРЕСДАЧА", none:"НЕ НАЧАЛ",
+      stPassed:"сдано", stFailed:"провалено", stPending:"ожидает",
+      retakeLock:"Пересдача будет доступна после", admittedNote:"Вы допущены к работе. Можно пройти заново для повторной проверки.",
+      histCols:["Дата","Результат","Темы","Вопросы","Пересдача"], hResAdm:"допущен", hResDen:"пересдача",
+      send:"Отправить", ack:"Понятно", back:"Вернуться в кабинет",
       voiceOn:"🔊 Голос", voiceOff:"🔇 Голос", voiceNo:"🔇 нет", replay:"↻ Повтор",
-      send:"Отправить", ack:"Понятно", restart:"Начать заново",
-      kindQuiz:"Контрольный вопрос", kindInstr:"Инструктаж",
-      phaseQuiz:"Ответьте на вопрос…", phaseInstr:"Слушайте, затем «понятно»…",
-      needName:"Укажите ФИО.", procLoading:"загрузка…", procNoServer:"сервер недоступен — запустите adam_portal",
-      camUnavail:"камера недоступна", camDenied:"нет доступа к камере — подтверждение оператором",
-      proctorOk:"📷 подтверждено", errPrefix:"Ошибка: ",
-      admitted:"ДОПУЩЕН К РАБОТЕ", denied:"НЕ ДОПУЩЕН", denyTail:"пересдача после",
-      stopped:"Инструктаж прекращён на теме", prep:"Подготовьтесь и пройдите повторно после",
+      kindQuiz:"Контрольный вопрос", kindInstr:"Инструктаж", phaseQuiz:"Ответьте на вопрос…", phaseInstr:"Слушайте, затем «Понятно»…",
       progTopic:"Тема", progOf:"из", aggTopics:"темы сданы", aggQuestions:"вопросы верно",
-      tPass:"сдан", tFail:"не сдан", sigOk:"✓ подпись Ed25519 верна", sigBad:"✗ подпись не сходится",
-      issuerKey:"Ключ подписи: ", download:"↓ Протокол программы (JSON)", ack_word:"понятно"
-    },
-    kk: {
-      htmllang:"kk", title:"Жылдық нұсқаулық", tag:"жұмысшы кабинеті · ADAM қозғалтқышы",
-      lWorker:"Аты-жөні", lWid:"Табельдік № / ID", lProg:"Жылдық нұсқаулық бағдарламасы", lAnswer:"Жауап",
-      camnote:"📷 Камера жеке басты растайды — суреті допуск дәлелі ретінде сақталады.",
-      start:"Бағдарламаны бастау", hint:"Әр тақырыптан кейін — сынақ. Допуск барлық тақырып тапсырылғанда ғана беріледі.",
+      resPass:"сдан", resFail:"не сдан", verAdm:"ДОПУЩЕН К РАБОТЕ", verDen:"НЕ ДОПУЩЕН — пересдача после",
+      stopped:"Инструктаж прекращён на теме", prep:"Подготовьтесь и пройдите повторно после",
+      sigOk:"✓ подпись Ed25519 верна", issuerKey:"Ключ подписи:", download:"↓ Протокол программы (JSON)",
+      errPrefix:"Ошибка: ", ack_word:"понятно", noServer:"сервер недоступен — запустите adam_portal" },
+    kk:{ htmllang:"kk", tag:"жұмысшы кабинеті · еңбекті қорғау", title:"Жұмысшы кабинетіне кіру",
+      lShop:"Цех", lSection:"Учаске", lWorker:"Қызметкер", lAnswer:"Жауап",
+      enter:"Кіру", hint:"Тізімнен өзіңізді таңдаңыз — бағдарлама мен тарихы бар жеке кабинет ашылады.",
+      camnote:"📷 Камера жеке басты растайды — суреті допускке тігіледі.",
+      camUnavail:"камера қолжетімсіз", camDenied:"камераға рұқсат жоқ — операторлық растау", proctorOk:"📷 расталды",
+      prog:"Нұсқаулық бағдарламасы", hist:"Емтихан тарихы", noHist:"Әзірге әрекет жоқ.",
+      start:"Бағдарламадан өту", startRetake:"Қайта тапсыру", startAgain:"Қайта өту", switch:"Қызметкерді ауыстыру",
+      admitted:"ЖІБЕРІЛДІ", retake:"ҚАЙТА ТАПСЫРУ", none:"БАСТАМАҒАН",
+      stPassed:"тапсырылды", stFailed:"тапсырылмады", stPending:"күтуде",
+      retakeLock:"Қайта тапсыру мына күннен кейін ашылады:", admittedNote:"Сіз жұмысқа жіберілдіңіз. Қайта тексеру үшін тағы өтуге болады.",
+      histCols:["Күні","Нәтиже","Тақырыптар","Сұрақтар","Қайта тапсыру"], hResAdm:"жіберілді", hResDen:"қайта тапсыру",
+      send:"Жіберу", ack:"Түсінікті", back:"Кабинетке оралу",
       voiceOn:"🔊 Дауыс", voiceOff:"🔇 Дауыс", voiceNo:"🔇 жоқ", replay:"↻ Қайта",
-      send:"Жіберу", ack:"Түсінікті", restart:"Жаңадан бастау",
-      kindQuiz:"Бақылау сұрағы", kindInstr:"Нұсқаулық",
-      phaseQuiz:"Сұраққа жауап беріңіз…", phaseInstr:"Тыңдаңыз, содан кейін «Түсінікті»…",
-      needName:"Аты-жөні қажет.", procLoading:"жүктелуде…", procNoServer:"сервер жоқ — adam_portal іске қосыңыз",
-      camUnavail:"камера қолжетімсіз", camDenied:"камераға рұқсат жоқ — операторлық растау",
-      proctorOk:"📷 расталды", errPrefix:"Қате: ",
-      admitted:"ЖҰМЫСҚА ЖІБЕРІЛДІ", denied:"ЖІБЕРІЛМЕДІ", denyTail:"қайта тапсыру",
-      stopped:"Нұсқаулық тоқтатылды, тақырып", prep:"Дайындалып, кейін қайта тапсырыңыз, мерзімі",
+      kindQuiz:"Бақылау сұрағы", kindInstr:"Нұсқаулық", phaseQuiz:"Сұраққа жауап беріңіз…", phaseInstr:"Тыңдаңыз, содан кейін «Түсінікті»…",
       progTopic:"Тақырып", progOf:"—", aggTopics:"тақырып тапсырылды", aggQuestions:"сұрақ дұрыс",
-      tPass:"тапсырылды", tFail:"тапсырылмады", sigOk:"✓ Ed25519 қолтаңба дұрыс", sigBad:"✗ қолтаңба сәйкес емес",
-      issuerKey:"Қол қойған кілт: ", download:"↓ Бағдарлама хаттамасы (JSON)", ack_word:"түсінікті"
-    }
+      resPass:"тапсырылды", resFail:"тапсырылмады", verAdm:"ЖҰМЫСҚА ЖІБЕРІЛДІ", verDen:"ЖІБЕРІЛМЕДІ — қайта тапсыру",
+      stopped:"Нұсқаулық тоқтатылды, тақырып", prep:"Дайындалып, кейін қайта тапсырыңыз, мерзімі",
+      sigOk:"✓ Ed25519 қолтаңба дұрыс", issuerKey:"Қол қойған кілт:", download:"↓ Бағдарлама хаттамасы (JSON)",
+      errPrefix:"Қате: ", ack_word:"түсінікті", noServer:"сервер жоқ — adam_portal іске қосыңыз" }
   };
-  let curLang = "ru", T = I18N.ru;
+  let curLang="ru", T=I18N.ru, ORG=null, me=null, sessionId=null, sessionLang="ru";
+
+  function esc(s){return (s||"").replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]));}
+  function initials(n){ return (n||"").split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase(); }
+  function today(){ return new Date().toISOString().slice(0,10); }
+  async function api(path, body){
+    const opt={method:body?"POST":"GET",headers:{"Content-Type":"application/json"}};
+    if(body) opt.body=JSON.stringify(body);
+    const r=await fetch(path,opt); if(!r.ok) throw new Error("HTTP "+r.status); return r.json();
+  }
+  function show(sec){ ["login","cabinet","session","result"].forEach(s=>$(s).classList.toggle("hidden",s!==sec)); }
 
   function applyLang(l){
-    curLang = (l === "kk") ? "kk" : "ru"; T = I18N[curLang];
-    document.documentElement.lang = T.htmllang;
-    $("tag").textContent = T.tag;
-    $("t-title").textContent = T.title;
-    $("t-l-worker").textContent = T.lWorker;
-    $("t-l-wid").textContent = T.lWid;
-    $("t-l-prog").textContent = T.lProg;
-    $("t-l-answer").textContent = T.lAnswer;
-    renderProgram();
-    if (!$("camwrap").classList.contains("nocam")) $("camnote").textContent = T.camnote;
-    $("startBtn").textContent = T.start;
-    $("t-hint").textContent = T.hint;
-    $("voiceBtn").textContent = voiceOn ? T.voiceOn : T.voiceOff;
-    $("replayBtn").textContent = T.replay;
-    $("sendBtn").textContent = T.send;
-    $("ackBtn").textContent = T.ack;
-    $("restartBtn").textContent = T.restart;
-    $("download").textContent = T.download;
+    curLang=(l==="kk")?"kk":"ru"; T=I18N[curLang];
+    document.documentElement.lang=T.htmllang; $("tag").textContent=T.tag;
+    $("t-title").textContent=T.title; $("t-l-shop").textContent=T.lShop; $("t-l-section").textContent=T.lSection;
+    $("t-l-worker").textContent=T.lWorker; $("t-l-answer").textContent=T.lAnswer;
+    $("enterBtn").textContent=T.enter; $("t-hint").textContent=T.hint;
+    $("t-prog").textContent=T.prog; $("t-hist").textContent=T.hist;
+    $("switchBtn").textContent=T.switch; $("sendBtn").textContent=T.send; $("ackBtn").textContent=T.ack;
+    $("backBtn").textContent=T.back; $("download").textContent=T.download;
+    $("voiceBtn").textContent=voiceOn?T.voiceOn:T.voiceOff; $("replayBtn").textContent=T.replay;
+    if(!$("camwrap").classList.contains("nocam")) $("camnote").textContent=T.camnote;
+    renderRoster(); if(me) renderCabinet();
   }
 
-  async function api(path, body) {
-    const opt = { method: body ? "POST" : "GET", headers: { "Content-Type": "application/json" } };
-    if (body) opt.body = JSON.stringify(body);
-    const r = await fetch(path, opt);
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    return r.json();
+  // ---- roster login ----
+  async function loadOrg(){
+    try{ ORG=(await api("/api/org")).shops; }catch(e){ ORG=[]; }
+    renderRoster();
+  }
+  function renderRoster(){
+    if(!ORG||!ORG.length){ $("selShop").innerHTML=`<option>${T.noServer}</option>`; return; }
+    $("selShop").innerHTML=ORG.map((s,i)=>`<option value="${i}">${esc(s.shop)}</option>`).join("");
+    fillSections();
+  }
+  function fillSections(){
+    const shop=ORG[+$("selShop").value||0]; if(!shop) return;
+    $("selSection").innerHTML=shop.sections.map((s,i)=>`<option value="${i}">${esc(s.section)}</option>`).join("");
+    fillWorkers();
+  }
+  function fillWorkers(){
+    const shop=ORG[+$("selShop").value||0]; const sec=shop&&shop.sections[+$("selSection").value||0];
+    if(!sec) return;
+    $("selWorker").innerHTML=sec.workers.map(w=>`<option value="${w.id}">${esc(w.name)} — ${esc(w.position)}</option>`).join("");
   }
 
-  // ---- программа инструктажа: список тем (сервер задаёт порядок) ----
-  let PROGRAM = [];
-  async function loadProgram() {
-    try { PROGRAM = await api("/api/program"); }
-    catch (e) { PROGRAM = []; }
-    renderProgram();
+  async function loadCabinet(id){
+    try{ me=await api("/api/worker",{id}); }catch(e){ $("loginErr").textContent=T.errPrefix+e.message; return; }
+    show("cabinet"); renderCabinet(); initCam();
   }
-  function renderProgram() {
-    if (!PROGRAM.length) { $("progList").innerHTML = `<div class="t">${T.procNoServer}</div>`; return; }
-    $("progList").innerHTML = PROGRAM.map((p, i) =>
-      `<div class="t"><span class="i">${i + 1}.</span><span>${curLang === "kk" ? p.title_kk : p.title_ru}</span></div>`
-    ).join("");
+  function statusClass(s){ return s==="admitted"?"ok":s==="retake"?"bad":"none"; }
+  function statusLabel(s){ return s==="admitted"?T.admitted:s==="retake"?T.retake:T.none; }
+  function renderCabinet(){
+    if(!me) return;
+    $("c-ava").innerHTML = esc(initials(me.name));
+    $("c-name").textContent=me.name; $("c-pos").textContent=me.position;
+    $("c-loc").textContent=`${me.shop} · ${me.section} · ${me.id}`;
+    const sc=$("c-status"); sc.className="statuschip "+statusClass(me.status); sc.textContent=statusLabel(me.status);
+    // program topics
+    $("c-topics").innerHTML=me.topics.map(t=>{
+      const st=t.status; const ic=st==="passed"?"✓":st==="failed"?"✗":"•";
+      const lbl=st==="passed"?T.stPassed:st==="failed"?T.stFailed:T.stPending;
+      const sc2=(t.passedCount!=null)?`${t.passedCount}/${t.total}`:"";
+      return `<li><span class="ic ${st}">${ic}</span><span class="tt">${esc(curLang==="kk"?t.titleKk:t.titleRu)}</span><span class="sc">${lbl} ${sc2}</span></li>`;
+    }).join("");
+    // action button state
+    const locked = me.status==="retake" && me.retakeAfter && me.retakeAfter > today();
+    const btn=$("startBtn"); btn.disabled=locked;
+    btn.textContent = me.status==="admitted"?T.startAgain : me.status==="retake"?T.startRetake : T.start;
+    $("c-actionnote").textContent = locked ? `${T.retakeLock} ${me.retakeAfter}` : (me.status==="admitted"?T.admittedNote:"");
+    // history
+    if(!me.history.length){ $("c-history").innerHTML=`<div class="muted">${T.noHist}</div>`; }
+    else{
+      $("c-history").innerHTML=`<table><thead><tr>${T.histCols.map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>`+
+        me.history.map(h=>`<tr>
+          <td class="muted">${h.issuanceDate||"—"}</td>
+          <td><span class="pill ${h.admitted?'ok':'bad'}">${h.admitted?T.hResAdm:T.hResDen}</span></td>
+          <td class="muted">${h.topicsPassed}/${h.topicsTotal}</td>
+          <td class="muted">${h.questionsCorrect}/${h.questionsTotal}</td>
+          <td class="muted">${(!h.admitted&&h.retakeAfter)?h.retakeAfter:"—"}</td>
+        </tr>`).join("")+`</tbody></table>`;
+    }
   }
 
-  function show(sec) { ["login","session","result"].forEach(s => $(s).classList.toggle("hidden", s !== sec)); }
-
-  // ---- голос ИИ: НАШ нейронный казахский (/api/tts), браузер — fallback ----
-  let voiceOn = true, ttsVoice = null, lastText = "", curAudio = null, sessionLang = "ru";
-  const synth = window.speechSynthesis || null;
-  function pickVoice() {
-    if (!synth) return;
-    const vs = synth.getVoices() || [];
-    ttsVoice = vs.find(v => /^kk/i.test(v.lang)) || vs.find(v => /^ru/i.test(v.lang)) || vs[0] || null;
+  // ---- voice (our neural kk via /api/tts; browser ru) ----
+  let voiceOn=true, ttsVoice=null, lastText="", curAudio=null;
+  const synth=window.speechSynthesis||null;
+  function pickVoice(){ if(!synth) return; const vs=synth.getVoices()||[]; ttsVoice=vs.find(v=>/^kk/i.test(v.lang))||vs.find(v=>/^ru/i.test(v.lang))||vs[0]||null; }
+  if(synth){ pickVoice(); synth.onvoiceschanged=pickVoice; }
+  function stopAudio(){ if(curAudio){curAudio.pause();curAudio=null;} if(synth) synth.cancel(); }
+  // Убираем кавычки/скобки из ОЗВУЧКИ — иначе голос читает «кавычки».
+  function forSpeech(s){ return (s||"").replace(/[«»„‟“”"'`´‹›]/g," ").replace(/\s{2,}/g," ").trim(); }
+  function browserSpeak(text){
+    if(!synth) return; synth.cancel();
+    const u=new SpeechSynthesisUtterance(forSpeech(text));
+    const vs=synth.getVoices()||[];
+    const v=sessionLang==="ru"?(vs.find(x=>/^ru/i.test(x.lang))||ttsVoice):ttsVoice;
+    if(v) u.voice=v; u.lang=sessionLang==="ru"?"ru-RU":(ttsVoice?ttsVoice.lang:"kk-KZ"); u.rate=0.98; synth.speak(u);
   }
-  if (synth) { pickVoice(); synth.onvoiceschanged = pickVoice; }
-  function stopAudio() { if (curAudio) { curAudio.pause(); curAudio = null; } if (synth) synth.cancel(); }
-  function browserSpeak(text) {
-    if (!synth) return;
-    synth.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    const vs = synth.getVoices() || [];
-    const v = sessionLang === "ru" ? (vs.find(x => /^ru/i.test(x.lang)) || ttsVoice) : ttsVoice;
-    if (v) u.voice = v;
-    u.lang = sessionLang === "ru" ? "ru-RU" : (ttsVoice ? ttsVoice.lang : "kk-KZ");
-    u.rate = 0.98;
-    synth.speak(u);
-  }
-  async function speak(text) {
-    lastText = text || "";
-    if (!voiceOn || !text) return;
-    stopAudio();
-    // Русский → браузерный ru-голос (хорош). Казахский → наш нейронный /api/tts.
-    if (sessionLang === "ru") { browserSpeak(text); return; }
-    try {
-      const r = await fetch("/api/tts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
-      if (r.ok) {
-        const blob = new Blob([await r.arrayBuffer()], { type: "audio/wav" });
-        curAudio = new Audio(URL.createObjectURL(blob));
-        curAudio.play().catch(() => browserSpeak(text));
-        return;
-      }
-    } catch (e) {}
+  async function speak(text){
+    lastText=text||""; if(!voiceOn||!text) return; stopAudio();
+    if(sessionLang==="ru"){ browserSpeak(text); return; }
+    try{ const r=await fetch("/api/tts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:forSpeech(text)})});
+      if(r.ok){ const blob=new Blob([await r.arrayBuffer()],{type:"audio/wav"}); curAudio=new Audio(URL.createObjectURL(blob)); curAudio.play().catch(()=>browserSpeak(text)); return; } }catch(e){}
     browserSpeak(text);
   }
 
-  function render(reply) {
-    if (reply.done) { stopAudio(); finishProgram(reply); return; }
-    // program progress «Тема N из M: <title>»
-    if (reply.topicIndex && reply.topicCount) {
-      $("progress").innerHTML = `${T.progTopic} <b>${reply.topicIndex}</b> ${T.progOf} <b>${reply.topicCount}</b>` +
-        (reply.topicTitle ? ` · ${reply.topicTitle}` : "");
+  // ---- camera proctoring ----
+  let camStream=null;
+  async function initCam(){
+    if(camStream) return;
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ noCam(T.camUnavail); return; }
+    try{ camStream=await navigator.mediaDevices.getUserMedia({video:{width:320,height:240},audio:false}); $("cam").srcObject=camStream; $("camwrap").classList.remove("nocam"); $("camnote").textContent=T.camnote; }
+    catch(e){ noCam(T.camDenied); }
+  }
+  function noCam(msg){ camStream=null; $("camwrap").classList.add("nocam"); $("camnote").textContent="⚠ "+msg; }
+  async function captureProctor(){
+    if(!camStream) return "";
+    const v=$("cam"),c=document.createElement("canvas");
+    c.width=v.videoWidth||320; c.height=v.videoHeight||240; c.getContext("2d").drawImage(v,0,0,c.width,c.height);
+    const blob=await new Promise(r=>c.toBlob(r,"image/jpeg",0.85)); if(!blob) return "";
+    const r=await fetch("/api/proctor",{method:"POST",headers:{"Content-Type":"image/jpeg"},body:blob});
+    if(!r.ok) return ""; return (await r.json()).proctorSha256||"";
+  }
+  function stopCam(){ if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; } }
+
+  // ---- program flow ----
+  function render(reply){
+    if(reply.done){ stopAudio(); finishProgram(reply); return; }
+    if(reply.topicIndex&&reply.topicCount){
+      $("progress").innerHTML=`${T.progTopic} <b>${reply.topicIndex}</b> ${T.progOf} <b>${reply.topicCount}</b>`+(reply.topicTitle?` · ${reply.topicTitle}`:"");
     }
-    const isQuiz = reply.isQuestion === true;
-    $("prompt").textContent = reply.text;
-    $("prompt").classList.toggle("quiz", isQuiz);
-    const kind = $("slidekind");
-    kind.textContent = isQuiz ? T.kindQuiz : T.kindInstr;
-    kind.classList.toggle("quiz", isQuiz);
-    $("phase").textContent = isQuiz ? T.phaseQuiz : T.phaseInstr;
+    const isQuiz=reply.isQuestion===true;
+    $("prompt").textContent=reply.text; $("prompt").classList.toggle("quiz",isQuiz);
+    const kind=$("slidekind"); kind.textContent=isQuiz?T.kindQuiz:T.kindInstr; kind.classList.toggle("quiz",isQuiz);
+    $("phase").textContent=isQuiz?T.phaseQuiz:T.phaseInstr;
     speak(reply.text);
   }
-
-  // ---- камера-прокторинг: снимок при старте → хеш в допуск ----
-  let camStream = null;
-  async function initCam() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { noCam(T.camUnavail); return; }
-    try {
-      camStream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 }, audio: false });
-      $("cam").srcObject = camStream;
-    } catch (e) { noCam(T.camDenied); }
+  async function start(){
+    sessionLang=$("lang").value;
+    try{
+      let proctorSha256=""; try{ proctorSha256=await captureProctor(); }catch(e){}
+      const res=await api("/api/start",{worker:me.name,workerId:me.id,proctorSha256,lang:sessionLang});
+      stopCam(); sessionId=res.sessionId; show("session");
+      $("meta").textContent=(proctorSha256?T.proctorOk:""); render(res); $("answer").focus();
+    }catch(e){ $("c-actionnote").textContent=T.errPrefix+e.message; }
   }
-  function noCam(msg) {
-    camStream = null;
-    $("camwrap").classList.add("nocam");
-    $("camnote").textContent = "⚠ " + msg;
+  async function send(text){
+    if(!sessionId) return; const input=text!==undefined?text:$("answer").value; $("answer").value="";
+    try{ render(await api("/api/answer",{sessionId,input})); }catch(e){ $("phase").textContent=T.errPrefix+e.message; }
   }
-  async function captureProctor() {
-    if (!camStream) return "";
-    const v = $("cam");
-    const c = document.createElement("canvas");
-    c.width = v.videoWidth || 320; c.height = v.videoHeight || 240;
-    c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
-    const blob = await new Promise(r => c.toBlob(r, "image/jpeg", 0.85));
-    if (!blob) return "";
-    const r = await fetch("/api/proctor", { method: "POST", headers: { "Content-Type": "image/jpeg" }, body: blob });
-    if (!r.ok) return "";
-    return (await r.json()).proctorSha256 || "";
-  }
-  function stopCam() { if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; } }
-
-  async function start() {
-    const worker = $("worker").value.trim(), wid = $("wid").value.trim();
-    sessionLang = $("lang").value;
-    if (!worker) { $("loginErr").textContent = T.needName; return; }
-    try {
-      let proctorSha256 = "";
-      try { proctorSha256 = await captureProctor(); } catch (e) {}
-      const res = await api("/api/start", { worker, workerId: wid, proctorSha256, lang: sessionLang });
-      stopCam();
-      sessionId = res.sessionId;
-      show("session");
-      $("meta").textContent = (proctorSha256 ? T.proctorOk : "");
-      render(res);
-      $("answer").focus();
-    } catch (e) { $("loginErr").textContent = T.errPrefix + e.message; }
-  }
-
-  async function send(text) {
-    if (!sessionId) return;
-    const input = text !== undefined ? text : $("answer").value;
-    $("answer").value = "";
-    try { render(await api("/api/answer", { sessionId, input })); }
-    catch (e) { $("phase").textContent = T.errPrefix + e.message; }
-  }
-
-  // Final aggregate result over the whole program.
-  function finishProgram(reply) {
-    const a = reply.aggregate || {};
-    show("result");
-    const v = $("verdict");
-    v.className = "verdict " + (a.admitted ? "ok" : "bad");
-    v.innerHTML = "<span>●</span><span>" + (a.admitted
-      ? `${T.admitted}`
-      : `${T.denied} — ${T.denyTail} ${a.retakeAfter || ""}`) + "</span>";
-    const dn = $("denynote");
-    if (!a.admitted && a.stoppedAt) {
-      dn.style.display = "block";
-      dn.textContent = `${T.stopped} «${a.stoppedAt}». ${T.prep} ${a.retakeAfter}.`;
-    } else { dn.style.display = "none"; }
-    $("agg").innerHTML =
-      `<div class="c"><div class="n">${a.topicsPassed}/${a.topicsTotal}</div><div class="l">${T.aggTopics}</div></div>` +
+  function finishProgram(reply){
+    const a=reply.aggregate||{}; show("result");
+    const v=$("verdict"); v.className="verdict "+(a.admitted?"ok":"bad");
+    v.innerHTML="<span>●</span><span>"+(a.admitted?T.verAdm:`${T.verDen} ${a.retakeAfter||""}`)+"</span>";
+    const dn=$("denynote");
+    if(!a.admitted&&a.stoppedAt){ dn.classList.remove("hidden"); dn.textContent=`${T.stopped} «${a.stoppedAt}». ${T.prep} ${a.retakeAfter}.`; }
+    else dn.classList.add("hidden");
+    $("agg").innerHTML=`<div class="c"><div class="n">${a.topicsPassed}/${a.topicsTotal}</div><div class="l">${T.aggTopics}</div></div>`+
       `<div class="c"><div class="n">${a.questionsCorrect}/${a.questionsTotal}</div><div class="l">${T.aggQuestions}</div></div>`;
-    $("topiclist").innerHTML = (a.topics || []).map(t =>
-      `<li><span class="tp ${t.admitted?'ok':'bad'}">${t.admitted?T.tPass:T.tFail}</span>` +
-      `<span>${t.title}</span><span class="sc">${t.passedCount}/${t.total}` +
-      `${t.valid?'':' · '+T.sigBad}</span></li>`
-    ).join("");
-    const allValid = (a.topics || []).every(t => t.valid);
-    $("issuer").textContent = (allValid ? T.sigOk + " · " : "") + T.issuerKey + (a.publicKey || "").slice(0, 24) + "…";
-    const blob = new Blob([JSON.stringify(reply.sealed, null, 2)], { type: "application/json" });
-    $("download").href = URL.createObjectURL(blob);
+    $("reslist").innerHTML=(a.topics||[]).map(t=>`<li><span class="tp ${t.admitted?'ok':'bad'}">${t.admitted?T.resPass:T.resFail}</span><span>${esc(t.title)}</span><span class="sc">${t.passedCount}/${t.total}</span></li>`).join("");
+    const allValid=(a.topics||[]).every(t=>t.valid);
+    $("issuer").textContent=(allValid?T.sigOk+" · ":"")+T.issuerKey+" "+(a.publicKey||"").slice(0,24)+"…";
+    const blob=new Blob([JSON.stringify(reply.sealed,null,2)],{type:"application/json"}); $("download").href=URL.createObjectURL(blob);
   }
 
-  $("startBtn").onclick = start;
-  $("sendBtn").onclick = () => send();
-  $("ackBtn").onclick = () => send(T.ack_word);
-  $("answer").addEventListener("keydown", e => { if (e.key === "Enter") send(); });
-  $("voiceBtn").onclick = () => {
-    voiceOn = !voiceOn;
-    $("voiceBtn").classList.toggle("off", !voiceOn);
-    $("voiceBtn").textContent = voiceOn ? T.voiceOn : T.voiceOff;
-    if (!voiceOn) stopAudio(); else speak(lastText);
-  };
-  $("replayBtn").onclick = () => speak(lastText);
-  $("lang").onchange = () => { applyLang($("lang").value); };
+  // ---- wiring ----
+  $("selShop").onchange=fillSections; $("selSection").onchange=fillWorkers;
+  $("enterBtn").onclick=()=>{ const id=$("selWorker").value; if(id) loadCabinet(id); };
+  $("startBtn").onclick=start;
+  $("switchBtn").onclick=()=>{ stopCam(); me=null; show("login"); };
+  $("backBtn").onclick=()=>{ if(me) loadCabinet(me.id); else show("login"); };
+  $("sendBtn").onclick=()=>send(); $("ackBtn").onclick=()=>send(T.ack_word);
+  $("answer").addEventListener("keydown",e=>{ if(e.key==="Enter") send(); });
+  $("voiceBtn").onclick=()=>{ voiceOn=!voiceOn; $("voiceBtn").classList.toggle("off",!voiceOn); $("voiceBtn").textContent=voiceOn?T.voiceOn:T.voiceOff; if(!voiceOn) stopAudio(); else speak(lastText); };
+  $("replayBtn").onclick=()=>speak(lastText);
+  $("lang").onchange=()=>applyLang($("lang").value);
+  if(!synth){ $("voiceBtn").classList.add("off"); $("voiceBtn").textContent=T.voiceNo; $("voiceBtn").disabled=true; }
 
   applyLang("ru");
-  if (!synth) { $("voiceBtn").classList.add("off"); $("voiceBtn").textContent = T.voiceNo; $("voiceBtn").disabled = true; }
-  loadProgram();
-  initCam();
+  loadOrg();
 </script>
 </body>
 </html>

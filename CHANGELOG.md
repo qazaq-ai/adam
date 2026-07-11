@@ -28,6 +28,42 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [6.19.0] — 2026-07-09 — worker cabinet + ИТР org dashboard + TTS quote fix + brand-neutral
+
+Turns the portal from a one-shot flow into a real product surface: a
+personal worker cabinet with history, and an ИТР dashboard over the whole
+org chart with live statistics.
+
+- **Org chart (`adam-portal`).** New цех → участок → персонал model, seeded
+  from [`demo/org_seed.json`](demo/org_seed.json) (override with
+  `data/portal/org.json`). Each worker's допуск status/history is derived
+  from the signed journal by table № (`worker_id`). New endpoints:
+  `GET /api/org` (tree + top-line stats) and `POST /api/worker` (one
+  person's profile + per-topic program status + full attempt history).
+- **Worker cabinet ([`portal_worker.html`](demo/portal_worker.html)).** Login
+  is now a roster pick (цех → участок → ФИО). The cabinet shows the
+  assigned program with per-topic status (сдано / провалено / ожидает), a
+  status chip (допущен / пересдача / не начинал), the full **exam history**
+  (date, verdict, topics, questions, retake date), and a retake-gated
+  action button. Then the program flow, then back to the cabinet.
+- **ИТР dashboard ([`portal_itr.html`](demo/portal_itr.html)).** Rebuilt as a
+  full admin board with a **left sidebar** (обзор · статусы · цеха/участки ·
+  категории инструктажей), **KPI cards** — including **онлайн сейчас**
+  (workers currently taking a зачёт, from live sessions) plus допущено / на
+  пересдаче / не начинали / готовность % — and **charts**: a status donut, a
+  per-цех readiness bar chart, and a per-category (briefing type) stacked
+  pass/fail/pending chart. The worker table shows avatars with an online
+  indicator, groups by цех, and filters by any sidebar selection (incl.
+  per-category pass/fail) + free-text search; polls live every 3 s.
+  New portal data: `/api/org` now returns online sessions, per-category
+  aggregates, and per-worker topic flags.
+- **TTS quote fix.** The Russian browser voice no longer reads out
+  «кавычки» — quote/guillemet characters are stripped before speech (worker
+  + dialog pages), display text unchanged.
+- **Brand-neutral.** All four demo pages and the credential `site` field now
+  say **Company name** instead of a specific company, so the demo drops onto
+  any prospect.
+
 ## [6.18.1] — 2026-07-08 — CI hotfix: clippy lints from the Rust 1.97 toolchain bump
 
 CI's stable toolchain moved to Rust 1.97, whose clippy promotes

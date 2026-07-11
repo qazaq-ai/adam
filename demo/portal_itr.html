@@ -3,172 +3,301 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ERG/ССГПО · ОТ/ТБ — дашборд ИТР</title>
+<title>Company name · ОТ/ТБ — дашборд ИТР</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cg stroke='%23d27700' stroke-width='45' stroke-linecap='round'%3E%3Cline x1='76' y1='76' x2='324' y2='324'/%3E%3Cline x1='137' y1='37' x2='363' y2='263'/%3E%3Cline x1='37' y1='137' x2='263' y2='363'/%3E%3Cline x1='76' y1='324' x2='324' y2='76'/%3E%3Cline x1='137' y1='363' x2='363' y2='137'/%3E%3Cline x1='37' y1='263' x2='263' y2='37'/%3E%3C/g%3E%3C/svg%3E">
 <style>
   :root{
     --bg:#EBEEF0;--surface:#FBFCFD;--surface-2:#F1F3F5;--ink:#14181B;--ink-soft:#545C63;
     --ink-faint:#8A9299;--line:#D2D8DC;--line-strong:#B8C0C6;--accent:#d27700;
     --verified:#1E8A5C;--verified-soft:#DBEEE4;--danger:#C13A34;--danger-soft:#F3DAD8;
+    --warn:#B8791A;--warn-soft:#F5E6C8;--info:#2D6BB8;--info-soft:#DCE8F5;
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    --shadow:0 1px 2px rgba(20,24,27,.04),0 2px 10px rgba(20,24,27,.05);--sb:16rem;
   }
   @media (prefers-color-scheme:dark){:root{
     --bg:#0E1113;--surface:#171B1E;--surface-2:#1E2327;--ink:#ECEFF1;--ink-soft:#9DA5AB;
     --ink-faint:#6B747B;--line:#272D32;--line-strong:#353D43;--accent:#E0A63F;
-    --verified:#37B87F;--verified-soft:#16281F;--danger:#E6635C;--danger-soft:#2C1917;}}
+    --verified:#37B87F;--verified-soft:#16281F;--danger:#E6635C;--danger-soft:#2C1917;
+    --warn:#E0A63F;--warn-soft:#2E2716;--info:#5B9BE0;--info-soft:#152436;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 2px 10px rgba(0,0,0,.28);}}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;font-variant-numeric:tabular-nums}
-  .bar{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
-  .bar .in{max-width:72rem;margin:0 auto;padding:.7rem 1.4rem;display:flex;align-items:center;gap:.6rem}
-  .logo{width:24px;height:24px;flex:none}
-  .brand{font-family:var(--mono);font-weight:700;font-size:.9rem}
-  .brand b{color:var(--accent)}
-  .tag{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint)}
+  .layout{display:grid;grid-template-columns:var(--sb) 1fr;min-height:100vh}
+  /* ---- sidebar ---- */
+  .sidebar{background:var(--surface);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow-y:auto;padding:1rem .8rem}
+  .sbrand{display:flex;align-items:center;gap:.55rem;padding:.3rem .4rem 1rem}
+  .sbrand svg{width:26px;height:26px}
+  .sbrand .b{font-family:var(--mono);font-weight:700;font-size:.9rem}
+  .sbrand .b b{color:var(--accent)}
+  .navsec{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin:1rem .4rem .35rem}
+  .navitem{display:flex;align-items:center;gap:.5rem;padding:.45rem .55rem;border-radius:8px;cursor:pointer;font-size:.86rem;color:var(--ink-soft)}
+  .navitem:hover{background:var(--surface-2)}
+  .navitem.active{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);font-weight:600}
+  .navitem .cnt{margin-left:auto;font-family:var(--mono);font-size:.72rem;color:var(--ink-faint)}
+  .navitem.active .cnt{color:var(--accent)}
+  .dot{width:8px;height:8px;border-radius:50%;flex:none}
+  .dot.g{background:var(--verified)} .dot.r{background:var(--danger)} .dot.n{background:var(--ink-faint)} .dot.a{background:var(--accent)}
+  /* ---- main ---- */
+  .main{min-width:0}
+  .topbar{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:9;padding:.7rem 1.4rem;display:flex;align-items:center;gap:.7rem}
+  .topbar h1{font-size:1.05rem;font-weight:700;margin:0}
+  .live{font-family:var(--mono);font-size:.7rem;color:var(--verified);display:inline-flex;align-items:center;gap:.3rem}
+  .live::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--verified) 55%,transparent)}70%{box-shadow:0 0 0 6px transparent}100%{box-shadow:0 0 0 0 transparent}}
   .lang{margin-left:auto;font-family:var(--mono);font-size:.78rem;padding:.35rem .5rem;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface-2);color:var(--ink)}
-  main{max-width:72rem;margin:0 auto;padding:1.6rem 1.4rem 4rem}
-  h1{font-size:1.4rem;margin:.2rem 0 1.1rem}
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:1.4rem}
-  @media(max-width:640px){.stats{grid-template-columns:1fr 1fr}}
-  .stat{background:var(--surface);padding:1rem 1.1rem}
-  .stat .n{font-family:var(--mono);font-size:1.6rem;font-weight:700}
-  .stat .l{font-size:.78rem;color:var(--ink-soft)}
-  .stat .n.ok{color:var(--verified)} .stat .n.bad{color:var(--danger)}
-  table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
-  th,td{text-align:left;padding:.6rem .8rem;border-bottom:1px solid var(--line);font-size:.86rem}
-  th{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);background:var(--surface-2)}
+  .content{padding:1.3rem 1.4rem 4rem;max-width:78rem}
+  /* ---- KPI cards ---- */
+  .cards{display:grid;grid-template-columns:repeat(6,1fr);gap:.8rem;margin-bottom:1.3rem}
+  @media(max-width:1100px){.cards{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:560px){.cards{grid-template-columns:repeat(2,1fr)}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:.95rem 1rem;box-shadow:var(--shadow)}
+  .card .n{font-family:var(--mono);font-size:1.7rem;font-weight:700;line-height:1;display:flex;align-items:center;gap:.4rem}
+  .card .l{font-size:.74rem;color:var(--ink-soft);margin-top:.4rem}
+  .card.ok .n{color:var(--verified)} .card.bad .n{color:var(--danger)} .card.warn .n{color:var(--warn)} .card.info .n{color:var(--info)}
+  .card .live{font-size:.62rem}
+  .readybar{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden;margin-top:.5rem;border:1px solid var(--line)}
+  .readybar>i{display:block;height:100%;background:var(--verified)}
+  /* ---- charts ---- */
+  .charts{display:grid;grid-template-columns:1fr 1.4fr;gap:1rem;margin-bottom:1.3rem}
+  @media(max-width:900px){.charts{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:1.1rem 1.2rem;box-shadow:var(--shadow)}
+  .panel h3{font-size:.9rem;margin:0 0 1rem;font-weight:700}
+  .donutwrap{display:flex;align-items:center;gap:1.2rem}
+  .donut{width:130px;height:130px;border-radius:50%;flex:none;display:grid;place-items:center;position:relative}
+  .donut::after{content:"";position:absolute;inset:20px;border-radius:50%;background:var(--surface)}
+  .donut .mid{position:relative;z-index:1;text-align:center}
+  .donut .mid .p{font-family:var(--mono);font-size:1.5rem;font-weight:700}
+  .donut .mid .s{font-size:.64rem;color:var(--ink-faint)}
+  .legend{display:flex;flex-direction:column;gap:.45rem;font-size:.82rem}
+  .legend .row{display:flex;align-items:center;gap:.5rem}
+  .legend .row .v{margin-left:auto;font-family:var(--mono);color:var(--ink-soft)}
+  .bars{display:flex;flex-direction:column;gap:.7rem}
+  .barrow .top{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.25rem}
+  .barrow .top .v{font-family:var(--mono);font-size:.76rem;color:var(--ink-soft)}
+  .track{height:9px;border-radius:5px;background:var(--surface-2);overflow:hidden;display:flex;border:1px solid var(--line)}
+  .track i{display:block;height:100%}
+  .track i.p{background:var(--verified)} .track i.f{background:var(--danger)} .track i.n{background:var(--line-strong)}
+  /* ---- table ---- */
+  .tablewrap{background:var(--surface);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
+  .tabletop{display:flex;align-items:center;gap:.7rem;padding:.8rem 1rem;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .tabletop .ttl{font-weight:700;font-size:.95rem}
+  .search{margin-left:auto;min-width:12rem;padding:.5rem .7rem;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface-2);color:var(--ink);font-size:.86rem}
+  table{width:100%;border-collapse:collapse}
+  th,td{text-align:left;padding:.55rem .8rem;font-size:.85rem;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);font-weight:600;background:var(--surface-2)}
   tr:last-child td{border-bottom:none}
-  td.mono{font-family:var(--mono);font-size:.78rem;color:var(--ink-faint)}
-  .pill{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:.15rem .5rem;border-radius:5px}
+  .who{display:flex;align-items:center;gap:.6rem}
+  .ava{width:32px;height:32px;border-radius:50%;flex:none;display:grid;place-items:center;font-family:var(--mono);font-size:.72rem;font-weight:700;color:#fff;background:var(--accent);position:relative}
+  .ava img{width:100%;height:100%;border-radius:50%;object-fit:cover;transform:scaleX(-1)}
+  .ava .on{position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;background:var(--verified);border:2px solid var(--surface)}
+  .nm{font-weight:600} .pos{font-size:.73rem;color:var(--ink-faint)}
+  .pill{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:.14rem .55rem;border-radius:999px;white-space:nowrap;display:inline-flex;gap:.3rem;align-items:center}
   .pill.ok{color:var(--verified);background:var(--verified-soft)} .pill.bad{color:var(--danger);background:var(--danger-soft)}
-  .v{font-family:var(--mono);font-size:.8rem} .v.y{color:var(--verified)} .v.n{color:var(--danger)}
-  .dots{display:inline-flex;gap:3px;margin-left:.3rem;vertical-align:middle}
-  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;cursor:help}
-  .dot.ok{background:var(--verified)} .dot.bad{background:var(--danger)}
-  .face{width:34px;height:34px;object-fit:cover;border-radius:6px;border:1px solid var(--line-strong);display:block;transform:scaleX(-1)}
-  .idm{font-family:var(--mono);font-size:.9rem;color:var(--ink-faint)}
-  .empty{padding:2rem;text-align:center;color:var(--ink-faint);font-family:var(--mono);font-size:.85rem}
-  .live{margin-left:.5rem;font-family:var(--mono);font-size:.7rem;color:var(--verified)}
+  .pill.none{color:var(--ink-soft);background:var(--surface-2)} .pill.on{color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
+  .mono{font-family:var(--mono);font-size:.8rem;color:var(--ink-soft)} .mono.faint{color:var(--ink-faint)}
+  .sh{padding:.5rem 1rem;background:var(--surface-2);font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);border-bottom:1px solid var(--line)}
+  .empty{padding:2.5rem;text-align:center;color:var(--ink-faint);font-family:var(--mono);font-size:.85rem}
+  @media(max-width:760px){.layout{grid-template-columns:1fr}.sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}.col-q,.col-date{display:none}}
 </style>
 </head>
 <body>
-<div class="bar"><div class="in">
-  <svg class="logo" viewBox="0 0 400 400" aria-hidden="true"><g stroke="#d27700" stroke-width="45" stroke-linecap="round">
-    <line x1="76" y1="76" x2="324" y2="324"/><line x1="137" y1="37" x2="363" y2="263"/><line x1="37" y1="137" x2="263" y2="363"/>
-    <line x1="76" y1="324" x2="324" y2="76"/><line x1="137" y1="363" x2="363" y2="137"/><line x1="37" y1="263" x2="263" y2="37"/></g></svg>
-  <span class="brand">ERG/ССГПО<b>·</b>ОТ/ТБ</span>
-  <span class="tag" id="tag"></span><span class="live" id="live">● live</span>
-  <select id="lang" class="lang">
-    <option value="ru">Русский</option>
-    <option value="kk">Қазақша</option>
-  </select>
-</div></div>
+<div class="layout">
+  <!-- ===== sidebar ===== -->
+  <aside class="sidebar">
+    <div class="sbrand">
+      <svg viewBox="0 0 400 400" aria-hidden="true"><g stroke="#d27700" stroke-width="45" stroke-linecap="round">
+        <line x1="76" y1="76" x2="324" y2="324"/><line x1="137" y1="37" x2="363" y2="263"/><line x1="37" y1="137" x2="263" y2="363"/>
+        <line x1="76" y1="324" x2="324" y2="76"/><line x1="137" y1="363" x2="363" y2="137"/><line x1="37" y1="263" x2="263" y2="37"/></g></svg>
+      <span class="b">Company name<b>·</b>ОТ/ТБ</span>
+    </div>
+    <nav id="nav"></nav>
+  </aside>
 
-<main>
-  <h1 id="h1"></h1>
-  <div class="stats">
-    <div class="stat"><div class="n" id="s-total">0</div><div class="l" id="l-total"></div></div>
-    <div class="stat"><div class="n ok" id="s-adm">0</div><div class="l" id="l-adm"></div></div>
-    <div class="stat"><div class="n bad" id="s-den">0</div><div class="l" id="l-den"></div></div>
-    <div class="stat"><div class="n" id="s-ver">0</div><div class="l" id="l-ver"></div></div>
+  <!-- ===== main ===== -->
+  <div class="main">
+    <div class="topbar">
+      <h1 id="h1"></h1>
+      <span class="live" id="live"></span>
+      <select id="lang" class="lang"><option value="ru">Русский</option><option value="kk">Қазақша</option></select>
+    </div>
+    <div class="content">
+      <div class="cards" id="cards"></div>
+      <div class="charts">
+        <div class="panel"><h3 id="ch-status"></h3><div class="donutwrap"><div class="donut" id="donut"><div class="mid"><div class="p" id="donut-p">0%</div><div class="s" id="donut-s"></div></div></div><div class="legend" id="legend"></div></div></div>
+        <div class="panel"><h3 id="ch-shops"></h3><div class="bars" id="shopbars"></div></div>
+      </div>
+      <div class="panel" style="margin-bottom:1.3rem"><h3 id="ch-cats"></h3><div class="bars" id="catbars"></div></div>
+      <div class="tablewrap">
+        <div class="tabletop"><span class="ttl" id="tbl-ttl"></span><input class="search" id="search" type="search"></div>
+        <div id="tbl"></div>
+      </div>
+    </div>
   </div>
-
-  <div style="overflow-x:auto">
-  <table id="tbl">
-    <thead><tr id="head"></tr></thead>
-    <tbody id="rows"></tbody>
-  </table>
-  </div>
-</main>
+</div>
 
 <script>
   const $ = id => document.getElementById(id);
   const I18N = {
-    ru: {
-      htmllang:"ru", tag:"дашборд ИТР · движок ADAM", h1:"Журнал допусков (годовая программа)",
-      lTotal:"всего работников", lAdm:"допущено", lDen:"на пересдачу", lVer:"подпись верна",
-      cols:["Время","Идент.","Работник","Табельный","Темы","Вопросы","Вердикт","Подпись"],
-      live:"● live", noconn:"○ нет связи",
-      wait:"Ожидание записей… запустите adam_portal и пройдите программу в кабинете работника.",
-      none:"Пока нет записей.",
-      admitted:"допущен", denied:"пересдача", retake:"до", sigOk:"✓ верна", sigBad:"✗ невалидна"
-    },
-    kk: {
-      htmllang:"kk", tag:"ИТҚ дашбордысы · ADAM қозғалтқышы", h1:"Жіберу журналы (жылдық бағдарлама)",
-      lTotal:"барлық қызметкер", lAdm:"жіберілді", lDen:"қайта тапсыруға", lVer:"қолтаңба дұрыс",
-      cols:["Уақыт","Сәйкест.","Қызметкер","Табельдік","Тақырыптар","Сұрақтар","Шешім","Қолтаңба"],
-      live:"● live", noconn:"○ байланыс жоқ",
-      wait:"Жазбалар күтілуде… adam_portal іске қосып, қызметкер кабинетінде бағдарламадан өтіңіз.",
-      none:"Әзірге жазба жоқ.",
-      admitted:"жіберілді", denied:"қайта тапсыру", retake:"дейін", sigOk:"✓ дұрыс", sigBad:"✗ жарамсыз"
-    }
+    ru:{ htmllang:"ru", h1:"Дашборд инженера ОТ и ТБ", live:"онлайн", noconn:"нет связи",
+      navMain:"Обзор", navShops:"Цеха и участки", navCats:"Категории инструктажей", navStatus:"Статусы",
+      overview:"Все работники", online:"Онлайн — сдают", admitted:"Допущено", retake:"На пересдаче", none:"Не начинали",
+      total:"Всего", ready:"Готовность", chStatus:"Распределение статусов", chShops:"Готовность по цехам", chCats:"Категории инструктажей — сдача",
+      search:"Поиск: ФИО, табельный, должность…", cols:["Работник","Статус","Темы","Обновлено","Пересдача"],
+      stAdm:"допущен", stRet:"пересдача", stNone:"не начинал", stOn:"сдаёт", retakeTo:"до",
+      empty:"Нет работников по фильтру.", wait:"Ожидание сервера… запустите adam_portal.",
+      passed:"сдали", failed:"провалили", pending:"не проходили", catAll:"Все категории" },
+    kk:{ htmllang:"kk", h1:"ЕҚ және ТҚ инженерінің дашборды", live:"желіде", noconn:"байланыс жоқ",
+      navMain:"Шолу", navShops:"Цехтар мен учаскелер", navCats:"Нұсқаулық санаттары", navStatus:"Мәртебелер",
+      overview:"Барлық қызметкер", online:"Желіде — тапсыруда", admitted:"Жіберілді", retake:"Қайта тапсыру", none:"Бастамаған",
+      total:"Барлығы", ready:"Дайындық", chStatus:"Мәртебелер бөлінісі", chShops:"Цехтар бойынша дайындық", chCats:"Нұсқаулық санаттары — тапсыру",
+      search:"Іздеу: аты-жөні, табельдік, лауазым…", cols:["Қызметкер","Мәртебе","Тақырыптар","Жаңартылды","Қайта тапсыру"],
+      stAdm:"жіберілді", stRet:"қайта тапсыру", stNone:"бастамаған", stOn:"тапсыруда", retakeTo:"дейін",
+      empty:"Сүзгі бойынша қызметкер жоқ.", wait:"Сервер күтілуде… adam_portal іске қосыңыз.",
+      passed:"тапсырды", failed:"тапсырмады", pending:"өтпеген", catAll:"Барлық санат" }
   };
-  let lang = "ru", T = I18N.ru, lastRows = [], hadConn = false;
+  let lang="ru", T=I18N.ru, data=null, hadConn=false, view={type:"all"}, query="";
+
+  const esc=s=>(s||"").replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]));
+  const initials=n=>(n||"").split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
+  const today=()=>new Date().toISOString().slice(0,10);
+  const tTitle=t=>lang==="kk"?t.titleKk:t.titleRu;
 
   function applyLang(l){
-    lang = (l === "kk") ? "kk" : "ru"; T = I18N[lang];
-    document.documentElement.lang = T.htmllang;
-    document.title = "ERG/ССГПО · ОТ/ТБ — " + T.h1;
-    $("tag").textContent = T.tag;
-    $("h1").textContent = T.h1;
-    $("l-total").textContent = T.lTotal;
-    $("l-adm").textContent = T.lAdm;
-    $("l-den").textContent = T.lDen;
-    $("l-ver").textContent = T.lVer;
-    $("head").innerHTML = T.cols.map(c => `<th>${c}</th>`).join("");
-    $("live").textContent = hadConn ? T.live : T.noconn;
+    lang=(l==="kk")?"kk":"ru"; T=I18N[lang];
+    document.documentElement.lang=T.htmllang;
+    document.title="Company name · ОТ/ТБ — "+(lang==="kk"?"ИТҚ дашбордысы":"дашборд ИТР");
+    $("h1").textContent=T.h1;
+    $("ch-status").textContent=T.chStatus; $("ch-shops").textContent=T.chShops; $("ch-cats").textContent=T.chCats;
+    $("search").placeholder=T.search;
+    $("live").textContent=hadConn?T.live:T.noconn; $("live").style.color=hadConn?"var(--verified)":"var(--ink-faint)";
     render();
+  }
+
+  function allWorkers(){ const out=[]; if(!data) return out;
+    data.shops.forEach(sh=>sh.sections.forEach(se=>se.workers.forEach(w=>out.push(Object.assign({shop:sh.shop,section:se.section},w))))); return out; }
+
+  function renderNav(){
+    if(!data){ $("nav").innerHTML=""; return; }
+    const s=data.stats;
+    let h=`<div class="navsec">${T.navMain}</div>`;
+    h+=navRow({type:"all"},"n",T.overview,s.total);
+    h+=`<div class="navsec">${T.navStatus}</div>`;
+    h+=navRow({type:"status",val:"online"},"a",T.online,s.online);
+    h+=navRow({type:"status",val:"admitted"},"g",T.admitted,s.admitted);
+    h+=navRow({type:"status",val:"retake"},"r",T.retake,s.retake);
+    h+=navRow({type:"status",val:"none"},"n",T.none,s.notStarted);
+    h+=`<div class="navsec">${T.navShops}</div>`;
+    data.shops.forEach(sh=>{ h+=navRow({type:"shop",name:sh.shop},"", sh.shop, `${sh.admitted}/${sh.total}`); });
+    h+=`<div class="navsec">${T.navCats}</div>`;
+    (data.topics||[]).forEach((t,i)=>{ h+=navRow({type:"topic",idx:i},"", tTitle(t), `${t.passed}/${t.passed+t.failed+t.pending}`); });
+    $("nav").innerHTML=h;
+    $("nav").querySelectorAll(".navitem").forEach(el=>{ el.onclick=()=>{ view=JSON.parse(el.getAttribute("data-view")); render(); }; });
+  }
+  function navRow(v,dot,label,cnt){
+    const active=JSON.stringify(v)===JSON.stringify(view);
+    return `<div class="navitem${active?' active':''}" data-view='${esc(JSON.stringify(v))}'>`+
+      (dot?`<span class="dot ${dot}"></span>`:`<span class="dot" style="background:var(--line-strong)"></span>`)+
+      `<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(label)}</span>`+
+      (cnt!=null?`<span class="cnt">${esc(String(cnt))}</span>`:'')+`</div>`;
+  }
+
+  function renderCards(){
+    const s=data.stats, pct=s.total?Math.round(100*s.admitted/s.total):0;
+    $("cards").innerHTML=
+      `<div class="card"><div class="n">${s.total}</div><div class="l">${T.total}</div></div>`+
+      `<div class="card info"><div class="n">${s.online} <span class="live" style="color:var(--info)"></span></div><div class="l">${T.online}</div></div>`+
+      `<div class="card ok"><div class="n">${s.admitted}</div><div class="l">${T.admitted}</div></div>`+
+      `<div class="card bad"><div class="n">${s.retake}</div><div class="l">${T.retake}</div></div>`+
+      `<div class="card warn"><div class="n">${s.notStarted}</div><div class="l">${T.none}</div></div>`+
+      `<div class="card"><div class="n">${pct}%</div><div class="l">${T.ready}</div><div class="readybar"><i style="width:${pct}%"></i></div></div>`;
+  }
+
+  function renderCharts(){
+    const s=data.stats, tot=s.total||1;
+    const a=100*s.admitted/tot, r=100*s.retake/tot, pct=Math.round(100*s.admitted/tot);
+    $("donut").style.background=`conic-gradient(var(--verified) 0 ${a}%, var(--danger) ${a}% ${a+r}%, var(--surface-2) ${a+r}% 100%)`;
+    $("donut-p").textContent=pct+"%"; $("donut-s").textContent=T.ready;
+    $("legend").innerHTML=
+      `<div class="row"><span class="dot g"></span>${T.admitted}<span class="v">${s.admitted}</span></div>`+
+      `<div class="row"><span class="dot r"></span>${T.retake}<span class="v">${s.retake}</span></div>`+
+      `<div class="row"><span class="dot n"></span>${T.none}<span class="v">${s.notStarted}</span></div>`;
+    // per-shop readiness bars
+    $("shopbars").innerHTML=data.shops.map(sh=>{
+      const p=sh.total?Math.round(100*sh.admitted/sh.total):0;
+      return `<div class="barrow"><div class="top"><span>${esc(sh.shop)}</span><span class="v">${sh.admitted}/${sh.total} · ${p}%</span></div>
+        <div class="track"><i class="p" style="width:${p}%"></i></div></div>`;
+    }).join("");
+    // per-category stacked bars
+    $("catbars").innerHTML=(data.topics||[]).map(t=>{
+      const tot2=t.passed+t.failed+t.pending||1;
+      return `<div class="barrow"><div class="top"><span>${esc(tTitle(t))}</span><span class="v">${T.passed} ${t.passed} · ${T.failed} ${t.failed} · ${T.pending} ${t.pending}</span></div>
+        <div class="track"><i class="p" style="width:${100*t.passed/tot2}%"></i><i class="f" style="width:${100*t.failed/tot2}%"></i><i class="n" style="width:${100*t.pending/tot2}%"></i></div></div>`;
+    }).join("");
+  }
+
+  function statusPill(w){
+    if(w.online) return `<span class="pill on">● ${T.stOn}</span>`;
+    if(w.status==="admitted") return `<span class="pill ok">✓ ${T.stAdm}</span>`;
+    if(w.status==="retake") return `<span class="pill bad">↻ ${T.stRet}</span>`;
+    return `<span class="pill none">— ${T.stNone}</span>`;
+  }
+  function matchQuery(w){ if(!query) return true; const q=query.toLowerCase();
+    return (w.name||"").toLowerCase().includes(q)||(w.id||"").toLowerCase().includes(q)||(w.position||"").toLowerCase().includes(q); }
+
+  function renderTable(){
+    let title=T.overview, rows=allWorkers();
+    if(view.type==="status"){ title=({online:T.online,admitted:T.admitted,retake:T.retake,none:T.none})[view.val];
+      rows=rows.filter(w=> view.val==="online"?w.online : w.status===view.val); }
+    else if(view.type==="shop"){ title=view.name; rows=rows.filter(w=>w.shop===view.name); }
+    else if(view.type==="topic"){ const t=data.topics[view.idx]; title=tTitle(t);
+      // annotate each worker with topic status
+      rows=rows.map(w=>Object.assign({},w,{_tf:(w.t||[])[view.idx]||"-"})); }
+    rows=rows.filter(matchQuery);
+    $("tbl-ttl").textContent=title;
+
+    if(!rows.length){ $("tbl").innerHTML=`<div class="empty">${hadConn?T.empty:T.wait}</div>`; return; }
+    const topicMode=view.type==="topic";
+    const head=`<tr>${T.cols.map((c,i)=>`<th class="${i===3?'col-date':''}">${c}</th>`).join("")}</tr>`;
+    // group by shop for readability
+    const byShop={}; rows.forEach(w=>{ (byShop[w.shop]=byShop[w.shop]||[]).push(w); });
+    let body="";
+    Object.keys(byShop).forEach(shop=>{
+      body+=`<tr><td colspan="5" class="sh">${esc(shop)}</td></tr>`;
+      byShop[shop].forEach(w=>{
+        const ava=w.proctorUrl?`<span class="ava"><img src="${w.proctorUrl}" alt="">${w.online?'<span class="on"></span>':''}</span>`:`<span class="ava">${esc(initials(w.name))}${w.online?'<span class="on"></span>':''}</span>`;
+        const retake=(w.status==="retake"&&w.retakeAfter)?`${T.retakeTo} ${w.retakeAfter}`:"—";
+        let statusCell = topicMode
+          ? (w._tf==="p"?`<span class="pill ok">✓ ${T.passed}</span>`:w._tf==="f"?`<span class="pill bad">✗ ${T.failed}</span>`:`<span class="pill none">— ${T.pending}</span>`)
+          : statusPill(w);
+        body+=`<tr>
+          <td><div class="who">${ava}<div><div class="nm">${esc(w.name)}</div><div class="pos">${esc(w.position)} · ${esc(w.section)} · ${esc(w.id)}</div></div></div></td>
+          <td>${statusCell}</td>
+          <td class="mono">${w.topicsPassed}/${w.topicsTotal}</td>
+          <td class="mono faint col-date">${w.lastDate||"—"}</td>
+          <td class="mono faint">${retake}</td>
+        </tr>`;
+      });
+    });
+    $("tbl").innerHTML=`<table><thead>${head}</thead><tbody>${body}</tbody></table>`;
   }
 
   function render(){
-    const rows = lastRows, total = rows.length;
-    const adm = rows.filter(x => x.admitted).length;
-    const ver = rows.filter(x => x.valid).length;
-    $("s-total").textContent = total;
-    $("s-adm").textContent = adm;
-    $("s-den").textContent = total - adm;
-    $("s-ver").textContent = ver;
-    $("rows").innerHTML = total ? rows.slice().reverse().map(x => {
-      const dots = (x.topics||[]).map(t =>
-        `<span class="dot ${t.admitted?'ok':'bad'}" title="${esc(t.title)}: ${t.passedCount}/${t.total}${t.valid?'':' · подпись невалидна'}"></span>`
-      ).join("");
-      const verdict = x.admitted
-        ? `<span class="pill ok">${T.admitted}</span>`
-        : `<span class="pill bad">${T.denied}${x.retakeAfter?` ${T.retake} ${x.retakeAfter}`:''}</span>`;
-      return `
-      <tr>
-        <td class="mono">${x.issuanceDate || "—"}</td>
-        <td>${x.proctorUrl
-          ? `<a href="${x.proctorUrl}" target="_blank" title="camera-proctored"><img class="face" src="${x.proctorUrl}" alt="фото"></a>`
-          : `<span class="idm" title="${esc(x.idMethod)}">${x.idMethod==='camera-proctored'?'📷':'—'}</span>`}</td>
-        <td>${esc(x.worker)}</td>
-        <td class="mono">${esc(x.workerId) || "—"}</td>
-        <td class="mono">${x.topicsPassed}/${x.topicsTotal} <span class="dots">${dots}</span></td>
-        <td class="mono">${x.questionsCorrect}/${x.questionsTotal}</td>
-        <td>${verdict}</td>
-        <td><span class="v ${x.valid?'y':'n'}">${x.valid?T.sigOk:T.sigBad}</span></td>
-      </tr>`; }).join("")
-      : `<tr><td colspan="8" class="empty">${hadConn?T.none:T.wait}</td></tr>`;
+    renderNav();
+    if(!data){ $("cards").innerHTML=""; $("tbl").innerHTML=`<div class="empty">${T.wait}</div>`; return; }
+    renderCards(); renderCharts(); renderTable();
   }
 
-  async function poll() {
-    try {
-      const r = await fetch("/api/admissions");
-      if (r.ok) lastRows = await r.json();
-      hadConn = true;
-      $("live").textContent = T.live;
-      $("live").style.color = "var(--verified)";
-    } catch (e) {
-      hadConn = false;
-      $("live").textContent = T.noconn;
-      $("live").style.color = "var(--ink-faint)";
-    }
+  async function poll(){
+    try{ const r=await fetch("/api/org"); if(r.ok) data=await r.json(); hadConn=true;
+      $("live").textContent=T.live; $("live").style.color="var(--verified)"; }
+    catch(e){ hadConn=false; $("live").textContent=T.noconn; $("live").style.color="var(--ink-faint)"; }
     render();
   }
-  function esc(s){return (s||"").replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]));}
-  $("lang").onchange = () => applyLang($("lang").value);
+  $("search").addEventListener("input",e=>{ query=e.target.value; renderTable(); });
+  $("lang").onchange=()=>applyLang($("lang").value);
   applyLang("ru");
   poll();
-  setInterval(poll, 3000);
+  setInterval(poll,3000);
 </script>
 </body>
 </html>

@@ -35,6 +35,13 @@ fn is_ignored_dir(name: &OsStr) -> bool {
             | Some("venv")
             | Some("__pycache__")
             | Some("site-packages")
+            // **2026-07-09** — `docs/outreach/` holds outreach / pitch
+            // materials (letters, filled forms and the small scripts that
+            // build them for a specific prospect).  It's git-ignored and is
+            // NOT shipped kernel source, so — like the venvs above — the
+            // Rust-only policy must not false-fire on a `.py` form-builder
+            // sitting in a local outreach folder.
+            | Some("outreach")
     )
 }
 

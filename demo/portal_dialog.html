@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ERG/ССГПО · ОТ/ТБ — общий диалог (движок ADAM)</title>
+<title>Company name · ОТ/ТБ — общий диалог (движок ADAM)</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cg stroke='%23d27700' stroke-width='45' stroke-linecap='round'%3E%3Cline x1='76' y1='76' x2='324' y2='324'/%3E%3Cline x1='137' y1='37' x2='363' y2='263'/%3E%3Cline x1='37' y1='137' x2='263' y2='363'/%3E%3Cline x1='76' y1='324' x2='324' y2='76'/%3E%3Cline x1='137' y1='363' x2='363' y2='137'/%3E%3Cline x1='37' y1='263' x2='263' y2='37'/%3E%3C/g%3E%3C/svg%3E">
 <style>
   :root{
@@ -48,7 +48,7 @@
   <svg class="logo" viewBox="0 0 400 400" aria-hidden="true"><g stroke="#d27700" stroke-width="45" stroke-linecap="round">
     <line x1="76" y1="76" x2="324" y2="324"/><line x1="137" y1="37" x2="363" y2="263"/><line x1="37" y1="137" x2="263" y2="363"/>
     <line x1="76" y1="324" x2="324" y2="76"/><line x1="137" y1="363" x2="363" y2="137"/><line x1="37" y1="263" x2="263" y2="37"/></g></svg>
-  <span class="brand">ERG/ССГПО<b>·</b>ОТ/ТБ</span>
+  <span class="brand">Company name<b>·</b>ОТ/ТБ</span>
   <span class="tag" id="tag"></span>
   <select id="lang" class="lang">
     <option value="ru">Русский</option>
@@ -127,9 +127,11 @@
   function pickVoice(){ if(!synth) return; const vs=synth.getVoices()||[]; ttsVoice=vs.find(v=>/^kk/i.test(v.lang))||vs.find(v=>/^ru/i.test(v.lang))||vs[0]||null; }
   if (synth){ pickVoice(); synth.onvoiceschanged=pickVoice; }
   function stopAudio(){ if(curAudio){ curAudio.pause(); curAudio=null; } if(synth) synth.cancel(); }
+  // Убираем кавычки/скобки из ОЗВУЧКИ — иначе голос читает «кавычки».
+  function forSpeech(s){ return (s||"").replace(/[«»„‟“”"'`´‹›]/g," ").replace(/\s{2,}/g," ").trim(); }
   function browserSpeak(t){
     if(!synth) return; synth.cancel();
-    const u=new SpeechSynthesisUtterance(t);
+    const u=new SpeechSynthesisUtterance(forSpeech(t));
     const vs=synth.getVoices()||[];
     // Russian reply → browser ru voice (good); Kazakh → our kk voice.
     const v = lang==="ru" ? (vs.find(x=>/^ru/i.test(x.lang))||ttsVoice) : ttsVoice;
@@ -143,7 +145,7 @@
     // Russian → browser ru voice; Kazakh → our neural /api/tts.
     if(lang==="ru"){ browserSpeak(t); return; }
     try {
-      const r = await fetch("/api/tts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:t})});
+      const r = await fetch("/api/tts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:forSpeech(t)})});
       if (r.ok) {
         const blob = new Blob([await r.arrayBuffer()],{type:"audio/wav"});
         curAudio = new Audio(URL.createObjectURL(blob));
